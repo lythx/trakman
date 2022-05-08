@@ -47,16 +47,17 @@ class Response {
     }
 
     getJson() {
-        console.log(this.#data.toString())
         const changeType = (value, type) => {
-            if (type === 'boolean')
-                return value === '1' ? true : false
-            else if (type === 'int')
-                return parseInt(value)
-            else if (type === 'double')
-                return parseFloat(value)
-            else if (type === 'string')
-                return value
+            switch (type) {
+                case 'boolean':
+                    return value === '1' ? true : false
+                case 'int': case 'i4':
+                    return parseInt(value)
+                case 'double':
+                    return parseFloat(value)
+                default:
+                    return value
+            }
         }
         let json = []
         xml2js.parseString(this.#data.toString(), (err, result) => {
@@ -84,15 +85,14 @@ class Response {
                 }
             }
             else if (Object.keys(value)[0] === 'struct') {
-                for (const key in value.struct[0].member[0]) {
-                    logger.warn(value.struct[0].member[0])
-                    // if (value.struct.member)
-
-                    //     for (const val of el.data[0].value) {
-                    //         const type = Object.keys(val)[0]
-                    //         arr.push(changeType(val[type][0], type))
-                    //     }
+                let obj = {}
+                for (const el of value.struct[0].member) {
+                    const key = el.name[0]
+                    const type = Object.keys(el.value[0])[0]
+                    obj[key] = changeType(el.value[0][type][0], type)
                 }
+
+                arr.push(obj)
             }
             else if (Object.keys(value)[0] === 'boolean')
                 arr.push(changeType(value.boolean[0], 'boolean'))
