@@ -13,9 +13,9 @@ async function main() {
         { value: process.env.SUPERADMIN_PASSWORD, type: 'string' }
     ])
     const c = await client.call('GetNetworkStats')
-    logger.info(a)
-    logger.warn(b)
-    logger.fatal(c)
+    // logger.info(a)
+    // logger.warn(b)
+    logger.fatal(JSON.stringify(c))
 }
 
 main();
