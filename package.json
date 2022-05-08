@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "tracer": "^1.1.5",
+    "xml2js": "^0.4.23"
+  }
+}
