@@ -5,7 +5,7 @@ const logger = require('tracer').colorConsole();
 
 class Socket extends net.Socket {
 
-    hanshakeHeaderSize = null
+    handshakeHeaderSize = null
     handshakeHeader = null
     handshakeStatus = null
     response = null
@@ -18,7 +18,7 @@ class Socket extends net.Socket {
 
     setupListeners() {
         this.on('data', buffer => {
-            if (this.hanshakeHeaderSize === null)
+            if (this.handshakeHeaderSize === null)
                 this.#setHandshakeHeaderSize(buffer)
             else if (this.handshakeHeader === null)
                 this.#handleHandshake(buffer)
@@ -54,12 +54,12 @@ class Socket extends net.Socket {
     }
 
     #setHandshakeHeaderSize(buffer) {
-        this.hanshakeHeaderSize = buffer.readUIntLE(0, 4);
+        this.handshakeHeaderSize = buffer.readUIntLE(0, 4);
     }
 
     #handleHandshake(buffer) {
         this.handshakeHeader = buffer.toString()
-        if (this.hanshakeHeaderSize !== this.handshakeHeader.length
+        if (this.handshakeHeaderSize !== this.handshakeHeader.length
             || this.handshakeHeader !== "GBXRemote 2") {
             this.destroy();
             this.handshakeStatus = 'wrong protocol';
