@@ -20,6 +20,7 @@ async function main() {
     // logger.info(a)
     // logger.warn(b)
     logger.fatal(JSON.stringify(c))
+    process.exit(0);
 }
 
 main();
