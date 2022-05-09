@@ -76,7 +76,11 @@ class Response {
   * @returns {any[]} array created from server response
   */
   getJson () {
-    if (this.#isEvent) { return this.#fixNesting(this.#json.methodCall) } else { return this.#fixNesting(this.#json.methodResponse) }
+    if (this.#isEvent) {
+      return this.#fixNesting(this.#json.methodCall)
+    } else {
+      return this.#fixNesting(this.#json.methodResponse)
+    }
   }
 
   getEventName () {
@@ -133,7 +137,7 @@ class Response {
     }
     // change overnested object received from parsing the xml to an array of server return values
     if (!obj.params[0].param) {
-      return [obj.params[0]] // some callbacks dont return params. NICE!!!!
+      return [obj.params[0]] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
       for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
@@ -153,7 +157,17 @@ class Response {
             obj[key] = changeType(el.value[0][type][0], type)
           }
           arr.push(obj)
-        } else if (Object.keys(value)[0] === 'boolean') { arr.push(changeType(value.boolean[0], 'boolean')) } else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4') { arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0])) } else if (Object.keys(value)[0] === 'double') { arr.push(changeType(value.float[0], 'double')) } else if (Object.keys(value)[0] === 'string') { arr.push(changeType(value.string[0], 'string')) } else if (Object.keys(value)[0] === 'base64') { arr.push(changeType(value.string[0], 'base64')) }
+        } else if (Object.keys(value)[0] === 'boolean') {
+          arr.push(changeType(value.boolean[0], 'boolean'))
+        } else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4') {
+          arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0]))
+        } else if (Object.keys(value)[0] === 'double') {
+          arr.push(changeType(value.float[0], 'double'))
+        } else if (Object.keys(value)[0] === 'string') {
+          arr.push(changeType(value.string[0], 'string'))
+        } else if (Object.keys(value)[0] === 'base64') {
+          arr.push(changeType(value.string[0], 'base64'))
+        }
       }
     }
     return arr
