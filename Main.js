@@ -2,9 +2,10 @@
 import client from './js/Client.js'
 import Logger from './js/Logger.js'
 import Error from './js/Error.js'
+import Listeners from './js/Listeners.js'
 import 'dotenv/config'
 
-async function main () {
+async function main() {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
     .catch(err => { Error.fatal(err) })
@@ -16,6 +17,9 @@ async function main () {
   ])
   if (authenticationStatus[0].faultCode) { Error.fatal('Authentication failed', authenticationStatus[0].faultString, authenticationStatus[0].faultCode) }
   Logger.info('Authentication success')
+
+  new Listeners()
+
   Logger.trace('Enabling callbacks...')
   const enableCallbacks = await client.call('EnableCallbacks', [
     { boolean: true }
