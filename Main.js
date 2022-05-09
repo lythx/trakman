@@ -25,7 +25,14 @@ async function main() {
         process.exit(1)
     }
     logger.info('Authentication success')
-    process.exit(0);
+    const enableCallbacks = await client.call('EnableCallbacks', [
+        { boolean: true }
+    ])
+    if (enableCallbacks[0].faultCode || !enableCallbacks[0])
+        logger.warn(`Failed to enable callbacks`)
+    else
+        logger.trace(`Listening for callbacks...`)
+    //process.exit(0);
 }
 
 main();

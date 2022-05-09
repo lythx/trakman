@@ -9,6 +9,9 @@ class Response {
     #id = null
     #data = Buffer.from('')
     #overload = null
+    #json = null
+    #isEvent = null
+    #eventName = null
 
     /**
     * Initiates an object to store buffers received from dedicated server
@@ -32,11 +35,13 @@ class Response {
             this.#data = newBuffer.subarray(0, this.#targetLength)
             this.#overload = newBuffer.subarray(this.#targetLength)
             this.#status = 'overloaded'
+            this.#generateJson()
             return
         }
         if (newBuffer.length === this.#targetLength) {
             this.#data = newBuffer.subarray(0, this.#targetLength)
             this.#status = 'completed'
+            this.#generateJson()
             return
         }
         this.#data = newBuffer
@@ -72,6 +77,21 @@ class Response {
     * @returns {any[]} array created from server response
     */
     getJson() {
+        if (this.#isEvent)
+            return this.#fixNesting(this.#json.methodCall)
+        else
+            return this.#fixNesting(this.#json.methodResponse)
+    }
+
+    getEventName() {
+        return this.#eventName
+    }
+
+    isEvent() {
+        return this.#isEvent
+    }
+
+    #generateJson() {
         let json = []
         //parse xml to json
         xml2js.parseString(this.#data.toString(), (err, result) => {
@@ -80,12 +100,25 @@ class Response {
             }
             json = result
         });
+
+        if (json.methodCall) {
+            this.#json = json
+            this.#eventName = json.methodCall.methodName[0]
+            this.#isEvent = true
+        }
+        else if (json.methodResponse) {
+            this.#json = json
+            this.#isEvent = false
+        }
+    }
+
+    #fixNesting(obj) {
         let arr = []
         //if server responded with error
-        if (json.methodResponse.fault) {
+        if (obj.faultCode) {
             arr.push({
-                faultCode: json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0],
-                faultString: json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
+                faultCode: obj.fault[0].value[0].struct[0].member[0].value[0].int[0],
+                faultString: obj.fault[0].value[0].struct[0].member[1].value[0].string[0]
             })
             return arr
         }
@@ -104,7 +137,10 @@ class Response {
             }
         }
         //change overnested object received from parsing the xml to an array of server return values
-        for (const param of json.methodResponse.params) {
+        if (!obj.params[0].param) {
+            return [obj.params[0]] //some callbacks dont return params. NICE!!!! 
+        }
+        for (const param of obj.params) {
             const value = param.param[0].value[0]
             if (Object.keys(value)[0] === 'array') {
                 for (const el of value.array) {
