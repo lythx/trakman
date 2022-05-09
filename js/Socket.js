@@ -2,6 +2,7 @@
 import net from 'node:net'
 import Response from './Response.js'
 import events from './Events.js'
+
 class Socket extends net.Socket {
   handshakeHeaderSize = null
   handshakeHeader = null
