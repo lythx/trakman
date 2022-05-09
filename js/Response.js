@@ -10,11 +10,22 @@ class Response {
     #data = Buffer.from('')
     #overload = null
 
+    /**
+    * Initiates an object to store buffers received from dedicated server
+    * @param {Number} targetLength first 4 bytes of response
+    * @param {Number} id second 4 bytes of response
+    */
     constructor(targetLength, id) {
         this.#targetLength = targetLength
         this.#id = id
     }
 
+    /**
+    * Concats new buffer with previous ones and sets status to completed if response reached its target length.
+    * If response length is greater than target length (new data contains fragment of next response)
+    * status is set to overloaded and next response buffer can be extracted using extractOverload() method
+    * @param {Buffer} data buffer received from dedicated server
+    */
     addData(data) {
         const newBuffer = Buffer.concat([this.#data, data])
         if (newBuffer.length > this.#targetLength) {
@@ -31,14 +42,25 @@ class Response {
         this.#data = newBuffer
     }
 
+    /**
+    * @returns {Number} response id
+    */
     getId() {
         return this.#id
     }
 
+    /**
+    * @returns {String} response status
+    */
     getStatus() {
         return this.#status
     }
 
+    /**
+    * Returns buffer fragment written after reaching target length (next response buffer)
+    * and sets status to complete
+    * @returns {Buffer} next response buffer
+    */
     extractOverload() {
         const overload = this.#overload
         this.#overload = null
@@ -46,7 +68,27 @@ class Response {
         return overload
     }
 
+    /**
+    * @returns {any[]} array created from server response
+    */
     getJson() {
+        let json = []
+        //parse xml to json
+        xml2js.parseString(this.#data.toString(), (err, result) => {
+            if (err) {
+                throw err;
+            }
+            json = result
+        });
+        let arr = []
+        //if server responded with error
+        if (json.methodResponse.fault) {
+            arr.push({
+                faultCode: json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0],
+                faultString: json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
+            })
+            return arr
+        }
         const changeType = (value, type) => {
             switch (type) {
                 case 'boolean':
@@ -55,25 +97,13 @@ class Response {
                     return parseInt(value)
                 case 'double':
                     return parseFloat(value)
+                case 'base64':
+                    return Buffer.from(value, 'base64')
                 default:
                     return value
             }
         }
-        let json = []
-        xml2js.parseString(this.#data.toString(), (err, result) => {
-            if (err) {
-                throw err;
-            }
-            json = result
-        });
-        let arr = []
-        if (json.methodResponse.fault) {
-            arr.push({
-                faultCode: json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0],
-                faultString: json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
-            })
-            return arr
-        }
+        //change overnested object received from parsing the xml to an array of server return values
         for (const param of json.methodResponse.params) {
             const value = param.param[0].value[0]
             if (Object.keys(value)[0] === 'array') {
@@ -102,6 +132,8 @@ class Response {
                 arr.push(changeType(value.float[0], 'double'))
             else if (Object.keys(value)[0] === 'string')
                 arr.push(changeType(value.string[0], 'string'))
+            else if (Object.keys(value)[0] === 'base64')
+                arr.push(changeType(value.string[0], 'base64'))
         }
         return arr
     }
