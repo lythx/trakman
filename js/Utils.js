@@ -4,4 +4,4 @@ class Utils {
 
 }
 
-module.exports = new Utils()
+export default Utils()

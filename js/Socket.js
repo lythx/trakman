@@ -1,8 +1,7 @@
 'use strict'
-const net = require('node:net')
-const Response = require('./Response')
-const logger = require('tracer').colorConsole()
-const Events = require('./Events')
+import net from 'node:net'
+import Response from './Response.js'
+import events from './Events.js'
 
 class Socket extends net.Socket {
   handshakeHeaderSize = null
@@ -120,4 +119,4 @@ class Socket extends net.Socket {
   }
 }
 
-module.exports = Socket
+export default Socket
