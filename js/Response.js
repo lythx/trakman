@@ -110,7 +110,7 @@ class Response {
   #fixNesting (obj) {
     const arr = []
     // if server responded with error
-    if (obj.faultCode) {
+    if (obj.fault) {
       arr.push({
         faultCode: obj.fault[0].value[0].struct[0].member[0].value[0].int[0],
         faultString: obj.fault[0].value[0].struct[0].member[1].value[0].string[0]
