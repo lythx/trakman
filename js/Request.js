@@ -1,5 +1,5 @@
 'use strict'
-const logger = require('tracer').colorConsole()
+// const logger = require('tracer').colorConsole()
 class Request {
   #xml
 

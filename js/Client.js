@@ -1,7 +1,7 @@
 'use strict'
 const Request = require('./Request')
 const Socket = require('./Socket')
-const utils = require('./Utils')
+// const utils = require('./Utils')
 
 class Client {
   socket = new Socket()
@@ -11,9 +11,9 @@ class Client {
 
   /**
   * Connects to dedicated server and waits for handshake.
-  * Rejects promise if connection is failed or server doesnt use "GBXRemote 2" protocol
+  * Rejects promise if connection is failed or server doesn't use "GBXRemote 2" protocol
   * @param {String} host ip of dedicated server (default localhost)
-  * @param {Number} port port at which dedicated server is listning for XmlRpc (default 5000)
+  * @param {Number} port port at which dedicated server is listening for XmlRpc (default 5000)
   * @returns {Promise<String>} handshake status
   */
   async connect (host = 'localhost', port = 5000) {

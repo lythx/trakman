@@ -1,7 +1,7 @@
 'use strict'
+require('dotenv').config()
 const Client = require('./js/Client.js')
 const logger = require('tracer').colorConsole()
-require('dotenv').config()
 
 async function main () {
   const client = new Client()
