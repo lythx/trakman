@@ -4,12 +4,12 @@ import client from './Client.js'
 import Chat from './Chat.js'
 
 class Events {
-  handleEvent(name, json) {
+  handleEvent (name, json) {
     Logger.warn(name)
     Logger.debug(json)
     switch (name) {
       case 'TrackMania.PlayerConnect':
-        this.#playerConnect(json)
+        Events.#playerConnect(json)
         break
       case 'TrackMania.PlayerChat':
         this.#playerChat(json)
@@ -17,14 +17,14 @@ class Events {
     }
   }
 
-  #playerConnect(params) {
+  static #playerConnect (params) {
     Logger.fatal(params)
     Logger.debug(JSON.stringify(client))
     Chat.sendMessage(`SUSSY PETYA ${params[0]}`)
   }
 
-  #playerChat(params) {
-    //TODO
+  #playerChat (params) {
+    // TODO
   }
 }
 

@@ -16,7 +16,7 @@ class Response {
   * @param {Number} targetLength first 4 bytes of response
   * @param {Number} id second 4 bytes of response
   */
-  constructor(targetLength, id) {
+  constructor (targetLength, id) {
     this.#targetLength = targetLength
     this.#id = id
   }
@@ -27,7 +27,7 @@ class Response {
   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
   * @param {Buffer} data buffer received from dedicated server
   */
-  addData(data) {
+  addData (data) {
     const newBuffer = Buffer.concat([this.#data, data])
     if (newBuffer.length > this.#targetLength) {
       this.#data = newBuffer.subarray(0, this.#targetLength)
@@ -48,14 +48,14 @@ class Response {
   /**
   * @returns {Number} response id
   */
-  getId() {
+  getId () {
     return this.#id
   }
 
   /**
   * @returns {String} response status
   */
-  getStatus() {
+  getStatus () {
     return this.#status
   }
 
@@ -64,7 +64,7 @@ class Response {
   * and sets status to complete
   * @returns {Buffer} next response buffer
   */
-  extractOverload() {
+  extractOverload () {
     const overload = this.#overload
     this.#overload = null
     this.#status = 'complete'
@@ -74,19 +74,23 @@ class Response {
   /**
   * @returns {any[]} array created from server response
   */
-  getJson() {
-    if (this.#isEvent) { return this.#fixNesting(this.#json.methodCall) } else { return this.#fixNesting(this.#json.methodResponse) }
+  getJson () {
+    if (this.#isEvent) {
+      return this.#fixNesting(this.#json.methodCall)
+    } else {
+      return this.#fixNesting(this.#json.methodResponse)
+    }
   }
 
-  getEventName() {
+  getEventName () {
     return this.#eventName
   }
 
-  isEvent() {
+  isEvent () {
     return this.#isEvent
   }
 
-  #generateJson() {
+  #generateJson () {
     let json = []
     // parse xml to json
     xml2js.parseString(this.#data.toString(), (err, result) => {
@@ -106,7 +110,7 @@ class Response {
     }
   }
 
-  #fixNesting(obj) {
+  #fixNesting (obj) {
     const arr = []
     // if server responded with error
     if (obj.fault) {
@@ -132,7 +136,7 @@ class Response {
     }
     // change overnested object received from parsing the xml to an array of server return values
     if (!obj.params[0].param) {
-      return [obj.params[0]] // some callbacks dont return params. NICE!!!!
+      return [obj.params[0]] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
       for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
@@ -152,7 +156,17 @@ class Response {
             obj[key] = changeType(el.value[0][type][0], type)
           }
           arr.push(obj)
-        } else if (Object.keys(value)[0] === 'boolean') { arr.push(changeType(value.boolean[0], 'boolean')) } else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4') { arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0])) } else if (Object.keys(value)[0] === 'double') { arr.push(changeType(value.float[0], 'double')) } else if (Object.keys(value)[0] === 'string') { arr.push(changeType(value.string[0], 'string')) } else if (Object.keys(value)[0] === 'base64') { arr.push(changeType(value.string[0], 'base64')) }
+        } else if (Object.keys(value)[0] === 'boolean') {
+          arr.push(changeType(value.boolean[0], 'boolean'))
+        } else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4') {
+          arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0]))
+        } else if (Object.keys(value)[0] === 'double') {
+          arr.push(changeType(value.float[0], 'double'))
+        } else if (Object.keys(value)[0] === 'string') {
+          arr.push(changeType(value.string[0], 'string'))
+        } else if (Object.keys(value)[0] === 'base64') {
+          arr.push(changeType(value.string[0], 'base64'))
+        }
       }
     }
     return arr
