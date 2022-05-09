@@ -11,13 +11,6 @@ class Socket extends net.Socket {
   responses = []
   #incompleteHeader = null
 
-  /*
-  * Create a net socket object.
-  */
-  constructor() {
-    super()
-  }
-
   /**
   * Setup socket listeners for client - server communication
   */

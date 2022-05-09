@@ -2,7 +2,9 @@
   "dependencies": {
     "tracer": "^1.1.5",
     "xml2js": "^0.4.23",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
     "standard": "^17.0.0"
   },
   "scripts": {
