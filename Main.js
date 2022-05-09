@@ -1,7 +1,7 @@
 'use strict'
-const Client = require("./js/Client.js")
-const logger = require('tracer').colorConsole();
-require('dotenv').config();
+const Client = require('./js/Client.js')
+const logger = require('tracer').colorConsole()
+require('dotenv').config()
 
 async function main() {
     const client = new Client();
@@ -35,7 +35,7 @@ async function main() {
     //process.exit(0);
 }
 
-main();
+main()
 
 /* call with array of structs in params example
     const val = await client.call('SetCallVoteRatios', [
