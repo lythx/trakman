@@ -9,7 +9,7 @@ class Events {
     Logger.debug(json)
     switch (name) {
       case 'TrackMania.PlayerConnect':
-        this.#playerConnect(json)
+        Events.#playerConnect(json)
         break
       case 'TrackMania.PlayerChat':
         this.#playerChat(json)
