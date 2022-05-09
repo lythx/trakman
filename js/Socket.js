@@ -12,16 +12,24 @@ class Socket extends net.Socket {
     receivingResponse = false
     responses = []
 
+    /**
+    * Create a net socket object.
+    */
     constructor() {
         super()
     }
 
+    /**
+    * Setup socket listeners for client - server communication
+    */
     setupListeners() {
         this.on('data', buffer => {
+            //handshake header has no id so it has to be treated differently from normal data
             if (this.handshakeHeaderSize === null)
                 this.#setHandshakeHeaderSize(buffer)
             else if (this.handshakeHeader === null)
                 this.#handleHandshake(buffer)
+            //all data except for the handshake
             else if (!this.receivingResponse)
                 this.#handleResponseStart(buffer)
             else if (this.receivingResponse)
@@ -29,6 +37,10 @@ class Socket extends net.Socket {
         })
     }
 
+    /**
+    * Poll handshake status
+    * @returns {Promise<String>} handshake status
+    */
     awaitHandshake() {
         return new Promise((resolve) => {
             const interval = setInterval(() => {
@@ -41,6 +53,10 @@ class Socket extends net.Socket {
         })
     }
 
+    /**
+    * Poll dedicated server response
+    * @returns {Promise<any[]>} array of server return values 
+    */
     awaitResponse(id) {
         return new Promise((resolve) => {
             const interval = setInterval(() => {
@@ -60,7 +76,7 @@ class Socket extends net.Socket {
 
     #handleHandshake(buffer) {
         this.handshakeHeader = buffer.toString()
-        if (this.handshakeHeaderSize !== this.handshakeHeader.length
+        if (this.handshakeHeaderSize !== this.handshakeHeader.length        //check if protocol and header length is right
             || this.handshakeHeader !== "GBXRemote 2") {
             this.destroy();
             this.handshakeStatus = 'wrong protocol';
@@ -69,22 +85,25 @@ class Socket extends net.Socket {
         this.handshakeStatus = 'handshake success'
     }
 
+    //initiate a Response object with targetSize and Id
     #handleResponseStart(buffer) {
         this.response = new Response(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
         this.receivingResponse = true
+        if (buffer.subarray(8))
+            this.#handleResponseChunk(buffer.subarray(8))
     }
 
+    //add new buffer to response object
     #handleResponseChunk(buffer) {
         this.response.addData(buffer)
         if (this.response.getStatus() === 'overloaded') {
             const nextResponseBuffer = this.response.extractOverload()
-            this.#handleResponseStart(nextResponseBuffer.subarray(0, 8))
-            this.#handleResponseChunk(nextResponseBuffer.subarray(8))
-            this.responses.push(this.response)
+            this.#handleResponseStart(nextResponseBuffer)                   //start new response if buffer was overloaded
+            this.responses.push(this.response)                              //push completed response to responses array
         }
         else if (this.response.getStatus() === 'completed') {
             this.receivingResponse = false
-            this.responses.push(this.response)
+            this.responses.push(this.response)                              //push completed response to responses array
         }
     }
 
