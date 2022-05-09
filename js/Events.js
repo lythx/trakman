@@ -1,6 +1,7 @@
 'use strict'
 import Logger from './Logger.js'
 import client from './Client.js'
+import Chat from './Chat.js'
 
 class Events {
   handleEvent(name, json) {
@@ -9,17 +10,22 @@ class Events {
     switch (name) {
       case 'TrackMania.PlayerConnect':
         this.#playerConnect(json)
+        break
+      case 'TrackMania.PlayerChat':
+        this.#playerChat(json)
+        break
     }
   }
 
   #playerConnect(params) {
     Logger.fatal(params)
     Logger.debug(JSON.stringify(client))
-    client.call('ChatSendServerMessage',
-      [{ string: `SUSSY PETYA ${params[0]}` }])
+    Chat.sendMessage(`SUSSY PETYA ${params[0]}`)
+  }
+
+  #playerChat(params) {
+    //TODO
   }
 }
 
-const events = new Events()
-
-export default events
+export default new Events()
