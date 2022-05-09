@@ -4,23 +4,43 @@ const logger = require('tracer').colorConsole();
 require('dotenv').config();
 
 async function main() {
-    let client = new Client();
+    const client = new Client();
+    logger.trace('Establishing connection with the server...')
     const connectionStatus = await client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
         .catch(err => {
             logger.fatal(err)
+            logger.fatal('Aborting...')
             process.exit(1)
         });
     logger.info(connectionStatus)
-    const a = await client.call('system.listMethods')
-    const b = await client.call('Authenticate', [
-        { value: process.env.SUPERADMIN_NAME, type: 'string' },
-        { value: process.env.SUPERADMIN_PASSWORD, type: 'string' }
+    logger.trace('Authenticating...')
+    const authenticationStatus = await client.call('Authenticate', [
+        { string: process.env.SUPERADMIN_NAME },
+        { string: process.env.SUPERADMIN_PASSWORD }
     ])
-    const c = await client.call('GetNetworkStats')
-    // logger.info(a)
-    // logger.warn(b)
-    logger.fatal(JSON.stringify(c))
+    if (authenticationStatus[0].faultCode) {
+        logger.fatal(`Authentication failed`)
+        logger.fatal(`error code: ${authenticationStatus[0].faultCode}, error: ${authenticationStatus[0].faultString}`)
+        logger.fatal('Aborting...')
+        process.exit(1)
+    }
+    logger.info('Authentication success')
     process.exit(0);
 }
 
 main();
+
+/* call with array of structs in params example
+    const val = await client.call('SetCallVoteRatios', [
+    {
+        array:
+            [{
+                struct:
+                    { Command: { string: 'command1' }, Ratio: { double: 0.4 } }
+            },
+            {
+                struct:
+                    { Command: { string: 'command2' }, Ratio: { double: 0.7 } }
+            }]
+    }
+]) */
