@@ -4,27 +4,22 @@ import client from './Client.js'
 import Chat from './Chat.js'
 
 class Events {
+  #eventListeners = []
+
+  /**
+   * Execute the callback on event
+   * @param event dedicated server callback event
+   * @param callback function to execute on event
+   */
+  addListener (event, callback) {
+    this.#eventListeners.push({ event, callback })
+  }
+
   handleEvent (name, json) {
-    Logger.warn(name)
-    Logger.debug(json)
-    switch (name) {
-      case 'TrackMania.PlayerConnect':
-        Events.#playerConnect(json)
-        break
-      case 'TrackMania.PlayerChat':
-        this.#playerChat(json)
-        break
+    const matchingEvents = this.#eventListeners.filter(a => a.event === name)
+    for (const listener of matchingEvents) {
+      listener.callback(json)
     }
-  }
-
-  static #playerConnect (params) {
-    Logger.fatal(params)
-    Logger.debug(JSON.stringify(client))
-    Chat.sendMessage(`SUSSY PETYA ${params[0]}`)
-  }
-
-  #playerChat (params) {
-    // TODO
   }
 }
 
