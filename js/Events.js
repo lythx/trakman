@@ -3,16 +3,16 @@ import Logger from './Logger.js'
 import client from './Client.js'
 
 class Events {
-  handleEvent(name, json) {
+  handleEvent (name, json) {
     Logger.warn(name)
     Logger.debug(json)
     switch (name) {
       case 'TrackMania.PlayerConnect':
-        this.#playerConnect(json)
+        Events.#playerConnect(json)
     }
   }
 
-  #playerConnect(params) {
+  static #playerConnect (params) {
     Logger.fatal(params)
     Logger.debug(JSON.stringify(client))
     client.call('ChatSendServerMessage',
