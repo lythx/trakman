@@ -1,5 +1,5 @@
 'use strict'
-const logger = require('tracer').colorConsole()
+import Logger from './Logger.js'
 
 class Error {
   /**
@@ -8,12 +8,12 @@ class Error {
     * @param {String} errstr error string
     * @param {Number} errcode error code
     */
-  static fatal (str, errstr, errcode) {
-    logger.fatal(str)
-    if (errstr && errcode) { logger.fatal(`error code: ${errcode}, error: ${errstr}`) } else if (errstr && !errcode) { logger.fatal(`error: ${errstr}`) } else if (!errstr && errcode) { logger.fatal(`error code: ${errcode}`) }
-    logger.fatal('Aborting...')
+  static fatal(str, errstr, errcode) {
+    Logger.fatal(str)
+    if (errstr && errcode) { Logger.fatal(`error code: ${errcode}, error: ${errstr}`) } else if (errstr && !errcode) { Logger.fatal(`error: ${errstr}`) } else if (!errstr && errcode) { Logger.fatal(`error code: ${errcode}`) }
+    Logger.fatal('Aborting...')
     process.exit(1)
   }
 }
 
-module.exports = Error
+export default Error
