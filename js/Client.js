@@ -31,8 +31,8 @@ class Client {
   }
 
   /**
-  * Calls a dedicated server method. Check if returnvalue[0].errorCode exists to handle errors.
-  * Error string is returnvalue[0].errorString.
+  * Calls a dedicated server method. Check if returnvalue[0].faultCode exists to handle errors.
+  * Error string is returnvalue[0].faultString.
   * @param {String} method dedicated server method name
   * @param {Object[]} params parameters, each param needs to be under key named after its type
   * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.

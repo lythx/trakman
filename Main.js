@@ -3,7 +3,7 @@ const Client = require('./js/Client.js')
 const logger = require('tracer').colorConsole()
 require('dotenv').config()
 
-async function main() {
+async function main () {
   const client = new Client()
   logger.trace('Establishing connection with the server...')
   const connectionStatus = await client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
