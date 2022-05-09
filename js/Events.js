@@ -4,7 +4,6 @@ import client from './Client.js'
 import Chat from './Chat.js'
 
 class Events {
-
   #eventListeners = []
 
   /**
@@ -12,18 +11,16 @@ class Events {
    * @param event dedicated server callback event
    * @param callback function to execute on event
    */
-  addListener(event, callback) {
+  addListener (event, callback) {
     this.#eventListeners.push({ event, callback })
   }
 
-  handleEvent(name, json) {
+  handleEvent (name, json) {
     const matchingEvents = this.#eventListeners.filter(a => a.event === name)
     for (const listener of matchingEvents) {
       listener.callback(json)
     }
   }
-
-
 }
 
 export default new Events()
