@@ -37,6 +37,7 @@ class Socket extends net.Socket {
                     clearInterval(interval)
                 }
             }, 300);
+            resolve('no response')
         })
     }
 
