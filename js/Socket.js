@@ -11,18 +11,19 @@ class Socket extends net.Socket {
   response = null
   receivingResponse = false
   responses = []
+  #incompleteHeader = null
 
   /*
   * Create a net socket object.
   */
-  constructor() {
+  constructor () {
     super()
   }
 
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners() {
+  setupListeners () {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.handshakeHeaderSize === null) {
@@ -41,7 +42,7 @@ class Socket extends net.Socket {
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  awaitHandshake() {
+  awaitHandshake () {
     let i = 0
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -61,7 +62,7 @@ class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  awaitResponse(id) {
+  awaitResponse (id) {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         if (this.responses.some(a => a.getId() === id && a.getStatus() === 'completed')) {
@@ -74,11 +75,11 @@ class Socket extends net.Socket {
     })
   }
 
-  #setHandshakeHeaderSize(buffer) {
+  #setHandshakeHeaderSize (buffer) {
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake(buffer) {
+  #handleHandshake (buffer) {
     this.handshakeHeader = buffer.toString()
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
@@ -90,14 +91,22 @@ class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart(buffer) {
+  #handleResponseStart (buffer) {
+    if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
+      this.#incompleteHeader = buffer
+      return
+    }
+    if (this.#incompleteHeader) { // concating header if it got split
+      buffer = Buffer.concat([this.#incompleteHeader, buffer])
+      this.#incompleteHeader = null
+    }
     this.response = new Response(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
     this.receivingResponse = true
     if (buffer.subarray(8)) { this.#handleResponseChunk(buffer.subarray(8)) }
   }
 
   // add new buffer to response object
-  #handleResponseChunk(buffer) {
+  #handleResponseChunk (buffer) {
     this.response.addData(buffer)
     if (this.response.getStatus() === 'overloaded') {
       const nextResponseBuffer = this.response.extractOverload()
