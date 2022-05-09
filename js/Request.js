@@ -1,14 +1,14 @@
 "use strict"
+const logger = require('tracer').colorConsole();
 class Request {
 
     #xml
 
     /**
     * Prepares XML string for a dedicated server request.
-    * Each object in params array needs to contain type and value parameters.
     * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
-    * @param {String} method
-    * @param {Object[]} params
+    * @param {String} method dedicated server method
+    * @param {Object[]} params parameters, each param needs to be under key named after its type
     */
     constructor(method, params) {
         this.#xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`;
@@ -32,28 +32,29 @@ class Request {
 
     //wraps params with type tags depending on type specified in param object
     //calls itself recursively in case type is array or struct
-    #handleParamType(arg) {
-        switch (arg.type) {
+    #handleParamType(param) {
+        const type = Object.keys(param)[0]
+        switch (Object.keys(param)[0]) {
             case 'boolean':
-                return `<boolean>${arg.value ? '1' : '0'}</boolean>`
+                return `<boolean>${param[type] ? '1' : '0'}</boolean>`
             case 'int':
-                return `<int>${arg.value}</int>`
+                return `<int>${param[type]}</int>`
             case 'double':
-                return `<double>${arg.value}</double>`
+                return `<double>${param[type]}</double>`
             case 'string':
-                return `<string>${this.#escapeHtml(arg.value)}</string>`
+                return `<string>${this.#escapeHtml(param[type])}</string>`
             case 'base64':
-                return `<base64>${arg.value}</base64>`
+                return `<base64>${param[type]}</base64>`
             case 'array':
                 let arr = '<array><data>'
-                for (const el of arg.value)
+                for (const el of param[type])
                     arr += `<value>${this.#handleParamType(el)}</value>`
                 arr += '</data></array>'
                 return arr
             case 'struct':
                 let str = '<struct>'
-                for (const key of arg.value)
-                    str += `<member><name>${key}</name><value>${this.#handleParamType(arg.value[key])}</value></member>`
+                for (const key in param[type])
+                    str += `<member><name>${key}</name><value>${this.#handleParamType(param[type][key])}</value></member>`
                 str += '</struct>'
                 return str
         }
