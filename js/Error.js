@@ -8,7 +8,7 @@ class Error {
     * @param {String} errstr error string
     * @param {Number} errcode error code
     */
-  static fatal(str, errstr, errcode) {
+  static fatal (str, errstr, errcode) {
     Logger.fatal(str)
     if (errstr && errcode) { Logger.fatal(`error code: ${errcode}, error: ${errstr}`) } else if (errstr && !errcode) { Logger.fatal(`error: ${errstr}`) } else if (!errstr && errcode) { Logger.fatal(`error code: ${errcode}`) }
     Logger.fatal('Aborting...')
