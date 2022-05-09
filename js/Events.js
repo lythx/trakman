@@ -23,8 +23,8 @@ class Events {
     Chat.sendMessage(`SUSSY PETYA ${params[0]}`)
   }
 
-  #playerChat(params) {
-    //TODO
+  #playerChat (params) {
+    // TODO
   }
 }
 
