@@ -121,13 +121,12 @@ class Response {
                     const type = Object.keys(el.value[0])[0]
                     obj[key] = changeType(el.value[0][type][0], type)
                 }
-
                 arr.push(obj)
             }
             else if (Object.keys(value)[0] === 'boolean')
                 arr.push(changeType(value.boolean[0], 'boolean'))
             else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4')
-                arr.push(changeType(value.int[0], 'int'))
+                arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0]))
             else if (Object.keys(value)[0] === 'double')
                 arr.push(changeType(value.float[0], 'double'))
             else if (Object.keys(value)[0] === 'string')

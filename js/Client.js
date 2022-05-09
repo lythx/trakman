@@ -23,17 +23,18 @@ class Client {
             this.socket.setKeepAlive(true)
             this.socket.setupListeners()
             const handshakeStatus = await this.socket.awaitHandshake()
-            if (handshakeStatus === 'no response' || handshakeStatus === 'wrong protocol')
+            if (handshakeStatus === 'No response from the server' || handshakeStatus === 'Server uses wrong GBX protocol')
                 reject(handshakeStatus)
-            else if (handshakeStatus === 'handshake success')
+            else if (handshakeStatus === 'Handshake success')
                 resolve(handshakeStatus)
         })
     }
 
     /**
-    * Calls a dedicated server method.
+    * Calls a dedicated server method. Check if returnvalue[0].errorCode exists to handle errors.
+    * Error string is returnvalue[0].errorString.
     * @param {String} method dedicated server method name
-    * @param {Object[]} params parameters, each one of objects has to contain type and value parameters
+    * @param {Object[]} params parameters, each param needs to be under key named after its type
     * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
     * @returns {Promise<any[]>} array of server response values
     */

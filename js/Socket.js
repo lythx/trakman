@@ -42,14 +42,19 @@ class Socket extends net.Socket {
     * @returns {Promise<String>} handshake status
     */
     awaitHandshake() {
+        let i = 0
         return new Promise((resolve) => {
             const interval = setInterval(() => {
+                i++
                 if (this.handshakeStatus !== null) {
                     resolve(this.handshakeStatus)
                     clearInterval(interval)
                 }
-            }, 300);
-            resolve('no response')
+                else if (i === 20) {                //stop poll after 5 seconds
+                    resolve('No response from the server')
+                    clearInterval(interval)
+                }
+            }, 250);
         })
     }
 
@@ -79,10 +84,10 @@ class Socket extends net.Socket {
         if (this.handshakeHeaderSize !== this.handshakeHeader.length        //check if protocol and header length is right
             || this.handshakeHeader !== "GBXRemote 2") {
             this.destroy();
-            this.handshakeStatus = 'wrong protocol';
+            this.handshakeStatus = 'Server uses wrong GBX protocol';
             return
         }
-        this.handshakeStatus = 'handshake success'
+        this.handshakeStatus = 'Handshake success'
     }
 
     //initiate a Response object with targetSize and Id
