@@ -15,7 +15,7 @@ class Client {
   * @param {Number} port port at which dedicated server is listening for XmlRpc (default 5000)
   * @returns {Promise<String>} handshake status
   */
-  async connect(host = 'localhost', port = 5000) {
+  async connect (host = 'localhost', port = 5000) {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
@@ -37,7 +37,7 @@ class Client {
   * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
   * @returns {Promise<any[]>} array of server response values
   */
-  async call(method, params = [], expectsResponse = true) {
+  async call (method, params = [], expectsResponse = true) {
     this.requestId++ // increment requestId so every request has an unique id
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
