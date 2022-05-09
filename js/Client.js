@@ -15,7 +15,7 @@ class Client {
             this.socket.connect(port || 5000, host || 'localhost')
             this.socket.setKeepAlive(true)
             this.socket.setupListeners()
-            let handshakeStatus = await this.socket.awaitHandshake()
+            const handshakeStatus = await this.socket.awaitHandshake()
             if (handshakeStatus === 'no response')
                 reject(handshakeStatus)
             else if (handshakeStatus === 'wrong protocol')
