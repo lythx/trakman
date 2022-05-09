@@ -1,12 +1,25 @@
 'use strict'
-const logger = require('tracer').colorConsole()
+import Logger from './Logger.js'
+import client from './Client.js'
 
 class Events {
-  static handleEvent (name, json) {
-    logger.warn(name)
-    logger.debug(json)
-    // TODO
+  handleEvent(name, json) {
+    Logger.warn(name)
+    Logger.debug(json)
+    switch (name) {
+      case 'TrackMania.PlayerConnect':
+        this.#playerConnect(json)
+    }
+  }
+
+  #playerConnect(params) {
+    Logger.fatal(params)
+    Logger.debug(JSON.stringify(client))
+    client.call('ChatSendServerMessage',
+      [{ string: `SUSSY PETYA ${params[0]}` }])
   }
 }
 
-module.exports = Events
+const events = new Events()
+
+export default events
