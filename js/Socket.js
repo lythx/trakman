@@ -2,6 +2,7 @@
 const net = require('node:net');
 const Response = require('./Response')
 const logger = require('tracer').colorConsole();
+const Events = require('./Events')
 
 class Socket extends net.Socket {
 
@@ -103,12 +104,18 @@ class Socket extends net.Socket {
         this.response.addData(buffer)
         if (this.response.getStatus() === 'overloaded') {
             const nextResponseBuffer = this.response.extractOverload()
+            if (this.response.isEvent())
+                Events.handleEvent(this.response.getEventName(), this.response.getJson())
+            else
+                this.responses.push(this.response)                          //push completed response to responses array
             this.#handleResponseStart(nextResponseBuffer)                   //start new response if buffer was overloaded
-            this.responses.push(this.response)                              //push completed response to responses array
         }
         else if (this.response.getStatus() === 'completed') {
+            if (this.response.isEvent())
+                Events.handleEvent(this.response.getEventName(), this.response.getJson())
+            else
+                this.responses.push(this.response)                           //push completed response to responses array
             this.receivingResponse = false
-            this.responses.push(this.response)                              //push completed response to responses array
         }
     }
 
