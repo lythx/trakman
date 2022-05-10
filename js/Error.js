@@ -21,6 +21,12 @@ class Error {
     process.exit(1)
   }
 
+  /**
+   * Logs error without exiting
+   * @param {String} str first line of log
+   * @param {String} errstr error string
+   * @param {Number} errcode error code
+   */
   static error (str, errstr, errcode) {
     Logger.warn(str)
     if (errstr && errcode) {

@@ -29,7 +29,7 @@ async function main () {
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
   const challengeService = await new ChallengeService()
-  const challengeList = await challengeService.push()
+  await challengeService.push()
     .then(() => Logger.info('Challenges fetched and added to database'))
 }
 
