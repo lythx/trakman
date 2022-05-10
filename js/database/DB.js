@@ -1,3 +1,4 @@
+'use strict'
 import 'dotenv/config'
 import postgres from 'pg'
 import Error from '../Error.js'
@@ -51,10 +52,10 @@ class Database {
 
   query (q) {
     if(typeof q !== 'string') {
-      Error.fatal('Database query is not a string')
+      Error.error('Database query is not a string')
     }
     this.#client.query(q).then(res => Logger.info(res))
-      .catch(err => Logger.warn(err))
+      .catch(err => Error.error('Database error', err))
   }
 }
 
