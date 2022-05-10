@@ -49,7 +49,7 @@ class Database {
    * @return {Promise<void>}
    */
   async query (q) {
-    if(typeof q !== 'string') {
+    if (typeof q !== 'string') {
       Error.error('Database query is not a string')
       return
     }

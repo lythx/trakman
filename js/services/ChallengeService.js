@@ -7,11 +7,8 @@ class ChallengeService {
   #list = null
   #repo
 
-  constructor () {
-    return new Promise(async (resolve, reject) => {
-      this.#repo = await new ChallengeRepository()
-        .then(resolve(this)).catch(err => reject(err))
-    })
+  async initialize () {
+    this.#repo = await new ChallengeRepository()
   }
 
   /**
@@ -44,7 +41,6 @@ class ChallengeService {
     const c = object.member
     return new Challenge(c[0].value[0].string, c[1].value[0].string, c[4].value[0].string, c[3].value[0].string)
   }
-
 }
 
 class Challenge {
@@ -60,22 +56,21 @@ class Challenge {
     this.#environment = environment
   }
 
-  get id(){
+  get id () {
     return this.#id
   }
 
-  get name(){
+  get name () {
     return this.#name
   }
 
-  get author() {
+  get author () {
     return this.#author
   }
 
-  get environment() {
+  get environment () {
     return this.#environment
   }
-
 }
 
 export default ChallengeService

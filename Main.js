@@ -28,8 +28,9 @@ async function main () {
   if (enableCallbacks[0].faultCode) { Error.fatal('Failed to enable callbacks', enableCallbacks[0].faultString, enableCallbacks[0].faultCode) }
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
-  const challengeService = await new ChallengeService()
-  Logger.info('Challenge service instantiated')
+  const challengeService = new ChallengeService()
+  await challengeService.initialize()
+    .then(() => Logger.info('Challenge service instantiated'))
   await challengeService.push()
     .then(() => Logger.info('Challenges are in the database'))
 }
