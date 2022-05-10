@@ -213,7 +213,7 @@ export default [
   },
   {
     code: 'CZE',
-    name: 'Czech Republic'
+    name: 'Czech republic'
   },
   {
     code: 'DNK',
@@ -1002,5 +1002,9 @@ export default [
   {
     code: 'UNK',
     name: 'Republic of Kosovo'
+  },
+  {
+    code: 'OTH',
+    name: 'Other Countries'
   }
 ]

@@ -2,7 +2,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
 import Error from '../Error.js'
-import Logger from '../Logger.js'
 const { Pool } = postgres
 
 const createRecords = `
@@ -43,7 +42,7 @@ class Database {
       Error.error('Database query is not a string')
       return
     }
-    return await this.#client.query(q).then(() => Logger.info('Query execution successful'))
+    return await this.#client.query(q)
       .catch(err => Error.error('Database error:', err))
   }
 }

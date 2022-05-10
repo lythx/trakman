@@ -1,6 +1,4 @@
 import Repository from './Repository.js'
-import Error from '../Error.js'
-import Logger from '../Logger.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS players(
@@ -22,40 +20,44 @@ class PlayerRepository extends Repository {
     this._db.query(createQuery)
   }
 
-  get (login) {
+  /**
+   * Searches for a login name in the database
+   * @param {String} login
+   * @return {Promise<Object[]>}
+   */
+  async get (login) {
     const query = `${getQuery}'${login}';`
-    return new Promise(async (resolve, reject) => {
-      const result = await this._db.query(query)
-      resolve(result.rows)
-    })
+    return (await this._db.query(query)).rows
   }
 
   /**
-     * Adds an array of challenges to the database
-     * @param {Object[]} objects the challenges
-     */
-  add (player) {
+   * Adds an array of challenges to the database
+   * @param {Player} player the player
+   * @return {Promise<Object[]>}
+   */
+  async add (player) {
     const p = "('"
     const m = "', '"
     const s = "')"
     let query = addQuery + p + player.login + m + player.nickName +
             m + player.nationCode + m + 0 + m + 0 + s
     query = query + ';'
-    return new Promise(async (resolve, reject) => {
-      resolve(await this._db.query(query))
-    })
+    return (await this._db.query(query)).rows
   }
 
-  update (player) {
+  /**
+   * Updates the player information in the database
+   * @param {Player} player a player instance
+   * @return {Promise<Object[]>}
+   */
+  async update (player) {
     const query = `UPDATE players SET 
         nickname='${player.nickName}',
         nation='${player.nationCode}',
         wins=${player.wins},
         timePlayed=${player.timePlayed}
         WHERE login='${player.login}';`
-    return new Promise(async (resolve, reject) => {
-      resolve(await this._db.query(query))
-    })
+    return (await this._db.query(query)).rows
   }
 }
 
