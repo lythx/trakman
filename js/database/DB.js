@@ -4,14 +4,6 @@ import postgres from 'pg'
 import Error from '../Error.js'
 import Logger from '../Logger.js'
 const { Pool } = postgres
-const createChallenges = `
-  CREATE TABLE IF NOT EXISTS challenges(
-    id VARCHAR(27) PRIMARY KEY NOT NULL,
-    name VARCHAR(60) NOT NULL,
-    author VARCHAR(25) NOT NULL,
-    environment VARCHAR(7) NOT NULL
-  );
-`
 const createPlayers = `
   CREATE TABLE IF NOT EXISTS players(
     login varchar(25) primary key not null,
@@ -45,17 +37,24 @@ class Database {
 
   constructor () {
     this.#client.connect()
-    this.#client.query(createChallenges)
     this.#client.query(createPlayers)
     this.#client.query(createRecords)
   }
 
+  /**
+   * Send a query to the database
+   * basically a wrapper
+   * no need to sanitise since the library does that itself
+   * @param {String} q the query
+   * @throws a database error if something goes wrong with the query
+   */
   query (q) {
     if(typeof q !== 'string') {
       Error.error('Database query is not a string')
+      return
     }
     this.#client.query(q).then(res => Logger.info(res))
-      .catch(err => Error.error('Database error', err))
+      .catch(err => throw err)
   }
 }
 

@@ -9,17 +9,25 @@ class ChallengeService {
 
   constructor () {
     this.#repo = new ChallengeRepository()
-
   }
 
+  /**
+   * Download all the challenges from the server and store them in a field
+   * @returns {Promise<void>}
+   */
   async #getList () {
     this.#list = await client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ]).catch(err => { Error.fatal('Error fetching challenges', err) })
   }
 
+  /**
+   * Put all the challenges in the list in the database
+   * If the list is empty, put the challenges there
+   * @returns {Promise<void>}
+   */
   async push () {
-    if(this.#list === null) await this.#getList()
+    if (this.#list === null) await this.#getList()
     this.#repo.add(this.#list)
   }
 }
