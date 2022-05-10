@@ -6,7 +6,7 @@ import ChallengeService from './js/services/ChallengeService.js'
 import 'dotenv/config'
 import Listeners from './js/Listeners.js'
 
-async function main() {
+async function main () {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
     .catch(err => { Error.fatal(err) })

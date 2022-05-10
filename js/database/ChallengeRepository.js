@@ -1,5 +1,6 @@
 import Repository from './Repository.js'
 import Error from '../Error.js'
+import Logger from '../Logger.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS challenges(
@@ -22,7 +23,6 @@ class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    */
   add (objects) {
-    console.log(typeof objects)
     if (typeof objects !== 'object' || objects.length < 1) {
       Error.fatal('Type error when adding challenges to database')
     }
@@ -32,12 +32,12 @@ class ChallengeRepository extends Repository {
     let query = addQuery
     objects.forEach(challenge => {
       const c = challenge.member
-      if (c === null || c.length !== 7) {
+      if (c !== null || c.length !== 7) {
         query += p + c[0].value[0].string + m + c[1].value[0].string +
-        m + c[4].value[0].string + m + c[3].value[0].string + s
+          m + c[4].value[0].string + m + c[3].value[0].string + s
       }
     })
-    query = query.slice(0, -1) + ';'
+    query = query.slice(0, -1) + ' ON CONFLICT DO NOTHING;'
     try {
       this._db.query(query)
     } catch (e) {
