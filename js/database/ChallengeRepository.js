@@ -13,11 +13,8 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 class ChallengeRepository extends Repository {
-  constructor () {
-    super()
-    return new Promise(async (resolve, reject) => {
-      await this._db.query(createQuery).then(resolve(this)).catch(err => reject(err))
-    })
+  async initialize () {
+    await this._db.query(createQuery)
   }
 
   /**
