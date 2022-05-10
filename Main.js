@@ -2,6 +2,7 @@
 import client from './js/Client.js'
 import Logger from './js/Logger.js'
 import Error from './js/Error.js'
+import ChallengeService from './js/services/ChallengeService.js'
 import listeners from './js/Listeners.js'
 import 'dotenv/config'
 
@@ -27,11 +28,9 @@ async function main () {
   if (enableCallbacks[0].faultCode) { Error.fatal('Failed to enable callbacks', enableCallbacks[0].faultString, enableCallbacks[0].faultCode) }
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
-  const challengeList = await client.call('GetChallengeList', [
-    { int: 5000 }, { int: 0 }
-  ])
-  if (challengeList[0].faultCode) { Error.fatal('Unable to fetch challenge list', challengeList[0].faultString, challengeList[0].faultCode) }
-  Logger.info('Challenges fetched')
+  const challengeService = await new ChallengeService()
+  const challengeList = await challengeService.push()
+    .then(() => Logger.info('Challenges fetched and added to database'))
 }
 
 main()

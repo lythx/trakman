@@ -1,5 +1,8 @@
-require('dotenv').config()
-const { DBClient } = require('pg')
+import 'dotenv/config'
+import postgres from 'pg'
+import Error from '../Error.js'
+import Logger from '../Logger.js'
+const { Pool } = postgres
 const createChallenges = `
   CREATE TABLE IF NOT EXISTS challenges(
     id VARCHAR(27) PRIMARY KEY NOT NULL,
@@ -31,7 +34,7 @@ const createRecords = `
 `
 
 class Database {
-  #client = new DBClient({
+  #client = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -44,6 +47,14 @@ class Database {
     this.#client.query(createChallenges)
     this.#client.query(createPlayers)
     this.#client.query(createRecords)
+  }
+
+  query (q) {
+    if(typeof q !== 'string') {
+      Error.fatal('Database query is not a string')
+    }
+    this.#client.query(q).then(res => Logger.info(res))
+      .catch(err => Logger.warn(err))
   }
 }
 
