@@ -1,7 +1,7 @@
 'use strict'
 import Logger from './Logger.js'
-import client from './Client.js'
-import Chat from './Chat.js'
+import Client from './Client.js'
+import Chat from './plugins/Chat.js'
 
 class Events {
   #eventListeners = []
