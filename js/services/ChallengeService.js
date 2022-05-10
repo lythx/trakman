@@ -8,7 +8,10 @@ class ChallengeService {
   #repo
 
   constructor () {
-    this.#repo = new ChallengeRepository()
+    return new Promise(async (resolve, reject) => {
+      this.#repo = await new ChallengeRepository()
+        .then(resolve(this)).catch(err => reject(err))
+    })
   }
 
   /**
@@ -16,9 +19,10 @@ class ChallengeService {
    * @returns {Promise<void>}
    */
   async #getList () {
-    this.#list = await client.call('GetChallengeList', [
+    const rawList = await client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ]).catch(err => { Error.fatal('Error fetching challenges', err) })
+    this.#list = rawList.map(challenge => ChallengeService.#deserialise(challenge))
   }
 
   /**
@@ -28,8 +32,50 @@ class ChallengeService {
    */
   async push () {
     if (this.#list === null) await this.#getList()
-    this.#repo.add(this.#list)
+    await this.#repo.add(this.#list)
   }
+
+  /**
+   * Retrieve a challenge from whatever mess TM sends us
+   * @param object
+   * @returns {Challenge}
+   */
+  static #deserialise (object) {
+    const c = object.member
+    return new Challenge(c[0].value[0].string, c[1].value[0].string, c[4].value[0].string, c[3].value[0].string)
+  }
+
+}
+
+class Challenge {
+  #id
+  #name
+  #author
+  #environment
+
+  constructor (id, name, author, environment) {
+    this.#id = id
+    this.#name = name
+    this.#author = author
+    this.#environment = environment
+  }
+
+  get id(){
+    return this.#id
+  }
+
+  get name(){
+    return this.#name
+  }
+
+  get author() {
+    return this.#author
+  }
+
+  get environment() {
+    return this.#environment
+  }
+
 }
 
 export default ChallengeService
