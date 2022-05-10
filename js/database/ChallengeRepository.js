@@ -1,4 +1,3 @@
-'use strict'
 import Repository from './Repository.js'
 import Error from '../Error.js'
 
@@ -33,7 +32,7 @@ class ChallengeRepository extends Repository {
     objects.forEach(c => {
       query += p + c.id + m + c.name + m + c.author + m + c.environment + s
     })
-    query = query.slice(0, -1) + ';'
+    query = query.slice(0, -1) + ' ON CONFLICT DO NOTHING;'
     await this._db.query(query)
   }
 }

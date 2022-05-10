@@ -1,5 +1,5 @@
 'use strict'
-import client from '../Client.js'
+import Client from '../Client.js'
 import Error from '../Error.js'
 import ChallengeRepository from '../database/ChallengeRepository.js'
 
@@ -16,7 +16,7 @@ class ChallengeService {
    * @returns {Promise<void>}
    */
   async #getList () {
-    const rawList = await client.call('GetChallengeList', [
+    const rawList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ]).catch(err => { Error.fatal('Error fetching challenges', err) })
     this.#list = rawList.map(challenge => ChallengeService.#deserialise(challenge))
