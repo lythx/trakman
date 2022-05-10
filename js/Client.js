@@ -3,10 +3,10 @@ import Request from './Request.js'
 import Socket from './Socket.js'
 
 class Client {
-  socket = new Socket()
-  requestId = 0x80000000
-  response = ''
-  awaitingResponse
+  static socket = new Socket()
+  static requestId = 0x80000000
+  static response = ''
+  static awaitingResponse
 
   /**
   * Connects to dedicated server and waits for handshake.
@@ -15,7 +15,7 @@ class Client {
   * @param {Number} port port at which dedicated server is listening for XmlRpc (default 5000)
   * @returns {Promise<String>} handshake status
   */
-  async connect (host = 'localhost', port = 5000) {
+  static async connect (host = 'localhost', port = 5000) {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
@@ -37,7 +37,7 @@ class Client {
   * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
   * @returns {Promise<any[]>} array of server response values
   */
-  async call (method, params = [], expectsResponse = true) {
+  static async call (method, params = [], expectsResponse = true) {
     this.requestId++ // increment requestId so every request has an unique id
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
@@ -47,6 +47,4 @@ class Client {
   }
 }
 
-const client = new Client()
-
-export default client
+export default Client

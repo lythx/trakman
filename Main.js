@@ -1,28 +1,26 @@
 'use strict'
-import client from './js/Client.js'
+import Client from './js/Client.js'
 import Logger from './js/Logger.js'
 import Error from './js/Error.js'
 import ChallengeService from './js/services/ChallengeService.js'
-import listeners from './js/Listeners.js'
 import 'dotenv/config'
+import Listeners from './js/Listeners.js'
 
 async function main () {
   Logger.warn('Establishing connection with the server...')
-  const connectionStatus = await client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
+  const connectionStatus = await Client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
     .catch(err => { Error.fatal(err) })
   Logger.info(connectionStatus)
   Logger.trace('Authenticating...')
-  const authenticationStatus = await client.call('Authenticate', [
+  const authenticationStatus = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
   if (authenticationStatus[0].faultCode) { Error.fatal('Authentication failed', authenticationStatus[0].faultString, authenticationStatus[0].faultCode) }
   Logger.info('Authentication success')
-
-  listeners.initialize()
-
+  Listeners.initialize()
   Logger.trace('Enabling callbacks...')
-  const enableCallbacks = await client.call('EnableCallbacks', [
+  const enableCallbacks = await Client.call('EnableCallbacks', [
     { boolean: true }
   ])
   if (enableCallbacks[0].faultCode) { Error.fatal('Failed to enable callbacks', enableCallbacks[0].faultString, enableCallbacks[0].faultCode) }

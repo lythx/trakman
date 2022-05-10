@@ -2,17 +2,7 @@
 import 'dotenv/config'
 import postgres from 'pg'
 import Error from '../Error.js'
-import Logger from '../Logger.js'
 const { Pool } = postgres
-const createPlayers = `
-  CREATE TABLE IF NOT EXISTS players(
-    login varchar(25) primary key not null,
-    nickname varchar(45) not null,
-    nation varchar(3) not null,
-    wins int4 not null default 0,
-    timePlayed int8 not null default 0
-  );
-`
 
 const createRecords = `
   CREATE TABLE IF NOT EXISTS records(
@@ -36,7 +26,6 @@ class Database {
 
   constructor () {
     this.#client.connect()
-    this.#client.query(createPlayers)
     this.#client.query(createRecords)
   }
 
@@ -53,7 +42,7 @@ class Database {
       Error.error('Database query is not a string')
       return
     }
-    return await this.#client.query(q).then(() => Logger.info('Query execution successful'))
+    return await this.#client.query(q)
       .catch(err => Error.error('Database error:', err))
   }
 }
