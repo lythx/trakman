@@ -10,9 +10,32 @@ class Error {
     */
   static fatal (str, errstr, errcode) {
     Logger.fatal(str)
-    if (errstr && errcode) { Logger.fatal(`error code: ${errcode}, error: ${errstr}`) } else if (errstr && !errcode) { Logger.fatal(`error: ${errstr}`) } else if (!errstr && errcode) { Logger.fatal(`error code: ${errcode}`) }
+    if (errstr && errcode) {
+      Logger.fatal(`error code: ${errcode}, error: ${errstr}`)
+    } else if (errstr && !errcode) {
+      Logger.fatal(`error: ${errstr}`)
+    } else if (!errstr && errcode) {
+      Logger.fatal(`error code: ${errcode}`)
+    }
     Logger.fatal('Aborting...')
     process.exit(1)
+  }
+
+  /**
+   * Logs error without exiting
+   * @param {String} str first line of log
+   * @param {String} errstr error string
+   * @param {Number} errcode error code
+   */
+  static error (str, errstr, errcode) {
+    Logger.warn(str)
+    if (errstr && errcode) {
+      Logger.warn(`error code: ${errcode}, error: ${errstr}`)
+    } else if (errstr && !errcode) {
+      Logger.warn(`error: ${errstr}`)
+    } else if (!errstr && errcode) {
+      Logger.warn(`error code: ${errcode}`)
+    }
   }
 }
 
