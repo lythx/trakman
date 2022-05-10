@@ -7,8 +7,9 @@ class Repository {
   /**
    * Adds an array of objects to the database
    * @param {Object[]} objects the objects
+   * @return {Promise<any[]>} query result
    */
-  add (objects) {}
+  async add (objects) { }
 }
 
 export default Repository
