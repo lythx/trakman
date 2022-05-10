@@ -1,3 +1,4 @@
+'use strict'
 import client from '../Client.js'
 import Error from '../Error.js'
 import ChallengeRepository from '../database/ChallengeRepository.js'
@@ -14,7 +15,7 @@ class ChallengeService {
   async #getList () {
     this.#list = await client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
-    ]).catch(err => { Error.fatal('Error while fetching challenges', err, 1) })
+    ]).catch(err => { Error.fatal('Error fetching challenges', err) })
   }
 
   async push () {
