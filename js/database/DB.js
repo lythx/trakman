@@ -53,7 +53,7 @@ class Database {
       Error.error('Database query is not a string')
       return
     }
-    return await this.#client.query(q).then(Logger.info('Query execution successful'))
+    return await this.#client.query(q).then(() => Logger.info('Query execution successful'))
       .catch(err => Error.error('Database error:', err))
   }
 }
