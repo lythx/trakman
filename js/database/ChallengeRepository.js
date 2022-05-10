@@ -1,3 +1,4 @@
+'use strict'
 import Repository from './Repository.js'
 import Error from '../Error.js'
 
@@ -12,17 +13,16 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 class ChallengeRepository extends Repository {
-  constructor () {
-    super()
-    this._db.query(createQuery)
+  async initialize () {
+    await this._db.query(createQuery)
   }
 
   /**
    * Adds an array of challenges to the database
    * @param {Object[]} objects the challenges
+   * @return {Promise<any[]>}
    */
-  add (objects) {
-    console.log(typeof objects)
+  async add (objects) {
     if (typeof objects !== 'object' || objects.length < 1) {
       Error.fatal('Type error when adding challenges to database')
     }
@@ -30,19 +30,11 @@ class ChallengeRepository extends Repository {
     const m = "', '"
     const s = "'),"
     let query = addQuery
-    objects.forEach(challenge => {
-      const c = challenge.member
-      if (c === null || c.length !== 7) {
-        query += p + c[0].value[0].string + m + c[1].value[0].string +
-        m + c[4].value[0].string + m + c[3].value[0].string + s
-      }
+    objects.forEach(c => {
+      query += p + c.id + m + c.name + m + c.author + m + c.environment + s
     })
     query = query.slice(0, -1) + ';'
-    try {
-      this._db.query(query)
-    } catch (e) {
-      Error.error('Error adding challenges to database', e)
-    }
+    await this._db.query(query)
   }
 }
 

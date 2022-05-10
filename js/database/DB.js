@@ -7,7 +7,6 @@ const { Pool } = postgres
 const createPlayers = `
   CREATE TABLE IF NOT EXISTS players(
     login varchar(25) primary key not null,
-    game varchar(3) not null,
     nickname varchar(45) not null,
     nation varchar(3) not null,
     wins int4 not null default 0,
@@ -47,14 +46,15 @@ class Database {
    * no need to sanitise since the library does that itself
    * @param {String} q the query
    * @throws a database error if something goes wrong with the query
+   * @return {Promise<void>}
    */
-  query (q) {
-    if(typeof q !== 'string') {
+  async query (q) {
+    if (typeof q !== 'string') {
       Error.error('Database query is not a string')
       return
     }
-    this.#client.query(q).then(res => Logger.info(res))
-      .catch(err => throw err)
+    return await this.#client.query(q).then(() => Logger.info('Query execution successful'))
+      .catch(err => Error.error('Database error:', err))
   }
 }
 
