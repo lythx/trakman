@@ -60,13 +60,13 @@ class Listeners {
     },
     {
       event: 'TrackMania.BeginRound',
-      callback: (params) => {
+      callback: () => {
         //I'm assuming this is ROUNDS only, will figure out later
       }
     },
     {
       event: 'TrackMania.EndRound',
-      callback: (params) => {
+      callback: () => {
         //I'm assuming this is ROUNDS only, will figure out later
       }
     },
