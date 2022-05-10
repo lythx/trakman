@@ -36,13 +36,15 @@ class Database {
    * no need to sanitise since the library does that itself
    * @param {String} q the query
    * @throws a database error if something goes wrong with the query
+   * @return {Promise<void>}
    */
   async query (q) {
     if (typeof q !== 'string') {
       Error.error('Database query is not a string')
       return
     }
-    return await this.#client.query(q)
+    return await this.#client.query(q).then(() => Logger.info('Query execution successful'))
+      .catch(err => Error.error('Database error:', err))
   }
 }
 
