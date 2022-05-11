@@ -7,8 +7,12 @@ class ChallengeService {
   #list = null
   #repo
 
+  constructor () {
+    this.#repo = new ChallengeRepository()
+  }
+
   async initialize () {
-    this.#repo = await new ChallengeRepository()
+    await this.#repo.initialize()
   }
 
   /**
