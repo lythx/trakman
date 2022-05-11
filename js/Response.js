@@ -45,18 +45,20 @@ class Response {
     this.#data = newBuffer
   }
 
-  /**
-  * @returns {Number} response id
-  */
-  getId () {
+  get id () {
     return this.#id
   }
 
-  /**
-  * @returns {String} response status
-  */
-  getStatus () {
+  get status () {
     return this.#status
+  }
+
+  get eventName () {
+    return this.#eventName
+  }
+
+  get isEvent () {
+    return this.#isEvent
   }
 
   /**
@@ -82,14 +84,6 @@ class Response {
     }
   }
 
-  getEventName () {
-    return this.#eventName
-  }
-
-  isEvent () {
-    return this.#isEvent
-  }
-
   #generateJson () {
     let json = []
     // parse xml to json
@@ -110,17 +104,21 @@ class Response {
     }
   }
 
+  // i hate XML
   #fixNesting (obj) {
     const arr = []
     // if server responded with error
     if (obj.fault) {
       arr.push({
-        faultCode: obj.fault[0].value[0].struct[0].member[0].value[0].int[0],
-        faultString: obj.fault[0].value[0].struct[0].member[1].value[0].string[0]
+        error: true,
+        errorCode: obj.fault[0].value[0].struct[0].member[0].value[0].int[0],
+        errorString: obj.fault[0].value[0].struct[0].member[1].value[0].string[0]
       })
       return arr
     }
     const changeType = (value, type) => {
+      const arr = []
+      const obj = {}
       switch (type) {
         case 'boolean':
           return value === '1'
@@ -130,13 +128,29 @@ class Response {
           return parseFloat(value)
         case 'base64':
           return Buffer.from(value, 'base64')
+        case 'struct':
+          for (const el of value.member) {
+            const key = el.name[0]
+            const t = Object.keys(el.value[0])[0]
+            const val = el.value[0][t][0]
+            obj[key] = changeType(val, t)
+          }
+          return obj
+        case 'array':
+          for (const el of value.data) {
+            if (!el.value) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            const t = Object.keys(el.value[0])[0]
+            const val = el.value[0][t][0]
+            arr.push(changeType(val, t))
+          }
+          return arr
         default:
           return value
       }
     }
     // change overnested object received from parsing the xml to an array of server return values
     if (!obj.params[0].param) {
-      return [obj.params[0]] // some callbacks don't return params. NICE!!!!
+      return [] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
       for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
