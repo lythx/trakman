@@ -1,3 +1,4 @@
+'use strict'
 import countries from '../data/Countries.js'
 import PlayerRepository from '../database/PlayerRepository.js'
 

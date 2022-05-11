@@ -1,3 +1,4 @@
+'use strict'
 import Repository from './Repository.js'
 
 const createQuery = `
@@ -40,7 +41,7 @@ class PlayerRepository extends Repository {
     const m = "', '"
     const s = "')"
     let query = addQuery + p + player.login + m + player.nickName +
-            m + player.nationCode + m + 0 + m + 0 + s
+      m + player.nationCode + m + 0 + m + 0 + s
     query = query + ';'
     return (await this._db.query(query)).rows
   }

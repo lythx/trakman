@@ -5,6 +5,7 @@ import Error from './js/Error.js'
 import ChallengeService from './js/services/ChallengeService.js'
 import 'dotenv/config'
 import Listeners from './js/Listeners.js'
+import DefaultCommands from './js/plugins/DefaultCommands.js'
 
 async function main () {
   Logger.warn('Establishing connection with the server...')
@@ -19,6 +20,8 @@ async function main () {
   if (authenticationStatus[0].faultCode) { Error.fatal('Authentication failed', authenticationStatus[0].faultString, authenticationStatus[0].faultCode) }
   Logger.info('Authentication success')
   Listeners.initialize()
+  const defaultCommands = new DefaultCommands()
+  defaultCommands.initialize()
   Logger.trace('Enabling callbacks...')
   const enableCallbacks = await Client.call('EnableCallbacks', [
     { boolean: true }
