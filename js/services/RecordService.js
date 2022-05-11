@@ -1,9 +1,8 @@
 'use strict'
-
+import { randomUUID } from 'crypto'
 import RecordRepository from '../database/RecordRepository.js'
 
 class RecordService {
-  #list = []
   #repo
 
   constructor () {
@@ -13,23 +12,51 @@ class RecordService {
   async initialize () {
     await this.#repo.initialize()
   }
+
+  async add (challenge, login, score, checkpoints) {
+    const record = new Record(challenge, login, score, checkpoints)
+    const res = await this.#repo.add(record)
+    if (res.rows?.[0]?.id) {
+      record.id = res.rows[0].id
+    }
+  }
 }
 
 class Record {
-  #id
+  id
   #challenge
   #login
   #score
   #date
   #checkpoints
 
-  constructor (id, challenge, login, score, checkpoints) {
-    this.#id = id
+  constructor (challenge, login, score, checkpoints) {
+    this.id = randomUUID()
     this.#challenge = challenge
     this.#login = login
     this.#score = score
     this.#checkpoints = checkpoints
     this.#date = new Date()
+  }
+
+  get challenge () {
+    return this.#challenge
+  }
+
+  get login () {
+    return this.#login
+  }
+
+  get score () {
+    return this.#score
+  }
+
+  get checkpoints () {
+    return this.#checkpoints
+  }
+
+  get date () {
+    return this.#date
   }
 }
 
