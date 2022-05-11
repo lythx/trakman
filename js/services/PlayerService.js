@@ -1,6 +1,7 @@
 'use strict'
 import countries from '../data/Countries.js'
 import PlayerRepository from '../database/PlayerRepository.js'
+import Chat from '../plugins/Chat.js'
 
 class PlayerService {
   #players = []
@@ -23,6 +24,7 @@ class PlayerService {
       await this.#repo.update(player)
     }
     this.#players.push(player)
+    Chat.sendJoinMessage(nickName)
   }
 
   get players () {
