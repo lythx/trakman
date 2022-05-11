@@ -12,7 +12,6 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 class ChallengeRepository extends Repository {
-
   async initialize () {
     await this._db.query(createQuery)
   }
@@ -23,7 +22,7 @@ class ChallengeRepository extends Repository {
    * @return {Promise<any[]>}
    */
   async add (objects) {
-    if (!objects instanceof Array || objects.length < 1) {
+    if (!(objects instanceof Array) || objects.length < 1) {
       Error.fatal('Type error when adding challenges to database')
     }
     const p = "('"

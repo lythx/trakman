@@ -6,7 +6,7 @@ import Client from '../Client.js'
 
 class DefaultCommands {
   #commands = [
-    //THIS IS JUST A TEST PLEASE FIX THIS FOR PRODUCTION
+    // THIS IS JUST A TEST PLEASE FIX THIS FOR PRODUCTION
     new Command(
       ['qwe', 'qwer', '123', 'test'],
       'qqweqwe',
@@ -19,7 +19,7 @@ class DefaultCommands {
       Events.addListener('TrackMania.PlayerChat', async (params) => {
         if (params[0] === 0 || !command.aliases.some(a => (params[2].trim().toLowerCase()).split(' ')[0] === `/${a}`)) { return }
         // TODO check for privileges db query
-        command.callback(/*TODO::: PASS PLAYER INFO THIS IS CRITICAL FOR OUR MISSION*/(params[2].trim()).split(/ /).shift())
+        command.callback(/* TODO::: PASS PLAYER INFO THIS IS CRITICAL FOR OUR MISSION */(params[2].trim()).split(/ /).shift())
       })
     }
   }
