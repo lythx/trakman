@@ -6,6 +6,7 @@ import ChallengeService from './js/services/ChallengeService.js'
 import 'dotenv/config'
 import Listeners from './js/Listeners.js'
 import DefaultCommands from './js/plugins/DefaultCommands.js'
+import PlayerService from './js/services/PlayerService.js'
 
 async function main () {
   Logger.warn('Establishing connection with the server...')
@@ -34,6 +35,11 @@ async function main () {
     .then(() => Logger.info('Challenge service instantiated'))
   await challengeService.push()
     .then(() => Logger.info('Challenges are in the database'))
+  const playerService = new PlayerService()
+  await playerService.initialize()
+    .then(() => Logger.info('Player service instantiated'))
+  await playerService.addAllFromList()
+    .then(() => Logger.info('Player list created'))
 }
 
 main()

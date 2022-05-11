@@ -18,10 +18,10 @@ class Events {
 
   /**
    * Execute the event callbacks
-   * @param event callback event name
-   * @param json callback params
+   * @param {String} event callback event name
+   * @param {any[]} json callback params
    */
-  static handleEvent (event, json) {
+  static emitEvent (event, json) {
     const matchingEvents = this.#eventListeners.filter(a => a.event === event)
     for (const listener of matchingEvents) {
       listener.callback(json)

@@ -16,9 +16,9 @@ const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = '
 const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES'
 
 class PlayerRepository extends Repository {
-  constructor () {
-    super()
-    this._db.query(createQuery)
+  
+  async initialize () {
+    await this._db.query(createQuery)
   }
 
   /**
@@ -58,6 +58,13 @@ class PlayerRepository extends Repository {
         wins=${player.wins},
         timePlayed=${player.timePlayed}
         WHERE login='${player.login}';`
+    return (await this._db.query(query)).rows
+  }
+
+  async setTimePlayed (login, timePlayed) {
+    const query = `UPDATE players SET 
+        timePlayed=${timePlayed}
+        WHERE login='${login}';`
     return (await this._db.query(query)).rows
   }
 }
