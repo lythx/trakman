@@ -157,6 +157,9 @@ class Response {
         const value = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
+            if (!el.data[0]?.value) { // some methods dont return value here too
+              continue
+            }
             for (const val of el.data[0].value) {
               const type = Object.keys(val)[0]
               arr.push(changeType(val[type][0], type))

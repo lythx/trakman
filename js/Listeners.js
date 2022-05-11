@@ -4,10 +4,10 @@ import Client from './Client.js'
 import Events from './Events.js'
 import Logger from './Logger.js'
 import DB from './database/DB.js'
-import PlayerService from './services/PlayerService.js'
+import Players from './Players.js'
+import Socket from './Socket.js'
 
 class Listeners {
-  static #playerService = new PlayerService()
 
   static #listeners = [
     {
@@ -15,14 +15,14 @@ class Listeners {
       callback: async (params) => {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        this.#playerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        Players.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
         Chat.sendJoinMessage(playerInfo[0].NickName)
       }
     },
     {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params) => {
-        await this.#playerService.leave(params[0])
+        await Players.leave(params[0])
       }
     },
     {
@@ -85,6 +85,7 @@ class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params) => {
         // Similar to EndRace, albeit gives more information to process
+        Logger.warn(JSON.stringify(params))
       }
     },
     {
