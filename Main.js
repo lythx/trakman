@@ -16,14 +16,14 @@ async function main () {
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
-  if (authenticationStatus[0].faultCode) { Error.fatal('Authentication failed', authenticationStatus[0].faultString, authenticationStatus[0].faultCode) }
+  if (authenticationStatus[0].error) { Error.fatal('Authentication failed', authenticationStatus[0].errorString, authenticationStatus[0].errorCode) }
   Logger.info('Authentication success')
   Listeners.initialize()
   Logger.trace('Enabling callbacks...')
   const enableCallbacks = await Client.call('EnableCallbacks', [
     { boolean: true }
   ])
-  if (enableCallbacks[0].faultCode) { Error.fatal('Failed to enable callbacks', enableCallbacks[0].faultString, enableCallbacks[0].faultCode) }
+  if (enableCallbacks[0].error) { Error.fatal('Failed to enable callbacks', enableCallbacks[0].errorString, enableCallbacks[0].errorCode) }
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
   const challengeService = new ChallengeService()

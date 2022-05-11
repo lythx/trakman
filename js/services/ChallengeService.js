@@ -16,10 +16,13 @@ class ChallengeService {
    * @returns {Promise<void>}
    */
   async #getList () {
-    const rawList = await Client.call('GetChallengeList', [
+    const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ]).catch(err => { Error.fatal('Error fetching challenges', err) })
-    this.#list = rawList.map(challenge => ChallengeService.#deserialise(challenge))
+    this.#list = []
+    for (const challenge of challengeList) {
+      this.#list.push(new Challenge(challenge.UId, challenge.Name, challenge.Author, challenge.Environnement)) // they cant speak english ahjahahahahhaha
+    }
   }
 
   /**
@@ -30,16 +33,6 @@ class ChallengeService {
   async push () {
     if (this.#list === null) await this.#getList()
     await this.#repo.add(this.#list)
-  }
-
-  /**
-   * Retrieve a challenge from whatever mess TM sends us
-   * @param object
-   * @returns {Challenge}
-   */
-  static #deserialise (object) {
-    const c = object.member
-    return new Challenge(c[0].value[0].string, c[1].value[0].string, c[4].value[0].string, c[3].value[0].string)
   }
 }
 
