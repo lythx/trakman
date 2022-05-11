@@ -4,6 +4,16 @@ import postgres from 'pg'
 import Error from '../Error.js'
 const { Pool } = postgres
 
+const createRecords = `
+  CREATE TABLE IF NOT EXISTS records(
+      id uuid primary key not null,
+      challenge varchar(27) not null,
+      login varchar(25) not null,
+      score int4 not null,
+      date timestamp not null,
+      checkpoints int4[]
+  );
+`
 
 class Database {
   #client = new Pool({
