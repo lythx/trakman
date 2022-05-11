@@ -103,14 +103,14 @@ class Socket extends net.Socket {
     if (this.#response.status === 'overloaded') {
       const nextResponseBuffer = this.#response.extractOverload()
       if (this.#response.isEvent) {
-        Events.handleEvent(this.#response.eventName, this.#response.getJson())
+        Events.emitEvent(this.#response.eventName, this.#response.getJson())
       } else {
         this.#responses.unshift(this.#response)
       } // put completed response at the start of responses array
       this.#handleResponseStart(nextResponseBuffer) // start new response if buffer was overloaded
     } else if (this.#response.status === 'completed') {
       if (this.#response.isEvent) {
-        Events.handleEvent(this.#response.eventName, this.#response.getJson())
+        Events.emitEvent(this.#response.eventName, this.#response.getJson())
       } else {
         this.#responses.unshift(this.#response)
       } // put completed response at the start of responses array

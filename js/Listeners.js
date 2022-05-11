@@ -15,14 +15,14 @@ class Listeners {
       callback: async (params) => {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        this.#playerService.add(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        this.#playerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
         Chat.sendJoinMessage(playerInfo[0].NickName)
       }
     },
     {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params) => {
-        // Handle player disconnection, put playtime in db, splice player from array
+        await this.#playerService.leave(params[0])
       }
     },
     {
