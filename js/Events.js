@@ -1,26 +1,32 @@
 'use strict'
-import Logger from './Logger.js'
-import Client from './Client.js'
-import Chat from './plugins/Chat.js'
-
+/**
+ * @abstract
+ * @method addListener
+ * @method handleEvent
+ */
 class Events {
-  #eventListeners = []
+  static #eventListeners = []
 
   /**
-   * Execute the callback on event
+   * Add callback function to execute on given event
    * @param event dedicated server callback event
    * @param callback function to execute on event
    */
-  addListener (event, callback) {
+  static addListener (event, callback) {
     this.#eventListeners.push({ event, callback })
   }
 
-  handleEvent (name, json) {
-    const matchingEvents = this.#eventListeners.filter(a => a.event === name)
+  /**
+   * Execute the event callbacks
+   * @param event callback event name
+   * @param json callback params
+   */
+  static handleEvent (event, json) {
+    const matchingEvents = this.#eventListeners.filter(a => a.event === event)
     for (const listener of matchingEvents) {
       listener.callback(json)
     }
   }
 }
 
-export default new Events()
+export default Events
