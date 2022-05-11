@@ -1,3 +1,4 @@
+'use strict'
 import Chat from './plugins/Chat.js'
 import Client from './Client.js'
 import Events from './Events.js'
@@ -28,7 +29,7 @@ class Listeners {
       event: 'TrackMania.PlayerChat',
       callback: async (params) => {
         if (params[0] === 0) // check if server message
-        {}
+        { }
         // Log the chat and write to log table
       }
     },
@@ -45,7 +46,7 @@ class Listeners {
         { return }
         const status = await Client.call('GetStatus')
         if (status[0].Code !== 4) // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-        {}
+        { }
         // Store/update finish time in db
       }
     },
