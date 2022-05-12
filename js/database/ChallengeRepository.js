@@ -1,5 +1,5 @@
 import Repository from './Repository.js'
-import Error from '../Error.js'
+import ErrorHandler from '../ErrorHandler.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS challenges(
@@ -23,7 +23,7 @@ class ChallengeRepository extends Repository {
    */
   async add (objects) {
     if (!(objects instanceof Array) || objects.length < 1) {
-      Error.fatal('Type error when adding challenges to database')
+      ErrorHandler.fatal('Type error when adding challenges to database')
     }
     const p = "('"
     const m = "', '"

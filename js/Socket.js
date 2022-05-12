@@ -16,7 +16,7 @@ class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners() {
+  setupListeners () {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.#handshakeHeaderSize === null) {
@@ -29,14 +29,14 @@ class Socket extends net.Socket {
         this.#handleResponseChunk(buffer)
       }
     })
-    this.on('error', err => ErrorHandler.fatal(err))
+    this.on('error', err => ErrorHandler.fatal('Socket error', err))
   }
 
   /**
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  awaitHandshake() {
+  awaitHandshake () {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
@@ -59,7 +59,7 @@ class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  awaitResponse(id, method) {
+  awaitResponse (id, method) {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
@@ -67,7 +67,7 @@ class Socket extends net.Socket {
         if (this.#responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.#responses.find(a => a.id === id && a.status === 'completed')
           if (response.isError) {
-            reject(new Error({ errorCode: response.errorCode, errorString: response.errorString }))
+            reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
           }
           resolve(response.getJson())
@@ -78,12 +78,12 @@ class Socket extends net.Socket {
     })
   }
 
-  #setHandshakeHeaderSize(buffer) {
-    if (buffer.length < 4) { ErrorHandler.fatal('Failed to read hanshake header', 'Buffer length too small') }
+  #setHandshakeHeaderSize (buffer) {
+    if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
     this.#handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake(buffer) {
+  #handleHandshake (buffer) {
     this.#handshakeHeader = buffer.toString()
     if (this.#handshakeHeaderSize !== this.#handshakeHeader.length || // check if protocol and header length is right
       this.#handshakeHeader !== 'GBXRemote 2') {
@@ -95,7 +95,7 @@ class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart(buffer) {
+  #handleResponseStart (buffer) {
     this.#responses.length = Math.min(this.#responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.#incompleteHeader = buffer
@@ -111,7 +111,7 @@ class Socket extends net.Socket {
   }
 
   // add new buffer to response object
-  #handleResponseChunk(buffer) {
+  #handleResponseChunk (buffer) {
     this.#response.addData(buffer)
     if (this.#response.status === 'overloaded') {
       const nextResponseBuffer = this.#response.extractOverload()
