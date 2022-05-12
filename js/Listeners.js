@@ -6,6 +6,7 @@ import Logger from './Logger.js'
 import DB from './database/DB.js'
 import Players from './Players.js'
 import Socket from './Socket.js'
+import RecordService from './services/RecordService.js'
 
 class Listeners {
 
@@ -41,12 +42,16 @@ class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params) => {
-        if (params[0] === 0 || params[2] === -1) // IGNORE THIS IS A FAKE FINISH | IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
-        { return }
+      callback: async (params) => { // params are PlayerUid, Login, Score
+        if (params[0] === 0 || params[2] === 0) { // IGNORE THIS IS A FAKE FINISH | IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
+          return
+        }
         const status = await Client.call('GetStatus')
-        if (status[0].Code !== 4) // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-        { }
+        if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
+          return
+        }
+        const challengeInfo = await Client.call('GetCurrentChallengeInfo')
+        await this.#recordService.add(challengeInfo[0].UId, params[1], params[2], [])
         // Store/update finish time in db
       }
     },
