@@ -141,6 +141,7 @@ class Listeners {
       }
     }
   ]
+
   static #recordService = new RecordService()
 
   static async initialize () {

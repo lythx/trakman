@@ -14,7 +14,6 @@ const createQuery = `
 const getQuery = 'SELECT id, score FROM records WHERE login = $1 AND challenge = $2;'
 
 class RecordRepository extends Repository {
-
   async initialize () {
     await super.initialize()
     await this._db.query(createQuery)

@@ -15,7 +15,6 @@ const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = $1'
 const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES($1, $2, $3, $4, $5);'
 
 class PlayerRepository extends Repository {
-
   async initialize () {
     await super.initialize()
     await this._db.query(createQuery)
