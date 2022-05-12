@@ -22,19 +22,13 @@ class Client {
     this.#socket.connect(port, host)
     this.#socket.setKeepAlive(true)
     this.#socket.setupListeners()
-    const handshakeStatus = await this.#socket.awaitHandshake()
-    return new Promise((resolve, reject) => {
-      if (handshakeStatus === 'No response from the server' || handshakeStatus === 'Server uses wrong GBX protocol') {
-        reject(handshakeStatus)
-      } else if (handshakeStatus === 'Handshake success') {
-        resolve(handshakeStatus)
-      }
-    })
+    const handshakeStatus = await this.#socket.awaitHandshake().catch(err => Promise.reject(err))
+    return handshakeStatus
   }
 
   /**
-  * Calls a dedicated server method. Check if returnvalue[0].error exists to handle errors.
-  * Error string is returnvalue[0].errorString, error code is returnvalue[0].errorCode.
+  * Calls a dedicated server method. Rejects promise if server responds error.
+  * On error passes object containing errorCode and errorString properties
   * @param {String} method dedicated server method name
   * @param {Object[]} params parameters, each param needs to be under key named after its type
   * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
@@ -46,7 +40,7 @@ class Client {
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)
     if (!expectsResponse) { return null }
-    return await this.#socket.awaitResponse(this.#requestId)
+    return await this.#socket.awaitResponse(this.#requestId, method).catch(err => Promise.reject(err))
   }
 }
 

@@ -11,12 +11,12 @@ const createQuery = `
   );
 `
 
-const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = '
-
-const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES'
+const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = $1'
+const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES($1, $2, $3, $4, $5);'
 
 class PlayerRepository extends Repository {
   async initialize () {
+    await super.initialize()
     await this._db.query(createQuery)
   }
 
@@ -26,8 +26,7 @@ class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async get (login) {
-    const query = `${getQuery}'${login}';`
-    return (await this._db.query(query)).rows
+    return (await this._db.query(getQuery, [login])).rows
   }
 
   /**
@@ -36,13 +35,7 @@ class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async add (player) {
-    const p = "('"
-    const m = "', '"
-    const s = "')"
-    let query = addQuery + p + player.login + m + player.nickName +
-      m + player.nationCode + m + 0 + m + 0 + s
-    query = query + ';'
-    return (await this._db.query(query)).rows
+    return (await this._db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])).rows
   }
 
   /**
@@ -52,12 +45,19 @@ class PlayerRepository extends Repository {
    */
   async update (player) {
     const query = `UPDATE players SET 
-        nickname='${player.nickName}',
-        nation='${player.nationCode}',
-        wins=${player.wins},
-        timePlayed=${player.timePlayed}
-        WHERE login='${player.login}';`
-    return (await this._db.query(query)).rows
+        nickname=$1,
+        nation=$2,
+        wins=$3,
+        timePlayed=$4
+        WHERE login=$5;`
+    return (await this._db.query(query, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])).rows
+  }
+
+  async setTimePlayed (login, timePlayed) {
+    const query = `UPDATE players SET 
+        timePlayed=$1
+        WHERE login=$2;`
+    return (await this._db.query(query, [timePlayed, login])).rows
   }
 }
 

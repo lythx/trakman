@@ -1,17 +1,41 @@
-'use strict'
-import countries from '../data/Countries.js'
+import Client from '../Client.js'
 import PlayerRepository from '../database/PlayerRepository.js'
-import Chat from '../plugins/Chat.js'
+import countries from '../data/Countries.js'
+import Events from '../Events.js'
 
 class PlayerService {
-  #players = []
-  #repo
+  static #players = []
+  static #repo = new PlayerRepository()
 
-  constructor () {
-    this.#repo = new PlayerRepository()
+  static async initialize () {
+    await this.#repo.initialize()
   }
 
-  async add (login, nickName, path) {
+  static get players () {
+    return this.#players
+  }
+
+  /**
+   * Add all the players in the server into local storage and database
+   * Only called in the beginning as a start job
+   * @returns {Promise<void>}
+   */
+  static async addAllFromList () {
+    const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
+    for (const player of playerList) {
+      const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path)
+    }
+  }
+
+  /**
+   * Adds a player into the list and database
+   * @param {String} login
+   * @param {String} nickName
+   * @param {String} path
+   * @returns {Promise<void>}
+   */
+  static async join (login, nickName, path) {
     const nation = path.split('|')[1]
     const nationCode = countries.find(a => a.name === path.split('|')[1]).code
     const playerData = await this.#repo.get(login)
@@ -19,16 +43,37 @@ class PlayerService {
     if (playerData.length === 0) {
       await this.#repo.add(player)
     } else {
-      player.wins = playerData[0].wins
-      player.timePlayed = playerData[0].timeplayed
+      player.wins = Number(playerData[0].wins)
+      player.timePlayed = Number(playerData[0].timeplayed)
       await this.#repo.update(player)
     }
     this.#players.push(player)
-    Chat.sendJoinMessage(nickName)
   }
 
-  get players () {
-    return this.#players
+  /**
+   * Remove the player
+   * @param login
+   * @returns {Promise<void>}
+   */
+  static async leave (login) {
+    const player = this.#players.find(p => p.login === login)
+    const sessionTime = Date.now() - player.joinTimestamp
+    const totalTimePlayed = sessionTime + player.timePlayed
+    // Do this instead of waiting for tm callback to prevent accessing database
+    Events.emitEvent('Controller.PlayerLeave',
+      [{
+        login: player.login,
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        wins: player.wins,
+        sessionTime,
+        totalTimePlayed,
+        joinTimestamp: player.joinTimestamp
+      }]
+    )
+    await this.#repo.setTimePlayed(player.login, totalTimePlayed)
+    this.#players = this.#players.filter(p => p.login !== player.login)
   }
 }
 
@@ -37,22 +82,16 @@ class Player {
   #nickName
   #nation
   #nationCode
-  #wins = 0
-  #timePlayed = 0
+  wins = 0
+  timePlayed = 0
+  #joinTimestamp
 
   constructor (login, nickName, nation, nationCode) {
     this.#login = login
     this.#nickName = nickName
     this.#nation = nation
     this.#nationCode = nationCode
-  }
-
-  set wins (wins) {
-    this.#wins = wins
-  }
-
-  set timePlayed (timePlayed) {
-    this.#timePlayed = timePlayed
+    this.#joinTimestamp = Date.now()
   }
 
   get login () {
@@ -71,12 +110,8 @@ class Player {
     return this.#nationCode
   }
 
-  get wins () {
-    return this.#wins
-  }
-
-  get timePlayed () {
-    return this.#timePlayed
+  get joinTimestamp () {
+    return this.#joinTimestamp
   }
 }
 

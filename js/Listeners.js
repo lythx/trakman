@@ -2,28 +2,25 @@
 import Chat from './plugins/Chat.js'
 import Client from './Client.js'
 import Events from './Events.js'
-import Logger from './Logger.js'
-import DB from './database/DB.js'
 import PlayerService from './services/PlayerService.js'
+import Logger from './Logger.js'
 import RecordService from './services/RecordService.js'
 
 class Listeners {
-  static #playerService = new PlayerService()
-  static #recordService = new RecordService()
-
   static #listeners = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params) => {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        await this.#playerService.add(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        Chat.sendJoinMessage(playerInfo[0].NickName)
       }
     },
     {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params) => {
-        // Handle player disconnection, put playtime in db, splice player from array
+        await PlayerService.leave(params[0])
       }
     },
     {
@@ -145,8 +142,11 @@ class Listeners {
     }
   ]
 
-  static initialize () {
+  static #recordService = new RecordService()
+
+  static async initialize () {
     for (const listener of this.#listeners) { Events.addListener(listener.event, listener.callback) }
+    await this.#recordService.initialize()
   }
 }
 
