@@ -12,7 +12,9 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 class ChallengeRepository extends Repository {
+
   async initialize () {
+    await super.initialize()
     await this._db.query(createQuery)
   }
 
@@ -25,15 +27,16 @@ class ChallengeRepository extends Repository {
     if (!(objects instanceof Array) || objects.length < 1) {
       ErrorHandler.fatal('Type error when adding challenges to database')
     }
-    const p = "('"
-    const m = "', '"
-    const s = "'),"
     let query = addQuery
+    let values = [];
+    let i = 1;
     for (const c of objects) {
-      query += p + c.id + m + c.name + m + c.author + m + c.environment + s
+      query += '($' + i++ + ', $' + i++ + ', $' + i++ + ', $' + i++ + '),'
+      values.push(c.id, c.name, c.author, c.environment)
+      console.log(i)
     }
     query = query.slice(0, -1) + ' ON CONFLICT DO NOTHING;'
-    await this._db.query(query)
+    await this._db.query(query, values)
   }
 }
 
