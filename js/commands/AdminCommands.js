@@ -1,5 +1,8 @@
+'use strict'
 class AdminCommands {
-  addLocal () {
+  addLocal() {
 
   }
 }
+
+export default AdminCommands
