@@ -11,19 +11,19 @@ const createQuery = `
       checkpoints int4[]
   );
 `
+const getQuery = 'SELECT id, score FROM records WHERE login = $1 AND challenge = $2;'
 
 class RecordRepository extends Repository {
   async initialize () {
+    await super.initialize()
     await this._db.query(createQuery)
   }
 
   async add (record) {
-    const getQuery = `SELECT id, score FROM records
-             WHERE login = '${record.login}' AND challenge = '${record.challenge}';`
-    const getRes = (await this._db.query(getQuery)).rows
+    const getRes = (await this._db.query(getQuery, [record.login, record.challenge])).rows
     let q
     if (getRes.length > 0) {
-      if (getRes[0][1] < record.score) {
+      if (getRes[0].score < record.score) {
         return Promise.resolve(null)
       }
       const query = `
@@ -34,7 +34,7 @@ class RecordRepository extends Repository {
         WHERE id = $4
         RETURNING id;
       `
-      q = this._db.query(query, [record.score, record.date, record.checkpoints, getRes[0][0]])
+      q = this._db.query(query, [record.score, record.date, record.checkpoints, getRes[0].id])
     } else {
       const query = `
         INSERT INTO records(id, challenge, login, score, date, checkpoints)

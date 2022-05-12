@@ -10,6 +10,9 @@ class Response {
   #json = null
   #isEvent = null
   #eventName = null
+  #isError = null
+  #errorString = null
+  #errorCode = null
 
   /**
   * Initiates an object to store buffers received from dedicated server
@@ -61,6 +64,18 @@ class Response {
     return this.#isEvent
   }
 
+  get isError () {
+    return this.#isError
+  }
+
+  get errorString () {
+    return this.#errorString
+  }
+
+  get errorCode () {
+    return this.#errorCode
+  }
+
   /**
   * Returns buffer fragment written after reaching target length (next response buffer)
   * and sets status to complete
@@ -101,21 +116,18 @@ class Response {
     } else if (json.methodResponse) {
       this.#json = json
       this.#isEvent = false
+      // if server responded with error
+      if (json.methodResponse.fault) {
+        this.#isError = true
+        this.#errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
+        this.#errorString = json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
+      }
     }
   }
 
   // i hate XML
   #fixNesting (obj) {
     const arr = []
-    // if server responded with error
-    if (obj.fault) {
-      arr.push({
-        error: true,
-        errorCode: obj.fault[0].value[0].struct[0].member[0].value[0].int[0],
-        errorString: obj.fault[0].value[0].struct[0].member[1].value[0].string[0]
-      })
-      return arr
-    }
     const changeType = (value, type) => {
       const arr = []
       const obj = {}
@@ -157,6 +169,9 @@ class Response {
         const value = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
+            if (!el.data[0]?.value) { // some methods dont return value here too
+              continue
+            }
             for (const val of el.data[0].value) {
               const type = Object.keys(val)[0]
               arr.push(changeType(val[type][0], type))

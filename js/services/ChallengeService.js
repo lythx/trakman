@@ -1,6 +1,6 @@
 'use strict'
 import Client from '../Client.js'
-import Error from '../Error.js'
+import ErrorHandler from '../ErrorHandler.js'
 import ChallengeRepository from '../database/ChallengeRepository.js'
 
 class ChallengeService {
@@ -22,7 +22,7 @@ class ChallengeService {
   async #getList () {
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
-    ]).catch(err => { Error.fatal('Error fetching challenges', err) })
+    ]).catch(err => { ErrorHandler.fatal('Error fetching challenges', err) })
     this.#list = []
     for (const challenge of challengeList) {
       this.#list.push(new Challenge(challenge.UId, challenge.Name, challenge.Author, challenge.Environnement)) // they cant speak english ahjahahahahhaha
