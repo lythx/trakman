@@ -12,6 +12,14 @@ class DefaultCommands {
       ['qwe', 'qwer', '123', 'test'],
       'qqweqwe',
       () => { Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false) }
+    ),
+    new Command(
+      ['ct', 'colourtest'],
+      'test the colours',
+      () => {
+        const col = Object.values(colours)
+        Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
+      }
     )
   ]
 
