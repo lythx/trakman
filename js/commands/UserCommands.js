@@ -1,6 +1,6 @@
 'use strict'
 class UserCommands {
-    // TODO
+  // TODO
 }
 
 export default UserCommands

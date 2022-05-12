@@ -1,6 +1,6 @@
 'use strict'
 class AdminCommands {
-  addLocal() {
+  addLocal () {
 
   }
 }
