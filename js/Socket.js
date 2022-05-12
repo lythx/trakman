@@ -2,6 +2,7 @@
 import net from 'node:net'
 import Response from './Response.js'
 import Events from './Events.js'
+import ErrorHandler from './ErrorHandler.js'
 
 class Socket extends net.Socket {
   #handshakeHeaderSize = null
@@ -15,7 +16,7 @@ class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners () {
+  setupListeners() {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.#handshakeHeaderSize === null) {
@@ -28,22 +29,26 @@ class Socket extends net.Socket {
         this.#handleResponseChunk(buffer)
       }
     })
+    this.on('error', err => ErrorHandler.fatal(err))
   }
 
   /**
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  awaitHandshake () {
+  awaitHandshake() {
     let i = 0
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
-        if (this.#handshakeStatus !== null) {
+        if (this.#handshakeStatus === 'Handshake success') {
           resolve(this.#handshakeStatus)
           clearInterval(interval)
+        } else if (this.#handshakeStatus === 'Server uses wrong GBX protocol') {
+          reject(new Error(this.#handshakeStatus))
+          clearInterval(interval)
         } else if (i === 20) { // stop poll after 5 seconds
-          resolve('No response from the server')
+          reject(new Error('No response from the server'))
           clearInterval(interval)
         }
       }, 250)
@@ -54,23 +59,31 @@ class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  awaitResponse (id) {
-    return new Promise((resolve) => {
+  awaitResponse(id, method) {
+    let i = 0
+    return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
+        i++
         if (this.#responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.#responses.find(a => a.id === id && a.status === 'completed')
+          if (response.isError) {
+            reject(new Error({ errorCode: response.errorCode, errorString: response.errorString }))
+            return
+          }
           resolve(response.getJson())
           clearInterval(interval)
         }
+        if (i === 50) { reject(new Error(`No server response for call ${method}`)) } // reject after 15 seconds
       }, 300)
     })
   }
 
-  #setHandshakeHeaderSize (buffer) {
+  #setHandshakeHeaderSize(buffer) {
+    if (buffer.length < 4) { ErrorHandler.fatal('Failed to read hanshake header', 'Buffer length too small') }
     this.#handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake (buffer) {
+  #handleHandshake(buffer) {
     this.#handshakeHeader = buffer.toString()
     if (this.#handshakeHeaderSize !== this.#handshakeHeader.length || // check if protocol and header length is right
       this.#handshakeHeader !== 'GBXRemote 2') {
@@ -82,7 +95,7 @@ class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart (buffer) {
+  #handleResponseStart(buffer) {
     this.#responses.length = Math.min(this.#responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.#incompleteHeader = buffer
@@ -98,22 +111,22 @@ class Socket extends net.Socket {
   }
 
   // add new buffer to response object
-  #handleResponseChunk (buffer) {
+  #handleResponseChunk(buffer) {
     this.#response.addData(buffer)
     if (this.#response.status === 'overloaded') {
       const nextResponseBuffer = this.#response.extractOverload()
       if (this.#response.isEvent) {
         Events.emitEvent(this.#response.eventName, this.#response.getJson())
       } else {
-        this.#responses.unshift(this.#response)
-      } // put completed response at the start of responses array
+        this.#responses.unshift(this.#response) // put completed response at the start of responses array
+      }
       this.#handleResponseStart(nextResponseBuffer) // start new response if buffer was overloaded
     } else if (this.#response.status === 'completed') {
       if (this.#response.isEvent) {
         Events.emitEvent(this.#response.eventName, this.#response.getJson())
       } else {
-        this.#responses.unshift(this.#response)
-      } // put completed response at the start of responses array
+        this.#responses.unshift(this.#response) // put completed response at the start of responses array
+      }
       this.#receivingResponse = false
     }
   }
