@@ -16,7 +16,7 @@ class Listeners {
       callback: async (params) => {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        Players.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        await Players.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
         Chat.sendJoinMessage(playerInfo[0].NickName)
       }
     },
