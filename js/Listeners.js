@@ -4,6 +4,7 @@ import Client from './Client.js'
 import Events from './Events.js'
 import PlayerService from './services/PlayerService.js'
 import Logger from './Logger.js'
+import RecordService from './services/RecordService.js'
 
 class Listeners {
   static #listeners = [
@@ -47,7 +48,7 @@ class Listeners {
           return
         }
         const challengeInfo = await Client.call('GetCurrentChallengeInfo')
-        // await this.#recordService.add(challengeInfo[0].UId, params[1], params[2], [])
+        await this.#recordService.add(challengeInfo[0].UId, params[1], params[2], [])
         // Store/update finish time in db
       }
     },
@@ -140,9 +141,11 @@ class Listeners {
       }
     }
   ]
+  static #recordService = new RecordService()
 
-  static initialize () {
+  static async initialize () {
     for (const listener of this.#listeners) { Events.addListener(listener.event, listener.callback) }
+    await this.#recordService.initialize()
   }
 }
 

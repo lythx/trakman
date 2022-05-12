@@ -22,7 +22,7 @@ async function main () {
   })
 
   Logger.info('Authentication success')
-  Listeners.initialize()
+  await Listeners.initialize()
   const defaultCommands = new DefaultCommands()
   defaultCommands.initialize()
   Logger.trace('Enabling callbacks...')
@@ -36,6 +36,7 @@ async function main () {
   Logger.info('Challenge service instantiated')
   await challengeService.push()
   Logger.info('Challenges are in the database')
+  await PlayerService.initialize()
   await PlayerService.addAllFromList()
     .catch(err => ErrorHandler.error(err))
   Logger.info('Player service instantiated')
