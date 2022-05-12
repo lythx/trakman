@@ -10,7 +10,7 @@ class Repository {
 
   constructor () {
     if (this.constructor === Repository) {
-      ErrorHandler.fatal("Abstract class Repository cannot be instantiated directly.")
+      ErrorHandler.fatal('Abstract class Repository cannot be instantiated directly.')
     }
   }
 
