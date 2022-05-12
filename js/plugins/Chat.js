@@ -7,6 +7,10 @@ class Chat {
     client.call('ChatSendServerMessage',
       [{ string: str }]) */
   }
+
+  static newLocalRecord (login) {
+
+  }
 }
 
 export default Chat

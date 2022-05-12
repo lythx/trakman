@@ -4,17 +4,6 @@ import postgres from 'pg'
 import Error from '../Error.js'
 const { Pool } = postgres
 
-const createRecords = `
-  CREATE TABLE IF NOT EXISTS records(
-      id uuid primary key not null,
-      challenge varchar(27) not null,
-      login varchar(25) not null,
-      score int4 not null,
-      date timestamp not null,
-      checkpoints int4[]
-  );
-`
-
 class Database {
   #client = new Pool({
     user: process.env.DB_USER,
@@ -26,7 +15,6 @@ class Database {
 
   constructor () {
     this.#client.connect()
-    this.#client.query(createRecords)
   }
 
   /**
@@ -34,15 +22,16 @@ class Database {
    * basically a wrapper
    * no need to sanitise since the library does that itself
    * @param {String} q the query
+   * @param params
    * @throws a database error if something goes wrong with the query
    * @return {Promise<void>}
    */
-  async query (q) {
+  async query (q, params = []) {
     if (typeof q !== 'string') {
       Error.error('Database query is not a string')
       return
     }
-    return await this.#client.query(q)
+    return await this.#client.query(q, params)
       .catch(err => Error.error('Database error:', err))
   }
 }
