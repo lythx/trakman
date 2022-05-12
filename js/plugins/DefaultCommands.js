@@ -3,6 +3,7 @@ import Command from '../Command.js'
 import Logger from '../Logger.js'
 import Events from '../Events.js'
 import Client from '../Client.js'
+import colours from '../data/Colours.js'
 
 class DefaultCommands {
   #commands = [
@@ -10,7 +11,15 @@ class DefaultCommands {
     new Command(
       ['qwe', 'qwer', '123', 'test'],
       'qqweqwe',
-      () => { Client.call('ChatSendServerMessage', [{ string: '$f0fqwrqwerwe' }], false) }
+      () => { Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false) }
+    ),
+    new Command(
+      ['ct', 'colourtest'],
+      'test the colours',
+      () => {
+        const col = Object.values(colours)
+        Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
+      }
     )
   ]
 
