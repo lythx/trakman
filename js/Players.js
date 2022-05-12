@@ -8,12 +8,12 @@ class Players {
   static #playerService = new PlayerService()
   static #players = []
 
-  static async initialize () {
-    await this.#playerService.initialize()
-    await this.#playerService.addAllFromList()
+  static async initialize() {
+    await this.#playerService.initialize().catch(err => Promise.reject(err))
+    await this.#playerService.addAllFromList().catch(err => Promise.reject(err))
   }
 
-  static async join (login, nickName, path) {
+  static async join(login, nickName, path) {
     const nation = path.split('|')[1]
     const nationCode = countries.find(a => a.name === path.split('|')[1]).code
     const playerData = await this.#playerService.get(login)
@@ -28,7 +28,7 @@ class Players {
     this.#players.push(player)
   }
 
-  static async leave (login) {
+  static async leave(login) {
     const player = this.#players.find(p => p.login === login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
@@ -60,7 +60,7 @@ class Player {
   #timePlayed = 0
   #joinTimestamp
 
-  constructor (login, nickName, nation, nationCode) {
+  constructor(login, nickName, nation, nationCode) {
     this.#login = login
     this.#nickName = nickName
     this.#nation = nation
@@ -68,39 +68,39 @@ class Player {
     this.#joinTimestamp = Date.now()
   }
 
-  set wins (wins) {
+  set wins(wins) {
     this.#wins = wins
   }
 
-  set timePlayed (timePlayed) {
+  set timePlayed(timePlayed) {
     this.#timePlayed = timePlayed
   }
 
-  get login () {
+  get login() {
     return this.#login
   }
 
-  get nickName () {
+  get nickName() {
     return this.#nickName
   }
 
-  get nation () {
+  get nation() {
     return this.#nation
   }
 
-  get nationCode () {
+  get nationCode() {
     return this.#nationCode
   }
 
-  get wins () {
+  get wins() {
     return this.#wins
   }
 
-  get timePlayed () {
+  get timePlayed() {
     return this.#timePlayed
   }
 
-  get joinTimestamp () {
+  get joinTimestamp() {
     return this.#joinTimestamp
   }
 }
