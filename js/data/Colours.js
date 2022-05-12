@@ -12,7 +12,7 @@ const colours = {
   lightgreen: '$0f5',
   blue: '$00f',
   deeppurple: '$50f',
-  blurple: '$05f',
+  blurple: '$56f',
   yellow: '$ff0',
   cyan: '$0ff',
   magenta: '$f0f'
