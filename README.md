@@ -1,4 +1,5 @@
 # trakman
+Note: Node 17.5+ required to run, or else JSON will complain
 
 To run:
 1. `$ npm i` just to make sure
