@@ -1,16 +1,16 @@
 'use strict'
 import 'dotenv/config'
 import postgres from 'pg'
-import ErrorHandler from '../ErrorHandler.js'
+import {ErrorHandler} from '../ErrorHandler.js'
 const { Pool } = postgres
 
-class Database {
+export class Database {
   #client = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     host: process.env.DB_SERVER,
-    port: process.env.DB_PORT
+    port: Number(process.env.DB_PORT)
   })
 
   async initialize () {
@@ -26,14 +26,8 @@ class Database {
    * @throws a database error if something goes wrong with the query
    * @return {Promise<void>}
    */
-  async query (q, params = []) {
-    if (typeof q !== 'string') {
-      ErrorHandler.error('Database query is not a string')
-      return
-    }
+  async query (q: string, params: any[] = []) {
     return await this.#client.query(q, params)
-      .catch(err => ErrorHandler.error(`Database error on query ${q}:`, err))
+      .catch(err => ErrorHandler.error(`Database error on query ${q}:`, err, 0))
   }
 }
-
-export default Database
