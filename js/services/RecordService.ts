@@ -1,22 +1,18 @@
 'use strict'
 import { randomUUID } from 'crypto'
-import RecordRepository from '../database/RecordRepository.js'
-import Chat from '../plugins/Chat.js'
+import {RecordRepository} from '../database/RecordRepository.js'
+import {Chat} from '../plugins/Chat.js'
 
 export class RecordService {
-  #repo: RecordRepository
+  private static repo = new RecordRepository()
 
-  constructor () {
-    this.#repo = new RecordRepository()
+  static async initialize () {
+    await this.repo.initialize()
   }
 
-  async initialize () {
-    await this.#repo.initialize()
-  }
-
-  async add (challenge: string, login: string, score: number, checkpoints: number[]) {
+  static async add (challenge: string, login: string, score: number, checkpoints: number[]) {
     const record = new Record(challenge, login, score, checkpoints)
-    const res = await this.#repo.add(record)
+    const res = await this.repo.add(record)
     if (res?.rows?.[0].id) {
       record.id = res.rows[0].id
       Chat.newLocalRecord(login)

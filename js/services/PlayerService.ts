@@ -1,11 +1,11 @@
-import Client from '../Client.js'
+import {Client} from '../Client.js'
 import {PlayerRepository} from '../database/PlayerRepository.js'
-import countries from '../data/Countries.json'
-import Events from '../Events.js'
-import ErrorHandler from "../ErrorHandler";
+import countries from '../data/Countries.json' assert {type: 'json'}
+import {Events} from '../Events.js'
+import {ErrorHandler} from "../ErrorHandler.js";
 
 export class PlayerService {
-  private static _players: Player[]
+  private static _players: Player[] = []
   private static repo = new PlayerRepository()
 
   static async initialize () {

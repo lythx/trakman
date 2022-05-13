@@ -1,7 +1,7 @@
 'use strict'
 import 'dotenv/config'
 import postgres from 'pg'
-import ErrorHandler from '../ErrorHandler.js'
+import {ErrorHandler} from '../ErrorHandler.js'
 const { Pool } = postgres
 
 export class Database {

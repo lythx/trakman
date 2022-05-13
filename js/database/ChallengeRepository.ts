@@ -1,5 +1,4 @@
 import { Repository } from './Repository.js'
-import ErrorHandler from '../ErrorHandler.js'
 import {Challenge} from "../services/ChallengeService";
 
 const createQuery = `

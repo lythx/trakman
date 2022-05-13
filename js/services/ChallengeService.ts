@@ -1,5 +1,5 @@
 'use strict'
-import Client from '../Client.js'
+import {Client} from '../Client.js'
 import {ChallengeRepository} from '../database/ChallengeRepository.js'
 
 export class ChallengeService {
@@ -14,7 +14,7 @@ export class ChallengeService {
    * Download all the challenges from the server and store them in a field
    * @returns {Promise<void>}
    */
-  static async #getList () {
+  private static async getList () {
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ])
@@ -33,7 +33,7 @@ export class ChallengeService {
    * @returns {Promise<void>}
    */
   static async push () {
-    if (!this.list) await this.#getList()
+    if (!this.list) await this.getList()
     await this.repo.add(this.list)
   }
 }

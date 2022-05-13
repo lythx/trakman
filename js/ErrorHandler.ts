@@ -1,11 +1,11 @@
-import Logger from './Logger.js'
+import { Logger } from './Logger.js'
 
-class ErrorHandler extends Error {
+export class ErrorHandler extends Error {
   /**
      * Logs error and exit process with code 1
      * @param {(string | Error)[]} lines
      */
-  static fatal (...lines) {
+  static fatal (...lines: string[]) {
     for (const line of lines) { Logger.fatal(line) }
     Logger.fatal('Aborting...')
     process.exit(1)
@@ -17,7 +17,7 @@ class ErrorHandler extends Error {
      * @param {String} errstr error string
      * @param {Number} errcode error code
      */
-  static error (str, errstr, errcode) {
+  static error (str: string, errstr: string, errcode: number) {
     Logger.warn(str)
     if (errstr && errcode) {
       Logger.warn(`error code: ${errcode}, error: ${errstr}`)
@@ -28,5 +28,3 @@ class ErrorHandler extends Error {
     }
   }
 }
-
-export default ErrorHandler
