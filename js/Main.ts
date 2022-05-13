@@ -1,18 +1,19 @@
 'use strict'
-import {Client} from './Client.js'
-import {Logger} from './Logger.js'
-import {ChallengeService} from './services/ChallengeService.js'
+import { Client } from './Client.js'
+import { Logger } from './Logger.js'
+import { ChallengeService } from './services/ChallengeService.js'
 import 'dotenv/config'
-import {Listeners} from './Listeners.js'
-import {DefaultCommands} from './plugins/DefaultCommands.js'
-import {PlayerService} from './services/PlayerService.js'
-import {ErrorHandler} from './ErrorHandler.js'
+import { Listeners } from './Listeners.js'
+import { DefaultCommands } from './plugins/DefaultCommands.js'
+import { PlayerService } from './services/PlayerService.js'
+import { ErrorHandler } from './ErrorHandler.js'
+//import { ChatService } from './services/ChatService.js'
 
-async function main () {
+async function main() {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
-  if(connectionStatus)
+  if (connectionStatus)
     Logger.info(connectionStatus)
   Logger.trace('Authenticating...')
   await Client.call('Authenticate', [
@@ -40,6 +41,9 @@ async function main () {
   await PlayerService.addAllFromList()
     .catch(err => ErrorHandler.error(err, '', 0))
   Logger.info('Player service instantiated')
+  // await ChatService.initialize()
+  // await ChatService.loadLastSessionMessages()
+  //   .catch(err => ErrorHandler.error('Failed to initialize chat service', err))
 }
 
 main()
