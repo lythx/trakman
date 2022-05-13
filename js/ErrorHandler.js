@@ -2,11 +2,9 @@ import Logger from './Logger.js'
 
 class ErrorHandler extends Error {
   /**
-       * Logs error and exit process with code 1
-       * @param {String} str first line of log
-       * @param {String} errstr error string
-       * @param {Number} errcode error code
-       */
+     * Logs error and exit process with code 1
+     * @param {(string | Error)[]} lines
+     */
   static fatal (...lines) {
     for (const line of lines) { Logger.fatal(line) }
     Logger.fatal('Aborting...')
