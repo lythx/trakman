@@ -15,7 +15,9 @@
     "@types/xml2js": "^0.4.11",
     "standard": "^17.0.0",
     "ts-node": "^10.7.0",
-    "ts-standard": "^11.0.0"
+    "ts-standard": "^11.0.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "@typescript-eslint/eslint-plugin": "^5.23.0"
   },
   "scripts": {
     "test": "standard",
