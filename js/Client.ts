@@ -1,13 +1,13 @@
 'use strict'
-import Request from './Request.js'
-import Socket from './Socket.js'
+import {Request} from './Request.js'
+import {Socket} from './Socket.js'
 
 /**
  * @abstract
  * @method connect
  * @method call
  */
-class Client {
+export class Client {
   static #socket = new Socket()
   static #requestId = 0x80000000
 
@@ -18,12 +18,11 @@ class Client {
   * @param {Number} port port at which dedicated server is listening for XmlRpc (default 5000)
   * @returns {Promise<String>} handshake status
   */
-  static async connect (host = 'localhost', port = 5000) {
+  static async connect (host = 'localhost', port = 5000): Promise<string> {
     this.#socket.connect(port, host)
     this.#socket.setKeepAlive(true)
     this.#socket.setupListeners()
-    const handshakeStatus = await this.#socket.awaitHandshake().catch(err => Promise.reject(err))
-    return handshakeStatus
+    return await this.#socket.awaitHandshake().catch(err => Promise.reject(err))
   }
 
   /**
@@ -34,14 +33,12 @@ class Client {
   * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
   * @returns {Promise<any[]>} array of server response values
   */
-  static async call (method, params = [], expectsResponse = true) {
+  static async call (method: string, params: object[] = [], expectsResponse = true): Promise<any[]> {
     this.#requestId++ // increment requestId so every request has an unique id
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)
-    if (!expectsResponse) { return null }
+    if (!expectsResponse) { return Promise.resolve([]) }
     return await this.#socket.awaitResponse(this.#requestId, method).catch(err => Promise.reject(err))
   }
 }
-
-export default Client
