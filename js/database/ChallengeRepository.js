@@ -1,4 +1,4 @@
-import Repository from './Repository.js'
+import { Repository } from './Repository.js'
 import ErrorHandler from '../ErrorHandler.js'
 
 const createQuery = `
@@ -14,7 +14,7 @@ const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 class ChallengeRepository extends Repository {
   async initialize () {
     await super.initialize()
-    await this._db.query(createQuery)
+    await this.db.query(createQuery)
   }
 
   /**
@@ -35,7 +35,7 @@ class ChallengeRepository extends Repository {
       console.log(i)
     }
     query = query.slice(0, -1) + ' ON CONFLICT DO NOTHING;'
-    await this._db.query(query, values)
+    await this.db.query(query, values)
   }
 }
 

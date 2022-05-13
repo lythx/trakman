@@ -1,5 +1,5 @@
 'use strict'
-import Repository from './Repository.js'
+import { Repository } from './Repository.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS players(
@@ -17,7 +17,7 @@ const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed)
 class PlayerRepository extends Repository {
   async initialize () {
     await super.initialize()
-    await this._db.query(createQuery)
+    await this.db.query(createQuery)
   }
 
   /**
@@ -26,7 +26,7 @@ class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async get (login) {
-    return (await this._db.query(getQuery, [login])).rows
+    return (await this.db.query(getQuery, [login])).rows
   }
 
   /**
@@ -35,7 +35,7 @@ class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async add (player) {
-    return (await this._db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])).rows
+    return (await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])).rows
   }
 
   /**
@@ -50,14 +50,14 @@ class PlayerRepository extends Repository {
         wins=$3,
         timePlayed=$4
         WHERE login=$5;`
-    return (await this._db.query(query, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])).rows
+    return (await this.db.query(query, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])).rows
   }
 
   async setTimePlayed (login, timePlayed) {
     const query = `UPDATE players SET 
         timePlayed=$1
         WHERE login=$2;`
-    return (await this._db.query(query, [timePlayed, login])).rows
+    return (await this.db.query(query, [timePlayed, login])).rows
   }
 }
 
