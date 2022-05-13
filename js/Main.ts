@@ -1,16 +1,16 @@
 'use strict'
-import Client from './js/Client.js'
-import Logger from './js/Logger.js'
-import ChallengeService from './js/services/ChallengeService.js'
+import Client from './Client.js'
+import Logger from './Logger.js'
+import ChallengeService from './services/ChallengeService.js'
 import 'dotenv/config'
-import Listeners from './js/Listeners.js'
-import DefaultCommands from './js/plugins/DefaultCommands.js'
-import PlayerService from './js/services/PlayerService.js'
-import ErrorHandler from './js/ErrorHandler.js'
+import Listeners from './Listeners.js'
+import DefaultCommands from './plugins/DefaultCommands.js'
+import PlayerService from './services/PlayerService.js'
+import ErrorHandler from './ErrorHandler.js'
 
 async function main () {
   Logger.warn('Establishing connection with the server...')
-  const connectionStatus = await Client.connect(process.env.SERVER_IP, process.env.SERVER_PORT)
+  const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
   Logger.info(connectionStatus)
   Logger.trace('Authenticating...')
@@ -38,7 +38,7 @@ async function main () {
   Logger.info('Challenges are in the database')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
-    .catch(err => ErrorHandler.error(err))
+    .catch(err => ErrorHandler.error(err, '', 0))
   Logger.info('Player service instantiated')
 }
 

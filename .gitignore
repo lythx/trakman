@@ -35,7 +35,7 @@ bower_components
 .lock-wscript
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
+built/Release
 
 # Dependency directories
 node_modules/
@@ -43,6 +43,9 @@ jspm_packages/
 
 # TypeScript v1 declaration files
 typings/
+
+# TypeScript build directory
+built/
 
 # TypeScript cache
 *.tsbuildinfo
@@ -105,3 +108,4 @@ dist
 
 # IntelliJ
 .idea/
+/built/
