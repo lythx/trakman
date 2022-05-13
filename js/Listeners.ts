@@ -1,13 +1,12 @@
 'use strict'
-import Chat from './plugins/Chat.js'
-import Client from './Client.js'
-import Events from './Events.js'
+import {Chat} from './plugins/Chat.js'
+import {Client} from './Client.js'
+import {Events} from './Events.js'
 import {PlayerService} from './services/PlayerService.js'
-import Logger from './Logger.js'
 import {RecordService} from './services/RecordService.js'
 
-class Listeners {
-  static #listeners = [
+export class Listeners {
+  private static listeners: TMEvent[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
@@ -48,7 +47,7 @@ class Listeners {
           return
         }
         const challengeInfo = await Client.call('GetCurrentChallengeInfo')
-        await this.recordService.add(challengeInfo[0].UId, params[1], params[2], [])
+        await RecordService.add(challengeInfo[0].UId, params[1], params[2], [])
         // Store/update finish time in db
       }
     },
@@ -142,12 +141,9 @@ class Listeners {
     }
   ]
 
-  private static recordService = new RecordService()
-
   static async initialize () {
-    for (const listener of this.#listeners) { Events.addListener(listener.event, listener.callback) }
-    await this.recordService.initialize()
+    for (const listener of this.listeners) {
+      Events.addListener(listener.event, listener.callback)
+    }
   }
 }
-
-export default Listeners

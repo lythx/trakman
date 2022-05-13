@@ -1,27 +1,27 @@
 'use strict'
 import xml2js from 'xml2js'
 
-class Response {
-  #status = 'pending'
-  #targetLength = null
-  #id = null
-  #data = Buffer.from('')
-  #overload = null
-  #json = null
-  #isEvent = null
-  #eventName = null
-  #isError = null
-  #errorString = null
-  #errorCode = null
+export class Response {
+  private _status = 'pending'
+  private readonly _targetLength: number
+  private readonly _id: number
+  private _data = Buffer.from('')
+  private _overload: Buffer | null = null
+  private _json: any = null
+  private _isEvent: boolean | null = null
+  private _eventName: string = ''
+  private _isError: boolean | null = null
+  private _errorString: string = ''
+  private _errorCode: number = 0
 
   /**
   * Initiates an object to store buffers received from dedicated server
   * @param {Number} targetLength first 4 bytes of response
   * @param {Number} id second 4 bytes of response
   */
-  constructor (targetLength, id) {
-    this.#targetLength = targetLength
-    this.#id = id
+  constructor (targetLength: number, id: number) {
+    this._targetLength = targetLength
+    this._id = id
   }
 
   /**
@@ -30,50 +30,50 @@ class Response {
   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
   * @param {Buffer} data buffer received from dedicated server
   */
-  addData (data) {
-    const newBuffer = Buffer.concat([this.#data, data])
-    if (newBuffer.length > this.#targetLength) {
-      this.#data = newBuffer.subarray(0, this.#targetLength)
-      this.#overload = newBuffer.subarray(this.#targetLength)
-      this.#status = 'overloaded'
+  addData (data: Buffer) {
+    const newBuffer = Buffer.concat([this._data, data])
+    if (newBuffer.length > this._targetLength) {
+      this._data = newBuffer.subarray(0, this._targetLength)
+      this._overload = newBuffer.subarray(this._targetLength)
+      this._status = 'overloaded'
       this.#generateJson()
       return
     }
-    if (newBuffer.length === this.#targetLength) {
-      this.#data = newBuffer.subarray(0, this.#targetLength)
-      this.#status = 'completed'
+    if (newBuffer.length === this._targetLength) {
+      this._data = newBuffer.subarray(0, this._targetLength)
+      this._status = 'completed'
       this.#generateJson()
       return
     }
-    this.#data = newBuffer
+    this._data = newBuffer
   }
 
   get id () {
-    return this.#id
+    return this._id
   }
 
   get status () {
-    return this.#status
+    return this._status
   }
 
   get eventName () {
-    return this.#eventName
+    return this._eventName
   }
 
   get isEvent () {
-    return this.#isEvent
+    return this._isEvent
   }
 
   get isError () {
-    return this.#isError
+    return this._isError
   }
 
   get errorString () {
-    return this.#errorString
+    return this._errorString
   }
 
   get errorCode () {
-    return this.#errorCode
+    return this._errorCode
   }
 
   /**
@@ -82,55 +82,55 @@ class Response {
   * @returns {Buffer} next response buffer
   */
   extractOverload () {
-    const overload = this.#overload
-    this.#overload = null
-    this.#status = 'complete'
+    const overload = this._overload
+    this._overload = null
+    this._status = 'complete'
     return overload
   }
 
   /**
   * @returns {any[]} array created from server response
   */
-  getJson () {
-    if (this.#isEvent) {
-      return this.#fixNesting(this.#json.methodCall)
+  get json () {
+    if (this._isEvent) {
+      return this.#fixNesting(this._json.methodCall)
     } else {
-      return this.#fixNesting(this.#json.methodResponse)
+      return this.#fixNesting(this._json.methodResponse)
     }
   }
 
   #generateJson () {
-    let json = []
+    let json: any
     // parse xml to json
-    xml2js.parseString(this.#data.toString(), (err, result) => {
+    xml2js.parseString(this._data.toString(), (err, result) => {
       if (err) {
         throw err
       }
       json = result
     })
 
-    if (json.methodCall) {
-      this.#json = json
-      this.#eventName = json.methodCall.methodName[0]
-      this.#isEvent = true
+    if (json?.methodCall) {
+      this._json = json
+      this._eventName = json.methodCall.methodName[0]
+      this._isEvent = true
     } else if (json.methodResponse) {
-      this.#json = json
-      this.#isEvent = false
+      this._json = json
+      this._isEvent = false
       // if server responded with error
       if (json.methodResponse.fault) {
-        this.#isError = true
-        this.#errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
-        this.#errorString = json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
+        this._isError = true
+        this._errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
+        this._errorString = json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
       }
     }
   }
 
   // i hate XML
-  #fixNesting (obj) {
+  #fixNesting (obj: any) {
     const arr = []
-    const changeType = (value, type) => {
+    const changeType: any = (value: any, type: string) => {
       const arr = []
-      const obj = {}
+      const obj: any = {}
       switch (type) {
         case 'boolean':
           return value === '1'
@@ -178,7 +178,7 @@ class Response {
             }
           }
         } else if (Object.keys(value)[0] === 'struct') {
-          const obj = {}
+          const obj: any = {}
           for (const el of value.struct[0].member) {
             const key = el.name[0]
             const type = Object.keys(el.value[0])[0]
@@ -201,5 +201,3 @@ class Response {
     return arr
   }
 }
-
-export default Response

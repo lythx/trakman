@@ -27,7 +27,7 @@ const insertQuery = `
       `
 const getQuery = 'SELECT id, score FROM records WHERE login = $1 AND challenge = $2;'
 
-class RecordRepository extends Repository {
+export class RecordRepository extends Repository {
 
   async initialize () {
     await super.initialize()
@@ -48,5 +48,3 @@ class RecordRepository extends Repository {
     return await q
   }
 }
-
-export default RecordRepository

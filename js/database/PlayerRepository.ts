@@ -1,7 +1,7 @@
 'use strict'
 import { Repository } from './Repository.js'
-import {Player} from "../services/PlayerService";
-import ErrorHandler from "../ErrorHandler";
+import {Player} from "../services/PlayerService.js";
+import {ErrorHandler} from "../ErrorHandler.js";
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS players(
