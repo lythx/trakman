@@ -1,18 +1,19 @@
 import Client from '../Client.js'
-import PlayerRepository from '../database/PlayerRepository.js'
-import countries from '../data/Countries.js'
+import {PlayerRepository} from '../database/PlayerRepository.js'
+import countries from '../data/Countries.json'
 import Events from '../Events.js'
+import ErrorHandler from "../ErrorHandler";
 
-class PlayerService {
-  static #players = []
-  static #repo = new PlayerRepository()
+export class PlayerService {
+  private static _players: Player[]
+  private static repo = new PlayerRepository()
 
   static async initialize () {
-    await this.#repo.initialize()
+    await this.repo.initialize()
   }
 
   static get players () {
-    return this.#players
+    return this._players
   }
 
   /**
@@ -35,19 +36,23 @@ class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join (login, nickName, path) {
+  static async join (login: string, nickName: string, path: string) {
     const nation = path.split('|')[1]
-    const nationCode = countries.find(a => a.name === path.split('|')[1]).code
-    const playerData = await this.#repo.get(login)
+    let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
+    if(!nationCode) {
+      nationCode = 'OTH'
+      ErrorHandler.error('Error adding player ' + login, 'Nation ' + nation + ' is not in the country list.', 0)
+    }
+    const playerData = await this.repo.get(login)
     const player = new Player(login, nickName, nation, nationCode)
     if (playerData.length === 0) {
-      await this.#repo.add(player)
+      await this.repo.add(player)
     } else {
       player.wins = Number(playerData[0].wins)
       player.timePlayed = Number(playerData[0].timeplayed)
-      await this.#repo.update(player)
+      await this.repo.update(player)
     }
-    this.#players.push(player)
+    this._players.push(player)
   }
 
   /**
@@ -55,8 +60,11 @@ class PlayerService {
    * @param login
    * @returns {Promise<void>}
    */
-  static async leave (login) {
-    const player = this.#players.find(p => p.login === login)
+  static async leave (login: string) {
+    const player = this._players.find(p => p.login === login)
+    if(!player) {
+      return Promise.reject('Player ' + login + ' not in player list.')
+    }
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
     // Do this instead of waiting for tm callback to prevent accessing database
@@ -72,47 +80,45 @@ class PlayerService {
         joinTimestamp: player.joinTimestamp
       }]
     )
-    await this.#repo.setTimePlayed(player.login, totalTimePlayed)
-    this.#players = this.#players.filter(p => p.login !== player.login)
+    await this.repo.setTimePlayed(player.login, totalTimePlayed)
+    this._players = this._players.filter(p => p.login !== player.login)
   }
 }
 
-class Player {
-  #login
-  #nickName
-  #nation
-  #nationCode
-  wins = 0
-  timePlayed = 0
-  #joinTimestamp
+export class Player {
+  private readonly _login
+  private readonly _nickName
+  private readonly _nation
+  private readonly _nationCode
+  public wins = 0
+  public timePlayed = 0
+  private readonly _joinTimestamp
 
-  constructor (login, nickName, nation, nationCode) {
-    this.#login = login
-    this.#nickName = nickName
-    this.#nation = nation
-    this.#nationCode = nationCode
-    this.#joinTimestamp = Date.now()
+  constructor (login: string, nickName: string, nation: string, nationCode: string) {
+    this._login = login
+    this._nickName = nickName
+    this._nation = nation
+    this._nationCode = nationCode
+    this._joinTimestamp = Date.now()
   }
 
   get login () {
-    return this.#login
+    return this._login
   }
 
   get nickName () {
-    return this.#nickName
+    return this._nickName
   }
 
   get nation () {
-    return this.#nation
+    return this._nation
   }
 
   get nationCode () {
-    return this.#nationCode
+    return this._nationCode
   }
 
   get joinTimestamp () {
-    return this.#joinTimestamp
+    return this._joinTimestamp
   }
 }
-
-export default PlayerService

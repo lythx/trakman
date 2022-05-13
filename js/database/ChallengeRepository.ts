@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import ErrorHandler from '../ErrorHandler.js'
+import {Challenge} from "../services/ChallengeService";
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS challenges(
@@ -11,7 +12,7 @@ const createQuery = `
 `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
-class ChallengeRepository extends Repository {
+export class ChallengeRepository extends Repository {
   async initialize () {
     await super.initialize()
     await this.db.query(createQuery)
@@ -22,10 +23,7 @@ class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    * @return {Promise<any[]>}
    */
-  async add (objects) {
-    if (!(objects instanceof Array) || objects.length < 1) {
-      ErrorHandler.fatal('Type error when adding challenges to database')
-    }
+  async add (objects: Challenge[]) {
     let query = addQuery
     const values = []
     let i = 1
@@ -38,5 +36,3 @@ class ChallengeRepository extends Repository {
     await this.db.query(query, values)
   }
 }
-
-export default ChallengeRepository

@@ -2,7 +2,7 @@
 import Chat from './plugins/Chat.js'
 import Client from './Client.js'
 import Events from './Events.js'
-import PlayerService from './services/PlayerService.js'
+import {PlayerService} from './services/PlayerService.js'
 import Logger from './Logger.js'
 import {RecordService} from './services/RecordService.js'
 
