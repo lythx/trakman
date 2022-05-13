@@ -1,7 +1,7 @@
 'use strict'
 import {Events} from '../Events.js'
 import {Client} from '../Client.js'
-import colours from '../data/Colours.js'
+import colours from '../data/Colours.json' assert {type: 'json'}
 
 export class DefaultCommands {
   #commands: Command[] = [
