@@ -10,10 +10,8 @@ export abstract class ChatService {
   static readonly messages: Message[] = []
   private static repo = new ChatRepository()
 
-  static async initialize(): Promise<void | Error> {
-    const result = await this.repo.initialize2()
-    if (result instanceof Error)
-      return result
+  static async initialize(): Promise<void> {
+    await this.repo.initialize()
   }
 
   static async loadLastSessionMessages(): Promise<void | Error> {
@@ -34,8 +32,8 @@ export abstract class ChatService {
   static async add(login: string, text: string): Promise<void | Error> {
     const message: Message = {
       id: randomUUID(),
-      login: login,
-      text: text,
+      login,
+      text,
       date: new Date()
     }
     Events.emitEvent('Controller.PlayerChat', [{ id: message.id, login: message.login, text: message.text, date: message.date }])
