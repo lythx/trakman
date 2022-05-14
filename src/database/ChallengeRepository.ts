@@ -23,6 +23,9 @@ export class ChallengeRepository extends Repository {
    * @return {Promise<any[]>}
    */
   async add (objects: Challenge[]): Promise<any> {
+    if (objects.length === 0) {
+      throw Error('No challenges in list.')
+    }
     let query = addQuery
     const values = []
     let i = 1

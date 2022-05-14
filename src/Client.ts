@@ -38,7 +38,7 @@ export class Client {
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)
-    if (!expectsResponse) { return await Promise.resolve([]) }
+    if (!expectsResponse) { return [] }
     return await this.#socket.awaitResponse(this.#requestId, method).catch(async err => await Promise.reject(err))
   }
 }
