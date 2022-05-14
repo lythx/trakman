@@ -9,23 +9,23 @@ export class DefaultCommands {
     {
       aliases: ['qwe', 'qwer', '123', 'test'],
       help: 'qqweqwe',
-      callback: () => {
-        Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false)
+      callback: async() => {
+        await Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false)
       },
       level: 0
     },
     {
       aliases: ['ct', 'colourtest'],
       help: 'test the colours',
-      callback: () => {
+      callback: async () => {
         const col = Object.values(colours)
-        Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
+        await Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
       },
       level: 0
     }
   ]
 
-  initialize () {
+  initialize (): void {
     for (const command of this.#commands) {
       Events.addListener('TrackMania.PlayerChat', async (params: any[]) => {
         if (params[0] === 0 || !command.aliases.some((a: any) => (params[2].trim().toLowerCase()).split(' ')[0] === `/${a}`)) { return }

@@ -1,6 +1,6 @@
 'use strict'
 import xml2js from 'xml2js'
-import { ErrorHandler } from './ErrorHandler'
+import { ErrorHandler } from './ErrorHandler.js'
 
 export class Response {
   private _status = 'pending'
@@ -97,7 +97,7 @@ export class Response {
   * @returns {any[]} array created from server response
   */
   get json (): any[] {
-    if (this._isEvent != null) {
+    if (this._isEvent) {
       return this.#fixNesting(this._json.methodCall)
     } else {
       return this.#fixNesting(this._json.methodResponse)
@@ -166,7 +166,7 @@ export class Response {
       }
     }
     // change overnested object received from parsing the xml to an array of server return values
-    if (obj.params[0].param == null) {
+    if (obj?.params[0].param === undefined) {
       return [] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {

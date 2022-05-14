@@ -29,7 +29,7 @@ export class Socket extends net.Socket {
         this.#handleResponseChunk(buffer)
       }
     })
-    this.on('error', err => ErrorHandler.fatal('Socket error:', err.toString()))
+    this.on('error', err => ErrorHandler.fatal('Socket error:', err.message))
   }
 
   /**
@@ -38,7 +38,7 @@ export class Socket extends net.Socket {
   */
   async awaitHandshake (): Promise<string> {
     let i = 0
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.handshakeStatus === 'Handshake success') {
@@ -61,12 +61,12 @@ export class Socket extends net.Socket {
   */
   async awaitResponse (id: number, method: string): Promise<any[]> {
     let i = 0
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.responses.find(a => a.id === id && a.status === 'completed')
-          if (response == null) {
+          if (response === undefined) {
             reject(new Error('Response id: ' + id.toString() + ' not found in responses list.'))
             return
           }
@@ -116,7 +116,7 @@ export class Socket extends net.Socket {
 
   // add new buffer to response object
   #handleResponseChunk (buffer: Buffer): void {
-    if (this.response == null) {
+    if (this.response === null) {
       ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
       return
     }
@@ -127,14 +127,14 @@ export class Socket extends net.Socket {
         ErrorHandler.error('Next response buffer is null.', '')
         return
       }
-      if (this.response.isEvent != null) {
+      if (this.response.isEvent) {
         Events.emitEvent(this.response.eventName, this.response.json)
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array
       }
       this.#handleResponseStart(nextResponseBuffer) // start new response if buffer was overloaded
     } else if (this.response.status === 'completed') {
-      if (this.response.isEvent != null) {
+      if (this.response.isEvent) {
         Events.emitEvent(this.response.eventName, this.response.json)
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array

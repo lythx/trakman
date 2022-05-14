@@ -25,7 +25,7 @@ export class Record {
   private readonly _challenge: string
   private readonly _login: string
   private readonly _score: number
-  private readonly _date: number
+  private readonly _date: Date
   private readonly _checkpoints: number[]
 
   constructor (challenge: string, login: string, score: number, checkpoints: number[]) {
@@ -34,7 +34,7 @@ export class Record {
     this._login = login
     this._score = score
     this._checkpoints = checkpoints
-    this._date = Date.now()
+    this._date = new Date()
   }
 
   get challenge (): string {
@@ -53,7 +53,7 @@ export class Record {
     return this._checkpoints
   }
 
-  get date (): number {
+  get date (): Date {
     return this._date
   }
 }
