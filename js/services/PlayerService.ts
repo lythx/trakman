@@ -1,18 +1,17 @@
-import {Client} from '../Client.js'
-import {PlayerRepository} from '../database/PlayerRepository.js'
+import { Client } from '../Client.js'
+import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
-import {Events} from '../Events.js'
-import {ErrorHandler} from "../ErrorHandler.js";
+import { Events } from '../Events.js'
 
 export class PlayerService {
   private static _players: Player[] = []
   private static repo = new PlayerRepository()
 
-  static async initialize () {
+  static async initialize() {
     await this.repo.initialize()
   }
 
-  static get players () {
+  static get players() {
     return this._players
   }
 
@@ -21,7 +20,7 @@ export class PlayerService {
    * Only called in the beginning as a start job
    * @returns {Promise<void>}
    */
-  static async addAllFromList () {
+  static async addAllFromList() {
     const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
     for (const player of playerList) {
       const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
@@ -36,13 +35,9 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join (login: string, nickName: string, path: string) {
+  static async join(login: string, nickName: string, path: string) {
     const nation = path.split('|')[1]
-    let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
-    if(!nationCode) {
-      nationCode = 'OTH'
-      ErrorHandler.error('Error adding player ' + login, 'Nation ' + nation + ' is not in the country list.', 0)
-    }
+    let nationCode = countries.find(a => a.name === path.split('|')[1])!.code
     const playerData = await this.repo.get(login)
     const player = new Player(login, nickName, nation, nationCode)
     if (playerData.length === 0) {
@@ -60,9 +55,9 @@ export class PlayerService {
    * @param login
    * @returns {Promise<void>}
    */
-  static async leave (login: string) {
+  static async leave(login: string) {
     const player = this._players.find(p => p.login === login)
-    if(!player) {
+    if (!player) {
       return Promise.reject('Player ' + login + ' not in player list.')
     }
     const sessionTime = Date.now() - player.joinTimestamp
@@ -94,7 +89,7 @@ export class Player {
   public timePlayed = 0
   private readonly _joinTimestamp
 
-  constructor (login: string, nickName: string, nation: string, nationCode: string) {
+  constructor(login: string, nickName: string, nation: string, nationCode: string) {
     this._login = login
     this._nickName = nickName
     this._nation = nation
@@ -102,23 +97,23 @@ export class Player {
     this._joinTimestamp = Date.now()
   }
 
-  get login () {
+  get login() {
     return this._login
   }
 
-  get nickName () {
+  get nickName() {
     return this._nickName
   }
 
-  get nation () {
+  get nation() {
     return this._nation
   }
 
-  get nationCode () {
+  get nationCode() {
     return this._nationCode
   }
 
-  get joinTimestamp () {
+  get joinTimestamp() {
     return this._joinTimestamp
   }
 }

@@ -1,8 +1,8 @@
 'use strict'
 import net from 'node:net'
-import {Response} from './Response.js'
-import {Events} from './Events.js'
-import {ErrorHandler} from './ErrorHandler.js'
+import { Response } from './Response.js'
+import { Events } from './Events.js'
+import { ErrorHandler } from './ErrorHandler.js'
 
 export class Socket extends net.Socket {
   private handshakeHeaderSize: number = 0
@@ -16,7 +16,7 @@ export class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners () {
+  setupListeners() {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (!this.handshakeHeaderSize) {
@@ -36,7 +36,7 @@ export class Socket extends net.Socket {
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  awaitHandshake (): Promise<string> {
+  awaitHandshake(): Promise<string> {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
@@ -59,14 +59,14 @@ export class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  awaitResponse (id: number, method: string): Promise<any[]> {
+  awaitResponse(id: number, method: string): Promise<any[]> {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.responses.find(a => a.id === id && a.status === 'completed')
-          if(!response) {
+          if (!response) {
             reject('Response id: ' + id + ' not found in responses list.')
             return
           }
@@ -82,12 +82,12 @@ export class Socket extends net.Socket {
     })
   }
 
-  #setHandshakeHeaderSize (buffer: Buffer) {
+  #setHandshakeHeaderSize(buffer: Buffer) {
     if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake (buffer: Buffer) {
+  #handleHandshake(buffer: Buffer) {
     this.handshakeHeader = buffer.toString()
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
@@ -99,7 +99,7 @@ export class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart (buffer: Buffer) {
+  #handleResponseStart(buffer: Buffer) {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.incompleteHeader = buffer
@@ -115,16 +115,16 @@ export class Socket extends net.Socket {
   }
 
   // add new buffer to response object
-  #handleResponseChunk (buffer: Buffer) {
-    if(!this.response) {
-      ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.', 0)
+  #handleResponseChunk(buffer: Buffer) {
+    if (!this.response) {
+      ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
       return
     }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer = this.response.extractOverload()
-      if(!nextResponseBuffer) {
-        ErrorHandler.error('Next response buffer is null.', '', 0)
+      if (!nextResponseBuffer) {
+        ErrorHandler.error('Next response buffer is null.', '')
         return
       }
       if (this.response.isEvent) {
