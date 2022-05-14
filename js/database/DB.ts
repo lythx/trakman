@@ -29,4 +29,13 @@ export class Database {
     return await this.#client.query(q, params)
       .catch(err => ErrorHandler.error(`Database error on query ${q}:`, err))
   }
+
+  async query2(q: string, params: any[] = []): Promise<postgres.QueryResult<any> | Error> {
+    const result = await this.#client.query(q, params)
+      .catch(err => {
+        ErrorHandler.error(`Database error on query ${q}`, err)
+        return err
+      })
+    return result
+  }
 }

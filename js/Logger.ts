@@ -13,7 +13,7 @@ export class Logger {
   }
 
   static error (str: string) {
-    console.log(`\u001b[31m$<Fatal>${str}\x1b[0m`)
+    console.log(`\u001b[31m<Error>${str}\x1b[0m`)
   }
 
   static trace (str: string) {

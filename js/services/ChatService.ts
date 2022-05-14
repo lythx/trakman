@@ -1,65 +1,55 @@
 'use strict'
 import { ChatRepository } from '../database/ChatRepository.js'
 import { randomUUID } from 'crypto'
-import { Logger } from '../Logger.js'
+import { Events } from '../Events.js'
 
-class ChatService {
+const messagesArraySize = 250
 
-  static readonly messages = []
+export abstract class ChatService {
+
+  static readonly messages: Message[] = []
   private static repo = new ChatRepository()
 
-  static async initialize() {
-    await this.repo.initialize()
+  static async initialize(): Promise<void | Error> {
+    const result = await this.repo.initialize2()
+    if (result instanceof Error)
+      return result
   }
 
-  static async loadLastSessionMessages() {
-    const messageList = await this.repo.get(250) //or more/less
-    if (messageList?.rows)
-      for (const m of messageList) {
-        const message = new Message(m.login, m.text)
-        message.id = m.id
-        message.timestamp = m.timestamp
-        this.messages.push(message)
+  static async loadLastSessionMessages(): Promise<void | Error> {
+    const result = await this.repo.get(messagesArraySize)
+    if (result instanceof Error)
+      return result
+    for (const m of result) {
+      const message: Message = {
+        id: m.id,
+        login: m.login,
+        text: m.message,
+        date: new Date(m.date)
       }
+      this.messages.push(message)
+    }
   }
 
-  /**
-   * add the message to runtime memory and database 
-   * @returns {Promise<void>}
-   */
-  async add(login, text) {
-    const message = new Message(login, text)
-    this.#messages.unshift(message)
-    this.#messages.length = Math.min(500, this.#messages.length)
-    await this.#repo.add(message)
+  static async add(login: string, text: string): Promise<void | Error> {
+    const message: Message = {
+      id: randomUUID(),
+      login: login,
+      text: text,
+      date: new Date()
+    }
+    Events.emitEvent('Controller.PlayerChat', [{ id: message.id, login: message.login, text: message.text, date: message.date }])
+    this.messages.unshift(message)
+    this.messages.length = Math.min(messagesArraySize, this.messages.length)
+    const result = await this.repo.add(message)
+    if (result instanceof Error)
+      return result
   }
 
-  get messages() {
-    return this.#messages
-  }
-}
-
-export class Message {
-
-  id
-  #login
-  #text
-  timestamp
-
-  constructor(login, text) {
-    this.#id = randomUUID()
-    this.#login = login
-    this.#text = text
-    this.#timestamp = Date.now()
-  }
-
-  get login() {
-    return this.#login
-  }
-
-  get text() {
-    return this.#text
+  static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
+    const result = await this.repo.getByLogin(login, limit)
+    return result
   }
 }
 
-export default ChatService
+

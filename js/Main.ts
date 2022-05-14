@@ -7,7 +7,7 @@ import { Listeners } from './Listeners.js'
 import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
-//import { ChatService } from './services/ChatService.js'
+import { ChatService } from './services/ChatService.js'
 
 async function main() {
   Logger.warn('Establishing connection with the server...')
@@ -39,11 +39,16 @@ async function main() {
   Logger.info('Challenges are in the database')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
-    .catch(err => ErrorHandler.error(err, '', 0))
+    .catch(err => ErrorHandler.error(err, ''))
   Logger.info('Player service instantiated')
-  // await ChatService.initialize()
-  // await ChatService.loadLastSessionMessages()
-  //   .catch(err => ErrorHandler.error('Failed to initialize chat service', err))
+  Logger.trace('Fetching message history...')
+  const chatServiceStatus = await ChatService.initialize()
+  if (chatServiceStatus instanceof Error)
+    ErrorHandler.fatal('Failed to initalize chat service')
+  const messagesStatus = await ChatService.loadLastSessionMessages()
+  if (messagesStatus instanceof Error)
+    ErrorHandler.fatal('Failed to fetch messages')
+  Logger.info('Chat service instantiated')
 }
 
 main()
