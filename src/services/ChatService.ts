@@ -1,7 +1,7 @@
 'use strict'
-import {ChatRepository} from '../database/ChatRepository.js'
-import {randomUUID} from 'crypto'
-import {Events} from '../Events.js'
+import { ChatRepository } from '../database/ChatRepository.js'
+import { randomUUID } from 'crypto'
+import { Events } from '../Events.js'
 
 const messagesArraySize = 250
 

@@ -24,7 +24,7 @@ async function main (): Promise<void> {
 
   Logger.info('Authentication success')
   await Listeners.initialize()
-  const defaultCommands = new DefaultCommands()
+  /* const defaultCommands = */new DefaultCommands()
   Logger.trace('Enabling callbacks...')
   await Client.call('EnableCallbacks', [
     { boolean: true }
@@ -43,7 +43,7 @@ async function main (): Promise<void> {
   await ChatService.initialize()
   try {
     await ChatService.loadLastSessionMessages()
-  } catch(e: any) {
+  } catch (e: any) {
     ErrorHandler.fatal('Failed to fetch messages', e.toString())
   }
   Logger.info('Chat service instantiated')
