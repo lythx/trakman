@@ -15,11 +15,9 @@ export class ChatRepository extends Repository {
     /**
      * initialize repository and create chat table if it doesn't exist
      */
-    async initialize2(): Promise<void | Error> {
+    async initialize(): Promise<void> {
         await super.initialize()
-        const response = await this.db.query2(createQuery)
-        if (response instanceof Error)
-            return response
+        await this.db.query2(createQuery)
     }
 
     async get(limit: number): Promise<any[] | Error> {
