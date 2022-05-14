@@ -11,7 +11,7 @@ export class RecordService {
   }
 
   static async add (challenge: string, login: string, score: number, checkpoints: number[]): Promise<void> {
-    const record = new Record(challenge, login, score, checkpoints)
+    const record = new TMRecord(challenge, login, score, checkpoints)
     const res = await this.repo.add(record)
     if (res?.rows?.[0].id != null) {
       record.id = res.rows[0].id
@@ -20,7 +20,7 @@ export class RecordService {
   }
 }
 
-export class Record {
+export class TMRecord {
   public id: string
   private readonly _challenge: string
   private readonly _login: string
