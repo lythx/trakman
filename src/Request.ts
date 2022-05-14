@@ -1,6 +1,5 @@
 'use strict'
-
-import {ErrorHandler} from "./ErrorHandler";
+import { ErrorHandler } from './ErrorHandler.js'
 
 export class Request {
   private readonly xml: string
@@ -70,7 +69,7 @@ export class Request {
 
   // php's htmlspecialchars() js implementation
   // https://stackoverflow.com/questions/1787322/what-is-the-htmlspecialchars-equivalent-in-javascript
-  #escapeHtml (str: string) {
+  #escapeHtml (str: string): string {
     const map = {
       '&': '&amp;',
       '<': '&lt;',

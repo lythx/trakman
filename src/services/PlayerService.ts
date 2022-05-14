@@ -63,7 +63,7 @@ export class PlayerService {
   static async leave (login: string): Promise<void> {
     const player = this._players.find(p => p.login === login)
     if (player == null) {
-      throw new Error('Player ' + login + ' not in player list.');
+      throw new Error('Player ' + login + ' not in player list.')
     }
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed

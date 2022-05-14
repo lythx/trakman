@@ -7,12 +7,13 @@ import { Listeners } from './Listeners.js'
 import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
+import { ChatService } from './services/ChatService.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
-  Logger.info(connectionStatus)
+  if (connectionStatus != null) { Logger.info(connectionStatus) }
   Logger.trace('Authenticating...')
   await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
@@ -24,7 +25,6 @@ async function main (): Promise<void> {
   Logger.info('Authentication success')
   await Listeners.initialize()
   const defaultCommands = new DefaultCommands()
-  defaultCommands.initialize()
   Logger.trace('Enabling callbacks...')
   await Client.call('EnableCallbacks', [
     { boolean: true }
@@ -37,8 +37,16 @@ async function main (): Promise<void> {
   Logger.info('Challenges are in the database')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
-    .catch(err => ErrorHandler.error(err, '', 0))
+    .catch(err => ErrorHandler.error(err, ''))
   Logger.info('Player service instantiated')
+  Logger.trace('Fetching message history...')
+  await ChatService.initialize()
+  try {
+    await ChatService.loadLastSessionMessages()
+  } catch(e: any) {
+    ErrorHandler.fatal('Failed to fetch messages', e.toString())
+  }
+  Logger.info('Chat service instantiated')
 }
 
 await main()

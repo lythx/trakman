@@ -4,6 +4,7 @@ import { Client } from './Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
+import { ChatService } from './services/ChatService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -26,8 +27,9 @@ export class Listeners {
       event: 'TrackMania.PlayerChat',
       callback: async (params: any[]) => {
         if (params[0] === 0) { // check if server message
+          return
         }
-        // Log the chat and write to log table
+        await ChatService.add(params[1], params[2])
       }
     },
     {

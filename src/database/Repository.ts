@@ -7,7 +7,7 @@ import { Database } from './DB.js'
 export abstract class Repository {
   protected db = new Database()
 
-  async initialize () {
+  async initialize (): Promise<void> {
     await this.db.initialize()
   }
 

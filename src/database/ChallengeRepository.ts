@@ -12,7 +12,7 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 export class ChallengeRepository extends Repository {
-  async initialize () {
+  async initialize (): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
@@ -22,14 +22,13 @@ export class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    * @return {Promise<any[]>}
    */
-  async add (objects: Challenge[]) {
+  async add (objects: Challenge[]): Promise<any> {
     let query = addQuery
     const values = []
     let i = 1
     for (const c of objects) {
-      query += '($' + i++ + ', $' + i++ + ', $' + i++ + ', $' + i++ + '),'
+      query += '($' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + '),'
       values.push(c.id, c.name, c.author, c.environment)
-      console.log(i)
     }
     query = query.slice(0, -1) + ' ON CONFLICT DO NOTHING;'
     await this.db.query(query, values)

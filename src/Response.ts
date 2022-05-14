@@ -1,6 +1,6 @@
 'use strict'
 import xml2js from 'xml2js'
-import {ErrorHandler} from "./ErrorHandler";
+import { ErrorHandler } from './ErrorHandler'
 
 export class Response {
   private _status = 'pending'
@@ -83,7 +83,7 @@ export class Response {
   * @returns {Buffer} next response buffer
   */
   extractOverload (): Buffer {
-    if(this._overload == null) {
+    if (this._overload == null) {
       ErrorHandler.error('Error in extractOverload()', 'Overload is null')
       return Buffer.from('')
     }
@@ -166,7 +166,7 @@ export class Response {
       }
     }
     // change overnested object received from parsing the xml to an array of server return values
-    if (!obj.params[0].param) {
+    if (obj.params[0].param == null) {
       return [] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
