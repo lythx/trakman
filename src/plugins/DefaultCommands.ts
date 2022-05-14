@@ -1,6 +1,6 @@
 'use strict'
-import {Events} from '../Events.js'
-import {Client} from '../Client.js'
+import { Events } from '../Events.js'
+import { Client } from '../Client.js'
 import colours from '../data/Colours.js'
 
 export class DefaultCommands {
@@ -10,7 +10,7 @@ export class DefaultCommands {
       aliases: ['qwe', 'qwer', '123', 'test'],
       help: 'qqweqwe',
       callback: () => {
-        Client.call('ChatSendServerMessage', [{string: `${colours.yellow}qwrqwerwe`}], false)
+        Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false)
       },
       level: 0
     },
@@ -19,7 +19,7 @@ export class DefaultCommands {
       help: 'test the colours',
       callback: () => {
         const col = Object.values(colours)
-        Client.call('ChatSendServerMessage', [{string: col.map((v) => `${v}|`).join(' ')}], false)
+        Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
       },
       level: 0
     }

@@ -1,10 +1,10 @@
 'use strict'
-import {Client} from '../Client.js'
-import {ChallengeRepository} from '../database/ChallengeRepository.js'
+import { Client } from '../Client.js'
+import { ChallengeRepository } from '../database/ChallengeRepository.js'
 
 export class ChallengeService {
   private static list: Challenge[]
-  private static repo = new ChallengeRepository()
+  private static readonly repo = new ChallengeRepository()
 
   static async initialize () {
     await this.repo.initialize()
@@ -18,8 +18,8 @@ export class ChallengeService {
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ])
-    if(!challengeList) {
-      return Promise.reject('Error fetching challenges from TM server.')
+    if (!challengeList) {
+      return await Promise.reject('Error fetching challenges from TM server.')
     }
     this.list = []
     for (const challenge of challengeList) {

@@ -1,5 +1,7 @@
 'use strict'
 
+import {ErrorHandler} from "./ErrorHandler";
+
 export class Request {
   private readonly xml: string
 
@@ -21,7 +23,7 @@ export class Request {
   * Prepares and returns buffer from XML string
   * @returns {Buffer} buffer from XML string
   */
-  getPreparedBuffer (requestId: number) {
+  getPreparedBuffer (requestId: number): Buffer {
     const bufferLength = Buffer.byteLength(this.xml)
     const buffer = Buffer.alloc(8 + bufferLength) // alloc 8 bonus bytes for target length and id
     buffer.writeUInt32LE(bufferLength, 0) // write target length of request
@@ -32,9 +34,9 @@ export class Request {
 
   // wraps params with type tags depending on type specified in param object
   // calls itself recursively in case type is array or struct
-  #handleParamType (param: any) {
+  #handleParamType (param: any): string {
     const type = Object.keys(param)[0]
-    switch (Object.keys(param)[0]) {
+    switch (type) {
       case 'boolean':
         return `<boolean>${param[type] ? '1' : '0'}</boolean>`
       case 'int':
@@ -62,6 +64,8 @@ export class Request {
         return str
       }
     }
+    ErrorHandler.error('Unknown type ' + type + ' of param.')
+    return ''
   }
 
   // php's htmlspecialchars() js implementation
