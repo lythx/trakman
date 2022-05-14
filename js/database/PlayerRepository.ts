@@ -79,7 +79,7 @@ export class PlayerRepository extends Repository {
    */
   async setTimePlayed (login: string, timePlayed: number) {
     await this.db.query(setTimeQuery, [timePlayed, login]).catch(err => {
-      ErrorHandler.error('Player ' + login + ' not found in the database.', err, 0)
+      ErrorHandler.error('Player ' + login + ' not found in the database.', err)
     })
   }
 }
