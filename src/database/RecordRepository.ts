@@ -1,6 +1,6 @@
 'use strict'
 import { Repository } from './Repository.js'
-import { Record } from '../services/RecordService.js'
+import { TMRecord } from '../services/RecordService.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS records(
@@ -33,7 +33,7 @@ export class RecordRepository extends Repository {
     await this.db.query(createQuery)
   }
 
-  async add (record: Record): Promise<any> {
+  async add (record: TMRecord): Promise<any> {
     const getRes = (await this.db.query(getQuery, [record.login, record.challenge]))?.rows
     let q
     if ((getRes != null) && getRes.length > 0) {
