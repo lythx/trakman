@@ -29,7 +29,7 @@ export class Socket extends net.Socket {
         this.#handleResponseChunk(buffer)
       }
     })
-    this.on('error', err => ErrorHandler.fatal('Socket error', err.toString()))
+    this.on('error', err => ErrorHandler.fatal('Socket error:', err.toString()))
   }
 
   /**

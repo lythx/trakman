@@ -27,7 +27,7 @@ const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = $1'
 const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES($1, $2, $3, $4, $5);'
 
 export class PlayerRepository extends Repository {
-  async initialize () {
+  async initialize (): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
@@ -37,23 +37,23 @@ export class PlayerRepository extends Repository {
    * @param {String} login
    * @return {Promise<Object[]>}
    */
-  async get (login: string) {
+  async get (login: string): Promise<any> {
     const res = await this.db.query(getQuery, [login])
     if ((res?.rows) == null) {
-      return await Promise.reject('Error getting player ' + login + ' from database.')
+      throw Error('Error getting player ' + login + ' from database.')
     }
     return res.rows
   }
 
   /**
-   * Adds an array of challenges to the database
+   * Adds a player to the database
    * @param {Player} player the player
    * @return {Promise<Object[]>}
    */
-  async add (player: Player) {
+  async add (player: Player): Promise<any> {
     const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])
     if ((res?.rows) == null) {
-      return await Promise.reject('Error adding player ' + player.login + ' to database.')
+      throw Error('Error adding player ' + player.login + ' to database.')
     }
     return res.rows
   }
@@ -63,10 +63,10 @@ export class PlayerRepository extends Repository {
    * @param {Player} player a player instance
    * @return {Promise<Object[]>}
    */
-  async update (player: Player) {
+  async update (player: Player): Promise<any> {
     const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])
     if ((res?.rows) == null) {
-      return await Promise.reject('Error updating player ' + player.login + "'s data in the database.")
+      throw Error('Error updating player ' + player.login + "'s data in the database.")
     }
     return res
   }
@@ -77,9 +77,9 @@ export class PlayerRepository extends Repository {
    * @param timePlayed
    * @return {Promise<void>}
    */
-  async setTimePlayed (login: string, timePlayed: number) {
+  async setTimePlayed (login: string, timePlayed: number): Promise<void> {
     await this.db.query(setTimeQuery, [timePlayed, login]).catch(err => {
-      ErrorHandler.error('Player ' + login + ' not found in the database.', err, 0)
+      ErrorHandler.error('Player ' + login + ' not found in the database.', err)
     })
   }
 }

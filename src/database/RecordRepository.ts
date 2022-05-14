@@ -28,22 +28,22 @@ const insertQuery = `
 const getQuery = 'SELECT id, score FROM records WHERE login = $1 AND challenge = $2;'
 
 export class RecordRepository extends Repository {
-  async initialize () {
+  async initialize (): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
-  async add (record: Record) {
+  async add (record: Record): Promise<any> {
     const getRes = (await this.db.query(getQuery, [record.login, record.challenge]))?.rows
     let q
     if ((getRes != null) && getRes.length > 0) {
       if (getRes[0].score < record.score) {
-        return await Promise.resolve(null)
+        return null
       }
       q = this.db.query(updateQuery, [record.score, record.date, record.checkpoints, getRes[0].id])
     } else {
       q = this.db.query(insertQuery, [record.id, record.challenge, record.login, record.score, record.date, record.checkpoints])
     }
-    return await q
+    await q
   }
 }
