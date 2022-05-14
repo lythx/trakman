@@ -1,5 +1,6 @@
 'use strict'
 import xml2js from 'xml2js'
+import {ErrorHandler} from "./ErrorHandler";
 
 export class Response {
   private _status = 'pending'
@@ -8,9 +9,9 @@ export class Response {
   private _data = Buffer.from('')
   private _overload: Buffer | null = null
   private _json: any = null
-  private _isEvent: boolean | null = null
+  private _isEvent: boolean = false
   private _eventName: string = ''
-  private _isError: boolean | null = null
+  private _isError: boolean = false
   private _errorString: string = ''
   private _errorCode: number = 0
 
@@ -30,7 +31,7 @@ export class Response {
   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
   * @param {Buffer} data buffer received from dedicated server
   */
-  addData (data: Buffer) {
+  addData (data: Buffer): void {
     const newBuffer = Buffer.concat([this._data, data])
     if (newBuffer.length > this._targetLength) {
       this._data = newBuffer.subarray(0, this._targetLength)
@@ -48,31 +49,31 @@ export class Response {
     this._data = newBuffer
   }
 
-  get id () {
+  get id (): number {
     return this._id
   }
 
-  get status () {
+  get status (): string {
     return this._status
   }
 
-  get eventName () {
+  get eventName (): string {
     return this._eventName
   }
 
-  get isEvent () {
+  get isEvent (): boolean {
     return this._isEvent
   }
 
-  get isError () {
+  get isError (): boolean {
     return this._isError
   }
 
-  get errorString () {
+  get errorString (): string {
     return this._errorString
   }
 
-  get errorCode () {
+  get errorCode (): number {
     return this._errorCode
   }
 
@@ -81,7 +82,11 @@ export class Response {
   * and sets status to complete
   * @returns {Buffer} next response buffer
   */
-  extractOverload () {
+  extractOverload (): Buffer {
+    if(this._overload == null) {
+      ErrorHandler.error('Error in extractOverload()', 'Overload is null')
+      return Buffer.from('')
+    }
     const overload = this._overload
     this._overload = null
     this._status = 'complete'
@@ -91,33 +96,33 @@ export class Response {
   /**
   * @returns {any[]} array created from server response
   */
-  get json () {
-    if (this._isEvent) {
+  get json (): any[] {
+    if (this._isEvent != null) {
       return this.#fixNesting(this._json.methodCall)
     } else {
       return this.#fixNesting(this._json.methodResponse)
     }
   }
 
-  #generateJson () {
+  #generateJson (): void {
     let json: any
     // parse xml to json
     xml2js.parseString(this._data.toString(), (err, result) => {
-      if (err) {
+      if (err != null) {
         throw err
       }
       json = result
     })
 
-    if (json?.methodCall) {
+    if (json?.methodCall != null) {
       this._json = json
       this._eventName = json.methodCall.methodName[0]
       this._isEvent = true
-    } else if (json.methodResponse) {
+    } else if (json.methodResponse != null) {
       this._json = json
       this._isEvent = false
       // if server responded with error
-      if (json.methodResponse.fault) {
+      if (json.methodResponse.fault != null) {
         this._isError = true
         this._errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
         this._errorString = json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
@@ -126,7 +131,7 @@ export class Response {
   }
 
   // i hate XML
-  #fixNesting (obj: any) {
+  #fixNesting (obj: any): any[] {
     const arr = []
     const changeType: any = (value: any, type: string) => {
       const arr = []
@@ -150,7 +155,7 @@ export class Response {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (!el.value) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value == null) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             const t = Object.keys(el.value[0])[0]
             const val = el.value[0][t][0]
             arr.push(changeType(val, t))
@@ -169,7 +174,7 @@ export class Response {
         const value = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
-            if (!el.data[0]?.value) { // some methods dont return value here too
+            if (el.data[0]?.value == null) { // some methods dont return value here too
               continue
             }
             for (const val of el.data[0].value) {

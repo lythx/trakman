@@ -1,12 +1,12 @@
 'use strict'
-import {Chat} from './plugins/Chat.js'
-import {Client} from './Client.js'
-import {Events} from './Events.js'
-import {PlayerService} from './services/PlayerService.js'
-import {RecordService} from './services/RecordService.js'
+import { Chat } from './plugins/Chat.js'
+import { Client } from './Client.js'
+import { Events } from './Events.js'
+import { PlayerService } from './services/PlayerService.js'
+import { RecordService } from './services/RecordService.js'
 
 export class Listeners {
-  private static listeners: TMEvent[] = [
+  private static readonly listeners: TMEvent[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
@@ -25,8 +25,8 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerChat',
       callback: async (params: any[]) => {
-        if (params[0] === 0) // check if server message
-        { }
+        if (params[0] === 0) { // check if server message
+        }
         // Log the chat and write to log table
       }
     },
@@ -141,7 +141,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize () {
+  static async initialize (): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

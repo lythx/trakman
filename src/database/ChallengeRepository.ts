@@ -1,5 +1,5 @@
 import { Repository } from './Repository.js'
-import {Challenge} from "../services/ChallengeService";
+import { Challenge } from '../services/ChallengeService'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS challenges(

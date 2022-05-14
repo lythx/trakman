@@ -1,7 +1,7 @@
 'use strict'
 import { Repository } from './Repository.js'
-import {Player} from "../services/PlayerService.js";
-import {ErrorHandler} from "../ErrorHandler.js";
+import { Player } from '../services/PlayerService.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS players(
@@ -39,8 +39,8 @@ export class PlayerRepository extends Repository {
    */
   async get (login: string) {
     const res = await this.db.query(getQuery, [login])
-    if(!res?.rows) {
-      return Promise.reject('Error getting player ' + login + ' from database.')
+    if ((res?.rows) == null) {
+      return await Promise.reject('Error getting player ' + login + ' from database.')
     }
     return res.rows
   }
@@ -52,8 +52,8 @@ export class PlayerRepository extends Repository {
    */
   async add (player: Player) {
     const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])
-    if(!res?.rows) {
-      return Promise.reject('Error adding player ' + player.login + ' to database.')
+    if ((res?.rows) == null) {
+      return await Promise.reject('Error adding player ' + player.login + ' to database.')
     }
     return res.rows
   }
@@ -65,8 +65,8 @@ export class PlayerRepository extends Repository {
    */
   async update (player: Player) {
     const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])
-    if(!res?.rows) {
-      return Promise.reject('Error updating player ' + player.login + "'s data in the database.")
+    if ((res?.rows) == null) {
+      return await Promise.reject('Error updating player ' + player.login + "'s data in the database.")
     }
     return res
   }

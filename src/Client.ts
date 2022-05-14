@@ -1,6 +1,6 @@
 'use strict'
-import {Request} from './Request.js'
-import {Socket} from './Socket.js'
+import { Request } from './Request.js'
+import { Socket } from './Socket.js'
 
 /**
  * @abstract
@@ -22,7 +22,7 @@ export class Client {
     this.#socket.connect(port, host)
     this.#socket.setKeepAlive(true)
     this.#socket.setupListeners()
-    return await this.#socket.awaitHandshake().catch(err => Promise.reject(err))
+    return await this.#socket.awaitHandshake().catch(async err => await Promise.reject(err))
   }
 
   /**
@@ -38,7 +38,7 @@ export class Client {
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)
-    if (!expectsResponse) { return Promise.resolve([]) }
-    return await this.#socket.awaitResponse(this.#requestId, method).catch(err => Promise.reject(err))
+    if (!expectsResponse) { return await Promise.resolve([]) }
+    return await this.#socket.awaitResponse(this.#requestId, method).catch(async err => await Promise.reject(err))
   }
 }

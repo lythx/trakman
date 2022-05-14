@@ -1,19 +1,18 @@
 'use strict'
-import {Client} from './Client.js'
-import {Logger} from './Logger.js'
-import {ChallengeService} from './services/ChallengeService.js'
+import { Client } from './Client.js'
+import { Logger } from './Logger.js'
+import { ChallengeService } from './services/ChallengeService.js'
 import 'dotenv/config'
-import {Listeners} from './Listeners.js'
-import {DefaultCommands} from './plugins/DefaultCommands.js'
-import {PlayerService} from './services/PlayerService.js'
-import {ErrorHandler} from './ErrorHandler.js'
+import { Listeners } from './Listeners.js'
+import { DefaultCommands } from './plugins/DefaultCommands.js'
+import { PlayerService } from './services/PlayerService.js'
+import { ErrorHandler } from './ErrorHandler.js'
 
-async function main () {
+async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
-  if(connectionStatus)
-    Logger.info(connectionStatus)
+  Logger.info(connectionStatus)
   Logger.trace('Authenticating...')
   await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
@@ -42,7 +41,7 @@ async function main () {
   Logger.info('Player service instantiated')
 }
 
-main()
+await main()
 
 /* call with array of structs in params example
     const val = await client.call('SetCallVoteRatios', [
