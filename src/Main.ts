@@ -4,12 +4,12 @@ import { Logger } from './Logger.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import 'dotenv/config'
 import { Listeners } from './Listeners.js'
-import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import '../Plugins.js'
 
-async function main (): Promise<void> {
+async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
@@ -24,7 +24,6 @@ async function main (): Promise<void> {
 
   Logger.info('Authentication success')
   await Listeners.initialize()
-  const defaultCommands = new DefaultCommands()
   Logger.trace('Enabling callbacks...')
   await Client.call('EnableCallbacks', [
     { boolean: true }
