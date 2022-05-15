@@ -7,7 +7,7 @@ import { RecordService } from './services/RecordService.js'
 import { ChatService } from './services/ChatService.js'
 
 export class Listeners {
-  private static listeners: TMEvent[] = [
+  private static readonly listeners: TMEvent[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
@@ -26,9 +26,10 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerChat',
       callback: async (params: any[]) => {
-        if (params[0] === 0)  // check if server message
+        if (params[0] === 0) { // check if server message
           return
-        ChatService.add(params[1], params[2])
+        }
+        await ChatService.add(params[1], params[2])
       }
     },
     {
@@ -142,7 +143,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize() {
+  static async initialize (): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

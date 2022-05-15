@@ -8,7 +8,6 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@types/dotenv": "^8.2.0",
     "@types/node": "^17.0.33",
     "@types/pg": "^8.6.5",
     "@types/uuid": "^8.3.4",
@@ -16,14 +15,18 @@
     "standard": "^17.0.0",
     "ts-node": "^10.7.0",
     "ts-standard": "^11.0.0",
+    "eslint": "7.32.0",
     "@typescript-eslint/parser": "^5.23.0",
     "@typescript-eslint/eslint-plugin": "^5.23.0"
   },
+  "ts-standard": {
+    "ignore": ["built", ".*", "node-modules", "src/**/*.js"]
+  },
   "scripts": {
-    "test": "standard",
+    "test": "ts-standard",
     "build": "tsc",
-    "prod": "tsc && node ./built/src/app.js",
-    "debug": "tsc && node --inspect ./built/src/app.js"
+    "prod": "tsc && node ./built/Main.js",
+    "debug": "tsc && node --inspect ./built/Main.js"
   },
   "type": "module"
 }
