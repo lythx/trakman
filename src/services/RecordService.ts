@@ -2,8 +2,8 @@
 import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
 import { Chat } from '../plugins/Chat.js'
-import {Player, PlayerService} from "./PlayerService.js";
-import {ErrorHandler} from "../ErrorHandler.js";
+import { Player, PlayerService } from './PlayerService.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
   private static readonly repo = new RecordRepository()

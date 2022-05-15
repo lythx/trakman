@@ -3,7 +3,7 @@ import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
-import {ChallengeService} from "./ChallengeService.js";
+import { ChallengeService } from './ChallengeService.js'
 
 export class PlayerService {
   private static _players: Player[] = []
@@ -94,7 +94,7 @@ export class PlayerService {
    * @param {number} lap
    * @return {Promise<void>}
    */
-  static async addCP (login: string, index: number, time: number, lap: number) {
+  static async addCP (login: string, index: number, time: number, lap: number): Promise<void> {
     try {
       const player = this.getPlayer(login)
       player.addCP({
@@ -126,7 +126,7 @@ export class Player {
     this._joinTimestamp = Date.now()
   }
 
-  addCP (cp: Checkpoint) {
+  addCP (cp: Checkpoint): void {
     const len = this._checkpoints.length
     const lap = cp.lap % ChallengeService.current.laps
     if (lap === 0 && cp.index === 0) {
@@ -136,7 +136,6 @@ export class Player {
       if (cp.time === 0) {
         throw Error('Checkpoint time cannot be 0.')
       }
-
     } else if (cp.time === this._checkpoints[len - 1].time) {
       throw Error('Checkpoint time cannot be the same as the last.')
     }
