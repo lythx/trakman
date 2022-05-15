@@ -4,10 +4,10 @@ import { Logger } from './Logger.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import 'dotenv/config'
 import { Listeners } from './Listeners.js'
-import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 
 async function main (): Promise<void> {
@@ -28,7 +28,6 @@ async function main (): Promise<void> {
   await GameService.initialize()
   Logger.info('Game info initialised')
   await Listeners.initialize()
-  const defaultCommands = new DefaultCommands()
   Logger.trace('Enabling callbacks...')
   await Client.call('EnableCallbacks', [
     { boolean: true }
