@@ -13,13 +13,17 @@ export abstract class ChatService {
     await this.repo.initialize()
   }
 
-  static async addCommand(command: Command): Promise<void> {
+static async addCommand(command: Command): Promise<void> {
     let prefix = '/'
-    if (command.level !== 0)
+    if (command.level !== 0) {
       prefix += '/'
+    }
     Events.addListener('Controller.PlayerChat', async (params: any[]) => {
-      if (!command.aliases.some((a: any) => (params[0].text.trim().toLowerCase()).split(' ')[0] === `${prefix}${a}`)) { return }
-      const text = (params[0].text.trim()).split(/ /).splice(1).toString().split(',').join(" ")
+      const input = params?.[0]?.text?.trim()?.toLowerCase();
+      if (!command.aliases.some((alias: any) => input.split(' ').shift() === (prefix + alias))) {
+        return;
+      }
+      const text = input.split(' ').splice(1).join(" ");
       command.callback({ login: params[0].login, text, level: command.level })
     })
   }
