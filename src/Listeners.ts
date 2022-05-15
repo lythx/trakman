@@ -5,8 +5,8 @@ import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { ChatService } from './services/ChatService.js'
-import {GameService} from "./services/GameService.js";
-import {ChallengeService} from "./services/ChallengeService.js";
+import { GameService } from './services/GameService.js'
+import { ChallengeService } from './services/ChallengeService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -59,7 +59,7 @@ export class Listeners {
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
           return
         }
-        if(GameService.gameMode === 3) { // return if it's the laps game mode
+        if (GameService.gameMode === 3) { // return if it's the laps game mode
           return
         }
         await RecordService.add(ChallengeService.current.id, params[1], params[2])

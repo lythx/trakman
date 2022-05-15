@@ -9,7 +9,7 @@ export class DefaultCommands {
     {
       aliases: ['qwe', 'qwer', '123', 'test'],
       help: 'qqweqwe',
-      callback: async() => {
+      callback: async () => {
         await Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false)
       },
       level: 0

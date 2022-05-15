@@ -8,7 +8,7 @@ import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
-import {GameService} from "./services/GameService.js";
+import { GameService } from './services/GameService.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')

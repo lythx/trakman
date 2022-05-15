@@ -1,13 +1,13 @@
 'use strict'
 
-import {Client} from "../Client.js";
+import { Client } from '../Client.js'
 
 export class GameService {
   private static _game: Game
 
-  static async initialize(): Promise<void> {
-    const info = (await Client.call('GetCurrentGameInfo', [{int: 1}]))[0]
-    if (info == null){
+  static async initialize (): Promise<void> {
+    const info = (await Client.call('GetCurrentGameInfo', [{ int: 1 }]))[0]
+    if (info == null) {
       return
     }
     this._game = {
@@ -37,7 +37,7 @@ export class GameService {
     }
   }
 
-  static get gameMode() {
+  static get gameMode (): number {
     return this._game.gameMode
   }
 }

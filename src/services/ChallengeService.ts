@@ -1,8 +1,8 @@
 'use strict'
 import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
-import {GameService} from "./GameService.js";
-import {ErrorHandler} from "../ErrorHandler.js";
+import { GameService } from './GameService.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 export class ChallengeService {
   private static _current: Challenge
@@ -24,13 +24,13 @@ export class ChallengeService {
       return
     }
     const curr = this.list.find(c => c.id === info.UId)
-    if (curr == undefined) {
+    if (curr === undefined) {
       ErrorHandler.error('Unable to find current challenge in challenge list.')
       return
     }
     this._current = curr
     // If the game mode can have laps (Rounds, Team, Cup), get the number of laps
-    if([0, 2, 5].includes(GameService.gameMode) && info.LapRace) {
+    if ([0, 2, 5].includes(GameService.gameMode) && info.LapRace as boolean) {
       this._current.laps = info.NbLaps
     }
   }

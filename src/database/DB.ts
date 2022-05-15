@@ -29,7 +29,7 @@ export class Database {
    */
   async query (q: string, params: any[] = []): Promise<QueryResult> {
     return await this.#client.query(q, params).catch(err => {
-      throw Error(`Database error on query ${q}: ` + err.message as string)
+      throw Error(`Database error on query ${q}: ` + err.message)
     })
   }
 }
