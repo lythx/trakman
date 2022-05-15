@@ -1,26 +1,26 @@
 'use strict'
 import { randomUUID } from 'crypto'
-import {RecordRepository} from '../database/RecordRepository.js'
-import {Chat} from '../plugins/Chat.js'
+import { RecordRepository } from '../database/RecordRepository.js'
+import { Chat } from '../plugins/Chat.js'
 
 export class RecordService {
-  private static repo = new RecordRepository()
+  private static readonly repo = new RecordRepository()
 
-  static async initialize () {
+  static async initialize (): Promise<void> {
     await this.repo.initialize()
   }
 
-  static async add (challenge: string, login: string, score: number, checkpoints: number[]) {
-    const record = new Record(challenge, login, score, checkpoints)
+  static async add (challenge: string, login: string, score: number, checkpoints: number[]): Promise<void> {
+    const record = new TMRecord(challenge, login, score, checkpoints)
     const res = await this.repo.add(record)
-    if (res?.rows?.[0].id) {
+    if (res?.rows?.[0].id != null) {
       record.id = res.rows[0].id
       Chat.newLocalRecord(login)
     }
   }
 }
 
-export class Record {
+export class TMRecord {
   public id: string
   private readonly _challenge: string
   private readonly _login: string
@@ -37,23 +37,23 @@ export class Record {
     this._date = new Date()
   }
 
-  get challenge () {
+  get challenge (): string {
     return this._challenge
   }
 
-  get login () {
+  get login (): string {
     return this._login
   }
 
-  get score () {
+  get score (): number {
     return this._score
   }
 
-  get checkpoints () {
+  get checkpoints (): number[] {
     return this._checkpoints
   }
 
-  get date () {
+  get date (): Date {
     return this._date
   }
 }

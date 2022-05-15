@@ -1,12 +1,12 @@
 'use strict'
-import {Client} from '../Client.js'
-import {ChallengeRepository} from '../database/ChallengeRepository.js'
+import { Client } from '../Client.js'
+import { ChallengeRepository } from '../database/ChallengeRepository.js'
 
 export class ChallengeService {
   private static list: Challenge[]
-  private static repo = new ChallengeRepository()
+  private static readonly repo = new ChallengeRepository()
 
-  static async initialize () {
+  static async initialize (): Promise<void> {
     await this.repo.initialize()
   }
 
@@ -14,12 +14,12 @@ export class ChallengeService {
    * Download all the challenges from the server and store them in a field
    * @returns {Promise<void>}
    */
-  private static async getList () {
+  private static async getList (): Promise<void> {
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ])
-    if(!challengeList) {
-      return Promise.reject('Error fetching challenges from TM server.')
+    if (challengeList == null) {
+      throw Error('Error fetching challenges from TM server.')
     }
     this.list = []
     for (const challenge of challengeList) {
@@ -32,8 +32,8 @@ export class ChallengeService {
    * If the list is empty, put the challenges there
    * @returns {Promise<void>}
    */
-  static async push () {
-    if (!this.list) await this.getList()
+  static async push (): Promise<void> {
+    if (this.list == null) await this.getList()
     await this.repo.add(this.list)
   }
 }
@@ -44,26 +44,26 @@ export class Challenge {
   private readonly _author
   private readonly _environment
 
-  constructor (id: any, name: any, author: any, environment: any) {
+  constructor (id: string, name: string, author: string, environment: string) {
     this._id = id
     this._name = name
     this._author = author
     this._environment = environment
   }
 
-  get id () {
+  get id (): string {
     return this._id
   }
 
-  get name () {
+  get name (): string {
     return this._name
   }
 
-  get author () {
+  get author (): string {
     return this._author
   }
 
-  get environment () {
+  get environment (): string {
     return this._environment
   }
 }

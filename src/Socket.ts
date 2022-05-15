@@ -16,12 +16,12 @@ export class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners() {
+  setupListeners (): void {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
-      if (!this.handshakeHeaderSize) {
+      if (this.handshakeHeaderSize === 0) {
         this.#setHandshakeHeaderSize(buffer)
-      } else if (!this.handshakeHeader) {
+      } else if (this.handshakeHeader === '') {
         this.#handleHandshake(buffer)
       } else if (!this.receivingResponse) { // all data except for the handshake
         this.#handleResponseStart(buffer)
@@ -29,14 +29,14 @@ export class Socket extends net.Socket {
         this.#handleResponseChunk(buffer)
       }
     })
-    this.on('error', err => ErrorHandler.fatal('Socket error', err.toString()))
+    this.on('error', err => ErrorHandler.fatal('Socket error:', err.message))
   }
 
   /**
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  awaitHandshake(): Promise<string> {
+  async awaitHandshake (): Promise<string> {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
@@ -59,15 +59,15 @@ export class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  awaitResponse(id: number, method: string): Promise<any[]> {
+  async awaitResponse (id: number, method: string): Promise<any[]> {
     let i = 0
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.responses.find(a => a.id === id && a.status === 'completed')
-          if (!response) {
-            reject('Response id: ' + id + ' not found in responses list.')
+          if (response === undefined) {
+            reject(new Error('Response id: ' + id.toString() + ' not found in responses list.'))
             return
           }
           if (response.isError) {
@@ -82,12 +82,12 @@ export class Socket extends net.Socket {
     })
   }
 
-  #setHandshakeHeaderSize(buffer: Buffer) {
+  #setHandshakeHeaderSize (buffer: Buffer): void {
     if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake(buffer: Buffer) {
+  #handleHandshake (buffer: Buffer): void {
     this.handshakeHeader = buffer.toString()
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
@@ -99,31 +99,31 @@ export class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart(buffer: Buffer) {
+  #handleResponseStart (buffer: Buffer): void {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.incompleteHeader = buffer
       return
     }
-    if (this.incompleteHeader) { // concating header if it got split
+    if (this.incompleteHeader != null) { // concating header if it got split
       buffer = Buffer.concat([this.incompleteHeader, buffer])
       this.incompleteHeader = null
     }
     this.response = new Response(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
     this.receivingResponse = true
-    if (buffer.subarray(8)) { this.#handleResponseChunk(buffer.subarray(8)) }
+    if (buffer.subarray(8) != null) { this.#handleResponseChunk(buffer.subarray(8)) }
   }
 
   // add new buffer to response object
-  #handleResponseChunk(buffer: Buffer) {
-    if (!this.response) {
+  #handleResponseChunk (buffer: Buffer): void {
+    if (this.response === null) {
       ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
       return
     }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer = this.response.extractOverload()
-      if (!nextResponseBuffer) {
+      if (nextResponseBuffer == null) {
         ErrorHandler.error('Next response buffer is null.', '')
         return
       }
