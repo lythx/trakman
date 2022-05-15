@@ -7,6 +7,7 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import { DedimaniaClient } from './dedimania/DedimaniaClient.js'
 import '../Plugins.js'
 
 async function main(): Promise<void> {
@@ -46,6 +47,10 @@ async function main(): Promise<void> {
     ErrorHandler.fatal('Failed to fetch messages', e.message)
   }
   Logger.info('Chat service instantiated')
+  if (process.env.USE_DEDIMANIA === 'YES') {
+    Logger.trace('Connecting to dedimania...')
+    DedimaniaClient.connect(Number(process.env.DEDIMANIA_PORT), 'dedimania.net')
+  }
 }
 
 await main()
