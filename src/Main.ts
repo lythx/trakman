@@ -8,6 +8,7 @@ import { DefaultCommands } from './plugins/DefaultCommands.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import {GameService} from "./services/GameService.js";
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -23,6 +24,9 @@ async function main (): Promise<void> {
   })
 
   Logger.info('Authentication success')
+  Logger.trace('Retrieving game info')
+  await GameService.initialize()
+  Logger.info('Game info initialised')
   await Listeners.initialize()
   const defaultCommands = new DefaultCommands()
   Logger.trace('Enabling callbacks...')

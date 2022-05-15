@@ -5,6 +5,8 @@ import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { ChatService } from './services/ChatService.js'
+import {GameService} from "./services/GameService.js";
+import {ChallengeService} from "./services/ChallengeService.js";
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -45,15 +47,22 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerFinish',
       callback: async (params: any[]) => { // params are PlayerUid, Login, Score
-        if (params[0] === 0 || params[2] === 0) { // IGNORE THIS IS A FAKE FINISH | IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
+        if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
+          return
+        }
+        if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
+          // reset cps
+          PlayerService.getPlayer(params[1]).finished()
           return
         }
         const status = await Client.call('GetStatus')
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
           return
         }
-        const challengeInfo = await Client.call('GetCurrentChallengeInfo')
-        await RecordService.add(challengeInfo[0].UId, params[1], params[2])
+        if(GameService.gameMode === 3) { // return if it's the laps game mode
+          return
+        }
+        await RecordService.add(ChallengeService.current.id, params[1], params[2])
         // Store/update finish time in db
       }
     },
@@ -85,7 +94,7 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]) => {
         // Similar to BeginRace, albeit gives more information to process
-
+        await ChallengeService.setCurrent()
       }
     },
     {
