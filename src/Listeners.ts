@@ -1,5 +1,4 @@
 'use strict'
-import { Chat } from './plugins/Chat.js'
 import { Client } from './Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
@@ -16,7 +15,6 @@ export class Listeners {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
-        Chat.sendJoinMessage(playerInfo[0].NickName)
       }
     },
     {
@@ -156,7 +154,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

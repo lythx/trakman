@@ -1,7 +1,6 @@
 'use strict'
 import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
-import { Chat } from '../plugins/Chat.js'
 import { Player, PlayerService } from './PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
@@ -24,7 +23,6 @@ export class RecordService {
     const res = await this.repo.add(record)
     if (res?.rows?.[0].id != null) {
       record.id = res.rows[0].id
-      Chat.newLocalRecord(login)
     }
   }
 }
