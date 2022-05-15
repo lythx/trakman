@@ -49,7 +49,8 @@ async function main(): Promise<void> {
   Logger.info('Chat service instantiated')
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
-    DedimaniaClient.connect(Number(process.env.DEDIMANIA_PORT), 'dedimania.net')
+    if (await DedimaniaClient.connect(Number(process.env.DEDIMANIA_PORT), 'dedimania.net'))
+      Logger.info('Connected to dedimania')
   }
 }
 
