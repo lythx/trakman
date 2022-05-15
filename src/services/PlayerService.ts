@@ -3,6 +3,7 @@ import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
+import {ChallengeService} from "./ChallengeService.js";
 
 export class PlayerService {
   private static _players: Player[] = []
@@ -127,15 +128,16 @@ export class Player {
 
   addCP (cp: Checkpoint) {
     const len = this._checkpoints.length
-    if (cp.lap === 0 && cp.index === 0) {
+    const lap = cp.lap % ChallengeService.current.laps
+    if (lap === 0 && cp.index === 0) {
       if (len !== 0) {
         throw Error('Something went horribly wrong, this is supposed to be the first checkpoint but somehow the array is not empty')
       }
       if (cp.time === 0) {
         throw Error('Checkpoint time cannot be 0.')
       }
-    }
-    if (cp.time === this._checkpoints[len - 1].time) {
+
+    } else if (cp.time === this._checkpoints[len - 1].time) {
       throw Error('Checkpoint time cannot be the same as the last.')
     }
     this._checkpoints.push(cp)
@@ -163,5 +165,9 @@ export class Player {
 
   get checkpoints (): Checkpoint[] {
     return this._checkpoints
+  }
+
+  finished (): void {
+    this._checkpoints = []
   }
 }
