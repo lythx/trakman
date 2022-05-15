@@ -21,6 +21,14 @@ const commands: Command[] = [
       await Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
     },
     level: 0
+  },
+  {
+    aliases: ['test'],
+    help: 'test',
+    callback: async (params: any[]) => {
+      await Client.call('ChatSendServerMessage', [{ string: JSON.stringify(params) }], false)
+    },
+    level: 0
   }
 ]
 

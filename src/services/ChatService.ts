@@ -17,12 +17,11 @@ export abstract class ChatService {
     let prefix = '/'
     if (command.level !== 0)
       prefix += '/'
-    Events.addListener('TrackMania.PlayerChat', async (params: any[]) => {
-      if (params[0] === 0 || !command.aliases.some((a: any) => (params[2].trim().toLowerCase()).split(' ')[0] === `${prefix}${a}`)) { return }
-      // TODO check for privileges db query
-      command.callback(/* TODO::: PASS PLAYER INFO THIS IS CRITICAL FOR OUR MISSION */(params[2].trim()).split(/ /).shift())
+    Events.addListener('Controller.PlayerChat', async (params: any[]) => {
+      if (!command.aliases.some((a: any) => (params[0].text.trim().toLowerCase()).split(' ')[0] === `${prefix}${a}`)) { return }
+      const text = (params[0].text.trim()).split(/ /).splice(1).toString().split(',').join(" ")
+      command.callback({ login: params[0].login, text, level: command.level })
     })
-
   }
 
   static async loadLastSessionMessages(): Promise<void> {
