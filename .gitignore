@@ -109,3 +109,7 @@ dist
 # IntelliJ
 .idea/
 /built/
+
+# Plugins
+Plugins.ts
+plugins
