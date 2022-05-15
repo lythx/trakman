@@ -36,6 +36,10 @@ export class Listeners {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async (params: any[]) => {
         // Store current checkpoints, check for incoherences, ensure index isn't fucked up
+        if (params[0] === 0) { // check if null player
+          return
+        }
+        await PlayerService.addCP(params[1], params[4], params[2], params[3])
       }
     },
     {
@@ -49,7 +53,7 @@ export class Listeners {
           return
         }
         const challengeInfo = await Client.call('GetCurrentChallengeInfo')
-        await RecordService.add(challengeInfo[0].UId, params[1], params[2], [])
+        await RecordService.add(challengeInfo[0].UId, params[1], params[2])
         // Store/update finish time in db
       }
     },
