@@ -6,9 +6,10 @@ import { ErrorHandler } from '../ErrorHandler.js'
 
 export class PlayerService {
   private static _players: Player[] = []
-  private static readonly repo = new PlayerRepository()
+  private static repo: PlayerRepository
 
-  static async initialize (): Promise<void> {
+  static async initialize (repo: PlayerRepository = new PlayerRepository()): Promise<void> {
+    this.repo = repo
     await this.repo.initialize()
   }
 

@@ -12,21 +12,37 @@
     "@types/pg": "^8.6.5",
     "@types/uuid": "^8.3.4",
     "@types/xml2js": "^0.4.11",
+    "@types/jest": "^27.5.1",
     "standard": "^17.0.0",
     "ts-node": "^10.7.0",
     "ts-standard": "^11.0.0",
     "eslint": "7.32.0",
     "@typescript-eslint/parser": "^5.23.0",
-    "@typescript-eslint/eslint-plugin": "^5.23.0"
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "ts-mockito": "^2.6.1",
+    "jest": "27.5.1",
+    "ts-jest": "27.1.4"
   },
   "ts-standard": {
-    "ignore": ["built", ".*", "node-modules", "src/**/*.js"]
+    "ignore": ["built", ".*", "node-modules", "src/**/*.js", "tests/**/*.js"]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [".ts"],
+    "roots": ["built/tests"],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    }
   },
   "scripts": {
-    "test": "ts-standard",
-    "build": "tsc",
-    "prod": "tsc && node ./built/Main.js",
-    "debug": "tsc && node --inspect ./built/Main.js"
+    "unit": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test": "npm run unit && ts-standard",
+    "build": "tsc -p tsconfig.json",
+    "prod": "npm run build && node ./built/Main.js",
+    "debug": "npm run build && node --inspect ./built/Main.js"
   },
   "type": "module"
 }

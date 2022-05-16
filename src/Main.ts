@@ -9,7 +9,7 @@ import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
 import '../Plugins.js'
 
-async function main(): Promise<void> {
+async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
