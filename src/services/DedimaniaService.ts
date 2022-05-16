@@ -25,7 +25,7 @@ export abstract class DedimaniaService {
                 { int: 1 }, //mode: 1-TA
                 {
                     struct: {
-                        SrvName: { string: process.env.SERVER_NAME }
+                        SrvName: { string: 'TODO' } //TODO
                     }
                 },
                 { int: 30 }, //number of records probably
@@ -45,7 +45,7 @@ export abstract class DedimaniaService {
                 { int: PlayerService.players.length },
                 {
                     struct: {
-                        SrvName: { string: process.env.SERVER_NAME }
+                        SrvName: { string: 'TODO' } //TODO
                     }
                 },
                 { array: [] }
