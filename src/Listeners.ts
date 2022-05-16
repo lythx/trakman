@@ -5,6 +5,7 @@ import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { ChatService } from './services/ChatService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
+import 'dotenv/config'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -79,11 +80,13 @@ export class Listeners {
     {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]) => {
-        const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
-        records[0].Name = params[0].Name
-        records[0].Author = params[0].Author
-        records[0].Environnement = params[0].Environnement
-        Events.emitEvent('Controller.DedimaniaRecords', [...records])
+        if (process.env.USE_DEDIMANIA === 'YES') {
+          const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
+          records[0].Name = params[0].Name
+          records[0].Author = params[0].Author
+          records[0].Environnement = params[0].Environnement
+          Events.emitEvent('Controller.DedimaniaRecords', [...records])
+        }
       }
     },
     {
