@@ -1,12 +1,15 @@
 'use strict'
 import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
+import { ErrorHandler } from '../ErrorHandler'
 
 export class ChallengeService {
   private static list: Challenge[]
-  private static readonly repo = new ChallengeRepository()
+  private static repo: ChallengeRepository
 
-  static async initialize (): Promise<void> {
+  static async initialize (repo: ChallengeRepository = new ChallengeRepository()): Promise<void> {
+    this.list = []
+    this.repo = repo
     await this.repo.initialize()
   }
 
@@ -15,13 +18,18 @@ export class ChallengeService {
    * @returns {Promise<void>}
    */
   private static async getList (): Promise<void> {
-    const challengeList = await Client.call('GetChallengeList', [
-      { int: 5000 }, { int: 0 }
-    ])
+    this.list = []
+    let challengeList
+    try {
+      challengeList = await Client.call('GetChallengeList', [
+        { int: 5000 }, { int: 0 }
+      ])
+    } catch (e) {
+      challengeList = null
+    }
     if (challengeList == null) {
       throw Error('Error fetching challenges from TM server.')
     }
-    this.list = []
     for (const challenge of challengeList) {
       this.list.push(new Challenge(challenge.UId, challenge.Name, challenge.Author, challenge.Environnement)) // they cant speak english ahjahahahahhaha
     }
@@ -33,7 +41,14 @@ export class ChallengeService {
    * @returns {Promise<void>}
    */
   static async push (): Promise<void> {
-    if (this.list == null) await this.getList()
+    if (this.list == null || this.list.length === 0) {
+      try {
+        await this.getList()
+      } catch (e: any) {
+        ErrorHandler.error(e.message.toString())
+        return
+      }
+    }
     await this.repo.add(this.list)
   }
 }

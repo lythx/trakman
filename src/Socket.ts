@@ -38,7 +38,7 @@ export class Socket extends net.Socket {
   */
   async awaitHandshake (): Promise<string> {
     let i = 0
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.handshakeStatus === 'Handshake success') {
@@ -61,7 +61,7 @@ export class Socket extends net.Socket {
   */
   async awaitResponse (id: number, method: string): Promise<any[]> {
     let i = 0
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         i++
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {

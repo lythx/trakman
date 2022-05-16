@@ -1,6 +1,6 @@
 'use strict'
 import 'dotenv/config'
-import postgres, { QueryResult } from 'pg'
+import postgres from 'pg'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 const { Pool } = postgres
@@ -27,9 +27,9 @@ export class Database {
    * @throws a database error if something goes wrong with the query
    * @return {Promise<void>}
    */
-  async query (q: string, params: any[] = []): Promise<QueryResult> {
+  async query (q: string, params: any[] = []): Promise<postgres.QueryResult> {
     return await this.#client.query(q, params).catch(err => {
-      throw Error(`Database error on query ${q}: ` + err.message as string)
+      throw Error(`Database error on query ${q}: ` + err.message)
     })
   }
 }

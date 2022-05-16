@@ -7,28 +7,29 @@ const messagesArraySize = 250
 
 export abstract class ChatService {
   static readonly messages: Message[] = []
-  private static readonly repo = new ChatRepository()
+  private static repo: ChatRepository
 
-  static async initialize(): Promise<void> {
+  static async initialize (repo: ChatRepository = new ChatRepository()): Promise<void> {
+    this.repo = repo
     await this.repo.initialize()
   }
 
-static async addCommand(command: Command): Promise<void> {
+  static async addCommand (command: Command): Promise<void> {
     let prefix = '/'
     if (command.level !== 0) {
       prefix += '/'
     }
     Events.addListener('Controller.PlayerChat', async (params: any[]) => {
-      const input = params?.[0]?.text?.trim()?.toLowerCase();
+      const input = params?.[0]?.text?.trim()?.toLowerCase()
       if (!command.aliases.some((alias: any) => input.split(' ').shift() === (prefix + alias))) {
-        return;
+        return
       }
-      const text = input.split(' ').splice(1).join(" ");
+      const text = input.split(' ').splice(1).join(' ')
       command.callback({ login: params[0].login, text, level: command.level })
     })
   }
 
-  static async loadLastSessionMessages(): Promise<void> {
+  static async loadLastSessionMessages (): Promise<void> {
     const result = await this.repo.get(messagesArraySize)
     if (result instanceof Error) { throw result }
     for (const m of result) {
@@ -42,7 +43,7 @@ static async addCommand(command: Command): Promise<void> {
     }
   }
 
-  static async add(login: string, text: string): Promise<void> {
+  static async add (login: string, text: string): Promise<void> {
     const message: Message = {
       id: randomUUID(),
       login,
@@ -56,7 +57,7 @@ static async addCommand(command: Command): Promise<void> {
     if (result instanceof Error) { throw result }
   }
 
-  static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
+  static async getByLogin (login: string, limit: number): Promise<any[] | Error> {
     return await this.repo.getByLogin(login, limit)
   }
 }
