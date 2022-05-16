@@ -1,6 +1,8 @@
 'use strict'
 import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
+import { Player, PlayerService } from './PlayerService.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
   private static repo: RecordRepository
@@ -10,8 +12,15 @@ export class RecordService {
     await this.repo.initialize()
   }
 
-  static async add (challenge: string, login: string, score: number, checkpoints: number[]): Promise<void> {
-    const record = new TMRecord(challenge, login, score, checkpoints)
+  static async add (challenge: string, login: string, score: number): Promise<void> {
+    let player: Player
+    try {
+      player = PlayerService.getPlayer(login)
+    } catch (e: any) {
+      ErrorHandler.error(e.message.toString())
+      return
+    }
+    const record = new TMRecord(challenge, login, score, player.checkpoints.map(c => c.time))
     const res = await this.repo.add(record)
     if (res?.rows?.[0].id != null) {
       record.id = res.rows[0].id
