@@ -7,7 +7,7 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
-import { DedimaniaClient } from './dedimania/DedimaniaClient.js'
+import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 
 async function main(): Promise<void> {
@@ -49,8 +49,8 @@ async function main(): Promise<void> {
   Logger.info('Chat service instantiated')
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
-    if (await DedimaniaClient.connect(Number(process.env.DEDIMANIA_PORT), 'dedimania.net'))
-      Logger.info('Connected to dedimania')
+    DedimaniaService.initialize()
+    Logger.info('Connected to dedimania')
   }
 }
 

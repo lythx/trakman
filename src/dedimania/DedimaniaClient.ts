@@ -5,33 +5,65 @@ import { DedimaniaResponse } from "./DedimaniaResponse.js"
 import net from "node:net"
 import 'dotenv/config'
 import { ErrorHandler } from "../ErrorHandler.js"
+import { PlayerService } from "../services/PlayerService.js"
 
 export abstract class DedimaniaClient {
 
     private static socket = new net.Socket()
     private static response: DedimaniaResponse
     private static receivingResponse: boolean = false
+    private static sessionId: string
 
-    static async connect(port: number, host: string): Promise<boolean> {
+    static async connect(host: string, port: number): Promise<void> {
         this.socket.connect(port, host)
         this.socket.setKeepAlive(true)
         this.setupListeners()
-        const request = new DedimaniaRequest('dedimania.Authenticate',
-            [
+        const request = new DedimaniaRequest('system.multicall',
+            [{
+                array: [{
+                    struct: {
+                        methodName: { string: 'dedimania.Authenticate' },
+                        params: {
+                            array: [{
+                                struct: {
+                                    Game: { string: process.env.SERVER_GAME },
+                                    Login: { string: process.env.SERVER_LOGIN },
+                                    Password: { string: process.env.SERVER_PASSWORD },
+                                    Tool: { string: 'SussyPetya' },
+                                    Version: { string: '420' },
+                                    Nation: { string: process.env.SERVER_NATION },
+                                    Packmask: { string: process.env.SERVER_PACKMASK }
+                                }
+                            }]
+                        }
+                    },
+                },
                 {
-                    struct:
-                    {
-                        Game: { string: process.env.SERVER_GAME },
-                        Login: { string: process.env.SERVER_LOGIN },
-                        Password: { string: process.env.SERVER_PASSWORD },
-                        Tool: { string: 'Trakman' },
-                        Version: { string: '0.0.1' },
-                        Nation: { string: process.env.SERVER_NATION },
-                        Packmask: { string: process.env.SERVER_PACKMASK },
-                        //  PlayersGame: { string: '1' } this was in xaseco request but the thing works without it so idk
+                    struct: {
+                        methodName: { string: 'dedimania.UpdateServerPlayers' },
+                        params: {
+                            array: [
+                                { string: process.env.SERVER_GAME },
+                                { int: PlayerService.players.length },
+                                {
+                                    struct: {
+                                        SrvName: { string: 'hehehha' },
+                                        Comment: { string: 'sussy petya' },
+                                        Private: { boolean: false }
+                                    }
+                                },
+                                { array: [] }
+                            ]
+                        }
                     }
-                }
-            ])
+                },
+                {
+                    struct: {
+                        methodName: { string: 'dedimania.WarningsAndTTR' },
+                        params: { array: [] }
+                    }
+                }]
+            }])
         this.receivingResponse = true
         this.socket.write(request.buffer)
         this.response = new DedimaniaResponse()
@@ -44,8 +76,17 @@ export abstract class DedimaniaClient {
                             `${this.response.errorString} Code: ${this.response.errorCode}`)
                         reject(new Error(this.response.errorString?.toString()))
                     }
-                    else
-                        resolve(true)
+                    else {
+                        if (!this.response.sessionId) {
+                            ErrorHandler.error(`Dedimania server didn't send sessionId`,
+                                `Received:
+                                ${this.response.data}`)
+                            reject(new Error(`Dedimania server didn't send sessionId`))
+                            return
+                        }
+                        this.sessionId = this.response.sessionId
+                        resolve()
+                    }
                     this.receivingResponse = false
                     clearInterval(interval)
                 }
@@ -68,7 +109,7 @@ export abstract class DedimaniaClient {
         while (this.receivingResponse)
             await new Promise((r) => setTimeout(r, 300))
         this.receivingResponse = true
-        const request = new DedimaniaRequest(method, params)
+        const request = new DedimaniaRequest(method, params, this.sessionId)
         this.socket.write(request.buffer)
         this.response = new DedimaniaResponse()
         return new Promise((resolve, reject) => {

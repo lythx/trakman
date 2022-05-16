@@ -10,15 +10,24 @@ export class DedimaniaResponse {
     private _errorCode: number | null = null
     private _errorString: number | null = null
     private _json: any = null
+    private _sessionId: string | null = null
 
     addData(data: string): void {
         this._data += data
-        const s = this._data.split('\n')
-        if (s[s.length - 1] === '</methodResponse>' && s[0] === 'HTTP/1.1 200 OK\r') {
+        const split = this._data.split('\n')
+        if (split[split.length - 1] === '</methodResponse>' && split[0] === 'HTTP/1.1 200 OK\r') {
+            for (const row of split) {
+                if (row.includes('Set-Cookie: PHPSESSID='))
+                    this._sessionId = row.substring(22).split(';')[0]
+            }
             this._status = 'completed'
             this._xml = this._data.split('\r\n\r\n')[1]
             this.generateJson()
         }
+    }
+
+    get data(): string {
+        return this._data
     }
 
     get json(): any[] {
@@ -39,6 +48,10 @@ export class DedimaniaResponse {
 
     get errorString(): number | null {
         return this._errorString
+    }
+
+    get sessionId(): string | null {
+        return this._sessionId
     }
 
     private generateJson(): void {
@@ -85,9 +98,18 @@ export class DedimaniaResponse {
                 case 'array':
                     for (const el of value.data) {
                         if (el.value == null) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
-                        const t = Object.keys(el.value[0])[0]
-                        const val = el.value[0][t][0]
-                        arr.push(changeType(val, t))
+                        if (el?.value?.[0]) {//dediman sends an array without telling you its an array
+                            for (const e of el.value) {
+                                const t = Object.keys(e)[0]
+                                const val = e[t][0]
+                                arr.push(changeType(val, t))
+                            }
+                        }
+                        else {
+                            const t = Object.keys(el.value[0])[0]
+                            const val = el.value[0][t][0]
+                            arr.push(changeType(val, t))
+                        }
                     }
                     return arr
                 default:
