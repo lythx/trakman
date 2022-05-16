@@ -16,18 +16,25 @@ export class DedimaniaRequest {
   * @param {String} method dedimania method
   * @param {Object[]} params parameters, each param needs to be under key named after its type
   */
-    constructor(method: string, params: object[]) {
+    constructor(method: string, params: object[], sessionKey?: string) {
         let xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
         for (const param of params) {
             xml += `<param><value>${this.#handleParamType(param)}</value></param>`
         }
         xml += '</params></methodCall>'
         const xmlBuffer = Buffer.from(xml)
-        this.buffer = Buffer.concat([
-            this.buffer,
-            Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
-            xmlBuffer
-        ])
+        if (!sessionKey)
+            this.buffer = Buffer.concat([
+                this.buffer,
+                Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
+                xmlBuffer
+            ])
+        else
+            this.buffer = Buffer.concat([
+                this.buffer,
+                Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${sessionKey}\r\n\r\n`),
+                xmlBuffer
+            ])
     }
 
     #handleParamType(param: any) {
