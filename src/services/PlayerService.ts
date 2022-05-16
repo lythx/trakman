@@ -4,7 +4,7 @@ import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { ChallengeService } from './ChallengeService.js'
-import {GameError, GameService} from "./GameService.js";
+import { GameError, GameService } from './GameService.js'
 
 export class PlayerService {
   private static _players: Player[] = []
