@@ -29,8 +29,8 @@ export abstract class DedimaniaClient {
                                     Game: { string: process.env.SERVER_GAME },
                                     Login: { string: process.env.SERVER_LOGIN },
                                     Password: { string: process.env.SERVER_PASSWORD },
-                                    Tool: { string: 'SussyPetya' },
-                                    Version: { string: '420' },
+                                    Tool: { string: 'Trakman' },
+                                    Version: { string: '0.0.1' },
                                     Nation: { string: process.env.SERVER_NATION },
                                     Packmask: { string: process.env.SERVER_PACKMASK }
                                 }
@@ -47,9 +47,7 @@ export abstract class DedimaniaClient {
                                 { int: PlayerService.players.length },
                                 {
                                     struct: {
-                                        SrvName: { string: 'hehehha' },
-                                        Comment: { string: 'sussy petya' },
-                                        Private: { boolean: false }
+                                        SrvName: { string: process.env.SERVER_NAME }
                                     }
                                 },
                                 { array: [] }
