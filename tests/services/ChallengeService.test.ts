@@ -1,6 +1,6 @@
 import {ChallengeRepository} from "../../src/database/ChallengeRepository.js";
 import {Challenge, ChallengeService} from "../../src/services/ChallengeService.js";
-import {anything, instance, mock, verify} from "ts-mockito";
+import {anything, capture, instance, mock, verify} from "ts-mockito";
 import {jest} from '@jest/globals'
 import {Client} from "../../src/Client.js";
 import { SpyInstance } from "jest-mock";
@@ -43,9 +43,10 @@ test('valid', async () => {
   await ChallengeService.push()
   const list = [
     new Challenge('a', 'track1', 'Nadeo', 'Bay'),
-    new Challenge('b_21', 'Map 21', 'midapetardez', 'Stadium')
+    new Challenge('b_21', 'Map 21', 'miapetardez', 'Stadium')
   ]
-  verify(mockedRepo.add(list)).once()
+  expect(capture(mockedRepo.add).first()[0]).toStrictEqual(list)
+  verify(mockedRepo.add(anything())).once()
 })
 
 test('invalid', async () => {
