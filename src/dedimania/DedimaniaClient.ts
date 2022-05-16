@@ -47,7 +47,7 @@ export abstract class DedimaniaClient {
                                 { int: PlayerService.players.length },
                                 {
                                     struct: {
-                                        SrvName: { string: process.env.SERVER_NAME }
+                                        SrvName: { string: 'TODO' } //TODO
                                     }
                                 },
                                 { array: [] }
