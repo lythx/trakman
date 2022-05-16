@@ -92,6 +92,7 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]) => {
         // Similar to BeginRace, albeit gives more information to process
+        await GameService.initialize()
         await ChallengeService.setCurrent()
       }
     },

@@ -40,4 +40,15 @@ export class GameService {
   static get gameMode (): number {
     return this._game.gameMode
   }
+
+  static get roundsForcedLaps (): number {
+    return this._game.roundsForcedLaps
+  }
+}
+
+export class GameError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'GameError'
+  }
 }
