@@ -47,9 +47,11 @@ async function main (): Promise<void> {
   try {
     await ChatService.loadLastSessionMessages()
   } catch (e: any) {
-    ErrorHandler.fatal('Failed to fetch messages', e.message)
+    ErrorHandler.fatal('Failed to fetch messages', e.message.toString())
   }
   Logger.info('Chat service instantiated')
+
+  //await Client.call('NextChallenge')
 }
 
 await main()
