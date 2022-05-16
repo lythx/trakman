@@ -41,8 +41,8 @@
     "unit": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test": "npm run unit && ts-standard",
     "build": "tsc -p tsconfig.json",
-    "prod": "npm run build && node ./built/Main.js",
-    "debug": "npm run build && node --inspect ./built/Main.js"
+    "prod": "npm run build && node ./built/src/Main.js",
+    "debug": "npm run build && node --inspect ./built/src/Main.js"
   },
   "type": "module"
 }

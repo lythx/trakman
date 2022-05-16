@@ -8,6 +8,7 @@ import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
 import '../Plugins.js'
+import { GameService } from './services/GameService.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -23,6 +24,9 @@ async function main (): Promise<void> {
   })
 
   Logger.info('Authentication success')
+  Logger.trace('Retrieving game info')
+  await GameService.initialize()
+  Logger.info('Game info initialised')
   await Listeners.initialize()
   Logger.trace('Enabling callbacks...')
   await Client.call('EnableCallbacks', [
@@ -43,9 +47,11 @@ async function main (): Promise<void> {
   try {
     await ChatService.loadLastSessionMessages()
   } catch (e: any) {
-    ErrorHandler.fatal('Failed to fetch messages', e.message)
+    ErrorHandler.fatal('Failed to fetch messages', e.message.toString())
   }
   Logger.info('Chat service instantiated')
+
+  // await Client.call('NextChallenge')
 }
 
 await main()

@@ -21,7 +21,7 @@ export abstract class ChatService {
     }
     Events.addListener('Controller.PlayerChat', async (params: any[]) => {
       const input = params?.[0]?.text?.trim()?.toLowerCase()
-      if (!command.aliases.some((alias: any) => input.split(' ').shift() === (prefix + alias))) {
+      if (!command.aliases.some((alias: string) => input.split(' ').shift() === (prefix + alias))) {
         return
       }
       const text = input.split(' ').splice(1).join(' ')

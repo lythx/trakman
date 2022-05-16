@@ -3,6 +3,8 @@ import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
+import { ChallengeService } from './ChallengeService.js'
+import { GameError, GameService } from './GameService.js'
 
 export class PlayerService {
   private static _players: Player[] = []
@@ -13,8 +15,12 @@ export class PlayerService {
     await this.repo.initialize()
   }
 
-  static get players (): Player[] {
-    return this._players
+  static getPlayer (login: string): Player {
+    const player = this._players.find(p => p.login === login)
+    if (player == null) {
+      throw Error('Player ' + login + ' not in player list.')
+    }
+    return player
   }
 
   /**
@@ -58,14 +64,11 @@ export class PlayerService {
 
   /**
    * Remove the player
-   * @param login
+   * @param {string} login
    * @returns {Promise<void>}
    */
   static async leave (login: string): Promise<void> {
-    const player = this._players.find(p => p.login === login)
-    if (player == null) {
-      throw new Error('Player ' + login + ' not in player list.')
-    }
+    const player = this.getPlayer(login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
     // Do this instead of waiting for tm callback to prevent accessing database
@@ -84,6 +87,27 @@ export class PlayerService {
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players = this._players.filter(p => p.login !== player.login)
   }
+
+  /**
+   * Add a checkpoint time to the player object.
+   * @param {string} login
+   * @param {number} index
+   * @param {number} time
+   * @param {number} lap
+   * @return {Promise<void>}
+   */
+  static async addCP (login: string, index: number, time: number, lap: number): Promise<void> {
+    try {
+      const player = this.getPlayer(login)
+      player.addCP({
+        index: index,
+        time: time,
+        lap: lap
+      })
+    } catch (e: any) {
+      ErrorHandler.error('Error adding a checkpoint time:', e.message.toString())
+    }
+  }
 }
 
 export class Player {
@@ -94,6 +118,7 @@ export class Player {
   public wins = 0
   public timePlayed = 0
   private readonly _joinTimestamp: number
+  private _checkpoints: Checkpoint[] = []
 
   constructor (login: string, nickName: string, nation: string, nationCode: string) {
     this._login = login
@@ -101,6 +126,28 @@ export class Player {
     this._nation = nation
     this._nationCode = nationCode
     this._joinTimestamp = Date.now()
+  }
+
+  addCP (cp: Checkpoint): void {
+    const len = this._checkpoints.length
+    let divisor: number
+    if (GameService.gameMode === 0) {
+      divisor = GameService.roundsForcedLaps
+    } else {
+      divisor = ChallengeService.current.laps
+    }
+    const lap = cp.lap % divisor
+    if (lap === 0 && cp.index === 0) {
+      if (len !== 0) {
+        throw new GameError('Something went horribly wrong, this is supposed to be the first checkpoint but somehow the array is not empty')
+      }
+      if (cp.time === 0) {
+        throw new GameError('Checkpoint time cannot be 0.')
+      }
+    } else if (cp.time === this._checkpoints[len - 1].time) {
+      throw new GameError('Checkpoint time cannot be the same as the last.')
+    }
+    this._checkpoints.push(cp)
   }
 
   get login (): string {
@@ -121,5 +168,13 @@ export class Player {
 
   get joinTimestamp (): number {
     return this._joinTimestamp
+  }
+
+  get checkpoints (): Checkpoint[] {
+    return this._checkpoints
+  }
+
+  finished (): void {
+    this._checkpoints = []
   }
 }
