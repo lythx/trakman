@@ -51,7 +51,7 @@ async function main (): Promise<void> {
   }
   Logger.info('Chat service instantiated')
 
-  //await Client.call('NextChallenge')
+  // await Client.call('NextChallenge')
 }
 
 await main()
