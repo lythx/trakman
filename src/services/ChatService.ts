@@ -9,22 +9,26 @@ export abstract class ChatService {
   static readonly messages: Message[] = []
   private static readonly repo = new ChatRepository()
 
-  static async initialize(): Promise<void> {
+  static async initialize (): Promise<void> {
     await this.repo.initialize()
   }
 
-  static async addCommand(command: Command): Promise<void> {
+  static async addCommand (command: Command): Promise<void> {
     let prefix = '/'
-    if (command.level !== 0)
+    if (command.level !== 0) {
       prefix += '/'
+    }
     Events.addListener('Controller.PlayerChat', async (params: any[]) => {
-      if (!command.aliases.some((a: any) => (params[0].text.trim().toLowerCase()).split(' ')[0] === `${prefix}${a}`)) { return }
-      const text = (params[0].text.trim()).split(/ /).splice(1).toString().split(',').join(" ")
+      const input = params?.[0]?.text?.trim()?.toLowerCase()
+      if (!command.aliases.some((alias: string) => input.split(' ').shift() === (prefix + alias))) {
+        return
+      }
+      const text = input.split(' ').splice(1).join(' ')
       command.callback({ login: params[0].login, text, level: command.level })
     })
   }
 
-  static async loadLastSessionMessages(): Promise<void> {
+  static async loadLastSessionMessages (): Promise<void> {
     const result = await this.repo.get(messagesArraySize)
     if (result instanceof Error) { throw result }
     for (const m of result) {
@@ -38,7 +42,7 @@ export abstract class ChatService {
     }
   }
 
-  static async add(login: string, text: string): Promise<void> {
+  static async add (login: string, text: string): Promise<void> {
     const message: Message = {
       id: randomUUID(),
       login,
@@ -52,7 +56,7 @@ export abstract class ChatService {
     if (result instanceof Error) { throw result }
   }
 
-  static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
+  static async getByLogin (login: string, limit: number): Promise<any[] | Error> {
     return await this.repo.getByLogin(login, limit)
   }
 }

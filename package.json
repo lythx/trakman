@@ -25,8 +25,8 @@
   "scripts": {
     "test": "ts-standard",
     "build": "tsc",
-    "prod": "tsc && node ./built/Main.js",
-    "debug": "tsc && node --inspect ./built/Main.js"
+    "prod": "tsc && node ./built/src/Main.js",
+    "debug": "tsc && node --inspect ./built/src/Main.js"
   },
   "type": "module"
 }
