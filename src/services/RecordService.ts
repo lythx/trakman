@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
 import { Player, PlayerService } from './PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
+import {Events} from "../Events.js";
 
 export class RecordService {
   private static readonly repo = new RecordRepository()
@@ -23,6 +24,7 @@ export class RecordService {
     const res = await this.repo.add(record)
     if (res?.rows?.[0].id != null) {
       record.id = res.rows[0].id
+      Events.emitEvent('Controller.PlayerRecord', [record])
     }
   }
 }
