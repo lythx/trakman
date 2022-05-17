@@ -2,6 +2,8 @@
 import { ChatRepository } from '../database/ChatRepository.js'
 import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
+import { PlayerService } from './PlayerService.js'
+import { Client } from '../Client.js'
 
 const messagesArraySize = 250
 
@@ -16,7 +18,7 @@ export abstract class ChatService {
 
   static async addCommand (command: Command): Promise<void> {
     let prefix = '/'
-    if (command.level !== 0) {
+    if (command.privilege !== 0) {
       prefix += '/'
     }
     Events.addListener('Controller.PlayerChat', async (params: any[]) => {
@@ -24,8 +26,27 @@ export abstract class ChatService {
       if (!command.aliases.some((alias: string) => input.split(' ').shift() === (prefix + alias))) {
         return
       }
+      const player = PlayerService.players.find(a => a.login === params[0].login)
+      if (player == null) { throw new Error(`Cannot find player ${params[0].login} in the memory`) }
+      if (player.privilege < command.privilege) {
+        await Client.call('ChatSendServerMessageToLogin',
+          [{ string: '$f00You have no privileges to use this command' },
+            { string: player.login }])
+        return
+      }
       const text = input.split(' ').splice(1).join(' ')
-      command.callback({ login: params[0].login, text, level: command.level })
+      const messageInfo: MessageInfo = {
+        login: params[0].login,
+        text,
+        privilege: command.privilege,
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        wins: player.wins,
+        timePlayed: player.timePlayed,
+        joinTimestamp: player.joinTimestamp
+      }
+      command.callback(messageInfo)
     })
   }
 
