@@ -30,7 +30,6 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "extensionsToTreatAsEsm": [".ts"],
-    "roots": ["/built/tests"],
     "globals": {
       "ts-jest": {
         "useESM": true
@@ -38,7 +37,7 @@
     }
   },
   "scripts": {
-    "unit": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "unit": "NODE_OPTIONS=--experimental-vm-modules jest --coverage built/tests/",
     "test": "npm run unit && ts-standard",
     "build": "tsc -p tsconfig.json",
     "prod": "npm run build && node ./built/src/Main.js",
