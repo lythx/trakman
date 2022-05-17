@@ -29,6 +29,14 @@ const commands: Command[] = [
       await Client.call('ChatSendServerMessage', [{ string: JSON.stringify(params) }], false)
     },
     privilege: 0
+  },
+  {
+    aliases: ['skip'],
+    help: 'skip to next tracker rutracker.orgy',
+    callback: async () => {
+      await Client.call('NextChallenge')
+    },
+    privilege: 0
   }
 ]
 
