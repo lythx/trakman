@@ -30,7 +30,7 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "extensionsToTreatAsEsm": [".ts"],
-    "roots": ["built/tests"],
+    "roots": ["./built/tests"],
     "globals": {
       "ts-jest": {
         "useESM": true
