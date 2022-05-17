@@ -36,8 +36,8 @@ export abstract class DedimaniaService {
     return records
   }
 
-  private static updateServerPlayers () {
-    setInterval(async () => {
+  private static updateServerPlayers (): void {
+    setInterval(async (): Promise<void> => {
       const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers', [
         { string: process.env.SERVER_GAME },
         { int: PlayerService.players.length },

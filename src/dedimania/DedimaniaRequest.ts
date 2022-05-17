@@ -14,6 +14,7 @@ export class DedimaniaRequest {
   * Prepares XML string for a dedimania request.
   * @param {String} method dedimania method
   * @param {Object[]} params parameters, each param needs to be under key named after its type
+   * @param {string} sessionKey
   */
   constructor (method: string, params: object[], sessionKey?: string) {
     let xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
@@ -22,7 +23,7 @@ export class DedimaniaRequest {
     }
     xml += '</params></methodCall>'
     const xmlBuffer = Buffer.from(xml)
-    if (!sessionKey) {
+    if (sessionKey === undefined) {
       this.buffer = Buffer.concat([
         this.buffer,
         Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
@@ -37,11 +38,11 @@ export class DedimaniaRequest {
     }
   }
 
-    #handleParamType (param: any) {
+    #handleParamType (param: any): any {
     const type = Object.keys(param)[0]
     switch (Object.keys(param)[0]) {
       case 'boolean':
-        return `<boolean>${param[type] ? '1' : '0'}</boolean>`
+        return `<boolean>${param[type] === true ? '1' : '0'}</boolean>`
       case 'int':
         return `<int>${param[type]}</int>`
       case 'double':
@@ -69,7 +70,7 @@ export class DedimaniaRequest {
     }
   }
 
-    #escapeHtml (str: string) {
+    #escapeHtml (str: string): string {
       const map = {
         '&': '&amp;',
         '<': '&lt;',

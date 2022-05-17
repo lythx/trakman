@@ -7,9 +7,11 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import './commands/InternalCommands.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
+import {RecordService} from "./services/RecordService.js";
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -30,6 +32,7 @@ async function main (): Promise<void> {
   Logger.info('Game info initialised')
   await Listeners.initialize()
   Logger.trace('Enabling callbacks...')
+  await RecordService.initialize()
   await Client.call('EnableCallbacks', [
     { boolean: true }
   ]).catch(err => { ErrorHandler.fatal('Failed to enable callbacks', err) })
@@ -48,12 +51,12 @@ async function main (): Promise<void> {
   try {
     await ChatService.loadLastSessionMessages()
   } catch (e: any) {
-    ErrorHandler.fatal('Failed to fetch messages', e.message.toString())
+    ErrorHandler.fatal('Failed to fetch messages', e.message)
   }
   Logger.info('Chat service instantiated')
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
-    DedimaniaService.initialize()
+    await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
   }
 }
