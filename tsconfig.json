@@ -101,10 +101,9 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "./Plugins.ts",
     "src/*",
     "src/types/*",
-    "tests/*",
+    "tests/**/*",
     "plugins/*"
   ],
   "exclude": ["node_modules"]
