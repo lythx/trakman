@@ -37,7 +37,7 @@ export class Request {
     const type = Object.keys(param)[0]
     switch (type) {
       case 'boolean':
-        return `<boolean>${param[type] ? '1' : '0'}</boolean>`
+        return `<boolean>${param[type] === true ? '1' : '0'}</boolean>`
       case 'int':
         return `<int>${param[type]}</int>`
       case 'double':
