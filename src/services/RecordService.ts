@@ -5,9 +5,10 @@ import { Player, PlayerService } from './PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
-  private static readonly repo = new RecordRepository()
+  private static repo: RecordRepository
 
-  static async initialize (): Promise<void> {
+  static async initialize (repo: RecordRepository = new RecordRepository()): Promise<void> {
+    this.repo = repo
     await this.repo.initialize()
   }
 
