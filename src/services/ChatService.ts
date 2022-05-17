@@ -7,9 +7,10 @@ const messagesArraySize = 250
 
 export abstract class ChatService {
   static readonly messages: Message[] = []
-  private static readonly repo = new ChatRepository()
+  private static repo: ChatRepository
 
-  static async initialize (): Promise<void> {
+  static async initialize (repo: ChatRepository = new ChatRepository()): Promise<void> {
+    this.repo = repo
     await this.repo.initialize()
   }
 
