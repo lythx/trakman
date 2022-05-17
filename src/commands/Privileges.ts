@@ -23,6 +23,12 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
+            if (targetInfo.privilege === 4) {
+                Client.call("ChatSendServerMessageToLogin",
+                    [{ string: 'You cannot demote the server owner' },
+                    { string: callerLogin }])
+                return
+            }
             if (targetInfo.privilege < 3) {
                 Client.call("ChatSendServerMessage", [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to masteradmin` }])
                 PlayerService.setPrivilege(targetLogin, 3)
@@ -38,10 +44,8 @@ const commands: Command[] = [
         aliases: ['admin'],
         help: 'Changes player privilege to admin',
         callback: async (info: MessageInfo) => {
-            console.log('dsaasdadsasdasd')
             const targetLogin: string = info.text
             const callerLogin: string = info.login
-            console.log(targetLogin, callerLogin)
             if (!targetLogin) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: `Please specify the new admin's login` },
@@ -52,6 +56,12 @@ const commands: Command[] = [
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
+                    { string: callerLogin }])
+                return
+            }
+            if (targetInfo.privilege === 4) {
+                Client.call("ChatSendServerMessageToLogin",
+                    [{ string: 'You cannot demote the server owner' },
                     { string: callerLogin }])
                 return
             }
@@ -90,6 +100,12 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
+            if (targetInfo.privilege === 4) {
+                Client.call("ChatSendServerMessageToLogin",
+                    [{ string: 'You cannot demote the server owner' },
+                    { string: callerLogin }])
+                return
+            }
             if (targetInfo.privilege < 1) {
                 Client.call("ChatSendServerMessage", [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to operator` }])
                 PlayerService.setPrivilege(targetLogin, 1)
@@ -121,6 +137,12 @@ const commands: Command[] = [
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
+                    { string: callerLogin }])
+                return
+            }
+            if (targetInfo.privilege === 4) {
+                Client.call("ChatSendServerMessageToLogin",
+                    [{ string: 'You cannot demote the server owner' },
                     { string: callerLogin }])
                 return
             }
