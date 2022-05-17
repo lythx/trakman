@@ -79,7 +79,7 @@ export class Response {
 
   /**
   * Returns buffer fragment written after reaching target length (next response buffer)
-  * and sets status to complete
+  * and sets status to completed
   * @returns {Buffer} next response buffer
   */
   extractOverload (): Buffer {
@@ -89,7 +89,7 @@ export class Response {
     }
     const overload = this._overload
     this._overload = null
-    this._status = 'complete'
+    this._status = 'completed'
     return overload
   }
 
