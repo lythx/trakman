@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
 import { Player, PlayerService } from './PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
-import {Events} from "../Events.js";
+import { Events } from '../Events.js'
 
 export class RecordService {
   private static readonly repo = new RecordRepository()
