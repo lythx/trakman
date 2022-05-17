@@ -22,6 +22,10 @@ export class PlayerService {
     return player
   }
 
+  static get players (): Player[] {
+    return this._players
+  }
+
   /**
    * Add all the players in the server into local storage and database
    * Only called in the beginning as a start job
