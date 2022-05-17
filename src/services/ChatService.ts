@@ -27,15 +27,14 @@ export abstract class ChatService {
         return
       }
       const player = PlayerService.players.find(a => a.login === params[0].login)
-      if (!player)
-        throw new Error(`Cannot find player ${params[0].login} in the memory`)
+      if (player == null) { throw new Error(`Cannot find player ${params[0].login} in the memory`) }
       if (player.privilege < command.privilege) {
-        Client.call("ChatSendServerMessageToLogin",
+        await Client.call('ChatSendServerMessageToLogin',
           [{ string: '$f00You have no privileges to use this command' },
-          { string: player.login }])
+            { string: player.login }])
         return
       }
-      const text = input.split(' ').splice(1).join(" ");
+      const text = input.split(' ').splice(1).join(' ')
       const messageInfo: MessageInfo = {
         login: params[0].login,
         text,

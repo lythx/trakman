@@ -102,7 +102,7 @@ export abstract class DedimaniaClient {
   }
 
   static async call (method: string, params: object[] = []): Promise<any[]> {
-    while (this.receivingResponse) { await new Promise((r) => setTimeout(r, 300)) }
+    while (this.receivingResponse) { await new Promise((resolve) => setTimeout(resolve, 300)) }
     this.receivingResponse = true
     const request = new DedimaniaRequest(method, params, this.sessionId)
     this.socket.write(request.buffer)
@@ -111,7 +111,7 @@ export abstract class DedimaniaClient {
       let i = 0
       const interval = setInterval(() => {
         if (this.response.status === 'completed') {
-          if (this.response.isError) {
+          if (this.response.isError === true) {
             ErrorHandler.error('Dedimania server responded with an error',
                             `${this.response.errorString} Code: ${this.response.errorCode}`)
             reject(new Error(this.response.errorString?.toString()))

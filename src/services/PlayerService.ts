@@ -1,8 +1,8 @@
 import { Client } from '../Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
-import {Events} from '../Events.js'
-import {ErrorHandler} from '../ErrorHandler.js'
+import { Events } from '../Events.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { ChallengeService } from './ChallengeService.js'
 import { GameError, GameService } from './GameService.js'
@@ -17,13 +17,10 @@ export class PlayerService {
     await this.repo.initialize()
     const oldOwnerLogin = (await this.repo.getOwner())?.[0]?.login
     const newOwnerLogin = process.env.SERVER_OWNER_LOGIN
-    if (!newOwnerLogin)
-      throw Error('Server owner login not specified')
-    if (oldOwnerLogin === newOwnerLogin)
-      return
+    if (newOwnerLogin === undefined || newOwnerLogin === '') { throw Error('Server owner login not specified') }
+    if (oldOwnerLogin === newOwnerLogin) { return }
     this.newOwnerLogin = newOwnerLogin
-    if (oldOwnerLogin)
-      await this.repo.removeOwner()
+    if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
   }
 
   static getPlayer (login: string): Player {
@@ -77,7 +74,7 @@ export class PlayerService {
     }
     this._players.push(player)
     if (player.login === this.newOwnerLogin && this.newOwnerLogin !== null) {
-      this.setPrivilege(player.login, 4)
+      await this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
   }
@@ -109,15 +106,14 @@ export class PlayerService {
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async fetchPlayer(login: string): Promise<any[]> {
+  static async fetchPlayer (login: string): Promise<any[]> {
     return await this.repo.get(login)
   }
 
-  static async setPrivilege(login: string, privilege: number): Promise<void> {
+  static async setPrivilege (login: string, privilege: number): Promise<void> {
     await this.repo.setPrivilege(login, privilege)
     const player = this.players.find(a => a.login === login)
-    if (player)
-      player.privilege = privilege
+    if (player != null) { player.privilege = privilege }
   }
 
   /**
@@ -153,7 +149,7 @@ export class Player {
   public privilege
   private _checkpoints: Checkpoint[] = []
 
-  constructor(login: string, nickName: string, nation: string, nationCode: string, privilege: number = 0) {
+  constructor (login: string, nickName: string, nation: string, nationCode: string, privilege: number = 0) {
     this._login = login
     this._nickName = nickName
     this._nation = nation
