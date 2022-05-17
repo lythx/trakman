@@ -7,6 +7,7 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 
@@ -50,8 +51,11 @@ async function main (): Promise<void> {
     ErrorHandler.fatal('Failed to fetch messages', e.message.toString())
   }
   Logger.info('Chat service instantiated')
-
-  // await Client.call('NextChallenge')
+  if (process.env.USE_DEDIMANIA === 'YES') {
+    Logger.trace('Connecting to dedimania...')
+    DedimaniaService.initialize()
+    Logger.info('Connected to dedimania')
+  }
 }
 
 await main()
