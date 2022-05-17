@@ -66,7 +66,7 @@ export class PlayerService {
     }
     this._players.push(player)
     if (player.login === this.newOwnerLogin && this.newOwnerLogin !== null) {
-      this.repo.setPrivilege(player.login, 4)
+      this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
   }

@@ -11,7 +11,7 @@ const commands: Command[] = [
     callback: async () => {
       await Client.call('ChatSendServerMessage', [{ string: `${colours.yellow}qwrqwerwe` }], false)
     },
-    level: 0
+    privilege: 0
   },
   {
     aliases: ['ct', 'colourtest'],
@@ -20,7 +20,7 @@ const commands: Command[] = [
       const col = Object.values(colours)
       await Client.call('ChatSendServerMessage', [{ string: col.map((v) => `${v}|`).join(' ') }], false)
     },
-    level: 0
+    privilege: 0
   },
   {
     aliases: ['test'],
@@ -28,7 +28,7 @@ const commands: Command[] = [
     callback: async (params: any[]) => {
       await Client.call('ChatSendServerMessage', [{ string: JSON.stringify(params) }], false)
     },
-    level: 0
+    privilege: 0
   }
 ]
 

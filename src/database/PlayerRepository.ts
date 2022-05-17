@@ -24,7 +24,7 @@ const setTimeQuery = `UPDATE players SET
         timePlayed=$1
         WHERE login=$2;
 `
-const getQuery = 'SELECT wins, timePlayed FROM players WHERE login = $1'
+const getQuery = 'SELECT * FROM players WHERE login = $1'
 const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES($1, $2, $3, $4, $5);'
 
 export class PlayerRepository extends Repository {
@@ -85,7 +85,7 @@ export class PlayerRepository extends Repository {
   }
 
   async setPrivilege(login: string, privilege: number): Promise<any[]> {
-    const res = await this.db.query('UPDATE players SET privilege = $1 WHERE login = $2')
+    const res = await this.db.query('UPDATE players SET privilege = $1 WHERE login = $2', [privilege, login])
     return res.rows
   }
 
