@@ -1,8 +1,8 @@
-import { Client } from '../Client.js'
-import { PlayerRepository } from '../database/PlayerRepository.js'
+import {Client} from '../Client.js'
+import {PlayerRepository} from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
-import { Events } from '../Events.js'
-import { ErrorHandler } from '../ErrorHandler.js'
+import {Events} from '../Events.js'
+import {ErrorHandler} from '../ErrorHandler.js'
 import 'dotenv/config'
 
 export class PlayerService {
@@ -101,9 +101,8 @@ export class PlayerService {
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async getPlayer(login: string): Promise<any[]> {
-    const playerData = await this.repo.get(login)
-    return playerData
+  static async fetchPlayer(login: string): Promise<any[]> {
+    return await this.repo.get(login)
   }
 
   static async setPrivilege(login: string, privilege: number): Promise<void> {

@@ -16,7 +16,7 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
-            const targetInfo = (await PlayerService.getPlayer(targetLogin))?.[0]
+            const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
@@ -52,7 +52,7 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
-            const targetInfo = (await PlayerService.getPlayer(targetLogin))?.[0]
+            const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
@@ -93,7 +93,7 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
-            const targetInfo = (await PlayerService.getPlayer(targetLogin))?.[0]
+            const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
@@ -133,7 +133,7 @@ const commands: Command[] = [
                     { string: callerLogin }])
                 return
             }
-            const targetInfo = (await PlayerService.getPlayer(targetLogin))?.[0]
+            const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
             if (!targetInfo) {
                 Client.call("ChatSendServerMessageToLogin",
                     [{ string: 'Cannot find this login in database' },
