@@ -28,7 +28,5 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build
-    - run: pwd
-    - run: ls -al built
     - run: npm run unit
     #- run: npm test
