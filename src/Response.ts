@@ -20,7 +20,7 @@ export class Response {
   * @param {Number} targetLength first 4 bytes of response
   * @param {Number} id second 4 bytes of response
   */
-  constructor(targetLength: number, id: number) {
+  constructor (targetLength: number, id: number) {
     this._targetLength = targetLength
     this._id = id
   }
@@ -31,7 +31,7 @@ export class Response {
   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
   * @param {Buffer} data buffer received from dedicated server
   */
-  addData(data: Buffer): void {
+  addData (data: Buffer): void {
     const newBuffer = Buffer.concat([this._data, data])
     if (newBuffer.length > this._targetLength) {
       this._data = newBuffer.subarray(0, this._targetLength)
@@ -49,31 +49,31 @@ export class Response {
     this._data = newBuffer
   }
 
-  get id(): number {
+  get id (): number {
     return this._id
   }
 
-  get status(): string {
+  get status (): string {
     return this._status
   }
 
-  get eventName(): string {
+  get eventName (): string {
     return this._eventName
   }
 
-  get isEvent(): boolean {
+  get isEvent (): boolean {
     return this._isEvent
   }
 
-  get isError(): boolean {
+  get isError (): boolean {
     return this._isError
   }
 
-  get errorString(): string {
+  get errorString (): string {
     return this._errorString
   }
 
-  get errorCode(): number {
+  get errorCode (): number {
     return this._errorCode
   }
 
@@ -82,7 +82,7 @@ export class Response {
   * and sets status to completed
   * @returns {Buffer} next response buffer
   */
-  extractOverload(): Buffer {
+  extractOverload (): Buffer {
     if (this._overload == null) {
       ErrorHandler.error('Error in extractOverload()', 'Overload is null')
       return Buffer.from('')
@@ -96,7 +96,7 @@ export class Response {
   /**
   * @returns {any[]} array created from server response
   */
-  get json(): any[] {
+  get json (): any[] {
     if (this._isEvent) {
       return this.#fixNesting(this._json.methodCall)
     } else {
@@ -104,7 +104,7 @@ export class Response {
     }
   }
 
-  #generateJson(): void {
+  #generateJson (): void {
     let json: any
     // parse xml to json
     xml2js.parseString(this._data.toString(), (err, result) => {
@@ -131,7 +131,7 @@ export class Response {
   }
 
   // i hate XML
-  #fixNesting(obj: any): any[] {
+  #fixNesting (obj: any): any[] {
     const arr = []
     const changeType: any = (value: any, type: string) => {
       const arr = []
