@@ -74,7 +74,7 @@ const commands: Command[] = [
             { string: callerLogin }])
       } else if (targetInfo.privilege > 2) {
         await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to admin` }])
-        awaitPlayerService.setPrivilege(targetLogin, 2)
+        await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
     privilege: 3
@@ -99,7 +99,7 @@ const commands: Command[] = [
         return
       }
       if (targetInfo.privilege === 4) {
-        awit Client.call('ChatSendServerMessageToLogin',
+        await Client.call('ChatSendServerMessageToLogin',
           [{ string: 'You cannot demote the server owner' },
             { string: callerLogin }])
         return
@@ -113,7 +113,7 @@ const commands: Command[] = [
             { string: callerLogin }])
       } else if (targetInfo.privilege > 1) {
         await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to operator` }])
-        awaitPlayerService.setPrivilege(targetLogin, 1)
+        await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
     privilege: 3
