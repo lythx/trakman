@@ -1,8 +1,8 @@
 'use strict'
 
 interface Command {
-  aliases: string[]
-  help: string
-  callback: Function
-  level: number
+  readonly aliases: string[]
+  readonly help?: string
+  readonly callback: Function
+  readonly privilege: number
 }

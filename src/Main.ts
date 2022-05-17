@@ -7,6 +7,7 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
+import './commands/InternalCommands.js'
 import '../Plugins.js'
 
 async function main(): Promise<void> {
