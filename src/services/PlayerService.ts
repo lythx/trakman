@@ -3,16 +3,27 @@ import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
+import 'dotenv/config'
 
 export class PlayerService {
   private static _players: Player[] = []
   private static readonly repo = new PlayerRepository()
+  private static newOwnerLogin: string | null = null
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     await this.repo.initialize()
+    const oldOwnerLogin = (await this.repo.getOwner())?.[0]?.login
+    const newOwnerLogin = process.env.SERVER_OWNER_LOGIN
+    if (!newOwnerLogin)
+      throw Error('Server owner login not specified')
+    if (oldOwnerLogin === newOwnerLogin)
+      return
+    this.newOwnerLogin = newOwnerLogin
+    if (oldOwnerLogin)
+      await this.repo.removeOwner()
   }
 
-  static get players (): Player[] {
+  static get players(): Player[] {
     return this._players
   }
 
@@ -21,7 +32,7 @@ export class PlayerService {
    * Only called in the beginning as a start job
    * @returns {Promise<void>}
    */
-  static async addAllFromList (): Promise<void> {
+  static async addAllFromList(): Promise<void> {
     const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
     for (const player of playerList) {
       const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
@@ -36,7 +47,7 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join (login: string, nickName: string, path: string): Promise<void> {
+  static async join(login: string, nickName: string, path: string): Promise<void> {
     const nation = path.split('|')[1]
     let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode == null) {
@@ -50,9 +61,14 @@ export class PlayerService {
     } else {
       player.wins = Number(playerData[0].wins)
       player.timePlayed = Number(playerData[0].timeplayed)
+      player.privilege = Number(playerData[0].privilege)
       await this.repo.update(player)
     }
     this._players.push(player)
+    if (player.login === this.newOwnerLogin && this.newOwnerLogin !== null) {
+      this.repo.setPrivilege(player.login, 4)
+      this.newOwnerLogin = null
+    }
   }
 
   /**
@@ -60,7 +76,7 @@ export class PlayerService {
    * @param login
    * @returns {Promise<void>}
    */
-  static async leave (login: string): Promise<void> {
+  static async leave(login: string): Promise<void> {
     const player = this._players.find(p => p.login === login)
     if (player == null) {
       throw new Error('Player ' + login + ' not in player list.')
@@ -77,11 +93,24 @@ export class PlayerService {
         wins: player.wins,
         sessionTime,
         totalTimePlayed,
-        joinTimestamp: player.joinTimestamp
+        joinTimestamp: player.joinTimestamp,
+        privilege: player.privilege
       }]
     )
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players = this._players.filter(p => p.login !== player.login)
+  }
+
+  static async getPlayer(login: string): Promise<any[]> {
+    const playerData = await this.repo.get(login)
+    return playerData
+  }
+
+  static async setPrivilege(login: string, privilege: number): Promise<void> {
+    await this.repo.setPrivilege(login, privilege)
+    const player = this.players.find(a => a.login === login)
+    if (player)
+      player.privilege = privilege
   }
 }
 
@@ -93,32 +122,34 @@ export class Player {
   public wins = 0
   public timePlayed = 0
   private readonly _joinTimestamp: number
+  public privilege
 
-  constructor (login: string, nickName: string, nation: string, nationCode: string) {
+  constructor(login: string, nickName: string, nation: string, nationCode: string, privilege: number = 0) {
     this._login = login
     this._nickName = nickName
     this._nation = nation
     this._nationCode = nationCode
     this._joinTimestamp = Date.now()
+    this.privilege = privilege
   }
 
-  get login (): string {
+  get login(): string {
     return this._login
   }
 
-  get nickName (): string {
+  get nickName(): string {
     return this._nickName
   }
 
-  get nation (): string {
+  get nation(): string {
     return this._nation
   }
 
-  get nationCode (): string {
+  get nationCode(): string {
     return this._nationCode
   }
 
-  get joinTimestamp (): number {
+  get joinTimestamp(): number {
     return this._joinTimestamp
   }
 }
