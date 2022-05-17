@@ -44,6 +44,6 @@ export class RecordRepository extends Repository {
     } else {
       q = this.db.query(insertQuery, [record.id, record.challenge, record.login, record.score, record.date, record.checkpoints])
     }
-    await q
+    return await q
   }
 }
