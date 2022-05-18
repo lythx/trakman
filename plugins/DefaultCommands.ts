@@ -112,8 +112,8 @@ const commands: Command[] = [
     aliases: ['ssn', 'setservername'],
     help: 'Change the server name.',
     callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has changed the server name to ${info.text}$z$s.` }], false)
       await Client.call('SetServerName', [{ string: info.text }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -121,8 +121,8 @@ const commands: Command[] = [
     aliases: ['sc', 'setcomment'],
     help: 'Change the server comment.',
     callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has changed the server comment to ${info.text}$z$s.` }], false)
       await Client.call('SetServerComment', [{ string: info.text }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -131,8 +131,8 @@ const commands: Command[] = [
     help: 'Change the max players amount.',
     callback: async (info: MessageInfo) => {
       if (isNaN(Number(info.text))) { return }
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has changed the max players amount to ${info.text}.` }], false)
       await Client.call('SetMaxPlayers', [{ number: info.text }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -141,8 +141,8 @@ const commands: Command[] = [
     help: 'Change the max spectators amount.',
     callback: async (info: MessageInfo) => {
       if (isNaN(Number(info.text))) { return }
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has changed the max specs amount to ${info.text}.` }], false)
       await Client.call('SetMaxSpectators', [{ number: info.text }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -151,8 +151,8 @@ const commands: Command[] = [
     help: 'Change the time you spend on the podium screen.',
     callback: async (info: MessageInfo) => {
       if (isNaN(Number(info.text))) { return }
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has set the podium time to ${info.text}ms.` }], false)
       await Client.call('SetChatTime', [{ number: info.text }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -162,8 +162,8 @@ const commands: Command[] = [
     callback: async (info: MessageInfo) => {
       let param = info.text.split(' ')
       if (isNaN(Number(param[0]))) { return }
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has sent a notice: ${param[1]}$z$s, displayed for ${param[0]}s.` }], false)
       await Client.call('SendNotice', [{ string: param[1] }, { string: '' }, { number: param[0] }])
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
@@ -171,19 +171,92 @@ const commands: Command[] = [
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
     callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has killed the server :,(.` }], false)
       await Client.call('StopServer')
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
     },
     privilege: 3
   },
-  // Admin level (TODO)
+  // Admin level
+  {
+    aliases: ['sgm', 'setgamemode'],
+    help: 'Change the gamemode.',
+    callback: async (info: MessageInfo) => {
+      let mode: number
+      switch (info.text.toLowerCase()) {
+        case 'rounds':
+        case 'round':
+          mode = 0
+          break
+        case 'timeattack':
+        case 'ta':
+          mode = 1
+          break
+        case 'teams':
+        case 'team':
+          mode = 2
+          break
+        case 'laps':
+        case 'lap':
+          mode = 3
+          break
+        case 'stunts':
+        case 'stunt':
+          mode = 4
+          break
+        case 'cup':
+          mode = 5
+          break
+        default:
+          return
+      }
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has changed the gamemode to ${info.text}.` }], false)
+      await Client.call('SetGameMode', [{ number: mode }])
+    },
+    privilege: 2
+  },
   // Operator level
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
     callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has skipped the ongoing track.` }], false)
       await Client.call('NextChallenge')
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['r', 'res'],
+    help: 'Restart the current map.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has restarted the ongoing track.` }], false)
+      await Client.call('RestartChallenge')
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['k', 'kick'],
+    help: 'Kick a specific player.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has kicked ${info.text}.` }], false)
+      await Client.call('Kick', [{ string: `${info.text}` }, { string: `asdsasdasd` }])
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['m', 'mute'],
+    help: 'Mute a specific player.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has muted ${info.text}.` }], false)
+      await Client.call('Ignore', [{ string: `${info.text}` }])
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['um', 'unmute'],
+    help: 'Mute a specific player.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has unmuted ${info.text}.` }], false)
+      await Client.call('UnIgnore', [{ string: `${info.text}` }])
     },
     privilege: 1
   },
