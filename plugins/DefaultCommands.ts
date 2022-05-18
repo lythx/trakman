@@ -68,8 +68,8 @@ const commands: Command[] = [
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
-      await Client.call('ForceSpectator', [{ string: `${info.login}` }, { number: 0 }], false)
-      // await Client.call('SpectatorReleasePlayerSlot', [{string: `${info.login}`}], false) // Maybe multicall this?
+      await Client.call('ForceSpectator', [{ string: info.login }, { number: 0 }], false)
+      // await Client.call('SpectatorReleasePlayerSlot', [{string: info.login}], false) // Maybe multicall this?
       await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }], false)
     },
     privilege: 0
@@ -107,6 +107,77 @@ const commands: Command[] = [
     privilege: 0
   },
   // Admin commands, not sure if the permissions really DO work so you can change the last param at will
+  // Masteradmin level
+  {
+    aliases: ['ssn', 'setservername'],
+    help: 'Change the server name.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('SetServerName', [{ string: info.text }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sc', 'setcomment'],
+    help: 'Change the server comment.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('SetServerComment', [{ string: info.text }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['smp', 'setmaxplayers'],
+    help: 'Change the max players amount.',
+    callback: async (info: MessageInfo) => {
+      if (isNaN(Number(info.text))) { return }
+      await Client.call('SetMaxPlayers', [{ number: info.text }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sms', 'setmaxspecs'],
+    help: 'Change the max spectators amount.',
+    callback: async (info: MessageInfo) => {
+      if (isNaN(Number(info.text))) { return }
+      await Client.call('SetMaxSpectators', [{ number: info.text }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sct', 'setchattime'],
+    help: 'Change the time you spend on the podium screen.',
+    callback: async (info: MessageInfo) => {
+      if (isNaN(Number(info.text))) { return }
+      await Client.call('SetChatTime', [{ number: info.text }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sn', 'sendnotice'],
+    help: 'Send a notice.',
+    callback: async (info: MessageInfo) => {
+      let param = info.text.split(' ')
+      if (isNaN(Number(param[0]))) { return }
+      await Client.call('SendNotice', [{ string: param[1] }, { string: '' }, { number: param[0] }])
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sd', 'shutdown'],
+    help: 'Stop the server.',
+    callback: async (info: MessageInfo) => {
+      await Client.call('StopServer')
+      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] LoOoOoOoL!` }], false)
+    },
+    privilege: 3
+  },
+  // Admin level (TODO)
+  // Operator level
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
