@@ -2,6 +2,7 @@
 import { Client } from '../src/Client.js'
 import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { ChatService } from '../src/services/ChatService.js'
+import { Trakman as TM } from '../src/Trakman.js'
 
 const commands: Command[] = [
   // TODO: help consistency, tidy up
@@ -20,7 +21,8 @@ const commands: Command[] = [
     aliases: ['hi', 'hey', 'hello'],
     help: 'Greet a certain someone.',
     callback: async (info: MessageInfo) => {
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] Hey, ${info.text || 'everyone'}!` }], false)
+      await TM.sendMessage(`$g[${info.nickName}$z$s$g] Hey, ${info.text || 'everyone'}!`)
+      // await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] Hey, ${info.text || 'everyone'}!` }], false)
     },
     privilege: 0
   },
@@ -160,7 +162,7 @@ const commands: Command[] = [
     aliases: ['sn', 'sendnotice'],
     help: 'Send a notice.',
     callback: async (info: MessageInfo) => {
-      let param = info.text.split(' ')
+      const param = info.text.split(' ')
       if (isNaN(Number(param[0]))) { return }
       await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has sent a notice: ${param[1]}$z$s, displayed for ${param[0]}s.` }], false)
       await Client.call('SendNotice', [{ string: param[1] }, { string: '' }, { number: param[0] }])
@@ -238,7 +240,7 @@ const commands: Command[] = [
     help: 'Kick a specific player.',
     callback: async (info: MessageInfo) => {
       await Client.call('ChatSendServerMessage', [{ string: `${info.nickName}$z$s${colours.yellow} has kicked ${info.text}.` }], false)
-      await Client.call('Kick', [{ string: `${info.text}` }, { string: `asdsasdasd` }])
+      await Client.call('Kick', [{ string: `${info.text}` }, { string: 'asdsasdasd' }])
     },
     privilege: 1
   },
@@ -259,8 +261,7 @@ const commands: Command[] = [
       await Client.call('UnIgnore', [{ string: `${info.text}` }])
     },
     privilege: 1
-  },
+  }
 ]
 
-for (const command of commands)
-  ChatService.addCommand(command)
+for (const command of commands) { ChatService.addCommand(command) }

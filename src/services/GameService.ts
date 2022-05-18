@@ -44,6 +44,10 @@ export class GameService {
   static get roundsForcedLaps (): number {
     return this._game.roundsForcedLaps
   }
+
+  static get game (): Game {
+    return this._game
+  }
 }
 
 export class GameError extends Error {
