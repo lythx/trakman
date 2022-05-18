@@ -2,7 +2,7 @@
 import { Client } from '../src/Client.js'
 import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { ChatService } from '../src/services/ChatService.js'
-import { Trakman as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const commands: Command[] = [
   // TODO: help consistency, tidy up

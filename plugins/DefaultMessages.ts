@@ -1,6 +1,6 @@
 'use strict'
 
-import { Trakman as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../src/Trakman.js'
 import { TMRecord } from '../src/services/RecordService.js'
 
 const plugins: TMEvent[] = [
