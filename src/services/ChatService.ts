@@ -8,7 +8,7 @@ import { Client } from '../Client.js'
 const messagesArraySize = 250
 
 export abstract class ChatService {
-  static readonly messages: Message[] = []
+  static readonly messages: TMMessage[] = []
   private static repo: ChatRepository
 
   static async initialize (repo: ChatRepository = new ChatRepository()): Promise<void> {
@@ -16,7 +16,7 @@ export abstract class ChatService {
     await this.repo.initialize()
   }
 
-  static async addCommand (command: Command): Promise<void> {
+  static async addCommand (command: TMCommand): Promise<void> {
     let prefix = '/'
     if (command.privilege !== 0) {
       prefix += '/'
@@ -54,7 +54,7 @@ export abstract class ChatService {
     const result = await this.repo.get(messagesArraySize)
     if (result instanceof Error) { throw result }
     for (const m of result) {
-      const message: Message = {
+      const message: TMMessage = {
         id: m.id,
         login: m.login,
         text: m.message,
@@ -65,7 +65,7 @@ export abstract class ChatService {
   }
 
   static async add (login: string, text: string): Promise<void> {
-    const message: Message = {
+    const message: TMMessage = {
       id: randomUUID(),
       login,
       text,

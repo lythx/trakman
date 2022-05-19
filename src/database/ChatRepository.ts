@@ -33,7 +33,7 @@ export class ChatRepository extends Repository {
     return response.rows
   }
 
-  async add (message: Message): Promise<any[] | Error> {
+  async add (message: TMMessage): Promise<any[] | Error> {
     const query = 'INSERT INTO chat(id, login, message, date) VALUES ($1, $2, $3, $4) RETURNING id;'
     const response = await this.db.query(query, [message.id, message.login, message.text, message.date])
     if (response instanceof Error) { return response }

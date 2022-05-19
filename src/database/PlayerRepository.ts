@@ -1,6 +1,5 @@
 'use strict'
 import { Repository } from './Repository.js'
-import { Player } from '../services/PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery = `
@@ -51,7 +50,7 @@ export class PlayerRepository extends Repository {
    * @param {Player} player the player
    * @return {Promise<Object[]>}
    */
-  async add (player: Player): Promise<any> {
+  async add (player: TMPlayer): Promise<any> {
     const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])
     if ((res?.rows) == null) {
       throw Error('Error adding player ' + player.login + ' to database.')
@@ -64,7 +63,7 @@ export class PlayerRepository extends Repository {
    * @param {Player} player a player instance
    * @return {Promise<Object[]>}
    */
-  async update (player: Player): Promise<any> {
+  async update (player: TMPlayer): Promise<any> {
     const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])
     if ((res?.rows) == null) {
       throw Error('Error updating player ' + player.login + "'s data in the database.")

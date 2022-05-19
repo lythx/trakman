@@ -3,7 +3,7 @@ import { PlayerService } from '../services/PlayerService.js'
 import { Client } from '../Client.js'
 import { ChatService } from '../services/ChatService.js'
 
-const commands: Command[] = [
+const commands: TMCommand[] = [
   {
     aliases: ['masteradmin'],
     help: 'Changes player privilege to masteradmin',

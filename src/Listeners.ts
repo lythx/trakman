@@ -41,7 +41,8 @@ export class Listeners {
         if (params[0] === 0) { // check if null player
           return
         }
-        await PlayerService.addCP(params[1], params[4], params[2], params[3])
+        const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
+        await PlayerService.addCP(params[1], checkpoint)
       }
     },
     {
@@ -52,7 +53,7 @@ export class Listeners {
         }
         if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
           // reset cps
-          PlayerService.getPlayer(params[1]).finished()
+          PlayerService.getPlayer(params[1]).checkpoints.length = 0
           return
         }
         const status = await Client.call('GetStatus')
