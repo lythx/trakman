@@ -1,6 +1,7 @@
 'use strict'
 import { Repository } from './Repository.js'
 import { TMRecord } from '../services/RecordService.js'
+import {ErrorHandler} from "../ErrorHandler";
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS records(
@@ -40,6 +41,9 @@ export class RecordRepository extends Repository {
       if (getRes[0].score < record.score) {
         return null
       }
+      if (getRes[0].score === record.score) {
+        return 'equal'
+      }
       q = this.db.query(updateQuery, [record.score, record.date, record.checkpoints, getRes[0].id])
     } else {
       q = this.db.query(insertQuery, [record.id, record.challenge, record.login, record.score, record.date, record.checkpoints])
@@ -48,7 +52,11 @@ export class RecordRepository extends Repository {
   }
 
   async get (challengeId: string): Promise<any[]> {
-    const res = await this.db.query('SELECT * FROM records WHERE id=\'$1\'', [challengeId])
-    return res.rows
+    const res = await this.db.query('SELECT * FROM records WHERE challenge=$1', [challengeId])
+    if (res.rows != null && res.rows.length > 0) {
+      return res.rows
+    }
+    ErrorHandler.error('Failed to fetch records for challenge ' + challengeId)
+    return []
   }
 }
