@@ -1,12 +1,12 @@
-import {GameService} from './services/GameService.js'
-import {Player, PlayerService} from './services/PlayerService.js'
-import {RecordService, TMRecord} from './services/RecordService.js'
-import {Challenge, ChallengeService} from './services/ChallengeService.js'
-import {Client} from './Client.js'
-import {ChatService} from './services/ChatService.js'
+import { GameService } from './services/GameService.js'
+import { Player, PlayerService } from './services/PlayerService.js'
+import { RecordService, TMRecord } from './services/RecordService.js'
+import { Challenge, ChallengeService } from './services/ChallengeService.js'
+import { Client } from './Client.js'
+import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
-import {Events} from './Events.js'
-import {Utils} from './Utils.js';
+import { Events } from './Events.js'
+import { Utils } from './Utils.js'
 
 export const TRAKMAN = {
   /**
@@ -19,29 +19,29 @@ export const TRAKMAN = {
   /**
      * Returns an array of objects containing information about current server players
      */
-   get players (): Player[] {
+  get players (): Player[] {
     return [...PlayerService.players]
   },
 
   /**
      * Returns an object containing information about specified player or undefined if player is not on the server
      */
-   getPlayer (login: string): Player | undefined {
+  getPlayer (login: string): Player | undefined {
     return PlayerService.players.find(a => a.login === login)
   },
 
   /**
      * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
      */
-   async fetchPlayer (login: string): Promise<any | undefined> {
+  async fetchPlayer (login: string): Promise<any | undefined> {
     return (await PlayerService.fetchPlayer(login))?.[0]
   },
 
   /**
      * Returns an array of objects containing information about local records on current challenge
      */
-   getLocalRecords (challenge: string, amount: number): TMRecord[] {
-     // love me some lambda expressions
+  getLocalRecords (challenge: string, amount: number): TMRecord[] {
+    // love me some lambda expressions
     return RecordService.records.filter(r => r.challenge === challenge)
       .sort((a, b) => a.score - b.score).slice(0, amount)
   },
@@ -50,7 +50,7 @@ export const TRAKMAN = {
      * Returns an object containing information about specified player's record on current map
      * or undefined if the player doesn't have a record
      */
-   getPlayerRecord (login: string): TMRecord | undefined {
+  getPlayerRecord (login: string): TMRecord | undefined {
     return RecordService.records.find(a => a.login === login)
   },
 
@@ -65,35 +65,35 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various information about current challenge
      */
-   get challenge (): Challenge {
+  get challenge (): Challenge {
     return Object.assign(ChallengeService.current)
   },
 
   /**
      * Returns an array of objects containing information about recent messages
      */
-   get messages (): Message[] {
+  get messages (): Message[] {
     return [...ChatService.messages]
   },
 
   /**
      * Returns an array of objects containing information about recent messages from a specified player
      */
-   getPlayerMessages (login: string): Message[] {
+  getPlayerMessages (login: string): Message[] {
     return ChatService.messages.filter(a => a.login === login)
   },
 
   /**
      * Calls a dedicated server method. Throws error if the server responds with error.
      */
-   async call (method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
+  async call (method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
     return await Client.call(method, params, expectsResponse).catch((err: Error) => { throw err })
   },
 
   /**
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
-   async sendMessage (message: string, login?: string): Promise<void> {
+  async sendMessage (message: string, login?: string): Promise<void> {
     if (login) {
       await Client.call('ChatSendServerMessageToLogin', [{ string: message }, { string: login }], false)
       return
@@ -104,25 +104,25 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
      */
-   get colours () {
+  get colours () {
     return colours
   },
 
   /**
      * Adds a chat command
      */
-   addCommand (command: Command) {
+  addCommand (command: Command) {
     ChatService.addCommand(command)
   },
 
   /**
      * Adds callback function to execute on given event
      */
-   addListener (event: string, callback: Function) {
+  addListener (event: string, callback: Function) {
     Events.addListener(event, callback)
   },
 
-   get Utils () {
+  get Utils () {
     return Utils
   }
 }
