@@ -1,7 +1,5 @@
-import { Events } from "../src/Events.js"
-import { Client } from "../src/Client.js"
+import { TRAKMAN as TM } from '../src/Trakman.js'
 import 'dotenv/config'
-import {Time} from "../src/types/Time.js";
 
 if (process.env.USE_DEDIMANIA === 'YES') {
     const plugins: TMEvent[] = [
@@ -10,14 +8,13 @@ if (process.env.USE_DEDIMANIA === 'YES') {
             callback: (params: any[]) => {
                 let str = `$zDedimania records on ${params[0].Name}: `
                 for (const record of params[0].Records) {
-                    str += `${record.NickName}$z[${Time.getString(record.Best)}], `
+                    str += `${record.NickName}$z[${TM.Utils.getTimeString(record.Best)}], `
                 }
                 str = str.substring(0, str.length - 3)
-                Client.call('ChatSendServerMessage', [{ string: str }])
+                TM.sendMessage(str)
             }
         },
     ]
     for (const plugin of plugins)
-        Events.addListener(plugin.event, plugin.callback)
+        TM.addListener(plugin.event, plugin.callback)
 }
-

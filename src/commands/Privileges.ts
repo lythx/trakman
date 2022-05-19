@@ -16,8 +16,8 @@ const commands: TMCommand[] = [
             { string: callerLogin }])
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
-      if (!targetInfo) {
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      if (targetInfo == null) {
         await Client.call('ChatSendServerMessageToLogin',
           [{ string: 'Cannot find this login in database' },
             { string: callerLogin }])
@@ -30,11 +30,11 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege < 3) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to masteradmin` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickName} to masteradmin` }])
         await PlayerService.setPrivilege(targetLogin, 3)
       } else if (targetInfo.privilege === 3) {
         await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already masteradmin` },
+          [{ string: `${targetInfo.nickName} is already masteradmin` },
             { string: callerLogin }])
       }
     },
@@ -52,8 +52,8 @@ const commands: TMCommand[] = [
             { string: callerLogin }])
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
-      if (!targetInfo) {
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      if (targetInfo == null) {
         await Client.call('ChatSendServerMessageToLogin',
           [{ string: 'Cannot find this login in database' },
             { string: callerLogin }])
@@ -66,14 +66,14 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege < 2) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to admin` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickName} to admin` }])
         await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 2) {
         await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already admin` },
+          [{ string: `${targetInfo.nickName} is already admin` },
             { string: callerLogin }])
       } else if (targetInfo.privilege > 2) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to admin` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickName} to admin` }])
         await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
@@ -91,7 +91,7 @@ const commands: TMCommand[] = [
             { string: callerLogin }])
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         await Client.call('ChatSendServerMessageToLogin',
           [{ string: 'Cannot find this login in database' },
@@ -105,14 +105,14 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege < 1) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to operator` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickName} to operator` }])
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
         await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already operator` },
+          [{ string: `${targetInfo.nickName} is already operator` },
             { string: callerLogin }])
       } else if (targetInfo.privilege > 1) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to operator` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickName} to operator` }])
         await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
@@ -130,7 +130,7 @@ const commands: TMCommand[] = [
             { string: callerLogin }])
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         await Client.call('ChatSendServerMessageToLogin',
           [{ string: 'Cannot find this login in database' },
@@ -144,11 +144,11 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege > 0) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to user` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickName} to user` }])
         await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === 0) {
         await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already user` },
+          [{ string: `${targetInfo.nickName} is already user` },
             { string: callerLogin }])
       }
     },
