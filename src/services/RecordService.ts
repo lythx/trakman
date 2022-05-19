@@ -16,7 +16,7 @@ export class RecordService {
 
   static async fetchRecords (challengeId: string): Promise<TMRecord[]> {
     const records = await this.repo.get(challengeId)
-    this._records.push(...records.map( r => new TMRecord(r.challenge, r.login, r.score, r.checkpoints, r.id, r.date)))
+    this._records.push(...records.map(r => new TMRecord(r.challenge, r.login, r.score, r.checkpoints, r.id, r.date)))
     return this._records
   }
 
@@ -39,7 +39,7 @@ export class RecordService {
       record.id = res.rows[0].id
       // add or replace the player's current record on this track
       const existing = this._records.findIndex(r => r.login === login && r.challenge === challenge)
-      if(existing === -1) {
+      if (existing === -1) {
         this._records.push(record)
         status = ' got the '
       } else {
