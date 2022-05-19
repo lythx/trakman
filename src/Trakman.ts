@@ -1,21 +1,19 @@
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
-import { RecordService } from './services/RecordService.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
+import { RecordService, TMRecord } from './services/RecordService.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
-import colours from './data/Colours.json' assert {type: "json"}
+import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
-import { Time } from './types/Time.js'
+import { Utils } from './Utils.js'
 
 export const TRAKMAN = {
   /**
      * Returns an object containing various information about game state
      */
   get gameInfo (): TMGame {
-    const gameInfo: TMGame = Object.assign(GameService.game)
-    return gameInfo
+    return Object.assign(GameService.game)
   },
 
   /**
@@ -36,14 +34,16 @@ export const TRAKMAN = {
      * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
      */
   async fetchPlayer (login: string): Promise<any | undefined> {
-    return (await PlayerService.fetchPlayer(login))?.[0]
+    return (await PlayerService.fetchPlayer(login))
   },
 
   /**
      * Returns an array of objects containing information about local records on current challenge
      */
-  get localRecords (): TMRecord[] {
-    return [...RecordService.records]
+  getLocalRecords (challenge: string, amount: number): TMRecord[] {
+    // love me some lambda expressions
+    return RecordService.records.filter(r => r.challenge === challenge)
+      .sort((a, b) => a.score - b.score).slice(0, amount)
   },
 
   /**
@@ -66,8 +66,7 @@ export const TRAKMAN = {
      * Returns an object containing various information about current challenge
      */
   get challenge (): TMChallenge {
-    const challengeInfo: TMChallenge = Object.assign(ChallengeService.current)
-    return challengeInfo
+    return Object.assign(ChallengeService.current)
   },
 
   /**
@@ -123,7 +122,7 @@ export const TRAKMAN = {
     Events.addListener(event, callback)
   },
 
-  get Time () {
-    return Time
+  get Utils () {
+    return Utils
   }
 }

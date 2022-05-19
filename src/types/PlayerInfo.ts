@@ -1,14 +1,13 @@
 'use strict'
 
-interface MessageInfo {
-  readonly id: string
+interface PlayerInfo {
   readonly login: string
-  readonly text: string
   readonly nickName: string
   readonly nation: string
   readonly nationCode: string
-  readonly wins: number
   readonly timePlayed: number
   readonly joinTimestamp: number
+  readonly sessionTime: number
+  readonly wins: number
   readonly privilege: number
 }

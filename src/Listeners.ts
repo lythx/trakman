@@ -96,6 +96,7 @@ export class Listeners {
       callback: async (params: any[]) => {
         // Similar to BeginRace, albeit gives more information to process
         await GameService.initialize()
+        await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
         if (process.env.USE_DEDIMANIA === 'YES') {
           const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)

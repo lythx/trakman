@@ -55,7 +55,7 @@ export class ChallengeService {
       throw Error('Error fetching challenges from TM server.')
     }
     for (const c of challengeList) {
-      const challenge: TMChallenge = { id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement }
+      const challenge: TMChallenge = { id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement, laps: 1 }
       this.list.push(challenge) // they cant speak english ahjahahahahhaha
     }
     await this.setCurrent()

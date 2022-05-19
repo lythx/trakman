@@ -1,3 +1,5 @@
+'use strict'
+
 import { Client } from '../Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
@@ -95,6 +97,7 @@ export class PlayerService {
       await this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
+    Events.emitEvent('Controller.PlayerJoin', player)
   }
 
   /**
@@ -106,26 +109,37 @@ export class PlayerService {
     const player = this.getPlayer(login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
-    // Do this instead of waiting for tm callback to prevent accessing database
-    Events.emitEvent('Controller.PlayerLeave',
-      [{
-        login: player.login,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        wins: player.wins,
-        sessionTime,
-        totalTimePlayed,
-        joinTimestamp: player.joinTimestamp,
-        privilege: player.privilege
-      }]
-    )
+    const playerInfo: PlayerInfo = {
+      login: player.login,
+      nickName: player.nickName,
+      nation: player.nation,
+      nationCode: player.nationCode,
+      timePlayed: totalTimePlayed,
+      joinTimestamp: player.joinTimestamp,
+      sessionTime,
+      wins: player.wins,
+      privilege: player.privilege
+    }
+    Events.emitEvent('Controller.PlayerLeave', playerInfo)
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async fetchPlayer (login: string): Promise<any[]> {
-    return await this.repo.get(login)
+  static async fetchPlayer (login: string): Promise<DBPlayerInfo | null> {
+    const res = (await this.repo.get(login))?.[0]
+    if (res == null) { return null }
+    const nation = countries.find(a => a.name === res.nation.split('|')[1])?.code
+    if (!nation) { throw new Error('Error adding player ' + login + ', nation ' + nation + ' is not in the country list.') }
+    const info: DBPlayerInfo = {
+      login: res.login,
+      nickName: res.nickname,
+      nationCode: res.nation,
+      nation,
+      timePlayed: res.timeplayed,
+      privilege: res.privilege,
+      wins: res.wins
+    }
+    return info
   }
 
   static async setPrivilege (login: string, privilege: number): Promise<void> {

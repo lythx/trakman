@@ -22,7 +22,7 @@ export class GameService {
       teamPointsLimit: info.TeamPointsLimit,
       teamMaxPoints: info.TeamMaxPoints,
       teamUseNewRules: info.TeamUseNewRules,
-      lapsNo: info.NbLaps,
+      lapsNo: info.LapsNbLaps,
       lapsTimeLimit: info.LapsTimeLimit,
       finishTimeout: info.FinishTimeout,
       allWarmUpDuration: info.AllWarmUpDuration,
