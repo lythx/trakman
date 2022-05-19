@@ -1,5 +1,5 @@
 ```typescript
-import { Trakman as TM } from '../src/Trakman.ts'
+import { TRAKMAN as TM } from '../src/Trakman.ts'
 TM.gameInfo() -> `Returns an object containing various information about game state`
 TM.players -> `Returns an array of objects containing information about current server players`
 TM.getPlayer() -> `Returns an object containing information about specified player or undefined if player is not on the server`
@@ -13,6 +13,6 @@ TM.messages -> `Returns an array of objects containing information about recent 
 TM.getPlayerMessages() -> `Returns an array of objects containing information about recent messages from a specified player`
 TM.call() -> `Calls a dedicated server method. Throws error if the server responds with error, so you probably should catch it to avoid unnecessary crashes`
 TM.sendMessages() -> `Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone`
-TM.colours -> `Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins`
+TM.colours -> `Returns an object containing various colours as keys, and their 3-digit hexes as values. Useful for text colouring in plugins`
 TM.addCommand() -> `Adds a chat command`
 TM.addListener() -> `Adds callback function to execute on given event`

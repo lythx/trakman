@@ -1,5 +1,4 @@
 import { Repository } from './Repository.js'
-import { Challenge } from '../services/ChallengeService.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS challenges(
@@ -22,7 +21,7 @@ export class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    * @return {Promise<any[]>}
    */
-  async add (objects: Challenge[]): Promise<any> {
+  async add (objects: TMChallenge[]): Promise<any> {
     if (objects.length === 0) {
       throw Error('No challenges in list.')
     }

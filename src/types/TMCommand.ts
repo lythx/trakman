@@ -1,6 +1,6 @@
 'use strict'
 
-interface Command {
+interface TMCommand {
   readonly aliases: string[]
   readonly help?: string
   readonly callback: Function

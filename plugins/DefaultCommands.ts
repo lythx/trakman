@@ -4,7 +4,7 @@ import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { ChatService } from '../src/services/ChatService.js'
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-const commands: Command[] = [
+const commands: TMCommand[] = [
   // TODO: help consistency, tidy up
   // Testing commands, remove those later into development
   {

@@ -5,8 +5,8 @@ import { GameService } from './GameService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 export class ChallengeService {
-  private static _current: Challenge
-  private static list: Challenge[]
+  private static _current: TMChallenge
+  private static list: TMChallenge[]
   private static repo: ChallengeRepository
 
   static async initialize (repo: ChallengeRepository = new ChallengeRepository()): Promise<void> {
@@ -15,7 +15,7 @@ export class ChallengeService {
     await this.repo.initialize()
   }
 
-  static get current (): Challenge {
+  static get current (): TMChallenge {
     return this._current
   }
 
@@ -54,8 +54,9 @@ export class ChallengeService {
     if (challengeList == null) {
       throw Error('Error fetching challenges from TM server.')
     }
-    for (const challenge of challengeList) {
-      this.list.push(new Challenge(challenge.UId, challenge.Name, challenge.Author, challenge.Environnement)) // they cant speak english ahjahahahahhaha
+    for (const c of challengeList) {
+      const challenge: TMChallenge = { id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement }
+      this.list.push(challenge) // they cant speak english ahjahahahahhaha
     }
     await this.setCurrent()
   }
@@ -75,36 +76,5 @@ export class ChallengeService {
       }
     }
     await this.repo.add(this.list)
-  }
-}
-
-export class Challenge {
-  private readonly _id
-  private readonly _name
-  private readonly _author
-  private readonly _environment
-  public laps = 1
-
-  constructor (id: string, name: string, author: string, environment: string) {
-    this._id = id
-    this._name = name
-    this._author = author
-    this._environment = environment
-  }
-
-  get id (): string {
-    return this._id
-  }
-
-  get name (): string {
-    return this._name
-  }
-
-  get author (): string {
-    return this._author
-  }
-
-  get environment (): string {
-    return this._environment
   }
 }

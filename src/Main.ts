@@ -11,7 +11,7 @@ import './commands/InternalCommands.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
-import {RecordService} from "./services/RecordService.js";
+import { RecordService } from './services/RecordService.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
