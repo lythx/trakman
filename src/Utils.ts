@@ -34,18 +34,9 @@ export const Utils = {
    * @param pos
    */
   getPositionString (pos: number): string {
-    if (pos < 1 && pos % 1 !== 0) {
+    if (pos < 1 || pos % 1 !== 0) {
       throw RangeError('The position must be a natural number.')
     }
-    switch (pos % 10) {
-      case 1:
-        return pos.toString() + 'st'
-      case 2:
-        return pos.toString() + 'nd'
-      case 3:
-        return pos.toString() + 'rd'
-      default:
-        return pos.toString() + 'th'
-    }
+    return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   }
 }
