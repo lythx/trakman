@@ -7,10 +7,26 @@ import { Events } from '../Events.js'
 
 export class RecordService {
   private static repo: RecordRepository
+  private static readonly _records: TMRecord[] = []
 
   static async initialize (repo: RecordRepository = new RecordRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
+  }
+
+  static async fetchRecords (challengeId: string): Promise<TMRecord[]> {
+    const records = await this.repo.get(challengeId)
+    for (const r of records) {
+      const record = new TMRecord(r.challenge, r.login, r.score, r.checkpoints)
+      record.id = r.id
+      record.date = new Date(r.date)
+      this._records.push(record)
+    }
+    return this._records
+  }
+
+  static get records (): TMRecord[] {
+    return this._records
   }
 
   static async add (challenge: string, login: string, score: number): Promise<void> {
@@ -35,7 +51,7 @@ export class TMRecord {
   private readonly _challenge: string
   private readonly _login: string
   private readonly _score: number
-  private readonly _date: Date
+  public date: Date
   private readonly _checkpoints: number[]
 
   constructor (challenge: string, login: string, score: number, checkpoints: number[]) {
@@ -44,7 +60,7 @@ export class TMRecord {
     this._login = login
     this._score = score
     this._checkpoints = checkpoints
-    this._date = new Date()
+    this.date = new Date()
   }
 
   get challenge (): string {
@@ -61,9 +77,5 @@ export class TMRecord {
 
   get checkpoints (): number[] {
     return this._checkpoints
-  }
-
-  get date (): Date {
-    return this._date
   }
 }
