@@ -46,4 +46,9 @@ export class RecordRepository extends Repository {
     }
     return await q
   }
+
+  async get (challengeId: string): Promise<any[]> {
+    const res = await this.db.query('SELECT * FROM records WHERE id=\'$1\'', [challengeId])
+    return res.rows
+  }
 }
