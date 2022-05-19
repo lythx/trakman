@@ -1,7 +1,7 @@
 'use strict'
 import { Repository } from './Repository.js'
 import { TMRecord } from '../services/RecordService.js'
-import { ErrorHandler } from '../ErrorHandler'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS records(
