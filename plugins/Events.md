@@ -6,9 +6,12 @@ Controller events pass an interface in arguments, dedicated server events pass a
 
 In controller events you should set callback function argument to a given type from list below to get information about passed object's arguments and types, which will also allow your IDE to help you. Example: 
 ```typescript 
-const callback = async (player: TMPlayer) => {
-  TM.sendMessage(`Welcone ${player.nickName}`)
+import { TRAKMAN as TM } from '../src/Trakman.js'
+const event  = 'Controller.PlayerJoin'
+const callback = (player: TMPlayer) => {
+  TM.sendMessage(`Welcome ${player.nickName}`)
 }
+TM.addListener(event, callback)
 ```
 
 Controller events
