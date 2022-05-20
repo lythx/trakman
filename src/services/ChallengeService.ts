@@ -3,6 +3,7 @@ import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { GameService } from './GameService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
+import {TMXService} from './TMXService.js'
 
 export class ChallengeService {
   private static _current: TMChallenge
@@ -35,6 +36,8 @@ export class ChallengeService {
     if ([0, 2, 5].includes(GameService.gameMode) && info.LapRace as boolean) {
       this._current.laps = info.NbLaps
     }
+    if(process.env.USE_TMX === 'YES') 
+      await TMXService.fetchTrack(ChallengeService.current.id)
   }
 
   /**

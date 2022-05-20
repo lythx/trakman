@@ -38,10 +38,7 @@ export class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async get (login: string): Promise<any> {
-    console.log((await this.db.query(`SELECT * from players;`)).rows)
-    console.log('dsffdsfdsdfs')
     const res = await this.db.query(getQuery, [login])
-    console.log(res.rows)
     return res.rows
   }
 

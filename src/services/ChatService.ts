@@ -20,8 +20,8 @@ export abstract class ChatService {
   static async addCommand (command: TMCommand): Promise<void> {
     const prefix = command.privilege === 0 ? '/' : '//'
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
-      const input = info.text?.trim()?.toLowerCase()
-      if (!command.aliases.some((alias: string) => input.split(' ').shift() === (prefix + alias))) {
+      const input = info.text?.trim()
+      if (!command.aliases.some((alias: string) => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {
         return
       }
       if (info.privilege < command.privilege) {
