@@ -74,6 +74,7 @@ export class PlayerService {
         nationCode,
         timePlayed: 0,
         joinTimestamp: Date.now(),
+        visits: 1,
         checkpoints: [],
         wins: 0,
         privilege: 0
@@ -87,6 +88,7 @@ export class PlayerService {
         nationCode,
         timePlayed: Number(playerData.timeplayed),
         joinTimestamp: Date.now(),
+        visits: Number(playerData.visits + 1),
         checkpoints: [],
         wins: Number(playerData.wins),
         privilege: Number(playerData.privilege)
@@ -119,7 +121,8 @@ export class PlayerService {
       joinTimestamp: player.joinTimestamp,
       sessionTime,
       wins: player.wins,
-      privilege: player.privilege
+      privilege: player.privilege,
+      visits: player.visits
     }
     Events.emitEvent('Controller.PlayerLeave', playerInfo)
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
