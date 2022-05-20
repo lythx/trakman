@@ -1,3 +1,6 @@
-import './plugins/DefaultCommands.js'
+import './plugins/UserCommands.js'
+import './plugins/OperatorCommands.js'
+import './plugins/AdminCommands.js'
+import './plugins/MasteradminCommands.js'
 import './plugins/Dedimania.js'
 import './plugins/DefaultMessages.js'

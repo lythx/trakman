@@ -10,4 +10,5 @@ interface PlayerInfo {
   readonly sessionTime: number
   readonly wins: number
   readonly privilege: number
+  readonly visits: number
 }

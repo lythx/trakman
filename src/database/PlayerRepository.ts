@@ -9,15 +9,17 @@ const createQuery = `
     nation varchar(3) not null,
     wins int4 not null default 0,
     timePlayed int8 not null default 0,
-    privilege int4 not null default 0
+    privilege int4 not null default 0,
+    visits int4 not null default 1
   );
 `
 const updateQuery = `UPDATE players SET 
         nickname=$1,
         nation=$2,
         wins=$3,
-        timePlayed=$4
-        WHERE login=$5;
+        timePlayed=$4,
+        visits=$5
+        WHERE login=$6;
 `
 const setTimeQuery = `UPDATE players SET 
         timePlayed=$1
@@ -58,7 +60,8 @@ export class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async update (player: TMPlayer): Promise<any> {
-    const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])
+    console.log(player)
+    const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.visits, player.login, ])
     if ((res?.rows) == null) {
       throw Error('Error updating player ' + player.login + "'s data in the database.")
     }
