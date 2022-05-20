@@ -4,7 +4,7 @@ import fetch from "node-fetch";
 
 export abstract class TMXService {
 
-    private static _current: TMXTrackInfo
+    private static _current: TMXTrackInfo | null
     private static prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
 
     static get current() {
@@ -26,6 +26,7 @@ export abstract class TMXService {
             }
         }
         if(prefix === ''){
+            this._current = null
             throw new Error('Cannot fetch track data from TMX')
         } 
         const s = data.split('\t')
