@@ -5,27 +5,35 @@ import fetch from "node-fetch";
 export abstract class TMXService {
 
     private static _current: TMXTrackInfo
-    private static prefixes = {
-        TMNF: 'tmnforever',
-        TMUF: 'united',
-        TMN: 'nations',
-        TMO: 'original',
-        TMS: 'sunrise'
-    }
+    private static prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
 
-    static get current () {
+    static get current() {
         return this._current
     }
 
     static async fetchTrack(trackId: string, game: string = 'TMNF') {
-        const prefix: string =(this.prefixes as any)[game]
-        const res = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
-        const data = await res.text()
+        let data = ''
+        let prefix = ''
+        for (const p of this.prefixes) {
+            const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
+            const d = await res.text()
+            console.log(d)
+            console.log(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
+            data = d
+            if (!data.includes(`<!DOCTYPE html>`) && data !== '') {
+                prefix = p
+                break
+            }
+        }
+        if(prefix === ''){
+            throw new Error('Cannot fetch track data from TMX')
+        } 
         const s = data.split('\t')
         const id = Number(s[0])
         const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${id}`)
         const replaysData = (await replaysRes.text()).split('\r\n')
         replaysData.pop()
+        //console.log(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${id}`)
         const replays: TMXReplay[] = []
         for (const r of replaysData) {
             const rs = r.split('\t')
@@ -68,6 +76,7 @@ export abstract class TMXService {
             downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${id}`,
             replays
         }
+        console.log(this._current)
         return this._current
     }
 }

@@ -36,8 +36,9 @@ export class ChallengeService {
     if ([0, 2, 5].includes(GameService.gameMode) && info.LapRace as boolean) {
       this._current.laps = info.NbLaps
     }
-    if(process.env.USE_TMX === 'YES') 
-      await TMXService.fetchTrack(ChallengeService.current.id)
+    if(process.env.USE_TMX === 'YES') {
+      await TMXService.fetchTrack(ChallengeService.current.id).catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
+    }
   }
 
   /**
