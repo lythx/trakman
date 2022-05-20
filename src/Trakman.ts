@@ -170,11 +170,20 @@ export const TRAKMAN = {
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
   async sendMessage(message: string, login?: string): Promise<void> {
-    if (login) {
+    if (login != null) {
       await Client.call('ChatSendServerMessageToLogin', [{ string: message }, { string: login }], false)
       return
     }
     await Client.call('ChatSendServerMessage', [{ string: message }], false)
+  },
+
+  async sendManialink(manialink: string, login?: string,expireTime: number = 0, deleteOnClick: boolean = false){
+    if(login != null){
+      await Client.call('SendDisplayManialinkPageToLogin', [
+        {string:login},{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}])
+        return
+    }
+    console.log(await Client.call('SendDisplayManialinkPage', [{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}]))
   },
 
   /**
