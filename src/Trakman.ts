@@ -93,10 +93,11 @@ export const TRAKMAN = {
   async multiCall (expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
     const arr: any[] = []
     for (const c of calls) {
+      const params = c.params == null ? [] : c.params
       arr.push({
         struct: {
           methodName: { string: c.method },
-          params: { array: c.params }
+          params: { array: params }
         }
       })
     }
