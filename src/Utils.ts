@@ -34,7 +34,9 @@ export const Utils = {
    * @param pos
    */
   getPositionString (pos: number): string {
-    // https://stackoverflow.com/questions/13627308/add-st-nd-rd-and-th-ordinal-suffix-to-a-number/39466341#39466341
-    { return ['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th' }
+    if (pos < 1 || pos % 1 !== 0) {
+      throw RangeError('The position must be a natural number.')
+    }
+    return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   }
 }
