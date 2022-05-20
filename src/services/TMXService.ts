@@ -17,8 +17,6 @@ export abstract class TMXService {
         for (const p of this.prefixes) {
             const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
             const d = await res.text()
-            console.log(d)
-            console.log(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
             data = d
             if (!data.includes(`<!DOCTYPE html>`) && data !== '') {
                 prefix = p
@@ -34,7 +32,6 @@ export abstract class TMXService {
         const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${id}`)
         const replaysData = (await replaysRes.text()).split('\r\n')
         replaysData.pop()
-        //console.log(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${id}`)
         const replays: TMXReplay[] = []
         for (const r of replaysData) {
             const rs = r.split('\t')
@@ -77,7 +74,6 @@ export abstract class TMXService {
             downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${id}`,
             replays
         }
-        console.log(this._current)
         return this._current
     }
 }
