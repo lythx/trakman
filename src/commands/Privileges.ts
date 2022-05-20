@@ -5,7 +5,7 @@ import { ChatService } from '../services/ChatService.js'
 
 const commands: TMCommand[] = [
   {
-    aliases: ['masteradmin'],
+    aliases: ['mad', 'masteradmin'],
     help: 'Changes player privilege to masteradmin',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
@@ -41,7 +41,7 @@ const commands: TMCommand[] = [
     privilege: 4
   },
   {
-    aliases: ['admin'],
+    aliases: ['ad', 'admin'],
     help: 'Changes player privilege to admin',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
@@ -80,7 +80,7 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
-    aliases: ['operator'],
+    aliases: ['op', 'operator'],
     help: 'Changes player privilege to operator',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
@@ -104,11 +104,12 @@ const commands: TMCommand[] = [
             { string: callerLogin }])
         return
       }
+      console.log(targetInfo.privilege)
       if (targetInfo.privilege < 1) {
         await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickName} to operator` }])
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
-        await Client.call('ChatSendServerMessage',
+        await Client.call('ChatSendServerMessageToLogin',
           [{ string: `${targetInfo.nickName} is already operator` },
             { string: callerLogin }])
       } else if (targetInfo.privilege > 1) {
@@ -119,8 +120,8 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
-    aliases: ['user'],
-    help: 'Changes player privilege to user',
+    aliases: ['rp', 'user'],
+    help: 'Remove player privleges',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
       const callerLogin: string = info.login
@@ -144,7 +145,7 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege > 0) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickName} to user` }])
+        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} removed ${targetInfo.nickName} privileges` }])
         await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === 0) {
         await Client.call('ChatSendServerMessage',
