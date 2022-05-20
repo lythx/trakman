@@ -1,6 +1,6 @@
 'use strict'
 
-interface Game {
+interface TMGame {
   gameMode: number
   chatTime: number // what the fuck is this
   challengeNo: number

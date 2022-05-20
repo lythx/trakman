@@ -1,7 +1,7 @@
 'use strict'
 import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
-import { Player, PlayerService } from './PlayerService.js'
+import { PlayerService } from './PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { Events } from '../Events.js'
 
@@ -25,7 +25,7 @@ export class RecordService {
   }
 
   static async add (challenge: string, login: string, score: number): Promise<void> {
-    let player: Player
+    let player: TMPlayer
     try {
       player = PlayerService.getPlayer(login)
     } catch (e: any) {

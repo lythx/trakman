@@ -7,26 +7,27 @@ import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
 import { Utils } from './Utils.js'
+import { randomUUID } from 'crypto'
 
 export const TRAKMAN = {
   /**
      * Returns an object containing various information about game state
      */
-  get gameInfo (): Game {
+  get gameInfo (): TMGame {
     return Object.assign(GameService.game)
   },
 
   /**
      * Returns an array of objects containing information about current server players
      */
-  get players (): Player[] {
+  get players (): TMPlayer[] {
     return [...PlayerService.players]
   },
 
   /**
      * Returns an object containing information about specified player or undefined if player is not on the server
      */
-  getPlayer (login: string): Player | undefined {
+  getPlayer (login: string): TMPlayer | undefined {
     return PlayerService.players.find(a => a.login === login)
   },
 
@@ -34,7 +35,7 @@ export const TRAKMAN = {
      * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
      */
   async fetchPlayer (login: string): Promise<any | undefined> {
-    return (await PlayerService.fetchPlayer(login))?.[0]
+    return (await PlayerService.fetchPlayer(login))
   },
 
   /**
@@ -65,21 +66,21 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various information about current challenge
      */
-  get challenge (): Challenge {
+  get challenge (): TMChallenge {
     return Object.assign(ChallengeService.current)
   },
 
   /**
      * Returns an array of objects containing information about recent messages
      */
-  get messages (): Message[] {
+  get messages (): TMMessage[] {
     return [...ChatService.messages]
   },
 
   /**
      * Returns an array of objects containing information about recent messages from a specified player
      */
-  getPlayerMessages (login: string): Message[] {
+  getPlayerMessages (login: string): TMMessage[] {
     return ChatService.messages.filter(a => a.login === login)
   },
 
@@ -88,6 +89,31 @@ export const TRAKMAN = {
      */
   async call (method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
     return await Client.call(method, params, expectsResponse).catch((err: Error) => { throw err })
+  },
+
+  async multiCall (expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params = c.params == null ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    if (!expectsResponse) {
+      await Client.call('system.multicall', [{
+        array: arr
+      }], expectsResponse)
+      return []
+    }
+    const res = await Client.call('system.multicall', [{
+      array: arr
+    }], expectsResponse)
+    const ret: CallResponse[] = []
+    for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
+    return ret
   },
 
   /**
@@ -111,7 +137,7 @@ export const TRAKMAN = {
   /**
      * Adds a chat command
      */
-  addCommand (command: Command) {
+  addCommand (command: TMCommand) {
     ChatService.addCommand(command)
   },
 
@@ -124,5 +150,9 @@ export const TRAKMAN = {
 
   get Utils () {
     return Utils
+  },
+
+  randomUUID () {
+    return randomUUID()
   }
 }

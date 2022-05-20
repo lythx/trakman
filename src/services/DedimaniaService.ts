@@ -6,6 +6,8 @@ import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 
 export abstract class DedimaniaService {
+  static _dedis: TMDedi[] = []
+
   static async initialize (): Promise<void> {
     await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT)).catch(err => {
       ErrorHandler.fatal('Failed to connect to dedimania', err)
@@ -13,8 +15,12 @@ export abstract class DedimaniaService {
     this.updateServerPlayers()
   }
 
+  static get dedis () {
+    return this._dedis
+  }
+
   static async getRecords (id: string, name: string, environment: string, author: string): Promise<any[]> {
-    const records = await DedimaniaClient.call('dedimania.CurrentChallenge',
+    const dedis = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
         { string: id },
         { string: name },
@@ -32,8 +38,33 @@ export abstract class DedimaniaService {
       ]
     )
       .catch(err => ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`, err))
-    if (records == null) { throw new Error('unable to fetch records') }
-    return records
+    if (dedis == null) { throw new Error('unable to fetch records') }
+    for (const d of dedis) {
+      const record: TMDedi = { id: d.id, login: d.login, score: d.score, checkpoints: [...d.checkpoints], date: d.date }
+      this._dedis.push(record)
+    }
+    return this._dedis
+  }
+
+  static async sendRecords (dedi: TMDedi[]) {
+    // const status = await DedimaniaClient.call('dedimania.SendRecords',
+    //   [
+    // { string: id },
+    // { string: name },
+    // { string: environment },
+    // { string: author },
+    // { string: 'TMF' },
+    // { int: 1 }, // mode: 1-TA
+    // {
+    //   struct: {
+    //     SrvName: { string: 'TODO' } // TODO
+    //   }
+    // },
+    // { int: 30 }, // number of records probably
+    // { array: [] } // idk
+    //   ]
+    // )
+    //   .catch(err => ErrorHandler.error(`Failed to send dedimania records`, err))
   }
 
   private static updateServerPlayers (): void {
