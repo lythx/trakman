@@ -1,158 +1,142 @@
 'use strict'
 import { PlayerService } from '../services/PlayerService.js'
-import { Client } from '../Client.js'
 import { ChatService } from '../services/ChatService.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 
-const commands: Command[] = [
+const commands: TMCommand[] = [
   {
-    aliases: ['masteradmin'],
-    help: 'Changes player privilege to masteradmin',
+    aliases: ['mad', 'masteradmin'],
+    help: 'Change player privilege to Masteradmin.',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Please specify the new masteradmins\'s login' },
-            { string: callerLogin }])
+        await TM.sendMessage(`No login specified.`, callerLogin)
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
-      if (!targetInfo) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Cannot find this login in database' },
-            { string: callerLogin }])
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      if (targetInfo == null) {
+        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'You cannot demote the server owner' },
-            { string: callerLogin }])
+        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        return
+      }
+      if (targetInfo.login === callerLogin) {
+        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 3) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to masteradmin` }])
+        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Masteradmin.`)
         await PlayerService.setPrivilege(targetLogin, 3)
       } else if (targetInfo.privilege === 3) {
-        await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already masteradmin` },
-            { string: callerLogin }])
+        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Masteradmin.`, callerLogin)
       }
     },
     privilege: 4
   },
   {
-    aliases: ['admin'],
-    help: 'Changes player privilege to admin',
+    aliases: ['ad', 'admin'],
+    help: 'Change player privilege to Admin.',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
       const callerLogin: string = info.login
-      if (!targetLogin) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Please specify the new admin\'s login' },
-            { string: callerLogin }])
+      if (targetLogin == null) {
+        await TM.sendMessage(`No login specified.`, callerLogin)
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
-      if (!targetInfo) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Cannot find this login in database' },
-            { string: callerLogin }])
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      if (targetInfo == null) {
+        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'You cannot demote the server owner' },
-            { string: callerLogin }])
+        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        return
+      }
+      if (targetInfo.login === callerLogin) {
+        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 2) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to admin` }])
+        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 2) {
-        await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already admin` },
-            { string: callerLogin }])
+        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to admin` }])
+        await TM.sendMessage(`Player ${info.nickName}$z$s has demoted ${targetInfo.nickName}$z$s to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
     privilege: 3
   },
   {
-    aliases: ['operator'],
-    help: 'Changes player privilege to operator',
+    aliases: ['op', 'operator'],
+    help: 'Change player privilege to Operator.',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
       const callerLogin: string = info.login
-      if (!targetLogin) {
-        Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Please specify the new operator\'s login' },
-            { string: callerLogin }])
+      if (targetLogin == null) {
+        await TM.sendMessage(`No login specified.`, callerLogin)
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Cannot find this login in database' },
-            { string: callerLogin }])
+        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'You cannot demote the server owner' },
-            { string: callerLogin }])
+        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        return
+      }
+      if (targetInfo.login === callerLogin) {
+        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 1) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} promoted ${targetInfo.nickname} to operator` }])
+        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
-        await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already operator` },
-            { string: callerLogin }])
+        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to operator` }])
+        await TM.sendMessage(`Player ${info.nickName}$z$s has demoted ${targetInfo.nickName}$z$s to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
-    privilege: 3
+    privilege: 2
   },
   {
-    aliases: ['user'],
-    help: 'Changes player privilege to user',
+    aliases: ['rp', 'user'],
+    help: 'Remove player priveleges.',
     callback: async (info: MessageInfo) => {
       const targetLogin: string = info.text
       const callerLogin: string = info.login
-      if (!targetLogin) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Please specify the new users\'s login' },
-            { string: callerLogin }])
+      if (targetLogin == null) {
+        await TM.sendMessage(`No login specified.`, callerLogin)
         return
       }
-      const targetInfo = (await PlayerService.fetchPlayer(targetLogin))?.[0]
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'Cannot find this login in database' },
-            { string: callerLogin }])
+        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: 'You cannot demote the server owner' },
-            { string: callerLogin }])
+        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
         return
       }
-      if (targetInfo.privilege > 0) {
-        await Client.call('ChatSendServerMessage', [{ string: `Player ${info.nickName} demoted ${targetInfo.nickname} to user` }])
-        await PlayerService.setPrivilege(targetLogin, 0)
+      if (targetInfo.login === callerLogin) {
+        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
+        return
+      }
+      if (targetInfo.privilege > 1) {
+        await TM.sendMessage(`Player ${info.nickName}$z$s has removed ${targetInfo.nickName}$z$s's privileges.`)
+        await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 0) {
-        await Client.call('ChatSendServerMessage',
-          [{ string: `${targetInfo.nickname} is already user` },
-            { string: callerLogin }])
+        await TM.sendMessage(`${targetInfo.nickName}$z$s has no privileges.`, callerLogin)
       }
     },
-    privilege: 3
+    privilege: 2
   }
 ]
 

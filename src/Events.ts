@@ -18,7 +18,7 @@ export abstract class Events {
    * @param {String} event callback event name
    * @param {any[]} json callback params
    */
-  static emitEvent (event: string, json: any[]): void {
+  static emitEvent (event: string, json: any): void {
     const matchingEvents = this.eventListeners.filter(a => a.event === event)
     for (const listener of matchingEvents) {
       listener.callback(json)

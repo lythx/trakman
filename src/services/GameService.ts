@@ -3,7 +3,7 @@
 import { Client } from '../Client.js'
 
 export class GameService {
-  private static _game: Game
+  private static _game: TMGame
 
   static async initialize (): Promise<void> {
     const info = (await Client.call('GetCurrentGameInfo', [{ int: 1 }]))[0]
@@ -45,7 +45,7 @@ export class GameService {
     return this._game.roundsForcedLaps
   }
 
-  static get game (): Game {
+  static get game (): TMGame {
     return this._game
   }
 }

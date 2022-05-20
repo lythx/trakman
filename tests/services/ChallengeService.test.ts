@@ -1,5 +1,5 @@
 import { ChallengeRepository } from '../../src/database/ChallengeRepository.js'
-import { Challenge, ChallengeService } from '../../src/services/ChallengeService.js'
+import { ChallengeService } from '../../src/services/ChallengeService.js'
 import { anything, capture, instance, mock, verify } from 'ts-mockito'
 import { jest } from '@jest/globals'
 import { Client } from '../../src/Client.js'
@@ -48,9 +48,9 @@ test('valid push', async () => {
     NbLaps: 7
   }])
   await ChallengeService.push()
-  const list = [
-    new Challenge('a', 'track1', 'Nadeo', 'Bay'),
-    new Challenge('b_21', 'Map 21', 'miapetardez', 'Stadium')
+  const list: TMChallenge[] = [
+    { id: 'a', name: 'track1', author: 'Nadeo', environment: 'Bay' },
+    { id: 'b_21', name: 'Map 21', author: 'miapetardez', environment: 'Stadium' }
   ]
   list[0].laps = 7
   expect(capture(mockedRepo.add).first()[0]).toStrictEqual(list)
@@ -68,9 +68,9 @@ test('valid no laps', async () => {
     NbLaps: 1
   }])
   await ChallengeService.push()
-  const list = [
-    new Challenge('a', 'track1', 'Nadeo', 'Bay'),
-    new Challenge('b_21', 'Map 21', 'miapetardez', 'Stadium')
+  const list: TMChallenge[] = [
+    { id: 'a', name: 'track1', author: 'Nadeo', environment: 'Bay' },
+    { id: 'b_21', name: 'Map 21', author: 'miapetardez', environment: 'Stadium' }
   ]
   expect(capture(mockedRepo.add).first()[0]).toStrictEqual(list)
   verify(mockedRepo.add(anything())).once()

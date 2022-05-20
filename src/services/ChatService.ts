@@ -1,4 +1,5 @@
 'use strict'
+
 import { ChatRepository } from '../database/ChatRepository.js'
 import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
@@ -8,7 +9,7 @@ import { Client } from '../Client.js'
 const messagesArraySize = 250
 
 export abstract class ChatService {
-  static readonly messages: Message[] = []
+  static readonly messages: TMMessage[] = []
   private static repo: ChatRepository
 
   static async initialize (repo: ChatRepository = new ChatRepository()): Promise<void> {
@@ -16,35 +17,31 @@ export abstract class ChatService {
     await this.repo.initialize()
   }
 
-  static async addCommand (command: Command): Promise<void> {
-    let prefix = '/'
-    if (command.privilege !== 0) {
-      prefix += '/'
-    }
-    Events.addListener('Controller.PlayerChat', async (params: any[]) => {
-      const input = params?.[0]?.text?.trim()?.toLowerCase()
+  static async addCommand (command: TMCommand): Promise<void> {
+    const prefix = command.privilege === 0 ? '/' : '//'
+    Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
+      const input = info.text?.trim()?.toLowerCase()
       if (!command.aliases.some((alias: string) => input.split(' ').shift() === (prefix + alias))) {
         return
       }
-      const player = PlayerService.players.find(a => a.login === params[0].login)
-      if (player == null) { throw new Error(`Cannot find player ${params[0].login} in the memory`) }
-      if (player.privilege < command.privilege) {
+      if (info.privilege < command.privilege) {
         await Client.call('ChatSendServerMessageToLogin',
           [{ string: '$f00You have no privileges to use this command' },
-            { string: player.login }])
+            { string: info.login }])
         return
       }
       const text = input.split(' ').splice(1).join(' ')
       const messageInfo: MessageInfo = {
-        login: params[0].login,
+        id: info.id,
+        login: info.login,
         text,
-        privilege: command.privilege,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        wins: player.wins,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp
+        nickName: info.nickName,
+        nation: info.nation,
+        nationCode: info.nationCode,
+        wins: info.wins,
+        timePlayed: info.timePlayed,
+        joinTimestamp: info.joinTimestamp,
+        privilege: info.privilege
       }
       command.callback(messageInfo)
     })
@@ -52,9 +49,8 @@ export abstract class ChatService {
 
   static async loadLastSessionMessages (): Promise<void> {
     const result = await this.repo.get(messagesArraySize)
-    if (result instanceof Error) { throw result }
     for (const m of result) {
-      const message: Message = {
+      const message: TMMessage = {
         id: m.id,
         login: m.login,
         text: m.message,
@@ -65,17 +61,30 @@ export abstract class ChatService {
   }
 
   static async add (login: string, text: string): Promise<void> {
-    const message: Message = {
+    const message: TMMessage = {
       id: randomUUID(),
       login,
       text,
       date: new Date()
     }
-    Events.emitEvent('Controller.PlayerChat', [{ id: message.id, login: message.login, text: message.text, date: message.date }])
     this.messages.unshift(message)
+    const player = PlayerService.players.find(a => a.login === login)
+    if (player == null) { throw new Error(`Cannot find player ${login} in the memory`) }
+    const messageInfo: MessageInfo = {
+      id: message.id,
+      login,
+      text,
+      nickName: player.nickName,
+      nation: player.nation,
+      nationCode: player.nationCode,
+      wins: player.wins,
+      timePlayed: player.timePlayed,
+      joinTimestamp: player.joinTimestamp,
+      privilege: player.privilege
+    }
+    Events.emitEvent('Controller.PlayerChat', messageInfo)
     this.messages.length = Math.min(messagesArraySize, this.messages.length)
-    const result = await this.repo.add(message)
-    if (result instanceof Error) { throw result }
+    await this.repo.add(message)
   }
 
   static async getByLogin (login: string, limit: number): Promise<any[] | Error> {

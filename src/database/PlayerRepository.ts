@@ -1,6 +1,5 @@
 'use strict'
 import { Repository } from './Repository.js'
-import { Player } from '../services/PlayerService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery = `
@@ -25,7 +24,7 @@ const setTimeQuery = `UPDATE players SET
         WHERE login=$2;
 `
 const getQuery = 'SELECT * FROM players WHERE login = $1'
-const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed) VALUES($1, $2, $3, $4, $5);'
+const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
 
 export class PlayerRepository extends Repository {
   async initialize (): Promise<void> {
@@ -39,10 +38,10 @@ export class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async get (login: string): Promise<any> {
+    console.log((await this.db.query(`SELECT * from players;`)).rows)
+    console.log('dsffdsfdsdfs')
     const res = await this.db.query(getQuery, [login])
-    if ((res?.rows) == null) {
-      throw Error('Error getting player ' + login + ' from database.')
-    }
+    console.log(res.rows)
     return res.rows
   }
 
@@ -51,11 +50,8 @@ export class PlayerRepository extends Repository {
    * @param {Player} player the player
    * @return {Promise<Object[]>}
    */
-  async add (player: Player): Promise<any> {
-    const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed])
-    if ((res?.rows) == null) {
-      throw Error('Error adding player ' + player.login + ' to database.')
-    }
+  async add (player: TMPlayer): Promise<any> {
+    const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed, player.privilege])
     return res.rows
   }
 
@@ -64,7 +60,7 @@ export class PlayerRepository extends Repository {
    * @param {Player} player a player instance
    * @return {Promise<Object[]>}
    */
-  async update (player: Player): Promise<any> {
+  async update (player: TMPlayer): Promise<any> {
     const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.login])
     if ((res?.rows) == null) {
       throw Error('Error updating player ' + player.login + "'s data in the database.")
