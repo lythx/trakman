@@ -13,7 +13,7 @@ const plugins: TMEvent[] = [
       if (position === -1) {
         return
       }
-      const msg = `Player $z${player.nickName}$z${TM.colours.white}$s${params[1]}${position + 1}${TM.Utils.getPositionString(position + 1)} local record: ${TM.Utils.getTimeString(params[0].score)}`
+      const msg = `Player $z${player.nickName}$z${TM.colours.white}$s${params[1]}${TM.Utils.getPositionString(position + 1)} local record: ${TM.Utils.getTimeString(params[0].score)}`
       await TM.sendMessage(msg)
     }
   }
