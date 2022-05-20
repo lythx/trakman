@@ -78,6 +78,7 @@ export class PlayerService {
         wins: 0,
         privilege: 0
       }
+      await this.repo.add(player)
     } else {
       player = {
         login,
@@ -128,8 +129,8 @@ export class PlayerService {
   static async fetchPlayer (login: string): Promise<DBPlayerInfo | null> {
     const res = (await this.repo.get(login))?.[0]
     if (res == null) { return null }
-    const nation = countries.find(a => a.name === res.nation.split('|')[1])?.code
-    if (!nation) { throw new Error('Error adding player ' + login + ', nation ' + nation + ' is not in the country list.') }
+    const nation = countries.find(a => a.code === res.nation)?.name
+    if (!nation) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
     const info: DBPlayerInfo = {
       login: res.login,
       nickName: res.nickname,
