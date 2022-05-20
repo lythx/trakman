@@ -1,7 +1,7 @@
 import { GameService } from './services/GameService.js'
-import { PlayerService } from './services/PlayerService.js'
+import { Player, PlayerService } from './services/PlayerService.js'
 import { RecordService, TMRecord } from './services/RecordService.js'
-import { ChallengeService } from './services/ChallengeService.js'
+import { Challenge, ChallengeService } from './services/ChallengeService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
