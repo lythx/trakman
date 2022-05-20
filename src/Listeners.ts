@@ -136,6 +136,7 @@ export class Listeners {
     {
       event: 'TrackMania.ChallengeListModified',
       callback: async (params: any[]) => {
+        Client.call('SaveMatchSettings', [{string: 'MatchSettings/MatchSettings.txt'}])
         // Update maps in db, lists
       }
     },
