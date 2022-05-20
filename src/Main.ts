@@ -12,7 +12,6 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
-import {TMXService} from './services/TMXService.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -59,9 +58,6 @@ async function main (): Promise<void> {
     Logger.trace('Connecting to dedimania...')
     await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
-  }
-  if(process.env.USE_TMX === 'YES') {
-    await TMXService.fetchTrack(ChallengeService.current.id)
   }
 }
 

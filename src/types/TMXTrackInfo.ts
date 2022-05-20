@@ -16,11 +16,12 @@ interface TMXTrackInfo {
     readonly difficulty: string
     readonly leaderboardRating: number
     readonly game: string
+    readonly comment: string
+    readonly commentsAmount: number
     readonly awards: number
-    readonly comments: TMXComment[]
-    readonly screenshot: string
     readonly pageUrl: string
-    readonly replays: TMXReplay[]
     readonly screenshotUrl: string,
     readonly thumbnailUrl: string
+    readonly downloadUrl: string
+    readonly replays: TMXReplay[]
 }
