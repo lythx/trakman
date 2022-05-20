@@ -168,7 +168,7 @@ const commands: TMCommand[] = [
     aliases: ['sn', 'sendnotice'],
     help: 'Send a notice.',
     callback: async (info: MessageInfo) => {
-      const param = info.text.split(' ')
+      const param = info.text.split(' ', 1)
       if (!Number.isInteger(Number(param[0]))) { return }
       await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has sent a notice: ${param[1]}$z$s, displayed for ${param[0]}s.` }], }, { method: 'SendNotice', params: [{ string: param[1] }, { string: '' }, { int: param[0] }] })
     },
