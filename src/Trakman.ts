@@ -90,6 +90,30 @@ export const TRAKMAN = {
     return await Client.call(method, params, expectsResponse).catch((err: Error) => { throw err })
   },
 
+  async multiCall (expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
+    const arr: any[] = []
+    for (const c of calls) {
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: c.params }
+        }
+      })
+    }
+    if (!expectsResponse) {
+      await Client.call('system.multicall', [{
+        array: arr
+      }], expectsResponse)
+      return []
+    }
+    const res = await Client.call('system.multicall', [{
+      array: arr
+    }], expectsResponse)
+    const ret: CallResponse[] = []
+    for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
+    return ret
+  },
+
   /**
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */

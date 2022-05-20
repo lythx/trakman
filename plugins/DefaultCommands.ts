@@ -70,9 +70,12 @@ const commands: TMCommand[] = [
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
-      await Client.call('ForceSpectator', [{ string: info.login }, { number: 0 }], false)
-      // await Client.call('SpectatorReleasePlayerSlot', [{string: info.login}], false) // Maybe multicall this?
-      await Client.call('ChatSendServerMessage', [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }], false)
+      const c1: TMCall = { method: 'ForceSpectator', params: [{ string: info.login }, { int: 1 }] } //force spec
+      const c2: TMCall = { method: 'ForceSpectator', params: [{ string: info.login }, { int: 0 }] } //allow player to change back from spec
+      const c3: TMCall = { method: 'ChatSendServerMessage', params: [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }] }
+      await TM.multiCall(false, c1, c2, c3)
+      await new Promise(((r) => setTimeout(r, 1000))) //need a timeout for server to register that player is a spectator
+      TM.call('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0
   },
