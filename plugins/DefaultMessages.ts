@@ -1,28 +1,26 @@
 'use strict'
 
 import { TRAKMAN as TM } from '../src/Trakman.js'
-const titles = ['Player' , 'Operator' , 'Admin' , 'Masteradmin' , 'Server Owner']
-const specialTitles = [{
-  login:'petr_kharpe', title: 'Femboy'
-}]
 
-const getTitle=(player: TMPlayer): string =>{
-  let title = titles[player.privilege]
-  const specialTitle = specialTitles.find(a=>a.login=== player.login)
-  if(specialTitle != null){
-    title = specialTitle.title
-  }
-  return title
-}
+
+const c1 = TM.colours.white
+const c2 = TM.colours.folly
 
 const plugins: TMEvent[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: TMPlayer) => {
-      const title = getTitle(player) 
-      const c1 = TM.colours.white
-      const c2 = TM.colours.magenta
-      const msg = `»» ${c2}${title}${c1}: ${player.nickName}$z$s${c2} Country${c1}: ${player.nation} ${c2}Visits: ${c1}${player.visits}${c2}.`
+      const title = TM.getTitle(player) 
+      const nick = TM.stripModifiers(player.nickName)
+      const msg = `»» ${c2}${title}${c1}: ${nick}$z$s${c2} Country${c1}: ${player.nation} ${c2}Visits: ${c1}${player.visits}${c2}.`
+      TM.sendMessage(msg)
+    }
+  },
+  {
+    event: 'Controller.PlayerLeave',
+    callback: async (player: PlayerInfo) => {
+      const nick = TM.stripModifiers(player.nickName)
+      const msg = `»» ${c1}${nick}$z$s${c2} left after ${c1}${TM.msToTime(player.sessionTime)}${c2}.`
       TM.sendMessage(msg)
     }
   },
