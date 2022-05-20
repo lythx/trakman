@@ -1,8 +1,9 @@
 'use strict'
-import { Client } from '../src/Client.js'
 import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { ChatService } from '../src/services/ChatService.js'
 import { TRAKMAN as TM } from '../src/Trakman.js'
+import fs from 'node:fs/promises'
+import { ErrorHandler } from '../src/ErrorHandler.js'
 
 const commands: TMCommand[] = [
   // TODO: help consistency, tidy up
@@ -220,6 +221,48 @@ const commands: TMCommand[] = [
     privilege: 2
   },
   // Operator level
+  {
+    aliases: ['al', 'addlocal'],
+    help: 'Add a challenge from your pc.',
+    callback: async (info: MessageInfo) => {
+      const split = info.text.split(' ')
+      const fileName = split.shift() + '.Challenge.Gbx'
+      const path = split.join(' ')
+      let file
+      try{
+        file = (await fs.readFile(path, "base64"))
+      } catch(err: any) {
+        ErrorHandler.error(`Error when reading file on addlocal`, err.message)
+        TM.sendMessage(`File ${path} doesn't exist`)
+        return
+      }
+      try{
+        await TM.call('WriteFile', [{ string: fileName}, {base64: file}])
+      } catch(err: any) {
+        ErrorHandler.error(`Failed to write file`, err.toString())
+        TM.sendMessage(`Failed to write file`)
+        return
+      }
+      try{
+        await TM.call('InsertChallenge', [{ string: fileName }])
+      } catch(err: any) {
+        ErrorHandler.error(`Failed to insert challenge to jukebox`, err.toString())
+        TM.sendMessage(`Failed to insert challenge to jukebox`)
+        return
+      }
+      let res
+      try{
+        res = await TM.call('GetNextChallengeInfo')
+      } catch(err: any) {
+        ErrorHandler.error(`Failed to get next challenge info`, err.toString())
+        TM.sendMessage(`Failed to get next challenge info`)
+        return
+      }
+      const name = res?.[0]?.Name
+      TM.sendMessage(`Player ${info.nickName} added and jukeboxed map ${name}`)
+    },
+    privilege: 1
+  },
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
