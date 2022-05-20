@@ -7,6 +7,7 @@ import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
 import { Utils } from './Utils.js'
+import { randomUUID } from 'crypto'
 
 export const TRAKMAN = {
   /**
@@ -149,5 +150,9 @@ export const TRAKMAN = {
 
   get Utils () {
     return Utils
+  },
+
+  randomUUID () {
+    return randomUUID()
   }
 }
