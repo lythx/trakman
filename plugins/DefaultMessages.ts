@@ -7,6 +7,12 @@ const c2 = TM.colours.folly
 
 const plugins: TMEvent[] = [
   {
+    event: 'Controller.Ready',
+    callback: async () => {
+      TM.sendMessage(`${c2}TRAKMAN ${c1}started`)
+    }
+  },
+  {
     event: 'Controller.PlayerJoin',
     callback: async (player: TMPlayer) => {
       const title = TM.getTitle(player)
