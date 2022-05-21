@@ -17,6 +17,7 @@ export class Listeners {
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        await RecordService.fetchRecord(params[0].UId, params[0].Login)
       }
     },
     {
@@ -53,14 +54,11 @@ export class Listeners {
         }
         if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
           // reset cps
-          PlayerService.getPlayer(params[1]).checkpoints.length = 0
+         // PlayerService.getPlayer(params[1]).checkpoints.length = 0
           return
         }
         const status = await Client.call('GetStatus')
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-          return
-        }
-        if (GameService.gameMode === 3) { // return if it's the laps game mode
           return
         }
         await RecordService.add(ChallengeService.current.id, params[1], params[2])

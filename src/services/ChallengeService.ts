@@ -7,7 +7,7 @@ import {TMXService} from './TMXService.js'
 
 export class ChallengeService {
   private static _current: TMChallenge
-  private static list: TMChallenge[]
+  private static list: ChallengeInfo[]
   private static repo: ChallengeRepository
 
   static async initialize (repo: ChallengeRepository = new ChallengeRepository()): Promise<void> {
@@ -27,14 +27,15 @@ export class ChallengeService {
       return
     }
     const curr = this.list.find(c => c.id === info.UId)
+    const c = (await Client.call('GetCurrentChallengeInfo'))[0]
     if (curr === undefined) {
       ErrorHandler.error('Unable to find current challenge in challenge list.')
       return
     }
-    this._current = curr
-    // If the game mode can have laps (Rounds, Team, Cup), get the number of laps
-    if ([0, 2, 5].includes(GameService.gameMode) && info.LapRace as boolean) {
-      this._current.laps = info.NbLaps
+    this._current = {id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement,
+      mood: c.Mood, bronzeTime: c.BronzeTime, silverTime: c.SilverTime, goldTime: c.GoldTime,
+      authorTime: c.AuthorTime, copperPrice: c.CopperPrice, lapRace: c.LapRace,
+      lapsAmount: c.NbLaps, checkpointsAmount: c.NbCheckpoints
     }
     if(process.env.USE_TMX === 'YES') {
       await TMXService.fetchTrack(ChallengeService.current.id).catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
@@ -59,7 +60,8 @@ export class ChallengeService {
       throw Error('Error fetching challenges from TM server.')
     }
     for (const c of challengeList) {
-      const challenge: TMChallenge = { id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement, laps: 1 }
+      const challenge: ChallengeInfo = { id: c.UId, name: c.Name, author: c.Author, 
+        environment: c.Environnement  }
       this.list.push(challenge) // they cant speak english ahjahahahahhaha
     }
     await this.setCurrent()

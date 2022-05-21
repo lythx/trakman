@@ -1,32 +1,21 @@
 'use strict'
 import { Repository } from './Repository.js'
-import { TMRecord } from '../services/RecordService.js'
-import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery = `
   CREATE TABLE IF NOT EXISTS records(
-      id uuid primary key not null,
       challenge varchar(27) not null,
       login varchar(25) not null,
       score int4 not null,
       date timestamp not null,
-      checkpoints int4[]
+      checkpoints int4[],
+      PRIMARY KEY(login, challenge)
   );
 `
-const updateQuery = `
-        UPDATE records
-        SET score = $1,
-            date = $2,
-            checkpoints = $3
-        WHERE id = $4
-        RETURNING id;
-      `
+
 const insertQuery = `
-        INSERT INTO records(id, challenge, login, score, date, checkpoints)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id;
+        INSERT INTO records(challenge, login, score, date, checkpoints)
+        VALUES ($1, $2, $3, $4, $5);
       `
-const getQuery = 'SELECT id, score FROM records WHERE login = $1 AND challenge = $2;'
 
 export class RecordRepository extends Repository {
   async initialize (): Promise<void> {
@@ -34,29 +23,22 @@ export class RecordRepository extends Repository {
     await this.db.query(createQuery)
   }
 
-  async add (record: TMRecord): Promise<any> {
-    const getRes = (await this.db.query(getQuery, [record.login, record.challenge]))?.rows
-    let q
-    if ((getRes != null) && getRes.length > 0) {
-      if (getRes[0].score < record.score) {
-        return null
-      }
-      if (getRes[0].score === record.score) {
-        return 'equal'
-      }
-      q = this.db.query(updateQuery, [record.score, record.date, record.checkpoints, getRes[0].id])
-    } else {
-      q = this.db.query(insertQuery, [record.id, record.challenge, record.login, record.score, record.date, record.checkpoints])
-    }
-    return await q
+  async add (record: RecordInfo): Promise<void> {
+    await this.db.query(insertQuery, [record.challenge, record.login, record.score, record.date, record.checkpoints])
   }
 
   async get (challengeId: string): Promise<any[]> {
     const res = await this.db.query('SELECT * FROM records WHERE challenge=$1', [challengeId])
-    if (res.rows != null && res.rows.length > 0) {
-      return res.rows
-    }
-    ErrorHandler.error('Failed to fetch records for challenge ' + challengeId)
-    return []
+    return res.rows
+  }
+
+  async update(record: RecordInfo): Promise<void> {
+    await this.db.query('UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE challenge=$4 AND login=$5', 
+    [record.score, record.date, record.checkpoints, record.challenge, record.login])
+  }
+
+  async getByLogin (challengeId: string, login: string): Promise<any[]> {
+    const res = await this.db.query('SELECT * FROM records WHERE challenge=$1 AND login=$2', [challengeId, login])
+    return res.rows
   }
 }

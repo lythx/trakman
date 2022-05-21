@@ -21,7 +21,7 @@ export class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    * @return {Promise<any[]>}
    */
-  async add (objects: TMChallenge[]): Promise<any> {
+  async add (objects: ChallengeInfo[]): Promise<any> {
     if (objects.length === 0) {
       throw Error('No challenges in list.')
     }

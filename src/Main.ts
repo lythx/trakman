@@ -59,6 +59,7 @@ async function main (): Promise<void> {
     await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
   }
+  await RecordService.fetchRecords(ChallengeService.current.id)
 }
 
 await main()
