@@ -40,7 +40,7 @@ const commands: TMCommand[] = [
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)} ${TM.colours.folly}has set `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
               + `the gamemode to ${TM.colours.white + info.text.toUpperCase()}${TM.colours.folly}.`
           }]
         },
