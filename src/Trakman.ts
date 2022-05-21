@@ -92,7 +92,7 @@ export const TRAKMAN = {
      */
   getLocalRecords(challenge: string, amount: number): TMRecord[] {
     // love me some lambda expressions
-    return RecordService.currentPlayerRecords.filter(r => r.challenge === challenge)
+    return RecordService.records.filter(r => r.challenge === challenge)
       .sort((a, b) => a.score - b.score).slice(0, amount)
   },
 
@@ -101,7 +101,7 @@ export const TRAKMAN = {
      * or undefined if the player doesn't have a record
      */
   getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.currentPlayerRecords.find(a => a.login === login)
+    return RecordService.records.find(a => a.login === login)
   },
 
   // static get dediRecords():DediRecord[] {
