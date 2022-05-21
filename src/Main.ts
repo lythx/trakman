@@ -12,6 +12,7 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
+import { Events } from './Events.js'
 
 async function main (): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -25,41 +26,36 @@ async function main (): Promise<void> {
   ]).catch(err => {
     ErrorHandler.fatal('Authentication failed', err)
   })
-
   Logger.info('Authentication success')
   Logger.trace('Retrieving game info')
   await GameService.initialize()
-  Logger.info('Game info initialised')
-  await Listeners.initialize()
+  Logger.info('Game info fetched')
   Logger.trace('Enabling callbacks...')
-  await RecordService.initialize()
   await Client.call('EnableCallbacks', [
     { boolean: true }
   ]).catch(err => { ErrorHandler.fatal('Failed to enable callbacks', err) })
+  await RecordService.initialize()
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
   await ChallengeService.initialize()
-  Logger.info('Challenge service instantiated')
   await ChallengeService.push()
-  Logger.info('Challenges are in the database')
+  Logger.info('Challenge service instantiated')
+  Logger.trace('Fetching player info...')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
-    .catch(err => ErrorHandler.error(err, ''))
   Logger.info('Player service instantiated')
   Logger.trace('Fetching message history...')
   await ChatService.initialize()
-  try {
-    await ChatService.loadLastSessionMessages()
-  } catch (e: any) {
-    ErrorHandler.fatal('Failed to fetch messages', e.message)
-  }
+  await ChatService.loadLastSessionMessages()
   Logger.info('Chat service instantiated')
+  await Listeners.initialize()
+  await RecordService.fetchRecords(ChallengeService.current.id)
+  Events.initialize()
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
     await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
   }
-  await RecordService.fetchRecords(ChallengeService.current.id)
 }
 
 await main()
