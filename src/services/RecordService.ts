@@ -1,9 +1,9 @@
 'use strict'
-import { RecordRepository } from '../database/RecordRepository.js'
-import { PlayerService } from './PlayerService.js'
-import { ChallengeService } from './ChallengeService.js'
-import { Events } from '../Events.js'
-import { GameService } from './GameService.js'
+import {RecordRepository} from '../database/RecordRepository.js'
+import {PlayerService} from './PlayerService.js'
+import {ChallengeService} from './ChallengeService.js'
+import {Events} from '../Events.js'
+import {GameService} from './GameService.js'
 
 export class RecordService {
   private static repo: RecordRepository
@@ -28,8 +28,7 @@ export class RecordService {
   static async fetchRecord (challengeId: string, login: string): Promise<TMRecord | null> {
     const res = (await this.repo.getByLogin(challengeId, login))?.[0]
     if (res == null) { return null }
-    const record: TMRecord = { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
-    return record
+    return {challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints}
   }
 
   static get records (): TMRecord[] {
