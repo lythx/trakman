@@ -1,9 +1,9 @@
 'use strict'
 
 interface TMRecord {
-    readonly challenge: string
-    readonly login: string
-    readonly score: number
-    readonly date: Date
-    readonly checkpoints: number[]
+  readonly challenge: string
+  readonly login: string
+  readonly score: number
+  readonly date: Date
+  readonly checkpoints: number[]
 }
