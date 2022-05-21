@@ -18,21 +18,21 @@ const commands: TMCommand[] = [
         file = (await fs.readFile(path, 'base64'))
       } catch (err: any) {
         ErrorHandler.error('Error when reading file on addlocal', err.message)
-        TM.sendMessage(`File ${path} doesn't exist`)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}File ${TM.colours.white + path} is not accessible.`)
         return
       }
       try {
         await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       } catch (err: any) {
         ErrorHandler.error('Failed to write file', err.toString())
-        TM.sendMessage('Failed to write file')
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`)
         return
       }
       try {
         await TM.call('InsertChallenge', [{ string: fileName }])
       } catch (err: any) {
         ErrorHandler.error('Failed to insert challenge to jukebox', err.toString())
-        TM.sendMessage('Failed to insert challenge to jukebox')
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`)
         return
       }
       let res
@@ -40,11 +40,13 @@ const commands: TMCommand[] = [
         res = await TM.call('GetNextChallengeInfo')
       } catch (err: any) {
         ErrorHandler.error('Failed to get next challenge info', err.toString())
-        TM.sendMessage('Failed to get next challenge info')
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`)
         return
       }
       const name = res?.[0]?.Name
-      TM.sendMessage(`Player ${info.nickName} added and jukeboxed map ${name}`)
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
+        + `${TM.colours.white + TM.stripModifiers(name || 'TODO: FIX THIS', true)}${TM.colours.folly} from local files.`)
     },
     privilege: 1
   },
@@ -52,7 +54,17 @@ const commands: TMCommand[] = [
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
     callback: async (info: MessageInfo) => {
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has skipped the ongoing track.` }] }, { method: 'NextChallenge' })
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has skipped the ongoing track.`
+          }]
+        },
+        {
+          method: 'NextChallenge'
+        })
     },
     privilege: 1
   },
@@ -60,7 +72,17 @@ const commands: TMCommand[] = [
     aliases: ['r', 'res'],
     help: 'Restart the current map.',
     callback: async (info: MessageInfo) => {
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has restarted the ongoing track.` }] }, { method: 'RestartChallenge' })
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has restarted the ongoing track.`
+          }]
+        },
+        {
+          method: 'RestartChallenge'
+        })
     },
     privilege: 1
   },
@@ -68,8 +90,21 @@ const commands: TMCommand[] = [
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
     callback: async (info: MessageInfo) => {
-      if (TM.getPlayer(info.text) === undefined) { return }
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has kicked ${info.text}.` }] }, { method: 'Kick', params: [{ string: `${info.text}` }, { string: 'asdsasdasd' }] })
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has kicked `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'Kick',
+          params: [{ string: `${info.text}` }, { string: 'asdsasdasd' }]
+        })
     },
     privilege: 1
   },
@@ -79,7 +114,19 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has muted ${targetInfo.nickName}.` }] }, { method: 'Ignore', params: [{ string: `${info.text}` }] })
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unmuted `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'Ignore',
+          params: [{ string: `${info.text}` }]
+        })
     },
     privilege: 1
   },
@@ -87,8 +134,21 @@ const commands: TMCommand[] = [
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
     callback: async (info: MessageInfo) => {
-      if (TM.getPlayer(info.text) === undefined) { return }
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has unmuted ${info.text}.` }] }, { method: 'UnIgnore', params: [{ string: `${info.text}` }] })
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unmuted `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'UnIgnore',
+          params: [{ string: `${info.text}` }]
+        })
     },
     privilege: 1
   }
