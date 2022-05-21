@@ -9,7 +9,7 @@ const plugins: TMEvent[] = [
   {
     event: 'Controller.Ready',
     callback: async () => {
-      TM.sendMessage(`${c2}TRAKMAN ${c1}started`)
+      TM.sendMessage(`${c2}TRAKMAN ${c1}started${c2}.${c1} NICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`)
     }
   },
   {
