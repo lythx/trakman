@@ -1,6 +1,6 @@
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
-import { RecordService, TMRecord } from './services/RecordService.js'
+import { RecordService } from './services/RecordService.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
@@ -43,7 +43,6 @@ export const TRAKMAN = {
     const minutes = d.getMinutes();
     const hours = d.getHours() - 1;
     const days = d.getDate() - 1;
-    console.log(seconds, minutes, hours, days)
     if (days > 0)
       str += days === 1 ? `${days} day, ` : `${days} days, `
     if (hours > 0)
@@ -93,7 +92,7 @@ export const TRAKMAN = {
      */
   getLocalRecords(challenge: string, amount: number): TMRecord[] {
     // love me some lambda expressions
-    return RecordService.records.filter(r => r.challenge === challenge)
+    return RecordService.currentPlayerRecords.filter(r => r.challenge === challenge)
       .sort((a, b) => a.score - b.score).slice(0, amount)
   },
 
@@ -102,7 +101,7 @@ export const TRAKMAN = {
      * or undefined if the player doesn't have a record
      */
   getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.records.find(a => a.login === login)
+    return RecordService.currentPlayerRecords.find(a => a.login === login)
   },
 
   // static get dediRecords():DediRecord[] {

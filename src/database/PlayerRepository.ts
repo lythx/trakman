@@ -60,7 +60,6 @@ export class PlayerRepository extends Repository {
    * @return {Promise<Object[]>}
    */
   async update (player: TMPlayer): Promise<any> {
-    console.log(player)
     const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.visits, player.login, ])
     if ((res?.rows) == null) {
       throw Error('Error updating player ' + player.login + "'s data in the database.")

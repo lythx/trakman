@@ -19,7 +19,7 @@ const c2: TMCall = { method: 'ForceSpectator', params: [{ string: info.login }, 
 const c3: TMCall = { method: 'ChatSendServerMessage', params: [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }] }
 const res: CallResponse[] = await TM.multiCall(true, c1, c2, c3)
 
-TM.sendMessages() -> `Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone`
+TM.sendMessage() -> `Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone`
 TM.colours -> `Returns an object containing various colours as keys, and their 3-digit hexes as values. Useful for text colouring in plugins`
 TM.addCommand() -> `Adds a chat command`
 TM.addListener() -> `Adds callback function to execute on given event`

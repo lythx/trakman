@@ -6,8 +6,6 @@ import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
-import { GameError, GameService } from './GameService.js'
-import { ChallengeService } from './ChallengeService.js'
 
 export class PlayerService {
   private static _players: TMPlayer[] = []
@@ -159,32 +157,12 @@ export class PlayerService {
    * @return {Promise<void>}
    */
   static async addCP (login: string, cp: TMCheckpoint): Promise<void> {
-    try {
       const player = this.getPlayer(login)
-      const len = player.checkpoints.length
-      let divisor: number | undefined
-      if (GameService.gameMode === 0) {
-        divisor = GameService.roundsForcedLaps
-      } else {
-        divisor = ChallengeService.current.laps
+      if(cp.index === 0){
+        player.checkpoints.unshift(cp)
+        player.checkpoints.length = 1
       }
-      if (divisor == null) {
-        throw new GameError('Cannot get current map\'s laps')
-      }
-      const lap = cp.lap % divisor
-      if (lap === 0 && cp.index === 0) {
-        if (len !== 0) {
-          throw new GameError('Something went horribly wrong, this is supposed to be the first checkpoint but somehow the array is not empty')
-        }
-        if (cp.time === 0) {
-          throw new GameError('Checkpoint time cannot be 0.')
-        }
-      } else if (cp.time === player.checkpoints[len - 1].time) {
-        throw new GameError('Checkpoint time cannot be the same as the last.')
-      }
-      player.checkpoints.push(cp)
-    } catch (e: any) {
-      ErrorHandler.error('Error adding a checkpoint time:', e.message.toString())
-    }
+      else if(player.checkpoints.every(a=> a.lap === cp.lap))
+        player.checkpoints.push(cp)
   }
 }
