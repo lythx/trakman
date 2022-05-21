@@ -16,7 +16,7 @@ export class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners (): void {
+  setupListeners(): void {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.handshakeHeaderSize === 0) {
@@ -36,21 +36,23 @@ export class Socket extends net.Socket {
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  async awaitHandshake (): Promise<string> {
+  async awaitHandshake(): Promise<string> {
     const startTimestamp = Date.now()
-    return await new Promise((resolve, reject) => {
-      const immediate = setImmediate(() => {
+    return await new Promise(async (resolve, reject) => {
+      const poll = () => {
+        setImmediate(poll)
         if (this.handshakeStatus === 'Handshake success') {
           resolve(this.handshakeStatus)
-          clearImmediate(immediate)
+          return
         } else if (this.handshakeStatus === 'Server uses wrong GBX protocol') {
           reject(new Error(this.handshakeStatus))
-          clearImmediate(immediate)
-        } else if (Date.now() - startTimestamp > 5000) { 
+          return
+        } else if (Date.now() - startTimestamp > 5000) {
           reject(new Error('No response from the server'))
-          clearImmediate(immediate)
+          return
         }
-      })
+      }
+      setImmediate(poll)
     })
   }
 
@@ -58,38 +60,38 @@ export class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  async awaitResponse (id: number, method: string): Promise<any[]> {
+  async awaitResponse(id: number, method: string): Promise<any[]> {
     const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
-      const immediate = setImmediate(() => {
+      const poll = () => {
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.responses.find(a => a.id === id && a.status === 'completed')
           if (response === undefined) {
             reject(new Error('Response id: ' + id.toString() + ' not found in responses list.'))
-            clearImmediate(immediate)
             return
           }
           if (response.isError) {
             reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
-            clearImmediate(immediate)
             return
           }
           resolve(response.json)
-          clearImmediate(immediate)
-        } else if (Date.now() - startTimestamp > 15000) { 
+          return
+        } else if (Date.now() - startTimestamp > 15000) {
           reject(new Error(`No server response for call ${method}`))
-          clearImmediate(immediate)
-         }
-      })
+          return
+        }
+        setImmediate(poll)
+      }
+      setImmediate(poll)
     })
   }
 
-  #setHandshakeHeaderSize (buffer: Buffer): void {
+  #setHandshakeHeaderSize(buffer: Buffer): void {
     if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  #handleHandshake (buffer: Buffer): void {
+  #handleHandshake(buffer: Buffer): void {
     this.handshakeHeader = buffer.toString()
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
@@ -101,7 +103,7 @@ export class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  #handleResponseStart (buffer: Buffer): void {
+  #handleResponseStart(buffer: Buffer): void {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.incompleteHeader = buffer
@@ -117,7 +119,7 @@ export class Socket extends net.Socket {
   }
 
   // add new buffer to response object
-  #handleResponseChunk (buffer: Buffer): void {
+  #handleResponseChunk(buffer: Buffer): void {
     if (this.response === null) {
       ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
       return
