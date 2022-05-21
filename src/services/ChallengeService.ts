@@ -3,7 +3,7 @@ import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { GameService } from './GameService.js'
 import { ErrorHandler } from '../ErrorHandler.js'
-import {TMXService} from './TMXService.js'
+import { TMXService } from './TMXService.js'
 
 export class ChallengeService {
   private static _current: TMChallenge
@@ -32,12 +32,22 @@ export class ChallengeService {
       ErrorHandler.error('Unable to find current challenge in challenge list.')
       return
     }
-    this._current = {id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement,
-      mood: c.Mood, bronzeTime: c.BronzeTime, silverTime: c.SilverTime, goldTime: c.GoldTime,
-      authorTime: c.AuthorTime, copperPrice: c.CopperPrice, lapRace: c.LapRace,
-      lapsAmount: c.NbLaps, checkpointsAmount: c.NbCheckpoints
+    this._current = {
+      id: c.UId,
+      name: c.Name,
+      author: c.Author,
+      environment: c.Environnement,
+      mood: c.Mood,
+      bronzeTime: c.BronzeTime,
+      silverTime: c.SilverTime,
+      goldTime: c.GoldTime,
+      authorTime: c.AuthorTime,
+      copperPrice: c.CopperPrice,
+      lapRace: c.LapRace,
+      lapsAmount: c.NbLaps,
+      checkpointsAmount: c.NbCheckpoints
     }
-    if(process.env.USE_TMX === 'YES') {
+    if (process.env.USE_TMX === 'YES') {
       await TMXService.fetchTrack(ChallengeService.current.id).catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
     }
   }
@@ -60,8 +70,12 @@ export class ChallengeService {
       throw Error('Error fetching challenges from TM server.')
     }
     for (const c of challengeList) {
-      const challenge: ChallengeInfo = { id: c.UId, name: c.Name, author: c.Author, 
-        environment: c.Environnement  }
+      const challenge: ChallengeInfo = {
+        id: c.UId,
+        name: c.Name,
+        author: c.Author,
+        environment: c.Environnement
+      }
       this.list.push(challenge) // they cant speak english ahjahahahahhaha
     }
     await this.setCurrent()

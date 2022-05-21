@@ -6,6 +6,8 @@ import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
+import { ChallengeService } from './ChallengeService.js'
+import { GameService } from './GameService.js'
 
 export class PlayerService {
   private static _players: TMPlayer[] = []
@@ -157,12 +159,20 @@ export class PlayerService {
    * @return {Promise<void>}
    */
   static async addCP (login: string, cp: TMCheckpoint): Promise<void> {
-      const player = this.getPlayer(login)
-      if(cp.index === 0){
-        player.checkpoints.unshift(cp)
-        player.checkpoints.length = 1
-      }
-      else if(player.checkpoints.every(a=> a.lap === cp.lap))
-        player.checkpoints.push(cp)
+    const player = this.getPlayer(login)
+    if (cp.index === 0) {
+      player.checkpoints.unshift(cp)
+      player.checkpoints.length = 1
+      return
+    }
+    let laps
+    if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
+      laps = 1
+    } else if (GameService.game.gameMode === 3) {
+      laps = GameService.game.lapsNo
+    } else {
+      laps = ChallengeService.current.lapsAmount
+    }
+    if (cp.lap < player.checkpoints[0].lap + laps) { player.checkpoints.push(cp) }
   }
 }

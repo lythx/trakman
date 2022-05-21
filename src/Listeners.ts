@@ -54,7 +54,7 @@ export class Listeners {
         }
         if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
           // reset cps
-         // PlayerService.getPlayer(params[1]).checkpoints.length = 0
+          // PlayerService.getPlayer(params[1]).checkpoints.length = 0
           return
         }
         const status = await Client.call('GetStatus')
@@ -134,7 +134,7 @@ export class Listeners {
     {
       event: 'TrackMania.ChallengeListModified',
       callback: async (params: any[]) => {
-        Client.call('SaveMatchSettings', [{string: 'MatchSettings/MatchSettings.txt'}])
+        Client.call('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
         // Update maps in db, lists
       }
     },

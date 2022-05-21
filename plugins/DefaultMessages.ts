@@ -2,7 +2,6 @@
 
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-
 const c1 = TM.colours.white
 const c2 = TM.colours.folly
 
@@ -10,7 +9,7 @@ const plugins: TMEvent[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: TMPlayer) => {
-      const title = TM.getTitle(player) 
+      const title = TM.getTitle(player)
       const nick = TM.stripModifiers(player.nickName)
       const msg = `»» ${c2}${title}${c1}: ${nick}$z$s${c2} Country${c1}: ${player.nation} ${c2}Visits: ${c1}${player.visits}${c2}.`
       TM.sendMessage(msg)
@@ -27,8 +26,6 @@ const plugins: TMEvent[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      console.log('playerrecord')
-      console.log(info)
       const msg = `Player $z${info.nickName}$z${TM.colours.white}$s ${info.status} ${TM.Utils.getPositionString(info.position)} local record: ${TM.Utils.getTimeString(info.score)}`
       await TM.sendMessage(msg)
     }
