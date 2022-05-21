@@ -4,6 +4,7 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 import fs from 'node:fs/promises'
 import { ErrorHandler } from '../src/ErrorHandler.js'
 import { ChatService } from '../src/services/ChatService.js'
+import {ChallengeService} from "../src/services/ChallengeService";
 
 const commands: TMCommand[] = [
   {
@@ -18,33 +19,49 @@ const commands: TMCommand[] = [
         file = (await fs.readFile(path, 'base64'))
       } catch (err: any) {
         ErrorHandler.error('Error when reading file on addlocal', err.message)
-        TM.sendMessage(`File ${path} doesn't exist`)
+        TM.sendMessage(`File ${path} doesn't exist`).then()
         return
       }
       try {
         await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       } catch (err: any) {
-        ErrorHandler.error('Failed to write file', err.toString())
-        TM.sendMessage('Failed to write file')
+        ErrorHandler.error('Failed to write file', err.message)
+        TM.sendMessage('Failed to write file').then()
         return
       }
       try {
         await TM.call('InsertChallenge', [{ string: fileName }])
       } catch (err: any) {
-        ErrorHandler.error('Failed to insert challenge to jukebox', err.toString())
-        TM.sendMessage('Failed to insert challenge to jukebox')
+        ErrorHandler.error('Failed to insert challenge to jukebox', err.message)
+        TM.sendMessage('Failed to insert challenge to jukebox').then()
         return
       }
       let res
       try {
         res = await TM.call('GetNextChallengeInfo')
       } catch (err: any) {
-        ErrorHandler.error('Failed to get next challenge info', err.toString())
-        TM.sendMessage('Failed to get next challenge info')
+        ErrorHandler.error('Failed to get next challenge info', err.message)
+        TM.sendMessage('Failed to get next challenge info').then()
         return
       }
       const name = res?.[0]?.Name
-      TM.sendMessage(`Player ${info.nickName} added and jukeboxed map ${name}`)
+      if (name == null) {
+        ErrorHandler.error('Next challenge name is undefined. Cancelling transaction.')
+        TM.multiCall(false,
+          {method: 'ChatSendServerMessage', params: [{string: 'Next challenge name is undefined. Cancelling transaction.' }]},
+          {method: 'RemoveChallenge', params: [{ string: fileName }]}).then()
+        return
+      }
+      try {
+        await ChallengeService.add(res[0].UId, name, res[0].Author, res[0].Environnement)
+      } catch (err: any) {
+        ErrorHandler.error('Error adding challenge to database. Cancelling transaction.')
+        TM.multiCall(false,
+          {method: 'ChatSendServerMessage', params: [{string: 'Error adding challenge to database. Cancelling transaction.' }]},
+          {method: 'RemoveChallenge', params: [{ string: fileName }]}).then()
+        return
+      }
+      TM.sendMessage(`Player ${info.nickName} added and jukeboxed map ${name}`).then()
     },
     privilege: 1
   },
@@ -94,4 +111,4 @@ const commands: TMCommand[] = [
   }
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { ChatService.addCommand(command).then() }
