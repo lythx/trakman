@@ -27,6 +27,8 @@ const plugins: TMEvent[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
+      console.log('playerrecord')
+      console.log(info)
       const msg = `Player $z${info.nickName}$z${TM.colours.white}$s ${info.status} ${TM.Utils.getPositionString(info.position)} local record: ${TM.Utils.getTimeString(info.score)}`
       await TM.sendMessage(msg)
     }
