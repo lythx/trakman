@@ -11,20 +11,20 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage(`No login specified.`, callerLogin)
+        await TM.sendMessage('No login specified.', callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
+        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
+        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
         return
       }
       if (targetInfo.privilege < 3) {
@@ -43,20 +43,20 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage(`No login specified.`, callerLogin)
+        await TM.sendMessage('No login specified.', callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
+        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
+        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
         return
       }
       if (targetInfo.privilege < 2) {
@@ -78,20 +78,20 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage(`No login specified.`, callerLogin)
+        await TM.sendMessage('No login specified.', callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
+        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
+        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
         return
       }
       if (targetInfo.privilege < 1) {
@@ -113,20 +113,20 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage(`No login specified.`, callerLogin)
+        await TM.sendMessage('No login specified.', callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage(`Cannot find the specified login in the database.`, callerLogin)
+        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage(`You cannot demote the server owner.`, callerLogin)
+        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage(`You cannot control your own privileges.`, callerLogin)
+        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
         return
       }
       if (targetInfo.privilege > 1) {
@@ -140,4 +140,4 @@ const commands: TMCommand[] = [
   }
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { ChatService.addCommand(command).then() }

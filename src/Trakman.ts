@@ -1,6 +1,6 @@
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
-import { RecordService, TMRecord } from './services/RecordService.js'
+import { RecordService } from './services/RecordService.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
@@ -12,13 +12,13 @@ import { randomUUID } from 'crypto'
 export const TRAKMAN = {
 
   specialTitles: [
-    {login: 'redgreendevil', title: 'venti the anemo archon'},
-    {login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹'}
+    { login: 'redgreendevil', title: 'venti the anemo archon' },
+    { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
   ],
   titles: ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner'],
 
-  getTitle(player: any): string {
-    let title = TRAKMAN.titles[player.privilege]
+  getTitle (player: any): string {
+    const title = TRAKMAN.titles[player.privilege]
     const specialTitle = TRAKMAN.specialTitles.find(a => a.login === player.login)
     if (specialTitle != null) {
       return specialTitle.title
@@ -26,72 +26,64 @@ export const TRAKMAN = {
     return title
   },
 
-  stripModifiers(str: string, removeColors: boolean = true) {
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)(.*?)/i, '$2')
-    str = str.replace(/\${1}[SHWILONZ]/i, '')
-    if (removeColors)
-      str = str.replace(/\${1}([0-9A-F]){3}/gi, '')
-    return str;
+  stripModifiers (str: string, removeColors: boolean = true) {
+    str = str.replace(/\$([LHP])\[.*?](.*?)\$(LHP)/i, '$2')
+    str = str.replace(/\$(LHP)\[.*?](.*?)/i, '$2')
+    str = str.replace(/\$(LHP)(.*?)/i, '$2')
+    str = str.replace(/\$[SHWILONZ]/i, '')
+    if (removeColors) { str = str.replace(/\$([\dA-F]){3}/gi, '') }
+    return str
   },
 
-  msToTime(ms: number) {
+  msToTime (ms: number) {
     const d = new Date(ms)
     let str = ''
-    const seconds = d.getSeconds();
-    const minutes = d.getMinutes();
-    const hours = d.getHours() - 1;
-    const days = d.getDate() - 1;
-    console.log(seconds, minutes, hours, days)
-    if (days > 0)
-      str += days === 1 ? `${days} day, ` : `${days} days, `
-    if (hours > 0)
-      str += hours === 1 ? `${hours} hour, ` : `${hours} hours, `
-    if (minutes > 0)
-      str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, `
-    if (seconds > 0)
-      str += seconds === 1 ? `${seconds} second, ` : `${seconds} seconds, `
+    const seconds = d.getSeconds()
+    const minutes = d.getMinutes()
+    const hours = d.getHours() - 1
+    const days = d.getDate() - 1
+    if (days > 0) { str += days === 1 ? `${days} day, ` : `${days} days, ` }
+    if (hours > 0) { str += hours === 1 ? `${hours} hour, ` : `${hours} hours, ` }
+    if (minutes > 0) { str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, ` }
+    if (seconds > 0) { str += seconds === 1 ? `${seconds} second, ` : `${seconds} seconds, ` }
     str = str.substring(0, str.length - 2)
     const index = str.lastIndexOf(',')
-    if (index !== -1)
-      str = str.substring(0, index) + ' and' + str.substring(index + 1)
-    if (str === '')
-      return `0 seconds`
+    if (index !== -1) { str = str.substring(0, index) + ' and' + str.substring(index + 1) }
+    if (str === '') { return '0 seconds' }
     return str
   },
   /**
      * Returns an object containing various information about game state
      */
-  get gameInfo(): TMGame {
+  get gameInfo (): TMGame {
     return Object.assign(GameService.game)
   },
 
   /**
      * Returns an array of objects containing information about current server players
      */
-  get players(): TMPlayer[] {
+  get players (): TMPlayer[] {
     return [...PlayerService.players]
   },
 
   /**
      * Returns an object containing information about specified player or undefined if player is not on the server
      */
-  getPlayer(login: string): TMPlayer | undefined {
+  getPlayer (login: string): TMPlayer | undefined {
     return PlayerService.players.find(a => a.login === login)
   },
 
   /**
      * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
      */
-  async fetchPlayer(login: string): Promise<any | undefined> {
+  async fetchPlayer (login: string): Promise<any | undefined> {
     return (await PlayerService.fetchPlayer(login))
   },
 
   /**
      * Returns an array of objects containing information about local records on current challenge
      */
-  getLocalRecords(challenge: string, amount: number): TMRecord[] {
+  getLocalRecords (challenge: string, amount: number): TMRecord[] {
     // love me some lambda expressions
     return RecordService.records.filter(r => r.challenge === challenge)
       .sort((a, b) => a.score - b.score).slice(0, amount)
@@ -101,7 +93,7 @@ export const TRAKMAN = {
      * Returns an object containing information about specified player's record on current map
      * or undefined if the player doesn't have a record
      */
-  getPlayerRecord(login: string): TMRecord | undefined {
+  getPlayerRecord (login: string): TMRecord | undefined {
     return RecordService.records.find(a => a.login === login)
   },
 
@@ -116,32 +108,32 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various information about current challenge
      */
-  get challenge(): TMChallenge {
+  get challenge (): TMChallenge {
     return Object.assign(ChallengeService.current)
   },
 
   /**
      * Returns an array of objects containing information about recent messages
      */
-  get messages(): TMMessage[] {
+  get messages (): TMMessage[] {
     return [...ChatService.messages]
   },
 
   /**
      * Returns an array of objects containing information about recent messages from a specified player
      */
-  getPlayerMessages(login: string): TMMessage[] {
+  getPlayerMessages (login: string): TMMessage[] {
     return ChatService.messages.filter(a => a.login === login)
   },
 
   /**
      * Calls a dedicated server method. Throws error if the server responds with error.
      */
-  async call(method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
+  async call (method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
     return await Client.call(method, params, expectsResponse).catch((err: Error) => { throw err })
   },
 
-  async multiCall(expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
+  async multiCall (expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
     const arr: any[] = []
     for (const c of calls) {
       const params = c.params == null ? [] : c.params
@@ -169,7 +161,7 @@ export const TRAKMAN = {
   /**
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
-  async sendMessage(message: string, login?: string): Promise<void> {
+  async sendMessage (message: string, login?: string): Promise<void> {
     if (login != null) {
       await Client.call('ChatSendServerMessageToLogin', [{ string: message }, { string: login }], false)
       return
@@ -177,41 +169,45 @@ export const TRAKMAN = {
     await Client.call('ChatSendServerMessage', [{ string: message }], false)
   },
 
-  async sendManialink(manialink: string, login?: string,expireTime: number = 0, deleteOnClick: boolean = false){
-    if(login != null){
+  async sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
+    if (login != null) {
       await Client.call('SendDisplayManialinkPageToLogin', [
-        {string:login},{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}])
-        return
+        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+      return
     }
-    console.log(await Client.call('SendDisplayManialinkPage', [{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}]))
+    console.log(await Client.call('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }]))
   },
 
   /**
      * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
      */
-  get colours() {
+  get colours () {
     return colours
   },
 
   /**
      * Adds a chat command
      */
-  addCommand(command: TMCommand) {
-    ChatService.addCommand(command)
+  addCommand (command: TMCommand) {
+    ChatService.addCommand(command).then()
   },
 
   /**
      * Adds callback function to execute on given event
      */
-  addListener(event: string, callback: Function) {
+  addListener (event: string, callback: Function) {
     Events.addListener(event, callback)
   },
 
-  get Utils() {
+  async addChallenge (id: string, name: string, author: string, environment: string): Promise<void> {
+    await ChallengeService.add(id, name, author, environment)
+  },
+
+  get Utils () {
     return Utils
   },
 
-  randomUUID() {
+  randomUUID () {
     return randomUUID()
   }
 }

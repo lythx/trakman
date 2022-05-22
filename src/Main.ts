@@ -40,8 +40,6 @@ async function main (): Promise<void> {
   Logger.trace('Fetching challenges...')
   await ChallengeService.initialize()
   Logger.info('Challenge service instantiated')
-  await ChallengeService.push()
-  Logger.info('Challenges are in the database')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
     .catch(err => ErrorHandler.error(err, ''))
@@ -59,6 +57,7 @@ async function main (): Promise<void> {
     await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
   }
+  await RecordService.fetchRecords(ChallengeService.current.id)
 }
 
 await main()

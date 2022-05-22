@@ -4,7 +4,7 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 import { ChatService } from '../src/services/ChatService.js'
 
 const commands: TMCommand[] = [
-    {
+  {
     aliases: ['sgm', 'setgamemode'],
     help: 'Change the gamemode.',
     callback: async (info: MessageInfo) => {
@@ -36,10 +36,10 @@ const commands: TMCommand[] = [
         default:
           return
       }
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has changed the gamemode to ${info.text}.` }], }, { method: 'SetGameMode', params: [{ int: mode }] })
+      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has changed the gamemode to ${info.text}.` }] }, { method: 'SetGameMode', params: [{ int: mode }] })
     },
     privilege: 2
-  },
+  }
 ]
 
 for (const command of commands) { ChatService.addCommand(command) }
