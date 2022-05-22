@@ -9,7 +9,20 @@ export abstract class TMXService {
     return this._current
   }
 
-  static async fetchTrack (trackId: string, game: string = 'TMNF') {
+  static async fetchTrackFile (id: string, game: string = 'TMNF'): Promise<TMXFileData>{
+    const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
+    const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error)=> {throw err})
+    console.log(`https://${prefix}.tm-exchange.com/trackgbx/${id}`)
+    const nameHeader = res.headers.get('content-disposition')   
+    if(nameHeader == null) { throw new Error('Cannot read track name') }
+    //The header is inconsistent for some reason, I hate TMX
+    const name = nameHeader[21] === '"' ?  nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
+    const data = await res.arrayBuffer()
+    const buffer = Buffer.from(data)
+    return  { name, content: buffer.toString('base64') }
+  }
+
+  static async fetchTrackInfo (trackId: string) {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {

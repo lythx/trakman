@@ -48,7 +48,7 @@ export class ChallengeService {
       checkpointsAmount: c.NbCheckpoints
     }
     if (process.env.USE_TMX === 'YES') {
-      await TMXService.fetchTrack(ChallengeService.current.id).catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
+      await TMXService.fetchTrackInfo(ChallengeService.current.id).catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
     }
   }
 
