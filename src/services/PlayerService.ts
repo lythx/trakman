@@ -173,6 +173,7 @@ export class PlayerService {
     } else {
       laps = ChallengeService.current.lapsAmount
     }
+    if(player.checkpoints.length === 0){ return }
     if (cp.lap < player.checkpoints[0].lap + laps) { player.checkpoints.push(cp) }
   }
 }
