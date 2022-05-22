@@ -1,6 +1,6 @@
 'use strict'
 
 interface TMXFileData {
-    readonly name: string
-    readonly content: string 
+  readonly name: string
+  readonly content: string
 }
