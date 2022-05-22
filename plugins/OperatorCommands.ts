@@ -151,6 +151,28 @@ const commands: TMCommand[] = [
         })
     },
     privilege: 1
+  },
+  {
+    aliases: ['afu', 'addfromurl'],
+    help: 'Add a track from an url.',
+    callback: async (info: MessageInfo) => {
+      const [fileName, url] = info.text.split(' ')
+      const res = await fetch(url).catch((err: Error)=> err)
+      if(res instanceof Error){
+        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
+        return
+      }
+      const data = await res.arrayBuffer()
+      const buffer = Buffer.from(data)
+      await TM.call('WriteFile', [{string: fileName+ '.Challenge.Gbx' }, {base64: buffer.toString('base64') }], true)
+      await TM.call('InsertChallenge', [{ string: fileName+ '.Challenge.Gbx' }],true)
+      const insertRes = await TM.call('GetNextChallengeInfo', [], true)
+      const name = insertRes[0].Name
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+      + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
+      + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
+    },
+    privilege: 1
   }
 ]
 
