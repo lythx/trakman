@@ -1,10 +1,10 @@
 import { ChallengeRepository } from '../../src/database/ChallengeRepository.js'
 import { ChallengeService } from '../../src/services/ChallengeService.js'
-import {anything, capture, instance, mock, notNull, verify} from 'ts-mockito'
+import { anything, capture, instance, mock, verify } from 'ts-mockito'
 import { jest } from '@jest/globals'
 import { Client } from '../../src/Client.js'
 import { SpyInstance } from 'jest-mock'
-import {TMXService} from "../../src/services/TMXService";
+import { TMXService } from '../../src/services/TMXService'
 
 let mockedRepo: ChallengeRepository
 let repo: ChallengeRepository
@@ -15,25 +15,25 @@ const track1: object = {
   Name: 'track1',
   UId: 'a',
   Environnement: 'Bay',
-  Author: 'Nadeo',
+  Author: 'Nadeo'
 }
 const track2: object = {
   Name: 'Map 21',
   UId: 'b_21',
   Environnement: 'Stadium',
-  Author: 'miapetardez',
+  Author: 'miapetardez'
 }
 // challengelist expected result
 const list: ChallengeInfo[] = [{
   id: 'a',
   name: 'track1',
   author: 'Nadeo',
-  environment: 'Bay',
-},{
+  environment: 'Bay'
+}, {
   id: 'b_21',
   name: 'Map 21',
   author: 'miapetardez',
-  environment: 'Stadium',
+  environment: 'Stadium'
 }]
 // currentchallengeinfo response
 const currentChallengeInfo: object = {
@@ -80,7 +80,7 @@ test('invalid setCurrent() - error getting current challenge info', async () => 
   client.mockRejectedValueOnce(Error('dont work'))
   await ChallengeService.initialize(repo)
   expect(capture(mockedRepo.add).first()).toStrictEqual(list)
-  //verify(mockedRepo.add(anything())).once()
+  // verify(mockedRepo.add(anything())).once()
   // assert that current track was never set
   expect(ChallengeService.current).toEqual(undefined)
 })
@@ -99,7 +99,7 @@ test('valid push()', async () => {
   // assert that the first parameter of repo.add() is the challenge list (wrapped in an array)
   expect(capture(mockedRepo.add).first()).toStrictEqual(list)
   // verify that repo.add() is called exactly once
-  //verify(mockedRepo.add(notNull())).once()
+  // verify(mockedRepo.add(notNull())).once()
   // assert that the current track actually gets set to the correct one
   expect(ChallengeService.current).toEqual(current)
   // verify that TMXService.fetchTrack() is never called
