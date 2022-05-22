@@ -8,10 +8,10 @@ const plugins: TMEvent[] = [
     callback: async () => {
       TM.sendMessage(
         `${TM.colours.mayablue}||||||||||||||||||TRAKMAN\n`
-        + `${TM.colours.carnationpink}||||||||||||||||||0.0.1A\n`
+        + `${TM.colours.carnationpink}||||||||||||||||||0.0.1a\n`
         + `${TM.colours.white}||||||||||||||||||STARTUP\n`
-        + `${TM.colours.mayablue}||||||||||||||||||SEQUENCE\n`
-        + `${TM.colours.carnationpink}||||||||||||||||||SUCCESSFUL\n`)
+        + `${TM.colours.carnationpink}||||||||||||||||||SEQUENCE\n`
+        + `${TM.colours.mayablue}||||||||||||||||||SUCCESSFUL`)
     }
   },
   {

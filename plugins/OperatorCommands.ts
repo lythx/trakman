@@ -1,7 +1,7 @@
 'use strict'
-import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import fs from 'node:fs/promises'
+import fetch from 'node-fetch'
 import { ErrorHandler } from '../src/ErrorHandler.js'
 import { ChatService } from '../src/services/ChatService.js'
 
@@ -157,20 +157,20 @@ const commands: TMCommand[] = [
     help: 'Add a track from an url.',
     callback: async (info: MessageInfo) => {
       const [fileName, url] = info.text.split(' ')
-      const res = await fetch(url).catch((err: Error)=> err)
-      if(res instanceof Error){
+      const res = await fetch(url).catch((err: Error) => err)
+      if (res instanceof Error) {
         TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
         return
       }
       const data = await res.arrayBuffer()
       const buffer = Buffer.from(data)
-      await TM.call('WriteFile', [{string: fileName+ '.Challenge.Gbx' }, {base64: buffer.toString('base64') }], true)
-      await TM.call('InsertChallenge', [{ string: fileName+ '.Challenge.Gbx' }],true)
+      await TM.call('WriteFile', [{ string: fileName + '.Challenge.Gbx' }, { base64: buffer.toString('base64') }], true)
+      await TM.call('InsertChallenge', [{ string: fileName + '.Challenge.Gbx' }], true)
       const insertRes = await TM.call('GetNextChallengeInfo', [], true)
       const name = insertRes[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-      + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-      + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
+        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
+        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
     },
     privilege: 1
   }
