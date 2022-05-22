@@ -18,35 +18,49 @@ const commands: TMCommand[] = [
         file = (await fs.readFile(path, 'base64'))
       } catch (err: any) {
         ErrorHandler.error('Error when reading file on addlocal', err.message)
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}File ${TM.colours.white + path} is not accessible.`)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}File ${TM.colours.white + path} is not accessible.`).then()
         return
       }
       try {
         await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       } catch (err: any) {
-        ErrorHandler.error('Failed to write file', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`)
+        ErrorHandler.error('Failed to write file', err.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`).then()
         return
       }
       try {
         await TM.call('InsertChallenge', [{ string: fileName }])
       } catch (err: any) {
-        ErrorHandler.error('Failed to insert challenge to jukebox', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`)
+        ErrorHandler.error('Failed to insert challenge to jukebox', err.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`).then()
         return
       }
       let res
       try {
         res = await TM.call('GetNextChallengeInfo')
       } catch (err: any) {
-        ErrorHandler.error('Failed to get next challenge info', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`)
+        ErrorHandler.error('Failed to get next challenge info', err.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`).then()
         return
       }
       const name = res?.[0]?.Name
-      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name || 'TODO: FIX THIS', true)}${TM.colours.folly} from local files.`)
+      if (name == null) {
+        ErrorHandler.error('Next challenge name is undefined. Cancelling transaction.')
+        TM.multiCall(false,
+          {method: 'ChatSendServerMessage', params: [{string: 'Next challenge name is undefined. Cancelling transaction.' }]},
+          {method: 'RemoveChallenge', params: [{ string: fileName }]}).then()
+        return
+      }
+      try {
+        await TM.addChallenge(res[0].UId, name, res[0].Author, res[0].Environnement)
+      } catch (err: any) {
+        ErrorHandler.error('Error adding challenge to database. Cancelling transaction.')
+        TM.multiCall(false,
+          {method: 'ChatSendServerMessage', params: [{string: 'Error adding challenge to database. Cancelling transaction.' }]},
+          {method: 'RemoveChallenge', params: [{ string: fileName }]}).then()
+        return
+      }
+      TM.sendMessage(`Player ${info.nickName} added and jukeboxed map ${name}`).then()
     },
     privilege: 1
   },
@@ -159,7 +173,7 @@ const commands: TMCommand[] = [
       const [fileName, url] = info.text.split(' ')
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
-        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
+        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login).then()
         return
       }
       const data = await res.arrayBuffer()
@@ -170,10 +184,10 @@ const commands: TMCommand[] = [
       const name = insertRes[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
         + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
+        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`).then()
     },
     privilege: 1
   }
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { ChatService.addCommand(command).then() }

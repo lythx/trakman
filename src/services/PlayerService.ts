@@ -88,7 +88,7 @@ export class PlayerService {
         nationCode,
         timePlayed: Number(playerData.timeplayed),
         joinTimestamp: Date.now(),
-        visits: Number(playerData.visits + 1),
+        visits: Number(playerData.visits + 1 as string),
         checkpoints: [],
         wins: Number(playerData.wins),
         privilege: Number(playerData.privilege)
@@ -133,8 +133,8 @@ export class PlayerService {
     const res = (await this.repo.get(login))?.[0]
     if (res == null) { return null }
     const nation = countries.find(a => a.code === res.nation)?.name
-    if (!nation) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
-    const info: DBPlayerInfo = {
+    if (nation == null) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
+    return {
       login: res.login,
       nickName: res.nickname,
       nationCode: res.nation,
@@ -143,7 +143,6 @@ export class PlayerService {
       privilege: res.privilege,
       wins: res.wins
     }
-    return info
   }
 
   static async setPrivilege (login: string, privilege: number): Promise<void> {
