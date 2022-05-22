@@ -169,13 +169,13 @@ export const TRAKMAN = {
     await Client.call('ChatSendServerMessage', [{ string: message }], false)
   },
 
-  async sendManialink(manialink: string, login?: string,expireTime: number = 0, deleteOnClick: boolean = false){
-    if(login != null){
+  async sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
+    if (login != null) {
       await Client.call('SendDisplayManialinkPageToLogin', [
-        {string:login},{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}])
-        return
+        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+      return
     }
-    console.log(await Client.call('SendDisplayManialinkPage', [{string: manialink}, {int: expireTime}, {boolean: deleteOnClick}]))
+    console.log(await Client.call('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }]))
   },
 
   /**

@@ -1,13 +1,13 @@
 'use strict'
 
-import {Client} from '../Client.js'
-import {PlayerRepository} from '../database/PlayerRepository.js'
+import { Client } from '../Client.js'
+import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
-import {Events} from '../Events.js'
-import {ErrorHandler} from '../ErrorHandler.js'
+import { Events } from '../Events.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
-import {ChallengeService} from './ChallengeService.js'
-import {GameService} from './GameService.js'
+import { ChallengeService } from './ChallengeService.js'
+import { GameService } from './GameService.js'
 
 export class PlayerService {
   private static _players: TMPlayer[] = []
