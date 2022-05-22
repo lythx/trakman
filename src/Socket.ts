@@ -40,7 +40,6 @@ export class Socket extends net.Socket {
     const startTimestamp = Date.now()
     return await new Promise(async (resolve, reject) => {
       const poll = () => {
-        setImmediate(poll)
         if (this.handshakeStatus === 'Handshake success') {
           resolve(this.handshakeStatus)
           return
@@ -51,6 +50,7 @@ export class Socket extends net.Socket {
           reject(new Error('No response from the server'))
           return
         }
+        setImmediate(poll)
       }
       setImmediate(poll)
     })
