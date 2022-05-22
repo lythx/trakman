@@ -43,6 +43,50 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
+    aliases: ['sp', 'setpwd', 'setpassword'],
+    help: 'Change the player password.',
+    callback: async (info: MessageInfo) => {
+      const regex: RegExp = /[\p{ASCII}]+/u
+      if (!regex.test(info.text)) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+              + `the player password to ${info.text}$z$s${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'SetServerPassword',
+          params: [{ string: info.text }]
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
+    help: 'Change the spectator password.',
+    callback: async (info: MessageInfo) => {
+      const regex: RegExp = /[\p{ASCII}]+/u
+      if (!regex.test(info.text)) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+              + `the spectator password to ${info.text}$z$s${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'SetServerPasswordForSpectator',
+          params: [{ string: info.text }]
+        })
+    },
+    privilege: 3
+  },
+  {
     aliases: ['smp', 'setmaxplayers'],
     help: 'Change the max players amount.',
     callback: async (info: MessageInfo) => {
