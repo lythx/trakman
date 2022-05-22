@@ -27,11 +27,11 @@ export const TRAKMAN = {
   },
 
   stripModifiers (str: string, removeColors: boolean = true) {
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)(.*?)/i, '$2')
-    str = str.replace(/\${1}[SHWILONZ]/i, '')
-    if (removeColors) { str = str.replace(/\${1}([0-9A-F]){3}/gi, '') }
+    str = str.replace(/\$([LHP])\[.*?](.*?)\$(LHP)/i, '$2')
+    str = str.replace(/\$(LHP)\[.*?](.*?)/i, '$2')
+    str = str.replace(/\$(LHP)(.*?)/i, '$2')
+    str = str.replace(/\$[SHWILONZ]/i, '')
+    if (removeColors) { str = str.replace(/\$([\dA-F]){3}/gi, '') }
     return str
   },
 
@@ -162,11 +162,20 @@ export const TRAKMAN = {
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
   async sendMessage (message: string, login?: string): Promise<void> {
-    if (login) {
+    if (login != null) {
       await Client.call('ChatSendServerMessageToLogin', [{ string: message }, { string: login }], false)
       return
     }
     await Client.call('ChatSendServerMessage', [{ string: message }], false)
+  },
+
+  async sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
+    if (login != null) {
+      await Client.call('SendDisplayManialinkPageToLogin', [
+        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+      return
+    }
+    console.log(await Client.call('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }]))
   },
 
   /**
@@ -180,7 +189,7 @@ export const TRAKMAN = {
      * Adds a chat command
      */
   addCommand (command: TMCommand) {
-    ChatService.addCommand(command)
+    ChatService.addCommand(command).then()
   },
 
   /**
@@ -188,6 +197,10 @@ export const TRAKMAN = {
      */
   addListener (event: string, callback: Function) {
     Events.addListener(event, callback)
+  },
+
+  async addChallenge (id: string, name: string, author: string, environment: string): Promise<void> {
+    await ChallengeService.add(id, name, author, environment)
   },
 
   get Utils () {
