@@ -131,7 +131,7 @@ const commands: TMCommand[] = [
       }
       if (targetInfo.privilege > 1) {
         await TM.sendMessage(`Player ${info.nickName}$z$s has removed ${targetInfo.nickName}$z$s's privileges.`)
-        await PlayerService.setPrivilege(targetLogin, 2)
+        await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === 0) {
         await TM.sendMessage(`${targetInfo.nickName}$z$s has no privileges.`, callerLogin)
       }
