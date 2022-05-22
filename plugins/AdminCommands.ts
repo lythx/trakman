@@ -1,5 +1,4 @@
 'use strict'
-import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import { ChatService } from '../src/services/ChatService.js'
 
@@ -36,7 +35,19 @@ const commands: TMCommand[] = [
         default:
           return
       }
-      await TM.multiCall(false, { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${colours.yellow} has changed the gamemode to ${info.text}.` }] }, { method: 'SetGameMode', params: [{ int: mode }] })
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+              + `the gamemode to ${TM.colours.white + info.text.toUpperCase()}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'SetGameMode',
+          params: [{ int: mode }]
+        })
     },
     privilege: 2
   }

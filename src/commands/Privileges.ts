@@ -11,27 +11,29 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage('No login specified.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 3) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Masteradmin.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Masteradmin.`)
         await PlayerService.setPrivilege(targetLogin, 3)
       } else if (targetInfo.privilege === 3) {
-        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Masteradmin.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Masteradmin.`, callerLogin)
       }
     },
     privilege: 4
@@ -43,29 +45,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage('No login specified.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 2) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Admin.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 2) {
-        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Admin.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has demoted ${targetInfo.nickName}$z$s to Admin.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has demoted ` +
+          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
@@ -78,29 +84,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage('No login specified.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 1) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has promoted ${targetInfo.nickName}$z$s to Operator.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
-        await TM.sendMessage(`${targetInfo.nickName}$z$s is already Operator.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has demoted ${targetInfo.nickName}$z$s to Operator.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has demoted ` +
+          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
@@ -113,27 +123,29 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        await TM.sendMessage('No login specified.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        await TM.sendMessage('Cannot find the specified login in the database.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        await TM.sendMessage('You cannot demote the server owner.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        await TM.sendMessage('You cannot control your own privileges.', callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege > 1) {
-        await TM.sendMessage(`Player ${info.nickName}$z$s has removed ${targetInfo.nickName}$z$s's privileges.`)
+        await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has removed ` +
+          `permissions of ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly}.`)
         await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === 0) {
-        await TM.sendMessage(`${targetInfo.nickName}$z$s has no privileges.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} has no priveleges.`, callerLogin)
       }
     },
     privilege: 2

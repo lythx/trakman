@@ -25,9 +25,7 @@ export abstract class ChatService {
         return
       }
       if (info.privilege < command.privilege) {
-        await Client.call('ChatSendServerMessageToLogin',
-          [{ string: '$f00You have no privileges to use this command' },
-            { string: info.login }])
+        await Client.call('ChatSendServerMessageToLogin', [{ string: '$ff0» $f00You have no permission to use this command.' }, { string: info.login }])
         return
       }
       const text = input.split(' ').splice(1).join(' ')
