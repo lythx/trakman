@@ -1,9 +1,9 @@
 'use strict'
-import {RecordRepository} from '../database/RecordRepository.js'
-import {PlayerService} from './PlayerService.js'
-import {ChallengeService} from './ChallengeService.js'
-import {Events} from '../Events.js'
-import {GameService} from './GameService.js'
+import { RecordRepository } from '../database/RecordRepository.js'
+import { PlayerService } from './PlayerService.js'
+import { ChallengeService } from './ChallengeService.js'
+import { Events } from '../Events.js'
+import { GameService } from './GameService.js'
 
 export class RecordService {
   private static repo: RecordRepository
@@ -28,7 +28,7 @@ export class RecordService {
   static async fetchRecord (challengeId: string, login: string): Promise<TMRecord | null> {
     const res = (await this.repo.getByLogin(challengeId, login))?.[0]
     if (res == null) { return null }
-    return {challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints}
+    return { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
   static get records (): TMRecord[] {
@@ -119,7 +119,7 @@ export class RecordService {
         visits: player.visits,
         position
       }
-      this._records = this._records.filter(a => a.login != login)
+      this._records = this._records.filter(a => a.login !== login)
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       await this.repo.update(recordInfo)

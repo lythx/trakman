@@ -52,7 +52,7 @@ export class ChallengeService {
     }
     if (process.env.USE_TMX === 'YES') {
       await TMXService.fetchTrack(ChallengeService.current.id)
-        .catch((err: Error) => ErrorHandler.error(err.toString(), 'Either TMX is down or map is not on TMX'))
+        .catch((err: Error) => ErrorHandler.error(err.message, 'Either TMX is down or map is not on TMX'))
     }
   }
 
@@ -100,6 +100,6 @@ export class ChallengeService {
   }
 
   static async add (id: string, name: string, author: string, environment: string): Promise<void> {
-    await this.repo.add({id: id, name: name, author: author, environment: environment})
+    await this.repo.add({ id: id, name: name, author: author, environment: environment })
   }
 }
