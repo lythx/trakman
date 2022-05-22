@@ -1,6 +1,5 @@
 'use strict'
 import { TRAKMAN as TM } from '../src/Trakman.js'
-import { ChatService } from '../src/services/ChatService.js'
 
 const commands: TMCommand[] = [
   {
@@ -168,7 +167,7 @@ const commands: TMCommand[] = [
         })
     },
     privilege: 3
-  },
+  }
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { TM.addCommand(command) }

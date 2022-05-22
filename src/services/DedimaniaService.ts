@@ -39,8 +39,8 @@ export abstract class DedimaniaService {
     )
       .catch(err => ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`, err))
     if (dedis == null) { throw new Error('unable to fetch records') }
-    for (const d of dedis) {
-      const record: TMDedi = { id: d.id, login: d.login, score: d.score, checkpoints: [...d.checkpoints], date: d.date }
+    for (const d of dedis[0].Records) {
+      const record: TMDedi = { login: d.Login, score: d.Best, checkpoints: d.Checks, date: d.date }
       this._dedis.push(record)
     }
     return this._dedis
