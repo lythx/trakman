@@ -37,21 +37,22 @@ export class Socket extends net.Socket {
   * @returns {Promise<String>} handshake status
   */
   async awaitHandshake (): Promise<string> {
-    let i = 0
+    const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
-      const interval = setInterval(() => {
-        i++
+      const poll = () => {
         if (this.handshakeStatus === 'Handshake success') {
           resolve(this.handshakeStatus)
-          clearInterval(interval)
+          return
         } else if (this.handshakeStatus === 'Server uses wrong GBX protocol') {
           reject(new Error(this.handshakeStatus))
-          clearInterval(interval)
-        } else if (i === 20) { // stop poll after 5 seconds
+          return
+        } else if (Date.now() - startTimestamp > 5000) {
           reject(new Error('No response from the server'))
-          clearInterval(interval)
+          return
         }
-      }, 250)
+        setImmediate(poll)
+      }
+      setImmediate(poll)
     })
   }
 
@@ -60,10 +61,9 @@ export class Socket extends net.Socket {
   * @returns {Promise<any[]>} array of server return values
   */
   async awaitResponse (id: number, method: string): Promise<any[]> {
-    let i = 0
+    const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
-      const interval = setInterval(() => {
-        i++
+      const poll = () => {
         if (this.responses.some(a => a.id === id && a.status === 'completed')) {
           const response = this.responses.find(a => a.id === id && a.status === 'completed')
           if (response === undefined) {
@@ -75,10 +75,14 @@ export class Socket extends net.Socket {
             return
           }
           resolve(response.json)
-          clearInterval(interval)
+          return
+        } else if (Date.now() - startTimestamp > 15000) {
+          reject(new Error(`No server response for call ${method}`))
+          return
         }
-        if (i === 50) { reject(new Error(`No server response for call ${method}`)) } // reject after 15 seconds
-      }, 300)
+        setImmediate(poll)
+      }
+      setImmediate(poll)
     })
   }
 

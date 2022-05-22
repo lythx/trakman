@@ -1,5 +1,4 @@
 'use strict'
-import colours from '../src/data/Colours.json' assert {type: 'json'}
 import { ChatService } from '../src/services/ChatService.js'
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
@@ -10,7 +9,7 @@ const commands: TMCommand[] = [
     aliases: ['ct', 'colourtest'],
     help: 'Display all the colours in order [TO BE REMOVED].',
     callback: async () => {
-      const col = Object.values(colours)
+      const col = Object.values(TM.colours)
       await TM.sendMessage(col.map((v) => `${v}>`).join(' '))
     },
     privilege: 0
@@ -68,8 +67,22 @@ const commands: TMCommand[] = [
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
-      await TM.multiCall(false, { method: 'ForceSpectator', params: [{ string: info.login }, { int: 1 }] }, { method: 'ForceSpectator', params: [{ string: info.login }, { int: 0 }] }, { method: 'ChatSendServerMessage', params: [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }] })
-      await new Promise((r) => setTimeout(r, 100)) // Need a timeout for server to register that player is a spectator
+      await TM.multiCall(false,
+        {
+          method: 'ForceSpectator',
+          params: [{ string: info.login }, { int: 1 }]
+        },
+        {
+          method: 'ForceSpectator',
+          params: [{ string: info.login }, { int: 0 }]
+        },
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `$g[${info.nickName}$z$s$g] Away from keyboard!`
+          }]
+        })
+      await new Promise((r) => setTimeout(r, 50)) // Need a timeout for server to register that player is a spectator
       TM.call('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0
@@ -78,7 +91,7 @@ const commands: TMCommand[] = [
     aliases: ['me', 'mfw'],
     help: 'Express the deep emotions hidden within your sinful soul.',
     callback: async (info: MessageInfo) => {
-      await TM.sendMessage(`$i${info.nickName}$z$s$i${colours.amber} ${info.text}`)
+      await TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${info.text}`)
     },
     privilege: 0
   },
@@ -102,7 +115,7 @@ const commands: TMCommand[] = [
     aliases: ['loool'],
     help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
     callback: async (info: MessageInfo) => {
-      await TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
+      await TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
   }

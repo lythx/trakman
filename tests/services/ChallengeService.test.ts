@@ -70,7 +70,7 @@ beforeEach(async () => {
   // intercept the Client.call() method, become nadeo
   client = jest.spyOn(Client, 'call')
   // intercept TMXService.fetchTrack()
-  tmx = jest.spyOn(TMXService, 'fetchTrack')
+  tmx = jest.spyOn(TMXService, 'fetchTrackInfo')
 })
 
 test('invalid setCurrent() - error getting current challenge info', async () => {
