@@ -1,13 +1,13 @@
 'use strict'
-import { randomUUID } from 'crypto'
 import { RecordRepository } from '../database/RecordRepository.js'
 import { PlayerService } from './PlayerService.js'
-import { ErrorHandler } from '../ErrorHandler.js'
+import { ChallengeService } from './ChallengeService.js'
 import { Events } from '../Events.js'
+import { GameService } from './GameService.js'
 
 export class RecordService {
   private static repo: RecordRepository
-  private static readonly _records: TMRecord[] = []
+  private static _records: TMRecord[] = []
 
   static async initialize (repo: RecordRepository = new RecordRepository()): Promise<void> {
     this.repo = repo
@@ -15,9 +15,20 @@ export class RecordService {
   }
 
   static async fetchRecords (challengeId: string): Promise<TMRecord[]> {
+    this._records.length = 0
     const records = await this.repo.get(challengeId)
-    this._records.push(...records.map(r => new TMRecord(r.challenge, r.login, r.score, r.checkpoints, r.id, r.date)))
+    records.sort((a, b) => a.score - b.score)
+    for (const r of records) {
+      this._records.push({ challenge: challengeId, score: r.score, login: r.login, date: r.date, checkpoints: r.checkpoints })
+    }
+    Events.emitEvent('Controller.LocalRecords', records)
     return this._records
+  }
+
+  static async fetchRecord (challengeId: string, login: string): Promise<TMRecord | null> {
+    const res = (await this.repo.getByLogin(challengeId, login))?.[0]
+    if (res == null) { return null }
+    return { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
   static get records (): TMRecord[] {
@@ -25,66 +36,93 @@ export class RecordService {
   }
 
   static async add (challenge: string, login: string, score: number): Promise<void> {
-    let player: TMPlayer
-    try {
-      player = PlayerService.getPlayer(login)
-    } catch (e: any) {
-      ErrorHandler.error(e.message.toString())
+    const date = new Date()
+    const player = PlayerService.getPlayer(login)
+    const cpsPerLap = ChallengeService.current.checkpointsAmount
+    let laps
+    if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
+      laps = 1
+    } else if (GameService.game.gameMode === 3) {
+      laps = GameService.game.lapsNo
+    } else if (GameService.game.gameMode === 4) {
+      return // TODO STUNTS MODE
+    } else {
+      laps = ChallengeService.current.lapsAmount
+    }
+    const cpAmount = cpsPerLap * laps
+    const checkpoints = [...player.checkpoints.map(a => a.time)]
+    if (checkpoints.length !== cpAmount - 1) {
+      checkpoints.length = 0
       return
     }
-    const record = new TMRecord(challenge, login, score, player.checkpoints.map(c => c.time))
-    const res = await this.repo.add(record)
-    let status = ''
-    if (res?.rows?.[0].id != null) {
-      record.id = res.rows[0].id
-      // add or replace the player's current record on this track
-      const existing = this._records.findIndex(r => r.login === login && r.challenge === challenge)
-      if (existing === -1) {
-        this._records.push(record)
-        status = ' got the '
-      } else {
-        this._records[existing] = record
-        status = ' improved their '
+    const pb = this._records.find(a => a.login === login)?.score
+    const position = this._records.filter(a => a.score < score).length + 1
+    if (pb == null) {
+      const recordInfo: RecordInfo = {
+        challenge,
+        login,
+        score,
+        date,
+        checkpoints,
+        status: 'new',
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        timePlayed: player.timePlayed,
+        joinTimestamp: player.joinTimestamp,
+        wins: player.wins,
+        privilege: player.privilege,
+        visits: player.visits,
+        position
       }
-    } else if (res === 'equal') {
-      status = ' equaled their '
+      this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      Events.emitEvent('Controller.PlayerRecord', recordInfo)
+      await this.repo.add(recordInfo)
+      return
     }
-    if (status !== '') {
-      Events.emitEvent('Controller.PlayerRecord', [record, status])
+    if (score === pb) {
+      const recordInfo: RecordInfo = {
+        challenge,
+        login,
+        score,
+        date,
+        checkpoints,
+        status: 'equal',
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        timePlayed: player.timePlayed,
+        joinTimestamp: player.joinTimestamp,
+        wins: player.wins,
+        privilege: player.privilege,
+        visits: player.visits,
+        position
+      }
+      Events.emitEvent('Controller.PlayerRecord', recordInfo)
+      return
     }
-  }
-}
-
-export class TMRecord {
-  public id: string
-  private readonly _challenge: string
-  private readonly _login: string
-  private readonly _score: number
-  public date: Date
-  private readonly _checkpoints: number[]
-
-  constructor (challenge: string, login: string, score: number, checkpoints: number[], id: string = randomUUID(), date: Date = new Date()) {
-    this.id = id
-    this._challenge = challenge
-    this._login = login
-    this._score = score
-    this._checkpoints = checkpoints
-    this.date = date
-  }
-
-  get challenge (): string {
-    return this._challenge
-  }
-
-  get login (): string {
-    return this._login
-  }
-
-  get score (): number {
-    return this._score
-  }
-
-  get checkpoints (): number[] {
-    return this._checkpoints
+    if (score < pb) {
+      const recordInfo: RecordInfo = {
+        challenge,
+        login,
+        score,
+        date,
+        checkpoints,
+        status: 'improved',
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        timePlayed: player.timePlayed,
+        joinTimestamp: player.joinTimestamp,
+        wins: player.wins,
+        privilege: player.privilege,
+        visits: player.visits,
+        position
+      }
+      this._records = this._records.filter(a => a.login !== login)
+      this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      Events.emitEvent('Controller.PlayerRecord', recordInfo)
+      await this.repo.update(recordInfo)
+    }
   }
 }

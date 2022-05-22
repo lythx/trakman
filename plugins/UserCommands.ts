@@ -69,7 +69,7 @@ const commands: TMCommand[] = [
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
       await TM.multiCall(false, { method: 'ForceSpectator', params: [{ string: info.login }, { int: 1 }] }, { method: 'ForceSpectator', params: [{ string: info.login }, { int: 0 }] }, { method: 'ChatSendServerMessage', params: [{ string: `$g[${info.nickName}$z$s$g] Away from keyboard!` }] })
-      await new Promise(((r) => setTimeout(r, 100))) // Need a timeout for server to register that player is a spectator
+      await new Promise((r) => setTimeout(r, 100)) // Need a timeout for server to register that player is a spectator
       TM.call('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0

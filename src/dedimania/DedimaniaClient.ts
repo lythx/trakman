@@ -68,12 +68,12 @@ export abstract class DedimaniaClient {
       let i = 0
       const interval = setInterval(() => {
         if (this.response.status === 'completed') {
-          if (this.response.isError) {
+          if (this.response.isError != null) {
             ErrorHandler.error('Dedimania server responded with an error',
                             `${this.response.errorString} Code: ${this.response.errorCode}`)
             reject(new Error(this.response.errorString?.toString()))
           } else {
-            if (!this.response.sessionId) {
+            if (this.response.sessionId == null) {
               ErrorHandler.error('Dedimania server didn\'t send sessionId',
                                 `Received:
                                 ${this.response.data}`)

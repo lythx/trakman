@@ -6,8 +6,8 @@ import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
-import { GameError, GameService } from './GameService.js'
 import { ChallengeService } from './ChallengeService.js'
+import { GameService } from './GameService.js'
 
 export class PlayerService {
   private static _players: TMPlayer[] = []
@@ -88,7 +88,7 @@ export class PlayerService {
         nationCode,
         timePlayed: Number(playerData.timeplayed),
         joinTimestamp: Date.now(),
-        visits: Number(playerData.visits + 1),
+        visits: Number(playerData.visits + 1 as string),
         checkpoints: [],
         wins: Number(playerData.wins),
         privilege: Number(playerData.privilege)
@@ -133,8 +133,8 @@ export class PlayerService {
     const res = (await this.repo.get(login))?.[0]
     if (res == null) { return null }
     const nation = countries.find(a => a.code === res.nation)?.name
-    if (!nation) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
-    const info: DBPlayerInfo = {
+    if (nation == null) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
+    return {
       login: res.login,
       nickName: res.nickname,
       nationCode: res.nation,
@@ -143,7 +143,6 @@ export class PlayerService {
       privilege: res.privilege,
       wins: res.wins
     }
-    return info
   }
 
   static async setPrivilege (login: string, privilege: number): Promise<void> {
@@ -159,32 +158,20 @@ export class PlayerService {
    * @return {Promise<void>}
    */
   static async addCP (login: string, cp: TMCheckpoint): Promise<void> {
-    try {
-      const player = this.getPlayer(login)
-      const len = player.checkpoints.length
-      let divisor: number | undefined
-      if (GameService.gameMode === 0) {
-        divisor = GameService.roundsForcedLaps
-      } else {
-        divisor = ChallengeService.current.laps
-      }
-      if (divisor == null) {
-        throw new GameError('Cannot get current map\'s laps')
-      }
-      const lap = cp.lap % divisor
-      if (lap === 0 && cp.index === 0) {
-        if (len !== 0) {
-          throw new GameError('Something went horribly wrong, this is supposed to be the first checkpoint but somehow the array is not empty')
-        }
-        if (cp.time === 0) {
-          throw new GameError('Checkpoint time cannot be 0.')
-        }
-      } else if (cp.time === player.checkpoints[len - 1].time) {
-        throw new GameError('Checkpoint time cannot be the same as the last.')
-      }
-      player.checkpoints.push(cp)
-    } catch (e: any) {
-      ErrorHandler.error('Error adding a checkpoint time:', e.message.toString())
+    const player = this.getPlayer(login)
+    if (cp.index === 0) {
+      player.checkpoints.unshift(cp)
+      player.checkpoints.length = 1
+      return
     }
+    let laps
+    if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
+      laps = 1
+    } else if (GameService.game.gameMode === 3) {
+      laps = GameService.game.lapsNo
+    } else {
+      laps = ChallengeService.current.lapsAmount
+    }
+    if (cp.lap < player.checkpoints[0].lap + laps) { player.checkpoints.push(cp) }
   }
 }
