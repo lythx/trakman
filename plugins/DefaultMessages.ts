@@ -2,38 +2,39 @@
 
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-const c1 = TM.colours.white
-const c2 = TM.colours.folly
-
 const plugins: TMEvent[] = [
   {
     event: 'Controller.Ready',
     callback: async () => {
-      TM.sendMessage(`${c2}TRAKMAN ${c1}started${c2}.${c1} NICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`)
+      TM.sendMessage(
+        `${TM.colours.mayablue}||||||||||||||||||TRAKMAN\n`
+        + `${TM.colours.carnationpink}||||||||||||||||||0.0.1A\n`
+        + `${TM.colours.white}||||||||||||||||||STARTUP\n`
+        + `${TM.colours.mayablue}||||||||||||||||||SEQUENCE\n`
+        + `${TM.colours.carnationpink}||||||||||||||||||SUCCESSFUL\n`)
     }
   },
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: TMPlayer) => {
-      const title = TM.getTitle(player)
-      const nick = TM.stripModifiers(player.nickName)
-      const msg = `»» ${c2}${title}${c1}: ${nick}$z$s${c2} Country${c1}: ${player.nation} ${c2}Visits: ${c1}${player.visits}${c2}.`
-      TM.sendMessage(msg)
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(player)}${TM.colours.white}: `
+        + `${TM.stripModifiers(player.nickName, true)}${TM.colours.folly} Country${TM.colours.white}: `
+        + `${player.nation} ${TM.colours.folly}Visits${TM.colours.white}: ${player.visits}${TM.colours.folly}.`)
     }
   },
   {
     event: 'Controller.PlayerLeave',
     callback: async (player: PlayerInfo) => {
-      const nick = TM.stripModifiers(player.nickName)
-      const msg = `»» ${c1}${nick}$z$s${c2} left after ${c1}${TM.msToTime(player.sessionTime)}${c2}.`
-      TM.sendMessage(msg)
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(player.nickName, true)}${TM.colours.folly} `
+        + `has quit after ${TM.colours.white + TM.msToTime(player.sessionTime)}${TM.colours.folly}.`)
     }
   },
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      const msg = `Player $z${info.nickName}$z${TM.colours.white}$s ${info.status} ${TM.Utils.getPositionString(info.position)} local record: ${TM.Utils.getTimeString(info.score)}`
-      await TM.sendMessage(msg)
+      await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} `
+        + `${info.status} ${TM.colours.white + TM.Utils.getPositionString(info.position)}${TM.colours.folly} `
+        + `local record. Time${TM.colours.white}: ${TM.Utils.getTimeString(info.score)}`)
     }
   },
   {
