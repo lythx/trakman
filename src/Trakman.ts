@@ -27,11 +27,11 @@ export const TRAKMAN = {
   },
 
   stripModifiers (str: string, removeColors: boolean = true) {
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)\[.*?\](.*?)/i, '$2')
-    str = str.replace(/\${1}(L|H|P)(.*?)/i, '$2')
-    str = str.replace(/\${1}[SHWILONZ]/i, '')
-    if (removeColors) { str = str.replace(/\${1}([0-9A-F]){3}/gi, '') }
+    str = str.replace(/\$([LHP])\[.*?](.*?)\$(LHP)/i, '$2')
+    str = str.replace(/\$(LHP)\[.*?](.*?)/i, '$2')
+    str = str.replace(/\$(LHP)(.*?)/i, '$2')
+    str = str.replace(/\$[SHWILONZ]/i, '')
+    if (removeColors) { str = str.replace(/\$([\dA-F]){3}/gi, '') }
     return str
   },
 
@@ -188,6 +188,10 @@ export const TRAKMAN = {
      */
   addListener (event: string, callback: Function) {
     Events.addListener(event, callback)
+  },
+
+  async addChallenge (id: string, name: string, author: string, environment: string): Promise<void> {
+    await ChallengeService.add(id, name, author, environment)
   },
 
   get Utils () {

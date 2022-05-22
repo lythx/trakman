@@ -4,7 +4,6 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 import fs from 'node:fs/promises'
 import { ErrorHandler } from '../src/ErrorHandler.js'
 import { ChatService } from '../src/services/ChatService.js'
-import {ChallengeService} from "../src/services/ChallengeService";
 
 const commands: TMCommand[] = [
   {
@@ -53,7 +52,7 @@ const commands: TMCommand[] = [
         return
       }
       try {
-        await ChallengeService.add(res[0].UId, name, res[0].Author, res[0].Environnement)
+        await TM.addChallenge(res[0].UId, name, res[0].Author, res[0].Environnement)
       } catch (err: any) {
         ErrorHandler.error('Error adding challenge to database. Cancelling transaction.')
         TM.multiCall(false,
