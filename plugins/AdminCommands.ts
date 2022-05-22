@@ -1,7 +1,6 @@
 'use strict'
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import { ChatService } from '../src/services/ChatService.js'
-import { getAllJSDocTagsOfKind } from 'typescript'
 
 const commands: TMCommand[] = [
   {
