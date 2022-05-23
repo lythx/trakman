@@ -173,6 +173,7 @@ export class PlayerService {
       laps = ChallengeService.current.lapsAmount
     }
     if (player.checkpoints.length === 0) { return }
-    if (cp.lap < player.checkpoints[0].lap + laps) { player.checkpoints.push(cp) }
+    const correctLap = player.checkpoints[0].lap + laps
+    if (cp.lap < correctLap || (cp.lap === correctLap && cp.index === ChallengeService.current.checkpointsAmount - 1 )) { player.checkpoints.push(cp) }
   }
 }
