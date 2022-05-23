@@ -14,6 +14,7 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
+        // [0] = Login, [1] = IsSpectator
         if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
@@ -23,13 +24,15 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params: any[]) => {
+        // [0] = Login
         await PlayerService.leave(params[0])
       }
     },
     {
       event: 'TrackMania.PlayerChat',
       callback: async (params: any[]) => {
-        if (params[0] === 0) { // check if server message
+        // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCmd
+        if (params[0] === 0) { // Ignore server messages
           return
         }
         await ChatService.add(params[1], params[2])
@@ -38,8 +41,8 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async (params: any[]) => {
-        // Store current checkpoints, check for incoherences, ensure index isn't fucked up
-        if (params[0] === 0) { // check if null player
+        // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
+        if (params[0] === 0) { // Ignore inexistent people
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
@@ -48,7 +51,8 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params: any[]) => { // params are PlayerUid, Login, Score
+      callback: async (params: any[]) => {
+        // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
         if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
           return
         }
@@ -61,38 +65,38 @@ export class Listeners {
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
           return
         }
-        await RecordService.add(ChallengeService.current.id, params[1], params[2])
         // Store/update finish time in db
+        await RecordService.add(ChallengeService.current.id, params[1], params[2])
       }
     },
     {
       event: 'TrackMania.BeginRace',
       callback: async (params: any[]) => {
-        // Mostly ui updates
+        // [0] = Challenge
       }
     },
     {
       event: 'TrackMania.EndRace',
       callback: async (params: any[]) => {
-        // Mostly ui updates
+        // [0] = Rankings[arr], [1] = Challenge
       }
     },
     {
       event: 'TrackMania.BeginRound',
       callback: async () => {
-        // I'm assuming this is ROUNDS only, will figure out later
+        // No params, rounds mode only
       }
     },
     {
       event: 'TrackMania.EndRound',
       callback: async () => {
-        // I'm assuming this is ROUNDS only, will figure out later
+        // No params, rounds mode only
       }
     },
     {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]) => {
-        // Similar to BeginRace, albeit gives more information to process
+        // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
@@ -108,12 +112,14 @@ export class Listeners {
     {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]) => {
-        // Similar to EndRace, albeit gives more information to process
+        // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
       }
     },
     {
       event: 'TrackMania.StatusChanged',
       callback: async (params: any[]) => {
+        // [0] = StatusCode, [1] = StatusName
+        // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play
         // if (params[1][0] == 4)
@@ -122,37 +128,42 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: async (params: any[]) => {
-        // Handle player interaction with manialinks
+        // [0] = PlayerUid, [1] = Login, [2] = Answer
+        // Handle player interaction with Manialinks
       }
     },
     {
       event: 'TrackMania.BillUpdated',
       callback: async (params: any[]) => {
+        // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
         // Related to payments: donations, payouts, etc
       }
     },
     {
       event: 'TrackMania.ChallengeListModified',
       callback: async (params: any[]) => {
+        // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         Client.call('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }]).then()
-        // Update maps in db, lists
       }
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
       callback: async (params: any[]) => {
+        // [0] = PlayerInfo
         // Handle changes in the player object
       }
     },
     {
       event: 'TrackMania.PlayerIncoherence',
       callback: async (params: any[]) => {
+        // [0] = PlayerUid, [1] = Login
         // No real use case. Game will tell you about redtime anyway
       }
     },
     {
       event: 'TrackMania.Echo',
       callback: async (params: any[]) => {
+        // [0] = Internal, [1] = Public
         // Have to understand what this thing actually does first
         // 8 results on Google, either xaseco source or callbacks list lol
       }
@@ -160,12 +171,13 @@ export class Listeners {
     {
       event: 'TrackMania.VoteUpdated',
       callback: async (params: any[]) => {
+        // [0] = StateName, [1] = Login, [2] = CmdName, [3] = CmdParam
         // Tied to CallVotes. Very unlikely we'll use those at all
       }
     }
   ]
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
