@@ -109,6 +109,31 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
+    aliases: ['pt', 'prev', 'previoustrack'],
+    help: 'Requeue the previously played track.',
+    callback: async (info: MessageInfo) => {
+      const index = await TM.call('GetCurrentChallengeIndex', [], true)
+      if (Number(index) === -1) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has requeued the previous track.`
+          }]
+        },
+        {
+          method: 'SetNextChallengeIndex',
+          params: [{
+            int: Number(index) - 1
+          }]
+        })
+      await new Promise((r) => setTimeout(r, 5)) // Let the server think first
+      TM.call('NextChallenge')
+    },
+    privilege: 1
+  },
+  {
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
     callback: async (info: MessageInfo) => {
