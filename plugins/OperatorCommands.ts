@@ -13,37 +13,31 @@ const commands: TMCommand[] = [
       const split = info.text.split(' ')
       const fileName = split.shift() + '.Challenge.Gbx'
       const path = split.join(' ')
-      let file
-      try {
-        file = (await fs.readFile(path, 'base64'))
-      } catch (err: any) {
-        ErrorHandler.error('Error when reading file on addlocal', err.message)
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}File ${TM.colours.white + path} is not accessible.`)
+      const file = await fs.readFile(path, 'base64').catch(err=>err)
+      if(file instanceof Error){
+        ErrorHandler.error('Error when reading file on addlocal', file.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}File ${TM.colours.white + path} is not accessible.`, info.login)
         return
       }
-      try {
-        await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
-      } catch (err: any) {
-        ErrorHandler.error('Failed to write file', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`)
+      const write = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
+      if(write instanceof Error){
+        ErrorHandler.error('Failed to write file', write.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`, info.login)
         return
       }
-      try {
-        await TM.call('InsertChallenge', [{ string: fileName }])
-      } catch (err: any) {
-        ErrorHandler.error('Failed to insert challenge to jukebox', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`)
+      const insert =  await TM.call('InsertChallenge', [{ string: fileName }])
+      if(insert instanceof Error) {
+        ErrorHandler.error('Failed to insert challenge to jukebox', insert.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`, info.login)
         return
       }
-      let res
-      try {
-        res = await TM.call('GetNextChallengeInfo')
-      } catch (err: any) {
-        ErrorHandler.error('Failed to get next challenge info', err.toString())
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`)
+      const res = await TM.call('GetNextChallengeInfo')
+      if(res instanceof Error) {
+        ErrorHandler.error('Failed to get next challenge info', res.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`, info.login)
         return
       }
-      const name = res?.[0]?.Name
+      const name = res[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
         + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
         + `${TM.colours.white + TM.stripModifiers(name || 'TODO: FIX THIS', true)}${TM.colours.folly} from local files.`)
@@ -57,27 +51,41 @@ const commands: TMCommand[] = [
       const [fileName, url] = info.text.split(' ')
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
-        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login).then()
+        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
         return
       }
       const data = await res.arrayBuffer()
       const buffer = Buffer.from(data)
-      await TM.call('WriteFile', [{ string: fileName + '.Challenge.Gbx' }, { base64: buffer.toString('base64') }], true)
-      await TM.call('InsertChallenge', [{ string: fileName + '.Challenge.Gbx' }], true)
-      const insertRes = await TM.call('GetNextChallengeInfo', [], true)
-      const name = insertRes[0].Name
+      const write = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
+      if(write instanceof Error){
+        ErrorHandler.error('Failed to write file', write.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the file to the server.`, info.login)
+        return
+      }
+      const insert =  await TM.call('InsertChallenge', [{ string: fileName }])
+      if(insert instanceof Error) {
+        ErrorHandler.error('Failed to insert challenge to jukebox', insert.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the challenge into queue.`, info.login)
+        return
+      }
+      const nextInfo = await TM.call('GetNextChallengeInfo')
+      if(nextInfo instanceof Error) {
+        ErrorHandler.error('Failed to get next challenge info', nextInfo.message)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to obtain the next challenge info.`, info.login)
+        return
+      }
+      const name = nextInfo[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
         + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`).then()
+        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
     },
     privilege: 1
   },
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
-    callback: async (info: MessageInfo) => {
-      await TM.multiCall(false,
-        {
+    callback: (info: MessageInfo) => {
+        TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -93,9 +101,8 @@ const commands: TMCommand[] = [
   {
     aliases: ['r', 'res'],
     help: 'Restart the current map.',
-    callback: async (info: MessageInfo) => {
-      await TM.multiCall(false,
-        {
+    callback: (info: MessageInfo) => {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -112,10 +119,14 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previoustrack'],
     help: 'Requeue the previously played track.',
     callback: async (info: MessageInfo) => {
-      const index = await TM.call('GetCurrentChallengeIndex', [], true)
+      const index = await TM.call('GetCurrentChallengeIndex', [])
+      if(index instanceof Error) {
+        TM.sendMessage('Failed to fetch current challenge index', info.login)
+        ErrorHandler.error('Failed to fetch current challenge index', index.message)
+        return
+      }
       if (Number(index) === -1) { return }
-      await TM.multiCall(false,
-        {
+      const res = await TM.multiCall({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -128,6 +139,11 @@ const commands: TMCommand[] = [
             int: Number(index) - 1
           }]
         })
+      if(res instanceof Error) {
+        TM.sendMessage('Failed to set next challenge index', info.login)
+        ErrorHandler.error('Failed to set next challenge index', res.message)
+        return
+      }
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.call('NextChallenge')
     },
@@ -136,11 +152,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -154,15 +169,14 @@ const commands: TMCommand[] = [
         })
     },
     privilege: 1
-  },
+   },
   {
     aliases: ['m', 'mute'],
     help: 'Mute a specific player.',
-    callback: async (info: MessageInfo) => {
+    callback:  (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -180,11 +194,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -202,11 +215,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['fs', 'forcespec'],
     help: 'Force a player into specmode.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -229,11 +241,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['fp', 'forceplay'],
     help: 'Force a player into playermode.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `

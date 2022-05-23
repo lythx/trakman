@@ -8,14 +8,23 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import 'dotenv/config'
 import { GameService } from './services/GameService.js'
 import { ChallengeService } from './services/ChallengeService.js'
+import { ErrorHandler } from './ErrorHandler.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
-        if (params[0] === undefined) { await Client.call('Kick', [{ string: params[0] }]) }
+        if (params[0] === undefined) { 
+          Client.callNoRes('Kick', [{ string: params[0] }])
+          return 
+        }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
+        if(playerInfo instanceof Error) {
+          ErrorHandler.error(`Failed to get player ${params[0]} info`, playerInfo.message)
+          Client.callNoRes('Kick', [{ string: params[0] }])
+          return
+        }
         await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
         await RecordService.fetchRecord(params[0].UId, params[0].Login)
       }
@@ -58,6 +67,10 @@ export class Listeners {
           return
         }
         const status = await Client.call('GetStatus')
+        if(status instanceof Error) {
+          ErrorHandler.error('Failed to get game status', status.message)
+          return
+        }
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
           return
         }
@@ -134,7 +147,7 @@ export class Listeners {
     {
       event: 'TrackMania.ChallengeListModified',
       callback: async (params: any[]) => {
-        Client.call('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }]).then()
+        Client.callNoRes('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
         // Update maps in db, lists
       }
     },

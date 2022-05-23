@@ -25,16 +25,12 @@ export class ChallengeService {
    * Sets the current challenge.
    */
   static async setCurrent (): Promise<void> {
-    let info
-    try {
-      info = (await Client.call('GetCurrentChallengeInfo'))[0]
-      if (info.UId == null) {
-        throw Error('Challenge id is undefined')
-      }
-    } catch (e: any) {
-      ErrorHandler.error('Unable to retrieve current challenge info.', e.message)
+    const res = await Client.call('GetCurrentChallengeInfo')
+    if(res instanceof Error){
+      ErrorHandler.error('Unable to retrieve current challenge info.', res.message)
       return
     }
+    const info = res[0]
     this._current = {
       id: info.UId,
       name: info.Name,
@@ -61,14 +57,12 @@ export class ChallengeService {
    */
   private static async getList (): Promise<void> {
     this.list = []
-    let challengeList
-    try {
-      challengeList = await Client.call('GetChallengeList', [
+    const challengeList = await Client.call('GetChallengeList', [
         { int: 5000 }, { int: 0 }
       ])
-    } catch (e: any) {
-      ErrorHandler.error('Error getting challenge list', e.message)
-      challengeList = []
+    if(challengeList instanceof Error){
+      ErrorHandler.error('Error getting the challenge list', challengeList.message)
+      return
     }
     for (const c of challengeList) {
       const challenge: ChallengeInfo = {

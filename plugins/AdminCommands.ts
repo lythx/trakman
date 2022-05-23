@@ -1,12 +1,11 @@
 'use strict'
 import { TRAKMAN as TM } from '../src/Trakman.js'
-import { ChatService } from '../src/services/ChatService.js'
 
 const commands: TMCommand[] = [
   {
     aliases: ['sgm', 'setgamemode'],
     help: 'Change the gamemode.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       let mode: number
       switch (info.text.toLowerCase()) {
         case 'rounds':
@@ -35,8 +34,7 @@ const commands: TMCommand[] = [
         default:
           return
       }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -54,11 +52,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes( {
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -76,14 +73,13 @@ const commands: TMCommand[] = [
   {
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       // TODO: implement an internal ban list or something
       // So that this returns if you attempt to unban somebody who's not banned
       TM.fetchPlayer(info.text).then(async (i) => {
         const targetInfo = i
         if (targetInfo == null) { return }
-        await TM.multiCall(false,
-          {
+        TM.multiCallNoRes({
             method: 'ChatSendServerMessage',
             params: [{
               string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -105,8 +101,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      await TM.multiCall(false,
-        {
+      await TM.multiCall({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -119,7 +114,7 @@ const commands: TMCommand[] = [
           params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
         })
       await new Promise((r) => setTimeout(r, 5)) // Timeout to ensure BlackList gets called after Kick
-      TM.call('BlackList', [{ string: targetInfo.login }])
+      TM.callNoRes('BlackList', [{ string: targetInfo.login }])
     },
     privilege: 2
   },
@@ -132,8 +127,7 @@ const commands: TMCommand[] = [
       TM.fetchPlayer(info.text).then(async (i) => {
         const targetInfo = i
         if (targetInfo == null) { return }
-        await TM.multiCall(false,
-          {
+        TM.multiCallNoRes({
             method: 'ChatSendServerMessage',
             params: [{
               string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -151,4 +145,4 @@ const commands: TMCommand[] = [
   },
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { TM.addCommand(command) }

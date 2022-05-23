@@ -20,20 +20,24 @@ async function main (): Promise<void> {
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
   if (connectionStatus != null) { Logger.info(connectionStatus) }
   Logger.trace('Authenticating...')
-  await Client.call('Authenticate', [
+  const auth = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
-  ]).catch(err => {
-    ErrorHandler.fatal('Authentication failed', err)
-  })
+  ])
+  if(auth instanceof Error){
+    ErrorHandler.fatal('Authentication failed', auth.message)
+  }
   Logger.info('Authentication success')
   Logger.trace('Retrieving game info')
   await GameService.initialize()
   Logger.info('Game info fetched')
   Logger.trace('Enabling callbacks...')
-  await Client.call('EnableCallbacks', [
+  const cb=  await Client.call('EnableCallbacks', [
     { boolean: true }
-  ]).catch(err => { ErrorHandler.fatal('Failed to enable callbacks', err) })
+  ])
+  if(cb instanceof Error) { 
+    ErrorHandler.fatal('Failed to enable callbacks', cb.message) 
+  }
   await RecordService.initialize()
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')

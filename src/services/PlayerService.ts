@@ -44,8 +44,16 @@ export class PlayerService {
    */
   static async addAllFromList (): Promise<void> {
     const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
+    if(playerList instanceof Error){
+      ErrorHandler.error('Error when fetching players from the server', playerList.message)
+      return
+    }
     for (const player of playerList) {
       const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      if(detailedPlayerInfo instanceof Error){
+        ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
+        return
+      }
       await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path)
     }
   }
