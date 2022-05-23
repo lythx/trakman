@@ -28,8 +28,8 @@ export const TRAKMAN = {
 
   stripModifiers(str: string, removeColours: boolean = true) {
     return removeColours
-      ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONTZ]/gi, '')
-      : str.replace(/\$(?:[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONTZ]/gi, '')
+      ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
+      : str.replace(/\$(?:[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
   },
 
   msToTime (ms: number) {
