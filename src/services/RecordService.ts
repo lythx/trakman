@@ -51,7 +51,7 @@ export class RecordService {
     }
     const cpAmount = cpsPerLap * laps
     const checkpoints = [...player.checkpoints.map(a => a.time)]
-    if (checkpoints.length !== cpAmount - 1) {
+    if (checkpoints.length !== cpAmount) {
       checkpoints.length = 0
       return
     }
