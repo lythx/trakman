@@ -5,9 +5,8 @@ const commands: TMCommand[] = [
   {
     aliases: ['ssn', 'setservername'],
     help: 'Change the server name.',
-    callback: async (info: MessageInfo) => {
-      await TM.multiCall(false,
-        {
+    callback: (info: MessageInfo) => {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -25,9 +24,8 @@ const commands: TMCommand[] = [
   {
     aliases: ['sc', 'setcomment'],
     help: 'Change the server comment.',
-    callback: async (info: MessageInfo) => {
-      await TM.multiCall(false,
-        {
+    callback: (info: MessageInfo) => {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -45,12 +43,11 @@ const commands: TMCommand[] = [
   {
     aliases: ['sp', 'setpwd', 'setpassword'],
     help: 'Change the player password.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       // Passwords outside of ASCII range cannot be entered in the field
       const regex: RegExp = /[\p{ASCII}]+/u
       if (!regex.test(info.text)) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -68,12 +65,11 @@ const commands: TMCommand[] = [
   {
     aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
     help: 'Change the spectator password.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       // Passwords outside of ASCII range cannot be entered in the field
       const regex: RegExp = /[\p{ASCII}]+/u
       if (!regex.test(info.text)) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -91,10 +87,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['smp', 'setmaxplayers'],
     help: 'Change the max players amount.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
-      await TM.multiCall(false,
-        {
+        TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -112,10 +107,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['sms', 'setmaxspecs'],
     help: 'Change the max spectators amount.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -133,10 +127,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['sct', 'setchattime'],
     help: 'Change the time you spend on the podium screen.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -154,10 +147,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['stl', 'settimelimit'],
     help: 'Change the time you spend gaming.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -175,12 +167,11 @@ const commands: TMCommand[] = [
   {
     aliases: ['sn', 'sendnotice'],
     help: 'Send a notice.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const time = info.text.split(' ')[0]
       const notice = info.text.split(' ').splice(1, info.text.length - 1).join(' ')
       if (!Number.isInteger(Number(time))) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -198,10 +189,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['acdl', 'allowchallengedownload'],
     help: 'Change whether challenge download is enabled.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
-      await TM.multiCall(false,
-        {
+      TM.multiCall({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -221,10 +211,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['drp', 'disablerespawn'],
     help: 'Change whether checkpoint respawning is enabled.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -244,11 +233,10 @@ const commands: TMCommand[] = [
   {
     aliases: ['fso', 'forceshowopp', 'forceshowopponents'],
     help: 'Change whether challenge download is enabled.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       // 0 = No change, 1 = Show all, n = Show n
       if (!Number.isInteger(Number(info.text))) { return }
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
@@ -268,10 +256,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
-    callback: async (info: MessageInfo) => {
+    callback: (info: MessageInfo) => {
       // Might need a timeout for this one
-      await TM.multiCall(false,
-        {
+      TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
