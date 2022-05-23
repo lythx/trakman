@@ -82,7 +82,7 @@ const commands: TMCommand[] = [
             string: `$g[${info.nickName}$z$s$g] Away from keyboard!`
           }]
         })
-      await new Promise((r) => setTimeout(r, 50)) // Need a timeout for server to register that player is a spectator
+      await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
       TM.call('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0

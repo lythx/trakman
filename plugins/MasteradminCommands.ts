@@ -12,7 +12,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server name to ${info.text}$z$s${TM.colours.folly}.`
+              + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
@@ -32,11 +32,57 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server comment to ${info.text}$z$s${TM.colours.folly}.`
+              + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
           method: 'SetServerComment',
+          params: [{ string: info.text }]
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['sp', 'setpwd', 'setpassword'],
+    help: 'Change the player password.',
+    callback: async (info: MessageInfo) => {
+      // Passwords outside of ASCII range cannot be entered in the field
+      const regex: RegExp = /[\p{ASCII}]+/u
+      if (!regex.test(info.text)) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+              + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'SetServerPassword',
+          params: [{ string: info.text }]
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
+    help: 'Change the spectator password.',
+    callback: async (info: MessageInfo) => {
+      // Passwords outside of ASCII range cannot be entered in the field
+      const regex: RegExp = /[\p{ASCII}]+/u
+      if (!regex.test(info.text)) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+              + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'SetServerPasswordForSpectator',
           params: [{ string: info.text }]
         })
     },
@@ -145,6 +191,76 @@ const commands: TMCommand[] = [
         {
           method: 'SendNotice',
           params: [{ string: notice }, { string: '' }, { int: time }]
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['acdl', 'allowchallengedownload'],
+    help: 'Change whether challenge download is enabled.',
+    callback: async (info: MessageInfo) => {
+      const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+              + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} the challenge download.`
+          }]
+        },
+        {
+          method: 'AllowChallengeDownload',
+          params: [{
+            boolean: status
+          }],
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['drp', 'disablerespawn'],
+    help: 'Change whether checkpoint respawning is enabled.',
+    callback: async (info: MessageInfo) => {
+      const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+              + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} checkpoint respawning.`
+          }]
+        },
+        {
+          method: 'SetDisableRespawn',
+          params: [{
+            boolean: status
+          }],
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['fso', 'forceshowopp', 'forceshowopponents'],
+    help: 'Change whether challenge download is enabled.',
+    callback: async (info: MessageInfo) => {
+      // 0 = No change, 1 = Show all, n = Show n
+      if (!Number.isInteger(Number(info.text))) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+              + `${TM.colours.white + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.colours.folly} forced opponent display.`
+          }]
+        },
+        {
+          method: 'SetForceShowAllOpponents',
+          params: [{
+            int: info.text
+          }],
         })
     },
     privilege: 3
