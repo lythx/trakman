@@ -11,7 +11,7 @@ PostgreSQL [v14](https://www.postgresql.org/download/)+
 ### Install & Run
 1. Get a hold of the current master branch via `git clone` or by downloading the source.
 2. `$ npm i` to install all the dependencies.
-3. Copy `.env.example` to `.env` and configure [settings](https://github.com/felacek/trakman/readme-proper/README.md#settings).
+3. Copy `.env.example` to `.env` and configure [settings](https://github.com/felacek/trakman/README.md#settings).
 4. `$ npx tsc` to transpile the code.
 5. `$ node ./built/src/Main.js` to run the controller.
 
