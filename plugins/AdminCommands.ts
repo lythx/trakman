@@ -50,7 +50,105 @@ const commands: TMCommand[] = [
         })
     },
     privilege: 2
-  }
+  },
+  {
+    aliases: ['b', 'ban'],
+    help: 'Ban a specific player.',
+    callback: async (info: MessageInfo) => {
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has banned `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'Ban',
+          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['ub', 'unban'],
+    help: 'Unban a specific player.',
+    callback: async (info: MessageInfo) => {
+      // TODO: implement an internal ban list or something
+      // So that this returns if you attempt to unban somebody who's not banned
+      TM.fetchPlayer(info.text).then(async (i) => {
+        const targetInfo = i
+        if (targetInfo == null) { return }
+        await TM.multiCall(false,
+          {
+            method: 'ChatSendServerMessage',
+            params: [{
+              string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+                + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unbanned `
+                + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+            }]
+          },
+          {
+            method: 'UnBan',
+            params: [{ string: targetInfo.login }]
+          })
+      })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['bl', 'blacklist'],
+    help: 'Blacklist a specific player.',
+    callback: async (info: MessageInfo) => {
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has blacklisted `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
+        {
+          method: 'Kick', // Kick the player first, so that we don't have to execute BanAndBlackList method
+          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
+        })
+      await new Promise((r) => setTimeout(r, 5)) // Timeout to ensure BlackList gets called after Kick
+      TM.call('BlackList', [{ string: targetInfo.login }])
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['ubl', 'unblacklist'],
+    help: 'Unblacklist a specific player.',
+    callback: async (info: MessageInfo) => {
+      // TODO: implement an internal blacklisted people list or something
+      // So that this returns if you attempt to unblacklist somebody who's not blacklisted
+      TM.fetchPlayer(info.text).then(async (i) => {
+        const targetInfo = i
+        if (targetInfo == null) { return }
+        await TM.multiCall(false,
+          {
+            method: 'ChatSendServerMessage',
+            params: [{
+              string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+                + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unblacklisted `
+                + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+            }]
+          },
+          {
+            method: 'UnBlackList',
+            params: [{ string: targetInfo.login }]
+          })
+      })
+    },
+    privilege: 2
+  },
 ]
 
 for (const command of commands) { ChatService.addCommand(command) }
