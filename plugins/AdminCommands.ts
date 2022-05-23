@@ -68,7 +68,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Ban',
-          params: [{ string: `${targetInfo.login}` }, { string: 'asdsasdasd' }]
+          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
         })
     },
     privilege: 2
@@ -93,7 +93,7 @@ const commands: TMCommand[] = [
           },
           {
             method: 'UnBan',
-            params: [{ string: `${targetInfo.login}` }]
+            params: [{ string: targetInfo.login }]
           })
       })
     },
@@ -116,7 +116,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Kick', // Kick the player first, so that we don't have to execute BanAndBlackList method
-          params: [{ string: `${targetInfo.login}` }, { string: 'asdsasdasd' }]
+          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
         })
       await new Promise((r) => setTimeout(r, 5)) // Timeout to ensure BlackList gets called after Kick
       TM.call('BlackList', [{ string: targetInfo.login }])
@@ -143,7 +143,7 @@ const commands: TMCommand[] = [
           },
           {
             method: 'UnBlackList',
-            params: [{ string: `${targetInfo.login}` }]
+            params: [{ string: targetInfo.login }]
           })
       })
     },

@@ -103,7 +103,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Kick',
-          params: [{ string: `${info.text}` }, { string: 'asdsasdasd' }]
+          params: [{ string: info.text }, { string: 'asdsasdasd' }]
         })
     },
     privilege: 1
@@ -125,7 +125,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Ignore',
-          params: [{ string: `${info.text}` }]
+          params: [{ string: info.text }]
         })
     },
     privilege: 1
@@ -147,7 +147,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'UnIgnore',
-          params: [{ string: `${info.text}` }]
+          params: [{ string: info.text }]
         })
     },
     privilege: 1
