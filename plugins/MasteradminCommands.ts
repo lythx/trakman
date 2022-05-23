@@ -12,7 +12,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server name to ${info.text}$z$s${TM.colours.folly}.`
+              + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
@@ -32,7 +32,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server comment to ${info.text}$z$s${TM.colours.folly}.`
+              + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
@@ -54,7 +54,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the player password to ${info.text}$z$s${TM.colours.folly}.`
+              + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
@@ -76,7 +76,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
               + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the spectator password to ${info.text}$z$s${TM.colours.folly}.`
+              + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
           }]
         },
         {
