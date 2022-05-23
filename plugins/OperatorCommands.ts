@@ -51,6 +51,28 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
+    aliases: ['afu', 'addfromurl'],
+    help: 'Add a track from an url.',
+    callback: async (info: MessageInfo) => {
+      const [fileName, url] = info.text.split(' ')
+      const res = await fetch(url).catch((err: Error) => err)
+      if (res instanceof Error) {
+        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login).then()
+        return
+      }
+      const data = await res.arrayBuffer()
+      const buffer = Buffer.from(data)
+      await TM.call('WriteFile', [{ string: fileName + '.Challenge.Gbx' }, { base64: buffer.toString('base64') }], true)
+      await TM.call('InsertChallenge', [{ string: fileName + '.Challenge.Gbx' }], true)
+      const insertRes = await TM.call('GetNextChallengeInfo', [], true)
+      const name = insertRes[0].Name
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
+        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`).then()
+    },
+    privilege: 1
+  },
+  {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
     callback: async (info: MessageInfo) => {
@@ -103,7 +125,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Kick',
-          params: [{ string: info.text }, { string: 'asdsasdasd' }]
+          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
         })
     },
     privilege: 1
@@ -125,7 +147,7 @@ const commands: TMCommand[] = [
         },
         {
           method: 'Ignore',
-          params: [{ string: info.text }]
+          params: [{ string: targetInfo.login }]
         })
     },
     privilege: 1
@@ -147,33 +169,65 @@ const commands: TMCommand[] = [
         },
         {
           method: 'UnIgnore',
-          params: [{ string: info.text }]
+          params: [{ string: targetInfo.login }]
         })
     },
     privilege: 1
   },
   {
-    aliases: ['afu', 'addfromurl'],
-    help: 'Add a track from an url.',
+    aliases: ['fs', 'forcespec'],
+    help: 'Force a player into specmode.',
     callback: async (info: MessageInfo) => {
-      const [fileName, url] = info.text.split(' ')
-      const res = await fetch(url).catch((err: Error) => err)
-      if (res instanceof Error) {
-        TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login).then()
-        return
-      }
-      const data = await res.arrayBuffer()
-      const buffer = Buffer.from(data)
-      await TM.call('WriteFile', [{ string: fileName + '.Challenge.Gbx' }, { base64: buffer.toString('base64') }], true)
-      await TM.call('InsertChallenge', [{ string: fileName + '.Challenge.Gbx' }], true)
-      const insertRes = await TM.call('GetNextChallengeInfo', [], true)
-      const name = insertRes[0].Name
-      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`).then()
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has forced `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly} into specmode.`
+          }]
+        },
+        {
+          method: 'ForceSpectator',
+          params: [{ string: targetInfo.login }, { int: 1 }]
+        },
+        {
+          method: 'ForceSpectator',
+          params: [{ string: targetInfo.login }, { int: 0 }]
+        }
+      )
     },
     privilege: 1
-  }
+  },
+  {
+    aliases: ['fp', 'forceplay'],
+    help: 'Force a player into playermode.',
+    callback: async (info: MessageInfo) => {
+      const targetInfo = TM.getPlayer(info.text)
+      if (targetInfo === undefined) { return }
+      await TM.multiCall(false,
+        {
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has forced `
+              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly} into playermode.`
+          }]
+        },
+        {
+          method: 'ForceSpectator',
+          params: [{ string: targetInfo.login }, { int: 2 }]
+        },
+        {
+          method: 'ForceSpectator',
+          params: [{ string: targetInfo.login }, { int: 0 }]
+        }
+      )
+    },
+    privilege: 1
+  },
 ]
 
 for (const command of commands) { ChatService.addCommand(command).then() }
