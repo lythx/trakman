@@ -6,12 +6,14 @@ if (process.env.USE_DEDIMANIA === 'YES') {
     {
       event: 'Controller.DedimaniaRecords',
       callback: (params: any[]) => {
-        let str = `$zDedimania records on ${params[0].Name}: `
-        for (const record of params[0].Records) {
-          str += `${record.NickName}$z[${TM.Utils.getTimeString(record.Best)}], `
+        let str = `$zDedimania records on ${TM.challenge.name}: `
+        for (const record of params) {
+          let nick = TM.getPlayer(record.login)?.nickName
+          if (nick === undefined) { nick = record.nickName }
+          str += `${nick}$z[${TM.Utils.getTimeString(record.score)}], `
         }
-        str = str.substring(0, str.length - 3)
-        TM.sendMessage(str)
+        str = str.substring(0, str.length - 2)
+        TM.sendMessage(str).then()
       }
     }
   ]
