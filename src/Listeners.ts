@@ -61,7 +61,6 @@ export class Listeners {
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
           return
         }
-        await RecordService.add(ChallengeService.current.id, params[1], params[2])
         // Store/update finish time in db
       }
     },
