@@ -25,7 +25,7 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerJoin',
-        callback: async (player: TMPlayer) => {
+        callback: async (player: JoinInfo) => {
             // TODO: Fetch the connecting player info
 
             // TODO: Fetch player records on the current challenge
@@ -35,7 +35,7 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerLeave',
-        callback: async (playerInfo: PlayerInfo) => {
+        callback: async (playerInfo: LeaveInfo) => {
             // TODO: Update the widgets to no more indicate the disconnectee's presence
             // That is, if they had any records
 
@@ -45,7 +45,7 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'TrackMania.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO
-        callback: async (params: any[]) => {
+        callback: async (info: FinishInfo) => {
             // TODO: Update cpcounter to indicate finish
         }
     },

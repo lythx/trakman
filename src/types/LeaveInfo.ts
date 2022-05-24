@@ -1,6 +1,6 @@
 'use strict'
 
-interface PlayerInfo {
+interface LeaveInfo {
   readonly login: string
   readonly nickName: string
   readonly nation: string

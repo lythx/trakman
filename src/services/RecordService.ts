@@ -51,6 +51,12 @@ export class RecordService {
     }
     const cpAmount = cpsPerLap * laps
     const checkpoints = [...player.checkpoints.map(a => a.time)]
+    const temp: any = player
+    temp.checkpoints = [...checkpoints] //break the reference
+    temp.challenge = challenge
+    temp.score = score 
+    const finishInfo :FinishInfo = temp
+    Events.emitEvent('Controller.PlayerFinish', finishInfo) 
     if (checkpoints.length !== cpAmount) {
       checkpoints.length = 0
       return
