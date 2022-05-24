@@ -98,10 +98,7 @@ export class Listeners {
         await ChallengeService.setCurrent()
         if (process.env.USE_DEDIMANIA === 'YES') {
           const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
-          records[0].Name = params[0].Name
-          records[0].Author = params[0].Author
-          records[0].Environnement = params[0].Environnement
-          Events.emitEvent('Controller.DedimaniaRecords', [...records])
+          Events.emitEvent('Controller.DedimaniaRecords', records)
         }
       }
     },
