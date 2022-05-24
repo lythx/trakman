@@ -8,7 +8,7 @@ In controller events you should set callback function argument to a given type f
 ```typescript 
 import { TRAKMAN as TM } from '../src/Trakman.js'
 const event  = 'Controller.PlayerJoin'
-const callback = (player: TMPlayer) => {
+const callback = (player: JoinInfo) => {
   TM.sendMessage(`Welcome ${player.nickName}`)
 }
 TM.addListener(event, callback)
@@ -16,10 +16,13 @@ TM.addListener(event, callback)
 
 Controller events
 ```typescript
+'Controller.Ready' (no params) -> `Triggered on startup after all core services are ready`
 'Controller.PlayerChat': MessageInfo -> `Triggered after player sends message, passes player information and the message`
-'Controller.PlayerJoin': TMPlayer -> `Triggered after player joins the server, passes player information`
-'Controller.PlayerLeave': PlayerInfo -> `Triggered after player leaves the server, passes player information`
-'Controller.PlayerRecord': TODO -> `Triggered after player gets a local record,    ` 
+'Controller.PlayerJoin': JoinInfo -> `Triggered after player joins the server, passes player information`
+'Controller.PlayerLeave': LeaveInfo -> `Triggered after player leaves the server, passes player information`
+'Controller.PlayerRecord': RecordInfo -> `Triggered after player gets a local record, passes player and record information` 
+'Controller.PlayerFinish': FinishInfo -> `Triggered after player finishes, passes player and run information`
+
 'Controller.DedimaniaRecords', TODO `Triggered after dedimania records get fetched,    ` 
 ```
 Dedicated server events

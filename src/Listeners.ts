@@ -148,6 +148,8 @@ export class Listeners {
       callback: async (params: any[]) => {
         // [0] = PlayerInfo
         // Handle changes in the player object
+        console.log(params)
+        //Events.emitEvent('Controller.PlayerInfoChanged', )
       }
     },
     {
