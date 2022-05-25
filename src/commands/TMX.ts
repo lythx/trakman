@@ -13,9 +13,21 @@ const command: TMCommand = {
       TM.sendMessage(`Failed to fetch map file from ${game || 'TMNF'} TMX, check if you specified the correct game.`, info.login)
       return
     }
-    await Client.call('WriteFile', [{ string: file.name }, { base64: file.content }])
-    await Client.call('InsertChallenge', [{ string: file.name }])
+    const write = await Client.call('WriteFile', [{ string: file.name }, { base64: file.content }])
+    if(write instanceof Error){
+      TM.sendMessage(`Server failed to write file`)
+      return
+    }
+    const insert = await Client.call('InsertChallenge', [{ string: file.name }])
+    if(insert instanceof Error) {
+      TM.sendMessage(`Server failed to add challenge to jukebox`)
+      return
+    }
     const insertRes = await Client.call('GetNextChallengeInfo')
+    if(insertRes instanceof Error) {
+      TM.sendMessage('Failed to fetch next challenge info')
+      return
+    }
     const name = insertRes[0].Name
     TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
         `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued ` +

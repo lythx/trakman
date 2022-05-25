@@ -126,11 +126,15 @@ export const TRAKMAN = {
   /**
      * Calls a dedicated server method. Throws error if the server responds with error.
      */
-  async call (method: string, params: any[] = [], expectsResponse: boolean = false): Promise<any[]> {
-    return await Client.call(method, params, expectsResponse).catch((err: Error) => { throw err })
+  async call (method: string, params: any[] = []): Promise<any[] | Error> {
+    return await Client.call(method, params)
   },
 
-  async multiCall (expectsResponse: boolean, ...calls: TMCall[]): Promise<CallResponse[]> {
+  callNoRes (method: string, params: any[] = []): void {
+    Client.callNoRes(method, params)
+  },
+
+  async multiCall (...calls: TMCall[]): Promise<CallResponse[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params = c.params == null ? [] : c.params
@@ -141,38 +145,47 @@ export const TRAKMAN = {
         }
       })
     }
-    if (!expectsResponse) {
-      await Client.call('system.multicall', [{
-        array: arr
-      }], expectsResponse)
-      return []
+    const res = await Client.call('system.multicall', [{array: arr}])
+    if(res instanceof Error){
+      return res
     }
-    const res = await Client.call('system.multicall', [{
-      array: arr
-    }], expectsResponse)
     const ret: CallResponse[] = []
     for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
     return ret
   },
 
+  multiCallNoRes(...calls: TMCall[]): void {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params = c.params == null ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    Client.callNoRes('system.multicall', [{ array: arr }])
+  },
+
   /**
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
-  async sendMessage (message: string, login?: string): Promise<void> {
+  sendMessage (message: string, login?: string): void {
     if (login != null) {
-      await Client.call('ChatSendServerMessageToLogin', [{ string: message }, { string: login }], false)
+      Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
       return
     }
-    await Client.call('ChatSendServerMessage', [{ string: message }], false)
+    Client.callNoRes('ChatSendServerMessage', [{ string: message }])
   },
 
-  async sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
+  sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
     if (login != null) {
-      await Client.call('SendDisplayManialinkPageToLogin', [
+      Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
     }
-    console.log(await Client.call('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }]))
+    Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
   },
 
   /**

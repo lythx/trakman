@@ -1,15 +1,18 @@
 'use strict'
 
+import { ErrorHandler } from '../ErrorHandler.js'
 import { Client } from '../Client.js'
 
 export class GameService {
   private static _game: TMGame
 
   static async initialize (): Promise<void> {
-    const info = (await Client.call('GetCurrentGameInfo', [{ int: 1 }]))[0]
-    if (info == null) {
+    const res = await Client.call('GetCurrentGameInfo', [{ int: 1 }])
+    if (res instanceof Error) {
+      ErrorHandler.error('Failed to get game info', res.message)
       return
     }
+    const info = res[0]
     this._game = {
       gameMode: info.GameMode,
       chatTime: info.ChatTime,

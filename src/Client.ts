@@ -28,17 +28,22 @@ export class Client {
   /**
   * Calls a dedicated server method. Rejects promise if server responds error.
   * On error passes object containing errorCode and errorString properties
-  * @param {String} method dedicated server method name
-  * @param {Object[]} params parameters, each param needs to be under key named after its type
-  * @param {boolean} expectsResponse if set to false doesnt poll the response and returns null.
+  * @param {string} method dedicated server method name
+  * @param {object[]} params parameters, each param needs to be under key named after its type
   * @returns {Promise<any[]>} array of server response values
   */
-  static async call (method: string, params: object[] = [], expectsResponse = true): Promise<any[]> {
+  static async call (method: string, params: object[] = []): Promise<any[] | Error> {
     this.#requestId++ // increment requestId so every request has an unique id
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)
-    if (!expectsResponse) { return [] }
-    return await this.#socket.awaitResponse(this.#requestId, method).catch(async err => await Promise.reject(err))
+    return await this.#socket.awaitResponse(this.#requestId, method).catch((err: Error) => err)
+  }
+
+  static callNoRes (method: string, params: object[] = []): void {
+    this.#requestId++ 
+    const request = new Request(method, params)
+    const buffer = request.getPreparedBuffer(this.#requestId)
+    this.#socket.write(buffer)
   }
 }
