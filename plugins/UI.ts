@@ -26,7 +26,7 @@ const plugins: TMEvent[] = [
     {
         event: 'Controller.PlayerJoin',
         callback: async (player: JoinInfo) => {
-            // TODO: Fetch the connecting player info
+            // TODO: Fetch the connecting player info //its all in the passed object
 
             // TODO: Fetch player records on the current challenge
             // TODO: Display all the widgets for the new player
@@ -44,14 +44,14 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO
+        event: 'Controller.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO //done
         callback: async (info: FinishInfo) => {
             // TODO: Update cpcounter to indicate finish
         }
     },
     {
-        event: 'TrackMania.PlayerInfoChanged', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.PlayerInfoChanged', // Need a Controller event for better handling //YEAAAAAAAAAAAAAAA
+        callback: async (info: InfoChangedInfo) => {
             // TODO: Remove cpcounter if player switched to specmode
             // PlayerInfo['SpectatorStatus'] % 10 !== 0
 
@@ -81,14 +81,16 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerRecord',
-        callback: async (params: any[]) => { //Should return TMRecord
+        callback: async (params: RecordInfo) => { //Should return TMRecord //record info contains both TMRecord and TMPlayer and some other stuf
             // TODO: Update the local records widget
         }
     },
     {
-        event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling
+        event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling 
         callback: async (params: any[]) => {
-            // TODO: Re-fetch the next challenge info
+            // TODO: Re-fetch the next challenge info 
+            //calling next challenge info should probably be done in challenge service tho
+            //maybe we should always fetch next 5 maps and keep last 5 or somethign idk
             // TODO: Update miscellaneous widgets:
             // Trackcount...
         }
