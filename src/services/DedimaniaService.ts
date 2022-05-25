@@ -4,6 +4,7 @@ import { DedimaniaClient } from '../dedimania/DedimaniaClient.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
+import {GameService} from "./GameService.js";
 
 export abstract class DedimaniaService {
   static _dedis: TMDedi[] = []
@@ -27,7 +28,7 @@ export abstract class DedimaniaService {
         { string: environment },
         { string: author },
         { string: 'TMF' },
-        { int: 1 }, // mode: 1-TA
+        { int: GameService.gameMode }, // mode: 1-TA
         {
           struct: {
             SrvName: { string: 'TODO' } // TODO
@@ -40,7 +41,7 @@ export abstract class DedimaniaService {
       .catch(err => ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`, err))
     if (dedis == null) { throw new Error('unable to fetch records') }
     for (const d of dedis[0].Records) {
-      const record: TMDedi = { login: d.Login, score: d.Best, checkpoints: d.Checks, date: d.date }
+      const record: TMDedi = { login: d.Login, nickName: d.NickName, score: d.Best, checkpoints: d.Checks }
       this._dedis.push(record)
     }
     return this._dedis

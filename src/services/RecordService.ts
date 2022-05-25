@@ -32,7 +32,7 @@ export class RecordService {
   }
 
   static get records (): TMRecord[] {
-    return this._records
+    return [...this._records]
   }
 
   static async add (challenge: string, login: string, score: number): Promise<void> {
@@ -51,7 +51,13 @@ export class RecordService {
     }
     const cpAmount = cpsPerLap * laps
     const checkpoints = [...player.checkpoints.map(a => a.time)]
-    if (checkpoints.length !== cpAmount) {
+    const temp: any = player
+    temp.checkpoints = [...checkpoints] //break the reference
+    temp.challenge = challenge
+    temp.score = score 
+    const finishInfo :FinishInfo = temp
+    Events.emitEvent('Controller.PlayerFinish', finishInfo) 
+    if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
       return
     }
