@@ -32,7 +32,7 @@ export class RecordService {
   }
 
   static get records (): TMRecord[] {
-    return this._records
+    return [...this._records]
   }
 
   static async add (challenge: string, login: string, score: number): Promise<void> {

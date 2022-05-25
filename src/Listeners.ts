@@ -106,6 +106,14 @@ export class Listeners {
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
+        const c = params[0]
+        const info: BeginChallengeInfo = {
+          id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement, mood: c.Mood,
+          bronzeTime: c.BronzeTime, silverTime: c.SilverTime, goldTime: c.GoldTime,
+          authorTime: c.AuthorTime, copperPrice: c.CopperPrice, lapRace: c.LapRace,
+          lapsAmount: c.NbLaps, checkpointsAmount: c.NbCheckpoints, records: RecordService.records
+        }
+        Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') {
           const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
           Events.emitEvent('Controller.DedimaniaRecords', records)
@@ -132,7 +140,10 @@ export class Listeners {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: async (params: any[]) => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
-        // Handle player interaction with Manialinks
+        const temp: any = PlayerService.getPlayer(params[1])
+        temp.answer = params[2]
+        const info: ManialinkClickInfo = temp
+        Events.emitEvent('Controller.ManialinkClick', info)
       }
     },
     {

@@ -21,6 +21,7 @@ const plugins: TMEvent[] = [
                 + `</custom_ui></manialinks>`
             await TM.call('SendDisplayManialinkPage', [{ string: customUi }, { int: 0 }, { boolean: false }])
             // TODO: SetForceMods
+            
         }
     },
     {
@@ -60,7 +61,7 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.PlayerManialinkPageAnswer', // Need a Controller event for better handling
+        event: 'Controller.ManialinkClick', // Need a Controller event for better handling //asdasd
         callback: async (params: any[]) => {
             // This will basically handle every widget click
             // If I were to write every TODO I'd kill myself, so..
@@ -110,8 +111,8 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.BeginChallenge', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.BeginChallenge', // Need a Controller event for better handling //hhhhhhhhhh
+        callback: async (info: BeginChallengeInfo) => {
             // TODO: Remove podium/score widgets
 
             // TODO: Fetch the current challenge info
