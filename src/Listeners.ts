@@ -15,12 +15,12 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
-        if (params[0] === undefined) { 
+        if (params[0] === undefined) {
           Client.callNoRes('Kick', [{ string: params[0] }])
-          return 
+          return
         }
         const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        if(playerInfo instanceof Error) {
+        if (playerInfo instanceof Error) {
           ErrorHandler.error(`Failed to get player ${params[0]} info`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
@@ -55,7 +55,7 @@ export class Listeners {
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         PlayerService.addCP(params[1], checkpoint)
-        const temp:any = PlayerService.getPlayer(params[1])
+        const temp: any = PlayerService.getPlayer(params[1])
         temp.time = params[2]
         temp.lap = params[3]
         temp.index = params[4]
@@ -76,12 +76,13 @@ export class Listeners {
           return
         }
         const status = await Client.call('GetStatus')
-        if(status instanceof Error) {
+        if (status instanceof Error) {
           ErrorHandler.error('Failed to get game status', status.message)
           return
         }
         if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-          return
+          // fun fact this is probably impossible to even get :D
+          // return
         }
       }
     },
@@ -118,10 +119,20 @@ export class Listeners {
         await ChallengeService.setCurrent()
         const c = params[0]
         const info: BeginChallengeInfo = {
-          id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement, mood: c.Mood,
-          bronzeTime: c.BronzeTime, silverTime: c.SilverTime, goldTime: c.GoldTime,
-          authorTime: c.AuthorTime, copperPrice: c.CopperPrice, lapRace: c.LapRace,
-          lapsAmount: c.NbLaps, checkpointsAmount: c.NbCheckpoints, records: RecordService.records
+          id: c.UId,
+          name: c.Name,
+          author: c.Author,
+          environment: c.Environnement,
+          mood: c.Mood,
+          bronzeTime: c.BronzeTime,
+          silverTime: c.SilverTime,
+          goldTime: c.GoldTime,
+          authorTime: c.AuthorTime,
+          copperPrice: c.CopperPrice,
+          lapRace: c.LapRace,
+          lapsAmount: c.NbLaps,
+          checkpointsAmount: c.NbCheckpoints,
+          records: RecordService.records
         }
         Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') {
@@ -222,7 +233,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize(): Promise<void> {
+  static async initialize (): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
