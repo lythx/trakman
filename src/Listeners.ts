@@ -15,6 +15,7 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]) => {
+        // [0] = Login, [1] = IsSpectator
         if (params[0] === undefined) {
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
@@ -233,7 +234,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
