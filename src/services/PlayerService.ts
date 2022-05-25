@@ -8,13 +8,14 @@ import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { ChallengeService } from './ChallengeService.js'
 import { GameService } from './GameService.js'
+import { RecordService } from './RecordService.js'
 
 export class PlayerService {
   private static _players: TMPlayer[] = []
   private static repo: PlayerRepository
   private static newOwnerLogin: string | null = null
 
-  static async initialize (repo: PlayerRepository = new PlayerRepository()): Promise<void> {
+  static async initialize(repo: PlayerRepository = new PlayerRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
     const oldOwnerLogin = (await this.repo.getOwner())?.[0]?.login
@@ -25,7 +26,7 @@ export class PlayerService {
     if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
   }
 
-  static getPlayer (login: string): TMPlayer {
+  static getPlayer(login: string): TMPlayer {
     const player = this._players.find(p => p.login === login)
     if (player == null) {
       throw Error('Player ' + login + ' not in player list.')
@@ -33,7 +34,7 @@ export class PlayerService {
     return player
   }
 
-  static get players (): TMPlayer[] {
+  static get players(): TMPlayer[] {
     return this._players
   }
 
@@ -42,7 +43,7 @@ export class PlayerService {
    * Only called in the beginning as a start job
    * @returns {Promise<void>}
    */
-  static async addAllFromList (): Promise<void> {
+  static async addAllFromList(): Promise<void> {
     const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
     if(playerList instanceof Error){
       ErrorHandler.error('Error when fetching players from the server', playerList.message)
@@ -65,7 +66,7 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join (login: string, nickName: string, path: string): Promise<void> {
+  static async join(login: string, nickName: string, path: string): Promise<void> {
     const nation = path.split('|')[1]
     let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode == null) {
@@ -108,7 +109,8 @@ export class PlayerService {
       await this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
-    Events.emitEvent('Controller.PlayerJoin', player)
+    const joinInfo: JoinInfo = player
+    Events.emitEvent('Controller.PlayerJoin', joinInfo)
   }
 
   /**
@@ -116,11 +118,11 @@ export class PlayerService {
    * @param {string} login
    * @returns {Promise<void>}
    */
-  static async leave (login: string): Promise<void> {
+  static async leave(login: string): Promise<void> {
     const player = this.getPlayer(login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
-    const playerInfo: PlayerInfo = {
+    const leaveInfo: LeaveInfo = {
       login: player.login,
       nickName: player.nickName,
       nation: player.nation,
@@ -132,12 +134,12 @@ export class PlayerService {
       privilege: player.privilege,
       visits: player.visits
     }
-    Events.emitEvent('Controller.PlayerLeave', playerInfo)
+    Events.emitEvent('Controller.PlayerLeave', leaveInfo)
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async fetchPlayer (login: string): Promise<DBPlayerInfo | null> {
+  static async fetchPlayer(login: string): Promise<DBPlayerInfo | null> {
     const res = (await this.repo.get(login))?.[0]
     if (res == null) { return null }
     const nation = countries.find(a => a.code === res.nation)?.name
@@ -153,7 +155,7 @@ export class PlayerService {
     }
   }
 
-  static async setPrivilege (login: string, privilege: number): Promise<void> {
+  static async setPrivilege(login: string, privilege: number): Promise<void> {
     await this.repo.setPrivilege(login, privilege)
     const player = this.players.find(a => a.login === login)
     if (player != null) { player.privilege = privilege }
@@ -165,13 +167,8 @@ export class PlayerService {
    * @param {TMCheckpoint} cp
    * @return {Promise<void>}
    */
-  static async addCP (login: string, cp: TMCheckpoint): Promise<void> {
+  static addCP (login: string, cp: TMCheckpoint): void {
     const player = this.getPlayer(login)
-    if (cp.index === 0) {
-      player.checkpoints.unshift(cp)
-      player.checkpoints.length = 1
-      return
-    }
     let laps
     if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
       laps = 1
@@ -180,8 +177,18 @@ export class PlayerService {
     } else {
       laps = ChallengeService.current.lapsAmount
     }
+    if (cp.index === 0) {
+      player.checkpoints.unshift(cp)
+      player.checkpoints.length = 1
+      if (laps === 1 && ChallengeService.current.checkpointsAmount === 1){
+        player.checkpoints.length = 0
+        RecordService.add(ChallengeService.current.id, login, cp.time)
+      }
+      return
+    }
     if (player.checkpoints.length === 0) { return }
     const correctLap = player.checkpoints[0].lap + laps
-    if (cp.lap < correctLap || (cp.lap === correctLap && cp.index === ChallengeService.current.checkpointsAmount - 1 )) { player.checkpoints.push(cp) }
+    if (cp.lap < correctLap) { player.checkpoints.push(cp) }
+    else RecordService.add(ChallengeService.current.id, login, cp.time)
   }
 }
