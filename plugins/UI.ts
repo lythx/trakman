@@ -21,12 +21,13 @@ const plugins: TMEvent[] = [
                 + `</custom_ui></manialinks>`
             await TM.call('SendDisplayManialinkPage', [{ string: customUi }, { int: 0 }, { boolean: false }])
             // TODO: SetForceMods
+            
         }
     },
     {
         event: 'Controller.PlayerJoin',
-        callback: async (player: TMPlayer) => {
-            // TODO: Fetch the connecting player info
+        callback: async (player: JoinInfo) => {
+            // TODO: Fetch the connecting player info //its all in the passed object
 
             // TODO: Fetch player records on the current challenge
             // TODO: Display all the widgets for the new player
@@ -35,7 +36,7 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerLeave',
-        callback: async (playerInfo: PlayerInfo) => {
+        callback: async (playerInfo: LeaveInfo) => {
             // TODO: Update the widgets to no more indicate the disconnectee's presence
             // That is, if they had any records
 
@@ -44,14 +45,14 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO
-        callback: async (params: any[]) => {
+        event: 'Controller.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO //done
+        callback: async (info: FinishInfo) => {
             // TODO: Update cpcounter to indicate finish
         }
     },
     {
-        event: 'TrackMania.PlayerInfoChanged', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.PlayerInfoChanged', // Need a Controller event for better handling //YEAAAAAAAAAAAAAAA
+        callback: async (info: InfoChangedInfo) => {
             // TODO: Remove cpcounter if player switched to specmode
             // PlayerInfo['SpectatorStatus'] % 10 !== 0
 
@@ -60,8 +61,8 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.PlayerManialinkPageAnswer', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.ManialinkClick', // Need a Controller event for better handling //asdasd
+        callback: async (info: ManialinkClickInfo) => {
             // This will basically handle every widget click
             // If I were to write every TODO I'd kill myself, so..
             // TODO: Everything about players <-> widgets interaction
@@ -81,21 +82,23 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerRecord',
-        callback: async (params: any[]) => { //Should return TMRecord
+        callback: async (params: RecordInfo) => { //Should return TMRecord //record info contains both TMRecord and TMPlayer and some other stuf
             // TODO: Update the local records widget
         }
     },
     {
-        event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling
+        event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling 
         callback: async (params: any[]) => {
-            // TODO: Re-fetch the next challenge info
+            // TODO: Re-fetch the next challenge info 
+            //calling next challenge info should probably be done in challenge service tho
+            //maybe we should always fetch next 5 maps and keep last 5 or somethign idk
             // TODO: Update miscellaneous widgets:
             // Trackcount...
         }
     },
     {
-        event: 'TrackMania.Checkpoint', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.PlayerCheckpoint', // Need a Controller event for better handling //e
+        callback: async (info: CheckpointInfo) => {
             // TODO: Update cpcounter to indicate current cp
         }
     },
@@ -108,8 +111,8 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.BeginChallenge', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.BeginChallenge', // Need a Controller event for better handling //hhhhhhhhhh
+        callback: async (info: BeginChallengeInfo) => {
             // TODO: Remove podium/score widgets
 
             // TODO: Fetch the current challenge info

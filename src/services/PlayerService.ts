@@ -101,7 +101,8 @@ export class PlayerService {
       await this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
-    Events.emitEvent('Controller.PlayerJoin', player)
+    const joinInfo: JoinInfo = player
+    Events.emitEvent('Controller.PlayerJoin', joinInfo)
   }
 
   /**
@@ -113,7 +114,7 @@ export class PlayerService {
     const player = this.getPlayer(login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
-    const playerInfo: PlayerInfo = {
+    const leaveInfo: LeaveInfo = {
       login: player.login,
       nickName: player.nickName,
       nation: player.nation,
@@ -125,7 +126,7 @@ export class PlayerService {
       privilege: player.privilege,
       visits: player.visits
     }
-    Events.emitEvent('Controller.PlayerLeave', playerInfo)
+    Events.emitEvent('Controller.PlayerLeave', leaveInfo)
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players = this._players.filter(p => p.login !== player.login)
   }
@@ -158,7 +159,7 @@ export class PlayerService {
    * @param {TMCheckpoint} cp
    * @return {Promise<void>}
    */
-  static async addCP(login: string, cp: TMCheckpoint): Promise<void> {
+  static addCP (login: string, cp: TMCheckpoint): void {
     const player = this.getPlayer(login)
     let laps
     if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
