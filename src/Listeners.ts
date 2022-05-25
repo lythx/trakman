@@ -147,9 +147,28 @@ export class Listeners {
       event: 'TrackMania.PlayerInfoChanged',
       callback: async (params: any[]) => {
         // [0] = PlayerInfo
-        // Handle changes in the player object
-        console.log(params)
-        //Events.emitEvent('Controller.PlayerInfoChanged', )
+        const spec = params[0].SpectatorStatus.toString()
+        const flags = params[0].Flags.toString()
+        const info: InfoChangedInfo = {
+          login: params[0].Login,
+          nickName: params[0].NickName,
+          id: params[0].PlayerId,
+          teamId: params[0].TeamId,
+          ladderRanking: params[0].LadderRanking,
+          isSpectator: spec?.[spec.length - 1] === '1',
+          isTemporarySpectator: spec?.[spec.length - 2] === '1',
+          isPureSpectator: spec?.[spec.length - 3] === '1',
+          autoTarget: spec?.[spec.length - 4] === '1',
+          currentTargetId: Number(spec?.substring(0, spec.length - 4)) || 0,
+          forceSpectator: Number(flags?.[flags.length - 1]) || 0,
+          isReferee: flags?.[flags.length - 2] === '1',
+          isPodiumReady: flags?.[flags.length - 3] === '1',
+          isUsingStereoscopy: flags?.[flags.length - 4] === '1',
+          isManagedByOtherServer: flags?.[flags.length - 5] === '1',
+          isServer: flags?.[flags.length - 6] === '1',
+          hasPlayerSlot: flags?.[flags.length - 7] === '1'
+        }
+        Events.emitEvent('Controller.PlayerInfoChanged', info)
       }
     },
     {
