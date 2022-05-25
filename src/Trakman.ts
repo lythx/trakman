@@ -26,7 +26,7 @@ export const TRAKMAN = {
     return title
   },
 
-  stripModifiers(str: string, removeColours: boolean = true) {
+  stripModifiers (str: string, removeColours: boolean = true) {
     return removeColours
       ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
       : str.replace(/\$(?:[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
@@ -145,8 +145,8 @@ export const TRAKMAN = {
         }
       })
     }
-    const res = await Client.call('system.multicall', [{array: arr}])
-    if(res instanceof Error){
+    const res = await Client.call('system.multicall', [{ array: arr }])
+    if (res instanceof Error) {
       return res
     }
     const ret: CallResponse[] = []
@@ -154,7 +154,7 @@ export const TRAKMAN = {
     return ret
   },
 
-  multiCallNoRes(...calls: TMCall[]): void {
+  multiCallNoRes (...calls: TMCall[]): void {
     const arr: any[] = []
     for (const c of calls) {
       const params = c.params == null ? [] : c.params

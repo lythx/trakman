@@ -26,7 +26,7 @@ export class ChallengeService {
    */
   static async setCurrent (): Promise<void> {
     const res = await Client.call('GetCurrentChallengeInfo')
-    if(res instanceof Error){
+    if (res instanceof Error) {
       ErrorHandler.error('Unable to retrieve current challenge info.', res.message)
       return
     }
@@ -58,9 +58,9 @@ export class ChallengeService {
   private static async getList (): Promise<void> {
     this.list = []
     const challengeList = await Client.call('GetChallengeList', [
-        { int: 5000 }, { int: 0 }
-      ])
-    if(challengeList instanceof Error){
+      { int: 5000 }, { int: 0 }
+    ])
+    if (challengeList instanceof Error) {
       ErrorHandler.error('Error getting the challenge list', challengeList.message)
       return
     }

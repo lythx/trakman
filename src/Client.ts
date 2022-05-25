@@ -41,7 +41,7 @@ export class Client {
   }
 
   static callNoRes (method: string, params: object[] = []): void {
-    this.#requestId++ 
+    this.#requestId++
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.#requestId)
     this.#socket.write(buffer)

@@ -14,17 +14,17 @@ const command: TMCommand = {
       return
     }
     const write = await Client.call('WriteFile', [{ string: file.name }, { base64: file.content }])
-    if(write instanceof Error){
-      TM.sendMessage(`Server failed to write file`)
+    if (write instanceof Error) {
+      TM.sendMessage('Server failed to write file')
       return
     }
     const insert = await Client.call('InsertChallenge', [{ string: file.name }])
-    if(insert instanceof Error) {
-      TM.sendMessage(`Server failed to add challenge to jukebox`)
+    if (insert instanceof Error) {
+      TM.sendMessage('Server failed to add challenge to jukebox')
       return
     }
     const insertRes = await Client.call('GetNextChallengeInfo')
-    if(insertRes instanceof Error) {
+    if (insertRes instanceof Error) {
       TM.sendMessage('Failed to fetch next challenge info')
       return
     }
