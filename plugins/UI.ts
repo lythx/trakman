@@ -96,8 +96,8 @@ const plugins: TMEvent[] = [
         }
     },
     {
-        event: 'TrackMania.Checkpoint', // Need a Controller event for better handling
-        callback: async (params: any[]) => {
+        event: 'Controller.PlayerCheckpoint', // Need a Controller event for better handling //e
+        callback: async (info: CheckpointInfo) => {
             // TODO: Update cpcounter to indicate current cp
         }
     },
