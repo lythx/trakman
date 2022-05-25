@@ -1,7 +1,7 @@
 ## TRAKMAN
 Trackmania Forever server controller written in TypeScript.
 
-More information is going to be available on the [wiki](https://github.com/felacek/trakman/wiki), later.
+Info about plugin development can/will be found on the [project wiki](https://github.com/felacek/trakman/wiki).
 
 ### Prerequisites
 Node.js [v18](https://nodejs.org/en/download/current/)+
