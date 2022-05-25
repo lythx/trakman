@@ -1,25 +1,42 @@
 'use strict'
 import { TRAKMAN as TM } from '../src/Trakman.js'
+import UIConfig from './UIConfig.json' assert { type: 'json' }
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
+
+abstract class UI {
+    // NOTE: Manialink IDs begin with 1000
+    // NOTE: Manialinks have their Z-index on 10
+
+    static buildCustomUi(): string {
+        const customUi: string = // Custom UI settings
+            `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
+            + `<notice visible="${UIConfig.customUi.notice.toString()}"/>` // Notice in the top left
+            + `<challenge_info visible="${UIConfig.customUi.challengeInfo.toString()}"/>` // Challenge info in the top right
+            + `<net_infos visible="${UIConfig.customUi.netInfo.toString()}"/>` // Loading bar in the top right
+            + `<chat visible="${UIConfig.customUi.chat.toString()}"/>` // Chat
+            + `<checkpoint_list visible="${UIConfig.customUi.checkpointList.toString()}"/>` // Checkpoint list, right of timer
+            + `<round_scores visible="${UIConfig.customUi.roundScores.toString()}"/>` // Round scores in rounds mode, right side
+            + `<scoretable visible="${UIConfig.customUi.scoreTable.toString()}"/>` // Scoretable on podium/score
+            + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
+            + `</custom_ui></manialinks>`
+        return customUi
+    }
+
+    // static buildChallengeWidget(info: BeginChallengeInfo, mode: boolean): string {
+    //     const xml: string = `<manialink id="1000">`
+    //         + `<frame posn="%posx% %posy% 10">`
+    //         + ``
+    //     return xml
+    // }
+}
 
 const plugins: TMEvent[] = [
     {
         event: 'Controller.Ready',
         callback: async () => {
-            const customUi: string = // Custom UI settings
-                `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
-                + `<notice visible="false"/>` // Notice in the top left
-                + `<challenge_info visible="false"/>` // Challenge info in the top right
-                + `<net_infos visible="true"/>` // Loading bar in the top right
-                + `<chat visible="true"/>` // Chat
-                + `<checkpoint_list visible="true"/>` // Checkpoint list, right of timer
-                + `<round_scores visible="true"/>` // Round scores in rounds mode, right side
-                + `<scoretable visible="true"/>` // Scoretable on podium/score
-                + `<global visible="true"/>` // All the windows: speed, timer, prev/best, etc.
-                + `</custom_ui></manialinks>`
-            await TM.call('SendDisplayManialinkPage', [{ string: customUi }, { int: 0 }, { boolean: false }])
+            await TM.call('SendDisplayManialinkPage', [{ string: UI.buildCustomUi() }, { int: 0 }, { boolean: false }])
             // await TM.call('SetForcedMods', [{ boolean: true }, { array: [{ 'Env': 'Stadium', 'Url': 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }] }])
             // Enable later ^
         }
@@ -113,6 +130,7 @@ const plugins: TMEvent[] = [
     {
         event: 'Controller.BeginChallenge', // Need a Controller event for better handling //hhhhhhhhhh
         callback: async (info: BeginChallengeInfo) => {
+
             // TODO: Remove podium/score widgets
 
             // TODO: Fetch the current challenge info
