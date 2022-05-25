@@ -199,7 +199,7 @@ export const TRAKMAN = {
      * Adds a chat command
      */
   addCommand (command: TMCommand) {
-    ChatService.addCommand(command).then()
+    ChatService.addCommand(command)
   },
 
   /**

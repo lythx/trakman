@@ -17,7 +17,7 @@ export abstract class ChatService {
     await this.repo.initialize()
   }
 
-  static async addCommand (command: TMCommand): Promise<void> {
+  static addCommand (command: TMCommand): void {
     const prefix = command.privilege === 0 ? '/' : '//'
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
       const input = info.text?.trim()
