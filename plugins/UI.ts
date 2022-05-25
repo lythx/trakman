@@ -62,7 +62,7 @@ const plugins: TMEvent[] = [
     },
     {
         event: 'Controller.ManialinkClick', // Need a Controller event for better handling //asdasd
-        callback: async (params: any[]) => {
+        callback: async (info: ManialinkClickInfo) => {
             // This will basically handle every widget click
             // If I were to write every TODO I'd kill myself, so..
             // TODO: Everything about players <-> widgets interaction

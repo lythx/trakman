@@ -22,7 +22,10 @@ Controller events
 'Controller.PlayerLeave': LeaveInfo -> `Triggered after player leaves the server, passes player information`
 'Controller.PlayerRecord': RecordInfo -> `Triggered after player gets a local record, passes player and record information` 
 'Controller.PlayerFinish': FinishInfo -> `Triggered after player finishes, passes player and run information`
-
+'Controller.PlayerInfoChanged': InfoChangedInfo -> `Triggered when players state changes, passes various information about player status`
+'Controller.ManialinkClick': ManialinkClickInfo -> `Triggered when player clicks a manialink which has an actionID, passes player information and actionID`
+'Controller.PlayerCheckpoint': CheckpointInfo -> `Triggered after player gets a checkpoint, passes player and checkpoint information`
+'Controller.BeginChallenge': BeginChallengeInfo -> `Triggered when new challenge starts, passes challenge information and local records`
 'Controller.DedimaniaRecords', TODO `Triggered after dedimania records get fetched,    ` 
 ```
 Dedicated server events
