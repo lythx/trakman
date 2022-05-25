@@ -152,4 +152,4 @@ const commands: TMCommand[] = [
   }
 ]
 
-for (const command of commands) { ChatService.addCommand(command).then() }
+for (const command of commands) { ChatService.addCommand(command) }

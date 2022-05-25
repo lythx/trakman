@@ -4,7 +4,7 @@ import { DedimaniaClient } from '../dedimania/DedimaniaClient.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
-import {GameService} from "./GameService.js";
+import { GameService } from './GameService.js'
 
 export abstract class DedimaniaService {
   static _dedis: TMDedi[] = []

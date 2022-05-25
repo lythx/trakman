@@ -15,7 +15,7 @@ export class PlayerService {
   private static repo: PlayerRepository
   private static newOwnerLogin: string | null = null
 
-  static async initialize(repo: PlayerRepository = new PlayerRepository()): Promise<void> {
+  static async initialize (repo: PlayerRepository = new PlayerRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
     const oldOwnerLogin = (await this.repo.getOwner())?.[0]?.login
@@ -26,7 +26,7 @@ export class PlayerService {
     if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
   }
 
-  static getPlayer(login: string): TMPlayer {
+  static getPlayer (login: string): TMPlayer {
     const player = this._players.find(p => p.login === login)
     if (player == null) {
       throw Error('Player ' + login + ' not in player list.')
@@ -34,7 +34,7 @@ export class PlayerService {
     return player
   }
 
-  static get players(): TMPlayer[] {
+  static get players (): TMPlayer[] {
     return this._players
   }
 
@@ -43,15 +43,15 @@ export class PlayerService {
    * Only called in the beginning as a start job
    * @returns {Promise<void>}
    */
-  static async addAllFromList(): Promise<void> {
+  static async addAllFromList (): Promise<void> {
     const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
-    if(playerList instanceof Error){
+    if (playerList instanceof Error) {
       ErrorHandler.error('Error when fetching players from the server', playerList.message)
       return
     }
     for (const player of playerList) {
       const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
-      if(detailedPlayerInfo instanceof Error){
+      if (detailedPlayerInfo instanceof Error) {
         ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
         return
       }
@@ -66,7 +66,7 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join(login: string, nickName: string, path: string): Promise<void> {
+  static async join (login: string, nickName: string, path: string): Promise<void> {
     const nation = path.split('|')[1]
     let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode == null) {
@@ -118,7 +118,7 @@ export class PlayerService {
    * @param {string} login
    * @returns {Promise<void>}
    */
-  static async leave(login: string): Promise<void> {
+  static async leave (login: string): Promise<void> {
     const player = this.getPlayer(login)
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
@@ -139,7 +139,7 @@ export class PlayerService {
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async fetchPlayer(login: string): Promise<DBPlayerInfo | null> {
+  static async fetchPlayer (login: string): Promise<DBPlayerInfo | null> {
     const res = (await this.repo.get(login))?.[0]
     if (res == null) { return null }
     const nation = countries.find(a => a.code === res.nation)?.name
@@ -155,7 +155,7 @@ export class PlayerService {
     }
   }
 
-  static async setPrivilege(login: string, privilege: number): Promise<void> {
+  static async setPrivilege (login: string, privilege: number): Promise<void> {
     await this.repo.setPrivilege(login, privilege)
     const player = this.players.find(a => a.login === login)
     if (player != null) { player.privilege = privilege }
@@ -180,7 +180,7 @@ export class PlayerService {
     if (cp.index === 0) {
       player.checkpoints.unshift(cp)
       player.checkpoints.length = 1
-      if (laps === 1 && ChallengeService.current.checkpointsAmount === 1){
+      if (laps === 1 && ChallengeService.current.checkpointsAmount === 1) {
         player.checkpoints.length = 0
         RecordService.add(ChallengeService.current.id, login, cp.time)
       }
@@ -188,7 +188,6 @@ export class PlayerService {
     }
     if (player.checkpoints.length === 0) { return }
     const correctLap = player.checkpoints[0].lap + laps
-    if (cp.lap < correctLap) { player.checkpoints.push(cp) }
-    else RecordService.add(ChallengeService.current.id, login, cp.time)
+    if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(ChallengeService.current.id, login, cp.time)
   }
 }

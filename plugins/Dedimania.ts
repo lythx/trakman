@@ -13,7 +13,7 @@ if (process.env.USE_DEDIMANIA === 'YES') {
             + `$z$s[${TM.Utils.getTimeString(record.score)}], `
         }
         str = str.substring(0, str.length - 2)
-        TM.sendMessage(str).then()
+        TM.sendMessage(str)
       }
     }
   ]
