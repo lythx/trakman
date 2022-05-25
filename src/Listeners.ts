@@ -46,7 +46,13 @@ export class Listeners {
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        await PlayerService.addCP(params[1], checkpoint)
+        PlayerService.addCP(params[1], checkpoint)
+        const temp:any = PlayerService.getPlayer(params[1])
+        temp.time = params[2]
+        temp.lap = params[3]
+        temp.index = params[4]
+        const info: CheckpointInfo = temp
+        Events.emitEvent('Controller.PlayerCheckpoint', info)
       }
     },
     {

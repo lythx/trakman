@@ -158,7 +158,7 @@ export class PlayerService {
    * @param {TMCheckpoint} cp
    * @return {Promise<void>}
    */
-  static async addCP (login: string, cp: TMCheckpoint): Promise<void> {
+  static addCP (login: string, cp: TMCheckpoint): void {
     const player = this.getPlayer(login)
     if (cp.index === 0) {
       player.checkpoints.unshift(cp)
