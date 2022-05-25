@@ -20,8 +20,8 @@ const plugins: TMEvent[] = [
                 + `<global visible="true"/>` // All the windows: speed, timer, prev/best, etc.
                 + `</custom_ui></manialinks>`
             await TM.call('SendDisplayManialinkPage', [{ string: customUi }, { int: 0 }, { boolean: false }])
-            // TODO: SetForceMods
-            
+            // await TM.call('SetForcedMods', [{ boolean: true }, { array: [{ 'Env': 'Stadium', 'Url': 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }] }])
+            // Enable later ^
         }
     },
     {
