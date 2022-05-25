@@ -24,7 +24,7 @@ async function main (): Promise<void> {
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
-  if(auth instanceof Error){
+  if (auth instanceof Error) {
     ErrorHandler.fatal('Authentication failed', auth.message)
   }
   Logger.info('Authentication success')
@@ -32,11 +32,11 @@ async function main (): Promise<void> {
   await GameService.initialize()
   Logger.info('Game info fetched')
   Logger.trace('Enabling callbacks...')
-  const cb=  await Client.call('EnableCallbacks', [
+  const cb = await Client.call('EnableCallbacks', [
     { boolean: true }
   ])
-  if(cb instanceof Error) { 
-    ErrorHandler.fatal('Failed to enable callbacks', cb.message) 
+  if (cb instanceof Error) {
+    ErrorHandler.fatal('Failed to enable callbacks', cb.message)
   }
   await RecordService.initialize()
   Logger.info('Callbacks enabled')
