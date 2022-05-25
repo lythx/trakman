@@ -57,7 +57,7 @@ export class RecordService {
     temp.score = score 
     const finishInfo :FinishInfo = temp
     Events.emitEvent('Controller.PlayerFinish', finishInfo) 
-    if (checkpoints.length !== cpAmount) {
+    if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
       return
     }
