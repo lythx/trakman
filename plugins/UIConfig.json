@@ -1,0 +1,60 @@
+{
+    "widgetStyleRace": {
+        "bgStyle": "Bgs1InRace",
+        "bgSubStyle": "NavButton",
+        "titleStyle": "BgsPlayerCard",
+        "titleSubStyle": "BgCardSystem",
+        "topStyle": "BgsPlayerCard",
+        "topSubStyle": "BgCardSystem",
+        "hlSelfStyle": "BgsPlayerCard",
+        "hlSelfSubStyle": "BgCardSystem",
+        "hlOtherStyle": "BgsPlayerCard",
+        "hlOtherSubStyle": "BgCardSystem",
+        "formattingCodes": "$s",
+        "colours": {
+            "default": "FFFF",
+            "scores": "DDDF",
+            "top": "FF0F",
+            "better": "F00F",
+            "worse": "CCCF",
+            "self": "35F5",
+            "bgRank": "0000",
+            "bgScore": "0000",
+            "bgName": "0000"
+        }
+    },
+    "widgetStyleScore": {
+        "bgStyle": "Bgs1InRace",
+        "bgSubStyle": "NavButton",
+        "titleStyle": "BgsPlayerCard",
+        "titleSubStyle": "BgCardSystem",
+        "topStyle": "BgsPlayerCard",
+        "topSubStyle": "BgCardSystem",
+        "hlSelfStyle": "BgsPlayerCard",
+        "hlSelfSubStyle": "BgCardSystem",
+        "hlOtherStyle": "BgsPlayerCard",
+        "hlOtherSubStyle": "BgCardSystem",
+        "formattingCodes": "$s",
+        "colours": {
+            "default": "FFFF",
+            "scores": "DDDF",
+            "top": "FF0F",
+            "better": "F00F",
+            "worse": "CCCF",
+            "self": "35F5",
+            "bgRank": "0000",
+            "bgScore": "0000",
+            "bgName": "0000"
+        }
+    },
+    "customUi": {
+        "notice": false,
+        "challengeInfo": false,
+        "netInfo": true,
+        "chat": true,
+        "checkpointList": true,
+        "roundScores": true,
+        "scoreTable": true,
+        "global": true
+    }
+}
