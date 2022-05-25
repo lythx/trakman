@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { Client } from '../Client.js'
+import { TRAKMAN as TM } from '../Trakman.js'
 
 const messagesArraySize = 250
 
@@ -25,7 +26,7 @@ export abstract class ChatService {
         return
       }
       if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: '$ff0» $f00You have no permission to use this command.' }, { string: info.login }])
+        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${TM.colours.yellow}»${TM.colours.red} You have no permission to use this command.` }, { string: info.login }])
         return
       }
       const text = input.split(' ').splice(1).join(' ')
