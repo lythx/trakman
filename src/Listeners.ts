@@ -46,7 +46,13 @@ export class Listeners {
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        await PlayerService.addCP(params[1], checkpoint)
+        PlayerService.addCP(params[1], checkpoint)
+        const temp:any = PlayerService.getPlayer(params[1])
+        temp.time = params[2]
+        temp.lap = params[3]
+        temp.index = params[4]
+        const info: CheckpointInfo = temp
+        Events.emitEvent('Controller.PlayerCheckpoint', info)
       }
     },
     {
@@ -100,6 +106,14 @@ export class Listeners {
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
+        const c = params[0]
+        const info: BeginChallengeInfo = {
+          id: c.UId, name: c.Name, author: c.Author, environment: c.Environnement, mood: c.Mood,
+          bronzeTime: c.BronzeTime, silverTime: c.SilverTime, goldTime: c.GoldTime,
+          authorTime: c.AuthorTime, copperPrice: c.CopperPrice, lapRace: c.LapRace,
+          lapsAmount: c.NbLaps, checkpointsAmount: c.NbCheckpoints, records: RecordService.records
+        }
+        Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') {
           const records = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
           Events.emitEvent('Controller.DedimaniaRecords', records)
@@ -126,7 +140,10 @@ export class Listeners {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: async (params: any[]) => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
-        // Handle player interaction with Manialinks
+        const temp: any = PlayerService.getPlayer(params[1])
+        temp.answer = params[2]
+        const info: ManialinkClickInfo = temp
+        Events.emitEvent('Controller.ManialinkClick', info)
       }
     },
     {
@@ -147,7 +164,28 @@ export class Listeners {
       event: 'TrackMania.PlayerInfoChanged',
       callback: async (params: any[]) => {
         // [0] = PlayerInfo
-        // Handle changes in the player object
+        const spec = params[0].SpectatorStatus.toString()
+        const flags = params[0].Flags.toString()
+        const info: InfoChangedInfo = {
+          login: params[0].Login,
+          nickName: params[0].NickName,
+          id: params[0].PlayerId,
+          teamId: params[0].TeamId,
+          ladderRanking: params[0].LadderRanking,
+          isSpectator: spec?.[spec.length - 1] === '1',
+          isTemporarySpectator: spec?.[spec.length - 2] === '1',
+          isPureSpectator: spec?.[spec.length - 3] === '1',
+          autoTarget: spec?.[spec.length - 4] === '1',
+          currentTargetId: Number(spec?.substring(0, spec.length - 4)) || 0,
+          forceSpectator: Number(flags?.[flags.length - 1]) || 0,
+          isReferee: flags?.[flags.length - 2] === '1',
+          isPodiumReady: flags?.[flags.length - 3] === '1',
+          isUsingStereoscopy: flags?.[flags.length - 4] === '1',
+          isManagedByOtherServer: flags?.[flags.length - 5] === '1',
+          isServer: flags?.[flags.length - 6] === '1',
+          hasPlayerSlot: flags?.[flags.length - 7] === '1'
+        }
+        Events.emitEvent('Controller.PlayerInfoChanged', info)
       }
     },
     {
