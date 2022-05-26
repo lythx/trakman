@@ -56,5 +56,37 @@
         "roundScores": true,
         "scoreTable": true,
         "global": true
+    },
+    "challengeWidget": {
+        "enabled": true,
+        "width": 15.5,
+        "height": 8.9,
+        "icons": {
+            "lastTrack": {
+                "style": "Icons128x128_1",
+                "substyle": "NewTrack"
+            },
+            "currTrack": {
+                "style": "Icons128x128_1",
+                "substyle": "Challenge"
+            },
+            "nextTrack": {
+                "style": "Icons128x128_1",
+                "substyle": "LoadTrack"
+            }
+        },
+        "titles": {
+            "lastTrack": "Last Map",
+            "currTrack": "Ongoing",
+            "nextTrack": "Next Map"
+        },
+        "racePos": {
+            "posX": 49.2,
+            "posY": 48
+        },
+        "scorePos": {
+            "posX": 49.2,
+            "posY": 47.5
+        }
     }
 }
