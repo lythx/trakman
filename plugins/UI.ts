@@ -93,10 +93,10 @@ abstract class UI {
             + `style="${UIConfig.challengeWidget.icons.currTrack.style}" substyle="${UIConfig.challengeWidget.icons.currTrack.substyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.currTrack}"/>`
-            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${info.name}"/>`
+            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${TM.stripModifiers(info.name, false)}"/>`
             + `<label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="by ${info.author}"/>`
             + `<quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>`
-            + `<label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${info.authorTime}"/>`
+            + `<label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${TM.Utils.getTimeString(info.authorTime)}"/>`
             + `</frame>`
             + `</manialink>`
         return xml
@@ -116,7 +116,7 @@ abstract class UI {
             + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.substyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.nextTrack}"/>`
-            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${info[0].Name}"/>`
+            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${TM.stripModifiers(info[0].Name, false)}"/>`
             + `<frame posn="0.5 -10 0">`
             + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${info[0].Author}"/>`
             + `<quad posn="2.95 3.38 0.11" sizen="2.5 2.5" halign="right" style="Icons128x128_1" substyle="Advanced"/>`
@@ -126,7 +126,7 @@ abstract class UI {
             + `<quad posn="2.75 5.25 0.11" sizen="2 2" halign="right" style="Icons128x128_1" substyle="Manialink"/>`
             + `<label posn="3.3 5 0.11" sizen="12 2" scale="0.9" text="${info[0].Mood}"/>`
             + `<quad posn="2.75 3.1 0.11" sizen="2 2" halign="right" style="BgRaceScore2" substyle="ScoreReplay"/>`
-            + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${info[0].AuthorTime}"/>`
+            + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${TM.Utils.getTimeString(info[0].AuthorTime)}"/>`
             + `</frame>`
             + `</frame>`
             + `</manialink>`
