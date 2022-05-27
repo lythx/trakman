@@ -64,15 +64,15 @@
         "icons": {
             "lastTrack": {
                 "style": "Icons128x128_1",
-                "substyle": "NewTrack"
+                "subStyle": "NewTrack"
             },
             "currTrack": {
                 "style": "Icons128x128_1",
-                "substyle": "Challenge"
+                "subStyle": "Challenge"
             },
             "nextTrack": {
                 "style": "Icons128x128_1",
-                "substyle": "LoadTrack"
+                "subStyle": "LoadTrack"
             }
         },
         "titles": {
@@ -88,5 +88,16 @@
             "posX": 49.2,
             "posY": 47.5
         }
+    },
+    "localRecordsWidget": {
+        "enabled": true,
+        "title": "Locals",
+        "width": 15.5,
+        "posX": 49.2,
+        "posY": 26.25,
+        "entries": 12,
+        "topCount": 5,
+        "iconStyle": "Icons128x128_1",
+        "iconSubStyle": "Rankings"
     }
 }
