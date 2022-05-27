@@ -1,4 +1,5 @@
 'use strict'
+
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import UIConfig from './UIConfig.json' assert { type: 'json' }
 
@@ -12,58 +13,16 @@ import UIConfig from './UIConfig.json' assert { type: 'json' }
 // Action IDs in use:
 // 50000 - ChallengeWidget
 
-abstract class UI {
+// Manialink IDs (RACE) begin with 10000
+// Manialink Action IDs begin with 50000
+// Manialinks have their Z-index on 10
+// Manialink IDs (SCORE) begin with 20000
 
-    // Manialink IDs (RACE) begin with 10000
-    // Manialink IDs (SCORE) begin with 20000
-    // Manialink Action IDs begin with 50000
-    // Manialinks have their Z-index on 10
-
-    // I HATE OOP XDDDD
-
-    // $re_config['Positions'] = array(
-    // 	'left'	=> array(
-    // 		'icon'		=> array(
-    // 			'x'		=> 0.6,
-    // 			'y'		=> 0
-    // 		),
-    // 		'title'		=> array(
-    // 			'x'		=> 3.2,
-    // 			'y'		=> -0.55,
-    // 			'halign'	=> 'left'
-    // 		),
-    // 		'image_open'	=> array(
-    // 			'x'		=> -0.3,
-    // 			'image'		=> $re_config['IMAGES'][0]['WIDGET_OPEN_LEFT'][0]
-    // 		)
-    // 	),
-    // 	'right'	=> array(
-    // 		'icon'		=> array(
-    // 			'x'		=> 12.5,
-    // 			'y'		=> 0
-    // 		),
-    // 		'title'		=> array(
-    // 			'x'		=> 12.4,
-    // 			'y'		=> -0.55,
-    // 			'halign'	=> 'right'
-    // 		),
-    // 		'image_open'	=> array(
-    // 			'x'		=> 12.2,
-    // 			'image'		=> $re_config['IMAGES'][0]['WIDGET_OPEN_RIGHT'][0]
-    // 		)
-    // 	)
-    // );
-
-    static closeManialinks(mode: boolean): string {
-        // This will need to be updated when more widgets are added!
-        const ids: Array<number> = mode ? [10000] : [20000]
-        let xml: string = ``
-        for (const id of ids) {
-            xml += `<manialink id="${id}"></manialink>`
-        }
-        return xml
-    }
-
+abstract class UIGeneral {
+    /**
+     * format custom ui using values from config
+     * @returns xml of the customui block
+     */
     static buildCustomUi(): string {
         const customUi: string = // Custom UI settings
             `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
@@ -79,6 +38,28 @@ abstract class UI {
         return customUi
     }
 
+    /**
+     * close all plugin manialinks
+     * @param mode race (true) or score (false)
+     * @returns xml with manialinks closed
+     */
+    static closeManialinks(mode: boolean): string {
+        // This will need to be updated when more widgets are added!
+        const ids: Array<number> = mode ? [10000, 10001] : [20000]
+        let xml: string = ``
+        for (const id of ids) {
+            xml += `<manialink id="${id}"></manialink>`
+        }
+        return xml
+    }
+}
+
+abstract class UIRace {
+    /**
+     * build the challenge widget for race
+     * @param info challenge info from callback
+     * @returns xml of the widget
+     */
     static buildChallengeWidget(info: BeginChallengeInfo): string {
         const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
         const xml: string = // Challenge widget
@@ -90,7 +71,7 @@ abstract class UI {
             + `<quad posn="0.4 -0.36 0.02" sizen="${UIConfig.challengeWidget.width - 0.8} 2" `
             + `style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/>`
             + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
-            + `style="${UIConfig.challengeWidget.icons.currTrack.style}" substyle="${UIConfig.challengeWidget.icons.currTrack.substyle}"/>`
+            + `style="${UIConfig.challengeWidget.icons.currTrack.style}" substyle="${UIConfig.challengeWidget.icons.currTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.currTrack}"/>`
             + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${TM.stripModifiers(info.name, false)}"/>`
@@ -102,7 +83,49 @@ abstract class UI {
         return xml
     }
 
-    static buildChallengeWidgetScore(info: any): string {
+    static buildLocalRecordsWidget(info: BeginChallengeInfo, player: TMPlayer): string {
+        const pos: boolean = (UIConfig.localRecordsWidget.posX < 0) ? true : false
+        const widgetHeight = 1.8 * UIConfig.localRecordsWidget.entries + 3.3
+        const columnHeight = widgetHeight - 3.1
+        const columnWidth = UIConfig.localRecordsWidget.width - 6.45
+        const titleWidth = UIConfig.localRecordsWidget.width - 0.8
+        // Build records list
+        const lineLimit: number = 50
+        const records: Array<TMRecord> = TM.getLocalRecords(info.id, 50)
+        if (records.length > 0) {
+            // TODO :d
+        }
+        const xml: string = // Locals widget
+            `<manialink id="10001">`
+            + `<frame posn="${UIConfig.localRecordsWidget.posX} ${UIConfig.localRecordsWidget.posY} 10">`
+            + `<quad posn="0 0 0.01" sizen="${UIConfig.localRecordsWidget.width} ${widgetHeight}" `
+            + `action="50001" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `<quad posn="0.4 -2.6 0.02" sizen="2 ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgRank}"/>`
+            + `<quad posn="2.4 -2.6 0.02" sizen="3.65 ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgScore}"/>`
+            + `<quad posn="6.05 -2.6 0.02" sizen="${columnWidth} ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgName}"/>`
+            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" `
+            + `style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/>`
+            + `<quad posn="${pos ? 12.5 + UIConfig.localRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+            + `style="${UIConfig.localRecordsWidget.iconStyle}" substyle="${UIConfig.localRecordsWidget.iconSubStyle}"/>`
+            + `<label posn="${pos ? 12.4 + UIConfig.localRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.localRecordsWidget.title}"/>`
+            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `<quad posn="0.4 -2.6 0.03" sizen="${titleWidth} ${1.8 * UIConfig.localRecordsWidget.topCount + 0.3}" `
+            + `style="${UIConfig.widgetStyleRace.topStyle}" substyle="${UIConfig.widgetStyleRace.topSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+}
+
+abstract class UIScore {
+    /**
+     * build challenge widget for score
+     * @param info challenge info from callback
+     * @returns xml of the widget
+     */
+    static buildChallengeWidget(info: any): string {
         const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
         const xml: string = // Challenge widget for podium/score
             `<manialink id="20000">`
@@ -113,7 +136,7 @@ abstract class UI {
             + `<quad posn="0.4 -0.36 0.02" sizen="${UIConfig.challengeWidget.width - 0.8} 2" `
             + `style="${UIConfig.widgetStyleScore.titleStyle}" substyle="${UIConfig.widgetStyleScore.titleSubStyle}"/>`
             + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
-            + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.substyle}"/>`
+            + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.nextTrack}"/>`
             + `<label posn="1.35 -3 0.11" sizen="15 2" text="${TM.stripModifiers(info[0].Name, false)}"/>`
@@ -134,11 +157,11 @@ abstract class UI {
     }
 }
 
-const plugins: TMEvent[] = [
+const events: TMEvent[] = [
     {
         event: 'Controller.Ready',
         callback: async () => {
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UI.buildCustomUi() }, { int: 0 }, { boolean: false }])
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildCustomUi() }, { int: 0 }, { boolean: false }])
             // await TM.call('SetForcedMods', [{ boolean: true }, { array: [{ 'Env': 'Stadium', 'Url': 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }] }])
             // Enable later ^
         }
@@ -225,12 +248,10 @@ const plugins: TMEvent[] = [
         event: 'TrackMania.EndChallenge', // Need a Controller event for better handling
         callback: async (params: any[]) => {
             // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UI.closeManialinks(true) }, { int: 0 }, { boolean: false }])
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(true) }, { int: 0 }, { boolean: false }])
             // This can be improved after queue/jukebox, as we can get next challenge from there also
             const info = await TM.call('GetNextChallengeInfo')
-            // TODO: INSTEAD OF USING SINGLE FUNCTIONS USE A META FUNCTION THAT CALLS THE REST AND RETURNS THE RESULTING XML
-            // TODO: ILL IMPLEMENT THAT LATER AFTER I HAVE BASIC UI WORKING OK
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UI.buildChallengeWidgetScore(info) }, { int: 0 }, { boolean: false }])
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
             // TODO: Display all the podium/score widgets
         }
@@ -239,7 +260,7 @@ const plugins: TMEvent[] = [
         event: 'Controller.BeginChallenge', // Need a Controller event for better handling //hhhhhhhhhh
         callback: async (info: BeginChallengeInfo) => {
             // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UI.closeManialinks(false) }, { int: 0 }, { boolean: false }])
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
 
             // TODO: Fetch the next challenge info
             // Temporarily moved to EndChallenge
@@ -247,11 +268,12 @@ const plugins: TMEvent[] = [
             // This is easier achievable with queue/jukebox
 
             // TODO: Display current challenge widget
-            // TODO: INSTEAD OF USING SINGLE FUNCTIONS USE A META FUNCTION THAT CALLS THE REST AND RETURNS THE RESULTING XML
-            // TODO: ILL IMPLEMENT THAT LATER AFTER I HAVE BASIC UI WORKING OK
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UI.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
             // TODO: Display current challenge record widgets
+            for (const player of TM.players) {
+                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: UIRace.buildLocalRecordsWidget(info, player) }, { int: 0 }, { boolean: false }])
+            }
 
             // TODO: Display the miscellaneous widgets:
             // Clock, addfav, cpcounter, gamemode, visitors,
@@ -260,6 +282,6 @@ const plugins: TMEvent[] = [
     },
 ]
 
-for (const plugin of plugins) {
-    TM.addListener(plugin.event, plugin.callback)
+for (const event of events) {
+    TM.addListener(event.event, event.callback)
 }
