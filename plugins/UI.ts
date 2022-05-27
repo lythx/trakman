@@ -90,8 +90,8 @@ abstract class UIRace {
         const columnWidth = UIConfig.localRecordsWidget.width - 6.45
         const titleWidth = UIConfig.localRecordsWidget.width - 0.8
         // Build records list
-        const lineLimit: number = 50
-        const records: Array<TMRecord> = TM.getLocalRecords(info.id, 50)
+        const lineLimit: number = 50 // idk whats the point
+        const records: Array<TMRecord> = TM.getLocalRecords(info.id, lineLimit)
         if (records.length > 0) {
             // TODO :d
         }
