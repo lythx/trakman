@@ -264,6 +264,14 @@ const commands: TMCommand[] = [
     },
     privilege: 1
   },
+  {
+      aliases: ['kickghost', 'ghostkick', 'kg'],
+      help: 'Manipulate every soul on the server that you kicked someone.',
+      callback: async(info: MessageInfo) => {
+        TM.sendMessage(`${info.nickName}$z$s${colours.green} has kicked ${colours.white}${info.text} ${colours.green}from the server.`)
+   },
+    privilege: 1
+  }, //You're welcome wizer : - )
 ]
 
 for (const command of commands) { ChatService.addCommand(command) }
