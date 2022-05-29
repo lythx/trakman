@@ -1,0 +1,103 @@
+{
+    "widgetStyleRace": {
+        "bgStyle": "Bgs1InRace",
+        "bgSubStyle": "NavButton",
+        "titleStyle": "BgsPlayerCard",
+        "titleSubStyle": "BgCardSystem",
+        "topStyle": "BgsPlayerCard",
+        "topSubStyle": "BgCardSystem",
+        "hlSelfStyle": "BgsPlayerCard",
+        "hlSelfSubStyle": "BgCardSystem",
+        "hlOtherStyle": "BgsPlayerCard",
+        "hlOtherSubStyle": "BgCardSystem",
+        "formattingCodes": "$s",
+        "colours": {
+            "default": "FFFF",
+            "scores": "DDDF",
+            "top": "FF0F",
+            "better": "F00F",
+            "worse": "CCCF",
+            "self": "35F5",
+            "bgRank": "F00F",
+            "bgScore": "0F0F",
+            "bgName": "00FF"
+        }
+    },
+    "widgetStyleScore": {
+        "bgStyle": "Bgs1InRace",
+        "bgSubStyle": "NavButton",
+        "titleStyle": "BgsPlayerCard",
+        "titleSubStyle": "BgCardSystem",
+        "topStyle": "BgsPlayerCard",
+        "topSubStyle": "BgCardSystem",
+        "hlSelfStyle": "BgsPlayerCard",
+        "hlSelfSubStyle": "BgCardSystem",
+        "hlOtherStyle": "BgsPlayerCard",
+        "hlOtherSubStyle": "BgCardSystem",
+        "formattingCodes": "$s",
+        "colours": {
+            "default": "FFFF",
+            "scores": "DDDF",
+            "top": "FF0F",
+            "better": "F00F",
+            "worse": "CCCF",
+            "self": "35F5",
+            "bgRank": "0000",
+            "bgScore": "0000",
+            "bgName": "0000"
+        }
+    },
+    "customUi": {
+        "notice": false,
+        "challengeInfo": false,
+        "netInfo": true,
+        "chat": true,
+        "checkpointList": true,
+        "roundScores": true,
+        "scoreTable": true,
+        "global": true
+    },
+    "challengeWidget": {
+        "enabled": true,
+        "width": 15.5,
+        "height": 8.9,
+        "icons": {
+            "lastTrack": {
+                "style": "Icons128x128_1",
+                "subStyle": "NewTrack"
+            },
+            "currTrack": {
+                "style": "Icons128x128_1",
+                "subStyle": "Challenge"
+            },
+            "nextTrack": {
+                "style": "Icons128x128_1",
+                "subStyle": "LoadTrack"
+            }
+        },
+        "titles": {
+            "lastTrack": "Last Map",
+            "currTrack": "Ongoing",
+            "nextTrack": "Next Map"
+        },
+        "racePos": {
+            "posX": 49.2,
+            "posY": 48
+        },
+        "scorePos": {
+            "posX": 49.2,
+            "posY": 47.5
+        }
+    },
+    "localRecordsWidget": {
+        "enabled": true,
+        "title": "Locals",
+        "width": 15.5,
+        "posX": 49.2,
+        "posY": 17.8,
+        "entries": 20,
+        "topCount": 5,
+        "iconStyle": "Icons128x128_1",
+        "iconSubStyle": "Rankings"
+    }
+}
