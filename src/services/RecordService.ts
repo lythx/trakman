@@ -4,20 +4,49 @@ import { PlayerService } from './PlayerService.js'
 import { ChallengeService } from './ChallengeService.js'
 import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
+import 'dotenv/config'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
   private static repo: RecordRepository
   private static _records: TMRecord[] = []
+  private static _topPlayers: TopPlayer[] = []
 
-  static async initialize (repo: RecordRepository = new RecordRepository()): Promise<void> {
+  static async initialize(repo: RecordRepository = new RecordRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
   }
 
-  static async fetchRecords (challengeId: string): Promise<TMRecord[]> {
+  static async fetchRecords(challengeId: string): Promise<TMRecord[]> {
     this._records.length = 0
+    this._topPlayers.length = 0
     const records = await this.repo.get(challengeId)
+    console.log(records)
     records.sort((a, b) => a.score - b.score)
+    const n = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
+    for (let i = 0; i < n; i++) {
+      const player = await PlayerService.fetchPlayer(records[i].login)
+      if (player == null) {
+        ErrorHandler.fatal('Cant find login in players table even though it has record in records table.')
+        return []
+      }
+      const topPlayer: TopPlayer = {
+        challenge: challengeId,
+        login: records[i].login,
+        score: records[i].score,
+        date: records[i].date,
+        checkpoints: records[i].checkpoints,
+        position: i + 1,
+        nickName: player.nickName,
+        nation: player.nation,
+        nationCode: player.nationCode,
+        privilege: player.privilege,
+        timePlayed: player.timePlayed,
+        wins: player.wins,
+        visits: player.visits
+      }
+      this._topPlayers.push(topPlayer)
+    }
     for (const r of records) {
       this._records.push({ challenge: challengeId, score: r.score, login: r.login, date: r.date, checkpoints: r.checkpoints })
     }
@@ -25,17 +54,21 @@ export class RecordService {
     return this._records
   }
 
-  static async fetchRecord (challengeId: string, login: string): Promise<TMRecord | null> {
+  static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | null> {
     const res = (await this.repo.getByLogin(challengeId, login))?.[0]
     if (res == null) { return null }
     return { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
-  static get records (): TMRecord[] {
+  static get records(): TMRecord[] {
     return [...this._records]
   }
 
-  static async add (challenge: string, login: string, score: number): Promise<void> {
+  static get topPlayers(): TopPlayer[] {
+    return [...this._topPlayers]
+  }
+
+  static async add(challenge: string, login: string, score: number): Promise<void> {
     const date = new Date()
     const player = PlayerService.getPlayer(login)
     const cpsPerLap = ChallengeService.current.checkpointsAmount
