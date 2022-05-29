@@ -21,7 +21,6 @@ export class RecordService {
     this._records.length = 0
     this._topPlayers.length = 0
     const records = await this.repo.get(challengeId)
-    console.log(records)
     records.sort((a, b) => a.score - b.score)
     const n = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
     for (let i = 0; i < n; i++) {
