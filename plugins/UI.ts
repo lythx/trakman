@@ -92,9 +92,16 @@ abstract class UIRace {
     // Build records list
     const lineLimit: number = 50 // idk whats the point
     const records = info.records
-    for (const r of records) {
-      
-    }
+    let recordsXML = `<frame posn="0 -3 10">`
+    for (const [i, r] of records.entries())
+      recordsXML +=
+        `<label posn="${1} ${-1.8 * i} 0.04" sizen="1 0"   
+         halign="left" textsize="1" text="${i + 1}."/>
+        <label posn="${2.485} ${-1.8 * i} 0.04" sizen="3.5 0"   
+         halign="left" textsize="1" text="${TM.Utils.getTimeString(r.score)}"/>
+        <label posn="${6.45} ${-1.8 * i} 0.04" sizen="8 0"   
+         halign="left" textsize="1" text="${r.login}"/>`
+    recordsXML += `</frame>`
     const xml: string = // Locals widget
       `<manialink id="10001">
         <frame posn="${UIConfig.localRecordsWidget.posX} ${UIConfig.localRecordsWidget.posY} 10">  
@@ -110,6 +117,7 @@ abstract class UIRace {
            style="${UIConfig.localRecordsWidget.iconStyle}" substyle="${UIConfig.localRecordsWidget.iconSubStyle}"/>  
           <label posn="${pos ? 12.4 + UIConfig.localRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0"   
            halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.localRecordsWidget.title}"/>  
+          ${recordsXML}
           <format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>  
           <quad posn="0.4 -2.6 0.03" sizen="${titleWidth} ${1.8 * UIConfig.localRecordsWidget.topCount + 0.3}"   
            style="${UIConfig.widgetStyleRace.topStyle}" substyle="${UIConfig.widgetStyleRace.topSubStyle}"/>  
@@ -163,7 +171,17 @@ const events: TMEvent[] = [
     event: 'Controller.Ready',
     callback: async () => {
       TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildCustomUi() }, { int: 0 }, { boolean: false }])
-      // await TM.call('SetForcedMods', [{ boolean: true }, { array: [{ 'Env': 'Stadium', 'Url': 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }] }])
+      await TM.call('SetForcedMods', [
+        { boolean: true },
+        {
+          array:
+            [{
+              struct: {
+                Env: { string: 'Stadium' },
+                Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
+              }
+            }]
+        }])
       // Enable later ^
     }
   },
