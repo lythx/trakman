@@ -83,7 +83,7 @@ abstract class UIRace {
         return xml
     }
 
-    static buildLocalRecordsWidget(info: BeginChallengeInfo, player: TMPlayer): string {
+    static buildLocalRecordsWidget(player: TMPlayer): string {
         const pos: boolean = (UIConfig.localRecordsWidget.posX < 0) ? true : false
         const widgetHeight = 1.8 * UIConfig.localRecordsWidget.entries + 3.3
         const columnHeight = widgetHeight - 3.1
@@ -230,7 +230,7 @@ const events: TMEvent[] = [
     },
     {
         event: 'Controller.DedimaniaRecords',
-        callback: async (params: any[]) => { // Should return TMDedi[]
+        callback: async (info: ChallengeDedisInfo) => { // Should return TMDedi[] //no it shouldnt u dumbass
             // TODO: Fill in the Dedimania record widget
         }
     },
@@ -242,8 +242,10 @@ const events: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerRecord',
-        callback: async (params: RecordInfo) => { //Should return TMRecord //record info contains both TMRecord and TMPlayer and some other stuf
-            // TODO: Update the local records widget
+        callback: async (info: RecordInfo) => { //Should return TMRecord //record info contains both TMRecord and TMPlayer and some other stuf
+            for (const player of TM.players) {
+                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+            }
         }
     },
     {
@@ -290,7 +292,7 @@ const events: TMEvent[] = [
 
             // TODO: Display current challenge record widgets
             for (const player of TM.players) {
-                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(info, player) }, { int: 0 }, { boolean: false }])
+                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
             }
 
             // TODO: Display the miscellaneous widgets:

@@ -5,22 +5,24 @@ import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
+import { ChallengeService } from './ChallengeService.js'
 
 export abstract class DedimaniaService {
   static _dedis: TMDedi[] = []
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT)).catch(err => {
       ErrorHandler.fatal('Failed to connect to dedimania', err)
     })
     this.updateServerPlayers()
   }
 
-  static get dedis () {
+  static get dedis() {
     return this._dedis
   }
 
-  static async getRecords (id: string, name: string, environment: string, author: string): Promise<any[]> {
+  static async getRecords(id: string, name: string, environment: string, author: string): Promise<ChallengeDedisInfo> {
+    this._dedis.length = 0
     const dedis = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
         { string: id },
@@ -44,10 +46,13 @@ export abstract class DedimaniaService {
       const record: TMDedi = { login: d.Login, nickName: d.NickName, score: d.Best, checkpoints: d.Checks }
       this._dedis.push(record)
     }
-    return this._dedis
+    const temp: any = ChallengeService.current
+    temp.dedis = this._dedis
+    const challengeDedisInfo: ChallengeDedisInfo = temp
+    return challengeDedisInfo
   }
 
-  static async sendRecords (dedi: TMDedi[]) {
+  static async sendRecords(dedi: TMDedi[]) {
     // const status = await DedimaniaClient.call('dedimania.SendRecords',
     //   [
     // { string: id },
@@ -68,7 +73,7 @@ export abstract class DedimaniaService {
     //   .catch(err => ErrorHandler.error(`Failed to send dedimania records`, err))
   }
 
-  private static updateServerPlayers (): void {
+  private static updateServerPlayers(): void {
     setInterval(async (): Promise<void> => {
       const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers', [
         { string: process.env.SERVER_GAME },
