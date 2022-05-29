@@ -26,7 +26,7 @@ Controller events
 'Controller.ManialinkClick': ManialinkClickInfo -> `Triggered when player clicks a manialink which has an actionID, passes player information and actionID`
 'Controller.PlayerCheckpoint': CheckpointInfo -> `Triggered after player gets a checkpoint, passes player and checkpoint information`
 'Controller.BeginChallenge': BeginChallengeInfo -> `Triggered when new challenge starts, passes challenge information and local records`
-'Controller.DedimaniaRecords', TODO `Triggered after dedimania records get fetched,    ` 
+'Controller.DedimaniaRecords', ChallengeDedisInfo `Triggered after dedimania records get fetched, contains information about challenge and an array of dedis` 
 ```
 Dedicated server events
 TODO
