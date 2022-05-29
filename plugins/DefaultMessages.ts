@@ -32,7 +32,7 @@ const plugins: TMEvent[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} `
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} `
         + `${info.status} ${TM.colours.white + TM.Utils.getPositionString(info.position)}${TM.colours.folly} `
         + `local record. Time${TM.colours.white}: ${TM.Utils.getTimeString(info.score)}`)
     }
