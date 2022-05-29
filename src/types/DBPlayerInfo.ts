@@ -8,4 +8,5 @@ interface DBPlayerInfo {
   readonly timePlayed: number
   readonly privilege: number
   readonly wins: number
+  readonly visits: number
 }
