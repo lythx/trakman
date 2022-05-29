@@ -151,7 +151,8 @@ export class PlayerService {
       nation,
       timePlayed: res.timeplayed,
       privilege: res.privilege,
-      wins: res.wins
+      wins: res.wins,
+      visits: res.visits
     }
   }
 
