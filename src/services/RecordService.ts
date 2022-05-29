@@ -115,6 +115,15 @@ export class RecordService {
         position
       }
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      if (position <= Number(process.env.LOCALS_AMOUNT)) {
+        const topPlayer: TopPlayer = {
+          challenge, login, score, date, checkpoints, nickName: player.nickName,
+          nation: player.nation, nationCode: player.nationCode,
+          timePlayed: player.timePlayed, wins: player.wins,
+          privilege: player.privilege, visits: player.visits, position
+        }
+        this._topPlayers.splice(position - 1, 0, topPlayer)
+      }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       await this.repo.add(recordInfo)
       return
@@ -160,6 +169,16 @@ export class RecordService {
       }
       this._records = this._records.filter(a => a.login !== login)
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      if (position <= Number(process.env.LOCALS_AMOUNT)) {
+        this._topPlayers = this._topPlayers.filter(a => a.login !== login)
+        const topPlayer: TopPlayer = {
+          challenge, login, score, date, checkpoints, nickName: player.nickName,
+          nation: player.nation, nationCode: player.nationCode,
+          timePlayed: player.timePlayed, wins: player.wins,
+          privilege: player.privilege, visits: player.visits, position
+        }
+        this._topPlayers.splice(position - 1, 0, topPlayer)
+      }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       await this.repo.update(recordInfo)
     }
