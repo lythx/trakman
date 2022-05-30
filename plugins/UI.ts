@@ -170,18 +170,18 @@ const events: TMEvent[] = [
         event: 'Controller.Ready',
         callback: async () => {
             TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildCustomUi() }, { int: 0 }, { boolean: false }])
-            await TM.call('SetForcedMods', [
-                { boolean: true },
+            await TM.call('SetForcedMods',
+                [{
+                    boolean: true
+                },
                 {
-                    array:
-                        [{
-                            struct: {
-                                Env: { string: 'Stadium' },
-                                Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
-                            }
-                        }]
+                    array: [{
+                        struct: {
+                            Env: { string: 'Stadium' },
+                            Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
+                        }
+                    }]
                 }])
-            // Enable later ^
         }
     },
     {
@@ -205,13 +205,13 @@ const events: TMEvent[] = [
         }
     },
     {
-        event: 'Controller.PlayerFinish', // Need a Controller event, PlayerRecord doesn't fit IMO //done
+        event: 'Controller.PlayerFinish',
         callback: async (info: FinishInfo) => {
             // TODO: Update cpcounter to indicate finish
         }
     },
     {
-        event: 'Controller.PlayerInfoChanged', // Need a Controller event for better handling //YEAAAAAAAAAAAAAAA
+        event: 'Controller.PlayerInfoChanged',
         callback: async (info: InfoChangedInfo) => {
             // TODO: Remove cpcounter if player switched to specmode
             // PlayerInfo['SpectatorStatus'] % 10 !== 0
@@ -221,7 +221,7 @@ const events: TMEvent[] = [
         }
     },
     {
-        event: 'Controller.ManialinkClick', // Need a Controller event for better handling //asdasd
+        event: 'Controller.ManialinkClick',
         callback: async (info: ManialinkClickInfo) => {
             // This will basically handle every widget click
             // If I were to write every TODO I'd kill myself, so..
@@ -230,7 +230,7 @@ const events: TMEvent[] = [
     },
     {
         event: 'Controller.DedimaniaRecords',
-        callback: async (info: ChallengeDedisInfo) => { // Should return TMDedi[] //no it shouldnt u dumbass
+        callback: async (info: ChallengeDedisInfo) => {
             // TODO: Fill in the Dedimania record widget
         }
     },
@@ -242,7 +242,7 @@ const events: TMEvent[] = [
     },
     {
         event: 'Controller.PlayerRecord',
-        callback: async (info: RecordInfo) => { //Should return TMRecord //record info contains both TMRecord and TMPlayer and some other stuf
+        callback: async (info: RecordInfo) => {
             for (const player of TM.players) {
                 TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
             }
@@ -252,14 +252,14 @@ const events: TMEvent[] = [
         event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling 
         callback: async (params: any[]) => {
             // TODO: Re-fetch the next challenge info 
-            //calling next challenge info should probably be done in challenge service tho
-            //maybe we should always fetch next 5 maps and keep last 5 or somethign idk
+            // calling next challenge info should probably be done in challenge service tho
+            // maybe we should always fetch next 5 maps and keep last 5 or somethign idk
             // TODO: Update miscellaneous widgets:
             // Trackcount...
         }
     },
     {
-        event: 'Controller.PlayerCheckpoint', // Need a Controller event for better handling //e
+        event: 'Controller.PlayerCheckpoint',
         callback: async (info: CheckpointInfo) => {
             // TODO: Update cpcounter to indicate current cp
         }
@@ -277,7 +277,7 @@ const events: TMEvent[] = [
         }
     },
     {
-        event: 'Controller.BeginChallenge', // Need a Controller event for better handling //hhhhhhhhhh
+        event: 'Controller.BeginChallenge',
         callback: async (info: BeginChallengeInfo) => {
             // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
             TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
@@ -302,6 +302,4 @@ const events: TMEvent[] = [
     },
 ]
 
-for (const event of events) {
-    TM.addListener(event.event, event.callback)
-}
+for (const event of events) { TM.addListener(event.event, event.callback) }
