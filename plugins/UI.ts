@@ -63,7 +63,7 @@ abstract class UIGeneral {
             `<manialink id="10002">` // DEDIMANIA WIDGET ID
             + `<frame posn="${UIConfig.dediRecordsWidget.posX} ${UIConfig.dediRecordsWidget.posY} 10">`
             + `<quad posn="0 0 0.01" sizen="${UIConfig.dediRecordsWidget.width} ${dediWidgetHeight}" `
-            + `action="50002" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `action="50002" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
             + `<quad posn="${dediPos ? 12.5 + UIConfig.dediRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="${UIConfig.dediRecordsWidget.iconStyle}" substyle="${UIConfig.dediRecordsWidget.iconSubStyle}"/>`
@@ -72,10 +72,11 @@ abstract class UIGeneral {
             + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
             + `</frame>`
             + `</manialink>`
+            ///////////////////
             + `<manialink id="10003">` // LIVE RANKS WIDGET ID
             + `<frame posn="${UIConfig.liveRankingsWidget.posX} ${UIConfig.liveRankingsWidget.posY} 10">`
             + `<quad posn="0 0 0.01" sizen="${UIConfig.liveRankingsWidget.width} ${lrWidgetHeight}" `
-            + `action="50003" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `action="50003" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
             + `<quad posn="${lrPos ? 12.5 + UIConfig.liveRankingsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="${UIConfig.liveRankingsWidget.iconStyle}" substyle="${UIConfig.liveRankingsWidget.iconSubStyle}"/>`
@@ -84,16 +85,26 @@ abstract class UIGeneral {
             + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
             + `</frame>`
             + `</manialink>`
+            ///////////////////
             + `<manialink id="10004">` // KARMA WIDGET ID NOT IN CONFIG SO VALUES ARE FUNNY
             + `<frame posn="49.2 32.8 10">`
             + `<quad posn="0 0 0.01" sizen="15.76 10.65" `
-            + `action="50004" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `action="50004" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
             + `<quad posn="${kvPos ? 12.5 + 15.76 - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="Icons64x64_1" substyle="ToolLeague1"/>`
             + `<label posn="${kvPos ? 12.4 + 15.76 - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${kvPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + 'Votes'}"/> `
             + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `</frame>`
+            + `</manialink>`
+            ///////////////////
+            // IDS FOR STUFF BELOW ARENT FINAL
+            ///////////////////
+            + `<manialink id="10005">` // TIMER (SERVER) OVERLAY ID
+            + `<frame posn="49.2 22.25">`
+            + `<quad posn="0 0 0.01" sizen="15.5 4.55" `
+            + `action="50005" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `</frame>`
             + `</manialink>`
         return temporaryWindows
