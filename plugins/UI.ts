@@ -102,16 +102,44 @@ abstract class UIGeneral {
             // IDS FOR STUFF BELOW ARENT FINAL
             ///////////////////
             + `<manialink id="10005">` // TIMER (SERVER) OVERLAY ID
-            + `<frame posn="49.2 22.25">`
+            + `<frame posn="49.2 22.25 10">`
             + `<quad posn="0 0 0.01" sizen="15.5 4.55" `
             + `action="50005" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `</frame>`
             + `</manialink>`
             ///////////////////
             + `<manialink id="10006">` // PREV+BEST OVERLAY ID
-            + `<frame posn="49.2 39.25">`
+            + `<frame posn="49.2 39.25 10">`
             + `<quad posn="0 0 0.01" sizen="15.5 6.55" `
             + `action="50006" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+            ///////////////////
+            + `<manialink id="10007">` // SPEC OVERLAY ID
+            + `<frame posn="-64.7 28.85 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 5.25" ` // why the fuck is it bigger than the rest ngiagda
+            + `action="50007" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+            ///////////////////
+            + `<manialink id="10008">` // RANKINGS OVERLAY ID
+            + `<frame posn="-64.7 33.25 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 4.5" `
+            + `action="50008" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+            ///////////////////
+            + `<manialink id="10009">` // RANDOM ASS WINDOW FOR REFERENCE ID (autistic flexi)
+            + `<frame posn="-64.7 37.65 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 4.5" `
+            + `action="50009" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+            ///////////////////
+            + `<manialink id="10010">` // RANDOM ASS WINDOW FOR REFERENCE ID 2 (autistic mk)
+            + `<frame posn="-64.7 48 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 10.5" `
+            + `action="50010" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `</frame>`
             + `</manialink>`
         return temporaryWindows
