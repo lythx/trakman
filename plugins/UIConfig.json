@@ -95,8 +95,30 @@
         "width": 15.5,
         "posX": 49.2,
         "posY": 17.8,
-        "entries": 20,
+        "entries": 16,
         "topCount": 5,
+        "iconStyle": "Icons128x128_1",
+        "iconSubStyle": "Rankings"
+    },
+    "dediRecordsWidget": {
+        "enabled": true,
+        "title": "Dedis",
+        "width": 15.5,
+        "posX": -64.7,
+        "posY": 23.65,
+        "entries": 18,
+        "topCount": 5,
+        "iconStyle": "Icons128x128_1",
+        "iconSubStyle": "Rankings"
+    },
+    "liveRankingsWidget": {
+        "enabled": true,
+        "title": "Live",
+        "width": 15.5,
+        "posX": 49.2,
+        "posY": -14.15,
+        "entries": 6,
+        "topCount": 3,
         "iconStyle": "Icons128x128_1",
         "iconSubStyle": "Rankings"
     }
