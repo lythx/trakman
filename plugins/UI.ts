@@ -152,7 +152,9 @@ abstract class UIGeneral {
      */
     static closeManialinks(mode: boolean): string {
         // This will need to be updated when more widgets are added!
-        const ids: Array<number> = mode ? [10000, 10001] : [20000]
+        const ids: Array<number> = mode
+            ? [10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010]
+            : [20000]
         let xml: string = ``
         for (const id of ids) {
             xml += `<manialink id="${id}"></manialink>`
