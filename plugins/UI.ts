@@ -6,17 +6,26 @@ import UIConfig from './UIConfig.json' assert { type: 'json' }
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
 
+// Manialink IDs (RACE) begin with 10000
+// Manialink IDs (SCORE) begin with 20000
+// Manialink Action IDs begin with 50000
+
+// Manialinks have their Z-index on 10
+
 // Manialink IDs in use:
 // 10000 - ChallengeWidget
-// 20000 ChallengeWidget score
+// 10001 - LocalRecordsWidget
+// 10002 - DediRecordsWidget
+// 10003 - LiveRankingsWidget
+// 10004 - KarmaVotesWidget
+// 20000 ChallengeWidgetScore
 
 // Action IDs in use:
 // 50000 - ChallengeWidget
-
-// Manialink IDs (RACE) begin with 10000
-// Manialink Action IDs begin with 50000
-// Manialinks have their Z-index on 10
-// Manialink IDs (SCORE) begin with 20000
+// 50001 - LocalRecordsWidget
+// 50002 - DediRecordsWidget
+// 50003 - LiveRankingsWidget
+// 50004 - KarmaVotesWidget
 
 abstract class UIGeneral {
     /**
@@ -36,6 +45,58 @@ abstract class UIGeneral {
             + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
             + `</custom_ui></manialinks>`
         return customUi
+    }
+
+    // this is for reference only!
+    static buildTempWindows(): string {
+        // temporary position variables you know
+        const lrPos: boolean = (UIConfig.liveRankingsWidget.posX < 0) ? true : false
+        const dediPos: boolean = (UIConfig.dediRecordsWidget.posX < 0) ? true : false
+        const kvPos: boolean = (49.2 < 0) ? true : false // impossible calculation
+        // and more!
+        const lrWidgetHeight: number = 1.8 * UIConfig.liveRankingsWidget.entries + 3.3
+        const dediWidgetHeight: number = 1.8 * UIConfig.dediRecordsWidget.entries + 3.3
+        // and more!!!
+        const titleWidth = UIConfig.localRecordsWidget.width - 0.8
+        // no way actual build biuild
+        const temporaryWindows: string =
+            `<manialink id="10002">` // DEDIMANIA WIDGET ID
+            + `<frame posn="${UIConfig.dediRecordsWidget.posX} ${UIConfig.dediRecordsWidget.posY} 10">`
+            + `<quad posn="0 0 0.01" sizen="${UIConfig.dediRecordsWidget.width} ${dediWidgetHeight}" `
+            + `action="50002" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
+            + `<quad posn="${dediPos ? 12.5 + UIConfig.dediRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+            + `style="${UIConfig.dediRecordsWidget.iconStyle}" substyle="${UIConfig.dediRecordsWidget.iconSubStyle}"/>`
+            + `<label posn="${dediPos ? 12.4 + UIConfig.dediRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+            + `halign="${dediPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.dediRecordsWidget.title}"/> `
+            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `</frame>`
+            + `</manialink>`
+            + `<manialink id="10003">` // LIVE RANKS WIDGET ID
+            + `<frame posn="${UIConfig.liveRankingsWidget.posX} ${UIConfig.liveRankingsWidget.posY} 10">`
+            + `<quad posn="0 0 0.01" sizen="${UIConfig.liveRankingsWidget.width} ${lrWidgetHeight}" `
+            + `action="50003" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
+            + `<quad posn="${lrPos ? 12.5 + UIConfig.liveRankingsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+            + `style="${UIConfig.liveRankingsWidget.iconStyle}" substyle="${UIConfig.liveRankingsWidget.iconSubStyle}"/>`
+            + `<label posn="${lrPos ? 12.4 + UIConfig.liveRankingsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+            + `halign="${lrPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.liveRankingsWidget.title}"/> `
+            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `</frame>`
+            + `</manialink>`
+            + `<manialink id="10004">` // KARMA WIDGET ID NOT IN CONFIG SO VALUES ARE FUNNY
+            + `<frame posn="49.2 32.8 10">`
+            + `<quad posn="0 0 0.01" sizen="15.76 10.65" `
+            + `action="50004" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
+            + `<quad posn="${kvPos ? 12.5 + 15.76 - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+            + `style="Icons64x64_1" substyle="ToolLeague1"/>`
+            + `<label posn="${kvPos ? 12.4 + 15.76 - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+            + `halign="${kvPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + 'Votes'}"/> `
+            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return temporaryWindows
     }
 
     /**
@@ -198,6 +259,7 @@ const events: TMEvent[] = [
                         }
                     }]
                 }])
+            TM.callNoRes('RestartChallenge') // testing purposes
         }
     },
     {
@@ -310,6 +372,9 @@ const events: TMEvent[] = [
             for (const player of TM.players) {
                 TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
             }
+
+            // testing only
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
 
             // TODO: Display the miscellaneous widgets:
             // Clock, addfav, cpcounter, gamemode, visitors,
