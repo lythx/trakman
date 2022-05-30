@@ -94,23 +94,23 @@ abstract class UIRace {
         let playersXML = `<frame posn="0 -3 10">`
         for (const [i, p] of players.entries()) {
             playersXML += // Records list in XML
-                `<label posn="${1} ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
+                `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
-                + `<label posn="${2.485} ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
+                + `<label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
-                + `<label posn="${6.45} ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
+                + `<label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
-                playersXML += `<quad posn="${-1.9} ${-1.8 * i} 0.04" sizen="2 2" `
+                playersXML += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
                 if (p.login !== player.login) {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="${-1.9} ${-1.8 * i} 0.05" sizen="2 2" style="Icons128x128_1" substyle="Solo"/>`
+                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
                 } else {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="${-1.9} ${-1.8 * i} 0.05" sizen="2 2" style="Icons64x64_1" substyle="ArrowNext"/>`
+                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
                 }
             }
         }
