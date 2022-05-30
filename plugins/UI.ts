@@ -107,6 +107,13 @@ abstract class UIGeneral {
             + `action="50005" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `</frame>`
             + `</manialink>`
+            ///////////////////
+            + `<manialink id="10006">` // PREV+BEST OVERLAY ID
+            + `<frame posn="49.2 39.25">`
+            + `<quad posn="0 0 0.01" sizen="15.5 6.55" `
+            + `action="50006" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
         return temporaryWindows
     }
 
