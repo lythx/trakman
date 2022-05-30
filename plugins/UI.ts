@@ -73,11 +73,11 @@ abstract class UIRace {
             + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="${UIConfig.challengeWidget.icons.currTrack.style}" substyle="${UIConfig.challengeWidget.icons.currTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
-            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.currTrack}"/>`
-            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${TM.stripModifiers(info.name, false)}"/>`
-            + `<label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="by ${info.author}"/>`
+            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.currTrack}"/>`
+            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(info.name, false)}"/>`
+            + `<label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info.author}"/>`
             + `<quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>`
-            + `<label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${TM.Utils.getTimeString(info.authorTime)}"/>`
+            + `<label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(info.authorTime)}"/>`
             + `</frame>`
             + `</manialink>`
         return xml
@@ -132,7 +132,7 @@ abstract class UIRace {
             + `<quad posn="${pos ? 12.5 + UIConfig.localRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="${UIConfig.localRecordsWidget.iconStyle}" substyle="${UIConfig.localRecordsWidget.iconSubStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.localRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
-            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.localRecordsWidget.title}"/> `
+            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.localRecordsWidget.title}"/> `
             + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
             + `<quad posn="0.4 -2.6 0.03" sizen="${titleWidth} ${1.8 * UIConfig.localRecordsWidget.topCount + 0.3}" `
             + `style="${UIConfig.widgetStyleRace.topStyle}" substyle="${UIConfig.widgetStyleRace.topSubStyle}"/>`
@@ -162,18 +162,18 @@ abstract class UIScore {
             + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
             + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
-            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.challengeWidget.titles.nextTrack}"/>`
-            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${TM.stripModifiers(info[0].Name, false)}"/>`
+            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.nextTrack}"/>`
+            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(info[0].Name, false)}"/>`
             + `<frame posn="0.5 -10 0">`
-            + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${info[0].Author}"/>`
+            + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info[0].Author}"/>`
             + `<quad posn="2.95 3.38 0.11" sizen="2.5 2.5" halign="right" style="Icons128x128_1" substyle="Advanced"/>`
-            + `<label posn="3.3 2.9 0.11" sizen="12 2" scale="0.9" text="${info[0].Environnement}"/>`
+            + `<label posn="3.3 2.9 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Environnement}"/>`
             + `</frame>`
             + `<frame posn="0.5 -14.3 0">`
             + `<quad posn="2.75 5.25 0.11" sizen="2 2" halign="right" style="Icons128x128_1" substyle="Manialink"/>`
-            + `<label posn="3.3 5 0.11" sizen="12 2" scale="0.9" text="${info[0].Mood}"/>`
+            + `<label posn="3.3 5 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Mood}"/>`
             + `<quad posn="2.75 3.1 0.11" sizen="2 2" halign="right" style="BgRaceScore2" substyle="ScoreReplay"/>`
-            + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${TM.Utils.getTimeString(info[0].AuthorTime)}"/>`
+            + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(info[0].AuthorTime)}"/>`
             + `</frame>`
             + `</frame>`
             + `</manialink>`
