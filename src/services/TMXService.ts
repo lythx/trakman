@@ -21,6 +21,27 @@ export abstract class TMXService {
     return { name, content: buffer.toString('base64') }
   }
 
+  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+    let data = ''
+    let prefix = ''
+    for (const p of this.prefixes) {
+      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
+      data = await res.text()
+      if (!data.includes('<!DOCTYPE html>') && data !== '') {
+        prefix = p
+        break
+      }
+    }
+    if (prefix === '') {
+      this._current = null
+      throw new Error('Cannot fetch track data from TMX')
+    }
+    const s = data.split('\t')
+    const id = s[0]
+    const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
+    return this.fetchTrackFile(id, site)
+  }
+
   static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo> {
     let data = ''
     let prefix = ''
