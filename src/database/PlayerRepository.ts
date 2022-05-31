@@ -8,8 +8,8 @@ const createQuery = `
     nickname varchar(45) not null,
     nation varchar(3) not null,
     wins int4 not null default 0,
-    timePlayed int8 not null default 0,
-    privilege int4 not null default 0,
+    timePlayed int4 not null default 0,
+    privilege int2 not null default 0,
     visits int4 not null default 1
   );
 `
