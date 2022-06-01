@@ -7,13 +7,13 @@ const commands: TMCommand[] = [
     help: 'Change the server name.',
     callback: (info: MessageInfo) => {
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'SetServerName',
           params: [{ string: info.text }]
@@ -26,13 +26,13 @@ const commands: TMCommand[] = [
     help: 'Change the server comment.',
     callback: (info: MessageInfo) => {
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'SetServerComment',
           params: [{ string: info.text }]
@@ -48,13 +48,13 @@ const commands: TMCommand[] = [
       const regex: RegExp = /[\p{ASCII}]+/u
       if (!regex.test(info.text)) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'SetServerPassword',
           params: [{ string: info.text }]
@@ -70,13 +70,13 @@ const commands: TMCommand[] = [
       const regex: RegExp = /[\p{ASCII}]+/u
       if (!regex.test(info.text)) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'SetServerPasswordForSpectator',
           params: [{ string: info.text }]
@@ -89,14 +89,14 @@ const commands: TMCommand[] = [
     help: 'Change the max players amount.',
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
-        TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the max players amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
-          }],
-        },
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the max players amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
+        }],
+      },
         {
           method: 'SetMaxPlayers',
           params: [{ int: info.text }]
@@ -110,13 +110,13 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the max spectators amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
-          }],
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the max spectators amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
+        }],
+      },
         {
           method: 'SetMaxSpectators',
           params: [{ int: info.text }]
@@ -130,13 +130,13 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the podium time to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
-          }],
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the podium time to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
+        }],
+      },
         {
           method: 'SetChatTime',
           params: [{ int: info.text }]
@@ -150,13 +150,13 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the time limit to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
-          }],
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the time limit to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
+        }],
+      },
         {
           method: 'SetTimeAttackLimit',
           params: [{ int: info.text }]
@@ -172,13 +172,13 @@ const commands: TMCommand[] = [
       const notice = info.text.split(' ').splice(1, info.text.length - 1).join(' ')
       if (!Number.isInteger(Number(time))) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the notice to ${TM.colours.white + TM.stripModifiers(notice, true)}${TM.colours.folly}.`
-          }],
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the notice to ${TM.colours.white + TM.strip(notice, true)}${TM.colours.folly}.`
+        }],
+      },
         {
           method: 'SendNotice',
           params: [{ string: notice }, { string: '' }, { int: time }]
@@ -192,13 +192,13 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
       TM.multiCall({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
-              + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} the challenge download.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} the challenge download.`
+        }]
+      },
         {
           method: 'AllowChallengeDownload',
           params: [{
@@ -214,13 +214,13 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
-              + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} checkpoint respawning.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} checkpoint respawning.`
+        }]
+      },
         {
           method: 'SetDisableRespawn',
           params: [{
@@ -237,13 +237,13 @@ const commands: TMCommand[] = [
       // 0 = No change, 1 = Show all, n = Show n
       if (!Number.isInteger(Number(info.text))) { return }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
-              + `${TM.colours.white + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.colours.folly} forced opponent display.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.colours.folly} forced opponent display.`
+        }]
+      },
         {
           method: 'SetForceShowAllOpponents',
           params: [{
@@ -259,12 +259,12 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       // Might need a timeout for this one
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has killed the server :,(`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has killed the server :,(`
+        }]
+      },
         {
           method: 'StopServer'
         })

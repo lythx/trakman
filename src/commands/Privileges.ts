@@ -29,11 +29,11 @@ const commands: TMCommand[] = [
       }
       if (targetInfo.privilege < 3) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Masteradmin.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Masteradmin.`)
         await PlayerService.setPrivilege(targetLogin, 3)
       } else if (targetInfo.privilege === 3) {
-        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Masteradmin.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Masteradmin.`, callerLogin)
       }
     },
     privilege: 4
@@ -63,15 +63,15 @@ const commands: TMCommand[] = [
       }
       if (targetInfo.privilege < 2) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 2) {
-        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Admin.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has demoted ` +
-          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has demoted ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
@@ -102,15 +102,15 @@ const commands: TMCommand[] = [
       }
       if (targetInfo.privilege < 1) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
-        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} is already Operator.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has demoted ` +
-          `${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has demoted ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
@@ -141,11 +141,11 @@ const commands: TMCommand[] = [
       }
       if (targetInfo.privilege > 1) {
         await TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has removed ` +
-          `permissions of ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.folly}.`)
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has removed ` +
+          `permissions of ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`)
         await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === 0) {
-        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.stripModifiers(targetInfo.nickName, true)}${TM.colours.red} has no priveleges.`, callerLogin)
+        await TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} has no priveleges.`, callerLogin)
       }
     },
     privilege: 2

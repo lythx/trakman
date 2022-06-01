@@ -35,13 +35,13 @@ const commands: TMCommand[] = [
           return
       }
       TM.multiCallNoRes({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-              + `the gamemode to ${TM.colours.white + info.text.toUpperCase()}${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the gamemode to ${TM.colours.white + info.text.toUpperCase()}${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'SetGameMode',
           params: [{ int: mode }]
@@ -55,14 +55,14 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
-      TM.multiCallNoRes( {
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has banned `
-              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
-          }]
-        },
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has banned `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'Ban',
           params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
@@ -80,13 +80,13 @@ const commands: TMCommand[] = [
         const targetInfo = i
         if (targetInfo == null) { return }
         TM.multiCallNoRes({
-            method: 'ChatSendServerMessage',
-            params: [{
-              string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-                + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unbanned `
-                + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
-            }]
-          },
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unbanned `
+              + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
           {
             method: 'UnBan',
             params: [{ string: targetInfo.login }]
@@ -102,13 +102,13 @@ const commands: TMCommand[] = [
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) { return }
       await TM.multiCall({
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has blacklisted `
-              + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
-          }]
-        },
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has blacklisted `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+        }]
+      },
         {
           method: 'Kick', // Kick the player first, so that we don't have to execute BanAndBlackList method
           params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
@@ -128,13 +128,13 @@ const commands: TMCommand[] = [
         const targetInfo = i
         if (targetInfo == null) { return }
         TM.multiCallNoRes({
-            method: 'ChatSendServerMessage',
-            params: [{
-              string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-                + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unblacklisted `
-                + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
-            }]
-          },
+          method: 'ChatSendServerMessage',
+          params: [{
+            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
+              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unblacklisted `
+              + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+          }]
+        },
           {
             method: 'UnBlackList',
             params: [{ string: targetInfo.login }]

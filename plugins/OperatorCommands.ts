@@ -39,8 +39,8 @@ const commands: TMCommand[] = [
       }
       const name = res[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name || 'TODO: FIX THIS', true)}${TM.colours.folly} from local files.`)
+        + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has added and queued `
+        + `${TM.colours.white + TM.strip(name || 'TODO: FIX THIS', true)}${TM.colours.folly} from local files.`)
     },
     privilege: 1
   },
@@ -76,8 +76,8 @@ const commands: TMCommand[] = [
       }
       const name = nextInfo[0].Name
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-        + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued `
-        + `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from url.`)
+        + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has added and queued `
+        + `${TM.colours.white + TM.strip(name, true)}${TM.colours.folly} from url.`)
     },
     privilege: 1
   },
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has skipped the ongoing track.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has skipped the ongoing track.`
         }]
       },
         {
@@ -106,7 +106,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has restarted the ongoing track.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has restarted the ongoing track.`
         }]
       },
         {
@@ -130,7 +130,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has requeued the previous track.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has requeued the previous track.`
         }]
       },
         {
@@ -159,8 +159,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has kicked `
-            + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has kicked `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
         }]
       },
         {
@@ -180,8 +180,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unmuted `
-            + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unmuted `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
         }]
       },
         {
@@ -201,8 +201,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has unmuted `
-            + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly}.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unmuted `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
         }]
       },
         {
@@ -222,8 +222,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has forced `
-            + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly} into specmode.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has forced `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly} into specmode.`
         }]
       },
         {
@@ -248,8 +248,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has forced `
-            + `${TM.colours.white + TM.stripModifiers(targetInfo.nickName)}${TM.colours.folly} into playermode.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has forced `
+            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly} into playermode.`
         }]
       },
         {
