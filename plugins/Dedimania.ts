@@ -8,9 +8,9 @@ if (process.env.USE_DEDIMANIA === 'YES') {
       callback: (info: ChallengeDedisInfo) => {
         const dedis = info.dedis
         let str = `${TM.colours.yellow}»» ${TM.colours.folly}Dedimania records on `
-          + `${TM.colours.white + TM.stripModifiers(TM.challenge.name, true)}: `
+          + `${TM.colours.white + TM.strip(TM.challenge.name, true)}: `
         for (const d of dedis) {
-          str += `${TM.colours.white + TM.stripModifiers(d.nickName, false)}`
+          str += `${TM.colours.white + TM.strip(d.nickName, false)}`
             + `$z$s[${TM.Utils.getTimeString(d.score)}], `
         }
         str = str.substring(0, str.length - 2)

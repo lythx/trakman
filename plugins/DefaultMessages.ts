@@ -18,21 +18,21 @@ const plugins: TMEvent[] = [
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo) => {
       TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(player)}${TM.colours.white}: `
-        + `${TM.stripModifiers(player.nickName, true)}${TM.colours.folly} Country${TM.colours.white}: `
+        + `${TM.strip(player.nickName, true)}${TM.colours.folly} Country${TM.colours.white}: `
         + `${player.nation} ${TM.colours.folly}Visits${TM.colours.white}: ${player.visits}${TM.colours.folly}.`)
     }
   },
   {
     event: 'Controller.PlayerLeave',
     callback: async (player: LeaveInfo) => {
-      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(player.nickName, true)}${TM.colours.folly} `
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.strip(player.nickName, true)}${TM.colours.folly} `
         + `has quit after ${TM.colours.white + TM.msToTime(player.sessionTime)}${TM.colours.folly}.`)
     }
   },
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} `
+      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} `
         + `${info.status} ${TM.colours.white + TM.Utils.getPositionString(info.position)}${TM.colours.folly} `
         + `local record. Time${TM.colours.white}: ${TM.Utils.getTimeString(info.score)}`)
     }

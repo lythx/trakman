@@ -183,7 +183,7 @@ abstract class UIRace {
             + `style="${UIConfig.challengeWidget.icons.currTrack.style}" substyle="${UIConfig.challengeWidget.icons.currTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.currTrack}"/>`
-            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(info.name, false)}"/>`
+            + `<label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(info.name, false)}"/>`
             + `<label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info.author}"/>`
             + `<quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>`
             + `<label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(info.authorTime)}"/>`
@@ -208,7 +208,7 @@ abstract class UIRace {
                 + `<label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
                 + `<label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
-                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(p.nickName, false)}"/>`
+                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
                 playersXML += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
@@ -272,7 +272,7 @@ abstract class UIScore {
             + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.subStyle}"/>`
             + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.nextTrack}"/>`
-            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${UIConfig.widgetStyleRace.formattingCodes + TM.stripModifiers(info[0].Name, false)}"/>`
+            + `<label posn="1.35 -3 0.11" sizen="15 2" text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(info[0].Name, false)}"/>`
             + `<frame posn="0.5 -10 0">`
             + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info[0].Author}"/>`
             + `<quad posn="2.95 3.38 0.11" sizen="2.5 2.5" halign="right" style="Icons128x128_1" substyle="Advanced"/>`

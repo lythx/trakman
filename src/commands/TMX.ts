@@ -31,8 +31,8 @@ const command: TMCommand = {
     }
     const name = insertRes[0].Name
     TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-      `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued ` +
-      `${TM.colours.white + TM.stripModifiers(name, true)}${TM.colours.folly} from TMX.`)
+      `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has added and queued ` +
+      `${TM.colours.white + TM.strip(name, true)}${TM.colours.folly} from TMX.`)
   },
   privilege: 1
 }

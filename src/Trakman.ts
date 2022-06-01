@@ -26,7 +26,7 @@ export const TRAKMAN = {
     return title
   },
 
-  stripModifiers(str: string, removeColours: boolean = true) {
+  strip(str: string, removeColours: boolean = true) {
     return removeColours
       ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
       : str.replace(/\$(?:[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
