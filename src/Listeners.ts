@@ -1,4 +1,5 @@
 'use strict'
+
 import { Client } from './Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
@@ -234,7 +235,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize(): Promise<void> {
+  static async initialize (): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

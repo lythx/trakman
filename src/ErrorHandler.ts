@@ -1,3 +1,5 @@
+'use strict'
+
 import { Logger } from './Logger.js'
 
 export class ErrorHandler extends Error {

@@ -1,4 +1,5 @@
 'use strict'
+
 import 'dotenv/config'
 import postgres from 'pg'
 import { ErrorHandler } from '../ErrorHandler.js'
@@ -6,7 +7,7 @@ import { ErrorHandler } from '../ErrorHandler.js'
 const { Pool } = postgres
 
 export class Database {
-  #client = new Pool({
+  private readonly client = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -15,7 +16,7 @@ export class Database {
   })
 
   async initialize (): Promise<void> {
-    await this.#client.connect().catch(err => ErrorHandler.fatal('Cannot connect to database', err))
+    await this.client.connect().catch(err => ErrorHandler.fatal('Cannot connect to database', err))
   }
 
   /**
@@ -28,8 +29,8 @@ export class Database {
    * @return {Promise<void>}
    */
   async query (q: string, params: any[] = []): Promise<postgres.QueryResult> {
-    return await this.#client.query(q, params).catch(err => {
-      throw Error(`Database error on query ${q}: ` + err.message)
+    return await this.client.query(q, params).catch(err => {
+      throw Error(`Database error on query ${q}: ${err.message}`)
     })
   }
 }

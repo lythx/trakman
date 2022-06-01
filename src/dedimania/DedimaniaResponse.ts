@@ -1,4 +1,5 @@
 'use strict'
+
 import xml2js from 'xml2js'
 
 export class DedimaniaResponse {
@@ -95,7 +96,7 @@ export class DedimaniaResponse {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value == null) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             if (el?.value?.[0] != null) { // dediman sends an array without telling you its an array
               for (const e of el.value) {
                 const t = Object.keys(e)[0]

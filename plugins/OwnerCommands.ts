@@ -19,22 +19,22 @@ const commands: TMCommand[] = [
           TM.error(err)
         })
         if (!file) {
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Track ${TM.stripModifiers(challenge.name, false)}$z$s${TM.colours.red} is not on TMX.`)
+          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} is not on TMX.`)
           continue
         }
         const write = await TM.call('WriteFile', [{ string: file.name }, { base64: file.content }])
         if (write instanceof Error) {
           TM.error('Failed to write file', write.message)
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the track ${TM.stripModifiers(challenge.name, false)}$z$s${TM.colours.red} file to the server.`)
+          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} file to the server.`)
           continue
         }
         const insert = await TM.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
           TM.error('Failed to insert challenge to jukebox', insert.message)
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the track ${TM.stripModifiers(challenge.name, false)}$z$s${TM.colours.red} into queue.`)
+          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} into queue.`)
           continue
         }
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white}Added map ${TM.stripModifiers(challenge.name, false)}$z$s${TM.colours.white} from TMX.`)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white}Added map ${TM.strip(challenge.name, false)}$z$s${TM.colours.white} from TMX.`)
       }
     },
     privilege: 4
