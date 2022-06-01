@@ -10,6 +10,12 @@ import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
 import { Utils } from './Utils.js'
 import { randomUUID } from 'crypto'
+import { Database } from './database/DB.js'
+import { TMXService } from './services/TMXService.js'
+import { ErrorHandler } from './ErrorHandler.js'
+
+const DB = new Database()
+DB.initialize()
 
 export const TRAKMAN = {
 
@@ -218,15 +224,45 @@ export const TRAKMAN = {
     Events.addListener(event, callback)
   },
 
-  async addChallenge (id: string, name: string, author: string, environment: string): Promise<void> {
-    await ChallengeService.add(id, name, author, environment)
+  async addChallenge(fileName: string): Promise<TMChallenge | Error> {
+    return await ChallengeService.add(fileName)
   },
 
   get Utils () {
     return Utils
   },
 
-  randomUUID () {
+  randomUUID(): string {
     return randomUUID()
+  },
+
+  async queryDB(query: string): Promise<any[] | Error> {
+    let res
+    try {
+      res = await DB.query(query)
+    } catch (err: any) {
+      return new Error(err)
+    } finally {
+      if (res === undefined) {
+        return new Error('Database response undefined')
+      }
+      return res.rows
+    }
+  },
+
+  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+    return await TMXService.fetchTrackFileByUid(trackId)
+  },
+
+  get challenges() {
+    return ChallengeService.challenges
+  },
+
+  error(...lines: string[]): void {
+    ErrorHandler.error(...lines)
+  },
+
+  fatalError(...lines: string[]): void {
+    ErrorHandler.fatal(...lines)
   }
 }
