@@ -407,7 +407,8 @@ const events: TMEvent[] = [
         callback: async (info: BeginChallengeInfo) => {
             // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
             TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
-
+            console.log(TM.challengeQueue)
+            console.log(TM.previousChallenges)
             // TODO: Fetch the next challenge info
             // Temporarily moved to EndChallenge
             // We'd need to store the nextchallenge in a variable
