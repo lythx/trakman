@@ -22,7 +22,7 @@ export abstract class TMXService {
     return { name, content: buffer.toString('base64') }
   }
 
-  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  static async fetchTrackFileByUid (trackId: string): Promise<TMXFileData> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {
@@ -40,10 +40,10 @@ export abstract class TMXService {
     const s = data.split('\t')
     const id = s[0]
     const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
-    return this.fetchTrackFile(id, site)
+    return await this.fetchTrackFile(id, site)
   }
 
-  static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo> {
+  static async fetchTrackInfo (trackId: string): Promise<TMXTrackInfo> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {

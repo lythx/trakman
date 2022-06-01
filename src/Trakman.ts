@@ -224,7 +224,7 @@ export const TRAKMAN = {
     Events.addListener(event, callback)
   },
 
-  async addChallenge(fileName: string): Promise<TMChallenge | Error> {
+  async addChallenge (fileName: string): Promise<TMChallenge | Error> {
     return await ChallengeService.add(fileName)
   },
 
@@ -232,11 +232,11 @@ export const TRAKMAN = {
     return Utils
   },
 
-  randomUUID(): string {
+  randomUUID (): string {
     return randomUUID()
   },
 
-  async queryDB(query: string): Promise<any[] | Error> {
+  async queryDB (query: string): Promise<any[] | Error> {
     let res
     try {
       res = await DB.query(query)
@@ -250,19 +250,19 @@ export const TRAKMAN = {
     }
   },
 
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  async fetchTrackFileByUid (trackId: string): Promise<TMXFileData> {
     return await TMXService.fetchTrackFileByUid(trackId)
   },
 
-  get challenges() {
+  get challenges () {
     return ChallengeService.challenges
   },
 
-  error(...lines: string[]): void {
+  error (...lines: string[]): void {
     ErrorHandler.error(...lines)
   },
 
-  fatalError(...lines: string[]): void {
+  fatalError (...lines: string[]): void {
     ErrorHandler.fatal(...lines)
   }
 }
