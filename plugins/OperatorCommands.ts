@@ -1,4 +1,5 @@
 'use strict'
+
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import fs from 'node:fs/promises'
 import fetch from 'node-fetch'

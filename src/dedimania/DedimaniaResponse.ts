@@ -1,4 +1,5 @@
 'use strict'
+
 import xml2js from 'xml2js'
 
 export class DedimaniaResponse {
@@ -11,7 +12,7 @@ export class DedimaniaResponse {
   private _json: any = null
   private _sessionId: string | null = null
 
-  addData (data: string): void {
+  addData(data: string): void {
     this._data += data
     const split = this._data.split('\n')
     if (split[split.length - 1] === '</methodResponse>' && split[0] === 'HTTP/1.1 200 OK\r') {
@@ -24,35 +25,35 @@ export class DedimaniaResponse {
     }
   }
 
-  get data (): string {
+  get data(): string {
     return this._data
   }
 
-  get json (): any[] {
+  get json(): any[] {
     return this.fixNesting(this._json.methodResponse)
   }
 
-  get status (): string {
+  get status(): string {
     return this._status
   }
 
-  get isError (): boolean | null {
+  get isError(): boolean | null {
     return this._isError
   }
 
-  get errorCode (): number | null {
+  get errorCode(): number | null {
     return this._errorCode
   }
 
-  get errorString (): number | null {
+  get errorString(): number | null {
     return this._errorString
   }
 
-  get sessionId (): string | null {
+  get sessionId(): string | null {
     return this._sessionId
   }
 
-  private generateJson (): void {
+  private generateJson(): void {
     let json: any
     // parse xml to json
     xml2js.parseString(this._xml.toString(), (err, result) => {
@@ -71,7 +72,7 @@ export class DedimaniaResponse {
   }
 
   // i hate XML
-  private fixNesting (obj: any): any[] {
+  private fixNesting(obj: any): any[] {
     const arr = []
     const changeType: any = (value: any, type: string) => {
       const arr = []
@@ -95,7 +96,7 @@ export class DedimaniaResponse {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value == null) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             if (el?.value?.[0] != null) { // dediman sends an array without telling you its an array
               for (const e of el.value) {
                 const t = Object.keys(e)[0]

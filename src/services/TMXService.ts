@@ -1,4 +1,5 @@
 'use strict'
+
 import fetch from 'node-fetch'
 
 export abstract class TMXService {

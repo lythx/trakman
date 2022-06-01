@@ -1,3 +1,5 @@
+'use strict'
+
 interface TMDedi {
   login: string
   nickName: string

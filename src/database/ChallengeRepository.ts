@@ -1,3 +1,5 @@
+'use strict'
+
 import { Repository } from './Repository.js'
 
 const createQuery = `
@@ -11,7 +13,7 @@ const createQuery = `
 const addQuery = 'INSERT INTO challenges(id, name, author, environment) VALUES'
 
 export class ChallengeRepository extends Repository {
-  async initialize (): Promise<void> {
+  async initialize(): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
@@ -21,7 +23,7 @@ export class ChallengeRepository extends Repository {
    * @param {Object[]} objects the challenges
    * @return {Promise<any[]>}
    */
-  async add (...objects: ChallengeInfo[]): Promise<any> {
+  async add(...objects: ChallengeInfo[]): Promise<any> {
     if (objects.length === 0) {
       throw Error('No challenges in list.')
     }

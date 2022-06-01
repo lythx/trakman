@@ -1,4 +1,5 @@
 'use strict'
+
 import { Database } from './DB.js'
 
 /**
@@ -7,7 +8,7 @@ import { Database } from './DB.js'
 export abstract class Repository {
   protected db = new Database()
 
-  async initialize (): Promise<void> {
+  async initialize(): Promise<void> {
     await this.db.initialize()
   }
 
@@ -16,5 +17,5 @@ export abstract class Repository {
    * @param {Object[]} objects the objects
    * @return {Promise<any[]>} query result
    */
-  abstract add (objects: Object): Promise<any>
+  abstract add(objects: Object): Promise<any>
 }

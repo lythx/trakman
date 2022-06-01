@@ -1,4 +1,5 @@
 'use strict'
+
 import { RecordRepository } from '../database/RecordRepository.js'
 import { PlayerService } from './PlayerService.js'
 import { ChallengeService } from './ChallengeService.js'

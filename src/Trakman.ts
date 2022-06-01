@@ -1,3 +1,5 @@
+'use strict'
+
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
