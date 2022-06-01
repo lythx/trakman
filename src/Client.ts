@@ -9,7 +9,7 @@ import { Socket } from './Socket.js'
  * @method call
  */
 export class Client {
-  private static socket = new Socket()
+  private static readonly socket = new Socket()
   private static requestId = 0x80000000
 
   /**
@@ -19,7 +19,7 @@ export class Client {
   * @param {Number} port port at which dedicated server is listening for XmlRpc (default 5000)
   * @returns {Promise<String>} handshake status
   */
-  static async connect(host = 'localhost', port = 5000): Promise<string> {
+  static async connect (host = 'localhost', port = 5000): Promise<string> {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
@@ -33,7 +33,7 @@ export class Client {
   * @param {object[]} params parameters, each param needs to be under key named after its type
   * @returns {Promise<any[]>} array of server response values
   */
-  static async call(method: string, params: object[] = []): Promise<any[] | Error> {
+  static async call (method: string, params: object[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
@@ -41,7 +41,7 @@ export class Client {
     return await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
   }
 
-  static callNoRes(method: string, params: object[] = []): void {
+  static callNoRes (method: string, params: object[] = []): void {
     this.requestId++
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)

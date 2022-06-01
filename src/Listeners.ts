@@ -235,7 +235,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize(): Promise<void> {
+  static async initialize (): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

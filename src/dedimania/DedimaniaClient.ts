@@ -46,7 +46,18 @@ export abstract class DedimaniaClient {
                 { int: PlayerService.players.length },
                 {
                   struct: {
-                    SrvName: { string: 'TODO' } // TODO
+                    SrvName: { string: 'TODO' },
+                    Comment: { string: 'TODO' },
+                    Private: { boolean: 'TODO' },
+                    SrvIP: { string: 'TODO' },
+                    SrvPort: { string: 'TODO' },
+                    XmlRpcPort: { string: 'TODO' },
+                    NumPlayers: { int: 'TODO' },
+                    MaxPlayers: { int: 'TODO' },
+                    NumSpecs: { int: 'TODO' },
+                    MaxSpecs: { int: 'TODO' },
+                    LadderMode: { int: 'TODO' },
+                    NextFiveUID: { string: ['TODO', 'TODO', 'TODO', 'TODO', 'TODO'].join('/') }
                   }
                 },
                 { array: [] }
@@ -70,12 +81,12 @@ export abstract class DedimaniaClient {
         if (this.response.status === 'completed') {
           if (this.response.isError != null) {
             ErrorHandler.error('Dedimania server responded with an error',
-                            `${this.response.errorString} Code: ${this.response.errorCode}`)
+              `${this.response.errorString} Code: ${this.response.errorCode}`)
             reject(new Error(this.response.errorString?.toString()))
           } else {
             if (this.response.sessionId == null) {
               ErrorHandler.error('Dedimania server didn\'t send sessionId',
-                                `Received:
+                `Received:
                                 ${this.response.data}`)
               reject(new Error('Dedimania server didn\'t send sessionId'))
               return
@@ -113,7 +124,7 @@ export abstract class DedimaniaClient {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
             ErrorHandler.error('Dedimania server responded with an error',
-                            `${this.response.errorString} Code: ${this.response.errorCode}`)
+              `${this.response.errorString} Code: ${this.response.errorCode}`)
             reject(new Error(this.response.errorString?.toString()))
           } else { resolve(this.response.json) }
           this.receivingResponse = false
