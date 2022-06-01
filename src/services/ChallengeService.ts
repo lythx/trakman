@@ -1,4 +1,5 @@
 'use strict'
+
 import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
@@ -9,7 +10,7 @@ export class ChallengeService {
   private static list: ChallengeInfo[]
   private static repo: ChallengeRepository
 
-  static async initialize (repo: ChallengeRepository = new ChallengeRepository()): Promise<void> {
+  static async initialize(repo: ChallengeRepository = new ChallengeRepository()): Promise<void> {
     this.list = []
     this.repo = repo
     await this.repo.initialize()
@@ -17,14 +18,14 @@ export class ChallengeService {
     await this.setCurrent()
   }
 
-  static get current (): TMChallenge {
+  static get current(): TMChallenge {
     return this._current
   }
 
   /**
    * Sets the current challenge.
    */
-  static async setCurrent (): Promise<void> {
+  static async setCurrent(): Promise<void> {
     const res = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
       ErrorHandler.error('Unable to retrieve current challenge info.', res.message)
@@ -55,7 +56,7 @@ export class ChallengeService {
   /**
    * Download all the challenges from the server and store them in a field
    */
-  private static async getList (): Promise<void> {
+  private static async getList(): Promise<void> {
     this.list = []
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
@@ -80,7 +81,7 @@ export class ChallengeService {
    * If the list is empty, put the challenges there
    * @returns {Promise<void>}
    */
-  static async push (): Promise<void> {
+  static async push(): Promise<void> {
     if (this.list == null) {
       ErrorHandler.error('Challenge list is null, was initialize() called before pushing?')
       this.list = []
@@ -93,7 +94,7 @@ export class ChallengeService {
     await this.repo.add(...this.list)
   }
 
-  static async add (id: string, name: string, author: string, environment: string): Promise<void> {
+  static async add(id: string, name: string, author: string, environment: string): Promise<void> {
     await this.repo.add({ id: id, name: name, author: author, environment: environment })
   }
 }

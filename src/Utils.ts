@@ -12,6 +12,7 @@ export const Utils = {
     const hs = time.toString().substring(time.toString().length - 3, 2)
     return `${m.padStart(2, '0')}:${s.padStart(2, '0')}.${hs.padStart(2, '0')}`
   },
+
   /**
    * Add a positional suffix to a number.
    * @param pos

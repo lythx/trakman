@@ -1,8 +1,10 @@
+'use strict'
+
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import 'dotenv/config'
 
 if (process.env.USE_DEDIMANIA === 'YES') {
-  const plugins: TMEvent[] = [
+  const events: TMEvent[] = [
     {
       event: 'Controller.DedimaniaRecords',
       callback: (info: ChallengeDedisInfo) => {
@@ -18,5 +20,5 @@ if (process.env.USE_DEDIMANIA === 'YES') {
       }
     }
   ]
-  for (const plugin of plugins) { TM.addListener(plugin.event, plugin.callback) }
+  for (const event of events) { TM.addListener(event.event, event.callback) }
 }

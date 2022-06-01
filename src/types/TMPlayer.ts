@@ -1,3 +1,5 @@
+'use strict'
+
 interface TMPlayer {
   readonly login: string
   readonly nickName: string

@@ -2,7 +2,7 @@
 
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-const plugins: TMEvent[] = [
+const events: TMEvent[] = [
   {
     event: 'Controller.Ready',
     callback: async () => {
@@ -48,6 +48,4 @@ const plugins: TMEvent[] = [
   }
 ]
 
-for (const plugin of plugins) {
-  TM.addListener(plugin.event, plugin.callback)
-}
+for (const event of events) { TM.addListener(event.event, event.callback) }

@@ -1,3 +1,5 @@
+'use strict'
+
 import { ChatService } from '../services/ChatService.js'
 import { TMXService } from '../services/TMXService.js'
 import { Client } from '../Client.js'
