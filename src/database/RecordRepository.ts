@@ -19,26 +19,26 @@ const insertQuery = `
       `
 
 export class RecordRepository extends Repository {
-  async initialize(): Promise<void> {
+  async initialize (): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
-  async add(record: RecordInfo): Promise<void> {
+  async add (record: RecordInfo): Promise<void> {
     await this.db.query(insertQuery, [record.challenge, record.login, record.score, record.date, record.checkpoints])
   }
 
-  async get(challengeId: string): Promise<any[]> {
+  async get (challengeId: string): Promise<any[]> {
     const res = await this.db.query('SELECT * FROM records WHERE challenge=$1', [challengeId])
     return res.rows
   }
 
-  async update(record: RecordInfo): Promise<void> {
+  async update (record: RecordInfo): Promise<void> {
     await this.db.query('UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE challenge=$4 AND login=$5',
       [record.score, record.date, record.checkpoints, record.challenge, record.login])
   }
 
-  async getByLogin(challengeId: string, login: string): Promise<any[]> {
+  async getByLogin (challengeId: string, login: string): Promise<any[]> {
     const res = await this.db.query('SELECT * FROM records WHERE challenge=$1 AND login=$2', [challengeId, login])
     return res.rows
   }

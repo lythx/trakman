@@ -14,12 +14,12 @@ import { randomUUID } from 'crypto'
 export const TRAKMAN = {
 
   specialTitles: [
-    { login: 'redgreendevil', title: 'venti the anemo archon' },
+    { login: 'redgreendevil', title: 'Venti the Anemo Archon' },
     { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
   ],
   titles: ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner'],
 
-  getTitle(player: any): string {
+  getTitle (player: any): string {
     const title = TRAKMAN.titles[player.privilege]
     const specialTitle = TRAKMAN.specialTitles.find(a => a.login === player.login)
     if (specialTitle != null) {
@@ -28,13 +28,13 @@ export const TRAKMAN = {
     return title
   },
 
-  strip(str: string, removeColours: boolean = true) {
+  strip (str: string, removeColours: boolean = true) {
     return removeColours
       ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
       : str.replace(/\$(?:[^][LHP]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
   },
 
-  msToTime(ms: number) {
+  msToTime (ms: number) {
     const d: Date = new Date(ms)
     let str: string = ''
     const seconds: number = d.getUTCSeconds()
@@ -54,42 +54,42 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various information about game state
      */
-  get gameInfo(): TMGame {
+  get gameInfo (): TMGame {
     return Object.assign(GameService.game)
   },
 
   /**
      * Returns an array of objects containing information about current server players
      */
-  get players(): TMPlayer[] {
+  get players (): TMPlayer[] {
     return PlayerService.players
   },
 
   /**
     * Returns an array of objects containing information about top local record players on current map
     */
-  get topPlayers(): TopPlayer[] {
+  get topPlayers (): TopPlayer[] {
     return RecordService.topPlayers
   },
 
   /**
      * Returns an object containing information about specified player or undefined if player is not on the server
      */
-  getPlayer(login: string): TMPlayer | undefined {
+  getPlayer (login: string): TMPlayer | undefined {
     return PlayerService.players.find(a => a.login === login)
   },
 
   /**
      * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
      */
-  async fetchPlayer(login: string): Promise<any | undefined> {
+  async fetchPlayer (login: string): Promise<any | undefined> {
     return (await PlayerService.fetchPlayer(login))
   },
 
   /**
      * Returns an array of objects containing information about local records on current challenge
      */
-  getLocalRecords(challenge: string, amount: number): TMRecord[] {
+  getLocalRecords (challenge: string, amount: number): TMRecord[] {
     // love me some lambda expressions
     return RecordService.records.filter(r => r.challenge === challenge)
       .sort((a, b) => a.score - b.score).slice(0, amount)
@@ -99,7 +99,7 @@ export const TRAKMAN = {
      * Returns an object containing information about specified player's record on current map
      * or undefined if the player doesn't have a record
      */
-  getPlayerRecord(login: string): TMRecord | undefined {
+  getPlayerRecord (login: string): TMRecord | undefined {
     return RecordService.records.find(a => a.login === login)
   },
 
@@ -114,36 +114,36 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various information about current challenge
      */
-  get challenge(): TMChallenge {
+  get challenge (): TMChallenge {
     return Object.assign(ChallengeService.current)
   },
 
   /**
      * Returns an array of objects containing information about recent messages
      */
-  get messages(): TMMessage[] {
+  get messages (): TMMessage[] {
     return [...ChatService.messages]
   },
 
   /**
      * Returns an array of objects containing information about recent messages from a specified player
      */
-  getPlayerMessages(login: string): TMMessage[] {
+  getPlayerMessages (login: string): TMMessage[] {
     return ChatService.messages.filter(a => a.login === login)
   },
 
   /**
      * Calls a dedicated server method. Throws error if the server responds with error.
      */
-  async call(method: string, params: any[] = []): Promise<any[] | Error> {
+  async call (method: string, params: any[] = []): Promise<any[] | Error> {
     return await Client.call(method, params)
   },
 
-  callNoRes(method: string, params: any[] = []): void {
+  callNoRes (method: string, params: any[] = []): void {
     Client.callNoRes(method, params)
   },
 
-  async multiCall(...calls: TMCall[]): Promise<CallResponse[] | Error> {
+  async multiCall (...calls: TMCall[]): Promise<CallResponse[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params = c.params == null ? [] : c.params
@@ -163,7 +163,7 @@ export const TRAKMAN = {
     return ret
   },
 
-  multiCallNoRes(...calls: TMCall[]): void {
+  multiCallNoRes (...calls: TMCall[]): void {
     const arr: any[] = []
     for (const c of calls) {
       const params = c.params == null ? [] : c.params
@@ -180,7 +180,7 @@ export const TRAKMAN = {
   /**
      * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
      */
-  sendMessage(message: string, login?: string): void {
+  sendMessage (message: string, login?: string): void {
     if (login != null) {
       Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
       return
@@ -188,7 +188,7 @@ export const TRAKMAN = {
     Client.callNoRes('ChatSendServerMessage', [{ string: message }])
   },
 
-  sendManialink(manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
+  sendManialink (manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
     if (login != null) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
@@ -200,33 +200,33 @@ export const TRAKMAN = {
   /**
      * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
      */
-  get colours() {
+  get colours () {
     return colours
   },
 
   /**
      * Adds a chat command
      */
-  addCommand(command: TMCommand) {
+  addCommand (command: TMCommand) {
     ChatService.addCommand(command)
   },
 
   /**
      * Adds callback function to execute on given event
      */
-  addListener(event: string, callback: Function) {
+  addListener (event: string, callback: Function) {
     Events.addListener(event, callback)
   },
 
-  async addChallenge(id: string, name: string, author: string, environment: string): Promise<void> {
+  async addChallenge (id: string, name: string, author: string, environment: string): Promise<void> {
     await ChallengeService.add(id, name, author, environment)
   },
 
-  get Utils() {
+  get Utils () {
     return Utils
   },
 
-  randomUUID() {
+  randomUUID () {
     return randomUUID()
   }
 }
