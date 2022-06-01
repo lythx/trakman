@@ -1,4 +1,5 @@
 'use strict'
+
 import xml2js from 'xml2js'
 import { ErrorHandler } from './ErrorHandler.js'
 
@@ -37,13 +38,13 @@ export class Response {
       this._data = newBuffer.subarray(0, this._targetLength)
       this._overload = newBuffer.subarray(this._targetLength)
       this._status = 'overloaded'
-      this.#generateJson()
+      this.generateJson()
       return
     }
     if (newBuffer.length === this._targetLength) {
       this._data = newBuffer.subarray(0, this._targetLength)
       this._status = 'completed'
-      this.#generateJson()
+      this.generateJson()
       return
     }
     this._data = newBuffer
@@ -98,13 +99,13 @@ export class Response {
   */
   get json (): any[] {
     if (this._isEvent) {
-      return this.#fixNesting(this._json.methodCall)
+      return this.fixNesting(this._json.methodCall)
     } else {
-      return this.#fixNesting(this._json.methodResponse)
+      return this.fixNesting(this._json.methodResponse)
     }
   }
 
-  #generateJson (): void {
+  private generateJson (): void {
     let json: any
     // parse xml to json
     xml2js.parseString(this._data.toString(), (err, result) => {
@@ -131,7 +132,7 @@ export class Response {
   }
 
   // i hate XML
-  #fixNesting (obj: any): any[] {
+  private fixNesting (obj: any): any[] {
     const arr = []
     const changeType: any = (value: any, type: string) => {
       const arr = []

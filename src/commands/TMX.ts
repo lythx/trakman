@@ -1,3 +1,5 @@
+'use strict'
+
 import { ChatService } from '../services/ChatService.js'
 import { TMXService } from '../services/TMXService.js'
 import { Client } from '../Client.js'
@@ -25,8 +27,8 @@ const command: TMCommand = {
       return
     }
     TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-      `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has added and queued ` +
-      `${TM.colours.white + TM.stripModifiers(challenge.name, true)}${TM.colours.folly} from TMX.`)
+      `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has added and queued ` +
+      `${TM.colours.white + TM.strip(challenge.name, true)}${TM.colours.folly} from TMX.`)
   },
   privilege: 1
 }

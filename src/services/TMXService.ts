@@ -1,15 +1,16 @@
 'use strict'
+
 import fetch from 'node-fetch'
 
 export abstract class TMXService {
   private static _current: TMXTrackInfo | null
   private static readonly prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
 
-  static get current(): TMXTrackInfo | null {
+  static get current (): TMXTrackInfo | null {
     return this._current
   }
 
-  static async fetchTrackFile(id: string, game: string = 'TMNF'): Promise<TMXFileData> {
+  static async fetchTrackFile (id: string, game: string = 'TMNF'): Promise<TMXFileData> {
     const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => { throw err })
     const nameHeader = res.headers.get('content-disposition')
@@ -21,7 +22,7 @@ export abstract class TMXService {
     return { name, content: buffer.toString('base64') }
   }
 
-  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  static async fetchTrackFileByUid (trackId: string): Promise<TMXFileData> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {
@@ -39,10 +40,10 @@ export abstract class TMXService {
     const s = data.split('\t')
     const id = s[0]
     const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
-    return this.fetchTrackFile(id, site)
+    return await this.fetchTrackFile(id, site)
   }
 
-  static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo> {
+  static async fetchTrackInfo (trackId: string): Promise<TMXTrackInfo> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {

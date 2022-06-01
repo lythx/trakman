@@ -1,4 +1,5 @@
 'use strict'
+
 export class Logger {
   static log (str: string): void {
     console.log(`<Log>${str}`)

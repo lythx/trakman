@@ -1,4 +1,5 @@
 'use strict'
+
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const commands: TMCommand[] = [
@@ -10,7 +11,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
         }]
       },
@@ -29,7 +30,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
         }]
       },
@@ -51,7 +52,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
         }]
       },
@@ -73,7 +74,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
         }]
       },
@@ -93,7 +94,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the max players amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
         }],
       },
@@ -113,7 +114,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the max spectators amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
         }],
       },
@@ -133,7 +134,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the podium time to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
         }],
       },
@@ -153,7 +154,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
             + `the time limit to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
         }],
       },
@@ -175,8 +176,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has set `
-            + `the notice to ${TM.colours.white + TM.stripModifiers(notice, true)}${TM.colours.folly}.`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
+            + `the notice to ${TM.colours.white + TM.strip(notice, true)}${TM.colours.folly}.`
         }],
       },
         {
@@ -195,7 +196,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
             + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} the challenge download.`
         }]
       },
@@ -217,7 +218,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
             + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} checkpoint respawning.`
         }]
       },
@@ -240,7 +241,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
             + `${TM.colours.white + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.colours.folly} forced opponent display.`
         }]
       },
@@ -262,7 +263,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.stripModifiers(info.nickName, true)}${TM.colours.folly} has killed the server :,(`
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has killed the server :,(`
         }]
       },
         {

@@ -1,4 +1,5 @@
 'use strict'
+
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const commands: TMCommand[] = [
@@ -67,9 +68,9 @@ const commands: TMCommand[] = [
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
       await TM.multiCall({
-          method: 'ForceSpectator',
-          params: [{ string: info.login }, { int: 1 }]
-        },
+        method: 'ForceSpectator',
+        params: [{ string: info.login }, { int: 1 }]
+      },
         {
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]

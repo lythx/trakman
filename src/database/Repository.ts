@@ -1,4 +1,5 @@
 'use strict'
+
 import { Database } from './DB.js'
 
 /**

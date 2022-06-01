@@ -1,3 +1,5 @@
+'use strict'
+
 interface TMMessage {
   readonly id: string
   readonly login: string
