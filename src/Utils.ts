@@ -6,34 +6,17 @@ export const Utils = {
    * @param {number} time time in milliseconds
    * @returns {string} formatted time
    */
-  getTimeString (time: number): string {
-    const hours = time / 3600000
-    const mins = (hours % 1) * 60
-    const secs = (mins % 1) * 60
-    const centisecs = (secs % 1) * 100
-    let ret = ':' + this.timeFormat(secs) + '.' + this.timeFormat(centisecs, true, true)
-    if (hours >= 1) {
-      ret = this.timeFormat(hours, false) + ':' + this.timeFormat(mins) + ret
-    } else {
-      ret = this.timeFormat(mins, false) + ret
-    }
-    return ret
-  },
-  /**
-   * Helper for the getTimeString method
-   * @param n time in any unit
-   * @param addZero add a zero before the number if it's smaller than 10? (eg. 5 -> '05')
-   * @param last truncate the decimals, or round the number?
-   */
-  timeFormat (n: number, addZero: boolean = true, last: boolean = false): string {
-    const res = (last ? Math.round(n) : Math.trunc(n)).toString()
-    return (addZero && n < 10) ? '0' + res : res
+  getTimeString(time: number): string {
+    const m = Math.floor(time / (1000 * 60)).toString()
+    const s = Math.floor((time - Number(m) * 60 * 1000) / 1000).toString()
+    const hs = time.toString().substring(time.toString().length - 3, 2)
+    return `${m.padStart(2, '0')}:${s.padStart(2, '0')}.${hs.padStart(2, '0')}`
   },
   /**
    * Add a positional suffix to a number.
    * @param pos
    */
-  getPositionString (pos: number): string {
+  getPositionString(pos: number): string {
     if (pos < 1 || pos % 1 !== 0) {
       throw RangeError('The position must be a natural number.')
     }
