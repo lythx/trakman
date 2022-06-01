@@ -33,12 +33,12 @@ export const TRAKMAN = {
   },
 
   msToTime(ms: number) {
-    const d = new Date(ms)
-    let str = ''
-    const seconds = d.getSeconds()
-    const minutes = d.getMinutes()
-    const hours = d.getHours() - 1
-    const days = d.getDate() - 1
+    const d: Date = new Date(ms)
+    let str: string = ''
+    const seconds: number = d.getUTCSeconds()
+    const minutes: number = d.getUTCMinutes()
+    const hours: number = d.getUTCHours()
+    const days: number = d.getUTCDate() - 1
     if (days > 0) { str += days === 1 ? `${days} day, ` : `${days} days, ` }
     if (hours > 0) { str += hours === 1 ? `${hours} hour, ` : `${hours} hours, ` }
     if (minutes > 0) { str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, ` }
