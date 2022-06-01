@@ -15,7 +15,7 @@ import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 
-async function main (): Promise<void> {
+async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
@@ -43,7 +43,6 @@ async function main (): Promise<void> {
   Logger.info('Callbacks enabled')
   Logger.trace('Fetching challenges...')
   await ChallengeService.initialize()
-  await ChallengeService.push()
   Logger.info('Challenge service instantiated')
   Logger.trace('Fetching player info...')
   await PlayerService.initialize()
