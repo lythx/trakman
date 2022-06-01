@@ -22,16 +22,14 @@ CREATE TABLE IF NOT EXISTS challenges(
 `
 
 export class ChallengeRepository extends Repository {
-
-  async initialize(): Promise<void> {
+  async initialize (): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
-  async add(...objects: TMChallenge[]): Promise<any> {
-    if (objects.length === 0)
-      return
-    let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount) VALUES';
+  async add (...objects: TMChallenge[]): Promise<any> {
+    if (objects.length === 0) { return }
+    let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount) VALUES'
     const values = []
     let i = 1
     for (const c of objects) {
@@ -44,9 +42,8 @@ export class ChallengeRepository extends Repository {
     await this.db.query(query, values)
   }
 
-  async getAll(): Promise<any[]> {
+  async getAll (): Promise<any[]> {
     const query = 'SELECT * FROM challenges;'
     return (await this.db.query(query)).rows
   }
-
 }
