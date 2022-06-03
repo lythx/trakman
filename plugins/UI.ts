@@ -170,16 +170,33 @@ abstract class UIRace {
         // Build records list
         const players: TopPlayer[] = TM.topPlayers
         let playersXML: string = `<frame posn="0 -3 10">`
+        let textColour: string = UIConfig.widgetStyleRace.colours.scores
         for (const [i, p] of players.entries()) {
+            const prIndex: number = players.findIndex(p => p.login === player.login)
+            if (i < prIndex) {
+                if (i >= UIConfig.localRecordsWidget.topCount) {
+                    textColour = UIConfig.widgetStyleRace.colours.better
+                } else {
+                    textColour = UIConfig.widgetStyleRace.colours.top
+                }
+            } else if (i > prIndex) {
+                if (i >= UIConfig.localRecordsWidget.topCount) {
+                    textColour = UIConfig.widgetStyleRace.colours.worse
+                } else {
+                    textColour = UIConfig.widgetStyleRace.colours.top
+                }
+            } else {
+                textColour = UIConfig.widgetStyleRace.colours.self
+            }
             playersXML += // Records list in XML
                 `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
                 + `<label posn="2.3 ${-1.8 * i} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
                 + `<label posn="5.9 ${-1.8 * i} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" `
-                + `textcolor="${UIConfig.widgetStyleRace.colours.top}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
-                + `<label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${UIConfig.localRecordsWidget.width - 5.7} 1.7" scale="0.9" `
+                + `textcolor="${textColour}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
+                + `<label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${UIConfig.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
-            // Display an arrow next to active player (but not self)
+            // Indicate online players
             if (TM.getPlayer(p.login) !== undefined) {
                 // Player in records is us
                 if (p.login === player.login) {
@@ -214,7 +231,9 @@ abstract class UIRace {
                         + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
-            if (i > UIConfig.localRecordsWidget.entries) { break }
+            if (i > UIConfig.localRecordsWidget.entries) {
+                break
+            }
         }
         playersXML += `</frame>`
         // Add no record thing if no record from player
@@ -257,16 +276,33 @@ abstract class UIRace {
         // Build records list (if we have it from dedimania)
         const players: TMDedi[] = TM.dediRecords
         let playersXML: string = `<frame posn="0 -3 10">`
+        let textColour: string = UIConfig.widgetStyleRace.colours.scores
         for (const [i, p] of players.entries()) {
+            const prIndex: number = players.findIndex(p => p.login === player.login)
+            if (i < prIndex) {
+                if (i >= UIConfig.localRecordsWidget.topCount) {
+                    textColour = UIConfig.widgetStyleRace.colours.better
+                } else {
+                    textColour = UIConfig.widgetStyleRace.colours.top
+                }
+            } else if (i > prIndex) {
+                if (i >= UIConfig.localRecordsWidget.topCount) {
+                    textColour = UIConfig.widgetStyleRace.colours.worse
+                } else {
+                    textColour = UIConfig.widgetStyleRace.colours.top
+                }
+            } else {
+                textColour = UIConfig.widgetStyleRace.colours.self
+            }
             playersXML += // Records list in XML
                 `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
                 + `<label posn="2.3 ${-1.8 * i} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
                 + `<label posn="5.9 ${-1.8 * i} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" `
-                + `textcolor="${UIConfig.widgetStyleRace.colours.top}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
+                + `textcolor="${textColour}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
                 + `<label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${UIConfig.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
-            // Display an arrow next to active player (but not self)
+            // Indicate online players
             if (TM.getPlayer(p.login) !== undefined) {
                 // Player in records is us
                 if (p.login === player.login) {
@@ -301,7 +337,9 @@ abstract class UIRace {
                         + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
-            if (i > UIConfig.localRecordsWidget.entries) { break }
+            if (i > UIConfig.localRecordsWidget.entries) {
+                break
+            }
         }
         playersXML += `</frame>`
         // Add no record thing if no record from player
