@@ -180,15 +180,37 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
-                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                if (p.login !== player.login) {
-                    playersXML +=
-                        `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+                // Player in records is us
+                if (p.login === player.login) {
+                    // Amount of records is bigger than max top entries (nullcheck)
+                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                        // Player's record is slower than the worst top entry
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                            // Add line indicating player position
+                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                                + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                        }
+                    }
+                    // Add arrow marker
+                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                        + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                    // Everyone else (the same just change the icon)
                 } else {
-                    playersXML +=
-                        `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                        // Player's record is slower than the worst top entry
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                            // Add line indicating player position
+                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                                + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
+                        }
+                    }
+                    // Add arrow marker
+                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                        + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
             if (i > UIConfig.localRecordsWidget.entries) { break }
@@ -244,15 +266,37 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
-                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                if (p.login !== player.login) {
-                    playersXML +=
-                        `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+                // Player in records is us
+                if (p.login === player.login) {
+                    // Amount of records is bigger than max top entries (nullcheck)
+                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                        // Player's record is slower than the worst top entry
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                            // Add line indicating player position
+                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                                + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                        }
+                    }
+                    // Add arrow marker
+                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                        + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                    // Everyone else (the same just change the icon)
                 } else {
-                    playersXML +=
-                        `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                        // Player's record is slower than the worst top entry
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                            // Add line indicating player position
+                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                                + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
+                        }
+                    }
+                    // Add arrow marker
+                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                        + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
             if (i > UIConfig.localRecordsWidget.entries) { break }
@@ -290,7 +334,7 @@ abstract class UIRace {
      */
     static buildCustomUi(): string {
         const customUi: string = // Custom UI settings
-            `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
+            `<manialink id="0"><line></line></manialink><custom_ui>`
             + `<notice visible="${UIConfig.customUi.notice.toString()}"/>` // Notice in the top left
             + `<challenge_info visible="${UIConfig.customUi.challengeInfo.toString()}"/>` // Challenge info in the top right
             + `<net_infos visible="${UIConfig.customUi.netInfo.toString()}"/>` // Loading bar in the top right
@@ -299,7 +343,7 @@ abstract class UIRace {
             + `<round_scores visible="${UIConfig.customUi.roundScores.toString()}"/>` // Round scores in rounds mode, right side
             + `<scoretable visible="${UIConfig.customUi.scoreTable.toString()}"/>` // Scoretable on podium/score
             + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
-            + `</custom_ui></manialinks>`
+            + `</custom_ui>`
         return customUi
     }
 
