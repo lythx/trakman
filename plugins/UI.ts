@@ -28,25 +28,6 @@ import UIConfig from './UIConfig.json' assert { type: 'json' }
 // 50004 - KarmaVotesWidget
 
 abstract class UIGeneral {
-    /**
-     * format custom ui using values from config
-     * @returns xml of the customui block
-     */
-    static buildCustomUi(): string {
-        const customUi: string = // Custom UI settings
-            `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
-            + `<notice visible="${UIConfig.customUi.notice.toString()}"/>` // Notice in the top left
-            + `<challenge_info visible="${UIConfig.customUi.challengeInfo.toString()}"/>` // Challenge info in the top right
-            + `<net_infos visible="${UIConfig.customUi.netInfo.toString()}"/>` // Loading bar in the top right
-            + `<chat visible="${UIConfig.customUi.chat.toString()}"/>` // Chat
-            + `<checkpoint_list visible="${UIConfig.customUi.checkpointList.toString()}"/>` // Checkpoint list, right of timer
-            + `<round_scores visible="${UIConfig.customUi.roundScores.toString()}"/>` // Round scores in rounds mode, right side
-            + `<scoretable visible="${UIConfig.customUi.scoreTable.toString()}"/>` // Scoretable on podium/score
-            + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
-            + `</custom_ui></manialinks>`
-        return customUi
-    }
-
     // this is for reference only!
     static buildTempWindows(): string {
         // temporary position variables you know
@@ -144,32 +125,15 @@ abstract class UIGeneral {
             + `</manialink>`
         return temporaryWindows
     }
-
-    /**
-     * close all plugin manialinks
-     * @param mode race (true) or score (false)
-     * @returns xml with manialinks closed
-     */
-    static closeManialinks(mode: boolean): string {
-        // This will need to be updated when more widgets are added!
-        const ids: Array<number> = mode
-            ? [10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010]
-            : [20000]
-        let xml: string = ``
-        for (const id of ids) {
-            xml += `<manialink id="${id}"></manialink>`
-        }
-        return xml
-    }
 }
 
 abstract class UIRace {
     /**
      * build the challenge widget for race
-     * @param info challenge info from callback
      * @returns xml of the widget
      */
-    static buildChallengeWidget(info: BeginChallengeInfo): string {
+    static buildChallengeWidget(): string {
+        const info: TMChallenge = TM.challenge
         const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
         const xml: string = // Challenge widget
             `<manialink id="10000">`
@@ -192,15 +156,20 @@ abstract class UIRace {
         return xml
     }
 
-    static buildLocalRecordsWidget(player: TMPlayer): string {
+    /**
+     * build the locals widget for race
+     * @param player player to adjust the widget for
+     * @returns xml of the widget
+     */
+    static buildLocalRecordsWidget(player: TMPlayer | JoinInfo): string {
         const pos: boolean = (UIConfig.localRecordsWidget.posX < 0) ? true : false
-        const widgetHeight = 1.8 * UIConfig.localRecordsWidget.entries + 3.3
-        const columnHeight = widgetHeight - 3.1
-        const columnWidth = UIConfig.localRecordsWidget.width - 6.45
-        const titleWidth = UIConfig.localRecordsWidget.width - 0.8
+        const widgetHeight: number = 1.8 * UIConfig.localRecordsWidget.entries + 3.3
+        const columnHeight: number = widgetHeight - 3.1
+        const columnWidth: number = UIConfig.localRecordsWidget.width - 6.45
+        const titleWidth: number = UIConfig.localRecordsWidget.width - 0.8
         // Build records list
-        const players = TM.topPlayers
-        let playersXML = `<frame posn="0 -3 10">`
+        const players: TopPlayer[] = TM.topPlayers
+        let playersXML: string = `<frame posn="0 -3 10">`
         for (const [i, p] of players.entries()) {
             playersXML += // Records list in XML
                 `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
@@ -222,13 +191,14 @@ abstract class UIRace {
                         + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
                 }
             }
+            if (i > UIConfig.localRecordsWidget.entries) { break }
         }
         playersXML += `</frame>`
         // Add no record thing if no record from player
         if (!players.find(pl => pl.login === player.login)) {
             playersXML += `` // TODO
         }
-        const xml: string = // Locals widget
+        const xml: string = // Locals widget body
             `<manialink id="10001">`
             + `<frame posn="${UIConfig.localRecordsWidget.posX} ${UIConfig.localRecordsWidget.posY} 10">`
             + `<quad posn="0 0 0.01" sizen="${UIConfig.localRecordsWidget.width} ${widgetHeight}" `
@@ -250,6 +220,116 @@ abstract class UIRace {
         return xml
     }
 
+    /**
+     * build the dedis widget for race
+     * @param player player to adjust the widget for
+     * @returns xml of the widget
+     */
+    static buildDediRecordsWidget(player: TMPlayer | JoinInfo): string {
+        const pos: boolean = (UIConfig.dediRecordsWidget.posX < 0) ? true : false
+        const widgetHeight: number = 1.8 * UIConfig.dediRecordsWidget.entries + 3.3
+        const columnHeight: number = widgetHeight - 3.1
+        const columnWidth: number = UIConfig.dediRecordsWidget.width - 6.45
+        const titleWidth: number = UIConfig.dediRecordsWidget.width - 0.8
+        // Build records list (if we have it from dedimania)
+        const players: TMDedi[] = TM.dediRecords
+        let playersXML: string = `<frame posn="0 -3 10">`
+        for (const [i, p] of players.entries()) {
+            playersXML += // Records list in XML
+                `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
+                + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
+                + `<label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
+                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
+                + `<label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
+                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
+            // Display an arrow next to active player (but not self)
+            if (TM.getPlayer(p.login) !== undefined) {
+                playersXML += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
+                if (p.login !== player.login) {
+                    playersXML +=
+                        `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
+                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+                } else {
+                    playersXML +=
+                        `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
+                }
+            }
+            if (i > UIConfig.localRecordsWidget.entries) { break }
+        }
+        playersXML += `</frame>`
+        // Add no record thing if no record from player
+        if (!players.find(pl => pl.login === player.login)) {
+            playersXML += `` // TODO
+        }
+        const xml: string = // Dedi widget body
+            `<manialink id="10002">`
+            + `<frame posn="${UIConfig.dediRecordsWidget.posX} ${UIConfig.dediRecordsWidget.posY} 10">`
+            + `<quad posn="0 0 0.01" sizen="${UIConfig.dediRecordsWidget.width} ${widgetHeight}" `
+            + `action="50002" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/> `
+            + `${playersXML}`
+            + `<quad posn="0.4 -2.6 0.02" sizen="2 ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgRank}"/> `
+            + `<quad posn="2.4 -2.6 0.02" sizen="3.65 ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgScore}"/> `
+            + `<quad posn="6.05 -2.6 0.02" sizen="${columnWidth} ${columnHeight}" bgcolor="${UIConfig.widgetStyleRace.colours.bgName}"/> `
+            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
+            + `<quad posn="${pos ? 12.5 + UIConfig.dediRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+            + `style="${UIConfig.dediRecordsWidget.iconStyle}" substyle="${UIConfig.dediRecordsWidget.iconSubStyle}"/>`
+            + `<label posn="${pos ? 12.4 + UIConfig.dediRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+            + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.dediRecordsWidget.title}"/> `
+            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+            + `<quad posn="0.4 -2.6 0.03" sizen="${titleWidth} ${1.8 * UIConfig.dediRecordsWidget.topCount + 0.3}" `
+            + `style="${UIConfig.widgetStyleRace.topStyle}" substyle="${UIConfig.widgetStyleRace.topSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * format custom ui using values from config
+     * @returns xml of the customui block
+     */
+    static buildCustomUi(): string {
+        const customUi: string = // Custom UI settings
+            `<manialinks><manialink id="0"><line></line></manialink><custom_ui>`
+            + `<notice visible="${UIConfig.customUi.notice.toString()}"/>` // Notice in the top left
+            + `<challenge_info visible="${UIConfig.customUi.challengeInfo.toString()}"/>` // Challenge info in the top right
+            + `<net_infos visible="${UIConfig.customUi.netInfo.toString()}"/>` // Loading bar in the top right
+            + `<chat visible="${UIConfig.customUi.chat.toString()}"/>` // Chat
+            + `<checkpoint_list visible="${UIConfig.customUi.checkpointList.toString()}"/>` // Checkpoint list, right of timer
+            + `<round_scores visible="${UIConfig.customUi.roundScores.toString()}"/>` // Round scores in rounds mode, right side
+            + `<scoretable visible="${UIConfig.customUi.scoreTable.toString()}"/>` // Scoretable on podium/score
+            + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
+            + `</custom_ui></manialinks>`
+        return customUi
+    }
+
+    /**
+     * close all manialinks belonging to this class
+     * @returns xml of manialinks closed
+     */
+    static closeManialinks(): string {
+        // This will need to be updated when more widgets are added on race
+        const ids: Array<number> = [10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010]
+        let xml: string = ``
+        for (const id of ids) {
+            xml += `<manialink id="${id}"></manialink>`
+        }
+        return xml
+    }
+
+    /**
+     * display all manialinks belonging to this class
+     * @param player player to adjust the manialinks for
+     * @returns xml of manialinks displayed
+     */
+    static async displayManialinks(player: TMPlayer | JoinInfo): Promise<string> {
+        let xml: string = ``
+        xml += this.buildCustomUi()
+        xml += this.buildChallengeWidget()
+        xml += this.buildLocalRecordsWidget(player)
+        xml += this.buildDediRecordsWidget(player)
+        return xml
+    }
 }
 
 abstract class UIScore {
@@ -258,7 +338,8 @@ abstract class UIScore {
      * @param info challenge info from callback
      * @returns xml of the widget
      */
-    static buildChallengeWidget(info: any): string {
+    static async buildChallengeWidget(): Promise<string> {
+        const info: any = await TM.call('GetNextChallengeInfo', [])
         const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
         const xml: string = // Challenge widget for podium/score
             `<manialink id="20000">`
@@ -288,43 +369,72 @@ abstract class UIScore {
             + `</manialink>`
         return xml
     }
+
+    /**
+     * close all manialinks belonging to this class
+     * @returns xml of manialinks closed
+     */
+    static closeManialinks(): string {
+        // This will need to be updated when more widgets are added on score
+        const ids: Array<number> = [20000]
+        let xml: string = ``
+        for (const id of ids) {
+            xml += `<manialink id="${id}"></manialink>`
+        }
+        return xml
+    }
+
+    /**
+     * display all manialinks belonging to this class
+     * @param player player to adjust the manialinks for
+     * @returns xml of manialinks displayed
+     */
+    static async displayManialinks(player: TMPlayer | JoinInfo): Promise<string> {
+        let xml: string = ``
+        xml += await this.buildChallengeWidget()
+        // TODO
+        // xml += this.buildLocalRecordsWidget(player)
+        // xml += this.buildDediRecordsWidget(player)
+        return xml
+    }
 }
 
 const events: TMEvent[] = [
     {
         event: 'Controller.Ready',
         callback: async () => {
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildCustomUi() }, { int: 0 }, { boolean: false }])
-            await TM.call('SetForcedMods',
-                [{
-                    boolean: true
-                },
-                {
-                    array: [{
-                        struct: {
-                            Env: { string: 'Stadium' },
-                            Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
-                        }
-                    }]
-                }])
-            TM.callNoRes('RestartChallenge') // testing purposes
+            // Restart the challenge to activate all manialinks for easy testing
+            // We need to implement a mechanic where if controller starts midway
+            // It makes all the current players "rejoin" but without most things like messages etc
+            // This can be done via separate event thats executed before PlayerJoin but after Ready
+            TM.callNoRes('RestartChallenge')
         }
     },
     {
         event: 'Controller.PlayerJoin',
         callback: async (player: JoinInfo) => {
-            // TODO: Fetch the connecting player info //its all in the passed object
-
-            // TODO: Fetch player records on the current challenge
-            // TODO: Display all the widgets for the new player
-            // Preferably with an indicator if they have a record
+            // TODO: Check for game to be race
+            // Only display race widgets if we are in race mode
+            // If player has record - update for all online players
+            if (TM.getPlayerRecord(player.login) !== undefined) {
+                for (const player of TM.players) {
+                    TM.sendManialink(await UIRace.displayManialinks(player), player.login)
+                }
+            } else {
+                // Display widgets for the player only
+                TM.sendManialink(await UIRace.displayManialinks(player), player.login)
+            }
         }
     },
     {
         event: 'Controller.PlayerLeave',
         callback: async (playerInfo: LeaveInfo) => {
-            // TODO: Update the widgets to no more indicate the disconnectee's presence
-            // That is, if they had any records
+            // If player had a record, update widgets for all online players
+            if (TM.getPlayerRecord(playerInfo.login) !== undefined) {
+                for (const player of TM.players) {
+                    TM.sendManialink(await UIRace.displayManialinks(player), player.login)
+                }
+            }
 
             // TODO: Update miscellaneous widgets:
             // Ranking, players/specs...
@@ -357,7 +467,12 @@ const events: TMEvent[] = [
     {
         event: 'Controller.DedimaniaRecords',
         callback: async (info: ChallengeDedisInfo) => {
-            // TODO: Fill in the Dedimania record widget
+            // If dedis exist, rebuild the widget
+            if (info.dedis.length > 0) {
+                for (const player of TM.players) {
+                    TM.sendManialink(UIRace.buildDediRecordsWidget(player), player.login)
+                }
+            }
         }
     },
     {
@@ -369,8 +484,9 @@ const events: TMEvent[] = [
     {
         event: 'Controller.PlayerRecord',
         callback: async (info: RecordInfo) => {
+            // If new record, rebuild the widget
             for (const player of TM.players) {
-                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+                TM.sendManialink(UIRace.buildLocalRecordsWidget(player), player.login)
             }
         }
     },
@@ -393,36 +509,36 @@ const events: TMEvent[] = [
     {
         event: 'TrackMania.EndChallenge', // Need a Controller event for better handling
         callback: async (params: any[]) => {
-            // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(true) }, { int: 0 }, { boolean: false }])
-            // This can be improved after queue/jukebox, as we can get next challenge from there also
-            const info = await TM.call('GetNextChallengeInfo')
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
-
-            // TODO: Display all the podium/score widgets
+            // Close race manialinks
+            TM.sendManialink(UIRace.closeManialinks())
+            // Send score widgets to all players
+            for (const player of TM.players) {
+                TM.sendManialink(await UIScore.displayManialinks(player))
+            }
         }
     },
     {
         event: 'Controller.BeginChallenge',
         callback: async (info: BeginChallengeInfo) => {
-            // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
-
-            // TODO: Fetch the next challenge info
-            // Temporarily moved to EndChallenge
-            // We'd need to store the nextchallenge in a variable
-            // This is easier achievable with queue/jukebox
-
-            // TODO: Display current challenge widget
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
-
-            // TODO: Display current challenge record widgets
+            // Close score manialinks
+            TM.sendManialink(UIScore.closeManialinks())
+            // Send race widgets to all players
             for (const player of TM.players) {
-                TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+                TM.sendManialink(await UIRace.displayManialinks(player))
             }
-
-            // testing only
-            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
+            // Set forced mod here, so every player gets it eventually
+            await TM.call('SetForcedMods',
+                [{
+                    boolean: true
+                },
+                {
+                    array: [{
+                        struct: {
+                            Env: { string: 'Stadium' },
+                            Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
+                        }
+                    }]
+                }])
 
             // TODO: Display the miscellaneous widgets:
             // Clock, addfav, cpcounter, gamemode, visitors,
