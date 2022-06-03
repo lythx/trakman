@@ -323,11 +323,12 @@ abstract class UIRace {
      * @returns xml of manialinks displayed
      */
     static async displayManialinks(player: TMPlayer | JoinInfo): Promise<string> {
-        let xml: string = ``
+        let xml: string = `<manialinks>`
         xml += this.buildCustomUi()
         xml += this.buildChallengeWidget()
         xml += this.buildLocalRecordsWidget(player)
         xml += this.buildDediRecordsWidget(player)
+        xml += `</manialinks>`
         return xml
     }
 }
@@ -513,7 +514,7 @@ const events: TMEvent[] = [
             TM.sendManialink(UIRace.closeManialinks())
             // Send score widgets to all players
             for (const player of TM.players) {
-                TM.sendManialink(await UIScore.displayManialinks(player))
+                TM.sendManialink(await UIScore.displayManialinks(player), player.login)
             }
         }
     },
@@ -524,7 +525,7 @@ const events: TMEvent[] = [
             TM.sendManialink(UIScore.closeManialinks())
             // Send race widgets to all players
             for (const player of TM.players) {
-                TM.sendManialink(await UIRace.displayManialinks(player))
+                TM.sendManialink(await UIRace.displayManialinks(player), player.login)
             }
             // Set forced mod here, so every player gets it eventually
             await TM.call('SetForcedMods',
