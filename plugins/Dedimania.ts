@@ -12,8 +12,8 @@ if (process.env.USE_DEDIMANIA === 'YES') {
         let str = `${TM.colours.yellow}»» ${TM.colours.folly}Dedimania records on `
           + `${TM.colours.white + TM.strip(TM.challenge.name, true)}: `
         for (const d of dedis) {
-          str += `${TM.colours.white + TM.strip(d.nickName, false)}`
-            + `$z$s[${TM.Utils.getTimeString(d.score)}], `
+          str += `$n${TM.colours.white + TM.strip(d.nickName, true)}`
+            + `${TM.colours.grey}[${TM.Utils.getTimeString(d.score)}], $z$s`
         }
         str = str.substring(0, str.length - 2)
         TM.sendMessage(str)
