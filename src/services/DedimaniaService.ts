@@ -10,18 +10,18 @@ import { ChallengeService } from './ChallengeService.js'
 export abstract class DedimaniaService {
   static _dedis: TMDedi[] = []
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT)).catch(err => {
       ErrorHandler.fatal('Failed to connect to dedimania', err)
     })
     this.updateServerPlayers()
   }
 
-  static get dedis (): TMDedi[] {
+  static get dedis(): TMDedi[] {
     return this._dedis
   }
 
-  static async getRecords (id: string, name: string, environment: string, author: string): Promise<ChallengeDedisInfo> {
+  static async getRecords(id: string, name: string, environment: string, author: string): Promise<ChallengeDedisInfo> {
     this._dedis.length = 0
     const dedis = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
@@ -33,7 +33,18 @@ export abstract class DedimaniaService {
         { int: GameService.gameMode }, // mode: 1-TA
         {
           struct: {
-            SrvName: { string: 'TODO' } // TODO
+            SrvName: { string: 'TODO' },
+            Comment: { string: 'TODO' },
+            Private: { boolean: 'TODO' },
+            SrvIP: { string: 'TODO' },
+            SrvPort: { string: 'TODO' },
+            XmlRpcPort: { string: 'TODO' },
+            NumPlayers: { int: 'TODO' },
+            MaxPlayers: { int: 'TODO' },
+            NumSpecs: { int: 'TODO' },
+            MaxSpecs: { int: 'TODO' },
+            LadderMode: { int: 'TODO' },
+            NextFiveUID: { string: ['TODO', 'TODO', 'TODO', 'TODO', 'TODO'].join('/') }
           }
         },
         { int: 30 }, // number of records probably
@@ -52,7 +63,7 @@ export abstract class DedimaniaService {
     return challengeDedisInfo
   }
 
-  static async sendRecords (dedi: TMDedi[]): Promise<void> {
+  static async sendRecords(dedi: TMDedi[]): Promise<void> {
     // const status = await DedimaniaClient.call('dedimania.SendRecords',
     //   [
     // { string: id },
@@ -73,7 +84,7 @@ export abstract class DedimaniaService {
     //   .catch(err => ErrorHandler.error(`Failed to send dedimania records`, err))
   }
 
-  private static updateServerPlayers (): void {
+  private static updateServerPlayers(): void {
     setInterval(async (): Promise<void> => {
       const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers', [
         { string: process.env.SERVER_GAME },
