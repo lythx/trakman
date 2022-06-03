@@ -4,21 +4,21 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 import 'dotenv/config'
 
 if (process.env.USE_DEDIMANIA === 'YES') {
-  const events: TMEvent[] = [
+  const commands: TMCommand[] = [
     {
-      event: 'Controller.DedimaniaRecords',
-      callback: (info: ChallengeDedisInfo) => {
-        const dedis = info.dedis
-        let str = `${TM.colours.yellow}»» ${TM.colours.folly}Dedimania records on `
-          + `${TM.colours.white + TM.strip(TM.challenge.name, true)}: `
-        for (const d of dedis) {
-          str += `$n${TM.colours.white + TM.strip(d.nickName, true)}`
-            + `${TM.colours.grey}[${TM.Utils.getTimeString(d.score)}], $z$s`
+      aliases: ['dedirecs'],
+      help: '',
+      callback: (info: MessageInfo) => {
+        const dediRecs: TMDedi[] = TM.dediRecords
+        let str = `${TM.colours.yellow}» ${TM.colours.folly}Dedimania records on `
+          + `${TM.colours.white + TM.strip(TM.challenge.name, false)}${TM.colours.white}: `
+        for (const dr of dediRecs) {
+          str += `${TM.strip(dr.nickName, false)}$z$s ${TM.colours.white + '- ' + TM.Utils.getTimeString(dr.score)}, `
         }
-        str = str.substring(0, str.length - 2)
-        TM.sendMessage(str)
-      }
+        TM.sendMessage(str.slice(0, -2), info.login)
+      },
+      privilege: 0
     }
   ]
-  for (const event of events) { TM.addListener(event.event, event.callback) }
+  for (const command of commands) { TM.addCommand(command) }
 }
