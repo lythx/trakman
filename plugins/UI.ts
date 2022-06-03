@@ -172,11 +172,12 @@ abstract class UIRace {
         let playersXML: string = `<frame posn="0 -3 10">`
         for (const [i, p] of players.entries()) {
             playersXML += // Records list in XML
-                `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
+                `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+                + `<label posn="2.3 ${-1.8 * i} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
-                + `<label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
-                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
-                + `<label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
+                + `<label posn="5.9 ${-1.8 * i} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" `
+                + `textcolor="${UIConfig.widgetStyleRace.colours.top}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
+                + `<label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${UIConfig.localRecordsWidget.width - 5.7} 1.7" scale="0.9" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
@@ -258,11 +259,12 @@ abstract class UIRace {
         let playersXML: string = `<frame posn="0 -3 10">`
         for (const [i, p] of players.entries()) {
             playersXML += // Records list in XML
-                `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" `
+                `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+                + `<label posn="2.3 ${-1.8 * i} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes}${i + 1}."/>`
-                + `<label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" `
-                + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
-                + `<label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" `
+                + `<label posn="5.9 ${-1.8 * i} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" `
+                + `textcolor="${UIConfig.widgetStyleRace.colours.top}" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>`
+                + `<label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${UIConfig.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" `
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
