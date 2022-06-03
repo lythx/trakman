@@ -172,7 +172,8 @@ abstract class UIRace {
         let playersXML: string = `<frame posn="0 -3 10">`
         let textColour: string = UIConfig.widgetStyleRace.colours.scores
         for (const [i, p] of players.entries()) {
-            const prIndex: number = players.findIndex(p => p.login === player.login)
+            let prIndex: number = players.findIndex(p => p.login === player.login)
+            if (prIndex === -1) { prIndex = 100 } // Function returns -1, bad for comparison below
             if (i < prIndex) {
                 if (i >= UIConfig.localRecordsWidget.topCount) {
                     textColour = UIConfig.widgetStyleRace.colours.better
@@ -278,15 +279,16 @@ abstract class UIRace {
         let playersXML: string = `<frame posn="0 -3 10">`
         let textColour: string = UIConfig.widgetStyleRace.colours.scores
         for (const [i, p] of players.entries()) {
-            const prIndex: number = players.findIndex(p => p.login === player.login)
+            let prIndex: number = players.findIndex(p => p.login === player.login)
+            if (prIndex === -1) { prIndex = 100 } // Function returns -1, bad for comparison below
             if (i < prIndex) {
-                if (i >= UIConfig.localRecordsWidget.topCount) {
+                if (i >= UIConfig.dediRecordsWidget.topCount) {
                     textColour = UIConfig.widgetStyleRace.colours.better
                 } else {
                     textColour = UIConfig.widgetStyleRace.colours.top
                 }
             } else if (i > prIndex) {
-                if (i >= UIConfig.localRecordsWidget.topCount) {
+                if (i >= UIConfig.dediRecordsWidget.topCount) {
                     textColour = UIConfig.widgetStyleRace.colours.worse
                 } else {
                     textColour = UIConfig.widgetStyleRace.colours.top
@@ -307,9 +309,9 @@ abstract class UIRace {
                 // Player in records is us
                 if (p.login === player.login) {
                     // Amount of records is bigger than max top entries (nullcheck)
-                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                    if (players.length > UIConfig.dediRecordsWidget.topCount) {
                         // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
                             // Add line indicating player position
                             playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
                                 + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
@@ -322,9 +324,9 @@ abstract class UIRace {
                         + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                     // Everyone else (the same just change the icon)
                 } else {
-                    if (players.length > UIConfig.localRecordsWidget.topCount) {
+                    if (players.length > UIConfig.dediRecordsWidget.topCount) {
                         // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
+                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
                             // Add line indicating player position
                             playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
                                 + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
