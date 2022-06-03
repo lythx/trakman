@@ -180,15 +180,15 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
-                playersXML += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
+                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
                 if (p.login !== player.login) {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
                 } else {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
             if (i > UIConfig.localRecordsWidget.entries) { break }
@@ -244,15 +244,15 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Display an arrow next to active player (but not self)
             if (TM.getPlayer(p.login) !== undefined) {
-                playersXML += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
+                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
                 if (p.login !== player.login) {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
                 } else {
                     playersXML +=
                         `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
+                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
             }
             if (i > UIConfig.localRecordsWidget.entries) { break }
@@ -310,10 +310,11 @@ abstract class UIRace {
     static closeManialinks(): string {
         // This will need to be updated when more widgets are added on race
         const ids: Array<number> = [10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010]
-        let xml: string = ``
+        let xml: string = `<manialinks>`
         for (const id of ids) {
             xml += `<manialink id="${id}"></manialink>`
         }
+        xml += `</manialinks>`
         return xml
     }
 
@@ -378,10 +379,11 @@ abstract class UIScore {
     static closeManialinks(): string {
         // This will need to be updated when more widgets are added on score
         const ids: Array<number> = [20000]
-        let xml: string = ``
+        let xml: string = `<manialinks>`
         for (const id of ids) {
             xml += `<manialink id="${id}"></manialink>`
         }
+        xml += `</manialinks>`
         return xml
     }
 
@@ -391,11 +393,12 @@ abstract class UIScore {
      * @returns xml of manialinks displayed
      */
     static async displayManialinks(player: TMPlayer | JoinInfo): Promise<string> {
-        let xml: string = ``
+        let xml: string = `<manialinks>`
         xml += await this.buildChallengeWidget()
         // TODO
         // xml += this.buildLocalRecordsWidget(player)
         // xml += this.buildDediRecordsWidget(player)
+        xml += `</manialinks>`
         return xml
     }
 }
