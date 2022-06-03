@@ -32,27 +32,13 @@ abstract class UIGeneral {
     static buildTempWindows(): string {
         // temporary position variables you know
         const lrPos: boolean = (UIConfig.liveRankingsWidget.posX < 0) ? true : false
-        const dediPos: boolean = (UIConfig.dediRecordsWidget.posX < 0) ? true : false
         const kvPos: boolean = (49.2 < 0) ? true : false // impossible calculation
         // and more!
         const lrWidgetHeight: number = 1.8 * UIConfig.liveRankingsWidget.entries + 3.3
-        const dediWidgetHeight: number = 1.8 * UIConfig.dediRecordsWidget.entries + 3.3
         // and more!!!
         const titleWidth = UIConfig.localRecordsWidget.width - 0.8
         // no way actual build biuild
         const temporaryWindows: string =
-            `<manialink id="10002">` // DEDIMANIA WIDGET ID
-            + `<frame posn="${UIConfig.dediRecordsWidget.posX} ${UIConfig.dediRecordsWidget.posY} 10">`
-            + `<quad posn="0 0 0.01" sizen="${UIConfig.dediRecordsWidget.width} ${dediWidgetHeight}" `
-            + `action="50002" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
-            + `<quad posn="0.4 -0.36 0.02" sizen="${titleWidth} 2" style="${UIConfig.widgetStyleRace.titleStyle}" substyle="${UIConfig.widgetStyleRace.titleSubStyle}"/> `
-            + `<quad posn="${dediPos ? 12.5 + UIConfig.dediRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
-            + `style="${UIConfig.dediRecordsWidget.iconStyle}" substyle="${UIConfig.dediRecordsWidget.iconSubStyle}"/>`
-            + `<label posn="${dediPos ? 12.4 + UIConfig.dediRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
-            + `halign="${dediPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.dediRecordsWidget.title}"/> `
-            + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
-            + `</frame>`
-            + `</manialink>`
             ///////////////////
             + `<manialink id="10003">` // LIVE RANKS WIDGET ID
             + `<frame posn="${UIConfig.liveRankingsWidget.posX} ${UIConfig.liveRankingsWidget.posY} 10">`
@@ -77,36 +63,6 @@ abstract class UIGeneral {
             + `<label posn="${kvPos ? 12.4 + 15.76 - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
             + `halign="${kvPos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + 'Votes'}"/> `
             + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
-            + `</frame>`
-            + `</manialink>`
-            ///////////////////
-            // IDS FOR STUFF BELOW ARENT FINAL
-            ///////////////////
-            + `<manialink id="10005">` // TIMER (SERVER) OVERLAY ID
-            + `<frame posn="49.2 22.25 10">`
-            + `<quad posn="0 0 0.01" sizen="15.5 4.55" `
-            + `action="50005" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
-            + `</frame>`
-            + `</manialink>`
-            ///////////////////
-            + `<manialink id="10006">` // PREV+BEST OVERLAY ID
-            + `<frame posn="49.2 39.25 10">`
-            + `<quad posn="0 0 0.01" sizen="15.5 6.55" `
-            + `action="50006" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
-            + `</frame>`
-            + `</manialink>`
-            ///////////////////
-            + `<manialink id="10007">` // SPEC OVERLAY ID
-            + `<frame posn="-64.7 28.85 10">`
-            + `<quad posn="0 0 0.01" sizen="15.5 5.25" ` // why the fuck is it bigger than the rest ngiagda
-            + `action="50007" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
-            + `</frame>`
-            + `</manialink>`
-            ///////////////////
-            + `<manialink id="10008">` // RANKINGS OVERLAY ID
-            + `<frame posn="-64.7 33.25 10">`
-            + `<quad posn="0 0 0.01" sizen="15.5 4.5" `
-            + `action="50008" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
             + `</frame>`
             + `</manialink>`
             ///////////////////
@@ -199,48 +155,39 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Indicate online players
             if (TM.getPlayer(p.login) !== undefined) {
-                // Player in records is us
-                if (p.login === player.login) {
-                    // Amount of records is bigger than max top entries (nullcheck)
-                    if (players.length > UIConfig.localRecordsWidget.topCount) {
-                        // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
-                            // Add line indicating player position
-                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
-                                + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        }
+                // Amount of records is bigger than max top entries (nullcheck)
+                if (players.length > UIConfig.dediRecordsWidget.topCount) {
+                    // Player's record is slower than the worst top entry
+                    if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
+                        // Add line indicating player position
+                        playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                            + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
                     }
-                    // Add arrow marker
-                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                        + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
-                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
-                    // Everyone else (the same just change the icon)
-                } else {
-                    if (players.length > UIConfig.localRecordsWidget.topCount) {
-                        // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.localRecordsWidget.topCount - 1].score) {
-                            // Add line indicating player position
-                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
-                                + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        }
-                    }
-                    // Add arrow marker
-                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                        + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
-                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
+                // Add marker
+                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                    + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                    + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                if (i < prIndex) {
+                    playersXML += `style="Icons128x128_1" substyle="ChallengeAuthor"/>`
+                } else if (i > prIndex) {
+                    playersXML += `style="Icons128x128_1" substyle="Solo"/>`
+                } else {
+                    playersXML += `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                }
+                if (i > UIConfig.localRecordsWidget.entries) {
+                    break
+                }
+            }
+            // Add no record thing if no record from player
+            if (!players.find(pl => pl.login === player.login)) {
+                playersXML += `` // TODO
             }
             if (i > UIConfig.localRecordsWidget.entries) {
                 break
             }
         }
         playersXML += `</frame>`
-        // Add no record thing if no record from player
-        if (!players.find(pl => pl.login === player.login)) {
-            playersXML += `` // TODO
-        }
         const xml: string = // Locals widget body
             `<manialink id="10001">`
             + `<frame posn="${UIConfig.localRecordsWidget.posX} ${UIConfig.localRecordsWidget.posY} 10">`
@@ -306,48 +253,36 @@ abstract class UIRace {
                 + `text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
             // Indicate online players
             if (TM.getPlayer(p.login) !== undefined) {
-                // Player in records is us
-                if (p.login === player.login) {
-                    // Amount of records is bigger than max top entries (nullcheck)
-                    if (players.length > UIConfig.dediRecordsWidget.topCount) {
-                        // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
-                            // Add line indicating player position
-                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
-                                + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        }
+                // Amount of records is bigger than max top entries (nullcheck)
+                if (players.length > UIConfig.dediRecordsWidget.topCount) {
+                    // Player's record is slower than the worst top entry
+                    if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
+                        // Add line indicating player position
+                        playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
+                            + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
                     }
-                    // Add arrow marker
-                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                        + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
-                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
-                    // Everyone else (the same just change the icon)
-                } else {
-                    if (players.length > UIConfig.dediRecordsWidget.topCount) {
-                        // Player's record is slower than the worst top entry
-                        if (TM.getPlayerDedi(p.login)?.score! > players[UIConfig.dediRecordsWidget.topCount - 1].score) {
-                            // Add line indicating player position
-                            playersXML += `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" `
-                                + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        }
-                    }
-                    // Add arrow marker
-                    playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
-                        + `style="${UIConfig.widgetStyleRace.hlOtherStyle}" substyle="${UIConfig.widgetStyleRace.hlOtherSubStyle}"/>`
-                        + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
-                        + `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
                 }
+                // Add marker
+                playersXML += `<quad posn="${pos ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" `
+                    + `style="${UIConfig.widgetStyleRace.hlSelfStyle}" substyle="${UIConfig.widgetStyleRace.hlSelfSubStyle}"/>`
+                    + `<quad posn="${pos ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+                if (i < prIndex) {
+                    playersXML += `style="Icons128x128_1" substyle="ChallengeAuthor"/>`
+                } else if (i > prIndex) {
+                    playersXML += `style="Icons128x128_1" substyle="Solo"/>`
+                } else {
+                    playersXML += `style="Icons64x64_1" substyle="${pos ? 'ArrowPrev' : 'ArrowNext'}"/>`
+                }
+            }
+            // Add no record thing if no record from player
+            if (!players.find(pl => pl.login === player.login)) {
+                playersXML += `` // TODO
             }
             if (i > UIConfig.localRecordsWidget.entries) {
                 break
             }
         }
         playersXML += `</frame>`
-        // Add no record thing if no record from player
-        if (!players.find(pl => pl.login === player.login)) {
-            playersXML += `` // TODO
-        }
         const xml: string = // Dedi widget body
             `<manialink id="10002">`
             + `<frame posn="${UIConfig.dediRecordsWidget.posX} ${UIConfig.dediRecordsWidget.posY} 10">`
@@ -371,11 +306,95 @@ abstract class UIRace {
     }
 
     /**
+     * build live ranks widget for race (no way)
+     * @returns xml of the widget
+     */
+    static buildLiveRankingsWidget(player: TMPlayer | JoinInfo): string {
+        // TODO
+        const xml: string =
+            `<manialink id="10003">`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * build karma widget for race
+     * @returns xml of the widget
+     */
+    static buildKarmaWidget(player: TMPlayer | JoinInfo): string {
+        // TODO
+        const xml: string =
+            `<manialink id="10004">`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * build widget on top of the timer
+     * @returns xml of the widget
+     */
+    static buildTimerWidget(): string {
+        const xml: string =
+            `<manialink id="10005">`
+            + `<frame posn="49.2 22.25 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 4.55" `
+            + `action="50005" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * build widget on top of prev/best time
+     * @returns xml of the widget
+     */
+    static buildPrevBestWidget(): string {
+        const xml: string =
+            `<manialink id="10006">`
+            + `<frame posn="49.2 39.25 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 6.55" `
+            + `action="50006" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * build widget on top of spec eye
+     * @returns xml of the widget
+     */
+    static buildSpecWidget(): string {
+        const xml: string =
+            `<manialink id="10007">`
+            + `<frame posn="-64.7 28.85 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 5.3" ` // Why the fuck is it bigger than the rest ngiagda
+            + `action="50007" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
+     * build widget on top of current rankings
+     * @returns xml of the widget
+     */
+    static buildCurrentRankingsWidget(): string {
+        const xml: string =
+            `<manialink id="10008">`
+            + `<frame posn="-64.7 33.25 10">`
+            + `<quad posn="0 0 0.01" sizen="15.5 4.5" `
+            + `action="50008" style="${UIConfig.widgetStyleRace.bgStyle}" substyle="${UIConfig.widgetStyleRace.bgSubStyle}"/>`
+            + `</frame>`
+            + `</manialink>`
+        return xml
+    }
+
+    /**
      * format custom ui using values from config
      * @returns xml of the customui block
      */
     static buildCustomUi(): string {
-        const customUi: string = // Custom UI settings
+        const xml: string = // Custom UI settings
             `<manialink id="0"><line></line></manialink><custom_ui>`
             + `<notice visible="${UIConfig.customUi.notice.toString()}"/>` // Notice in the top left
             + `<challenge_info visible="${UIConfig.customUi.challengeInfo.toString()}"/>` // Challenge info in the top right
@@ -386,7 +405,7 @@ abstract class UIRace {
             + `<scoretable visible="${UIConfig.customUi.scoreTable.toString()}"/>` // Scoretable on podium/score
             + `<global visible="${UIConfig.customUi.global.toString()}"/>` // All the windows: speed, timer, prev/best, etc.
             + `</custom_ui>`
-        return customUi
+        return xml
     }
 
     /**
@@ -415,6 +434,12 @@ abstract class UIRace {
         xml += this.buildChallengeWidget()
         xml += this.buildLocalRecordsWidget(player)
         xml += this.buildDediRecordsWidget(player)
+        xml += this.buildLiveRankingsWidget(player)
+        xml += this.buildKarmaWidget(player)
+        xml += this.buildTimerWidget()
+        xml += this.buildPrevBestWidget()
+        xml += this.buildSpecWidget()
+        xml += this.buildCurrentRankingsWidget()
         xml += `</manialinks>`
         return xml
     }
@@ -423,7 +448,6 @@ abstract class UIRace {
 abstract class UIScore {
     /**
      * build challenge widget for score
-     * @param info challenge info from callback
      * @returns xml of the widget
      */
     static async buildChallengeWidget(): Promise<string> {
