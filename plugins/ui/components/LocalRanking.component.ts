@@ -55,27 +55,62 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
   }
 
   private getWidgetContent(login: string) {
+    const titleWidth = CFG.localRecordsWidget.width - 0.8
+    const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false
     let xml = `<frame posn="0 -3 10">`
+    let textColour: string
+    const pr = TM.topPlayers.find(a => a.login === login)
+    const prIndex = pr !== undefined ? TM.topPlayers.indexOf(pr) : Infinity
     for (const [i, p] of TM.topPlayers.entries()) {
-      xml += // Records list in XML
-        `<label posn="1 ${-1.8 * i} 0.04" sizen="1 0" halign="left" textsize="1" 
-         text="${CFG.widgetStyleRace.formattingCodes}${i + 1}."/>
-        <label posn="2.485 ${-1.8 * i} 0.04" sizen="3.5 0" halign="left" textsize="1" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>
-        <label posn="6.45 ${(-1.8 * i) + 0.05} 0.04" sizen="7.5 0" halign="left" textsize="1" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(p.nickName, false)}"/>`
-      // Display an arrow next to active player (but not self)
-      if (TM.getPlayer(p.login) !== undefined) {
-        xml += `<quad posn="-1.9 ${-1.8 * i} 0.04" sizen="2 2" `
-        if (p.login !== login) {
-          xml +=
-            `style="${CFG.widgetStyleRace.hlOtherStyle}" substyle="${CFG.widgetStyleRace.hlOtherSubStyle}"/>
-            <quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons128x128_1" substyle="Solo"/>`
+      if (i < prIndex) {
+        if (i >= CFG.localRecordsWidget.topCount) {
+          textColour = CFG.widgetStyleRace.colours.better
         } else {
-          xml +=
-            `style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
-            <quad posn="-1.7 ${-1.8 * i - 0.2} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="ArrowNext"/>`
+          textColour = CFG.widgetStyleRace.colours.top
         }
+      } else if (i > prIndex) {
+        if (i >= CFG.localRecordsWidget.topCount) {
+          textColour = CFG.widgetStyleRace.colours.worse
+        } else {
+          textColour = CFG.widgetStyleRace.colours.top
+        }
+      } else {
+        textColour = CFG.widgetStyleRace.colours.self
+      }
+      xml += // Records list in XML
+        `<format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
+        <label posn="2.3 ${-1.8 * i} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
+         text="${CFG.widgetStyleRace.formattingCodes}${i + 1}."/>
+        <label posn="5.9 ${-1.8 * i} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
+         textcolor="${textColour}" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>
+        <label posn="6.1 ${(-1.8 * i) + 0.05} 0.04" sizen="${CFG.localRecordsWidget.width - 5.7} 1.7" scale="0.9" 
+         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p.nickName), false)}"/>`
+      // Indicate online players
+      if (TM.getPlayer(p.login) !== undefined) {
+        // Amount of records is bigger than max top entries (nullcheck)
+        if (i > CFG.localRecordsWidget.topCount) {
+          // Player's record is slower than the worst top entry
+          // Add line indicating player position
+          xml +=
+            `<quad posn="0.4 ${-1.8 * i + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
+             style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
+        }
+        // Add marker
+        xml +=
+          `<quad posn="${side ? 15.4 : -1.9} ${-1.8 * i + 0.3} 0.04" sizen="2 2" 
+           style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
+          <quad posn="${side ? 15.6 : -1.7} ${-1.8 * i + 0.1} 0.05" sizen="1.6 1.6" `
+        if (i < prIndex) {
+          xml += `style="Icons128x128_1" substyle="ChallengeAuthor"/>`
+        } else if (i > prIndex) {
+          xml += `style="Icons128x128_1" substyle="Solo"/>`
+        } else {
+          xml += `style="Icons64x64_1" substyle="${side ? 'ArrowPrev' : 'ArrowNext'}"/>`
+        }
+      }
+      // Add no record thing if no record from player
+      if (i === CFG.localRecordsWidget.entries - 1) {
+        break
       }
     }
     xml += '</frame>'

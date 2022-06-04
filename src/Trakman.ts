@@ -220,6 +220,22 @@ export const TRAKMAN = {
   },
 
   /**
+   * copypaste of escape html
+   * @param str string to safer d
+   * @returns string but safe
+   */
+  safeString(str: string): string {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }
+    return str.replace(/[&<>"']/g, (m) => { return map[m as keyof typeof map] })
+  },
+
+  /**
      * Adds callback function to execute on given event
      */
   addListener(event: string, callback: Function) {
