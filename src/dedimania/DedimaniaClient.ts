@@ -13,7 +13,7 @@ export abstract class DedimaniaClient {
   private static receivingResponse: boolean = false
   private static sessionId: string
 
-  static async connect (host: string, port: number): Promise<void> {
+  static async connect(host: string, port: number): Promise<void> {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
@@ -85,9 +85,7 @@ export abstract class DedimaniaClient {
             reject(new Error(this.response.errorString?.toString()))
           } else {
             if (this.response.sessionId == null) {
-              ErrorHandler.error('Dedimania server didn\'t send sessionId',
-                `Received:
-                                ${this.response.data}`)
+              ErrorHandler.error('Dedimania server didn\'t send sessionId', `Received: ${this.response.data}`)
               reject(new Error('Dedimania server didn\'t send sessionId'))
               return
             }
@@ -106,13 +104,13 @@ export abstract class DedimaniaClient {
     })
   }
 
-  static setupListeners (): void {
+  static setupListeners(): void {
     this.socket.on('data', buffer => {
       this.response.addData(buffer.toString())
     })
   }
 
-  static async call (method: string, params: object[] = []): Promise<any[]> {
+  static async call(method: string, params: object[] = []): Promise<any[]> {
     while (this.receivingResponse) { await new Promise((resolve) => setTimeout(resolve, 300)) }
     this.receivingResponse = true
     const request = new DedimaniaRequest(method, params, this.sessionId)
