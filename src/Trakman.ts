@@ -4,6 +4,7 @@ import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { ChallengeService } from './services/ChallengeService.js'
+import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
@@ -110,13 +111,13 @@ export const TRAKMAN = {
     return RecordService.records.find(a => a.login === login)
   },
 
-  // static get dediRecords():DediRecord[] {
-  //     return [...DedimaniaService.records]
-  // }
+  get dediRecords(): TMDedi[] {
+    return [...DedimaniaService.dedis]
+  },
 
-  // static getPlayerDedi():DediRecord | undefined {
-  //     return DedimaniaService.records.find(a=>a.login===login)
-  // }
+  getPlayerDedi(login: string): TMDedi | undefined {
+    return DedimaniaService.dedis.find(a => a.login === login)
+  },
 
   /**
      * Returns an object containing various information about current challenge
