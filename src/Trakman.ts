@@ -196,8 +196,8 @@ export const TRAKMAN = {
     Client.callNoRes('ChatSendServerMessage', [{ string: message }])
   },
 
-  sendManialink(manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
-    if (login != null) {
+  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0) {
+    if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return

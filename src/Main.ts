@@ -15,7 +15,7 @@ import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 
-async function main (): Promise<void> {
+async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
   const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
@@ -54,12 +54,12 @@ async function main (): Promise<void> {
   Logger.info('Chat service instantiated')
   await Listeners.initialize()
   await RecordService.fetchRecords(ChallengeService.current.id)
-  Events.initialize()
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
     await DedimaniaService.initialize()
     Logger.info('Connected to dedimania')
   }
+  Events.initialize()
 }
 
 await main()

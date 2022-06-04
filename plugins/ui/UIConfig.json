@@ -17,10 +17,10 @@
             "top": "FF0F",
             "better": "F00F",
             "worse": "CCCF",
-            "self": "3F5F",
-            "bgRank": "0000",
-            "bgScore": "0000",
-            "bgName": "0000"
+            "self": "35F5",
+            "bgRank": "F00F",
+            "bgScore": "0F0F",
+            "bgName": "00FF"
         }
     },
     "widgetStyleScore": {
@@ -41,7 +41,7 @@
             "top": "FF0F",
             "better": "F00F",
             "worse": "CCCF",
-            "self": "3F5F",
+            "self": "35F5",
             "bgRank": "0000",
             "bgScore": "0000",
             "bgName": "0000"

@@ -112,5 +112,3 @@ dist
 .run/
 
 # Plugins
-Plugins.ts
-plugins/
