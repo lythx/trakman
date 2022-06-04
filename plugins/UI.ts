@@ -634,9 +634,25 @@ const events: TMEvent[] = [
     {
         event: 'Controller.BeginChallenge',
         callback: async (info: BeginChallengeInfo) => {
+
+            // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
+            console.log(TM.challengeQueue)
+            console.log(TM.previousChallenges)
+            // TODO: Fetch the next challenge info
+            // Temporarily moved to EndChallenge
+            // We'd need to store the nextchallenge in a variable
+            // This is easier achievable with queue/jukebox
+
+            // TODO: Display current challenge widget
+            TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+
+            // TODO: Display current challenge record widgets
+
             // Close score manialinks
             TM.sendManialink(UIScore.closeManialinks())
             // Send race widgets to all players
+
             for (const player of TM.players) {
                 TM.sendManialink(await UIRace.displayManialinks(player), player.login)
             }

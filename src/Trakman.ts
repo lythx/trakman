@@ -14,6 +14,7 @@ import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
 import { ErrorHandler } from './ErrorHandler.js'
+import { JukeboxService } from './services/JukeboxService.js'
 
 const DB = new Database()
 DB.initialize()
@@ -265,5 +266,13 @@ export const TRAKMAN = {
 
   fatalError(...lines: string[]): void {
     ErrorHandler.fatal(...lines)
+  },
+
+  get challengeQueue() {
+    return JukeboxService.queue
+  },
+
+  get previousChallenges() {
+    return JukeboxService.previous
   }
 }

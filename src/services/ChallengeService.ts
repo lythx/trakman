@@ -4,31 +4,33 @@ import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { TMXService } from './TMXService.js'
+import { JukeboxService } from './JukeboxService.js'
 
 export class ChallengeService {
   private static _current: TMChallenge
   private static readonly _challenges: TMChallenge[] = []
   private static repo: ChallengeRepository
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     this.repo = new ChallengeRepository()
     await this.repo.initialize()
     await this.initializeList()
     await this.setCurrent()
+    JukeboxService.initialize()
   }
 
-  static get current (): TMChallenge {
+  static get current(): TMChallenge {
     return this._current
   }
 
-  static get challenges (): TMChallenge[] {
+  static get challenges(): TMChallenge[] {
     return this._challenges
   }
 
   /**
    * Sets the current challenge.
    */
-  static async setCurrent (): Promise<void> {
+  static async setCurrent(): Promise<void> {
     const res = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
       ErrorHandler.error('Unable to retrieve current challenge info.', res.message)
@@ -60,7 +62,7 @@ export class ChallengeService {
   /**
    * Download all the challenges from the server and store them in a field
    */
-  private static async initializeList (): Promise<void> {
+  private static async initializeList(): Promise<void> {
     const challengeList = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ])
@@ -124,7 +126,7 @@ export class ChallengeService {
     this.repo.add(...challengesNotInDBInfo)
   }
 
-  static async add (fileName: string): Promise<TMChallenge | Error> {
+  static async add(fileName: string): Promise<TMChallenge | Error> {
     const insert = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }
     if (insert[0] === false) { return new Error(`Failed to insert challenge ${fileName}`) }
@@ -149,5 +151,12 @@ export class ChallengeService {
     }
     this._challenges.push(obj)
     return obj
+  }
+
+  static async setNextChallenge(id: string): Promise<void | Error> {
+    const challenge = this.challenges.find(a => a.id === id)
+    if (challenge === undefined) { return new Error(`Cant find challenge with UId ${id} in memory`) }
+    const res = await Client.call('ChooseNextChallenge', [{ string: challenge.fileName }])
+    if (res instanceof Error) { return new Error(`Failed to queue challenge ${challenge.name}`) }
   }
 }
