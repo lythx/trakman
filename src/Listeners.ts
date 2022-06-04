@@ -10,6 +10,7 @@ import 'dotenv/config'
 import { GameService } from './services/GameService.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import { ErrorHandler } from './ErrorHandler.js'
+import { JukeboxService } from './services/JukeboxService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -136,6 +137,7 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.records
         }
+        JukeboxService.update()
         Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') {
           const challengeDedisInfo = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
@@ -235,7 +237,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
