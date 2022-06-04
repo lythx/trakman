@@ -196,8 +196,8 @@ export const TRAKMAN = {
     Client.callNoRes('ChatSendServerMessage', [{ string: message }])
   },
 
-  sendManialink(manialink: string, login?: string, expireTime: number = 0, deleteOnClick: boolean = false) {
-    if (login != null) {
+  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0) {
+    if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
@@ -217,6 +217,22 @@ export const TRAKMAN = {
      */
   addCommand(command: TMCommand) {
     ChatService.addCommand(command)
+  },
+
+  /**
+   * copypaste of escape html
+   * @param str string to safer d
+   * @returns string but safe
+   */
+  safeString(str: string): string {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }
+    return str.replace(/[&<>"']/g, (m) => { return map[m as keyof typeof map] })
   },
 
   /**
