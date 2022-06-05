@@ -7,6 +7,10 @@ const commands: TMCommand[] = [
     aliases: ['ssn', 'setservername'],
     help: 'Change the server name.',
     callback: (info: MessageInfo) => {
+      if (info.text.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No name specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -26,6 +30,10 @@ const commands: TMCommand[] = [
     aliases: ['sc', 'setcomment'],
     help: 'Change the server comment.',
     callback: (info: MessageInfo) => {
+      if (info.text.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No comment specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -45,9 +53,15 @@ const commands: TMCommand[] = [
     aliases: ['sp', 'setpwd', 'setpassword'],
     help: 'Change the player password.',
     callback: (info: MessageInfo) => {
-      // Passwords outside of ASCII range cannot be entered in the field
-      const regex: RegExp = /[\p{ASCII}]+/u
-      if (!regex.test(info.text)) { return }
+      if (info.text.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No password specified.`, info.login)
+        return
+      }
+      const regex: RegExp = /[\p{ASCII}]+/u   // Passwords outside of ASCII range cannot be entered in the field
+      if (!regex.test(info.text)) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Invalid password (ASCII mismatch).`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -67,9 +81,15 @@ const commands: TMCommand[] = [
     aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
     help: 'Change the spectator password.',
     callback: (info: MessageInfo) => {
-      // Passwords outside of ASCII range cannot be entered in the field
-      const regex: RegExp = /[\p{ASCII}]+/u
-      if (!regex.test(info.text)) { return }
+      if (info.text.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No password specified.`, info.login)
+        return
+      }
+      const regex: RegExp = /[\p{ASCII}]+/u   // Passwords outside of ASCII range cannot be entered in the field
+      if (!regex.test(info.text)) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Invalid password (ASCII mismatch).`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -89,7 +109,10 @@ const commands: TMCommand[] = [
     aliases: ['smp', 'setmaxplayers'],
     help: 'Change the max players amount.',
     callback: (info: MessageInfo) => {
-      if (!Number.isInteger(Number(info.text))) { return }
+      if (!Number.isInteger(Number(info.text))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -109,7 +132,10 @@ const commands: TMCommand[] = [
     aliases: ['sms', 'setmaxspecs'],
     help: 'Change the max spectators amount.',
     callback: (info: MessageInfo) => {
-      if (!Number.isInteger(Number(info.text))) { return }
+      if (!Number.isInteger(Number(info.text))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -129,7 +155,10 @@ const commands: TMCommand[] = [
     aliases: ['sct', 'setchattime'],
     help: 'Change the time you spend on the podium screen.',
     callback: (info: MessageInfo) => {
-      if (!Number.isInteger(Number(info.text))) { return }
+      if (!Number.isInteger(Number(info.text))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -149,7 +178,10 @@ const commands: TMCommand[] = [
     aliases: ['stl', 'settimelimit'],
     help: 'Change the time you spend gaming.',
     callback: (info: MessageInfo) => {
-      if (!Number.isInteger(Number(info.text))) { return }
+      if (!Number.isInteger(Number(info.text))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -171,7 +203,14 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       const time = info.text.split(' ')[0]
       const notice = info.text.split(' ').splice(1, info.text.length - 1).join(' ')
-      if (!Number.isInteger(Number(time))) { return }
+      if (!Number.isInteger(Number(time))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No time specified.`, info.login)
+        return
+      }
+      if (notice === undefined || notice.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No notice specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -191,7 +230,13 @@ const commands: TMCommand[] = [
     aliases: ['acdl', 'allowchallengedownload'],
     help: 'Change whether challenge download is enabled.',
     callback: (info: MessageInfo) => {
-      const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
+      let status: boolean
+      if (['true', 'yes', 'y'].includes(info.text.toLowerCase())) { status = true }
+      else if (['false', 'no', 'n'].includes(info.text.toLowerCase())) { status = false }
+      else {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Not a valid boolean parameter.`, info.login)
+        return
+      }
       TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
@@ -213,7 +258,13 @@ const commands: TMCommand[] = [
     aliases: ['drp', 'disablerespawn'],
     help: 'Change whether checkpoint respawning is enabled.',
     callback: (info: MessageInfo) => {
-      const status: boolean = (info.text.toLowerCase() === 'true') // Implement a better check maybe? lol
+      let status: boolean
+      if (['true', 'yes', 'y'].includes(info.text.toLowerCase())) { status = true }
+      else if (['false', 'no', 'n'].includes(info.text.toLowerCase())) { status = false }
+      else {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Not a valid boolean parameter.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -236,7 +287,10 @@ const commands: TMCommand[] = [
     help: 'Change whether challenge download is enabled.',
     callback: (info: MessageInfo) => {
       // 0 = No change, 1 = Show all, n = Show n
-      if (!Number.isInteger(Number(info.text))) { return }
+      if (!Number.isInteger(Number(info.text))) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -258,7 +312,7 @@ const commands: TMCommand[] = [
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
     callback: (info: MessageInfo) => {
-      // Might need a timeout for this one
+      // Might need a timeout for this one //helloo im php
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
