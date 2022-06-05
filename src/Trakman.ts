@@ -290,5 +290,9 @@ export const TRAKMAN = {
 
   get previousChallenges() {
     return JukeboxService.previous
+  },
+
+  setPrivilege(login: string, privilege: number) {
+    PlayerService.setPrivilege(login, privilege)
   }
 }
