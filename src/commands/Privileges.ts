@@ -145,12 +145,54 @@ const commands: TMCommand[] = [
           `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has removed ` +
           `permissions of ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`)
         await PlayerService.setPrivilege(targetLogin, 0)
+      } else if (targetInfo.privilege === -1) {
+        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has enabled ` +
+          `${TM.colours.white + TM.strip(targetInfo.nickName, true)} ${TM.colours.folly}commands.`)
       } else if (targetInfo.privilege === 0) {
         TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} has no priveleges.`, callerLogin)
       }
     },
     privilege: 2
-  }
+  },
+  {
+    aliases: ['dcmds', 'disablecommands'],
+    help: 'Disable player commands.',
+    callback: async (info: MessageInfo) => {
+      const targetLogin: string = info.text
+      const callerLogin: string = info.login
+      if (targetLogin == null) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        return
+      }
+      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      if (targetInfo == null) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        return
+      }
+      if (targetInfo.privilege === 4) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        return
+      }
+      if (targetInfo.login === callerLogin) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        return
+      }
+      if (targetInfo.privilege === -1) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} already can't use commands.`, callerLogin)
+      }
+      else if (targetInfo.privilege < 1) {
+        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
+          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has disabled ` +
+          `commands for ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`)
+        await PlayerService.setPrivilege(targetLogin, -1)
+      }
+      else {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot disable commands of a privileged person.`, callerLogin)
+      }
+    },
+    privilege: 2
+  },
 ]
 
 for (const command of commands) { ChatService.addCommand(command) }
