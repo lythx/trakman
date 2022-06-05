@@ -120,7 +120,7 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previoustrack'],
     help: 'Requeue the previously played track.',
     callback: async (info: MessageInfo) => {
-      const index = await TM.call('GetCurrentChallengeIndex', [])
+      const index = await TM.call('GetCurrentChallengeIndex')
       if (index instanceof Error) {
         TM.sendMessage('Failed to fetch current challenge index', info.login)
         ErrorHandler.error('Failed to fetch current challenge index', index.message)
@@ -141,12 +141,12 @@ const commands: TMCommand[] = [
           }]
         })
       if (res instanceof Error) {
-        TM.sendMessage('Failed to set next challenge index', info.login)
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to set next challenge index.`, info.login)
         ErrorHandler.error('Failed to set next challenge index', res.message)
         return
       }
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
-      TM.call('NextChallenge')
+      TM.callNoRes('NextChallenge')
     },
     privilege: 1
   },
@@ -155,7 +155,10 @@ const commands: TMCommand[] = [
     help: 'Kick a specific player.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -176,12 +179,15 @@ const commands: TMCommand[] = [
     help: 'Mute a specific player.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unmuted `
+            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has muted `
             + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
         }]
       },
@@ -197,7 +203,10 @@ const commands: TMCommand[] = [
     help: 'Unmute a specific player.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -218,7 +227,10 @@ const commands: TMCommand[] = [
     help: 'Force a player into specmode.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -244,7 +256,10 @@ const commands: TMCommand[] = [
     help: 'Force a player into playermode.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -269,7 +284,14 @@ const commands: TMCommand[] = [
     aliases: ['kickghost', 'ghostkick', 'kg'],
     help: 'Manipulate every soul on the server that you kicked someone.',
     callback: (info: MessageInfo) => {
-      TM.sendMessage(`${info.nickName}$z$s${TM.colours.green} has kicked ${TM.colours.white}${info.text} ${TM.colours.green}from the server.`)
+      if (info.text.length === 0) {
+        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red} No login specified.`, info.login)
+        return
+      }
+      TM.multiCallNoRes(
+        { method: 'Kick', params: [{ string: info.text }] },
+        { method: 'ChatSendServerMessage', params: [{ string: `${info.nickName}$z$s${TM.colours.green} has kicked ${TM.colours.white}${info.text} ${TM.colours.green}from the server.` }] }
+      )
     },
     privilege: 1
   }, //You're welcome wizer : - )
