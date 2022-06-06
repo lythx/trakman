@@ -4,6 +4,8 @@ import net from 'node:net'
 import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { PlayerService } from '../services/PlayerService.js'
+import { ServerConfig } from '../ServerConfig.js'
+import { JukeboxService } from '../services/JukeboxService.js'
 
 export abstract class DedimaniaClient {
   private static readonly socket = new net.Socket()
@@ -15,6 +17,9 @@ export abstract class DedimaniaClient {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
+    const cfg = ServerConfig.config
+    const nextIds = []
+    for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
     const request = new DedimaniaRequest('system.multicall',
       [{
         array: [{
@@ -23,7 +28,7 @@ export abstract class DedimaniaClient {
             params: {
               array: [{
                 struct: {
-                  Game: { string: process.env.SERVER_GAME },
+                  Game: { string: 'TMF' },
                   Login: { string: process.env.SERVER_LOGIN },
                   Password: { string: process.env.SERVER_PASSWORD },
                   Tool: { string: 'Trakman' },
@@ -40,22 +45,22 @@ export abstract class DedimaniaClient {
             methodName: { string: 'dedimania.UpdateServerPlayers' },
             params: {
               array: [
-                { string: process.env.SERVER_GAME },
+                { string: 'TMF' },
                 { int: PlayerService.players.length },
                 {
                   struct: {
-                    SrvName: { string: 'TODO' },
-                    Comment: { string: 'TODO' },
-                    Private: { boolean: 'TODO' },
-                    SrvIP: { string: 'TODO' },
-                    SrvPort: { string: 'TODO' },
-                    XmlRpcPort: { string: 'TODO' },
-                    NumPlayers: { int: 'TODO' },
-                    MaxPlayers: { int: 'TODO' },
-                    NumSpecs: { int: 'TODO' },
-                    MaxSpecs: { int: 'TODO' },
-                    LadderMode: { int: 'TODO' },
-                    NextFiveUID: { string: ['TODO', 'TODO', 'TODO', 'TODO', 'TODO'].join('/') }
+                    SrvName: { string: cfg.name },
+                    Comment: { string: cfg.comment },
+                    Private: { boolean: cfg.password === '' },
+                    SrvIP: { string: 'lol' },
+                    SrvPort: { string: 'lol2' },
+                    XmlRpcPort: { string: 'lol3' },
+                    NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+                    MaxPlayers: { int: cfg.currentMaxPlayers },
+                    NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+                    MaxSpecs: { int: cfg.currentMaxPlayers },
+                    LadderMode: { int: cfg.currentLadderMode },
+                    NextFiveUID: { string: nextIds.join('/') }
                   }
                 },
                 { array: [] }

@@ -16,6 +16,9 @@ export default class DediRanking extends StaticComponent implements IStaticCompo
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
       if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
+    TM.addListener('Controller.DedimaniaRecord', () => {
+      this.display()
+    })
   }
 
   display(): void {

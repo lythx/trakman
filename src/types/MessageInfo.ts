@@ -9,4 +9,5 @@ interface MessageInfo {
   readonly timePlayed: number
   readonly joinTimestamp: number
   readonly privilege: number
+  readonly isSpectator: boolean
 }

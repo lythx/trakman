@@ -27,14 +27,14 @@ const events: TMEvent[] = [
         + `has quit after ${TM.colours.white + TM.msToTime(player.sessionTime)}${TM.colours.folly}.`)
     }
   },
-  {
-    event: 'Controller.PlayerRecord',
-    callback: async (info: RecordInfo) => {
-      TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} `
-        + `${info.status} ${TM.colours.white + TM.Utils.getPositionString(info.position)}${TM.colours.folly} `
-        + `local record. Time${TM.colours.white}: ${TM.Utils.getTimeString(info.score)}`)
-    }
-  },
+  // {
+  //   event: 'Controller.PlayerRecord',
+  //   callback: async (info: RecordInfo) => {
+  //     TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} `
+  //       + `${info.status} ${TM.colours.white + TM.Utils.getPositionString(info.position)}${TM.colours.folly} `
+  //       + `local record. Time${TM.colours.white}: ${TM.Utils.getTimeString(info.score)}`)
+  //   }
+  // },
   {
     event: 'Controller.LocalRecords',
     callback: async (info: RecordInfo) => {

@@ -4,7 +4,6 @@ interface RecordInfo {
   readonly score: number
   readonly date: Date
   readonly checkpoints: number[]
-  readonly status: string
   readonly nickName: string
   readonly nation: string
   readonly nationCode: string
@@ -14,4 +13,6 @@ interface RecordInfo {
   readonly privilege: number
   readonly visits: number
   readonly position: number
+  readonly previousPosition: number
+  readonly previousScore: number
 }
