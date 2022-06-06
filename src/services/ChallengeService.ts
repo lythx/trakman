@@ -1,5 +1,3 @@
-'use strict'
-
 import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'

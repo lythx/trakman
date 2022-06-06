@@ -1,5 +1,3 @@
-'use strict'
-
 interface MessageInfo {
   readonly id: string
   readonly login: string

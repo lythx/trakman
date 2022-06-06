@@ -1,5 +1,3 @@
-'use strict'
-
 interface BeginChallengeInfo {
   readonly id: string
   readonly name: string
