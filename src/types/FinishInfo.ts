@@ -5,7 +5,7 @@ interface FinishInfo {
   readonly nationCode: string
   readonly timePlayed: number
   readonly joinTimestamp: number
-  readonly checkpoints: TMCheckpoint[]
+  readonly checkpoints: number[]
   readonly visits: number
   readonly wins: number
   readonly privilege: number
