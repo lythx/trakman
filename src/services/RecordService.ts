@@ -101,7 +101,6 @@ export class RecordService {
         score,
         date,
         checkpoints,
-        status: 'new',
         nickName: player.nickName,
         nation: player.nation,
         nationCode: player.nationCode,
@@ -110,7 +109,9 @@ export class RecordService {
         wins: player.wins,
         privilege: player.privilege,
         visits: player.visits,
-        position
+        position,
+        previousScore: -1,
+        previousPosition: -1
       }
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
@@ -142,7 +143,6 @@ export class RecordService {
         score,
         date,
         checkpoints,
-        status: 'equal',
         nickName: player.nickName,
         nation: player.nation,
         nationCode: player.nationCode,
@@ -151,19 +151,25 @@ export class RecordService {
         wins: player.wins,
         privilege: player.privilege,
         visits: player.visits,
-        position
+        position,
+        previousScore: score,
+        previousPosition: position
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       return
     }
     if (score < pb) {
+      const previousScore = this._records.find(a => a.login === login)?.score
+      if (previousScore === undefined) {
+        ErrorHandler.error(`Can't find player ${login} in memory`)
+        return
+      }
       const recordInfo: RecordInfo = {
         challenge,
         login,
         score,
         date,
         checkpoints,
-        status: 'improved',
         nickName: player.nickName,
         nation: player.nation,
         nationCode: player.nationCode,
@@ -172,7 +178,9 @@ export class RecordService {
         wins: player.wins,
         privilege: player.privilege,
         visits: player.visits,
-        position
+        position,
+        previousPosition: this._records.findIndex(a => a.login === login),
+        previousScore
       }
       this._records = this._records.filter(a => a.login !== login)
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })

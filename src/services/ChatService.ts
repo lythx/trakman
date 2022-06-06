@@ -38,7 +38,8 @@ export abstract class ChatService {
         wins: info.wins,
         timePlayed: info.timePlayed,
         joinTimestamp: info.joinTimestamp,
-        privilege: info.privilege
+        privilege: info.privilege,
+        isSpectator: info.isSpectator
       }
       command.callback(messageInfo)
     })
@@ -77,7 +78,8 @@ export abstract class ChatService {
       wins: player.wins,
       timePlayed: player.timePlayed,
       joinTimestamp: player.joinTimestamp,
-      privilege: player.privilege
+      privilege: player.privilege,
+      isSpectator: player.isSpectator
     }
     Events.emitEvent('Controller.PlayerChat', messageInfo)
     this.messages.length = Math.min(messagesArraySize, this.messages.length)

@@ -12,6 +12,7 @@ import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
+import { ServerConfig } from './ServerConfig.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -52,6 +53,7 @@ async function main(): Promise<void> {
   Logger.info('Chat service instantiated')
   await Listeners.initialize()
   await RecordService.fetchRecords(ChallengeService.current.id)
+  await ServerConfig.update()
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
     await DedimaniaService.initialize()
