@@ -116,6 +116,7 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]) => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
+        await ServerConfig.update()
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
