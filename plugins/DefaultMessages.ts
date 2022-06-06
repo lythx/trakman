@@ -1,5 +1,3 @@
-'use strict'
-
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const events: TMEvent[] = [

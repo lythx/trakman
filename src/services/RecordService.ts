@@ -1,5 +1,3 @@
-'use strict'
-
 import { RecordRepository } from '../database/RecordRepository.js'
 import { PlayerService } from './PlayerService.js'
 import { ChallengeService } from './ChallengeService.js'
@@ -13,12 +11,12 @@ export class RecordService {
   private static _records: TMRecord[] = []
   private static _topPlayers: TopPlayer[] = []
 
-  static async initialize (repo: RecordRepository = new RecordRepository()): Promise<void> {
+  static async initialize(repo: RecordRepository = new RecordRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
   }
 
-  static async fetchRecords (challengeId: string): Promise<TMRecord[]> {
+  static async fetchRecords(challengeId: string): Promise<TMRecord[]> {
     this._records.length = 0
     this._topPlayers.length = 0
     const records = await this.repo.get(challengeId)
@@ -54,21 +52,21 @@ export class RecordService {
     return this._records
   }
 
-  static async fetchRecord (challengeId: string, login: string): Promise<TMRecord | null> {
+  static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | null> {
     const res = (await this.repo.getByLogin(challengeId, login))?.[0]
     if (res == null) { return null }
     return { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
-  static get records (): TMRecord[] {
+  static get records(): TMRecord[] {
     return [...this._records]
   }
 
-  static get topPlayers (): TopPlayer[] {
+  static get topPlayers(): TopPlayer[] {
     return [...this._topPlayers]
   }
 
-  static async add (challenge: string, login: string, score: number): Promise<void> {
+  static async add(challenge: string, login: string, score: number): Promise<void> {
     const date = new Date()
     const player = PlayerService.getPlayer(login)
     const cpsPerLap = ChallengeService.current.checkpointsAmount

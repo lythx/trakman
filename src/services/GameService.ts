@@ -1,12 +1,10 @@
-'use strict'
-
 import { ErrorHandler } from '../ErrorHandler.js'
 import { Client } from '../Client.js'
 
 export class GameService {
   private static _game: TMGame
 
-  static async initialize (): Promise<void> {
+  static async initialize(): Promise<void> {
     const res = await Client.call('GetCurrentGameInfo', [{ int: 1 }])
     if (res instanceof Error) {
       ErrorHandler.error('Failed to get game info', res.message)
@@ -40,21 +38,21 @@ export class GameService {
     }
   }
 
-  static get gameMode (): number {
+  static get gameMode(): number {
     return this._game.gameMode
   }
 
-  static get roundsForcedLaps (): number {
+  static get roundsForcedLaps(): number {
     return this._game.roundsForcedLaps
   }
 
-  static get game (): TMGame {
+  static get game(): TMGame {
     return this._game
   }
 }
 
 export class GameError extends Error {
-  constructor (message: string) {
+  constructor(message: string) {
     super(message)
     this.name = 'GameError'
   }

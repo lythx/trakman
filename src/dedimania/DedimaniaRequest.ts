@@ -1,5 +1,3 @@
-'use strict'
-
 export class DedimaniaRequest {
   readonly buffer = Buffer.from(
     'POST /Dedimania HTTP/1.1\r\n' +
@@ -16,7 +14,7 @@ export class DedimaniaRequest {
   * @param {Object[]} params parameters, each param needs to be under key named after its type
    * @param {string} sessionKey
   */
-  constructor (method: string, params: object[], sessionKey?: string) {
+  constructor(method: string, params: object[], sessionKey?: string) {
     let xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       xml += `<param><value>${this.handleParamType(param)}</value></param>`
@@ -38,7 +36,7 @@ export class DedimaniaRequest {
     }
   }
 
-  private handleParamType (param: any): any {
+  private handleParamType(param: any): any {
     const type = Object.keys(param)[0]
     switch (Object.keys(param)[0]) {
       case 'boolean':
@@ -70,7 +68,7 @@ export class DedimaniaRequest {
     }
   }
 
-  private escapeHtml (str: string): string {
+  private escapeHtml(str: string): string {
     const map = {
       '&': '&amp;',
       '<': '&lt;',

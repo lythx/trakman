@@ -1,5 +1,3 @@
-'use strict'
-
 interface TMGame {
   gameMode: number
   chatTime: number // what the fuck is this

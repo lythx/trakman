@@ -1,5 +1,3 @@
-'use strict'
-
 import 'dotenv/config'
 import postgres from 'pg'
 import { ErrorHandler } from '../ErrorHandler.js'

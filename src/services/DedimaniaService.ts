@@ -1,5 +1,3 @@
-'use strict'
-
 import { DedimaniaClient } from '../dedimania/DedimaniaClient.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'

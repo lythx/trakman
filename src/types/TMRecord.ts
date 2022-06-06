@@ -1,5 +1,3 @@
-'use strict'
-
 interface TMRecord {
   readonly challenge: string
   readonly login: string

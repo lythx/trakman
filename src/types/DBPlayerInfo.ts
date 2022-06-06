@@ -1,5 +1,3 @@
-'use strict'
-
 interface DBPlayerInfo {
   readonly login: string
   readonly nickName: string
