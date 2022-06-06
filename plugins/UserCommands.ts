@@ -115,6 +115,16 @@ const commands: TMCommand[] = [
       TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
+  },
+  //REMOVE THIS LATER
+
+  {
+    aliases: ['queue'],
+    help: 'asfaf',
+    callback: (info: MessageInfo) => {
+      TM.addToQueue(info.text)
+    },
+    privilege: 0
   }
 ]
 
