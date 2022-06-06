@@ -1,5 +1,3 @@
-'use strict'
-
 interface ChallengeInfo {
   readonly id: string
   readonly fileName: string

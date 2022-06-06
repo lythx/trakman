@@ -1,5 +1,3 @@
-'use strict'
-
 interface TMXTrackInfo {
   readonly id: number
   readonly name: string

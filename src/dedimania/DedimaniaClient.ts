@@ -1,5 +1,3 @@
-'use strict'
-
 import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import net from 'node:net'

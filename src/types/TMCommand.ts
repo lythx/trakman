@@ -1,5 +1,3 @@
-'use strict'
-
 interface TMCommand {
   readonly aliases: string[]
   readonly help?: string

@@ -1,5 +1,3 @@
-'use strict'
-
 interface ChallengeDedisInfo {
   readonly id: string
   readonly name: string

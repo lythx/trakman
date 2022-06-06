@@ -1,5 +1,3 @@
-'use strict'
-
 interface ManialinkClickInfo {
   readonly answer: number
   readonly login: string

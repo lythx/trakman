@@ -1,5 +1,3 @@
-'use strict'
-
 interface RecordInfo {
   readonly challenge: string
   readonly login: string

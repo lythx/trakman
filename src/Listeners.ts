@@ -1,5 +1,3 @@
-'use strict'
-
 import { Client } from './Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'

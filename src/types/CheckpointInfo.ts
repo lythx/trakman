@@ -1,5 +1,3 @@
-'use strict'
-
 interface CheckpointInfo {
   readonly login: string
   readonly id: number

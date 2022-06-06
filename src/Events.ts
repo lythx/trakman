@@ -1,10 +1,8 @@
-'use strict'
-
 export abstract class Events {
   private static readonly eventListeners: TMEvent[] = []
   private static controllerReady = false
 
-  static initialize (): void {
+  static initialize(): void {
     this.controllerReady = true
     Events.emitEvent('Controller.Ready', [])
   }
@@ -14,7 +12,7 @@ export abstract class Events {
    * @param event dedicated server callback event
    * @param callback
    */
-  static addListener (event: string, callback: Function): void {
+  static addListener(event: string, callback: Function): void {
     const e: TMEvent = { event: event, callback: callback }
     this.eventListeners.push(e)
   }
@@ -24,7 +22,7 @@ export abstract class Events {
    * @param {String} event callback event name
    * @param {any[]} json callback params
    */
-  static emitEvent (event: string, json: any): void {
+  static emitEvent(event: string, json: any): void {
     if (!this.controllerReady) { return }
     const matchingEvents = this.eventListeners.filter(a => a.event === event)
     for (const listener of matchingEvents) {
