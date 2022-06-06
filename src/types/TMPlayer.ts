@@ -9,4 +9,5 @@ interface TMPlayer {
   readonly visits: number
   wins: number
   privilege: number
+  isSpectator: boolean
 }

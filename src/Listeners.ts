@@ -9,6 +9,7 @@ import { GameService } from './services/GameService.js'
 import { ChallengeService } from './services/ChallengeService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
+import { ServerConfig } from './ServerConfig.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -26,7 +27,7 @@ export class Listeners {
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
-        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path)
+        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1])
         await RecordService.fetchRecord(params[0].UId, params[0].Login)
       }
     },
@@ -122,6 +123,7 @@ export class Listeners {
         const info: BeginChallengeInfo = {
           id: c.UId,
           name: c.Name,
+          fileName: c.FileName,
           author: c.Author,
           environment: c.Environnement,
           mood: c.Mood,
@@ -136,6 +138,7 @@ export class Listeners {
           records: RecordService.records
         }
         JukeboxService.update()
+        ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') {
           const challengeDedisInfo = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
@@ -144,9 +147,36 @@ export class Listeners {
       }
     },
     {
+      // interface EndChallengeInfo {
+      // readonly id: string
+      // readonly name: string
+      // readonly author: string
+      // readonly environment: string
+      // readonly mood: string
+      // readonly bronzeTime: number
+      // readonly silverTime: number
+      // readonly goldTime: number
+      // readonly authorTime: number
+      // readonly copperPrice: number
+      // readonly lapRace: boolean
+      // readonly lapsAmount: number
+      // readonly checkpointsAmount: number
+      // readonly records: TMRecord[]
+      // readonly isRestarted: boolean
+      // readonly wasWarmUp: boolean
+      // readonly continuesOnNextChallenge: boolean
+      // }
+
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]) => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
+        const temp: any = ChallengeService.current
+        temp.records = RecordService.records
+        temp.isRestarted = params[4]
+        temp.wasWarmUp = params[2]
+        temp.continuesOnNextChallenge = params[3]
+        const endChallengeInfo: EndChallengeInfo = temp
+        Events.emitEvent('Controller.EndChallenge', endChallengeInfo)
       }
     },
     {
@@ -208,6 +238,8 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
+        if (info.isSpectator || info.isTemporarySpectator || info.isPureSpectator) { PlayerService.setPlayerSpectatorStatus(info.login, true) }
+        else { PlayerService.setPlayerSpectatorStatus(info.login, false) }
         Events.emitEvent('Controller.PlayerInfoChanged', info)
       }
     },

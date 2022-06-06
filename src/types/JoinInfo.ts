@@ -8,4 +8,5 @@ interface JoinInfo {
   readonly visits: number
   readonly wins: number
   readonly privilege: number
+  readonly isSpectator: boolean
 }
