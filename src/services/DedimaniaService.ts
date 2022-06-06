@@ -13,7 +13,7 @@ import { Events } from '../Events.js'
 export abstract class DedimaniaService {
 
   static _dedis: TMDedi[] = []
-
+  static _newDedis: TMDedi[] = []
 
   static async initialize(): Promise<void> {
     await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT)).catch(err => {
@@ -26,14 +26,22 @@ export abstract class DedimaniaService {
     Events.addListener('Controller.EndChallenge', (info: EndChallengeInfo) => {
       this.sendRecords(info)
     })
+    Events.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+      this.addRecord(info)
+    })
   }
 
   static get dedis(): TMDedi[] {
     return [...this._dedis]
   }
 
+  static get newDedis(): TMDedi[] {
+    return [...this._newDedis]
+  }
+
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<ChallengeDedisInfo> {
     this._dedis.length = 0
+    this._newDedis.length = 0
     const cfg = ServerConfig.config
     const nextIds = []
     for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
@@ -77,22 +85,129 @@ export abstract class DedimaniaService {
   }
 
   static async sendRecords(info: EndChallengeInfo): Promise<void> {
-    return
-    const cfg = ServerConfig.config
-    const nextIds = []
-    for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers', [
-      { string: info.id },
-      { string: info.name },
-      { string: info.environment },
-      { string: info.author },
-      { string: 'TMF' },
-      { int: GameService.gameMode },
-      { int: info.checkpointsAmount },
-      { int: process.env.DEDIS_AMOUNT },
-      //{ array: [] } //TIMES TODO
-    ]
+    const recordsArray: any = []
+    for (const d of this._newDedis) {
+      recordsArray.push(
+        {
+          struct: {
+            Login: { string: d.login },
+            Best: { int: d.score },
+            Checks: { string: [...d.checkpoints, d.score].join(',') }
+          }
+        }
+      )
+    }
+    const status = await DedimaniaClient.call('system.multicall',
+      [{
+        array: [
+          {
+            struct:
+            {
+              methodName: { string: 'dedimania.ChallengeRaceTimes' },
+              params: {
+                array: [
+                  { string: info.id },
+                  { string: info.name },
+                  { string: info.environment },
+                  { string: info.author },
+                  { string: 'TMF' },
+                  { int: GameService.gameMode },
+                  { int: info.checkpointsAmount },
+                  { int: process.env.DEDIS_AMOUNT },
+                  { array: recordsArray }
+                ]
+              }
+            }
+          },
+          {
+            struct:
+            {
+              methodName: { string: 'dedimania.WarningsAndTTR' },
+              params: { array: [] }
+            }
+          },
+        ]
+      }]
     )
+  }
+
+  private static addRecord(info: FinishInfo): void {
+    const pb = this._dedis.find(a => a.login === info.login)?.score
+    const position = this._dedis.filter(a => a.score < info.score).length + 1
+    if (position > Number(process.env.DEDIS_AMOUNT)) { return }
+    if (pb == null) {
+      const dediRecordInfo: DediRecordInfo = {
+        challenge: info.challenge,
+        login: info.login,
+        score: info.score,
+        checkpoints: info.checkpoints,
+        nickName: info.nickName,
+        nation: info.nation,
+        nationCode: info.nationCode,
+        timePlayed: info.timePlayed,
+        joinTimestamp: info.joinTimestamp,
+        wins: info.wins,
+        privilege: info.privilege,
+        visits: info.visits,
+        position,
+        previousScore: -1,
+        previousPosition: -1
+      }
+      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
+      return
+    }
+    if (info.score === pb) {
+      const dediRecordInfo: DediRecordInfo = {
+        challenge: info.challenge,
+        login: info.login,
+        score: info.score,
+        checkpoints: info.checkpoints,
+        nickName: info.nickName,
+        nation: info.nation,
+        nationCode: info.nationCode,
+        timePlayed: info.timePlayed,
+        joinTimestamp: info.joinTimestamp,
+        wins: info.wins,
+        privilege: info.privilege,
+        visits: info.visits,
+        position,
+        previousScore: info.score,
+        previousPosition: position
+      }
+      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
+      return
+    }
+    if (info.score < pb) {
+      const previousScore = this._dedis.find(a => a.login === info.login)?.score
+      if (previousScore === undefined) {
+        ErrorHandler.error(`Can't find player ${info.login} in memory`)
+        return
+      }
+      const dediRecordInfo: DediRecordInfo = {
+        challenge: info.challenge,
+        login: info.login,
+        score: info.score,
+        checkpoints: info.checkpoints,
+        nickName: info.nickName,
+        nation: info.nation,
+        nationCode: info.nationCode,
+        timePlayed: info.timePlayed,
+        joinTimestamp: info.joinTimestamp,
+        wins: info.wins,
+        privilege: info.privilege,
+        visits: info.visits,
+        position,
+        previousScore,
+        previousPosition: this._dedis.findIndex(a => a.login === info.login)
+      }
+      this._dedis = this._dedis.filter(a => a.login !== info.login)
+      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      this._newDedis = this._newDedis.filter(a => a.login !== info.login)
+      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
+    }
   }
 
   private static updateServerPlayers(): void {
