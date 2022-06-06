@@ -1,6 +1,7 @@
 interface BeginChallengeInfo {
   readonly id: string
   readonly name: string
+  readonly fileName: string
   readonly author: string
   readonly environment: string
   readonly mood: string

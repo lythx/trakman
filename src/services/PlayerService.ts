@@ -53,7 +53,7 @@ export class PlayerService {
         ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
         return
       }
-      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path)
+      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path, false)
     }
   }
 
@@ -64,7 +64,7 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join(login: string, nickName: string, path: string): Promise<void> {
+  static async join(login: string, nickName: string, path: string, isSpectator: boolean): Promise<void> {
     const nation = path.split('|')[1]
     let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode == null) {
@@ -84,7 +84,8 @@ export class PlayerService {
         visits: 1,
         checkpoints: [],
         wins: 0,
-        privilege: 0
+        privilege: 0,
+        isSpectator
       }
       await this.repo.add(player)
     } else {
@@ -98,7 +99,8 @@ export class PlayerService {
         visits: Number(playerData.visits + 1 as string),
         checkpoints: [],
         wins: Number(playerData.wins),
-        privilege: Number(playerData.privilege)
+        privilege: Number(playerData.privilege),
+        isSpectator
       }
       await this.repo.update(player)
     }
@@ -188,5 +190,12 @@ export class PlayerService {
     if (player.checkpoints.length === 0) { return }
     const correctLap = player.checkpoints[0].lap + laps
     if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(ChallengeService.current.id, login, cp.time)
+  }
+
+  static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
+    const player = this._players.find(a => a.login === login)
+    if (player === undefined) { return false }
+    player.isSpectator = status
+    return true
   }
 }
