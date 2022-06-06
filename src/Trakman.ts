@@ -292,5 +292,10 @@ export const TRAKMAN = {
 
   setPrivilege(login: string, privilege: number) {
     PlayerService.setPrivilege(login, privilege)
+  },
+
+  addToQueue(challengeId: string) {
+    JukeboxService.add(challengeId)
   }
+
 }

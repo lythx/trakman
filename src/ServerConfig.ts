@@ -5,7 +5,7 @@ export class ServerConfig {
 
     private static _config: ServerInfo
 
-    static async update() {
+    static async update(): Promise<void> {
         const res = await Client.call('GetServerOptions')
         if (res instanceof Error) {
             ErrorHandler.fatal('Cant fetch server info', res.message)
