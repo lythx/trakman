@@ -1,5 +1,3 @@
-'use strict'
-
 interface JoinInfo {
   readonly login: string
   readonly nickName: string

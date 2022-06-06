@@ -1,5 +1,3 @@
-'use strict'
-
 interface LeaveInfo {
   readonly login: string
   readonly nickName: string

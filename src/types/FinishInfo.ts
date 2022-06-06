@@ -1,5 +1,3 @@
-'use strict'
-
 interface FinishInfo {
   readonly login: string
   readonly nickName: string

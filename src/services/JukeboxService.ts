@@ -1,5 +1,3 @@
-'use strict'
-
 import { Events } from "../Events.js"
 import { ChallengeService } from "./ChallengeService.js"
 

@@ -1,5 +1,3 @@
-'use strict'
-
 interface TMChallenge {
   readonly id: string
   readonly name: string

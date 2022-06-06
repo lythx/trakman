@@ -1,5 +1,3 @@
-'use strict'
-
 import net from 'node:net'
 import { Response } from './Response.js'
 import { Events } from './Events.js'
@@ -17,7 +15,7 @@ export class Socket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners (): void {
+  setupListeners(): void {
     this.on('data', buffer => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.handshakeHeaderSize === 0) {
@@ -37,7 +35,7 @@ export class Socket extends net.Socket {
   * Poll handshake status
   * @returns {Promise<String>} handshake status
   */
-  async awaitHandshake (): Promise<string> {
+  async awaitHandshake(): Promise<string> {
     const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
       const poll = (): void => {
@@ -61,7 +59,7 @@ export class Socket extends net.Socket {
   * Poll dedicated server response
   * @returns {Promise<any[]>} array of server return values
   */
-  async awaitResponse (id: number, method: string): Promise<any[]> {
+  async awaitResponse(id: number, method: string): Promise<any[]> {
     const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
       const poll = (): void => {
@@ -87,12 +85,12 @@ export class Socket extends net.Socket {
     })
   }
 
-  private setHandshakeHeaderSize (buffer: Buffer): void {
+  private setHandshakeHeaderSize(buffer: Buffer): void {
     if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
-  private handleHandshake (buffer: Buffer): void {
+  private handleHandshake(buffer: Buffer): void {
     this.handshakeHeader = buffer.toString()
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
@@ -104,7 +102,7 @@ export class Socket extends net.Socket {
   }
 
   // initiate a Response object with targetSize and Id
-  private handleResponseStart (buffer: Buffer): void {
+  private handleResponseStart(buffer: Buffer): void {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.incompleteHeader = buffer
@@ -120,7 +118,7 @@ export class Socket extends net.Socket {
   }
 
   // add new buffer to response object
-  private handleResponseChunk (buffer: Buffer): void {
+  private handleResponseChunk(buffer: Buffer): void {
     if (this.response === null) {
       ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
       return

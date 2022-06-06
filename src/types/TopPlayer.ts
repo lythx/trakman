@@ -1,5 +1,3 @@
-'use strict'
-
 interface TopPlayer {
   readonly challenge: string
   readonly login: string

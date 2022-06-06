@@ -1,5 +1,3 @@
-'use strict'
-
 import { ChatRepository } from '../database/ChatRepository.js'
 import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
@@ -13,12 +11,12 @@ export abstract class ChatService {
   static readonly messages: TMMessage[] = []
   private static repo: ChatRepository
 
-  static async initialize (repo: ChatRepository = new ChatRepository()): Promise<void> {
+  static async initialize(repo: ChatRepository = new ChatRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
   }
 
-  static addCommand (command: TMCommand): void {
+  static addCommand(command: TMCommand): void {
     const prefix = command.privilege === 0 ? '/' : '//'
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
       const input = info.text?.trim()
@@ -46,7 +44,7 @@ export abstract class ChatService {
     })
   }
 
-  static async loadLastSessionMessages (): Promise<void> {
+  static async loadLastSessionMessages(): Promise<void> {
     const result = await this.repo.get(messagesArraySize)
     for (const m of result) {
       const message: TMMessage = {
@@ -59,7 +57,7 @@ export abstract class ChatService {
     }
   }
 
-  static async add (login: string, text: string): Promise<void> {
+  static async add(login: string, text: string): Promise<void> {
     const message: TMMessage = {
       id: randomUUID(),
       login,
@@ -86,7 +84,7 @@ export abstract class ChatService {
     await this.repo.add(message)
   }
 
-  static async getByLogin (login: string, limit: number): Promise<any[] | Error> {
+  static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
     return await this.repo.getByLogin(login, limit)
   }
 }

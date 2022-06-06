@@ -1,5 +1,3 @@
-'use strict'
-
 export const Utils = {
   /**
    * Transforms a time in milliseconds into a (hh:m)m:ss:cc format
