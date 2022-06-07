@@ -7,7 +7,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo) => {
       const res = await TM.queryDB('SELECT * FROM challenges;')
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to get challenges from database`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get challenges from the database.`, info.login)
         return
       }
       for (const challenge of res) {
@@ -17,22 +17,24 @@ const commands: TMCommand[] = [
           TM.error(err)
         })
         if (!file) {
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} is not on TMX.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
           continue
         }
         const write = await TM.call('WriteFile', [{ string: file.name }, { base64: file.content }])
         if (write instanceof Error) {
           TM.error('Failed to write file', write.message)
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to write the track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} file to the server.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}file to the server.`, info.login)
           continue
         }
         const insert = await TM.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
           TM.error('Failed to insert challenge to jukebox', insert.message)
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Failed to insert the track ${TM.strip(challenge.name, false)}$z$s${TM.colours.red} into queue.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
           continue
         }
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white}Added map ${TM.strip(challenge.name, false)}$z$s${TM.colours.white} from TMX.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
+          + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from TMX.`)
       }
     },
     privilege: 4
