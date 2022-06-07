@@ -123,6 +123,8 @@ export const TRAKMAN = {
       highlight: this.colours.white,
       // Karma messages
       karma: this.colours.greenyellow,
+      // Server messages
+      servermsg: this.colours.erin,
       // Misc messages
       message: this.colours.lightseagreen,
       // Rank highlighting colour
