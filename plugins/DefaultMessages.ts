@@ -34,7 +34,7 @@ const events: TMEvent[] = [
           co.c1 = '$000'; co.c2 = '$aaa'; co.c3 = '$fff'; co.c4 = '$808'; co.c5 = '$505'
           break
         case 9: // Pansexual (shifted)
-          co.c1 = '$1bf'; co.c2 = '$f28'; co.c3 = '$fd0'; co.c4 = '$1bf'; co.c5 = '$1bf'
+          co.c1 = '$f28'; co.c2 = '$f28'; co.c3 = '$fd0'; co.c4 = '$1bf'; co.c5 = '$1bf'
           break
         case 10: // Prideflag (shifted)
           co.c1 = '$d22'; co.c2 = '$f81'; co.c3 = '$fe1'; co.c4 = '$074'; co.c5 = '$248'
