@@ -7,6 +7,9 @@ export default class LiveRanking extends StaticComponent implements IStaticCompo
 
   constructor(id: number) {
     super('race', id)
+    TM.addListener('Controller.LiveRecord', (info: RecordInfo) => {
+      console.log(info)
+    })
   }
 
   display(): void {

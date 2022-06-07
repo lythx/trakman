@@ -121,7 +121,7 @@ const commands: TMCommand[] = [
     aliases: ['recs'],
     help: 'asdasd',
     callback: (info: MessageInfo) => {
-      const localRecs: TopPlayer[] = TM.topPlayers
+      const localRecs: LocalRecord[] = TM.localRecords
       let str = `${TM.palette.server}» ${TM.palette.message}Local records on `
         + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
       for (const lr of localRecs) {
