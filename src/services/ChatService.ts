@@ -24,7 +24,7 @@ export abstract class ChatService {
         return
       }
       if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${TM.colours.yellow}»${TM.colours.red} You have no permission to use this command.` }, { string: info.login }])
+        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${TM.palette.server}»${TM.palette.error} You have no permission to use this command.` }, { string: info.login }])
         return
       }
       const text = input.split(' ').splice(1).join(' ')

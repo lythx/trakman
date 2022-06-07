@@ -117,7 +117,20 @@ const commands: TMCommand[] = [
     privilege: 0
   },
   //REMOVE THIS LATER
-
+  {
+    aliases: ['recs'],
+    help: 'asdasd',
+    callback: (info: MessageInfo) => {
+      const localRecs: TopPlayer[] = TM.topPlayers
+      let str = `${TM.palette.server}» ${TM.palette.message}Local records on `
+        + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
+      for (const lr of localRecs) {
+        str += `${TM.strip(lr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(lr.score)}, `
+      }
+      TM.sendMessage(str.slice(0, -2), info.login)
+    },
+    privilege: 0
+  },
   {
     aliases: ['queue'],
     help: 'asfaf',

@@ -57,6 +57,7 @@ export const TRAKMAN = {
     if (str === '') { return '0 seconds' }
     return str
   },
+
   /**
      * Returns an object containing various information about game state
      */
@@ -76,6 +77,73 @@ export const TRAKMAN = {
     */
   get topPlayers(): TopPlayer[] {
     return RecordService.topPlayers
+  },
+
+  get dediRecords(): TMDedi[] {
+    return [...DedimaniaService.dedis]
+  },
+
+  /**
+   * Returns an object containing various information about current challenge
+   */
+  get challenge(): TMChallenge {
+    return Object.assign(ChallengeService.current)
+  },
+
+  /**
+     * Returns an array of objects containing information about recent messages
+     */
+  get messages(): TMMessage[] {
+    return [...ChatService.messages]
+  },
+
+  /**
+   * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
+   */
+  get colours() {
+    return colours
+  },
+
+  /**
+   * Returns an object containing the current server palette values
+   */
+  get palette() {
+    return {
+      // All admin commands
+      admin: this.colours.erin,
+      // Dedi record messages
+      dedirecord: this.colours.darkpastelgreen,
+      // Dedi misc messages
+      dedimessage: this.colours.kellygreen,
+      // Donation messages
+      donation: this.colours.brilliantrose,
+      // Error messages
+      error: this.colours.red,
+      // General highlighting colour
+      highlight: this.colours.white,
+      // Karma messages
+      karma: this.colours.greenyellow,
+      // Server messages
+      servermsg: this.colours.erin,
+      // Misc messages
+      message: this.colours.lightseagreen,
+      // Rank highlighting colour
+      rank: this.colours.icterine,
+      // Record messages
+      record: this.colours.erin,
+      // Server message prefix colour
+      server: this.colours.yellow,
+      // Voting messages
+      vote: this.colours.chartreuse,
+    }
+  },
+
+  get Utils() {
+    return Utils
+  },
+
+  get challenges(): TMChallenge[] {
+    return ChallengeService.challenges
   },
 
   /**
@@ -109,26 +177,8 @@ export const TRAKMAN = {
     return RecordService.records.find(a => a.login === login)
   },
 
-  get dediRecords(): TMDedi[] {
-    return [...DedimaniaService.dedis]
-  },
-
   getPlayerDedi(login: string): TMDedi | undefined {
     return DedimaniaService.dedis.find(a => a.login === login)
-  },
-
-  /**
-     * Returns an object containing various information about current challenge
-     */
-  get challenge(): TMChallenge {
-    return Object.assign(ChallengeService.current)
-  },
-
-  /**
-     * Returns an array of objects containing information about recent messages
-     */
-  get messages(): TMMessage[] {
-    return [...ChatService.messages]
   },
 
   /**
@@ -204,13 +254,6 @@ export const TRAKMAN = {
   },
 
   /**
-     * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
-     */
-  get colours() {
-    return colours
-  },
-
-  /**
      * Adds a chat command
      */
   addCommand(command: TMCommand) {
@@ -244,10 +287,6 @@ export const TRAKMAN = {
     return await ChallengeService.add(fileName)
   },
 
-  get Utils() {
-    return Utils
-  },
-
   randomUUID(): string {
     return randomUUID()
   },
@@ -268,10 +307,6 @@ export const TRAKMAN = {
 
   async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
     return await TMXService.fetchTrackFileByUid(trackId)
-  },
-
-  get challenges() {
-    return ChallengeService.challenges
   },
 
   error(...lines: string[]): void {

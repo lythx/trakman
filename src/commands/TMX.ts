@@ -10,23 +10,23 @@ const command: TMCommand = {
     const [trackId, game] = info.text.toUpperCase().split(' ')
     const file = await TMXService.fetchTrackFile(trackId, game).catch((err: Error) => err)
     if (file instanceof Error) {
-      TM.sendMessage(`${TM.colours.yellow}»${TM.colours.red} Failed to fetch file from ${TM.colours.white + game || 'TMNF'} TMX` +
-        `${TM.colours.red}, check if you specified the correct game.`, info.login)
+      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + game || 'TMNF'} TMX` +
+        `${TM.palette.error}, check if you specified the correct game.`, info.login)
       return
     }
     const write = await Client.call('WriteFile', [{ string: file.name }, { base64: file.content }])
     if (write instanceof Error) {
-      TM.sendMessage(`${TM.colours.yellow}»${TM.colours.red} Server failed to write file.`, info.login)
+      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to write file.`, info.login)
       return
     }
     const challenge = await TM.addChallenge(file.name)
     if (challenge instanceof Error) {
-      TM.sendMessage(`${TM.colours.yellow}»${TM.colours.red} Server failed to queue the challenge.`, info.login)
+      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the challenge.`, info.login)
       return
     }
-    TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-      `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has added and queued ` +
-      `${TM.colours.white + TM.strip(challenge.name, true)}${TM.colours.folly} from TMX.`)
+    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+      `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued ` +
+      `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from TMX.`)
   },
   privilege: 1
 }
