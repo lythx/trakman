@@ -6,15 +6,15 @@ const commands: TMCommand[] = [
     help: 'Change the server name.',
     callback: (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No name specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No name specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the server name to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the server name to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -29,15 +29,15 @@ const commands: TMCommand[] = [
     help: 'Change the server comment.',
     callback: (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No comment specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No comment specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the server comment to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the server comment to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -52,20 +52,20 @@ const commands: TMCommand[] = [
     help: 'Change the player password.',
     callback: (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No password specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No password specified.`, info.login)
         return
       }
-      const regex: RegExp = /[\p{ASCII}]+/u   // Passwords outside of ASCII range cannot be entered in the field
+      const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (!regex.test(info.text)) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Invalid password (ASCII mismatch).`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the player password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the player password to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -80,20 +80,20 @@ const commands: TMCommand[] = [
     help: 'Change the spectator password.',
     callback: (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No password specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No password specified.`, info.login)
         return
       }
-      const regex: RegExp = /[\p{ASCII}]+/u   // Passwords outside of ASCII range cannot be entered in the field
+      const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (!regex.test(info.text)) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Invalid password (ASCII mismatch).`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the spectator password to ${TM.colours.white + info.text}$z$s${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the spectator password to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -108,15 +108,15 @@ const commands: TMCommand[] = [
     help: 'Change the max players amount.',
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No number specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the max players amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the max players amount to ${TM.palette.highlight + info.text}${TM.palette.admin}.`
         }],
       },
         {
@@ -131,15 +131,15 @@ const commands: TMCommand[] = [
     help: 'Change the max spectators amount.',
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No number specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the max spectators amount to ${TM.colours.white + info.text}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the max spectators amount to ${TM.palette.highlight + info.text}${TM.palette.admin}.`
         }],
       },
         {
@@ -154,15 +154,15 @@ const commands: TMCommand[] = [
     help: 'Change the time you spend on the podium screen.',
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No number specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the podium time to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the podium time to ${TM.palette.highlight + info.text}${TM.palette.admin}msec.`
         }],
       },
         {
@@ -177,15 +177,15 @@ const commands: TMCommand[] = [
     help: 'Change the time you spend gaming.',
     callback: (info: MessageInfo) => {
       if (!Number.isInteger(Number(info.text))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No number specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the time limit to ${TM.colours.white + info.text}${TM.colours.folly}msec.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the time limit to ${TM.palette.highlight + info.text}${TM.palette.admin}msec.`
         }],
       },
         {
@@ -202,19 +202,19 @@ const commands: TMCommand[] = [
       const time = info.text.split(' ')[0]
       const notice = info.text.split(' ').splice(1, info.text.length - 1).join(' ')
       if (!Number.isInteger(Number(time))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No time specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No time specified.`, info.login)
         return
       }
       if (notice === undefined || notice.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No notice specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No notice specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the notice to ${TM.colours.white + TM.strip(notice, true)}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the notice to ${TM.palette.highlight + TM.strip(notice, true)}${TM.palette.admin}.`
         }],
       },
         {
@@ -232,15 +232,15 @@ const commands: TMCommand[] = [
       if (['true', 'yes', 'y'].includes(info.text.toLowerCase())) { status = true }
       else if (['false', 'no', 'n'].includes(info.text.toLowerCase())) { status = false }
       else {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Not a valid boolean parameter.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Not a valid boolean parameter.`, info.login)
         return
       }
       TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
-            + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} the challenge download.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + status ? 'allowed' : 'disallowed'}${TM.palette.admin} the challenge download.`
         }]
       },
         {
@@ -260,15 +260,15 @@ const commands: TMCommand[] = [
       if (['true', 'yes', 'y'].includes(info.text.toLowerCase())) { status = true }
       else if (['false', 'no', 'n'].includes(info.text.toLowerCase())) { status = false }
       else {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Not a valid boolean parameter.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Not a valid boolean parameter.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
-            + `${TM.colours.white + status ? 'allowed' : 'disallowed'}${TM.colours.folly} checkpoint respawning.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + status ? 'allowed' : 'disallowed'}${TM.palette.admin} checkpoint respawning.`
         }]
       },
         {
@@ -286,15 +286,15 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       // 0 = No change, 1 = Show all, n = Show n
       if (!Number.isInteger(Number(info.text))) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No number specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No number specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has `
-            + `${TM.colours.white + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.colours.folly} forced opponent display.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + (Number(info.text) !== 0) ? 'enabled' : 'disabled'}${TM.palette.admin} forced opponent display.`
         }]
       },
         {
@@ -314,8 +314,8 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has killed the server :,(`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has killed the server :,(`
         }]
       },
         {

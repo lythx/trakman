@@ -10,29 +10,29 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 3) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Masteradmin.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Masteradmin.`)
         await PlayerService.setPrivilege(targetLogin, 3)
       } else if (targetInfo.privilege === 3) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Masteradmin.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Masteradmin.`, callerLogin)
       }
     },
     privilege: 4
@@ -44,33 +44,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 2) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       } else if (targetInfo.privilege === 2) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Admin.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has demoted ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Admin.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Admin.`)
         await PlayerService.setPrivilege(targetLogin, 2)
       }
     },
@@ -83,33 +83,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege < 1) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has promoted ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       } else if (targetInfo.privilege === 1) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} is already Operator.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has demoted ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly} to Operator.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Operator.`)
         await PlayerService.setPrivilege(targetLogin, 1)
       }
     },
@@ -122,33 +122,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege > 1) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has removed ` +
-          `permissions of ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed ` +
+          `permissions of ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`)
         await PlayerService.setPrivilege(targetLogin, 0)
       } else if (targetInfo.privilege === -1) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has enabled ` +
-          `${TM.colours.white + TM.strip(targetInfo.nickName, true)} ${TM.colours.folly}commands.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has enabled ` +
+          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)} ${TM.palette.admin}commands.`)
       } else if (targetInfo.privilege === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} has no priveleges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} has no priveleges.`, callerLogin)
       }
     },
     privilege: 2
@@ -160,33 +160,33 @@ const commands: TMCommand[] = [
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       const targetInfo = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Cannot find the specified login in the database.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       if (targetInfo.privilege === -1) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.red} already can't use commands.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} already can't use commands.`, callerLogin)
       }
       else if (targetInfo.privilege < 1) {
-        TM.sendMessage(`${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-          `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has disabled ` +
-          `commands for ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+          `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
+          `commands for ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`)
         await PlayerService.setPrivilege(targetLogin, -1)
       }
       else {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot disable commands of a privileged person.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)
       }
     },
     privilege: 2
