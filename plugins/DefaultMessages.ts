@@ -73,7 +73,7 @@ const events: TMEvent[] = [
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
       else if (info.previousPosition + 1 < info.position) { rs.str = 'obtained', rs.calcDiff = true }
       else if (info.previousPosition + 1 === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      else { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition + 1 === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
       if (rs.calcDiff) {
         diff = TM.Utils.getTimeString(info.score > info.previousScore ? info.score - info.previousScore : info.previousScore - info.score)
       }
@@ -92,7 +92,7 @@ const events: TMEvent[] = [
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
       else if (info.previousPosition + 1 < info.position) { rs.str = 'obtained', rs.calcDiff = true }
       else if (info.previousPosition + 1 === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      else { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition + 1 === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
       if (rs.calcDiff) {
         diff = TM.Utils.getTimeString(info.score > info.previousScore ? info.score - info.previousScore : info.previousScore - info.score)
       }
