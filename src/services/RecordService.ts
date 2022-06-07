@@ -87,13 +87,17 @@ export class RecordService {
     temp.challenge = challenge
     temp.score = score
     const finishInfo: FinishInfo = temp
+    await this.handleFinish(challenge, login, score, date, cpAmount, [...checkpoints], player)
     Events.emitEvent('Controller.PlayerFinish', finishInfo)
+  }
+
+  private static async handleFinish(challenge: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
     if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
       return
     }
     const pb = this._records.find(a => a.login === login)?.score
-    const position = this._records.filter(a => a.score < score).length + 1
+    const position = this._records.filter(a => a.score <= score).length + 1
     if (pb == null) {
       const recordInfo: RecordInfo = {
         challenge,
@@ -133,10 +137,11 @@ export class RecordService {
         this._topPlayers.splice(position - 1, 0, topPlayer)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      await this.repo.add(recordInfo)
+      this.repo.add(recordInfo)
       return
     }
     if (score === pb) {
+      const previousPosition = this.records.findIndex(a => a.login === this.records.find(a => a.login === login)?.login) + 1
       const recordInfo: RecordInfo = {
         challenge,
         login,
@@ -151,9 +156,9 @@ export class RecordService {
         wins: player.wins,
         privilege: player.privilege,
         visits: player.visits,
-        position,
+        position: previousPosition,
         previousScore: score,
-        previousPosition: position
+        previousPosition
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       return
@@ -179,7 +184,7 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position,
-        previousPosition: this._records.findIndex(a => a.login === login),
+        previousPosition: this._records.findIndex(a => a.login === login) + 1,
         previousScore
       }
       this._records = this._records.filter(a => a.login !== login)
@@ -204,7 +209,7 @@ export class RecordService {
         this._topPlayers.splice(position - 1, 0, topPlayer)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      await this.repo.update(recordInfo)
+      this.repo.update(recordInfo)
     }
   }
 }
