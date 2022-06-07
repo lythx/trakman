@@ -71,17 +71,27 @@ const events: TMEvent[] = [
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-      else if (info.previousPosition + 1 < info.position) { rs.str = 'obtained', rs.calcDiff = true }
-      else if (info.previousPosition + 1 === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      else if (info.previousPosition + 1 === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition > info.position) { rs.str = 'obtained', rs.calcDiff = true }
+      else if (info.previousPosition === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
       if (rs.calcDiff) {
-        diff = TM.Utils.getTimeString(info.score > info.previousScore ? info.score - info.previousScore : info.previousScore - info.score)
+        diff = TM.Utils.getTimeString(info.previousScore - info.score)
+        let i = -1
+        while (true) {
+          i++
+          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
+          if (Number(diff[i]) !== 0) { continue }
+          diff = diff.substring(1)
+          i--
+          if (diff[i + 1] === ':') {
+            diff = diff.substring(1)
+          }
+        }
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.record} has `
         + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.record} `
-        + `local record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.score)}`)
-      // TODO
-      //+ `${rs.calcDiff ? ` ${TM.palette.record}$n(${TM.palette.rank + info.previousPosition + 1} ${TM.palette.highlight}-${diff + TM.palette.record})` : ``}`)
+        + `local record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.score)}`
+        + `${rs.calcDiff ? ` ${TM.palette.record}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.record})` : ``}`)
     }
   },
   {
@@ -90,17 +100,27 @@ const events: TMEvent[] = [
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-      else if (info.previousPosition + 1 < info.position) { rs.str = 'obtained', rs.calcDiff = true }
-      else if (info.previousPosition + 1 === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      else if (info.previousPosition + 1 === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition > info.position) { rs.str = 'obtained', rs.calcDiff = true }
+      else if (info.previousPosition === info.position && info.previousScore === info.score) { rs.str = 'equaled', rs.calcDiff = false }
+      else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
       if (rs.calcDiff) {
-        diff = TM.Utils.getTimeString(info.score > info.previousScore ? info.score - info.previousScore : info.previousScore - info.score)
+        diff = TM.Utils.getTimeString(info.previousScore - info.score)
+        let i = -1
+        while (true) {
+          i++
+          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
+          if (Number(diff[i]) !== 0) { continue }
+          diff = diff.substring(1)
+          i--
+          if (diff[i + 1] === ':') {
+            diff = diff.substring(1)
+          }
+        }
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.dedirecord} has `
         + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.dedirecord} `
-        + `dedimania record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.score)}`)
-      // TODO
-      //+ `${rs.calcDiff ? ` ${TM.palette.dedirecord}$n(${TM.palette.rank + info.previousPosition + 1} ${TM.palette.highlight}-${diff + TM.palette.dedirecord})` : ``}`)
+        + `dedimania record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.score)}`
+        + `${rs.calcDiff ? ` ${TM.palette.dedirecord}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.dedirecord})` : ``}`)
     }
   },
 ]

@@ -133,7 +133,7 @@ export abstract class DedimaniaService {
 
   private static addRecord(info: FinishInfo): void {
     const pb = this._dedis.find(a => a.login === info.login)?.score
-    const position = this._dedis.filter(a => a.score < info.score).length + 1
+    const position = this._dedis.filter(a => a.score <= info.score).length + 1
     if (position > Number(process.env.DEDIS_AMOUNT) || info.score > (pb || Infinity)) { return }
     if (pb == null) {
       const dediRecordInfo: DediRecordInfo = {
@@ -159,6 +159,7 @@ export abstract class DedimaniaService {
       return
     }
     if (info.score === pb) {
+      const previousPosition = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = {
         challenge: info.challenge,
         login: info.login,
@@ -172,9 +173,9 @@ export abstract class DedimaniaService {
         wins: info.wins,
         privilege: info.privilege,
         visits: info.visits,
-        position,
+        position: previousPosition,
         previousScore: info.score,
-        previousPosition: position
+        previousPosition
       }
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
@@ -200,7 +201,7 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position,
         previousScore,
-        previousPosition: this._dedis.findIndex(a => a.login === info.login)
+        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1
       }
       this._dedis = this._dedis.filter(a => a.login !== info.login)
       this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
