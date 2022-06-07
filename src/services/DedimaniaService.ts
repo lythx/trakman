@@ -134,7 +134,7 @@ export abstract class DedimaniaService {
   private static addRecord(info: FinishInfo): void {
     const pb = this._dedis.find(a => a.login === info.login)?.score
     const position = this._dedis.filter(a => a.score < info.score).length + 1
-    if (position > Number(process.env.DEDIS_AMOUNT)) { return }
+    if (position > Number(process.env.DEDIS_AMOUNT) || info.score > (pb || Infinity)) { return }
     if (pb == null) {
       const dediRecordInfo: DediRecordInfo = {
         challenge: info.challenge,
@@ -153,8 +153,8 @@ export abstract class DedimaniaService {
         previousScore: -1,
         previousPosition: -1
       }
-      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
-      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
+      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
     }
@@ -203,9 +203,9 @@ export abstract class DedimaniaService {
         previousPosition: this._dedis.findIndex(a => a.login === info.login)
       }
       this._dedis = this._dedis.filter(a => a.login !== info.login)
-      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       this._newDedis = this._newDedis.filter(a => a.login !== info.login)
-      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: info.checkpoints })
+      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
     }
   }
