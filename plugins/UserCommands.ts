@@ -123,7 +123,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo) => {
       const localRecs: TopPlayer[] = TM.topPlayers
       let str = `${TM.palette.server}» ${TM.palette.message}Local records on `
-        + `${TM.palette.highlight + TM.strip(TM.challenge.name, false)}${TM.palette.highlight}: `
+        + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
       for (const lr of localRecs) {
         str += `${TM.strip(lr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(lr.score)}, `
       }
