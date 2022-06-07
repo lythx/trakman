@@ -5,13 +5,13 @@ if (process.env.USE_DEDIMANIA === 'YES') {
   const commands: TMCommand[] = [
     {
       aliases: ['dedirecs'],
-      help: '',
+      help: 'rrwewwqer',
       callback: (info: MessageInfo) => {
         const dediRecs: TMDedi[] = TM.dediRecords
-        let str = `${TM.colours.yellow}» ${TM.colours.folly}Dedimania records on `
-          + `${TM.colours.white + TM.strip(TM.challenge.name, false)}${TM.colours.white}: `
+        let str = `${TM.palette.server}» ${TM.palette.dedimessage}Dedimania records on `
+          + `${TM.palette.highlight + TM.strip(TM.challenge.name, false)}${TM.palette.highlight}: `
         for (const dr of dediRecs) {
-          str += `${TM.strip(dr.nickName, false)}$z$s ${TM.colours.white + '- ' + TM.Utils.getTimeString(dr.score)}, `
+          str += `${TM.strip(dr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(dr.score)}, `
         }
         TM.sendMessage(str.slice(0, -2), info.login)
       },

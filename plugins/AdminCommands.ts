@@ -33,15 +33,15 @@ const commands: TMCommand[] = [
           mode = 5
           break
         default:
-          TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Invalid gamemode.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid gamemode.`, info.login)
           return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has set `
-            + `the gamemode to ${TM.colours.white + info.text.toUpperCase()}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `the gamemode to ${TM.palette.highlight + info.text.toUpperCase()}${TM.palette.admin}.`
         }]
       },
         {
@@ -56,13 +56,16 @@ const commands: TMCommand[] = [
     help: 'Ban a specific player.',
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+        return
+      }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has banned `
-            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has banned `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
         }]
       },
         {
@@ -80,13 +83,16 @@ const commands: TMCommand[] = [
       // So that this returns if you attempt to unban somebody who's not banned
       TM.fetchPlayer(info.text).then(async (i) => {
         const targetInfo = i
-        if (targetInfo == null) { return }
+        if (targetInfo == null) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+          return
+        }
         TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unbanned `
-              + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+            string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
+              + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
           }]
         },
           {
@@ -102,13 +108,16 @@ const commands: TMCommand[] = [
     help: 'Blacklist a specific player.',
     callback: async (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+        return
+      }
       await TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-            + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has blacklisted `
-            + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has blacklisted `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
         }]
       },
         {
@@ -128,13 +137,16 @@ const commands: TMCommand[] = [
       // So that this returns if you attempt to unblacklist somebody who's not blacklisted
       TM.fetchPlayer(info.text).then(async (i) => {
         const targetInfo = i
-        if (targetInfo == null) { return }
+        if (targetInfo == null) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+          return
+        }
         TM.multiCallNoRes({
           method: 'ChatSendServerMessage',
           params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has unblacklisted `
-              + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly}.`
+            string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unblacklisted `
+              + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
           }]
         },
           {
@@ -150,34 +162,37 @@ const commands: TMCommand[] = [
     help: 'Mute a player and disable his commands.',
     callback: async (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
-      if (targetInfo === undefined) { return }
+      if (targetInfo === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+        return
+      }
       const targetLogin: string = info.text
       const callerLogin: string = info.login
       if (targetLogin == null) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}No login specified.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
       if (targetInfo.privilege === 4) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control privileges of the server owner.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control privileges of the server owner.`, callerLogin)
         return
       }
       if (targetInfo.login === callerLogin) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot control your own privileges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
       else if (targetInfo.privilege < 1) {
         TM.setPrivilege(targetLogin, -1)
       }
       else {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}You cannot disable commands of a privileged person.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} ` +
-            `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has disabled ` +
-            `commands and muted ${TM.colours.white + TM.strip(targetInfo.nickName, true)}${TM.colours.folly}.`
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+            `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
+            `commands and muted ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`
         }]
       },
         {
@@ -192,16 +207,16 @@ const commands: TMCommand[] = [
     help: 'Force player into specmode without ability to disable it.',
     callback: async (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Login not specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
         return
       }
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not on the server.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
       }
       if (hfsList.some(a => a === targetInfo.login)) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is already hardforced into specmode.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is already hardforced into specmode.`, info.login)
         return
       }
       hfsList.push(targetInfo.login)
@@ -213,9 +228,9 @@ const commands: TMCommand[] = [
         {
           method: 'ChatSendServerMessage',
           params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has hardforced `
-              + `${TM.colours.white + TM.strip(targetInfo.nickName)}${TM.colours.folly} into specmode.`
+            string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has hardforced `
+              + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into specmode.`
           }]
         }
       )
@@ -240,11 +255,11 @@ const commands: TMCommand[] = [
     help: 'Undo hardforcespec.',
     callback: async (info: MessageInfo) => {
       if (info.text.length === 0) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Login not specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
         return
       }
       if (!hfsList.some(a => a === info.login)) {
-        TM.sendMessage(`${TM.colours.yellow}» ${TM.colours.red}Player is not hardforced into specmode.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not hardforced into specmode.`, info.login)
         return
       }
       hfsList.splice(hfsList.indexOf(info.login), 1)
@@ -257,9 +272,9 @@ const commands: TMCommand[] = [
         {
           method: 'ChatSendServerMessage',
           params: [{
-            string: `${TM.colours.yellow}»» ${TM.colours.folly}${TM.getTitle(info)} `
-              + `${TM.colours.white + TM.strip(info.nickName, true)}${TM.colours.folly} has released `
-              + `${TM.colours.white + TM.strip(targetInfo?.nickName || info.login)}${TM.colours.folly} out of specmode.`
+            string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has released `
+              + `${TM.palette.highlight + TM.strip(targetInfo?.nickName || info.login)}${TM.palette.admin} out of specmode.`
           }]
         }
       )

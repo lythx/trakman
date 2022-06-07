@@ -117,6 +117,8 @@ export const TRAKMAN = {
       dedimessage: this.colours.kellygreen,
       // Donation messages
       donation: this.colours.brilliantrose,
+      // Error messages
+      error: this.colours.red,
       // General highlighting colour
       highlight: this.colours.white,
       // Karma messages
