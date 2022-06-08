@@ -60,6 +60,16 @@ export class DedimaniaResponse {
       }
       json = result
     })
+    if (json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array?.[0]?.data?.[0]?.value) { // system.multicall errors
+      for (const e of json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array[0]?.data?.[0]?.value) {
+        if (e?.struct?.[0]?.member?.[0]?.name?.[0] === 'faultCode') {
+          this._isError = true
+          this._errorCode = e?.struct?.[0]?.member?.[0]?.value?.[0]?.int?.[0]
+          this._errorString = e?.struct?.[0]?.member?.[1]?.value?.[0]?.string?.[0]
+          return
+        }
+      }
+    }
     if (json.methodResponse.fault != null) {
       this._isError = true
       this._errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
