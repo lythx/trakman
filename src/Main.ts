@@ -56,8 +56,9 @@ async function main(): Promise<void> {
   await ServerConfig.update()
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
-    await DedimaniaService.initialize()
-    Logger.info('Connected to dedimania')
+    const status = await DedimaniaService.initialize()
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
+    else { Logger.info('Connected to dedimania') }
   }
   Events.initialize()
 }
