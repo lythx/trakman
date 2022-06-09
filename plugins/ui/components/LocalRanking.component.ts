@@ -64,7 +64,7 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
       TM.localRecords.length - (CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) :
       playerLocalIndex - Math.floor((CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) / 2)
     if (playerLocalIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 //display index is number of records that were displayed
+    let displayIndex = 0 // Display index is number of records that were displayed
     for (const [i, p] of TM.localRecords.entries()) {
       if (i >= CFG.localRecordsWidget.topCount && i < personalStart)
         continue
