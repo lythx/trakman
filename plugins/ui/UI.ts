@@ -1,21 +1,23 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
 import UIConfig from './UIConfig.json' assert { type: 'json' }
 
-import CustomUi from './components/CustomUi.js'
+import CustomUi from './CustomUi.js'
 
-import temp1 from './components/temp1.component.js'
-import temp2 from './components/temp2.component.js'
-import RankWidget from './components/RankWidget.component.js'
-import SpectatorWidget from './components/SpectatorWidget.component.js'
-import DediRanking from './components/DediRanking.component.js'
+import temp1 from './static_components/temp1.component.js'
+import temp2 from './static_components/temp2.component.js'
+import RankWidget from './static_components/RankWidget.component.js'
+import SpectatorWidget from './static_components/SpectatorWidget.component.js'
+import DediRanking from './static_components/DediRanking.component.js'
+import ChallengeWidget from './static_components/ChallengeWidget.component.js'
+import PreviousAndBest from './static_components/PreviousAndBest.component.js'
+import KarmaWidget from './static_components/KarmaWidget.component.js'
+import TimerWidget from './static_components/TimerWidget.component.js'
+import LocalRanking from './static_components/LocalRanking.component.js'
+import LiveRanking from './static_components/LiveRanking.component.js'
+import StaticComponent from './static_components/StaticComponent.js'
 
-import ChallengeWidget from './components/ChallengeWidget.component.js'
-import PreviousAndBest from './components/PreviousAndBest.component.js'
-import KarmaWidget from './components/KarmaWidget.component.js'
-import TimerWidget from './components/TimerWidget.component.js'
-import LocalRanking from './components/LocalRanking.component.js'
-import LiveRanking from './components/LiveRanking.component.js'
-import StaticComponent from './components/StaticComponent.js'
+import DynamicComponent from './dynamic_components/DynamicComponent.js'
+import Jukebox from './dynamic_components/Jukebox.component.js'
 
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
@@ -84,6 +86,7 @@ abstract class UIScore {
 
 let customUi: CustomUi
 const staticComponents: StaticComponent[] = []
+const dynamicComponents: DynamicComponent[] = []
 const loadMod = () => {
     TM.callNoRes('SetForcedMods',
         [{
@@ -120,6 +123,9 @@ const events: TMEvent[] = [
                 new LiveRanking(110)
             )
             for (const c of staticComponents) { c.display() }
+            dynamicComponents.push(
+                new Jukebox(1000, 2000)
+            )
         }
     },
     {

@@ -328,4 +328,11 @@ export const TRAKMAN = {
     JukeboxService.add(challengeId)
   },
 
+  openManialink(id: number, login: string) {
+    const temp: any = PlayerService.getPlayer(login)
+    temp.answer = id
+    const info: ManialinkClickInfo = temp
+    Events.emitEvent('Controller.ManialinkClick', info)
+  }
+
 }
