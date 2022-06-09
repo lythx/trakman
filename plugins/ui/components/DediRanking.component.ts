@@ -67,7 +67,7 @@ export default class DediRanking extends StaticComponent implements IStaticCompo
       TM.dediRecords.length - (CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) :
       playerDediIndex - Math.floor((CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) / 2)
     if (playerDediIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 //display index is number of records that were displayed
+    let displayIndex = 0 // Display index is number of records that were displayed
     for (const [i, p] of TM.dediRecords.entries()) {
       if (i >= CFG.dediRecordsWidget.topCount && i < personalStart)
         continue
@@ -120,7 +120,7 @@ export default class DediRanking extends StaticComponent implements IStaticCompo
         <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
          text="${CFG.widgetStyleRace.formattingCodes}--."/>
         <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${CFG.widgetStyleRace.colours.self}" text="-:--.--"/>
+         textcolor="${CFG.widgetStyleRace.colours.self}" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
         <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" 
          text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p?.nickName), false)}"/>
         ${background}

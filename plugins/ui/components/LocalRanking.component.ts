@@ -11,10 +11,10 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
       this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
-      if (TM.topPlayers.some(a => a.login === info.login)) { this.display() }
+      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
-      if (TM.topPlayers.some(a => a.login === info.login)) { this.display() }
+      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -58,14 +58,14 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
     const titleWidth = CFG.localRecordsWidget.width - 0.8
     const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false
     let xml = `<frame posn="0 -3 10">`
-    const playerLocal = TM.topPlayers.find(a => a.login === login)
-    const playerLocalIndex = playerLocal !== undefined ? TM.topPlayers.indexOf(playerLocal) : Infinity
-    let personalStart = playerLocalIndex > TM.topPlayers.length - Math.ceil((CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) / 2) ?
-      TM.topPlayers.length - (CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) :
+    const playerLocal = TM.localRecords.find(a => a.login === login)
+    const playerLocalIndex = playerLocal !== undefined ? TM.localRecords.indexOf(playerLocal) : Infinity
+    let personalStart = playerLocalIndex > TM.localRecords.length - Math.ceil((CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) / 2) ?
+      TM.localRecords.length - (CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) :
       playerLocalIndex - Math.floor((CFG.localRecordsWidget.entries - CFG.localRecordsWidget.topCount) / 2)
     if (playerLocalIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 //display index is number of records that were displayed
-    for (const [i, p] of TM.topPlayers.entries()) {
+    let displayIndex = 0 // Display index is number of records that were displayed
+    for (const [i, p] of TM.localRecords.entries()) {
       if (i >= CFG.localRecordsWidget.topCount && i < personalStart)
         continue
       const textColour = this.getTextColour(i, playerLocalIndex)
@@ -109,7 +109,7 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
         return `<frame posn="0 -3 10"></frame>`
       }
       // If this entry is inside the top records dont't add background shade as it would be doubled
-      const background = TM.topPlayers.length < CFG.localRecordsWidget.topCount + 1 ? '' :
+      const background = TM.localRecords.length < CFG.localRecordsWidget.topCount + 1 ? '' :
         `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
          style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
       xml +=
@@ -117,7 +117,7 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
         <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
          text="${CFG.widgetStyleRace.formattingCodes}--."/>
         <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${CFG.widgetStyleRace.colours.self}" text="-:--.--"/>
+         textcolor="${CFG.widgetStyleRace.colours.self}" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
         <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.localRecordsWidget.width - 5.7} 1.7" scale="0.9" 
          text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p?.nickName), false)}"/>
         ${background}

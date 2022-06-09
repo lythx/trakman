@@ -141,10 +141,7 @@ export class Listeners {
         JukeboxService.update()
         ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
-        if (process.env.USE_DEDIMANIA === 'YES') {
-          const challengeDedisInfo = await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
-          Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
-        }
+        if (process.env.USE_DEDIMANIA === 'YES') {  await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)}
       }
     },
     {
