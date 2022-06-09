@@ -116,6 +116,14 @@ const commands: TMCommand[] = [
     },
     privilege: 0
   },
+  {
+    aliases: ['l', 'list'],
+    help: 'Display list of maps.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(1000, info.login)
+    },
+    privilege: 0
+  },
   //REMOVE THIS LATER
   {
     aliases: ['recs'],
