@@ -117,7 +117,7 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
         <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
          text="${CFG.widgetStyleRace.formattingCodes}--."/>
         <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${CFG.widgetStyleRace.colours.self}" text="-:--.--"/>
+         textcolor="${CFG.widgetStyleRace.colours.self}" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
         <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.localRecordsWidget.width - 5.7} 1.7" scale="0.9" 
          text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p?.nickName), false)}"/>
         ${background}
