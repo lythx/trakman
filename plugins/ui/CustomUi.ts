@@ -1,5 +1,5 @@
-import CFG from '../UIConfig.json' assert { type: 'json' }
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import CFG from './UIConfig.json' assert { type: 'json' }
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 
 export default class CustomUi {
 
