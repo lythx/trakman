@@ -1,4 +1,4 @@
-interface TopPlayer {
+interface LocalRecord {
   readonly challenge: string
   readonly login: string
   readonly score: number

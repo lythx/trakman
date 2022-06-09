@@ -218,8 +218,8 @@ const events: TMEvent[] = [
     {
         event: 'Controller.BeginChallenge',
         callback: async (info: BeginChallengeInfo) => {
-            loadMod()
             customUi.display()
+            loadMod()
             // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
             // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
             // console.log(TM.challengeQueue)

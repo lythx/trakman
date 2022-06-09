@@ -75,12 +75,16 @@ export const TRAKMAN = {
   /**
     * Returns an array of objects containing information about top local record players on current map
     */
-  get topPlayers(): TopPlayer[] {
-    return RecordService.topPlayers
+  get localRecords(): LocalRecord[] {
+    return RecordService.localRecords
   },
 
   get dediRecords(): TMDedi[] {
     return [...DedimaniaService.dedis]
+  },
+
+  get liveRecords(): FinishInfo[] {
+    return RecordService.liveRecords
   },
 
   /**
@@ -158,15 +162,6 @@ export const TRAKMAN = {
      */
   async fetchPlayer(login: string): Promise<any | undefined> {
     return (await PlayerService.fetchPlayer(login))
-  },
-
-  /**
-     * Returns an array of objects containing information about local records on current challenge
-     */
-  getLocalRecords(challenge: string, amount: number): TMRecord[] {
-    // love me some lambda expressions
-    return RecordService.records.filter(r => r.challenge === challenge)
-      .sort((a, b) => a.score - b.score).slice(0, amount)
   },
 
   /**
@@ -331,6 +326,6 @@ export const TRAKMAN = {
 
   addToQueue(challengeId: string) {
     JukeboxService.add(challengeId)
-  }
+  },
 
 }

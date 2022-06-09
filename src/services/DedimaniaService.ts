@@ -15,11 +15,12 @@ export abstract class DedimaniaService {
   static _dedis: TMDedi[] = []
   static _newDedis: TMDedi[] = []
 
-  static async initialize(): Promise<void> {
-    await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT)).catch(err => {
-      ErrorHandler.error('Failed to connect to dedimania', err)
-      Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to connect to dedimania` }])
-    })
+  static async initialize(): Promise<void | Error> {
+    const status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+    if (status instanceof Error) {
+      if (status.message !== 'No response from dedimania server') { ErrorHandler.fatal('Failed to connect to dedimania', status.message) }
+      return status
+    }
     this.updateServerPlayers()
     const challengeDedisInfo = await DedimaniaService.getRecords(ChallengeService.current.id, ChallengeService.current.name, ChallengeService.current.environment, ChallengeService.current.author)
     Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
@@ -39,7 +40,7 @@ export abstract class DedimaniaService {
     return [...this._newDedis]
   }
 
-  static async getRecords(id: string, name: string, environment: string, author: string): Promise<ChallengeDedisInfo> {
+  static async getRecords(id: string, name: string, environment: string, author: string, isRetry: boolean = false): Promise<void | Error> {
     this._dedis.length = 0
     this._newDedis.length = 0
     const cfg = ServerConfig.config
@@ -71,9 +72,11 @@ export abstract class DedimaniaService {
         },
         { int: process.env.DEDIS_AMOUNT },
         { array: [] } // idk
-      ]
-    ).catch(err => ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`, err))
-    if (dedis == null) { throw new Error('unable to fetch records') }
+      ])
+    if (dedis instanceof Error) {
+      this.retryGetRecords(id, name, environment, author, isRetry)
+      return dedis
+    }
     for (const d of dedis[0].Records) {
       const record: TMDedi = { login: d.Login, nickName: d.NickName, score: d.Best, checkpoints: d.Checks }
       this._dedis.push(record)
@@ -81,7 +84,20 @@ export abstract class DedimaniaService {
     const temp: any = ChallengeService.current
     temp.dedis = this._dedis
     const challengeDedisInfo: ChallengeDedisInfo = temp
-    return challengeDedisInfo
+    Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
+  }
+
+  private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean) {
+    if (isRetry) { return }
+    await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
+    ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`)
+    Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
+    let status
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10000))
+      if (ChallengeService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
+      else { return }
+    } while (status instanceof Error)
   }
 
   static async sendRecords(info: EndChallengeInfo): Promise<void> {
@@ -97,38 +113,20 @@ export abstract class DedimaniaService {
         }
       )
     }
-    const status = await DedimaniaClient.call('system.multicall',
-      [{
-        array: [
-          {
-            struct:
-            {
-              methodName: { string: 'dedimania.ChallengeRaceTimes' },
-              params: {
-                array: [
-                  { string: info.id },
-                  { string: info.name },
-                  { string: info.environment },
-                  { string: info.author },
-                  { string: 'TMF' },
-                  { int: GameService.gameMode },
-                  { int: info.checkpointsAmount },
-                  { int: process.env.DEDIS_AMOUNT },
-                  { array: recordsArray }
-                ]
-              }
-            }
-          },
-          {
-            struct:
-            {
-              methodName: { string: 'dedimania.WarningsAndTTR' },
-              params: { array: [] }
-            }
-          },
-        ]
-      }]
+    const status = await DedimaniaClient.call('dedimania.ChallengeRaceTimes',
+      [
+        { string: info.id },
+        { string: info.name },
+        { string: info.environment },
+        { string: info.author },
+        { string: 'TMF' },
+        { int: GameService.gameMode },
+        { int: info.checkpointsAmount },
+        { int: process.env.DEDIS_AMOUNT },
+        { array: recordsArray }
+      ]
     )
+    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for challenge ${info.name}`, status.message) }
   }
 
   private static addRecord(info: FinishInfo): void {
@@ -216,29 +214,30 @@ export abstract class DedimaniaService {
       const cfg = ServerConfig.config
       const nextIds = []
       for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-      const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers', [
-        { string: 'TMF' },
-        { int: PlayerService.players.length },
-        {
-          struct: {
-            SrvName: { string: cfg.name },
-            Comment: { string: cfg.comment },
-            Private: { boolean: cfg.password === '' },
-            SrvIP: { string: 'lol' },
-            SrvPort: { string: 'lol2' },
-            XmlRpcPort: { string: 'lol3' },
-            NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
-            MaxPlayers: { int: cfg.currentMaxPlayers },
-            NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
-            MaxSpecs: { int: cfg.currentMaxPlayers },
-            LadderMode: { int: cfg.currentLadderMode },
-            NextFiveUID: { string: nextIds.join('/') }
-          }
-        },
-        { array: [] }
-      ]
-      ).catch(err => ErrorHandler.error('Error when trying to update dedimania status', err))
-      if (status == null) { ErrorHandler.error('Failed to update dedimania status') }
+      const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers',
+        [
+          { string: 'TMF' },
+          { int: PlayerService.players.length },
+          {
+            struct: {
+              SrvName: { string: cfg.name },
+              Comment: { string: cfg.comment },
+              Private: { boolean: cfg.password === '' },
+              SrvIP: { string: 'lol' },
+              SrvPort: { string: 'lol2' },
+              XmlRpcPort: { string: 'lol3' },
+              NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+              MaxPlayers: { int: cfg.currentMaxPlayers },
+              NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+              MaxSpecs: { int: cfg.currentMaxPlayers },
+              LadderMode: { int: cfg.currentLadderMode },
+              NextFiveUID: { string: nextIds.join('/') }
+            }
+          },
+          { array: [] }
+        ]
+      )
+      if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
     }, 240000)
   }
 }
