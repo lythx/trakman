@@ -67,7 +67,7 @@ export default class DediRanking extends StaticComponent implements IStaticCompo
       TM.dediRecords.length - (CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) :
       playerDediIndex - Math.floor((CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) / 2)
     if (playerDediIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 //display index is number of records that were displayed
+    let displayIndex = 0 // Display index is number of records that were displayed
     for (const [i, p] of TM.dediRecords.entries()) {
       if (i >= CFG.dediRecordsWidget.topCount && i < personalStart)
         continue
