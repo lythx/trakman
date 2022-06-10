@@ -26,7 +26,7 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
   }
 
   displayToPlayer(login: string): void {
-    const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false
+    const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false // Right/Left
     const widgetHeight = 1.8 * CFG.localRecordsWidget.entries + 3.3
     const columnHeight = widgetHeight - 3.1
     const columnWidth = CFG.localRecordsWidget.width - 6.45
@@ -54,9 +54,9 @@ export default class LocalRanking extends StaticComponent implements IStaticComp
     )
   }
 
-  private getWidgetContent(login: string) {
+  private getWidgetContent(login: string): string {
     const titleWidth = CFG.localRecordsWidget.width - 0.8
-    const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false
+    const side: boolean = (CFG.localRecordsWidget.posX < 0) ? true : false // Right/Left
     let xml = `<frame posn="0 -3 10">`
     const playerLocal = TM.localRecords.find(a => a.login === login)
     const playerLocalIndex = playerLocal !== undefined ? TM.localRecords.indexOf(playerLocal) : Infinity

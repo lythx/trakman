@@ -20,7 +20,7 @@ export default class LiveRanking extends StaticComponent implements IStaticCompo
   }
 
   displayToPlayer(login: string): void {
-    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false
+    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false // Right/Left
     const widgetHeight = 1.8 * CFG.liveRankingsWidget.entries + 3.3
     const columnHeight = widgetHeight - 3.1
     const columnWidth = CFG.liveRankingsWidget.width - 6.45
@@ -48,9 +48,9 @@ export default class LiveRanking extends StaticComponent implements IStaticCompo
     )
   }
 
-  private getWidgetContent(login: string) {
+  private getWidgetContent(login: string): string {
     const titleWidth = CFG.liveRankingsWidget.width - 0.8
-    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false
+    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false // Right/Left
     let xml = `<frame posn="0 -3 10">`
     const playerLive = TM.liveRecords.find(a => a.login === login)
     const playerLiveIndex = playerLive !== undefined ? TM.liveRecords.indexOf(playerLive) : Infinity
