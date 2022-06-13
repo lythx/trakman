@@ -1,4 +1,3 @@
-import { ErrorHandler } from '../src/ErrorHandler.js'
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const commands: TMCommand[] = [
@@ -304,13 +303,13 @@ const commands: TMCommand[] = [
     help: 'Check the amount of coppers the server owns.',
     callback: async (info: MessageInfo) => {
       // TODO: Return immediately if the server isn't united. How to check tho..?
-      const coppers = TM.call('GetServerCoppers')
+      const coppers = await TM.call('GetServerCoppers')
       if (coppers instanceof Error) {
-        ErrorHandler.error(`Couldn't retrieve the coppers amount.`, coppers.message)
+        TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't retrieve the coppers amount.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server coppers amount${TM.palette.highlight}: ${coppers}${TM.palette.admin}.`, info.login)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server coppers amount${TM.palette.highlight}: ${coppers[0]}${TM.palette.admin}.`, info.login)
     },
     privilege: 3
   },

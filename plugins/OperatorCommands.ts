@@ -1,9 +1,6 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import fs from 'node:fs/promises'
 import fetch from 'node-fetch'
-import { ErrorHandler } from '../src/ErrorHandler.js'
-import { ChatService } from '../src/services/ChatService.js'
-import { GameService } from '../src/services/GameService.js'
 
 const commands: TMCommand[] = [
   {
@@ -15,25 +12,25 @@ const commands: TMCommand[] = [
       const path = split.join(' ')
       const file = await fs.readFile(path, 'base64').catch(err => err)
       if (file instanceof Error) {
-        ErrorHandler.error('Error when reading file on addlocal', file.message)
+        TM.error('Error when reading file on addlocal', file.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}File ${TM.palette.highlight + path} is not accessible.`, info.login)
         return
       }
       const write = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       if (write instanceof Error) {
-        ErrorHandler.error('Failed to write file', write.message)
+        TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        ErrorHandler.error('Failed to insert challenge to jukebox', insert.message)
+        TM.error('Failed to insert challenge to jukebox', insert.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the challenge into queue.`, info.login)
         return
       }
       const res = await TM.call('GetNextChallengeInfo')
       if (res instanceof Error) {
-        ErrorHandler.error('Failed to get next challenge info', res.message)
+        TM.error('Failed to get next challenge info', res.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next challenge info.`, info.login)
         return
       }
@@ -58,19 +55,19 @@ const commands: TMCommand[] = [
       const buffer = Buffer.from(data)
       const write = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
       if (write instanceof Error) {
-        ErrorHandler.error('Failed to write file', write.message)
+        TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        ErrorHandler.error('Failed to insert challenge to jukebox', insert.message)
+        TM.error('Failed to insert challenge to jukebox', insert.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the challenge into queue.`, info.login)
         return
       }
       const nextInfo = await TM.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
-        ErrorHandler.error('Failed to get next challenge info', nextInfo.message)
+        TM.error('Failed to get next challenge info', nextInfo.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next challenge info.`, info.login)
         return
       }
@@ -89,7 +86,7 @@ const commands: TMCommand[] = [
       const challenge = TM.challenge
       const res = await TM.call('RemoveChallenge', [{ string: challenge.fileName }])
       if (res instanceof Error) { // This can happen if the challenge was already removed
-        ErrorHandler.error(`Couldn't remove ${challenge.fileName} from the playlist.`, res.message)
+        TM.error(`Couldn't remove ${challenge.fileName} from the playlist.`, res.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
         return
       }
@@ -140,7 +137,7 @@ const commands: TMCommand[] = [
       const index = await TM.call('GetCurrentChallengeIndex')
       if (index instanceof Error) {
         TM.sendMessage('${TM.palette.server}» ${TM.palette.error}Failed to fetch current challenge index', info.login)
-        ErrorHandler.error('Failed to fetch current challenge index', index.message)
+        TM.error('Failed to fetch current challenge index', index.message)
         return
       }
       if (Number(index) === -1) { return }
@@ -159,7 +156,7 @@ const commands: TMCommand[] = [
         })
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to set next challenge index.`, info.login)
-        ErrorHandler.error('Failed to set next challenge index', res.message)
+        TM.error('Failed to set next challenge index', res.message)
         return
       }
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
@@ -325,7 +322,7 @@ const commands: TMCommand[] = [
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo) => {
-      if (GameService.gameMode === 1 || GameService.gameMode === 4) { // TimeAttack & Stunts
+      if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
         return
       }
@@ -345,4 +342,4 @@ const commands: TMCommand[] = [
   },
 ]
 
-for (const command of commands) { ChatService.addCommand(command) }
+for (const command of commands) { TM.addCommand(command) }
