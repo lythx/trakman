@@ -39,6 +39,12 @@ The following settings are currently supported by the `.env` file:
 - `USE_DEDIMANIA`: Enable or disable Dedimania (`YES` or `NO`)
 - `DEDIMANIA_PORT`: Port used for dedimania communication (`8002` by default)
 - `DEDIS_AMOUNT`: Amount of records to be fetched from Dedimania (`30` by default)
+##### Webservices
+- `USE_WEBSERVICES`: Enable or disable nickname fetching from TMWS (`YES` or `NO`)
+- `WEBSERVICES_LOGIN`: Your TMWS login
+- `WEBSERVICES_PASSWORD`: Your TMWS password
+##### Miscellaneous
+- `USE_TMX`: Enable or disable track info fetching from TMExchange (`YES` or `NO`)
 
 ### Limitations
 1. Stunts mode is not supported (yet?)
