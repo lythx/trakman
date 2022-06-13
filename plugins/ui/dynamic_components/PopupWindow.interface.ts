@@ -5,5 +5,7 @@ export default interface IPopupWindow {
     readonly displayedToPlayers: string[]
     displayToPlayer(login: string): void
     closeToPlayer(login: string): void
-    constructContent(login: string):string
+    constructHeader(login: string): string
+    constructContent(login: string): string
+    constructFooter(login: string): string
 }
