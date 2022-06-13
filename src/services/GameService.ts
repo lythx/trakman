@@ -12,7 +12,7 @@ export class GameService {
     }
     const info = res[0]
     this._game = {
-      gameMode: info.GameMode,
+      gameMode: info.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       chatTime: info.ChatTime,
       challengeNo: info.NbChallenge,
       roundsPointsLimit: info.RoundsPointsLimit,

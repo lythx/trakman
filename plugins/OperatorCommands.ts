@@ -3,6 +3,7 @@ import fs from 'node:fs/promises'
 import fetch from 'node-fetch'
 import { ErrorHandler } from '../src/ErrorHandler.js'
 import { ChatService } from '../src/services/ChatService.js'
+import { GameService } from '../src/services/GameService.js'
 
 const commands: TMCommand[] = [
   {
@@ -81,6 +82,24 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
+    aliases: ['rt', 'et', 'removethis', 'erasethis'],
+    help: 'Remove the current track from the playlist.',
+    callback: async (info: MessageInfo) => {
+      // TODO: Import node:fs to unlinkSync the file (optionally?)
+      const challenge = TM.challenge
+      const res = await TM.call('RemoveChallenge', [{ string: challenge.fileName }])
+      if (res instanceof Error) { // This can happen if the challenge was already removed
+        ErrorHandler.error(`Couldn't remove ${challenge.fileName} from the playlist.`, res.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
+        return
+      }
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from the playlist.`)
+    },
+    privilege: 1
+  },
+  {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
     callback: (info: MessageInfo) => {
@@ -120,7 +139,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo) => {
       const index = await TM.call('GetCurrentChallengeIndex')
       if (index instanceof Error) {
-        TM.sendMessage('Failed to fetch current challenge index', info.login)
+        TM.sendMessage('${TM.palette.server}» ${TM.palette.error}Failed to fetch current challenge index', info.login)
         ErrorHandler.error('Failed to fetch current challenge index', index.message)
         return
       }
@@ -286,23 +305,44 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
         return
       }
-      TM.multiCallNoRes(
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
+            + `${TM.palette.highlight + TM.strip(info.text)}${TM.palette.admin}.`
+        }]
+      },
         {
           method: 'Kick',
           params: [{ string: info.text }]
-        },
-        {
-          method: 'ChatSendServerMessage',
-          params: [{
-            string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-              + `${TM.palette.highlight + TM.strip(info.text)}${TM.palette.admin}.`
-          }]
         }
       )
     },
     privilege: 1
-  }, //You're welcome wizer : - )
+  }, //You're welcome wizer : - ) // Thank Znake
+  {
+    aliases: ['er', 'endround'],
+    help: 'End the ongoing race in rounds-based gamemodes.',
+    callback: (info: MessageInfo) => {
+      if (GameService.gameMode === 1 || GameService.gameMode === 4) { // TimeAttack & Stunts
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
+            + `the ongoing round to end.`
+        }]
+      },
+        {
+          method: 'ForceEndRound',
+        })
+    },
+    privilege: 1
+  },
 ]
 
 for (const command of commands) { ChatService.addCommand(command) }
