@@ -18,7 +18,7 @@ import StaticComponent from './static_components/StaticComponent.js'
 
 import DynamicComponent from './dynamic_components/DynamicComponent.js'
 import Jukebox from './dynamic_components/Jukebox.component.js'
-
+import TestWindow from './dynamic_components/TestWindow.js'
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
@@ -124,8 +124,13 @@ const events: TMEvent[] = [
             )
             for (const c of staticComponents) { c.display() }
             dynamicComponents.push(
-                new Jukebox(1000, 2000)
+                new Jukebox(1000, 2000),
+                // new TestWindow(1000, 2000)
             )
+            // setInterval(() => {
+            //     dynamicComponents[1].displayToPlayer('ciekma_czakwal')
+            //     dynamicComponents[1].displayToPlayer('redgreendevil')
+            // }, 1000)
         }
     },
     {
