@@ -13,6 +13,11 @@ import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
+import fetch from 'node-fetch'
+import tls from 'node:tls'
+import 'dotenv/config'
+tls.DEFAULT_MIN_VERSION = 'TLSv1'
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const DB = new Database()
 DB.initialize()
@@ -333,6 +338,18 @@ export const TRAKMAN = {
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
-  }
+  },
 
+  async fetchWebServices(login: string): Promise<any | Error> {
+    if (process.env.USE_WEBSERVICES !== "YES") {
+      return new Error('Use webservices set to false')
+    }
+    const au = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
+    const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
+      headers: {
+        "Authorization": au
+      }
+    })
+    return await response.json()
+  }
 }

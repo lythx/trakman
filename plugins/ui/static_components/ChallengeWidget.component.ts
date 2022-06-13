@@ -12,16 +12,33 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
   }
 
   display(): void {
-    this.updateXML()
     this._isDisplayed = true
-    TM.sendManialink(this.xml)
+    this.updateXML().then(() => {
+      TM.sendManialink(this.xml)
+    })
   }
 
   displayToPlayer(login: string): void {
     TM.sendManialink(this.xml, login)
   }
 
-  private updateXML() {
+  private async updateXML(): Promise<void> {
+    let author
+    const authorLogin = TM.challenge.author
+    if (process.env.USE_WEBSERVICES === "YES" && authorLogin.match(/[\da - z_ +.-]/)) {
+      const json = await TM.fetchWebServices(authorLogin)
+      if (json instanceof Error) {
+        TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
+        author = authorLogin
+      }
+      else {
+        author = json.nickname
+      }
+    }
+    else {
+      author = authorLogin
+    }
+
     const side: boolean = (CFG.challengeWidget.racePos.posX < 0) ? true : false
     this.xml =
       `<manialink id="${this.id}">
@@ -36,7 +53,7 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
           <label posn="${side ? 12.4 + CFG.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" 
            halign="${side ? 'right' : 'left'}" textsize="1" text="${CFG.widgetStyleRace.formattingCodes + CFG.challengeWidget.titles.currTrack}"/>
           <label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.challenge.name, false)}"/>
-          <label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.challenge.author}"/>
+          <label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${author}"/>
           <quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
           <label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(TM.challenge.authorTime)}"/>
         </frame>
