@@ -1,0 +1,23 @@
+<manialink id="1000">
+    <frame posn="-40.1 30.45 10">
+        <quad posn="-0.2 0.2 0.02" sizen="80.4 55.7" style="Bgs1InRace" substyle="NavButton"/>
+    </frame>
+
+    <frame posn="-39.9 30.09 11">
+        <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad posn="2.5 -2.1 0.04" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="TV"/>
+        <label posn="39.800000000000004 -2.1 0.04" sizen="80.4 55.7" halign="center" valign="center" textsize="3" text="$STITLE_HERE_MAN_XD"/>
+    </frame>
+
+    <frame posn="-39.9 25.35 11">
+        <quad posn="0 0 0" sizen="79.60000000000001 45.5" style="BgsPlayerCard" substyle="BgCardSystem"/>
+        <frame posn="1 -1.5 0.02">
+            <quad posn="0 0 0" sizen="15.5 10" action="58329582" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
+            
+        </frame>
+    </frame>
+
+    <frame posn="-39.9 -20.3 11">
+        <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad posn="39.6 -2 0.01" 
+          sizen="3.5 3.5" halign="center" valign="center" action="2000" style="Icons64x64_1" substyle="Close"/>
+    </frame>
+</manialink>

@@ -138,7 +138,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot control your own privileges.`, callerLogin)
         return
       }
-      if (targetInfo.privilege > 1) {
+      if (targetInfo.privilege >= 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed ` +
           `permissions of ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`)
