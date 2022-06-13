@@ -51,12 +51,8 @@ const commands: TMCommand[] = [
     aliases: ['sp', 'setpwd', 'setpassword'],
     help: 'Change the player password.',
     callback: (info: MessageInfo) => {
-      if (info.text.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No password specified.`, info.login)
-        return
-      }
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
-      if (!regex.test(info.text)) {
+      if (!regex.test(info.text) || info.text.length < 1) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
@@ -65,7 +61,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
-            + `the player password to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
+            + `the player password to ${TM.palette.highlight + (info.text.length > 0 ? info.text : 'none (disabled)')}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -79,12 +75,8 @@ const commands: TMCommand[] = [
     aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
     help: 'Change the spectator password.',
     callback: (info: MessageInfo) => {
-      if (info.text.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No password specified.`, info.login)
-        return
-      }
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
-      if (!regex.test(info.text)) {
+      if (!regex.test(info.text) || info.text.length < 1) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
@@ -93,7 +85,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
-            + `the spectator password to ${TM.palette.highlight + info.text}$z$s${TM.palette.admin}.`
+            + `the spectator password to ${TM.palette.highlight + (info.text.length > 0 ? info.text : 'none (disabled)')}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -240,7 +232,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + status ? 'allowed' : 'disallowed'}${TM.palette.admin} the challenge download.`
+            + `${TM.palette.highlight + (status ? 'allowed' : 'disallowed')}${TM.palette.admin} the challenge download.`
         }]
       },
         {
@@ -268,7 +260,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + status ? 'allowed' : 'disallowed'}${TM.palette.admin} checkpoint respawning.`
+            + `${TM.palette.highlight + (status ? 'allowed' : 'disallowed')}${TM.palette.admin} checkpoint respawning.`
         }]
       },
         {
@@ -307,10 +299,25 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
+    aliases: ['ccs', 'coppers', 'checkcoppers'],
+    help: 'Check the amount of coppers the server owns.',
+    callback: async (info: MessageInfo) => {
+      // TODO: Return immediately if the server isn't united. How to check tho..?
+      const coppers = await TM.call('GetServerCoppers')
+      if (coppers instanceof Error) {
+        TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't retrieve the coppers amount.`, info.login)
+        return
+      }
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server coppers amount${TM.palette.highlight}: ${coppers[0]}${TM.palette.admin}.`, info.login)
+    },
+    privilege: 3
+  },
+  {
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
     callback: (info: MessageInfo) => {
-      // Might need a timeout for this one //helloo im php
+      // Might need a timeout for this one // helloo im php // my name is kotlin boilerplate oop giga mega
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
