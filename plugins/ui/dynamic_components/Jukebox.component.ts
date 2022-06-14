@@ -25,18 +25,19 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
       if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
         const challengeId = this.challengeActionIds.find(a => a.actionId === info.answer)?.challengeId
         if (challengeId === undefined) {
-          TM.sendMessage(`Error while adding challenge to queue`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
           TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${info.answer} in memory`)
           return
         }
         const challenge = TM.challenges.find(a => a.id === challengeId)
         if (challenge === undefined) {
-          TM.sendMessage(`Error while adding challenge to queue`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
           TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
           return
         }
         TM.addToQueue(challengeId)
-        TM.sendMessage(`${info.nickName}$z$s added map ${TM.strip(challenge.name)} to the jukebox.`)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
+          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
       }
       else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
         const playerPage = this.playerPages.find(a => a.login === info.login)
@@ -116,16 +117,16 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
             <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>
             <quad posn="0.6 -0.2 3" sizen="2.5 2.5"  style="BgRaceScore2" substyle="Warmup"/>
             <format textsize="1.3" textcolor="FFFF"/>
-            <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="Track #${n}"/>
-            <label posn="0.7 -3.1 3" sizen="13 2" scale="1" text="${TM.safeString(TM.strip(challenges[n].name, false))}"/>
-            <label posn="0.7 -5.3 3" sizen="16.2 2" scale="0.9" text="by ${TM.safeString(challenges[n].author)}"/>
+            <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}Track #${n}"/>
+            <label posn="0.7 -3.1 3" sizen="13 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(TM.strip(challenges[n].name, false))}"/>
+            <label posn="0.7 -5.3 3" sizen="13 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.safeString(challenges[n].author)}"/>
             <format textsize="1" textcolor="FFFF"/>
-            <quad posn="0.4 -7.45 3" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
-            <label posn="2.1 -7.75 3" sizen="4.4 2" scale="0.8" text="${TM.Utils.getTimeString(challenges[n].authorTime)}"/>
-            <quad posn="5.7 -7.4 3" sizen="1.9 1.9" style="BgRaceScore2" substyle="LadderRank"/>
-            <label posn="7.5 -7.75 3" sizen="3 2" scale="0.8" text="${recordIndexString}."/>
-            <quad posn="10.2 -7.35 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
-            <label posn="12.1 -7.85 3" sizen="3 2" scale="0.8" text="100"/>
+            <quad posn="0.4 -8 3" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
+            <label posn="2.1 -8.3 3" sizen="4.4 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenges[n].authorTime)}"/>
+            <quad posn="5.7 -7.9 3" sizen="1.9 1.9" style="BgRaceScore2" substyle="LadderRank"/>
+            <label posn="7.5 -8.3 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}."/>
+            <quad posn="10.2 -7.8 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
+            <label posn="12.1 -8.3 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes}100"/>
           </frame>` // TODO: manialink xml inside window here, for close button actionid use this.closeId
       }
     }
