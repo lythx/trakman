@@ -77,6 +77,10 @@ export const TRAKMAN = {
     return PlayerService.players
   },
 
+  get records(): TMRecord[] {
+    return RecordService.records
+  },
+
   /**
     * Returns an array of objects containing information about top local record players on current map
     */

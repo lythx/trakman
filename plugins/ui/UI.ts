@@ -123,14 +123,16 @@ const events: TMEvent[] = [
                 new LiveRanking(110)
             )
             for (const c of staticComponents) { c.display() }
+            const jukebox = new Jukebox(10000, 20000)
+            jukebox.initialize()
             dynamicComponents.push(
-                new Jukebox(1000, 2000),
-                // new TestWindow(1000, 2000)
+                jukebox,
+                new TestWindow(1000, 2000)
             )
-            // setInterval(() => {
-            //     dynamicComponents[1].displayToPlayer('ciekma_czakwal')
-            //     dynamicComponents[1].displayToPlayer('redgreendevil')
-            // }, 1000)
+            setInterval(() => {
+                dynamicComponents[1].displayToPlayer('ciekma_czakwal')
+                dynamicComponents[1].displayToPlayer('redgreendevil')
+            }, 1000)
         }
     },
     {
