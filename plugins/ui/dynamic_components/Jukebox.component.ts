@@ -121,12 +121,12 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
             <label posn="0.7 -3.1 3" sizen="13 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(TM.strip(challenges[n].name, false))}"/>
             <label posn="0.7 -5.3 3" sizen="13 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.safeString(challenges[n].author)}"/>
             <format textsize="1" textcolor="FFFF"/>
-            <quad posn="0.4 -8 3" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
-            <label posn="2.1 -8.3 3" sizen="4.4 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenges[n].authorTime)}"/>
-            <quad posn="5.7 -7.9 3" sizen="1.9 1.9" style="BgRaceScore2" substyle="LadderRank"/>
-            <label posn="7.5 -8.3 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}."/>
-            <quad posn="10.2 -7.8 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
-            <label posn="12.1 -8.3 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes}100"/>
+            <quad posn="0.4 -7.6 3" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
+            <label posn="2.1 -7.9 3" sizen="4.4 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenges[n].authorTime)}"/>
+            <quad posn="5.7 -7.5 3" sizen="1.9 1.9" style="BgRaceScore2" substyle="LadderRank"/>
+            <label posn="7.5 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}."/>
+            <quad posn="10.2 -7.4 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
+            <label posn="12.1 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes}100"/>
           </frame>` // TODO: manialink xml inside window here, for close button actionid use this.closeId
       }
     }
