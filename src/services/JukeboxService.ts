@@ -44,6 +44,18 @@ export abstract class JukeboxService {
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
     }
 
+    static remove(challengeId: string) {
+        this._queue.splice(this._queue.findIndex(a => a.challenge.id === challengeId), 1)
+        const q = ChallengeService.challenges.find(a => !this._queue.some(b => a.id === challengeId))
+        if (q !== undefined) { this._queue.push({ challenge: q, isForced: false }) }
+        else { this._queue.push({ challenge: this._previous[0], isForced: false }) }
+        ChallengeService.setNextChallenge(this._queue[0].challenge.id)
+    }
+
+    static get jukebox() {
+        return [...this._queue.filter(a => a.isForced === true).map(a => a.challenge)]
+    }
+
     static get queue() {
         return [...this._queue.map(a => a.challenge)]
     }

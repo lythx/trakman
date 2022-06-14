@@ -35,9 +35,17 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
           TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
           return
         }
-        TM.addToQueue(challengeId)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
+        if (TM.challengeQueue.some(a => a.id === challengeId)) {
+          TM.removeFromQueue(challengeId)
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
+            + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
+        }
+        else {
+          TM.addToQueue(challengeId)
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
+            + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
+        }
+        this.displayToPlayer(info.login)
       }
       else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
         const playerPage = this.playerPages.find(a => a.login === info.login)
@@ -109,12 +117,17 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
           }
         }
         this.challengeActionIds.push({ actionId, challengeId: challenges[n].id })
+        const header = TM.jukebox.some(a => a.id === challenges[n].id) ?
+          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
+          imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>
+          <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="Bgs1InRace" substyle="BgListLine"/>` :
+          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
+          imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260547911740/plusek8.png"/>
+          <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>`
         xml += `
           <frame posn="${j * 15.75} ${-i * 10.9} 0.02">
-            <quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
-             imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986329315945902130/plusek7.png"/>
+            ${header}
             <quad posn="0 0 1" sizen="14.5 10" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
-            <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>
             <quad posn="0.6 -0.2 3" sizen="2.5 2.5"  style="BgRaceScore2" substyle="Warmup"/>
             <format textsize="1.3" textcolor="FFFF"/>
             <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}Track #${n}"/>
@@ -127,7 +140,7 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
             <label posn="7.5 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}."/>
             <quad posn="10.2 -7.4 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
             <label posn="12.1 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes}100"/>
-          </frame>` // TODO: manialink xml inside window here, for close button actionid use this.closeId
+          </frame>`
       }
     }
     return xml
