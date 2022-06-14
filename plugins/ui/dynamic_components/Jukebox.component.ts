@@ -8,56 +8,99 @@ interface ChallengeActionId {
   readonly actionId: number
 }
 
+interface PlayerPage {
+  readonly login: string
+  page: number
+}
+
 export default class Jukebox extends PopupWindow implements IPopupWindow {
 
   readonly gridWidth = 5
   readonly gridHeight = 4
-  private challengeActionIds: ChallengeActionId[] = []
+  private readonly challengeActionIds: ChallengeActionId[] = []
+  private readonly playerPages: PlayerPage[] = []
 
   initialize(): void {
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.answer < this.id + 1000 || info.answer > this.id + 6000) { return }
-      const challengeId = this.challengeActionIds.find(a => a.actionId === info.answer)?.challengeId
-      if (challengeId === undefined) {
-        TM.sendMessage(`Error while adding challenge to queue`, info.login)
-        TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${info.answer} in memory`)
-        return
+      if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
+        const challengeId = this.challengeActionIds.find(a => a.actionId === info.answer)?.challengeId
+        if (challengeId === undefined) {
+          TM.sendMessage(`Error while adding challenge to queue`, info.login)
+          TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${info.answer} in memory`)
+          return
+        }
+        const challenge = TM.challenges.find(a => a.id === challengeId)
+        if (challenge === undefined) {
+          TM.sendMessage(`Error while adding challenge to queue`, info.login)
+          TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
+          return
+        }
+        TM.addToQueue(challengeId)
+        TM.sendMessage(`${info.nickName}$z$s added map ${TM.strip(challenge.name)} to the jukebox.`)
       }
-      const challenge = TM.challenges.find(a => a.id === challengeId)
-      if (challenge === undefined) {
-        TM.sendMessage(`Error while adding challenge to queue`, info.login)
-        TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
-        return
+      else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
+        const playerPage = this.playerPages.find(a => a.login === info.login)
+        if (playerPage === undefined) {
+          TM.error(`Can't find player ${info.login} in memory`)
+          return
+        }
+        switch (info.answer) {
+          case this.id + 1:
+            playerPage.page = 1
+            break
+          case this.id + 2:
+            playerPage.page -= 10
+            if (playerPage.page < 1) { playerPage.page = 1 }
+            break
+          case this.id + 3:
+            playerPage.page--
+            break
+          case this.id + 4:
+            playerPage.page++
+            break
+          case this.id + 5: {
+            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
+            playerPage.page += 10
+            if (playerPage.page > lastPage) {
+              playerPage.page = lastPage
+            }
+            break
+          } case this.id + 6:
+            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
+            playerPage.page = lastPage
+            break
+        }
+        this.displayToPlayer(info.login)
       }
-      TM.addToQueue(challengeId)
-      TM.sendMessage(`${info.nickName}$z$s added map ${TM.strip(challenge.name)} to the jukebox.`)
     })
   }
 
   constructContent(login: string): string {
+    let page: number
+    const playerPage = this.playerPages.find(a => a.login === login)
+    if (playerPage === undefined) {
+      this.playerPages.push({ login, page: 1 })
+      page = 1
+    }
+    else {
+      page = playerPage.page
+    }
     const challenges = TM.challenges
-    challenges.sort((a, b) => a.author[0] > b.author[0] ? 1 : -1)
+    challenges.sort((a, b) => a.author.localeCompare(b.author))
     let xml = ''
-    let n = 0
+    let n = (this.gridHeight * this.gridWidth) * (page - 1)
     for (let i = 0; i < this.gridHeight; i++) {
       for (let j = 0; j < this.gridWidth; j++) {
-        const recordIndex = TM.records.filter(a => a.challenge === challenges[n].id).sort((a, b) => a.score - b.score).findIndex(a => a.login === login)
-        let recordIndexString
-        if (recordIndex === -1) {
-          recordIndexString = "--"
-        }
-        else if (recordIndex.toString().length === 1) {
-          recordIndexString = `0${recordIndex}`
-        }
-        else {
-          recordIndexString = recordIndex.toString()
-        }
         n++
+        if (challenges[n] === undefined) { break }
+        const recordIndex = TM.records.filter(a => a.challenge === challenges[n].id).sort((a, b) => a.score - b.score).findIndex(a => a.login === login) + 1
+        let recordIndexString
+        if (recordIndex === 0) { recordIndexString = "--" }
+        else if (recordIndex.toString().length === 1) { recordIndexString = `0${recordIndex}` }
+        else { recordIndexString = recordIndex.toString() }
         let actionId: number
         const challengeActionId = this.challengeActionIds.find(a => a.challengeId === challenges[n].id)
-        if (challengeActionId !== undefined) {
-          actionId = challengeActionId.actionId
-        }
+        if (challengeActionId !== undefined) { actionId = challengeActionId.actionId }
         else {
           actionId = this.id + 1000
           while (this.challengeActionIds.some(a => a.actionId === actionId)) {
@@ -85,6 +128,41 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
             <label posn="12.1 -7.85 3" sizen="3 2" scale="0.8" text="100"/>
           </frame>` // TODO: manialink xml inside window here, for close button actionid use this.closeId
       }
+    }
+    return xml
+  }
+
+  constructFooter(login: string): string {
+    let xml = ''
+    const playerPage = this.playerPages.find(a => a.login === login)
+    if (playerPage === undefined) {
+      TM.error(`Can't find player ${login} in the memory`)
+      return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" style="Icons64x64_1" substyle="StatePrivate"/>`
+    }
+    if (playerPage.page !== 1) {
+      xml += `
+      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" style="Icons64x64_1" substyle="ArrowFirst"/>
+      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" style="Icons64x64_1" substyle="ArrowFastPrev"/>
+      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 3}" style="Icons64x64_1" substyle="ArrowPrev"/>`
+    }
+    else {
+      xml += `
+      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
+      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
+      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>`
+    }
+    xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" style="Icons64x64_1" substyle="StatePrivate"/>`
+    if (playerPage.page !== Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))) {
+      xml += `
+       <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 4}" style="Icons64x64_1" substyle="ArrowNext"/>
+       <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" style="Icons64x64_1" substyle="ArrowFastNext"/>
+       <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" style="Icons64x64_1" substyle="ArrowLast"/>`
+    }
+    else {
+      xml += `
+      <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
+      <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
+      <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>`
     }
     return xml
   }
