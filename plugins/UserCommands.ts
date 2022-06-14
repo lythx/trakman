@@ -120,7 +120,7 @@ const commands: TMCommand[] = [
     aliases: ['l', 'list'],
     help: 'Display list of maps.',
     callback: (info: MessageInfo) => {
-      TM.openManialink(1000, info.login)
+      TM.openManialink(10000, info.login)
     },
     privilege: 0
   },
