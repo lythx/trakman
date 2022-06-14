@@ -1,5 +1,5 @@
 <manialink id="432432432">
-        <frame posn="-40999999999999.2 27.85 10">
+        <frame posn="-40994359.2 27.85 10">
           <quad posn="0 0 0.02" sizen="80.4 55.7" style="Bgs1InRace" substyle="NavButton"/>
             <frame posn="0.4 -0.44 1">
             <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad 
@@ -87,9 +87,13 @@ text="$STITLE_HERE_MAN_XD"/>
           </frame>
           </frame>
         </frame>
-          <frame posn="0.4 -51 1">
-            <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad 
-posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="2000" style="Icons64x64_1" substyle="Close"/>
-          </frame>
+        <frame posn="0.4 -51 1">
+            <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/>
+            <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowFirst"/>
+            <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowPrev"/>
+            <quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="StatePrivate"/>
+            <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowNext"/>
+            <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowLast"/>
         </frame>
-      </manialink>
+  </frame>
+</manialink>

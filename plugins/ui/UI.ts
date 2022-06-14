@@ -123,7 +123,7 @@ const events: TMEvent[] = [
                 new LiveRanking(110)
             )
             for (const c of staticComponents) { c.display() }
-            const jukebox = new Jukebox(10000, 20000)
+            const jukebox = new Jukebox(10000, 50000)
             jukebox.initialize()
             dynamicComponents.push(
                 jukebox,
