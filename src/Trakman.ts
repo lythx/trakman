@@ -325,6 +325,10 @@ export const TRAKMAN = {
     return JukeboxService.queue
   },
 
+  get jukebox() {
+    return JukeboxService.jukebox
+  },
+
   get previousChallenges() {
     return JukeboxService.previous
   },
@@ -335,6 +339,10 @@ export const TRAKMAN = {
 
   addToQueue(challengeId: string) {
     JukeboxService.add(challengeId)
+  },
+
+  removeFromQueue(challengeId: string) {
+    JukeboxService.remove(challengeId)
   },
 
   openManialink(id: number, login: string) {
