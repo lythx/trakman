@@ -10,7 +10,7 @@ const command: TMCommand = {
     const [trackId, game] = info.text.toUpperCase().split(' ')
     const file = await TMXService.fetchTrackFile(trackId, game).catch((err: Error) => err)
     if (file instanceof Error) {
-      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + game || 'TMNF'} TMX` +
+      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + (game || 'TMNF')} TMX` +
         `${TM.palette.error}, check if you specified the correct game.`, info.login)
       return
     }

@@ -16,10 +16,12 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
   private readonly windowHeight: number = 55.7
   private readonly titleHeight: number = 2.1 * 2
 
-  constructor(openId: number, closeId: number) {
+  constructor(openId: number, closeId: number, contentHeight?: number, contentWidth?: number) {
     super(openId)
     this.openId = openId
-    this.closeId = closeId;
+    this.closeId = closeId
+    if (contentHeight !== undefined) { this.windowHeight = contentHeight + (2 * this.titleHeight) + 1.7 }
+    if (contentWidth !== undefined) { this.windowWidth = contentWidth + 1.6; }
     [this.frameTop, this.frameTopMid, this.frameMidBottom, this.frameBottom] = this.constructFrame()
     Events.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (Number(info.answer) === this.openId) { this.displayToPlayer(info.login) }
@@ -42,7 +44,7 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
       `
           </frame>
         </frame>
-          <frame posn="0.4 -51 1">
+          <frame posn="0.4 -${this.windowHeight - this.titleHeight - 0.44} 1">
             <quad posn="0 0 0" sizen="${this.windowWidth - 0.8} ${this.titleHeight}" style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/>`,
       `
           </frame>
@@ -61,7 +63,9 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
   }
 
   constructFooter(login: string): string {
-    return `<quad posn="${(this.windowWidth - 0.8) / 2 - 0.2} -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" style="Icons64x64_1" substyle="Close"/>`
+    return `<quad posn="${(this.windowWidth - 0.8) / 2 - 0.2} -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+    imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+    image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
   }
 
   displayToPlayer(login: string): void {
