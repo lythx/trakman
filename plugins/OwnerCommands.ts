@@ -13,10 +13,8 @@ const commands: TMCommand[] = [
       for (const challenge of res) {
         if (TM.challenges.some(a => a.id === challenge.id))
           continue
-        const file = await TM.fetchTrackFileByUid(challenge.id).catch(err => {
-          TM.error(err)
-        })
-        if (!file) {
+        const file = await TM.fetchTrackFileByUid(challenge.id)
+        if (file instanceof Error) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
           continue
         }

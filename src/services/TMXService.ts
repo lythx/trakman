@@ -1,18 +1,27 @@
 import fetch from 'node-fetch'
+import { ErrorHandler } from '../ErrorHandler.js'
 
 export abstract class TMXService {
+  
   private static _current: TMXTrackInfo | null
   private static readonly prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
 
   static get current(): TMXTrackInfo | null {
-    return this._current
+    return this._current === null ? null : { ...this._current }
   }
 
-  static async fetchTrackFile(id: string, game: string = 'TMNF'): Promise<TMXFileData> {
+  /**
+   * Fetches track gbx file from tmx by track id, returns name and file in base64 string
+   */
+  static async fetchTrackFile(id: string, game: string = 'TMNF'): Promise<TMXFileData | Error> {
     const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
-    const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => { throw err })
+    const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => err)
+    if (res instanceof Error) {
+      ErrorHandler.error(res.message)
+      return res
+    }
     const nameHeader = res.headers.get('content-disposition')
-    if (nameHeader == null) { throw new Error('Cannot read track name') }
+    if (nameHeader === null) { return new Error('Cannot read track name') }
     // The header is inconsistent for some reason, I hate TMX
     const name = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
     const data = await res.arrayBuffer()
@@ -20,20 +29,27 @@ export abstract class TMXService {
     return { name, content: buffer.toString('base64') }
   }
 
-  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  /**
+   * Fetches track gbx file from tmx by uid, returns name and file in base64 string
+   */
+  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {
-      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
+      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
+      if (res instanceof Error) {
+        ErrorHandler.error(res.message)
+        continue
+      }
       data = await res.text()
-      if (!data.includes('<!DOCTYPE html>') && data !== '') {
+      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
         prefix = p
         break
       }
     }
     if (prefix === '') {
       this._current = null
-      throw new Error('Cannot fetch track data from TMX')
+      return new Error('Cannot fetch track data from TMX')
     }
     const s = data.split('\t')
     const id = s[0]
@@ -41,20 +57,27 @@ export abstract class TMXService {
     return await this.fetchTrackFile(id, site)
   }
 
-  static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo> {
+  /**
+   * Fetches TMX info for track with given id
+   */
+  static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {
-      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`)
+      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
+      if (res instanceof Error) {
+        ErrorHandler.error(res.message)
+        continue
+      }
       data = await res.text()
-      if (!data.includes('<!DOCTYPE html>') && data !== '') {
+      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
         prefix = p
         break
       }
     }
     if (prefix === '') {
       this._current = null
-      throw new Error('Cannot fetch track data from TMX')
+      return new Error('Cannot fetch track data from TMX')
     }
     const s = data.split('\t')
     const id = Number(s[0])
@@ -78,6 +101,7 @@ export abstract class TMXService {
         url: `https://${prefix}.tm-exchange.com/recordgbx/${rs[0]}`
       })
     }
+    Object.freeze(replays)
     this._current = {
       id,
       name: s[1],
@@ -103,6 +127,6 @@ export abstract class TMXService {
       downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${id}`,
       replays
     }
-    return this._current
+    return { ...this._current }
   }
 }
