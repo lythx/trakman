@@ -16,8 +16,11 @@ import { JukeboxService } from './services/JukeboxService.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
-tls.DEFAULT_MIN_VERSION = 'TLSv1'
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+if (process.env.USE_WEBSERVICES === 'YES') {
+  tls.DEFAULT_MIN_VERSION = 'TLSv1'
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
 
 const DB = new Database()
 DB.initialize()
@@ -75,6 +78,10 @@ export const TRAKMAN = {
      */
   get players(): TMPlayer[] {
     return PlayerService.players
+  },
+
+  get records(): TMRecord[] {
+    return RecordService.records
   },
 
   /**
@@ -153,6 +160,14 @@ export const TRAKMAN = {
 
   get challenges(): TMChallenge[] {
     return ChallengeService.challenges
+  },
+
+  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
+    return await TMXService.fetchTrackInfo(trackId)
+  },
+
+  get TMXInfo(): TMXTrackInfo | null {
+    return TMXService.current
   },
 
   /**
@@ -305,7 +320,7 @@ export const TRAKMAN = {
     }
   },
 
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
     return await TMXService.fetchTrackFileByUid(trackId)
   },
 
@@ -321,6 +336,10 @@ export const TRAKMAN = {
     return JukeboxService.queue
   },
 
+  get jukebox() {
+    return JukeboxService.jukebox
+  },
+
   get previousChallenges() {
     return JukeboxService.previous
   },
@@ -329,8 +348,12 @@ export const TRAKMAN = {
     PlayerService.setPrivilege(login, privilege)
   },
 
-  addToQueue(challengeId: string) {
+  addToJukebox(challengeId: string) {
     JukeboxService.add(challengeId)
+  },
+
+  removeFromQueue(challengeId: string) {
+    JukeboxService.remove(challengeId)
   },
 
   openManialink(id: number, login: string) {
@@ -349,7 +372,11 @@ export const TRAKMAN = {
       headers: {
         "Authorization": au
       }
-    })
+    }).catch(err => err)
+    if (response instanceof Error) {
+      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
+      return response
+    }
     return await response.json()
   }
 }
