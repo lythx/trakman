@@ -159,6 +159,10 @@ export const TRAKMAN = {
     return ChallengeService.challenges
   },
 
+  async getTMXTrackInfo(trackId: string): Promise<TMXTrackInfo> {
+    return await TMXService.fetchTrackInfo(trackId)
+  },
+
   /**
      * Returns an object containing information about specified player or undefined if player is not on the server
      */
