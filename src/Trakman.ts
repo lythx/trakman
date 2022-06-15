@@ -162,8 +162,12 @@ export const TRAKMAN = {
     return ChallengeService.challenges
   },
 
-  async getTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
+  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
     return await TMXService.fetchTrackInfo(trackId)
+  },
+
+  get TMXInfo(): TMXTrackInfo | null {
+    return TMXService.current
   },
 
   /**
@@ -368,7 +372,11 @@ export const TRAKMAN = {
       headers: {
         "Authorization": au
       }
-    })
+    }).catch(err => err)
+    if (response instanceof Error) {
+      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
+      return response
+    }
     return await response.json()
   }
 }

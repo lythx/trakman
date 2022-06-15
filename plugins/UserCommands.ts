@@ -125,6 +125,14 @@ const commands: TMCommand[] = [
     },
     privilege: 0
   },
+  {
+    aliases: ['tmxinfo'],
+    help: 'Display TMX info.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(1000, info.login)
+    },
+    privilege: 0
+  },
   //REMOVE THIS LATER
   {
     aliases: ['recs'],

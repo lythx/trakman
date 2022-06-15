@@ -41,7 +41,7 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
 
     let tmxInfo = ``
     if (process.env.USE_TMX === "YES") {
-      const tmxTrackInfo = await TM.getTMXTrackInfo(TM.challenge.id)
+      const tmxTrackInfo = await TM.fetchTMXTrackInfo(TM.challenge.id)
       if (!(tmxTrackInfo instanceof Error)) {
         tmxTrackInfo
         tmxInfo += `
@@ -58,7 +58,7 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
         <frame posn="${CFG.challengeWidget.racePos.posX} ${CFG.challengeWidget.racePos.posY} 10">
           <format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
           <quad posn="0 0 0.01" sizen="${CFG.challengeWidget.width} ${CFG.challengeWidget.height}" 
-           action="50000" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
+           action="1000" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
           <quad posn="0.4 -0.36 0.02" sizen="${CFG.challengeWidget.width - 0.8} 2" 
            style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/>
           <quad posn="${side ? 12.5 + CFG.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" 
