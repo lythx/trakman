@@ -8,7 +8,7 @@ interface PlayerPage {
   page: number
 }
 
-export default class Jukebox extends PopupWindow implements IPopupWindow {
+export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
 
   readonly gridWidth = 5
   readonly gridHeight = 4
