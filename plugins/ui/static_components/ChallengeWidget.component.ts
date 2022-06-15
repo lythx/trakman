@@ -39,6 +39,21 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
       author = authorLogin
     }
 
+    let tmxInfo = ``
+    if (process.env.USE_TMX === "YES") {
+      const tmxTrackInfo = await TM.getTMXTrackInfo(TM.challenge.id)
+      if (tmxTrackInfo instanceof Error) {
+        TM.error(`Failed to fetch TMX track info for uid ${TM.challenge.id}`, tmxTrackInfo.message)
+        tmxInfo += ``
+      } else {
+        tmxInfo +=
+          `<quad posn="6.3 -6.25 0.04" sizen="1.5 1.7" image="https://cdn.discordapp.com/attachments/552460149957197845/986417064912777327/build.png"/>
+           <label posn="8 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.lastUpdateDate.getFullYear()}"/>
+           <quad posn="10.3 -6.25 0.04" sizen="1.7 1.7" style="Icons64x64_1" substyle="OfficialRace"/>
+           <label posn="12 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.awards}"/>`
+      }
+    }
+
     const side: boolean = (CFG.challengeWidget.racePos.posX < 0) ? true : false
     this.xml =
       `<manialink id="${this.id}">
@@ -56,6 +71,7 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
           <label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.strip(author, false)}"/>
           <quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
           <label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(TM.challenge.authorTime)}"/>
+          ${tmxInfo}
         </frame>
       </manialink>`
   }

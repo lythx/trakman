@@ -151,32 +151,48 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
     const playerPage = this.playerPages.find(a => a.login === login)
     if (playerPage === undefined) {
       TM.error(`Can't find player ${login} in the memory`)
-      return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" style="Icons64x64_1" substyle="StatePrivate"/>`
+      return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+      image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     }
     if (playerPage.page !== 1) {
       xml += `
-      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" style="Icons64x64_1" substyle="ArrowFirst"/>
-      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" style="Icons64x64_1" substyle="ArrowFastPrev"/>
-      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 3}" style="Icons64x64_1" substyle="ArrowPrev"/>`
+      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" 
+      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551449370634/firstek8.png"
+      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881192296448/firstek8w.png"/>
+      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" 
+      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551835250738/jumpekbw8.png"
+      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881590779934/jumpekbw8w.png"/>
+      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 3}" 
+      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552527298601/prevek8.png"
+      image="https://cdn.discordapp.com/attachments/599381118633902080/986427882190553088/prevek8w.png"/>`
     }
     else {
       xml += `
-      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
-      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
-      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>`
+      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
+      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
+      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
     }
-    xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" style="Icons64x64_1" substyle="StatePrivate"/>`
+    xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+    imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+    image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     if (playerPage.page !== Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))) {
       xml += `
-       <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 4}" style="Icons64x64_1" substyle="ArrowNext"/>
-       <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" style="Icons64x64_1" substyle="ArrowFastNext"/>
-       <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" style="Icons64x64_1" substyle="ArrowLast"/>`
+       <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 4}" 
+       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
+       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png"/>
+       <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" 
+       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551654887514/jumpek8.png"
+       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881402019941/jumpek8w.png"/>
+       <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" 
+       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552019816489/lastek8.png"
+       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881792086046/lastek8w.png"/>`
     }
     else {
       xml += `
-      <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
-      <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>
-      <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="StarGold"/>`
+      <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
+      <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
+      <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
     }
     return xml
   }
