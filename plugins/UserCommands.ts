@@ -65,10 +65,11 @@ const commands: TMCommand[] = [
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo) => {
-      await TM.multiCall({
-        method: 'ForceSpectator',
-        params: [{ string: info.login }, { int: 1 }]
-      },
+      await TM.multiCall(
+        {
+          method: 'ForceSpectator',
+          params: [{ string: info.login }, { int: 1 }]
+        },
         {
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]
@@ -136,14 +137,6 @@ const commands: TMCommand[] = [
         str += `${TM.strip(lr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(lr.score)}, `
       }
       TM.sendMessage(str.slice(0, -2), info.login)
-    },
-    privilege: 0
-  },
-  {
-    aliases: ['queue'],
-    help: 'asfaf',
-    callback: (info: MessageInfo) => {
-      TM.addToQueue(info.text)
     },
     privilege: 0
   }

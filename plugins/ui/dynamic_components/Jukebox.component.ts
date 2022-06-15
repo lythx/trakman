@@ -3,11 +3,6 @@ import IPopupWindow from "./PopupWindow.interface.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
 import CFG from '../UIConfig.json' assert { type: 'json' }
 
-interface ChallengeActionId {
-  readonly challengeId: string
-  readonly actionId: number
-}
-
 interface PlayerPage {
   readonly login: string
   page: number
@@ -17,13 +12,13 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
 
   readonly gridWidth = 5
   readonly gridHeight = 4
-  private readonly challengeActionIds: ChallengeActionId[] = []
+  private readonly challengeActionIds: string[] = []
   private readonly playerPages: PlayerPage[] = []
 
   initialize(): void {
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
-        const challengeId = this.challengeActionIds.find(a => a.actionId === info.answer)?.challengeId
+        const challengeId = this.challengeActionIds[info.answer - (this.id + 1000)]
         if (challengeId === undefined) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
           TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${info.answer} in memory`)
@@ -41,7 +36,7 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
             + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
         }
         else {
-          TM.addToQueue(challengeId)
+          TM.addToJukebox(challengeId)
           TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
             + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
         }
@@ -108,15 +103,12 @@ export default class Jukebox extends PopupWindow implements IPopupWindow {
         else if (recordIndex.toString().length === 1) { recordIndexString = `0${recordIndex}` }
         else { recordIndexString = recordIndex.toString() }
         let actionId: number
-        const challengeActionId = this.challengeActionIds.find(a => a.challengeId === challenges[n].id)
-        if (challengeActionId !== undefined) { actionId = challengeActionId.actionId }
+        const challengeActionId = this.challengeActionIds.indexOf(challenges[n].id)
+        if (challengeActionId !== -1) { actionId = challengeActionId + this.id + 1000 }
         else {
-          actionId = this.id + 1000
-          while (this.challengeActionIds.some(a => a.actionId === actionId)) {
-            actionId++
-          }
+          actionId = this.id + 1000 + this.challengeActionIds.length
+          this.challengeActionIds.push(challenges[n].id)
         }
-        this.challengeActionIds.push({ actionId, challengeId: challenges[n].id })
         const header = TM.jukebox.some(a => a.id === challenges[n].id) ?
           `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>

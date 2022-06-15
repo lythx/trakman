@@ -42,15 +42,13 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
     let tmxInfo = ``
     if (process.env.USE_TMX === "YES") {
       const tmxTrackInfo = await TM.getTMXTrackInfo(TM.challenge.id)
-      if (tmxTrackInfo instanceof Error) {
-        TM.error(`Failed to fetch TMX track info for uid ${TM.challenge.id}`, tmxTrackInfo.message)
-        tmxInfo += ``
-      } else {
-        tmxInfo +=
-          `<quad posn="6.3 -6.25 0.04" sizen="1.5 1.7" image="https://cdn.discordapp.com/attachments/552460149957197845/986417064912777327/build.png"/>
-           <label posn="8 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.lastUpdateDate.getFullYear()}"/>
-           <quad posn="10.3 -6.25 0.04" sizen="1.7 1.7" style="Icons64x64_1" substyle="OfficialRace"/>
-           <label posn="12 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.awards}"/>`
+      if (!(tmxTrackInfo instanceof Error)) {
+        tmxTrackInfo
+        tmxInfo += `
+          <quad posn="6 -6.25 0.04" sizen="1.5 1.7" image="https://cdn.discordapp.com/attachments/552460149957197845/986417064912777327/build.png"/>
+          <label posn="7.6 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.lastUpdateDate.getFullYear()}/${tmxTrackInfo.lastUpdateDate.getMonth().toString().padStart(2, '0')}"/>
+          <quad posn="11.3 -6.25 0.04" sizen="1.6 1.6" style="Icons64x64_1" substyle="OfficialRace"/>
+          <label posn="12.9 -6.55 0.04" sizen="1.9 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.awards}"/>`
       }
     }
 
@@ -69,8 +67,8 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
            halign="${side ? 'right' : 'left'}" textsize="1" text="${CFG.widgetStyleRace.formattingCodes + CFG.challengeWidget.titles.currTrack}"/>
           <label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.challenge.name, false)}"/>
           <label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.strip(author, false)}"/>
-          <quad posn="0.7 -6.25 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
-          <label posn="2.7 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(TM.challenge.authorTime)}"/>
+          <quad posn="0.6 -6.22 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
+          <label posn="2.35 -6.55 0.04" sizen="4.6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(TM.challenge.authorTime)}"/>
           ${tmxInfo}
         </frame>
       </manialink>`

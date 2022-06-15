@@ -16,8 +16,11 @@ import { JukeboxService } from './services/JukeboxService.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
-tls.DEFAULT_MIN_VERSION = 'TLSv1'
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+if (process.env.USE_WEBSERVICES === 'YES') {
+  tls.DEFAULT_MIN_VERSION = 'TLSv1'
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
 
 const DB = new Database()
 DB.initialize()
@@ -159,7 +162,7 @@ export const TRAKMAN = {
     return ChallengeService.challenges
   },
 
-  async getTMXTrackInfo(trackId: string): Promise<TMXTrackInfo> {
+  async getTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
     return await TMXService.fetchTrackInfo(trackId)
   },
 
@@ -313,7 +316,7 @@ export const TRAKMAN = {
     }
   },
 
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData> {
+  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
     return await TMXService.fetchTrackFileByUid(trackId)
   },
 
@@ -341,7 +344,7 @@ export const TRAKMAN = {
     PlayerService.setPrivilege(login, privilege)
   },
 
-  addToQueue(challengeId: string) {
+  addToJukebox(challengeId: string) {
     JukeboxService.add(challengeId)
   },
 
