@@ -86,7 +86,7 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
         const challenges = TM.challenges
         challenges.sort((a, b) => a.author.localeCompare(b.author))
         let xml = ''
-        const titles = ['Previous track', 'CurrentTrack', 'NextTrack']
+        const titles = [CFG.challengeWidget.titles.lastTrack, CFG.challengeWidget.titles.currTrack, CFG.challengeWidget.titles.nextTrack]
         for (let i = 0; i < 3; i++) {
             const challenge = [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]][i]
             if (challenge === undefined) {
@@ -114,9 +114,9 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
                     const txtPos = -(41.9 + (2.3 * i))
                     replaysXml += `
                     <quad posn="0.9 ${imgPos} 3" sizen="2 2" style="MedalsBig" substyle="${medals[i]}"/>
-                    <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${TM.safeString(tmxInfo.replays[i].name)}"/>
-                    <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${TM.Utils.getTimeString(tmxInfo.replays[i].time)}"/>
-                    <label posn="16 ${txtPos} 3" sizen="6.4 2" scale="1" text="${tmxInfo.replays[i].recordDate.getDay()}/${tmxInfo.replays[i].recordDate.getMonth()}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
+                    <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(tmxInfo.replays[i].name)}"/>
+                    <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(tmxInfo.replays[i].time)}"/>
+                    <label posn="16 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDay()}/${tmxInfo.replays[i].recordDate.getMonth()}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
                     <quad posn="22 ${imgPos + 0.2} 3" sizen="2 2" style="Icons128x128_1" substyle="Save" url="${tmxInfo.replays[i].url.replace(/^https:\/\//, '')}"/>`
                 }
                 replaysXml += `<quad posn="6 -49 3" sizen="3.5 3.5" style="Icons128x128_1" substyle="Save" url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
@@ -128,41 +128,41 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
           <quad posn="0.4 -0.36 2" sizen="24.2 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>
           <quad posn="0.6 -0.2 3" sizen="2.5 2.5"  style="BgRaceScore2" substyle="Warmup"/>
           <format textsize="1.3" textcolor="FFFF"/>
-          <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${titles[i]}"/>
+          <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + titles[i]}"/>
           <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
-          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${screnshot}"/>
-          <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${TM.safeString(TM.strip(challenge.name, false))}"/>
-          <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="by ${TM.safeString(challenge.author)}"/>
+          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${TM.safeString(screnshot + `&.jpeg`)}"/>
+          <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(TM.strip(challenge.name, false))}"/>
+          <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.safeString(challenge.author)}"/>
           <quad posn="0.4 -28.2 3" sizen="2 2" style="BgRaceScore2" substyle="ScoreLink"/>
-          <label posn="2.5 -28.38 3" sizen="4.4 2" scale="1" text="${TM.Utils.getTimeString(challenge.authorTime)}"/>
-          <quad posn="0.4 -30.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="2.5 -30.38 3" sizen="4.4 2" scale="1" text="${challenge.environment}"/>
-          <quad posn="0.4 -32.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="2.5 -32.38 3" sizen="4.4 2" scale="1" text="${challenge.mood}"/>
+          <label posn="2.5 -28.38 3" sizen="4.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenge.authorTime)}"/>
+          <quad posn="0.4 -30.2 3" sizen="2 2" style="Icons128x128_1" substyle="Vehicles"/>
+          <label posn="2.5 -30.38 3" sizen="4.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.environment}"/>
+          <quad posn="0.4 -32.2 3" sizen="2 2" style="Icons128x128_1" substyle="Manialink"/>
+          <label posn="2.5 -32.38 3" sizen="4.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.mood}"/>
           <quad posn="0.4 -34.2 3" sizen="2 2" style="Icons128x128_1" substyle="Coppers"/>
-          <label posn="2.5 -34.38 3" sizen="4.4 2" scale="1" text="${challenge.copperPrice}"/>
+          <label posn="2.5 -34.38 3" sizen="4.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.copperPrice}"/>
           <quad posn="0.4 -36.2 3" sizen="2 2" style="Icons128x32_1" substyle="RT_Cup"/>
-          <label posn="2.5 -36.38 3" sizen="4.4 2" scale="1" text="${tmxInfo.awards}"/>
+          <label posn="2.5 -36.38 3" sizen="4.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.awards}"/>
           <quad posn="8 -28.2 3" sizen="2 2" image="https://cdn.discordapp.com/attachments/793464821030322196/986680709538267227/build2.dds"/>
-          <label posn="10.1 -28.38 3" sizen="7 2" scale="1" text="30/12/2012"/>
-          <quad posn="8 -30.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="10.1 -30.38 3" sizen="7 2" scale="1" text="${tmxInfo.type} "/>
-          <quad posn="8 -32.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="10.1 -32.38 3" sizen="7 2" scale="1" text="${tmxInfo.style}"/>
-          <quad posn="8 -34.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="10.1 -34.38 3" sizen="7 2" scale="1" text="${tmxInfo.difficulty}"/>
-          <quad posn="8 -36.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="10.1 -36.38 3" sizen="7 2" scale="1" text="${tmxInfo.routes}"/>
-          <quad posn="17.5 -28.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="19.6 -28.38 3" sizen="7 2" scale="1" text="${tmxInfo.game}"/>
+          <label posn="10.1 -28.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.lastUpdateDate}"/>
+          <quad posn="8 -30.2 3" sizen="2 2" style="Icons128x128_1" substyle="NewTrack"/>
+          <label posn="10.1 -30.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.type} "/>
+          <quad posn="8 -32.2 3" sizen="2 2" style="Icons128x128_1" substyle="Custom"/>
+          <label posn="10.1 -32.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.style}"/>
+          <quad posn="8 -34.2 3" sizen="2 2" style="Icons128x128_1" substyle="United"/>
+          <label posn="10.1 -34.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.difficulty}"/>
+          <quad posn="8 -36.2 3" sizen="2 2" style="Icons128x128_1" substyle="Puzzle"/>
+          <label posn="10.1 -36.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.routes}"/>
+          <quad posn="17.5 -28.2 3" sizen="2 2" style="Icons128x128_1" substyle="Credits"/>
+          <label posn="19.6 -28.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.game}"/>
           <quad posn="17.5 -30.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="19.6 -30.38 3" sizen="7 2" scale="1" text=" "/>
+          <label posn="19.6 -30.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}TODO"/>
           <quad posn="17.5 -32.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="19.6 -32.38 3" sizen="7 2" scale="1" text=""/>
+          <label posn="19.6 -32.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}TODO"/>
           <quad posn="17.5 -34.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="19.6 -34.38 3" sizen="7 2" scale="1" text=""/>
+          <label posn="19.6 -34.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}TODO"/>
           <quad posn="17.5 -36.2 3" sizen="2 2" style="MedalsBig" substyle="MedalNadeo"/>
-          <label posn="19.6 -36.38 3" sizen="7 2" scale="1" text=""/>
+          <label posn="19.6 -36.38 3" sizen="7 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}TODO"/>
           ${replaysXml}
         </frame>`
         }
