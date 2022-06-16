@@ -126,10 +126,12 @@ const events: TMEvent[] = [
       for (const c of staticComponents) { c.display() }
       const jukebox = new JukeboxWidget(10000, 50000)
       jukebox.initialize()
+      const tmx = new TMXWidget(1000, 2000)
+      tmx.initialize()
       dynamicComponents.push(
         //new TestWindow(566565, 777667),
         jukebox,
-        new TMXWidget(1000, 2000)
+        tmx
       )
       // setInterval(() => {
       //   dynamicComponents[0].displayToPlayer('ciekma_czakwal')
