@@ -23,7 +23,6 @@ export abstract class Client {
   static callNoRes(method: string, params: object[] = []): void {
     this.requestId++
     const request = new Request(method, params)
-    console.log(method)
     const buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
   }
