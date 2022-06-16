@@ -37,28 +37,28 @@ export abstract class TMXService {
   }
 
   static async add(id: string, index: number): Promise<void | Error> {
-    if(index >= this.nextSize) {return}
+    if (index >= this.nextSize) { return }
     const track = await this.fetchTrackInfo(id)
     this._next.splice(index, 0, track instanceof Error ? null : track)
     this._next.length = this.nextSize
   }
 
   static async remove(index: number) {
-    if(index >= this.nextSize) {return}
+    if (index >= this.nextSize) { return }
     this._next.splice(index, 1)
     const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(track instanceof Error ? null : track)
   }
 
   static get current(): TMXTrackInfo | null {
-    return this._current
+    return this._current === null ? null : { ...this._current }
   }
 
   static get next(): (TMXTrackInfo | null)[] {
     return [...this._next]
   }
 
-  static get previous():  (TMXTrackInfo | null)[]{
+  static get previous(): (TMXTrackInfo | null)[] {
     return [...this._previous]
   }
 
@@ -99,10 +99,7 @@ export abstract class TMXService {
         break
       }
     }
-    if (prefix === '') {
-      this._current = null
-      return new Error('Cannot fetch track data from TMX')
-    }
+    if (prefix === '') { return new Error('Cannot fetch track data from TMX') }
     const s = data.split('\t')
     const id = s[0]
     const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
