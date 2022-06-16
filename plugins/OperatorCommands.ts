@@ -45,7 +45,9 @@ const commands: TMCommand[] = [
     aliases: ['afu', 'addfromurl'],
     help: 'Add a track from an url.',
     callback: async (info: MessageInfo) => {
-      const [fileName, url] = info.text.split(' ')
+      const s = info.text.split(' ')
+      const fileName = s[0] + '.Challenge.Gbx'
+      const url = s[1]
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
