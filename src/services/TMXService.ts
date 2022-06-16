@@ -1,13 +1,65 @@
 import fetch from 'node-fetch'
 import { ErrorHandler } from '../ErrorHandler.js'
+import { JukeboxService } from './JukeboxService.js'
 
 export abstract class TMXService {
-  
+
+  private static readonly _previous: (TMXTrackInfo | null)[] = []
   private static _current: TMXTrackInfo | null
+  private static readonly _next: (TMXTrackInfo | null)[] = []
   private static readonly prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
+  private static readonly nextSize = 4
+  private static readonly previousSize = 4
+
+  static async initialize(): Promise<void | Error> {
+    const status = await this.fetchTrackInfo('zwAbNlFSDcXjRBk0YSMyxc5kJJ8') // Fetching A12 to test if TMX is working
+    if (status instanceof Error) { return status }
+    const current = await this.fetchTrackInfo(JukeboxService.current.id)
+    this._current = current instanceof Error ? null : current
+    for (let i = 0; i < Math.min(JukeboxService.queue.length, this.nextSize); i++) {
+      const id = JukeboxService.queue[i].id
+      const track = await this.fetchTrackInfo(id)
+      this._next.push(track instanceof Error ? null : track)
+    }
+  }
+
+  static async nextChallenge(): Promise<void | Error> {
+    this._previous.unshift(this._current)
+    this._previous.length = Math.min(this._previous.length, this.previousSize)
+    const next = this._next.shift()
+    if (next === undefined) {
+      ErrorHandler.error(`TMX didn't get prefetched for some reason, this should never happen`)
+      return
+    }
+    this._current = next
+    const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
+    this._next.push(track instanceof Error ? null : track)
+  }
+
+  static async add(id: string, index: number): Promise<void | Error> {
+    if(index >= this.nextSize) {return}
+    const track = await this.fetchTrackInfo(id)
+    this._next.splice(index, 0, track instanceof Error ? null : track)
+    this._next.length = this.nextSize
+  }
+
+  static async remove(index: number) {
+    if(index >= this.nextSize) {return}
+    this._next.splice(index, 1)
+    const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
+    this._next.push(track instanceof Error ? null : track)
+  }
 
   static get current(): TMXTrackInfo | null {
-    return this._current === null ? null : { ...this._current }
+    return this._current
+  }
+
+  static get next(): (TMXTrackInfo | null)[] {
+    return [...this._next]
+  }
+
+  static get previous():  (TMXTrackInfo | null)[]{
+    return [...this._previous]
   }
 
   /**
@@ -80,8 +132,8 @@ export abstract class TMXService {
       return new Error('Cannot fetch track data from TMX')
     }
     const s = data.split('\t')
-    const id = Number(s[0])
-    const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${id}`)
+    const TMXId = Number(s[0])
+    const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`)
     const replaysData = (await replaysRes.text()).split('\r\n')
     replaysData.pop()
     const replays: TMXReplay[] = []
@@ -102,8 +154,9 @@ export abstract class TMXService {
       })
     }
     Object.freeze(replays)
-    this._current = {
-      id,
+    const obj: TMXTrackInfo = {
+      id: trackId,
+      TMXId,
       name: s[1],
       authorId: Number(s[2]),
       author: s[3],
@@ -121,12 +174,12 @@ export abstract class TMXService {
       comment: s[16],
       commentsAmount: Number(s[17]),
       awards: Number(s[18].split('<BR>')[0]),
-      pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${id}`,
-      screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${id}`,
-      thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${id}`,
-      downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${id}`,
+      pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${TMXId}`,
+      screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${TMXId}`,
+      thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${TMXId}`,
+      downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${TMXId}`,
       replays
     }
-    return { ...this._current }
+    return obj
   }
 }
