@@ -92,11 +92,10 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
             if (challenge === undefined) {
                 continue
             }
-            const tmxInfo = TM.TMXInfo
+            const tmxInfo = [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]][i]
             if (tmxInfo === null) {
                 continue
             }
-            const screnshot = tmxInfo.thumbnailUrl
             const recordIndex = TM.records.filter(a => a.challenge === challenge.id).sort((a, b) => a.score - b.score).findIndex(a => a.login === login) + 1
             let recordIndexString
             if (recordIndex === 0) { recordIndexString = "--" }
@@ -116,7 +115,7 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
                     <quad posn="0.9 ${imgPos} 3" sizen="2 2" style="MedalsBig" substyle="${medals[i]}"/>
                     <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(tmxInfo.replays[i].name)}"/>
                     <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(tmxInfo.replays[i].time)}"/>
-                    <label posn="16 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDay()}/${tmxInfo.replays[i].recordDate.getMonth()}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
+                    <label posn="16 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDate()}/${tmxInfo.replays[i].recordDate.getMonth()}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
                     <quad posn="22 ${imgPos + 0.2} 3" sizen="2 2" style="Icons128x128_1" substyle="Save" url="${tmxInfo.replays[i].url.replace(/^https:\/\//, '')}"/>`
                 }
                 replaysXml += `<quad posn="6 -49 3" sizen="3.5 3.5" style="Icons128x128_1" substyle="Save" url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
@@ -130,7 +129,7 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
           <format textsize="1.3" textcolor="FFFF"/>
           <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + titles[i]}"/>
           <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
-          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${TM.safeString(screnshot + `&.jpeg`)}"/>
+          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${TM.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)}"/>
           <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(TM.strip(challenge.name, false))}"/>
           <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.safeString(challenge.author)}"/>
           <quad posn="0.4 -28.2 3" sizen="2 2" style="BgRaceScore2" substyle="ScoreLink"/>

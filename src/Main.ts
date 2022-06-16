@@ -13,6 +13,8 @@ import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
+import { TMXService } from './services/TMXService.js'
+import { JukeboxService } from './services/JukeboxService.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -43,6 +45,7 @@ async function main(): Promise<void> {
   Logger.trace('Fetching challenges...')
   await ChallengeService.initialize()
   Logger.info('Challenge service instantiated')
+  JukeboxService.initialize()
   Logger.trace('Fetching player info...')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
@@ -51,11 +54,17 @@ async function main(): Promise<void> {
   await ChatService.initialize()
   await ChatService.loadLastSessionMessages()
   Logger.info('Chat service instantiated')
-  await Listeners.initialize()
+  Listeners.initialize()
   await RecordService.fetchRecords(ChallengeService.current.id)
   await ServerConfig.update()
+  if (process.env.USE_TMX === 'YES') {
+    Logger.trace('Initializing TMX service...')
+    const status = await TMXService.initialize()
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize TMX service', status.message) }
+    else { Logger.info('TMX service instantiated') }
+  }
   if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to dedimania...')
+    Logger.trace('Connecting to dedimania...') 
     const status = await DedimaniaService.initialize()
     if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
     else { Logger.info('Connected to dedimania') }

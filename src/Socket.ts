@@ -4,7 +4,7 @@ import { Events } from './Events.js'
 import { ErrorHandler } from './ErrorHandler.js'
 
 export class Socket extends net.Socket {
-  
+
   private handshakeHeaderSize: number = 0
   private handshakeHeader: string = ''
   private handshakeStatus: string = ''
@@ -65,7 +65,7 @@ export class Socket extends net.Socket {
     return await new Promise((resolve, reject) => {
       const poll = (): void => {
         const response = this.responses.find(a => a.id === id && a.status === 'completed')
-        if (response!==undefined) {
+        if (response !== undefined) {
           if (response.isError) {
             reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
@@ -103,6 +103,8 @@ export class Socket extends net.Socket {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.response = null
+      this.receivingResponse = false
+      console.log('NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGER')
       this.incompleteHeader = buffer
       return
     }

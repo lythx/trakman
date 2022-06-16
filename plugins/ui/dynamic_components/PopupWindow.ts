@@ -55,7 +55,7 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
 
   constructHeader(login: string): string {
     return `<quad posn="2.5 -${this.titleHeight / 2} 0.04" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="TV"/>
-        <label posn="${(this.windowWidth - 0.8) / 2} -${this.titleHeight / 2} 0.04" sizen="${this.windowWidth} ${this.windowHeight}" halign="center" valign="center" textsize="3" text="$STITLE_HERE_MAN_XD"/>`
+        <label posn="${(this.windowWidth - 0.8) / 2} -${this.titleHeight / 2} 0.04" sizen="${this.windowWidth} ${this.windowHeight}" halign="center" valign="center" textsize="3" text="Bibgo :D"/>`
   }
 
   constructContent(login: string): string {
