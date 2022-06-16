@@ -77,6 +77,10 @@ export abstract class DedimaniaService {
       this.retryGetRecords(id, name, environment, author, isRetry)
       return dedis
     }
+    else if(dedis?.[0]?.Records === undefined) {
+      this.retryGetRecords(id, name, environment, author, isRetry)
+      return new Error(`Failed to fetch records`)
+    }
     for (const d of dedis[0].Records) {
       const record: TMDedi = { login: d.Login, nickName: d.NickName, score: d.Best, checkpoints: d.Checks }
       this._dedis.push(record)

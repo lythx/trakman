@@ -82,7 +82,7 @@ export default class DediRanking extends StaticComponent implements IStaticCompo
          text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p.nickName), false)}"/>`
       // Indicate online players
       if (TM.getPlayer(p.login) !== undefined) { // Amount of records is bigger than max top entries (nullcheck)
-        if (i > CFG.dediRecordsWidget.topCount) { // If this entry is inside the top records dont't add background shade as it would be doubled
+        if (i >= CFG.dediRecordsWidget.topCount) { // If this entry is inside the top records dont't add background shade as it would be doubled
           xml += // Add line indicating player position
             `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
              style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
