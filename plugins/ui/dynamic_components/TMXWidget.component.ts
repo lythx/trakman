@@ -123,9 +123,9 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
                 else {
                     replaysXml += `
                     <quad posn="0.9 ${imgPos} 3" sizen="2 2" style="MedalsBig" substyle="${medals[i]}"/>
-                    <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="N/A"/>
-                    <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="-:--.--"/>
-                    <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" text="--/--/----"/>`
+                    <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}N/A"/>
+                    <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
+                    <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}--/--/----"/>`
                 }
             }
             const image = tmxInfo === null ? `https://cdn.discordapp.com/attachments/793464821030322196/986680709538267227/build2.dds` : TM.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
