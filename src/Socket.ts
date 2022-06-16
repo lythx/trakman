@@ -104,7 +104,6 @@ export class Socket extends net.Socket {
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.response = null
       this.receivingResponse = false
-      console.log('NIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGERNIGGER')
       this.incompleteHeader = buffer
       return
     }
