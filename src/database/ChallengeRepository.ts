@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS challenges(
   copperprice INT4 NOT NULL,
   laprace BOOLEAN NOT NULL,
   lapsamount INT2 NOT NULL,
-  checkpointsamount INT2 NOT NULL
+  checkpointsamount INT2 NOT NULL,
+  adddate TIMESTAMP NOT NUll
 );
 `
 
@@ -27,14 +28,14 @@ export class ChallengeRepository extends Repository {
 
   async add(...objects: TMChallenge[]): Promise<any> {
     if (objects.length === 0) { return }
-    let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount) VALUES'
+    let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
     const values = []
     let i = 1
     for (const c of objects) {
       query += '($' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
         ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
-        ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + '),'
-      values.push(c.id, c.name, c.fileName, c.author, c.environment, c.mood, c.bronzeTime, c.silverTime, c.goldTime, c.authorTime, c.copperPrice, c.lapRace, c.lapsAmount, c.checkpointsAmount)
+        ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + '),'
+      values.push(c.id, c.name, c.fileName, c.author, c.environment, c.mood, c.bronzeTime, c.silverTime, c.goldTime, c.authorTime, c.copperPrice, c.lapRace, c.lapsAmount, c.checkpointsAmount, c.addDate)
     }
     query = query.slice(0, -1) + ';'
     await this.db.query(query, values)
@@ -44,4 +45,10 @@ export class ChallengeRepository extends Repository {
     const query = 'SELECT * FROM challenges;'
     return (await this.db.query(query)).rows
   }
+
+  async get(id: string): Promise<any[]> {
+    const query = 'SELECT * FROM challenges WHERE id=$1;'
+    return (await this.db.query(query, [id])).rows
+  }
+
 }

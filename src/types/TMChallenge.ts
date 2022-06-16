@@ -13,4 +13,5 @@ interface TMChallenge {
   readonly lapRace: boolean
   readonly lapsAmount: number
   readonly checkpointsAmount: number
+  readonly addDate: Date
 }
