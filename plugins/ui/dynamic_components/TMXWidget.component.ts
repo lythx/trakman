@@ -11,7 +11,6 @@ interface PlayerPage {
 export default class TMXWidget extends PopupWindow implements IPopupWindow {
 
     readonly itemCount = 3
-    private readonly challengeActionIds: string[] = []
     private readonly playerPages: PlayerPage[] = []
 
     constructor(openId: number, closeId: number) {
@@ -20,65 +19,25 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
 
     initialize(): void {
         TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
-            //   if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
-            //     const challengeId = this.challengeActionIds[info.answer - (this.id + 1000)]
-            //     if (challengeId === undefined) {
-            //       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
-            //       TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${info.answer} in memory`)
-            //       return
-            //     }
-            //     const challenge = TM.challenges.find(a => a.id === challengeId)
-            //     if (challenge === undefined) {
-            //       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
-            //       TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
-            //       return
-            //     }
-            //     if (TM.challengeQueue.some(a => a.id === challengeId)) {
-            //       TM.removeFromQueue(challengeId)
-            //       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
-            //         + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
-            //     }
-            //     else {
-            //       TM.addToJukebox(challengeId)
-            //       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
-            //         + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
-            //     }
-            //     this.displayToPlayer(info.login)
-            //   }
-            //   else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
-            //     const playerPage = this.playerPages.find(a => a.login === info.login)
-            //     if (playerPage === undefined) {
-            //       TM.error(`Can't find player ${info.login} in memory`)
-            //       return
-            //     }
-            //     switch (info.answer) {
-            //       case this.id + 1:
-            //         playerPage.page = 1
-            //         break
-            //       case this.id + 2:
-            //         playerPage.page -= 10
-            //         if (playerPage.page < 1) { playerPage.page = 1 }
-            //         break
-            //       case this.id + 3:
-            //         playerPage.page--
-            //         break
-            //       case this.id + 4:
-            //         playerPage.page++
-            //         break
-            //       case this.id + 5: {
-            //         const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
-            //         playerPage.page += 10
-            //         if (playerPage.page > lastPage) {
-            //           playerPage.page = lastPage
-            //         }
-            //         break
-            //       } case this.id + 6:
-            //         const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
-            //         playerPage.page = lastPage
-            //         break
-            //     }
-            //     this.displayToPlayer(info.login)
-            //   }
+            if (info.answer >= this.id + 1 && info.answer <= this.id + 2) {
+                const playerPage = this.playerPages.find(a => a.login === info.login)
+                if (playerPage === undefined) {
+                    TM.error(`Can't find player ${info.login} in memory`)
+                    return
+                }
+                switch (info.answer) {
+                    case this.id + 1:
+                        playerPage.page--
+                        if (playerPage.page < 0) { playerPage.page = 0 }
+                        else if (TM.previousChallenges[1] === undefined && playerPage.page < 1) { playerPage.page = 1 }
+                        break
+                    case this.id + 2:
+                        playerPage.page++
+                        if (playerPage.page > 2) { playerPage.page = 2 }
+                        break
+                }
+                this.displayToPlayer(info.login)
+            }
         })
     }
 
@@ -87,12 +46,26 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
         challenges.sort((a, b) => a.author.localeCompare(b.author))
         let xml = ''
         const titles = [CFG.challengeWidget.titles.lastTrack, CFG.challengeWidget.titles.currTrack, CFG.challengeWidget.titles.nextTrack]
+        let page = 1
+        const playerPage = this.playerPages.find(a => a.login === login)
+        if (playerPage !== undefined) { page = playerPage.page }
+        else { this.playerPages.push({ login, page: 1 }) }
+        const pages = [
+            [TM.previousChallenges[3], TM.previousChallenges[2], TM.previousChallenges[1]],
+            [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]],
+            [TM.challengeQueue[1], TM.challengeQueue[2], TM.challengeQueue[3]]
+        ]
+        const TMXPages = [
+            [TM.TMXPrevious[3], TM.TMXPrevious[2], TM.TMXPrevious[1]],
+            [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]],
+            [TM.TMXNext[1], TM.TMXNext[2], TM.TMXNext[3]]
+        ]
         for (let i = 0; i < 3; i++) {
-            const challenge = [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]][i]
+            const challenge = pages[page][i]
             if (challenge === undefined) {
                 continue
             }
-            const tmxInfo = [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]][i]
+            const tmxInfo = TMXPages[page][i]
             let tmxXml = ''
             if (tmxInfo !== null) {
                 let lbRating: string = tmxInfo.leaderboardRating.toString()
@@ -184,6 +157,41 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
           ${tmxXml}
           ${replaysXml}
         </frame>`
+        }
+        return xml
+    }
+
+    constructFooter(login: string): string {
+        let xml = ''
+        const playerPage = this.playerPages.find(a => a.login === login)
+        if (playerPage === undefined) {
+            TM.error(`Can't find player ${login} in the memory`)
+            return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+          imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+          image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
+        }
+        if (playerPage.page !== 0 && (TM.previousChallenges[1] !== undefined || playerPage.page === 2)) {
+            xml += `
+          <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" 
+          imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552527298601/prevek8.png"
+          image="https://cdn.discordapp.com/attachments/599381118633902080/986427882190553088/prevek8w.png"/>`
+        }
+        else {
+            xml += `
+          <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+        }
+        xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+        imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+        image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
+        if (playerPage.page !== 2) {
+            xml += `
+           <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" 
+           imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
+           image="https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png"/>`
+        }
+        else {
+            xml += `
+          <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
         }
         return xml
     }
