@@ -82,13 +82,13 @@ export class Response {
   * @returns {Buffer} next response buffer
   */
   extractOverload(): Buffer {
+    this._status = 'completed'
     if (this._overload == null) {
       ErrorHandler.error('Error in extractOverload()', 'Overload is null')
       return Buffer.from('')
     }
     const overload = this._overload
     this._overload = null
-    this._status = 'completed'
     return overload
   }
 

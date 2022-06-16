@@ -2,7 +2,7 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const commands: TMCommand[] = [
   {
-    aliases: ['addallfromdb'],
+    aliases: ['fetchallfromdb'],
     help: 'Adds all the maps present in database if they are on TMX based on id',
     callback: async (info: MessageInfo) => {
       const res = await TM.queryDB('SELECT * FROM challenges;')
@@ -33,6 +33,31 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
           + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
           + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from TMX.`)
+      }
+    },
+    privilege: 4
+  },
+  {
+    aliases: ['addallfromdb'],
+    help: 'Adds all the maps present in database if they are on server based on filename.',
+    callback: async (info: MessageInfo) => {
+      const res = await TM.queryDB('SELECT * FROM challenges;')
+      if (res instanceof Error) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get challenges from the database.`, info.login)
+        return
+      }
+      for (const challenge of res) {
+        if (TM.challenges.some(a => a.id === challenge.id))
+          continue
+        const insert = await TM.call('InsertChallenge', [{ string: challenge.filename }])
+        if (insert instanceof Error) {
+          TM.error('Failed to insert challenge to jukebox', insert.message)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
+          continue
+        }
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
+          + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from server files.`)
       }
     },
     privilege: 4
