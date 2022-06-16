@@ -30,8 +30,8 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
           TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${challengeId} in memory`)
           return
         }
-        if (TM.challengeQueue.some(a => a.id === challengeId)) {
-          TM.removeFromQueue(challengeId)
+        if (TM.jukebox.some(a => a.id === challengeId)) {
+          TM.removeFromJukebox(challengeId)
           TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)} `
             + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
         }
@@ -58,11 +58,16 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
             break
           case this.id + 3:
             playerPage.page--
+            if (playerPage.page < 1) { playerPage.page = 1 }
             break
-          case this.id + 4:
+          case this.id + 4: {
+            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
             playerPage.page++
+            if (playerPage.page > lastPage) {
+              playerPage.page = lastPage
+            }
             break
-          case this.id + 5: {
+          } case this.id + 5: {
             const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
             playerPage.page += 10
             if (playerPage.page > lastPage) {
@@ -85,11 +90,9 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
     if (playerPage === undefined) {
       this.playerPages.push({ login, page: 1 })
       page = 1
-    }
-    else {
-      page = playerPage.page
-    }
-    const challenges = TM.challenges
+    } else { page = playerPage.page }
+    const challenges = [...TM.challenges]
+    challenges.sort((a, b) => a.name.localeCompare(b.name))
     challenges.sort((a, b) => a.author.localeCompare(b.author))
     let xml = ''
     let n = (this.gridHeight * this.gridWidth) * (page - 1)

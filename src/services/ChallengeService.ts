@@ -1,8 +1,6 @@
 import { Client } from '../Client.js'
 import { ChallengeRepository } from '../database/ChallengeRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
-import { TMXService } from './TMXService.js'
-import { JukeboxService } from './JukeboxService.js'
 
 export class ChallengeService {
   private static _current: TMChallenge
@@ -14,7 +12,6 @@ export class ChallengeService {
     await this.repo.initialize()
     await this.initializeList()
     await this.setCurrent()
-    JukeboxService.initialize()
   }
 
   static get current(): TMChallenge {
@@ -50,10 +47,6 @@ export class ChallengeService {
       lapRace: info.LapRace,
       lapsAmount: info.NbLaps,
       checkpointsAmount: info.NbCheckpoints
-    }
-    if (process.env.USE_TMX === 'YES') {
-      await TMXService.fetchTrackInfo(ChallengeService.current.id)
-        .catch((err: Error) => ErrorHandler.error(err.message, 'Either TMX is down or map is not on TMX'))
     }
   }
 
@@ -131,7 +124,7 @@ export class ChallengeService {
     const res = await Client.call('GetChallengeInfo', [{ string: fileName }])
     if (res instanceof Error) { return res }
     const info = res[0]
-    const obj = {
+    const obj: TMChallenge = {
       id: info.UId,
       name: info.Name,
       fileName: info.FileName,

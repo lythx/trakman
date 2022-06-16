@@ -344,6 +344,18 @@ export const TRAKMAN = {
     return JukeboxService.previous
   },
 
+  get TMXPrevious(): (TMXTrackInfo | null)[] {
+    return TMXService.previous
+  },
+
+  get TMXCurrent(): TMXTrackInfo | null {
+    return TMXService.current
+  },
+
+  get TMXNext(): (TMXTrackInfo | null)[] {
+    return TMXService.next
+  },
+
   setPrivilege(login: string, privilege: number) {
     PlayerService.setPrivilege(login, privilege)
   },
@@ -352,7 +364,7 @@ export const TRAKMAN = {
     JukeboxService.add(challengeId)
   },
 
-  removeFromQueue(challengeId: string) {
+  removeFromJukebox(challengeId: string) {
     JukeboxService.remove(challengeId)
   },
 

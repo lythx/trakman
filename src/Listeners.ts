@@ -10,6 +10,7 @@ import { ChallengeService } from './services/ChallengeService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { ServerConfig } from './ServerConfig.js'
+import { TMXService } from './services/TMXService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -56,7 +57,7 @@ export class Listeners {
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        PlayerService.addCP(params[1], checkpoint)
+        PlayerService.addCP(params[1], checkpoint) // FIX CP EVENT BEING EMITTED ON FINISH // or not? idk
         const temp: any = PlayerService.getPlayer(params[1])
         temp.time = params[2]
         temp.lap = params[3]
@@ -77,7 +78,7 @@ export class Listeners {
           // PlayerService.getPlayer(params[1]).checkpoints.length = 0
           return
         }
-        const status = await Client.call('GetStatus')
+        const status = await Client.call('GetStatus') // seems kinda useless innit
         if (status instanceof Error) {
           ErrorHandler.error('Failed to get game status', status.message)
           return
@@ -138,33 +139,16 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.records
         }
-        JukeboxService.update()
+        JukeboxService.nextChallenge()
+        if (process.env.USE_TMX === 'YES') {
+          await TMXService.nextChallenge()
+        }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
-        if (process.env.USE_DEDIMANIA === 'YES') {  await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)}
+        if (process.env.USE_DEDIMANIA === 'YES') { await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author) }
       }
     },
     {
-      // interface EndChallengeInfo {
-      // readonly id: string
-      // readonly name: string
-      // readonly author: string
-      // readonly environment: string
-      // readonly mood: string
-      // readonly bronzeTime: number
-      // readonly silverTime: number
-      // readonly goldTime: number
-      // readonly authorTime: number
-      // readonly copperPrice: number
-      // readonly lapRace: boolean
-      // readonly lapsAmount: number
-      // readonly checkpointsAmount: number
-      // readonly records: TMRecord[]
-      // readonly isRestarted: boolean
-      // readonly wasWarmUp: boolean
-      // readonly continuesOnNextChallenge: boolean
-      // }
-
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]) => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
@@ -265,7 +249,7 @@ export class Listeners {
     }
   ]
 
-  static async initialize(): Promise<void> {
+  static  initialize(): void {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }

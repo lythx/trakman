@@ -1,5 +1,6 @@
 interface TMXTrackInfo {
-  readonly id: number
+  readonly id: string
+  readonly TMXId: number
   readonly name: string
   readonly authorId: number
   readonly author: string

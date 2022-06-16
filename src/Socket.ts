@@ -4,6 +4,7 @@ import { Events } from './Events.js'
 import { ErrorHandler } from './ErrorHandler.js'
 
 export class Socket extends net.Socket {
+
   private handshakeHeaderSize: number = 0
   private handshakeHeader: string = ''
   private handshakeStatus: string = ''
@@ -63,12 +64,8 @@ export class Socket extends net.Socket {
     const startTimestamp = Date.now()
     return await new Promise((resolve, reject) => {
       const poll = (): void => {
-        if (this.responses.some(a => a.id === id && a.status === 'completed')) {
-          const response = this.responses.find(a => a.id === id && a.status === 'completed')
-          if (response === undefined) {
-            reject(new Error('Response id: ' + id.toString() + ' not found in responses list.'))
-            return
-          }
+        const response = this.responses.find(a => a.id === id && a.status === 'completed')
+        if (response !== undefined) {
           if (response.isError) {
             reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
@@ -105,10 +102,12 @@ export class Socket extends net.Socket {
   private handleResponseStart(buffer: Buffer): void {
     this.responses.length = Math.min(this.responses.length, 20)
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
+      this.response = null
+      this.receivingResponse = false
       this.incompleteHeader = buffer
       return
     }
-    if (this.incompleteHeader != null) { // concating header if it got split
+    if (this.incompleteHeader !== null) { // concating header if it got split
       buffer = Buffer.concat([this.incompleteHeader, buffer])
       this.incompleteHeader = null
     }
@@ -119,17 +118,10 @@ export class Socket extends net.Socket {
 
   // add new buffer to response object
   private handleResponseChunk(buffer: Buffer): void {
-    if (this.response === null) {
-      ErrorHandler.error('Response non-existant while calling handleResponseChunk.', 'This method should not have been called.')
-      return
-    }
+    if (this.response === null) { return }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer = this.response.extractOverload()
-      if (nextResponseBuffer == null) {
-        ErrorHandler.error('Next response buffer is null.', '')
-        return
-      }
       if (this.response.isEvent) {
         Events.emitEvent(this.response.eventName, this.response.json)
       } else {
