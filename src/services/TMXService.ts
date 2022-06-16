@@ -170,6 +170,8 @@ export abstract class TMXService {
       length: s[12],
       difficulty: s[13],
       leaderboardRating: Number(s[14]),
+      isClassic: Number(s[14]) === 0,
+      isNadeo: Number(s[14]) === 50000,
       game: s[15],
       comment: s[16],
       commentsAmount: Number(s[17]),
