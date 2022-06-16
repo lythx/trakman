@@ -22,5 +22,7 @@ interface TMXTrackInfo {
   readonly screenshotUrl: string
   readonly thumbnailUrl: string
   readonly downloadUrl: string
+  readonly isClassic: boolean
+  readonly isNadeo: boolean
   readonly replays: TMXReplay[]
 }

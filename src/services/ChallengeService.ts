@@ -32,6 +32,7 @@ export class ChallengeService {
       return
     }
     const info = res[0]
+    const dbinfo = await this.repo.get(info.UId)
     this._current = {
       id: info.UId,
       name: info.Name,
@@ -46,7 +47,8 @@ export class ChallengeService {
       copperPrice: info.CopperPrice,
       lapRace: info.LapRace,
       lapsAmount: info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints
+      checkpointsAmount: info.NbCheckpoints,
+      addDate: dbinfo[0].adddate
     }
   }
 
@@ -86,7 +88,8 @@ export class ChallengeService {
         copperPrice: info.CopperPrice,
         lapRace: info.LapRace,
         lapsAmount: info.NbLaps,
-        checkpointsAmount: info.NbCheckpoints
+        checkpointsAmount: info.NbCheckpoints,
+        addDate: new Date()
       }
       challengesNotInDBInfo.push(obj)
     }
@@ -107,7 +110,8 @@ export class ChallengeService {
         copperPrice: c.copperprice,
         lapRace: c.laprace,
         lapsAmount: c.lapsamount,
-        checkpointsAmount: c.checkpointsamount
+        checkpointsAmount: c.checkpointsamount,
+        addDate: new Date(c.adddate)
       }
       challengesInDBInfo.push(info)
     }
@@ -138,7 +142,8 @@ export class ChallengeService {
       copperPrice: info.CopperPrice,
       lapRace: info.LapRace,
       lapsAmount: info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints
+      checkpointsAmount: info.NbCheckpoints,
+      addDate: new Date()
     }
     this._challenges.push(obj)
     return obj
