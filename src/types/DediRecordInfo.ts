@@ -14,4 +14,8 @@ interface DediRecordInfo {
     readonly position: number
     readonly previousPosition: number
     readonly previousScore: number
+    readonly playerId: number
+    readonly ip: string
+    readonly region: string
+    readonly isUnited: boolean
 }

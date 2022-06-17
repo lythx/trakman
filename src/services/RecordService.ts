@@ -44,7 +44,7 @@ export class RecordService {
         privilege: player.privilege,
         timePlayed: player.timePlayed,
         wins: player.wins,
-        visits: player.visits
+        visits: player.visits,
       }
       this._localRecords.push(localRecord)
     }
@@ -73,6 +73,9 @@ export class RecordService {
   static async add(challenge: string, login: string, score: number): Promise<void> {
     const date = new Date()
     const player = PlayerService.getPlayer(login)
+    if (player === undefined) {
+      return
+    }
     const cpsPerLap = ChallengeService.current.checkpointsAmount
     let laps
     if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
@@ -120,7 +123,11 @@ export class RecordService {
         visits: player.visits,
         position,
         previousScore: -1,
-        previousPosition: -1
+        previousPosition: -1,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
@@ -163,7 +170,11 @@ export class RecordService {
         visits: player.visits,
         position: previousPosition,
         previousScore: score,
-        previousPosition
+        previousPosition,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       return
@@ -190,7 +201,11 @@ export class RecordService {
         visits: player.visits,
         position,
         previousPosition: this._localRecords.findIndex(a => a.login === login) + 1,
-        previousScore
+        previousScore,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       this._records = this._records.filter(a => !(a.login == login && a.challenge === challenge))
       this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
@@ -242,7 +257,11 @@ export class RecordService {
         visits: player.visits,
         position,
         previousScore: -1,
-        previousPosition: -1
+        previousPosition: -1,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       this._liveRecords.splice(position - 1, 0, {
         login,
@@ -256,7 +275,11 @@ export class RecordService {
         privilege: player.privilege,
         challenge,
         nation: player.nation,
-        nationCode: player.nationCode
+        nationCode: player.nationCode,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       })
       Events.emitEvent('Controller.LiveRecord', recordInfo)
       return
@@ -279,7 +302,11 @@ export class RecordService {
         visits: player.visits,
         position: previousPosition,
         previousScore: score,
-        previousPosition
+        previousPosition,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       Events.emitEvent('Controller.LiveRecord', recordInfo)
       return
@@ -306,7 +333,11 @@ export class RecordService {
         visits: player.visits,
         position,
         previousPosition: this._liveRecords.findIndex(a => a.login === login) + 1,
-        previousScore
+        previousScore,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       }
       this._liveRecords = this._liveRecords.filter(a => a.login !== login)
       this._liveRecords.splice(position - 1, 0, {
@@ -321,7 +352,11 @@ export class RecordService {
         privilege: player.privilege,
         challenge,
         nation: player.nation,
-        nationCode: player.nationCode
+        nationCode: player.nationCode,
+        playerId: player.playerId,
+        ip: player.ip,
+        region: player.region,
+        isUnited: player.isUnited
       })
       Events.emitEvent('Controller.LiveRecord', recordInfo)
     }

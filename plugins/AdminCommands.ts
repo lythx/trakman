@@ -54,23 +54,30 @@ const commands: TMCommand[] = [
   {
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
+    params: [{ name: 'login' }, { name: 'reason', optional: true }, { name: 'duration', optional: true }],
     callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+      const [login, reason, durationParam] = info.text.split(' ')
+      const targetInfo = TM.getPlayer(login)
+      const duration = durationParam === undefined ? null : TM.parseParamTime(durationParam)
+      const expireDate = duration === null ? undefined : new Date(Date.now() + duration)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
       }
+      TM.addToBanlist(targetInfo.ip, targetInfo.login, info.login, reason, expireDate)
+      const reasonString = reason === undefined ? '' : ` Reason: ${TM.palette.highlight}${reason}.`
+      const durationString = duration === null ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has banned `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
         }]
       },
         {
-          method: 'Ban',
-          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
+          method: 'Kick',
+          params: [{ string: targetInfo.login }, { string: reason === undefined ? 'No reason specified' : `Reason: ${reason}` }]
         })
     },
     privilege: 2
@@ -78,29 +85,27 @@ const commands: TMCommand[] = [
   {
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
+    params: [{ name: 'login' }],
     callback: async (info: MessageInfo) => {
-      // TODO: implement an internal ban list or something
-      // So that this returns if you attempt to unban somebody who's not banned
-      let targetInfo = TM.getPlayer(info.login)
+      const login = info.text
+      if (TM.banlist.some(a => a.login === login) === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not banned.`, info.login)
+        return
+      }
+      let targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(info.login)
+        targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
           return
         }
       }
-      TM.multiCallNoRes({
-        method: 'ChatSendServerMessage',
-        params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
-        }]
-      },
-        {
-          method: 'UnBan',
-          params: [{ string: targetInfo.login }]
-        })
+      TM.removeFromBanlist(targetInfo.login)
+      TM.sendMessage('ChatSendServerMessage',
+        `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+      )
     },
     privilege: 2
   },
@@ -113,6 +118,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
         return
       }
+      TM.addToBlacklist(info.text, info.login)
       await TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
@@ -125,8 +131,6 @@ const commands: TMCommand[] = [
           method: 'Kick', // Kick the player first, so that we don't have to execute BanAndBlackList method
           params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
         })
-      await new Promise((r) => setTimeout(r, 5)) // Timeout to ensure BlackList gets called after Kick
-      TM.callNoRes('BlackList', [{ string: targetInfo.login }])
     },
     privilege: 2
   },
