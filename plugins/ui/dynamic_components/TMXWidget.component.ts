@@ -65,14 +65,12 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
       [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]],
       [TM.TMXNext[1], TM.TMXNext[2], TM.TMXNext[3]]
     ]
-    const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
-    const pageCount = prevCount + 1 + nextCount
-    for (let i = 0; i < pageCount; i++) {
+    for (let i = 0; i < this.itemsPerPage; i++) {
       const challenge = pages[page - prevCount][i]
       if (challenge === undefined) { continue }
       const tmxInfo = TMXPages[page - prevCount][i]
       const tmxXml = this.getTMXXml(tmxInfo)
-      const positionString = this.getPositionString( login,challenge.id)
+      const positionString = this.getPositionString(login, challenge.id)
       const replaysXml = this.getReplaysXml(tmxInfo)
       const image = tmxInfo === null
         ? `https://cdn.discordapp.com/attachments/506852548938956800/987212401755713597/map_no_image.png`

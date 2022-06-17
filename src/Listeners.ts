@@ -139,9 +139,11 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.records
         }
+        const lastId = JukeboxService.current.id
         JukeboxService.nextChallenge()
         if (process.env.USE_TMX === 'YES') {
-          await TMXService.nextChallenge()
+          if (lastId === JukeboxService.current.id) { TMXService.restartChallenge() }
+          else { await TMXService.nextChallenge() }
         }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
@@ -249,7 +251,7 @@ export class Listeners {
     }
   ]
 
-  static  initialize(): void {
+  static initialize(): void {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
