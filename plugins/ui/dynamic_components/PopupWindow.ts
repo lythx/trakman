@@ -30,7 +30,7 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
   }
 
   private constructFrame(): string[] {
-    return [ // TODO window frame code. The first element in array is very top of manialink, 2nd is bottom
+    return [ 
       `<manialink id="${this.id}">
         <frame posn="-${this.windowWidth / 2} ${this.windowHeight / 2} 10">
           <quad posn="0 0 0.02" sizen="${this.windowWidth} ${this.windowHeight}" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>

@@ -2,6 +2,7 @@ import PopupWindow from "./PopupWindow.js";
 import IPopupWindow from "./PopupWindow.interface.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
 import CFG from '../UIConfig.json' assert { type: 'json' }
+import Paginator from '../Paginator.js'
 
 interface PlayerPage {
   readonly login: string
@@ -12,10 +13,13 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
 
   readonly gridWidth = 5
   readonly gridHeight = 4
+  private readonly paginator: Paginator
   private readonly challengeActionIds: string[] = []
   private readonly playerPages: PlayerPage[] = []
 
-  initialize(): void {
+  constructor(openId: number, closeId: number) {
+    super(openId, closeId)
+    this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth)))
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
         const challengeId = this.challengeActionIds[info.answer - (this.id + 1000)]
@@ -48,37 +52,8 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
           TM.error(`Can't find player ${info.login} in memory`)
           return
         }
-        switch (info.answer) {
-          case this.id + 1:
-            playerPage.page = 1
-            break
-          case this.id + 2:
-            playerPage.page -= 10
-            if (playerPage.page < 1) { playerPage.page = 1 }
-            break
-          case this.id + 3:
-            playerPage.page--
-            if (playerPage.page < 1) { playerPage.page = 1 }
-            break
-          case this.id + 4: {
-            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
-            playerPage.page++
-            if (playerPage.page > lastPage) {
-              playerPage.page = lastPage
-            }
-            break
-          } case this.id + 5: {
-            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
-            playerPage.page += 10
-            if (playerPage.page > lastPage) {
-              playerPage.page = lastPage
-            }
-            break
-          } case this.id + 6:
-            const lastPage = Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))
-            playerPage.page = lastPage
-            break
-        }
+        const page = this.paginator.getPageFromClick(info.answer, playerPage.page)
+        playerPage.page = page
         this.displayToPlayer(info.login)
       }
     })
@@ -142,7 +117,6 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
   }
 
   constructFooter(login: string): string {
-    let xml = ''
     const playerPage = this.playerPages.find(a => a.login === login)
     if (playerPage === undefined) {
       TM.error(`Can't find player ${login} in the memory`)
@@ -150,45 +124,6 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
       image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     }
-    if (playerPage.page !== 1) {
-      xml += `
-      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551449370634/firstek8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881192296448/firstek8w.png"/>
-      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551835250738/jumpekbw8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881590779934/jumpekbw8w.png"/>
-      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 3}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552527298601/prevek8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427882190553088/prevek8w.png"/>`
-    }
-    else {
-      xml += `
-      <quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
-      <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
-      <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
-    }
-    xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-    imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
-    image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
-    if (playerPage.page !== Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth))) {
-      xml += `
-       <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 4}" 
-       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
-       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png"/>
-       <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" 
-       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551654887514/jumpek8.png"
-       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881402019941/jumpek8w.png"/>
-       <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" 
-       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552019816489/lastek8.png"
-       image="https://cdn.discordapp.com/attachments/599381118633902080/986427881792086046/lastek8w.png"/>`
-    }
-    else {
-      xml += `
-      <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
-      <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
-      <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
-    }
-    return xml
+    return this.paginator.constructXml(playerPage.page)
   }
 } 
