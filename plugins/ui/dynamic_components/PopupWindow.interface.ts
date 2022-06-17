@@ -3,9 +3,10 @@ export default interface IPopupWindow {
     readonly openId: number
     readonly closeId: number
     readonly displayedToPlayers: string[]
-    displayToPlayer(login: string): void
-    closeToPlayer(login: string): void
-    constructHeader(login: string): string
-    constructContent(login: string): string
-    constructFooter(login: string): string
+    setupListeners():void
+    displayToPlayer(login: string, page:number): void
+    closeToPlayer(login: string, page:number): void
+    constructHeader(login: string, page:number): string
+    constructContent(login: string, page:number): string
+    constructFooter(login: string, page:number): string
 }

@@ -6,8 +6,6 @@ export default class Paginator {
   private pageCount: number
 
   constructor(id: number, closeId: number, pageCount: number) {
-    console.log(id)
-    console.log(pageCount)
     this.id = id
     this.closeId = closeId
     this.pageCount = pageCount
