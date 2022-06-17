@@ -77,9 +77,8 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
         if (challenges[n] === undefined) { break }
         const recordIndex = TM.records.filter(a => a.challenge === challenges[n].id).sort((a, b) => a.score - b.score).findIndex(a => a.login === login) + 1
         let recordIndexString
-        if (recordIndex === 0) { recordIndexString = "--" }
-        else if (recordIndex.toString().length === 1) { recordIndexString = `0${recordIndex}` }
-        else { recordIndexString = recordIndex.toString() }
+        if (recordIndex === 0) { recordIndexString = "--." }
+        else { recordIndexString = TM.Utils.getPositionString(recordIndex) }
         let actionId: number
         const challengeActionId = this.challengeActionIds.indexOf(challenges[n].id)
         if (challengeActionId !== -1) { actionId = challengeActionId + this.id + 1000 }
@@ -88,11 +87,13 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
           this.challengeActionIds.push(challenges[n].id)
         }
         const header = TM.jukebox.some(a => a.id === challenges[n].id) ?
-          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
-          imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>
+          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}"
+           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
+           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>
           <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="Bgs1InRace" substyle="BgListLine"/>` :
-          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" image="http://maniacdn.net/undef.de/uaseco/blank.png" 
-          imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260547911740/plusek8.png"/>
+          `<quad posn="0 0 4" sizen="14.5 10" action="${actionId}" 
+           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
+           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260547911740/plusek8.png"/>
           <quad posn="0.4 -0.36 2" sizen="13.7 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>`
         xml += `
           <frame posn="${j * 15.75} ${-i * 10.9} 0.02">
@@ -107,7 +108,7 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
             <quad posn="0.4 -7.6 3" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
             <label posn="2.1 -7.9 3" sizen="4.4 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenges[n].authorTime)}"/>
             <quad posn="5.7 -7.5 3" sizen="1.9 1.9" style="BgRaceScore2" substyle="LadderRank"/>
-            <label posn="7.5 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}."/>
+            <label posn="7.5 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + recordIndexString}"/>
             <quad posn="10.2 -7.4 3" sizen="1.9 1.9" style="Icons64x64_1" substyle="StateFavourite"/>
             <label posn="12.1 -7.9 3" sizen="3 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes}100"/>
           </frame>`
@@ -120,9 +121,9 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
     const playerPage = this.playerPages.find(a => a.login === login)
     if (playerPage === undefined) {
       TM.error(`Can't find player ${login} in the memory`)
-      return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
+      return `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+              imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+              image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     }
     return this.paginator.constructXml(playerPage.page)
   }
