@@ -16,6 +16,7 @@ import { JukeboxService } from './services/JukeboxService.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
+import { AdministrationService } from './services/AdministrationService.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -171,8 +172,8 @@ export const TRAKMAN = {
   },
 
   /**
-     * Returns an object containing information about specified player or undefined if player is not on the server
-     */
+    * Returns an object containing information about specified player or undefined if player is not on the server
+    */
   getPlayer(login: string): TMPlayer | undefined {
     return PlayerService.players.find(a => a.login === login)
   },
@@ -390,5 +391,65 @@ export const TRAKMAN = {
       return response
     }
     return await response.json()
+  },
+
+  banlist: AdministrationService.banlist,
+
+  addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
+  },
+
+  removeFromBanlist: (login: string): void => {
+    AdministrationService.removeFromBanlist(login)
+  },
+
+  blacklist: AdministrationService.blacklist,
+
+  addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
+  },
+
+  removeFromBlacklist: (login: string): void => {
+    AdministrationService.removeFromBlacklist(login)
+  },
+
+  mutelist: AdministrationService.mutelist,
+
+  addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
+  },
+
+  removeFromMutelist: (login: string): void => {
+    AdministrationService.removeFromMutelist(login)
+  },
+
+  guestlist: AdministrationService.guestlist,
+
+  addToGuestlist: (login: string, callerLogin: string): void => {
+    AdministrationService.addToGuestlist(login, callerLogin)
+  },
+
+  removeFromGuestlist: (login: string): void => {
+    AdministrationService.removeFromGuestlist(login)
+  },
+
+  parseParamTime: (timeString: string): number | null => {
+    if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes
+    const unit = timeString.substring(timeString.length - 1).toLowerCase()
+    const time = Number(timeString.substring(0, timeString.length - 1))
+    if (isNaN(time)) { return null }
+    switch (unit) {
+      case 's':
+        return time * 1000
+      case 'm':
+        return time * 1000 * 60
+      case 'h':
+        return time * 1000 * 60 * 60
+      case 'd':
+        return time * 1000 * 60 * 60 * 24
+      default:
+        return null
+    }
   }
+
 }

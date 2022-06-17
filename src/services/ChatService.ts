@@ -39,7 +39,11 @@ export abstract class ChatService {
         timePlayed: info.timePlayed,
         joinTimestamp: info.joinTimestamp,
         privilege: info.privilege,
-        isSpectator: info.isSpectator
+        isSpectator: info.isSpectator,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       command.callback(messageInfo)
     })
@@ -79,7 +83,11 @@ export abstract class ChatService {
       timePlayed: player.timePlayed,
       joinTimestamp: player.joinTimestamp,
       privilege: player.privilege,
-      isSpectator: player.isSpectator
+      isSpectator: player.isSpectator,
+      playerId: player.playerId,
+      ip: player.ip,
+      region: player.region,
+      isUnited: player.isUnited
     }
     Events.emitEvent('Controller.PlayerChat', messageInfo)
     this.messages.length = Math.min(messagesArraySize, this.messages.length)

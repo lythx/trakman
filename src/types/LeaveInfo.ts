@@ -9,4 +9,8 @@ interface LeaveInfo {
   readonly wins: number
   readonly privilege: number
   readonly visits: number
+  readonly playerId: number
+  readonly ip: string
+  readonly region: string
+  readonly isUnited: boolean
 }

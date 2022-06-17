@@ -153,7 +153,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position,
         previousScore: -1,
-        previousPosition: -1
+        previousPosition: -1,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
@@ -177,7 +181,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position: previousPosition,
         previousScore: info.score,
-        previousPosition
+        previousPosition,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
@@ -203,7 +211,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position,
         previousScore,
-        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1
+        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       this._dedis = this._dedis.filter(a => a.login !== info.login)
       this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
