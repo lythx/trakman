@@ -23,14 +23,18 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
     if (contentHeight !== undefined) { this.windowHeight = contentHeight + (2 * this.titleHeight) + 1.7 }
     if (contentWidth !== undefined) { this.windowWidth = contentWidth + 1.6; }
     [this.frameTop, this.frameTopMid, this.frameMidBottom, this.frameBottom] = this.constructFrame()
+    this.setupListeners()
+  }
+
+  setupListeners() {
     Events.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
-      if (Number(info.answer) === this.openId) { this.displayToPlayer(info.login) }
-      else if (Number(info.answer) === this.closeId) { this.closeToPlayer(info.login) }
+      if (info.answer === this.openId) { this.displayToPlayer(info.login) }
+      else if (info.answer === this.closeId) { this.closeToPlayer(info.login) }
     })
   }
 
   private constructFrame(): string[] {
-    return [ 
+    return [
       `<manialink id="${this.id}">
         <frame posn="-${this.windowWidth / 2} ${this.windowHeight / 2} 10">
           <quad posn="0 0 0.02" sizen="${this.windowWidth} ${this.windowHeight}" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
@@ -53,25 +57,25 @@ export default abstract class PopupWindow extends DynamicComponent implements IP
     ]
   }
 
-  constructHeader(login: string): string {
+  constructHeader(login: string, page:number): string {
     return `<quad posn="2.5 -${this.titleHeight / 2} 0.04" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="TV"/>
         <label posn="${(this.windowWidth - 0.8) / 2} -${this.titleHeight / 2} 0.04" sizen="${this.windowWidth} ${this.windowHeight}" halign="center" valign="center" textsize="3" text="Bibgo :D"/>`
   }
 
-  constructContent(login: string): string {
+  constructContent(login: string, page:number): string {
     return ``
   }
 
-  constructFooter(login: string): string {
+  constructFooter(login: string, page:number): string {
     return `<quad posn="${(this.windowWidth - 0.8) / 2 - 0.2} -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
     imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
     image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
   }
 
-  displayToPlayer(login: string): void {
-    const header = this.constructHeader(login)
-    const content = this.constructContent(login)
-    const footer = this.constructFooter(login)
+  displayToPlayer(login: string, page: number= 1): void {
+    const header = this.constructHeader(login, page)
+    const content = this.constructContent(login, page)
+    const footer = this.constructFooter(login, page)
     TM.sendManialink(`${this.frameTop}${header}${this.frameTopMid}${content}${this.frameMidBottom}${footer}${this.frameBottom}`, login)
   }
 
