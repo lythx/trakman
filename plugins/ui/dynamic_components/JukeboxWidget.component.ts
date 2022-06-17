@@ -28,7 +28,13 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
       if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
         const challengeId = this.challengeActionIds[info.answer - (this.id + 1000)]
         this.handleMapClick(challengeId, info.answer, info.login, info.nickName)
-        this.displayToPlayer(info.login)
+        const playerPage = this.playerPages.find(a => a.login === info.login)
+        if (playerPage === undefined) {
+          this.playerPages.push({ login: info.login, page: 1 })
+          this.displayToPlayer(info.login, 1)
+          return
+        }
+        this.displayToPlayer(info.login, playerPage.page)
       }
       else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
         const playerPage = this.playerPages.find(a => a.login === info.login)
@@ -41,8 +47,13 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
         playerPage.page = page
         this.displayToPlayer(info.login, page)
       } else if (info.answer === this.id) {
-        if (!this.playerPages.some(a => a.login === info.login)) { this.playerPages.push({ login: info.login, page: 1 }) }
-        this.displayToPlayer(info.login, 1)
+        const playerPage = this.playerPages.find(a => a.login === info.login)
+        if (playerPage === undefined) {
+          this.playerPages.push({ login: info.login, page: 1 })
+          this.displayToPlayer(info.login, 1)
+          return
+        }
+        this.displayToPlayer(info.login, playerPage.page)
       }
       else if (info.answer === this.closeId) { this.closeToPlayer(info.login) }
     })
@@ -123,7 +134,7 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
     if (challengeActionId !== -1) { return challengeActionId + this.id + 1000 }
     else {
       this.challengeActionIds.push(challengeId)
-      return this.id + 1000 + this.challengeActionIds.length
+      return this.challengeActionIds.length - 1 + this.id + 1000
     }
   }
 

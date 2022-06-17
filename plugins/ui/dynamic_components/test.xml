@@ -1,5 +1,5 @@
 <manialink id="432432432">
-        <frame posn="-4000.2 27.85 10">
+        <frame posn="-40.2 27.85 10">
           <quad posn="0 0 0.02" sizen="80.4 55.7" style="Bgs1InRace" substyle="NavButton"/>
             <frame posn="0.4 -0.44 1">
             <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad 

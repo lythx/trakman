@@ -36,6 +36,11 @@ export abstract class TMXService {
     this._next.push(track instanceof Error ? null : track)
   }
 
+  static restartChallenge(): void {
+    this._previous.unshift(this._current === null ? null : { ...this._current })
+    this._previous.length = Math.min(this._previous.length, this.previousSize)
+  }
+
   static async add(id: string, index: number): Promise<void | Error> {
     if (index >= this.nextSize) { return }
     const track = await this.fetchTrackInfo(id)
