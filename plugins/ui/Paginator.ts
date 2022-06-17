@@ -54,7 +54,7 @@ export default class Paginator {
 
   constructXml(page: number) {
     if (this.buttonCount === 0) {
-      return `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+      return `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
       imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
       image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     }
@@ -86,7 +86,7 @@ export default class Paginator {
         xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
       }
     }
-    xml += `<quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
+    xml += `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
         imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
         image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
     if (page !== this.pageCount) {
