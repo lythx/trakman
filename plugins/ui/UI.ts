@@ -20,6 +20,7 @@ import DynamicComponent from './dynamic_components/DynamicComponent.js'
 import JukeboxWidget from './dynamic_components/JukeboxWidget.component.js'
 import TestWindow from './dynamic_components/TestWindow.js'
 import TMXWidget from './dynamic_components/TMXWidget.component.js'
+import DediCps from './dynamic_components/DediCps.component.js'
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
@@ -124,19 +125,15 @@ const events: TMEvent[] = [
         new LiveRanking(110)
       )
       for (const c of staticComponents) { c.display() }
-      const jukebox = new JukeboxWidget(10000, 50000)
-      jukebox.initialize()
-      const tmx = new TMXWidget(1000, 2000)
-      tmx.initialize()
       dynamicComponents.push(
-        //new TestWindow(566565, 777667),
-        jukebox,
-        tmx
+       new TestWindow(566565, 777667),
+       new JukeboxWidget(10000, 50000),
+        new TMXWidget(1000, 2000)
       )
-      // setInterval(() => {
-      //   dynamicComponents[0].displayToPlayer('ciekma_czakwal')
-      //   dynamicComponents[0].displayToPlayer('redgreendevil')
-      // }, 1000)
+      setInterval(() => {
+        dynamicComponents[0].displayToPlayer('ciekma_czakwal')
+        dynamicComponents[0].displayToPlayer('redgreendevil')
+      }, 1000)
     }
   },
   {
