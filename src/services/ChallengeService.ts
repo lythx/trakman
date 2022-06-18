@@ -32,7 +32,9 @@ export class ChallengeService {
       return
     }
     const info = res[0]
+    console.log(JSON.stringify(info, null, 4))
     const dbinfo = await this.repo.get(info.UId)
+    console.log(JSON.stringify(dbinfo, null, 4))
     this._current = {
       id: info.UId,
       name: info.Name,
@@ -118,7 +120,8 @@ export class ChallengeService {
     for (const c of [...challengesInDBInfo, ...challengesNotInDBInfo]) {
       this._challenges.push(c)
     }
-    this.repo.add(...challengesNotInDBInfo)
+    console.log(challengesNotInDBInfo)
+    await this.repo.add(...challengesNotInDBInfo)
   }
 
   static async add(fileName: string): Promise<TMChallenge | Error> {

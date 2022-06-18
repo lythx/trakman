@@ -54,19 +54,17 @@ const commands: TMCommand[] = [
   {
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
-    params: [{ name: 'login' }, { name: 'reason', optional: true }, { name: 'duration', optional: true }],
-    callback: (info: MessageInfo) => {
-      const [login, reason, durationParam] = info.text.split(' ')
+    params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
+    callback: (info: MessageInfo, login: string, reason?: string, duration?: number) => {
       const targetInfo = TM.getPlayer(login)
-      const duration = durationParam === undefined ? null : TM.parseParamTime(durationParam)
-      const expireDate = duration === null ? undefined : new Date(Date.now() + duration)
+      const expireDate = duration === undefined ? undefined : new Date(Date.now() + duration)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} is not on the server.`, info.login)
         return
       }
       TM.addToBanlist(targetInfo.ip, targetInfo.login, info.login, reason, expireDate)
       const reasonString = reason === undefined ? '' : ` Reason: ${TM.palette.highlight}${reason}.`
-      const durationString = duration === null ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
+      const durationString = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
