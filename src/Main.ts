@@ -15,6 +15,7 @@ import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { JukeboxService } from './services/JukeboxService.js'
+import { AdministrationService } from './services/AdministrationService.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -34,6 +35,9 @@ async function main(): Promise<void> {
   await GameService.initialize()
   Logger.info('Game info fetched')
   Logger.trace('Enabling callbacks...')
+  Logger.trace('Fetching administration lists...')
+  await AdministrationService.initialize()
+  Logger.info('Administration service instantiated')
   const cb = await Client.call('EnableCallbacks', [
     { boolean: true }
   ])
@@ -64,7 +68,7 @@ async function main(): Promise<void> {
     else { Logger.info('TMX service instantiated') }
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to dedimania...') 
+    Logger.trace('Connecting to dedimania...')
     const status = await DedimaniaService.initialize()
     if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
     else { Logger.info('Connected to dedimania') }

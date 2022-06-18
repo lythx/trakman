@@ -13,4 +13,8 @@ interface CheckpointInfo {
   readonly visits: number
   readonly wins: number
   readonly privilege: number
+  readonly playerId: number
+  readonly ip: string
+  readonly region: string
+  readonly isUnited: boolean
 }

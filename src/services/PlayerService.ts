@@ -24,12 +24,8 @@ export class PlayerService {
     if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
   }
 
-  static getPlayer(login: string): TMPlayer {
-    const player = this._players.find(p => p.login === login)
-    if (player == null) {
-      throw Error('Player ' + login + ' not in player list.')
-    }
-    return player
+  static getPlayer(login: string): TMPlayer | undefined {
+    return this._players.find(p => p.login === login)
   }
 
   static get players(): TMPlayer[] {
@@ -53,7 +49,8 @@ export class PlayerService {
         ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
         return
       }
-      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path, false)
+      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path, detailedPlayerInfo[0].IsSpectator,
+        detailedPlayerInfo[0].PlayerId, detailedPlayerInfo[0].IPAddress.split(':')[0], detailedPlayerInfo[0].OnlineRights === 3)
     }
   }
 
@@ -64,7 +61,7 @@ export class PlayerService {
    * @param {String} path
    * @returns {Promise<void>}
    */
-  static async join(login: string, nickName: string, path: string, isSpectator: boolean): Promise<void> {
+  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean): Promise<void> {
     const nation = path.split('|')[1]
     let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode == null) {
@@ -85,7 +82,11 @@ export class PlayerService {
         checkpoints: [],
         wins: 0,
         privilege: 0,
-        isSpectator
+        isSpectator,
+        playerId,
+        ip,
+        region: path,
+        isUnited
       }
       await this.repo.add(player)
     } else {
@@ -100,7 +101,11 @@ export class PlayerService {
         checkpoints: [],
         wins: Number(playerData.wins),
         privilege: Number(playerData.privilege),
-        isSpectator
+        isSpectator,
+        playerId,
+        ip,
+        region: path,
+        isUnited
       }
       await this.repo.update(player)
     }
@@ -120,6 +125,9 @@ export class PlayerService {
    */
   static async leave(login: string): Promise<void> {
     const player = this.getPlayer(login)
+    if (player === undefined) {
+      return
+    }
     const sessionTime = Date.now() - player.joinTimestamp
     const totalTimePlayed = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
@@ -132,7 +140,11 @@ export class PlayerService {
       sessionTime,
       wins: player.wins,
       privilege: player.privilege,
-      visits: player.visits
+      visits: player.visits,
+      playerId: player.playerId,
+      ip: player.ip,
+      region: player.region,
+      isUnited: player.isUnited
     }
     Events.emitEvent('Controller.PlayerLeave', leaveInfo)
     await this.repo.setTimePlayed(player.login, totalTimePlayed)
@@ -170,6 +182,9 @@ export class PlayerService {
    */
   static addCP(login: string, cp: TMCheckpoint): void {
     const player = this.getPlayer(login)
+    if (player === undefined) {
+      return
+    }
     let laps
     if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
       laps = 1

@@ -11,6 +11,7 @@ import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
+import { AdministrationService } from './services/AdministrationService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -28,7 +29,15 @@ export class Listeners {
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
-        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1])
+        const ip = playerInfo[0].IPAddress.split(':')[0]
+        const canJoin = AdministrationService.checkIfCanJoin(params[0], ip)
+        if (canJoin !== true) {
+          const reason = typeof canJoin.reason === 'string' ? `\nReason: ${canJoin.reason}` : ''
+          Client.callNoRes('Kick', [{ string: params[0] },
+          { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
+        }
+        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
+          playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
         await RecordService.fetchRecord(params[0].UId, params[0].Login)
       }
     },
@@ -139,9 +148,11 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.records
         }
+        const lastId = JukeboxService.current.id
         JukeboxService.nextChallenge()
         if (process.env.USE_TMX === 'YES') {
-          await TMXService.nextChallenge()
+          if (lastId === JukeboxService.current.id) { TMXService.restartChallenge() }
+          else { await TMXService.nextChallenge() }
         }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
@@ -249,7 +260,7 @@ export class Listeners {
     }
   ]
 
-  static  initialize(): void {
+  static initialize(): void {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
