@@ -6,6 +6,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['al', 'addlocal'],
     help: 'Add a challenge from your pc.',
+    // todo params
     callback: async (info: MessageInfo) => {
       const split = info.text.split(' ')
       const fileName = split.shift() + '.Challenge.Gbx'
@@ -44,6 +45,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['afu', 'addfromurl'],
     help: 'Add a track from an url.',
+    // todo params
     callback: async (info: MessageInfo) => {
       const s = info.text.split(' ')
       const fileName = s[0] + '.Challenge.Gbx'
@@ -200,6 +202,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
+    // TODO params
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
