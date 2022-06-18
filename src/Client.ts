@@ -2,8 +2,10 @@ import { Request } from './Request.js'
 import { Socket } from './Socket.js'
 
 export abstract class Client {
+
   private static readonly socket = new Socket()
   private static requestId = 0x80000000
+  private static readonly proxies: { methods: string[], callback: Function }[] = []
 
   static async connect(host = 'localhost', port = 5000): Promise<string> {
     this.socket.connect(port, host)
@@ -17,7 +19,11 @@ export abstract class Client {
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
-    return await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
+    const response = await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
+    if (!(response instanceof Error)) {
+      this.callProxies(method, params, response)
+    }
+    return response
   }
 
   static callNoRes(method: string, params: object[] = []): void {
@@ -25,6 +31,16 @@ export abstract class Client {
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
+  }
+
+  static addProxy(methods: string[], callback: Function) {
+    this.proxies.push({ methods, callback })
+  }
+
+  private static callProxies(method: string, params: any[], response: any[]) {
+    for (const e of this.proxies.filter(a => a.methods.some(b => b === method))) {
+      e.callback(method, params, response)
+    }
   }
 
 }
