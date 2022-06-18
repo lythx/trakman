@@ -79,6 +79,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
+    // TODO params
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo) => {
       const login = info.text

@@ -6,8 +6,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['mad', 'masteradmin'],
     help: 'Change player privilege to Masteradmin.',
-    callback: async (info: MessageInfo) => {
-      const targetLogin: string = info.text
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string) => {
+      const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
@@ -40,8 +41,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['ad', 'admin'],
     help: 'Change player privilege to Admin.',
-    callback: async (info: MessageInfo) => {
-      const targetLogin: string = info.text
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string) => {
+      const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
@@ -79,8 +81,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['op', 'operator'],
     help: 'Change player privilege to Operator.',
-    callback: async (info: MessageInfo) => {
-      const targetLogin: string = info.text
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string) => {
+      const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
@@ -118,8 +121,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['rp', 'user'],
     help: 'Remove player priveleges.',
-    callback: async (info: MessageInfo) => {
-      const targetLogin: string = info.text
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string) => {
+      const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
@@ -156,8 +160,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['dcmds', 'disablecommands'],
     help: 'Disable player commands.',
-    callback: async (info: MessageInfo) => {
-      const targetLogin: string = info.text
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string) => {
+      const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
