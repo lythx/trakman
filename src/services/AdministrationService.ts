@@ -1,3 +1,5 @@
+import { ErrorHandler } from "../ErrorHandler.js";
+import { Client } from "../Client.js";
 import { AdministrationRepository } from "../database/AdministrationRepository.js";
 
 
@@ -9,6 +11,7 @@ export class AdministrationService {
     private static readonly _mutelist: { readonly login: string, readonly date: Date, readonly callerLogin: string, readonly reason?: string, readonly expireDate?: Date }[] = []
     private static readonly _guestlist: { readonly login: string, readonly date: Date, readonly callerLogin: string }[] = []
 
+    // MUTELIST DOESNT DO ANYTHING YET, WILL IMPLEMENT AFTER WE DO MANUALCHATROUTING
     static async initialize() {
         this.repo = new AdministrationRepository()
         await this.repo.initialize()
@@ -37,6 +40,27 @@ export class AdministrationService {
                 this.removeFromBlacklist(e.login)
             }
         }, 5000)
+        const guestList = await Client.call('GetGuestList', [{ int: 5000 }, { int: 0 }])
+        if (guestList instanceof Error) {
+            ErrorHandler.fatal('Failed to fetch guestlist', 'Server responded with error:', guestList.message)
+            return
+        }
+        for (const login of this._guestlist.map(a => a.login)) {
+            if (!guestList.some((a: any) => a.Login === login)) {
+                const res = await Client.call('AddGuest', [{ string: login }])
+                if (res instanceof Error) {
+                    ErrorHandler.error(`Failed to add login ${login} to guestlist`, `Server responded with error:`, res.message)
+                }
+            }
+        }
+        for (const login of guestList.map((a: any) => a.Login)) {
+            if (!this._guestlist.some((a: any) => a.login === login)) {
+                const res = await Client.call('RemoveGuest', [{ string: login }])
+                if (res instanceof Error) {
+                    ErrorHandler.error(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
+                }
+            }
+        }
     }
 
     static checkIfCanJoin(login: string, ip: string): true | { banMethod: 'ban' | 'blacklist', reason?: string } {
