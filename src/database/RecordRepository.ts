@@ -36,6 +36,16 @@ export class RecordRepository extends Repository {
     return res.rows
   }
 
+  async remove(login: string, challenge: string): Promise<any[]> {
+    const query = `DELETE FROM records WHERE login=$1 AND challenge=$2;`
+    return (await this.db.query(query, [login, challenge])).rows
+  }
+
+  async removeAll(challenge: string): Promise<any[]> {
+    const query = `DELETE FROM records WHERE challenge=$1;`
+    return (await this.db.query(query, [challenge])).rows
+  }
+
   async update(record: RecordInfo): Promise<void> {
     await this.db.query('UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE challenge=$4 AND login=$5',
       [record.score, record.date, record.checkpoints, record.challenge, record.login])

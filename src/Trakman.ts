@@ -452,6 +452,14 @@ export const TRAKMAN = {
     }
   },
 
-  addProxy: (methods: string[], callback: Function): void => { Client.addProxy(methods, callback) }
+  addProxy: (methods: string[], callback: Function): void => { Client.addProxy(methods, callback) },
+
+  removeRecord: async (login: string, challengeId: string): Promise<any[]> => {
+    return await RecordService.remove(login, challengeId)
+  },
+
+  removeAllRecords: async (challengeId: string): Promise<any[]> => {
+    return await RecordService.removeAll(challengeId)
+  }
 
 }

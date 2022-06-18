@@ -361,4 +361,23 @@ export class RecordService {
       Events.emitEvent('Controller.LiveRecord', recordInfo)
     }
   }
+
+  static async remove(login: string, challengeId: string): Promise<any[]> {
+    this._records.splice(this._records.findIndex(a => a.login === login && a.challenge === challengeId), 1)
+    this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.challenge === challengeId), 1)
+    Events.emitEvent('Controller.LocalRecords', this.localRecords)
+    return await this.repo.remove(login, challengeId)
+  }
+
+  static async removeAll(challengeId: string): Promise<any[]> {
+    while (this._records.some(a => a.challenge === challengeId)) {
+      this._records.splice(this._records.findIndex(a => a.challenge === challengeId), 1)
+    }
+    while (this._localRecords.some(a => a.challenge === challengeId)) {
+      this._localRecords.splice(this._localRecords.findIndex(a => a.challenge === challengeId), 1)
+    }
+    Events.emitEvent('Controller.LocalRecords', this.localRecords)
+    return await this.repo.removeAll(challengeId)
+  }
+
 }
