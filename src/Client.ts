@@ -44,9 +44,11 @@ export abstract class Client {
     }
   }
 
-  private static  async getProxyResponse(method: string, params: any[], requestId: number) {
-    
-
+  private static async getProxyResponse(method: string, params: any[], requestId: number) {
+    const response = await this.socket.awaitResponse(requestId, method).catch((err: Error) => err)
+    if (!(response instanceof Error)) {
+      this.callProxies(method, params, response)
+    }
   }
 
 }

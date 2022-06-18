@@ -23,12 +23,10 @@ CREATE TABLE IF NOT EXISTS challenges(
 export class ChallengeRepository extends Repository {
   async initialize(): Promise<void> {
     await super.initialize()
-    await this.db.query('DROP TABLE challenges;')
     await this.db.query(createQuery)
   }
 
   async add(...objects: TMChallenge[]): Promise<any> {
-    console.log(objects[0])
     if (objects.length === 0) { return }
     let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
     const values = []
