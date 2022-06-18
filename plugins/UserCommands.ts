@@ -91,9 +91,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['me', 'mfw'],
     help: 'Express the deep emotions hidden within your sinful soul.',
-    params: [{ name: 'thoughts', optional: true }],
-    callback: (info: MessageInfo, thoughts: string) => {
-      TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${thoughts}`)
+    params: [{ name: 'thoughts', type: 'multiword', optional: true }],
+    callback: (info: MessageInfo, thoughts?: string) => {
+      TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
   },

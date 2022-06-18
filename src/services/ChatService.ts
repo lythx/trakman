@@ -88,18 +88,16 @@ export abstract class ChatService {
               }
               break
             case 'multiword':
-              if (command.params.length === command.params.findIndex(a => a.name === param.name) + 1) {
-                const split = input.split(' ')
-                let n = 0
-                while (true) {
-                  const chunk = split.shift()
-                  if (params[n] === chunk) {
-                    n++
-                    if (n === i) {
-                      parsedParams.push(split.join(' ').substring(1))
-                      break
-                    }
+              const split = input.split(' ')
+              let n = 0
+              while (true) {
+                const chunk = split.shift()
+                if (params[n] === chunk) {
+                  if (n === i) {
+                    parsedParams.push([chunk, ...split].join(' '))
+                    break
                   }
+                  n++
                 }
               }
               break

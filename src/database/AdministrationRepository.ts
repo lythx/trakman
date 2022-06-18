@@ -6,7 +6,7 @@ const createQueries = [
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller VARCHAR(25) NOT NULL,
-    reason VARCHAR(25),
+    reason VARCHAR(250),
     expires TIMESTAMP,
     PRIMARY KEY(ip, login)
 );`,
@@ -14,14 +14,14 @@ const createQueries = [
     login VARCHAR(25) PRIMARY KEY NOT NULL,
     date TIMESTAMP NOT NULL,
     caller VARCHAR(25) NOT NULL,
-    reason VARCHAR(25),
+    reason VARCHAR(250),
     expires TIMESTAMP
 );`,
     `CREATE TABLE IF NOT EXISTS mutelist(
     login VARCHAR(25) PRIMARY KEY NOT NULL,
     date TIMESTAMP NOT NULL,
     caller VARCHAR(25) NOT NULL,
-    reason VARCHAR(25),
+    reason VARCHAR(250),
     expires TIMESTAMP
 );`,
     `CREATE TABLE IF NOT EXISTS guestlist(

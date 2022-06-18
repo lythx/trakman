@@ -393,7 +393,9 @@ export const TRAKMAN = {
     return await response.json()
   },
 
-  banlist: AdministrationService.banlist,
+  get banlist() {
+    return AdministrationService.banlist
+  },
 
   addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
@@ -403,7 +405,9 @@ export const TRAKMAN = {
     AdministrationService.removeFromBanlist(login)
   },
 
-  blacklist: AdministrationService.blacklist,
+  get blacklist() {
+    return AdministrationService.blacklist
+  },
 
   addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
@@ -413,7 +417,9 @@ export const TRAKMAN = {
     AdministrationService.removeFromBlacklist(login)
   },
 
-  mutelist: AdministrationService.mutelist,
+  get mutelist() {
+    return AdministrationService.mutelist
+  },
 
   addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
@@ -423,14 +429,16 @@ export const TRAKMAN = {
     AdministrationService.removeFromMutelist(login)
   },
 
-  guestlist: AdministrationService.guestlist,
-
-  addToGuestlist: (login: string, callerLogin: string): void => {
-    AdministrationService.addToGuestlist(login, callerLogin)
+  get guestlist() {
+    return AdministrationService.guestlist
   },
 
-  removeFromGuestlist: (login: string): void => {
-    AdministrationService.removeFromGuestlist(login)
+  addToGuestlist: async (login: string, callerLogin: string): Promise<void | Error> => {
+    await AdministrationService.addToGuestlist(login, callerLogin)
+  },
+
+  removeFromGuestlist: async (login: string): Promise<void | Error> => {
+    await AdministrationService.removeFromGuestlist(login)
   },
 
   parseParamTime: (timeString: string): number | null => {
