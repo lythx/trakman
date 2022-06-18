@@ -132,6 +132,23 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
       lbRating = 'Nadeo'
       lbIcon = "https://cdn.discordapp.com/attachments/506852548938956800/987202850327236668/map_tmx_ranking_nadeo.png"
     }
+    let tmxDiffImage: string
+    switch (tmxInfo.difficulty) {
+      case 'Beginner':
+        tmxDiffImage = 'https://cdn.discordapp.com/attachments/618467373053247489/987806592131010580/map_difficulty_beginner.png'
+        break
+      case 'Intermediate':
+        tmxDiffImage = 'https://cdn.discordapp.com/attachments/618467373053247489/987806592835649616/map_difficulty_intermediate.png'
+        break
+      case 'Expert':
+        tmxDiffImage = 'https://cdn.discordapp.com/attachments/618467373053247489/987806592483360828/map_difficulty_expert.png'
+        break
+      case 'Lunatic':
+        tmxDiffImage = 'https://cdn.discordapp.com/attachments/618467373053247489/987806593133457448/map_difficulty_lunatic.png'
+        break
+      default:
+        tmxDiffImage = 'https://cdn.discordapp.com/attachments/618467373053247489/987801069247688744/emptek8.png'
+    }
     return `
               <quad posn="0.4 -34.2 3" sizen="1.9 1.9" 
                image="https://cdn.discordapp.com/attachments/506852548938956800/987203422518407178/map_type.png"/>
@@ -143,7 +160,7 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
                image="https://cdn.discordapp.com/attachments/506852548938956800/987202829737398332/map_style.png"/>
               <label posn="10.1 -32.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.style}"/>
               <quad posn="8 -34.2 3" sizen="1.9 1.9" 
-               image="https://cdn.discordapp.com/attachments/506852548938956800/987202803141345310/map_difficulty.png"/>
+               image="${tmxDiffImage}"/>
               <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.difficulty}"/>
               <quad posn="8 -36.2 3" sizen="1.9 1.9" 
                image="https://cdn.discordapp.com/attachments/506852548938956800/987202802440884264/map_built.png"/>
