@@ -67,9 +67,9 @@ export abstract class DedimaniaClient {
                     SrvIP: { string: '127.0.0.1' },
                     SrvPort: { string: '5000' },
                     XmlRpcPort: { string: '5000' },
-                    NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+                    NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
                     MaxPlayers: { int: cfg.currentMaxPlayers },
-                    NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+                    NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
                     MaxSpecs: { int: cfg.currentMaxPlayers },
                     LadderMode: { int: cfg.currentLadderMode },
                     NextFiveUID: { string: nextIds.join('/') }

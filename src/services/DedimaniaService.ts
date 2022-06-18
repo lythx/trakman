@@ -254,6 +254,6 @@ export abstract class DedimaniaService {
         ]
       )
       if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
-    }, 30000)
+    }, 240000)
   }
 }
