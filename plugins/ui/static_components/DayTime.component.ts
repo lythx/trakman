@@ -11,7 +11,7 @@ export default class DayTime extends StaticComponent implements IStaticComponent
     super('race', id)
     this.timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
     setInterval(() => {
-      const timeString = `${new Date().getUTCHours()}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
+      const timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
       if (this._isDisplayed && this.timeString !== timeString) {
         this.timeString = timeString
         this.display()
