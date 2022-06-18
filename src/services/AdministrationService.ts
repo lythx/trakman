@@ -33,6 +33,7 @@ export class AdministrationService {
         }
         setInterval(() => {
             const date = new Date()
+            console.log(this._banlist?.[0]?.expireDate)
             for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
                 this.removeFromBanlist(e.login)
             }
@@ -76,6 +77,7 @@ export class AdministrationService {
     }
 
     static get banlist() {
+        console.log(this._banlist)
         return [...this._banlist]
     }
 
@@ -124,13 +126,27 @@ export class AdministrationService {
         return [...this._guestlist]
     }
 
-    static async addToGuestlist(login: string, callerLogin: string) {
+    static async addToGuestlist(login: string, callerLogin: string): Promise<void | Error> {
+        if (this._guestlist.some(a => a.login === login)) { return }
         const date = new Date()
+        // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
+        const add = await Client.call('AddGuest', [{ string: 'login' }])
+        if (add instanceof Error) {
+            return add
+        }
+        Client.callNoRes('SaveGuestList', [{ string: 'guestlist.txt' }]) // No res because I have no idea how to handle it adding and then not saving
         this._guestlist.push({ login, date, callerLogin })
         await this.repo.addToGuestlist(login, date, callerLogin)
     }
 
-    static async removeFromGuestlist(login: string) {
+    static async removeFromGuestlist(login: string): Promise<void | Error> {
+        if (!this._guestlist.some(a => a.login === login)) { return }
+        // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
+        const remove = await Client.call('RemoveGuest', [{ string: 'login' }])
+        if (remove instanceof Error) {
+            return remove
+        }
+        Client.callNoRes('SaveGuestList', [{ string: 'guestlist.txt' }]) // No res because I have no idea how to handle it adding and then not saving
         this._guestlist.splice(this._guestlist.findIndex(a => a.login === login), 1)
         await this.repo.removeFromGuestlist(login)
     }

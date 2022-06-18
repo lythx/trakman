@@ -35,6 +35,7 @@ export class Listeners {
           const reason = typeof canJoin.reason === 'string' ? `\nReason: ${canJoin.reason}` : ''
           Client.callNoRes('Kick', [{ string: params[0] },
           { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
+          return
         }
         await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)

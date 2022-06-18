@@ -87,6 +87,7 @@ const commands: TMCommand[] = [
     help: 'Remove the current track from the playlist.',
     callback: async (info: MessageInfo) => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
+      // TODO: Implement remove challenge
       const challenge = TM.challenge
       const res = await TM.call('RemoveChallenge', [{ string: challenge.fileName }])
       if (res instanceof Error) { // This can happen if the challenge was already removed
@@ -138,6 +139,7 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previoustrack'],
     help: 'Requeue the previously played track.',
     callback: async (info: MessageInfo) => {
+      // DOESNT SKIP
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
       TM.addToJukebox(TM.previousChallenges[0].id)
@@ -156,19 +158,20 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
       }
+      const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.${reasonString}`
         }]
       },
         {
           method: 'Kick',
           params: [
             { string: login },
-            { string: reason === undefined ? 'No reason specified.' : reason }
+            { string: reason === undefined ? 'No reason specified' : reason }
           ]
         })
     },
