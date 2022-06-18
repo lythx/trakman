@@ -11,4 +11,8 @@ interface FinishInfo {
   readonly privilege: number
   readonly challenge: string
   readonly score: number
+  readonly playerId: number
+  readonly ip: string
+  readonly region: string
+  readonly isUnited: boolean
 }

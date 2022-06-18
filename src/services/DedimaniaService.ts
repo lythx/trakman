@@ -59,9 +59,9 @@ export abstract class DedimaniaService {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
             Private: { boolean: cfg.password === '' },
-            SrvIP: { string: 'lol' },
-            SrvPort: { string: 'lol2' },
-            XmlRpcPort: { string: 'lol3' },
+            SrvIP: { string: '127.0.0.1' },
+            SrvPort: { string: '5000' },
+            XmlRpcPort: { string: '5000' },
             NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
             MaxPlayers: { int: cfg.currentMaxPlayers },
             NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -77,7 +77,7 @@ export abstract class DedimaniaService {
       this.retryGetRecords(id, name, environment, author, isRetry)
       return dedis
     }
-    else if(dedis?.[0]?.Records === undefined) {
+    else if (dedis?.[0]?.Records === undefined) {
       this.retryGetRecords(id, name, environment, author, isRetry)
       return new Error(`Failed to fetch records`)
     }
@@ -153,7 +153,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position,
         previousScore: -1,
-        previousPosition: -1
+        previousPosition: -1,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
@@ -177,7 +181,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position: previousPosition,
         previousScore: info.score,
-        previousPosition
+        previousPosition,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
@@ -203,7 +211,11 @@ export abstract class DedimaniaService {
         visits: info.visits,
         position,
         previousScore,
-        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1
+        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1,
+        playerId: info.playerId,
+        ip: info.ip,
+        region: info.region,
+        isUnited: info.isUnited
       }
       this._dedis = this._dedis.filter(a => a.login !== info.login)
       this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
@@ -227,9 +239,9 @@ export abstract class DedimaniaService {
               SrvName: { string: cfg.name },
               Comment: { string: cfg.comment },
               Private: { boolean: cfg.password === '' },
-              SrvIP: { string: 'lol' },
-              SrvPort: { string: 'lol2' },
-              XmlRpcPort: { string: 'lol3' },
+              SrvIP: { string: '127.0.0.1' },
+              SrvPort: { string: '5000' },
+              XmlRpcPort: { string: '5000' },
               NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
               MaxPlayers: { int: cfg.currentMaxPlayers },
               NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -242,6 +254,6 @@ export abstract class DedimaniaService {
         ]
       )
       if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
-    }, 240000)
+    }, 30000)
   }
 }

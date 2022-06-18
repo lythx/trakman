@@ -9,4 +9,8 @@ interface JoinInfo {
   readonly wins: number
   readonly privilege: number
   readonly isSpectator: boolean
+  readonly playerId: number
+  readonly ip: string
+  readonly region: string
+  readonly isUnited: boolean
 }

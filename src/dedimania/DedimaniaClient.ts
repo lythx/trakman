@@ -64,9 +64,9 @@ export abstract class DedimaniaClient {
                     SrvName: { string: cfg.name },
                     Comment: { string: cfg.comment },
                     Private: { boolean: cfg.password === '' },
-                    SrvIP: { string: 'lol' },
-                    SrvPort: { string: 'lol2' },
-                    XmlRpcPort: { string: 'lol3' },
+                    SrvIP: { string: '127.0.0.1' },
+                    SrvPort: { string: '5000' },
+                    XmlRpcPort: { string: '5000' },
                     NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
                     MaxPlayers: { int: cfg.currentMaxPlayers },
                     NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -140,6 +140,7 @@ export abstract class DedimaniaClient {
 
   static async call(method: string, params: any[] = []): Promise<any[] | Error> {
     if (!this.connected) { return new Error('Not connected to dedimania') }
+    // TODO: ensure that if theres 2 responses awaiting (basically never but ye) they get executed in good order
     while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 300)) }
     this.receivingResponse = true
     const request = new DedimaniaRequest(method, params, this.sessionId)

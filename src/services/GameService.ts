@@ -5,6 +5,7 @@ export class GameService {
   private static _game: TMGame
 
   static async initialize(): Promise<void> {
+    // TODO: implement proxy here like in ServerConfig.js
     const res = await Client.call('GetCurrentGameInfo', [{ int: 1 }])
     if (res instanceof Error) {
       ErrorHandler.error('Failed to get game info', res.message)

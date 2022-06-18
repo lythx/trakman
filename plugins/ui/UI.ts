@@ -4,7 +4,7 @@ import UIConfig from './UIConfig.json' assert { type: 'json' }
 import CustomUi from './CustomUi.js'
 
 import temp1 from './static_components/temp1.component.js'
-import temp2 from './static_components/temp2.component.js'
+import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
 import SpectatorWidget from './static_components/SpectatorWidget.component.js'
 import DediRanking from './static_components/DediRanking.component.js'
@@ -113,7 +113,7 @@ const events: TMEvent[] = [
       customUi.display()
       staticComponents.push(
         new temp1(100),
-        new temp2(101),
+        new DayTime(101),
         new RankWidget(102),
         new SpectatorWidget(103),
         new DediRanking(104),
@@ -126,14 +126,14 @@ const events: TMEvent[] = [
       )
       for (const c of staticComponents) { c.display() }
       dynamicComponents.push(
-       new TestWindow(566565, 777667),
-       new JukeboxWidget(10000, 50000),
+        new JukeboxWidget(10000, 50000),
         new TMXWidget(1000, 2000)
       )
-      setInterval(() => {
-        dynamicComponents[0].displayToPlayer('ciekma_czakwal')
-        dynamicComponents[0].displayToPlayer('redgreendevil')
-      }, 1000)
+      // const testWindow = new TestWindow()
+      // setInterval(() => {
+      //   testWindow.displayToPlayer('ciekma_czakwal')
+      //   testWindow.displayToPlayer('redgreendevil')
+      // }, 1000)
     }
   },
   {
