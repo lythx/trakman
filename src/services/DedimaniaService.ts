@@ -59,9 +59,9 @@ export abstract class DedimaniaService {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
             Private: { boolean: cfg.password === '' },
-            SrvIP: { string: 'lol' },
-            SrvPort: { string: 'lol2' },
-            XmlRpcPort: { string: 'lol3' },
+            SrvIP: { string: '127.0.0.1' },
+            SrvPort: { string: '5000' },
+            XmlRpcPort: { string: '5000' },
             NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
             MaxPlayers: { int: cfg.currentMaxPlayers },
             NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -77,7 +77,7 @@ export abstract class DedimaniaService {
       this.retryGetRecords(id, name, environment, author, isRetry)
       return dedis
     }
-    else if(dedis?.[0]?.Records === undefined) {
+    else if (dedis?.[0]?.Records === undefined) {
       this.retryGetRecords(id, name, environment, author, isRetry)
       return new Error(`Failed to fetch records`)
     }
@@ -239,9 +239,9 @@ export abstract class DedimaniaService {
               SrvName: { string: cfg.name },
               Comment: { string: cfg.comment },
               Private: { boolean: cfg.password === '' },
-              SrvIP: { string: 'lol' },
-              SrvPort: { string: 'lol2' },
-              XmlRpcPort: { string: 'lol3' },
+              SrvIP: { string: '127.0.0.1' },
+              SrvPort: { string: '5000' },
+              XmlRpcPort: { string: '5000' },
               NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
               MaxPlayers: { int: cfg.currentMaxPlayers },
               NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -254,6 +254,6 @@ export abstract class DedimaniaService {
         ]
       )
       if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
-    }, 240000)
+    }, 30000)
   }
 }
