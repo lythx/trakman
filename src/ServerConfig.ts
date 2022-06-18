@@ -5,6 +5,14 @@ export class ServerConfig {
 
     private static _config: ServerInfo
 
+    static async initialize(): Promise<void> {
+        this.update()
+        // Client.addProxy(<methods> , ()=>{
+        //    this.update()
+        // }) TODO: ADD PROXY FOR ALL COMMANDS WHICH CHANGE SERVER CONFIG
+        // then call this method instead of update on new challenge
+    }
+
     static async update(): Promise<void> {
         const res = await Client.call('GetServerOptions')
         if (res instanceof Error) {
@@ -36,7 +44,7 @@ export class ServerConfig {
     }
 
     static get config(): ServerInfo {
-        return Object.assign(this._config)
+        return { ...this._config }
     }
 
 }

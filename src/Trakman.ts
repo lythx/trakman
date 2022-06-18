@@ -450,6 +450,8 @@ export const TRAKMAN = {
       default:
         return null
     }
-  }
+  },
+
+  addProxy: (methods: string[], callback: Function): void => { Client.addProxy(methods, callback) }
 
 }
