@@ -53,9 +53,9 @@ const commands: TMCommand[] = [
     aliases: ['sp', 'setpwd', 'setpassword'],
     help: 'Change the player password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, password: string) => {
+    callback: (info: MessageInfo, password?: string) => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
-      if (!regex.test(password) && password.length > 0) {
+      if (password !== undefined && !regex.test(password)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
@@ -64,7 +64,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
-            + `the player password to ${TM.palette.highlight + (password.length > 0 ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
+            + `the player password to ${TM.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
         }]
       },
         {
@@ -78,9 +78,9 @@ const commands: TMCommand[] = [
     aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
     help: 'Change the spectator password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, password: string) => {
+    callback: (info: MessageInfo, password?: string) => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
-      if (!regex.test(password) || password.length > 0) {
+      if (password !== undefined && !regex.test(password)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
-            + `the spectator password to ${TM.palette.highlight + (password.length > 0 ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
+            + `the spectator password to ${TM.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
         }]
       },
         {
