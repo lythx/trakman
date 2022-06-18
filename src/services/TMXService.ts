@@ -70,7 +70,7 @@ export abstract class TMXService {
   /**
    * Fetches track gbx file from tmx by track id, returns name and file in base64 string
    */
-  static async fetchTrackFile(id: string, game: string = 'TMNF'): Promise<TMXFileData | Error> {
+  static async fetchTrackFile(id: number, game: string = 'TMNF'): Promise<TMXFileData | Error> {
     const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => err)
     if (res instanceof Error) {
@@ -106,7 +106,7 @@ export abstract class TMXService {
     }
     if (prefix === '') { return new Error('Cannot fetch track data from TMX') }
     const s = data.split('\t')
-    const id = s[0]
+    const id = Number(s[0])
     const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
     return await this.fetchTrackFile(id, site)
   }
