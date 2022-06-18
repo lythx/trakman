@@ -36,7 +36,7 @@ export abstract class ChatService {
             TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Required param ${param.name} not specified.`, info.login)
             return
           }
-          if (params[i].toLowerCase() === 'null' && param.optional === undefined) { parsedParams.push(undefined) }
+          if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
           switch (param.type) {
             case 'int':
               if (!Number.isInteger(Number(params[i]))) {
