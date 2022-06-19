@@ -24,7 +24,7 @@ export default class DayTime extends StaticComponent implements IStaticComponent
     TM.sendManialink(`
     <manialink id="${this.id}">
       <frame posn="-64.7 37.65 10">
-        <quad posn="0 0 1" sizen="15.5 4.5" 
+        <quad posn="0 0 1" sizen="15.5 4.5" action="50"
          style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
         <label posn="2.9 -0.45 2" sizen="14 2" style="TextRaceChrono" scale="0.7" text="${CFG.widgetStyleRace.formattingCodes}${this.timeString}"/>
       </frame>

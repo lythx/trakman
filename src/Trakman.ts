@@ -509,6 +509,10 @@ export const TRAKMAN = {
       return undefined
     }
     return guesses[0].login
+  },
+
+  get commandList() {
+    return ChatService.commandList
   }
 
 }
