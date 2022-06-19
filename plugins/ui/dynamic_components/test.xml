@@ -1,24 +1,220 @@
-<manialink id="432432432">
-        <frame posn="-40.2 27.85 10">
-          <quad posn="0 0 0.02" sizen="80.4 55.7" style="Bgs1InRace" substyle="NavButton"/>
-            <frame posn="0.4 -0.44 1">
-            <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/><quad 
-posn="2.5 -2.1 0.04" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="TV"/>
-        <label posn="39.800000000000004 -2.1 0.04" sizen="80.4 55.7" halign="center" valign="center" textsize="3" 
-text="$STITLE_HERE_MAN_XD"/>
+<manialink id="1000">
+        <frame posn="-40.2 33.050000000000004 10">
+          <quad posn="0 0 0.02" sizen="80.4 66.10000000000001" image="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png"/>
+            <frame posn="0 0 0">
+            <quad posn="0 0 1" sizen="80.4 4.2" image="https://cdn.discordapp.com/attachments/522878388269088782/988019645816664094/unknown.png"/>
+            <quad posn="2.5 -2.1 2" sizen="3.5 3.5" halign="center" valign="center" style="Icons64x64_1" substyle="TV"/>
+        <label posn="39.800000000000004 -2.1 2" sizen="80.4 66.10000000000001" halign="center" valign="center" textsize="3" text="Bibgo :D"/>
         </frame>
-        <frame posn="0.4 -5 1">
-          <quad posn="0 0 0" sizen="79.60000000000001 45.6" style="BgsPlayerCard" substyle="BgCardSystem"/>       
+        <frame posn="0 -4.2 1">
+          <quad posn="0 0 0" sizen="79.60000000000001 56.00000000000001" image=""/>
+             <quad posn="27 0 4" sizen="0.1 57.6" image="https://cdn.discordapp.com/attachments/522878388269088782/988019645816664094/unknown.png"/>
+             <quad posn="0 -4.6 4" sizen="80.4 0.1" image="https://cdn.discordapp.com/attachments/522878388269088782/988019645816664094/unknown.png"/>
           <frame posn="1 -1.5 0.02">
+        <frame posn="0 -2 0.02">
+          <!-- <quad posn="0 0 1" sizen="25 53" style="BgsPlayerCard" substyle="BgRacePlayerName"/> -->
+          <format textsize="1.3" textcolor="FFFF"/>
+          <label posn="1 2.3 3" sizen="13.55 2" scale="1.5" text="$sOngoing"/>
+          <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
+          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="https://united.tm-exchange.com/get.aspx?action=trackscreensmall&amp;id=3841107&amp;.jpeg"/>
+          <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="$sSlowly Race"/>
+          <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="$sby petr_kharpe"/>
+          <quad posn="0.4 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202802231173210/map_author_time_alt.png"/>
+          <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="$s0:12.91"/>
+          <quad posn="0.4 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202803502043136/map_envi.png"/>
+          <label posn="2.5 -30.38 3" sizen="5.25 2" scale="1" text="$sStadium"/>
+          <quad posn="0.4 -32.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202827975815198/map_karma.png"/>
+          <label posn="2.5 -32.38 3" sizen="5.25 2" scale="1" text="$s100"/>
+          <quad posn="8 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202801794953246/map_added.png"/>
+          <label posn="10.1 -28.38 3" sizen="7.15 2" scale="1" text="$s18/06/2022"/>
+          <quad posn="8 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828244238416/map_mood.png"/>
+          <label posn="10.1 -30.38 3" sizen="7.15 2" scale="1" text="$sDay"/>
+          <quad posn="17.5 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202850734096445/map_your_rank.png"/>
+          <label posn="19.6 -28.38 3" sizen="5 2" scale="1" text="$s1st"/>
+          <quad posn="17.5 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202802931609680/map_cost.png"/>
+          <label posn="19.6 -30.38 3" sizen="5 2" scale="1" text="$s574"/>
+
+              <quad posn="0.4 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987203422518407178/map_type.png"/>
+              <label posn="2.5 -34.38 3" sizen="5.25 2" scale="1" text="$sRace "/>
+              <quad posn="0.4 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202829531885568/map_routes.png"/>
+              <label posn="2.5 -36.38 3" sizen="5.25 2" scale="1" text="$sMulti"/>
+              <quad posn="8 -32.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202829737398332/map_style.png"/>
+              <label posn="10.1 -32.38 3" sizen="7.15 2" scale="1" text="$sStunt"/>
+              <quad posn="8 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/618467373053247489/987806592131010580/map_difficulty_beginner.png"/>     
+              <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="$sBeginner"/>
+              <quad posn="8 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202802440884264/map_built.png"/>
+              <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1"
+               text="$s01/07/2011"/>
+              <quad posn="17.5 -32.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202850562142290/map_tmx_ranking_normal.png"/>      
+              <label posn="19.6 -32.38 3" sizen="5 2" scale="1" text="$s1000"/>
+              <quad posn="17.5 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987204614124367872/map_awards.png"/>
+              <label posn="19.6 -34.38 3" sizen="5 2" scale="1" text="$s0"/>
+              <quad posn="17.5 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202803724320858/map_game.png"/>
+              <label posn="19.6 -36.38 3" sizen="5 2" scale="1" text="$sTMU"/>
+              <quad posn="6 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202803330072627/map_download.png"
+               url="united.tm-exchange.com/trackgbx/3841107"/>
+              <quad posn="11 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202802709327872/map_check_dedimania.png"
+               url="http://dedimania.net/tmstats/?do=stat&amp;Uid=M0OMrZwnUa7eHtMPff3f8fgHV_0&amp;Show=RECORDS"/>
+              <quad posn="16 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202828424601671/map_open_tmx.png"
+               url="united.tm-exchange.com/trackshow/3841107"/>
+          <quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
+            <quad posn="5.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202828915314688/map_replay_players.png"/>
+            <quad posn="11.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202829129244682/map_replay_times.png"/>
+            <quad posn="17.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202829313777684/map_replay_uploaded.png"/>
+          <quad posn="0.9 -41.7 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211349996208148/map_replay_first.png"/>
+          <label posn="3 -41.9 3" sizen="6.4 2" scale="1"
+           text="$sBladew1ng"/>
+          <label posn="12.5 -41.9 3" sizen="4 2" scale="1" halign="center"
+           text="$s0:09.52"/>
+          <label posn="15.5 -41.9 3" sizen="6.4 2" scale="1"
+           text="$s23/10/2018"/>
+          <quad posn="22.15 -41.5 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828651102218/map_replay_download.png"
+           url="united.tm-exchange.com/recordgbx/5160844"/>
+          <quad posn="0.9 -44 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211350264676442/map_replays_second.png"/>
+          <label posn="3 -44.199999999999996 3" sizen="6.4 2" scale="1" text="$sN/A"/>
+          <label posn="10 -44.199999999999996 3" sizen="6.4 2" scale="1" text="$s-:--.--"/>
+          <label posn="15.5 -44.199999999999996 3" sizen="6.4 2" scale="1" text="$s--/--/----"/>
+          <quad posn="0.9 -46.300000000000004 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211350470168606/map_replays_third.png"/>
+          <label posn="3 -46.5 3" sizen="6.4 2" scale="1" text="$sN/A"/>
+          <label posn="10 -46.5 3" sizen="6.4 2" scale="1" text="$s-:--.--"/>
+          <label posn="15.5 -46.5 3" sizen="6.4 2" scale="1" text="$s--/--/----"/>
+        </frame>
+        <frame posn="52 0 0.02">
+          <quad posn="0 0 1" sizen="25 53" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
+          <quad posn="0.4 -0.36 2" sizen="24.2 2.1" style="BgsPlayerCard" substyle="BgCardSystem"/>
+          <quad posn="0.6 -0.2 3" sizen="2.5 2.5"  style="BgRaceScore2" substyle="Warmup"/>
+          <format textsize="1.3" textcolor="FFFF"/>
+          <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="$sNext Map"/>
+          <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
+          <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="https://tmnforever.tm-exchange.com/get.aspx?action=trackscreensmall&amp;id=9589688&amp;.jpeg"/>
+          <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="$s0 iq jump 001"/>
+          <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="$sby anrede"/>
+          <quad posn="0.4 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202802231173210/map_author_time_alt.png"/>
+          <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="$s0:08.56"/>
+          <quad posn="0.4 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202803502043136/map_envi.png"/>
+          <label posn="2.5 -30.38 3" sizen="5.25 2" scale="1" text="$sStadium"/>
+          <quad posn="0.4 -32.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202827975815198/map_karma.png"/>
+          <label posn="2.5 -32.38 3" sizen="5.25 2" scale="1" text="$s100"/>
+          <quad posn="8 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202801794953246/map_added.png"/>
+          <label posn="10.1 -28.38 3" sizen="7.15 2" scale="1" text="$s18/06/2022"/>
+          <quad posn="8 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828244238416/map_mood.png"/>
+          <label posn="10.1 -30.38 3" sizen="7.15 2" scale="1" text="$sSunset"/>
+          <quad posn="17.5 -28.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202850734096445/map_your_rank.png"/>
+          <label posn="19.6 -28.38 3" sizen="5 2" scale="1" text="$s--."/>
+          <quad posn="17.5 -30.2 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202802931609680/map_cost.png"/>
+          <label posn="19.6 -30.38 3" sizen="5 2" scale="1" text="$s2183"/>
+
+              <quad posn="0.4 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987203422518407178/map_type.png"/>
+              <label posn="2.5 -34.38 3" sizen="5.25 2" scale="1" text="$sRace "/>
+              <quad posn="0.4 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202829531885568/map_routes.png"/>
+              <label posn="2.5 -36.38 3" sizen="5.25 2" scale="1" text="$sSingle"/>
+              <quad posn="8 -32.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202829737398332/map_style.png"/>
+              <label posn="10.1 -32.38 3" sizen="7.15 2" scale="1" text="$sNormal"/>
+              <quad posn="8 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/618467373053247489/987806592835649616/map_difficulty_intermediate.png"/> 
+              <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="$sIntermediate"/>
+              <quad posn="8 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202802440884264/map_built.png"/>
+              <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1"
+               text="$s23/05/2022"/>
+              <quad posn="17.5 -32.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202850562142290/map_tmx_ranking_normal.png"/>      
+              <label posn="19.6 -32.38 3" sizen="5 2" scale="1" text="$s69403"/>
+              <quad posn="17.5 -34.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987204614124367872/map_awards.png"/>
+              <label posn="19.6 -34.38 3" sizen="5 2" scale="1" text="$s2"/>
+              <quad posn="17.5 -36.2 3" sizen="1.9 1.9"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202803724320858/map_game.png"/>
+              <label posn="19.6 -36.38 3" sizen="5 2" scale="1" text="$sTMNF"/>
+              <quad posn="6 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202803330072627/map_download.png"
+               url="tmnforever.tm-exchange.com/trackgbx/9589688"/>
+              <quad posn="11 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202802709327872/map_check_dedimania.png"
+               url="http://dedimania.net/tmstats/?do=stat&amp;Uid=M0OMrZwnUa7eHtMPff3f8fgHV_0&amp;Show=RECORDS"/>
+              <quad posn="16 -49.2 3" sizen="3.2 3.2"
+               image="https://cdn.discordapp.com/attachments/506852548938956800/987202828424601671/map_open_tmx.png"
+               url="tmnforever.tm-exchange.com/trackshow/9589688"/>
+          <quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
+            <quad posn="5.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202828915314688/map_replay_players.png"/>
+            <quad posn="11.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202829129244682/map_replay_times.png"/>
+            <quad posn="17.55 -39.5 3" sizen="1.9 1.9"
+             image="https://cdn.discordapp.com/attachments/506852548938956800/987202829313777684/map_replay_uploaded.png"/>
+          <quad posn="0.9 -41.7 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211349996208148/map_replay_first.png"/>
+          <label posn="3 -41.9 3" sizen="6.4 2" scale="1"
+           text="$sBdaaav"/>
+          <label posn="12.5 -41.9 3" sizen="4 2" scale="1" halign="center"
+           text="$s0:08.09"/>
+          <label posn="15.5 -41.9 3" sizen="6.4 2" scale="1"
+           text="$s17/06/2022"/>
+          <quad posn="22.15 -41.5 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828651102218/map_replay_download.png"
+           url="tmnforever.tm-exchange.com/recordgbx/9648267"/>
+          <quad posn="0.9 -44 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211350264676442/map_replays_second.png"/>
+          <label posn="3 -44.199999999999996 3" sizen="6.4 2" scale="1"
+           text="$strick46"/>
+          <label posn="12.5 -44.199999999999996 3" sizen="4 2" scale="1" halign="center"
+           text="$s0:08.38"/>
+          <label posn="15.5 -44.199999999999996 3" sizen="6.4 2" scale="1"
+           text="$s13/06/2022"/>
+          <quad posn="22.15 -43.8 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828651102218/map_replay_download.png"
+           url="tmnforever.tm-exchange.com/recordgbx/9641835"/>
+          <quad posn="0.9 -46.300000000000004 3" sizen="1.9 1.9" image="https://cdn.discordapp.com/attachments/506852548938956800/987211350470168606/map_replays_third.png"/>
+          <label posn="3 -46.5 3" sizen="6.4 2" scale="1"
+           text="$sbomber boop"/>
+          <label posn="12.5 -46.5 3" sizen="4 2" scale="1" halign="center"
+           text="$s0:08.46"/>
+          <label posn="15.5 -46.5 3" sizen="6.4 2" scale="1"
+           text="$s23/05/2022"/>
+          <quad posn="22.15 -46.1 3" sizen="1.9 1.9"
+           image="https://cdn.discordapp.com/attachments/506852548938956800/987202828651102218/map_replay_download.png"
+           url="tmnforever.tm-exchange.com/recordgbx/9589970"/>
+        </frame>
           </frame>
         </frame>
-        <frame posn="0.4 -51 1">
-            <quad posn="0 0 0" sizen="79.60000000000001 4.2" style="BgsPlayerCard" substyle="BgCardSystem"/>
-            <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowFirst"/>
-            <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowPrev"/>
-            <quad posn="39.6 -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="StatePrivate"/>
-            <quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowNext"/>
-            <quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="432432432" style="Icons64x64_1" substyle="ArrowLast"/>
+          <frame posn="0 -61.86000000000001 1">
+            <quad posn="0 0 0" sizen="80.4 4.2" image="https://cdn.discordapp.com/attachments/522878388269088782/988019645816664094/unknown.png"/>
+            <quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>
+            <quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="2000"
+        imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
+        image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/><quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="1002"
+      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
+      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png"/>
+          </frame>
         </frame>
-  </frame>
-</manialink>
+      </manialink>

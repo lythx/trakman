@@ -153,11 +153,11 @@ const commands: TMCommand[] = [
     },
     privilege: 0
   },
+  //DELETE LATER
   {
     aliases: ['qwe'],
     params: [{ name: 'nickName' }],
     callback: (info: MessageInfo, nickName: string) => {
-      console.log('dasdas')
       TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
     },
     privilege: 0

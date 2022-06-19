@@ -1,3 +1,5 @@
+import ICN from './Icons.json' assert { type: 'json'}
+
 export default class Paginator {
 
   buttonCount = 0
@@ -53,65 +55,65 @@ export default class Paginator {
   constructXml(page: number) {
     if (this.buttonCount === 0) {
       return `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
+      imagefocus="${ICN.X.orange}"
+      image="${ICN.X.white}"/>`
     }
     let xml = ''
     if (page !== 1) {
       xml += `<quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 1}" 
-        imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552527298601/prevek8.png"
-        image="https://cdn.discordapp.com/attachments/599381118633902080/986427882190553088/prevek8w.png"/>`
+        imagefocus="${ICN.arrowL.orange}"
+        image="${ICN.arrowL.white}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" 
-            imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551449370634/firstek8.png"
-            image="https://cdn.discordapp.com/attachments/599381118633902080/986427881192296448/firstek8w.png"/>
+            imagefocus="${ICN.arrowMaxL.orange}"
+            image="${ICN.arrowMaxL.white}"/>
             <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 3}" 
-            imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551835250738/jumpekbw8.png"
-            image="https://cdn.discordapp.com/attachments/599381118633902080/986427881590779934/jumpekbw8w.png"/>`
+            imagefocus="${ICN.arrowDoubleL.orange}"
+            image="${ICN.arrowDoubleL.white}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 5}" 
-        imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551449370634/firstek8.png"
-        image="https://cdn.discordapp.com/attachments/599381118633902080/986427881192296448/firstek8w.png"/>`
+        imagefocus="${ICN.arrowMaxL.orange}"
+        image="${ICN.arrowMaxL.white}"/>`
       }
     }
     else {
-      xml += `<quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+      xml += `<quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       if (this.buttonCount > 1) {
-        xml += `<quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+        xml += `<quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       }
       if (this.buttonCount > 2) {
-        xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+        xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       }
     }
     xml += `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-        imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
-        image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
+        imagefocus="${ICN.X.orange}"
+        image="${ICN.X.white}"/>`
     if (page !== this.pageCount) {
       xml += `<quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 2}" 
-      imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
-      image="https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png"/>`
+      imagefocus="${ICN.arrowR.orange}"
+      image="${ICN.arrowR.white}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 4}" 
-          imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551654887514/jumpek8.png"
-          image="https://cdn.discordapp.com/attachments/599381118633902080/986427881402019941/jumpek8w.png"/>
+          imagefocus="${ICN.arrowDoubleR.orange}"
+          image="${ICN.arrowDoubleR.white}"/>
           <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" 
-          imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552019816489/lastek8.png"
-          image="https://cdn.discordapp.com/attachments/599381118633902080/986427881792086046/lastek8w.png"/>`
+          imagefocus="${ICN.arrowMaxR.orange}"
+          image="${ICN.arrowMaxR.white}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.id + 6}" 
-          imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425552019816489/lastek8.png"
-          image="https://cdn.discordapp.com/attachments/599381118633902080/986427881792086046/lastek8w.png"/>`
+          imagefocus="${ICN.arrowMaxR.orange}"
+          image="${ICN.arrowMaxR.white}"/>`
       }
     }
     else {
-      xml += `<quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+      xml += `<quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       if (this.buttonCount > 1) {
-        xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png"/>`
+        xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       }
       if (this.buttonCount > 2) {
-        xml += `<quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="https://cdn.discordapp.com/attachments/599381118633902080/986425551248031784/emptek8.png" /> `
+        xml += `<quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}" /> `
       }
     }
     return xml

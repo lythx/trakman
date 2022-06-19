@@ -59,7 +59,6 @@ export const TRAKMAN = {
     const days: number = d.getUTCDate() - 1
     const months: number = d.getUTCMonth()
     const years: number = d.getUTCFullYear() - 1970
-    console.log(years)
     if (years > 0) { str += years === 1 ? `${years} year, ` : `${years} years, ` }
     if (months > 0) { str += months === 1 ? `${months} month, ` : `${months} months, ` }
     if (days > 0) { str += days === 1 ? `${days} day, ` : `${days} days, ` }
@@ -486,7 +485,6 @@ export const TRAKMAN = {
     for (const guess of guesses) {
       for (const [i, letter] of guess.nickName.split('').entries()) {
         if (charmap?.[nickName[0]?.toString()]?.some((a: any) => a === letter) || nickName[0]?.toString() === letter) {
-          console.log(letter)
           for (let j = 0; j < nickName.length + 1; j++) {
             if (j === nickName.length + 1) {
               guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
@@ -503,9 +501,8 @@ export const TRAKMAN = {
         }
       }
     }
-    console.log(guesses)
     guesses.sort((a, b) => b.longestMatch - a.longestMatch)
-    if (Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
+    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
       return undefined
     }
     if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
