@@ -105,12 +105,15 @@ const commands: TMCommand[] = [
     aliases: ['bl', 'blacklist'],
     help: 'Blacklist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, login: string, duration?: number, reason?: string) => {
-      const targetInfo = TM.getPlayer(login)
+    callback: async (info: MessageInfo, login: string, duration?: number, reason?: string) => {
       const expireDate = duration === undefined ? undefined : new Date(Date.now() + duration)
+      let targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} is not on the server.`, info.login)
-        return
+        targetInfo = await TM.fetchPlayer(login)
+        if (targetInfo == null) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
+          return
+        }
       }
       TM.addToBlacklist(targetInfo.login, info.login, reason, expireDate)
       const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
@@ -239,9 +242,9 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
         return
       }
-      let targetInfo = TM.getPlayer(info.login)
+      let targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(info.login)
+        targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
           return

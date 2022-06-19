@@ -175,4 +175,8 @@ export abstract class ChatService {
   static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
     return await this.repo.getByLogin(login, limit)
   }
+
+  private static nickNameToLogin(nickName: string) {
+    
+  }
 }

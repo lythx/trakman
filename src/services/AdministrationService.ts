@@ -33,7 +33,6 @@ export class AdministrationService {
         }
         setInterval(() => {
             const date = new Date()
-            console.log(this._banlist?.[0]?.expireDate)
             for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
                 this.removeFromBanlist(e.login)
             }
@@ -77,7 +76,6 @@ export class AdministrationService {
     }
 
     static get banlist() {
-        console.log(this._banlist)
         return [...this._banlist]
     }
 
@@ -130,7 +128,7 @@ export class AdministrationService {
         if (this._guestlist.some(a => a.login === login)) { return }
         const date = new Date()
         // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
-        const add = await Client.call('AddGuest', [{ string: 'login' }])
+        const add = await Client.call('AddGuest', [{ string: login }])
         if (add instanceof Error) {
             return add
         }
@@ -142,7 +140,7 @@ export class AdministrationService {
     static async removeFromGuestlist(login: string): Promise<void | Error> {
         if (!this._guestlist.some(a => a.login === login)) { return }
         // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
-        const remove = await Client.call('RemoveGuest', [{ string: 'login' }])
+        const remove = await Client.call('RemoveGuest', [{ string: login }])
         if (remove instanceof Error) {
             return remove
         }
