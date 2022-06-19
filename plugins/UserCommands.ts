@@ -152,6 +152,15 @@ const commands: TMCommand[] = [
       TM.sendMessage(str.slice(0, -2), info.login)
     },
     privilege: 0
+  },
+  {
+    aliases: ['qwe'],
+    params: [{ name: 'nickName' }],
+    callback: (info: MessageInfo, nickName: string) => {
+      console.log('dasdas')
+      TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
+    },
+    privilege: 0
   }
 ]
 

@@ -69,7 +69,7 @@ const commands: TMCommand[] = [
       },
         {
           method: 'SetServerPassword',
-          params: [{ string: password }]
+          params: [{ string: password === undefined ? '' : password }]
         })
     },
     privilege: 3
@@ -94,7 +94,7 @@ const commands: TMCommand[] = [
       },
         {
           method: 'SetServerPasswordForSpectator',
-          params: [{ string: password }]
+          params: [{ string: password === undefined ? '' : password  }]
         })
     },
     privilege: 3
