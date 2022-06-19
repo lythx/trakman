@@ -8,8 +8,10 @@ import { TRAKMAN as TM } from '../Trakman.js'
 const messagesArraySize = 250
 
 export abstract class ChatService {
+
   static readonly messages: TMMessage[] = []
   private static repo: ChatRepository
+  private static readonly _commandList: TMCommand[] = []
 
   static async initialize(repo: ChatRepository = new ChatRepository()): Promise<void> {
     this.repo = repo
@@ -18,6 +20,8 @@ export abstract class ChatService {
 
   static addCommand(command: TMCommand): void {
     const prefix = command.privilege === 0 ? '/' : '//'
+    this._commandList.push(command)
+    this._commandList.splice(this._commandList.findIndex(a => a.aliases[0].localeCompare(command.aliases[0])), 0)
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
       const input = info.text?.trim()
       if (!command.aliases.some((alias: string) => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {
@@ -176,7 +180,8 @@ export abstract class ChatService {
     return await this.repo.getByLogin(login, limit)
   }
 
-  private static nickNameToLogin(nickName: string) {
-    
+  static get commandList() {
+    return [...this._commandList]
   }
+
 }

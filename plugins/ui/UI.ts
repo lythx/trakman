@@ -21,6 +21,7 @@ import JukeboxWidget from './dynamic_components/JukeboxWidget.component.js'
 import TestWindow from './dynamic_components/TestWindow.js'
 import TMXWidget from './dynamic_components/TMXWidget.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
+import HelpWidget from './dynamic_components/HelpWidget.component.js'
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
@@ -127,7 +128,8 @@ const events: TMEvent[] = [
       for (const c of staticComponents) { c.display() }
       dynamicComponents.push(
         new JukeboxWidget(10000, 50000),
-        new TMXWidget(1000, 2000)
+        new TMXWidget(1000, 2000),
+        new HelpWidget(50, 60)
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {
