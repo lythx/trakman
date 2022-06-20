@@ -1,9 +1,8 @@
-import {CONFIG as CFG } from '../UiUtils.js'
+import { CONFIG as CFG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import IStaticComponent from './StaticComponent.interface.js'
-import StaticComponent from './StaticComponent.js'
+import StaticComponent from '../StaticComponent.js'
 
-export default class temp1 extends StaticComponent implements IStaticComponent {
+export default class temp1 extends StaticComponent {
 
   private xml =      // RANDOM ASS WINDOW FOR REFERENCE ID (autistic flexi)
     `<manialink id="${this.id}">
@@ -13,8 +12,8 @@ export default class temp1 extends StaticComponent implements IStaticComponent {
       </frame>
     </manialink>`
 
-  constructor(id: number) {
-    super('race', id)
+  constructor() {
+    super(IDS.temp1, 'race')
   }
 
   display(): void {
