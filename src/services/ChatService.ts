@@ -20,8 +20,9 @@ export abstract class ChatService {
 
   static addCommand(command: TMCommand): void {
     const prefix = command.privilege === 0 ? '/' : '//'
+    // this could be 1000x more effective. too bad
     this._commandList.push(command)
-    this._commandList.splice(this._commandList.findIndex(a => a.aliases[0].localeCompare(command.aliases[0])), 0)
+    this._commandList.sort((a, b) => a.aliases[0].localeCompare(b.aliases[0]))
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
       const input = info.text?.trim()
       if (!command.aliases.some((alias: string) => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {

@@ -1,5 +1,5 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
-import UIConfig from './UIConfig.json' assert { type: 'json' }
+import { CONFIG as UIConfig } from './UiUtils.js'
 
 import CustomUi from './CustomUi.js'
 
@@ -16,12 +16,12 @@ import LocalRanking from './static_components/LocalRanking.component.js'
 import LiveRanking from './static_components/LiveRanking.component.js'
 import StaticComponent from './static_components/StaticComponent.js'
 
-import DynamicComponent from './dynamic_components/DynamicComponent.js'
-import JukeboxWidget from './dynamic_components/JukeboxWidget.component.js'
-import TestWindow from './dynamic_components/TestWindow.js'
-import TMXWidget from './dynamic_components/TMXWidget.component.js'
+import DynamicComponent from './DynamicComponent.js'
+import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
+import TestWindow from './test_widgets/TestWindow.js'
+import TMXWindow from './dynamic_components/TMXWindow.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
-import HelpWidget from './dynamic_components/HelpWidget.component.js'
+import HelpWindow from './dynamic_components/HelpWindow.component.js'
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
@@ -127,9 +127,9 @@ const events: TMEvent[] = [
       )
       for (const c of staticComponents) { c.display() }
       dynamicComponents.push(
-        new JukeboxWidget(10000, 50000),
-        new TMXWidget(1000, 2000),
-        new HelpWidget(50, 60)
+        new JukeboxWindow(),
+        new TMXWindow(),
+        new HelpWindow()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {

@@ -1,57 +1,36 @@
-import PopupWindow from "./PopupWindow.js";
-import IPopupWindow from "./PopupWindow.interface.js";
+import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import CFG from '../UIConfig.json' assert { type: 'json' }
-import Paginator from "../Paginator.js";
-import ICN from '../Icons.json' assert { type: 'json' }
-import BG from '../Backgrounds.json'  assert { type: 'json' }
+import { CONFIG as CFG, headerIconTitleText, ICONS as ICN, ICONS, IDS } from '../UiUtils.js'
+import { Paginator } from "../UiUtils.js";
 
-interface PlayerPage {
-  readonly login: string
-  page: number
-}
-
-export default class TMXWidget extends PopupWindow implements IPopupWindow {
+export default class TMXWindow extends PopupWindow {
 
   private readonly itemsPerPage = 3
   private readonly queueMapsCount = 4
   private readonly previousMapsCount = 4
-  private readonly playerPages: PlayerPage[] = []
   private readonly paginator: Paginator
 
-  constructor(openId: number, closeId: number) {
-    super(openId, closeId, 56)
-    this.paginator = new Paginator(openId, closeId, Math.ceil(1 + this.queueMapsCount / this.itemsPerPage))
-  }
-
-  setupListeners(): void {
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
-        const playerPage = this.playerPages.find(a => a.login === info.login)
-        if (playerPage === undefined) { // Should never happen
-          TM.error(`Can't find player ${info.login} in playerPages array in TMXWidget.`, `Clicked manialink id: ${info.answer}`)
-          this.closeToPlayer(info.login)
-          return
-        }
-        const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
-        const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
-        this.paginator.updatePageCount(prevCount + 1 + nextCount)
-        const page = this.paginator.getPageFromClick(info.answer, playerPage.page)
-        playerPage.page = page
-        this.displayToPlayer(info.login, page)
-      } else if (info.answer === this.id) {
-        const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
-        const page = prevCount + 1
-        if (!this.playerPages.some(a => a.login === info.login)) { this.playerPages.push({ login: info.login, page }) }
-        const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
-        this.paginator.updatePageCount(prevCount + 1 + nextCount)
-        this.displayToPlayer(info.login, page)
-      }
-      else if (info.answer === this.closeId) { this.closeToPlayer(info.login) }
+  constructor() {
+    super(IDS.TMXWindow)
+    this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(1 + this.queueMapsCount / this.itemsPerPage))
+    this.paginator.onPageChange((login: string, page: number) => {
+      this.displayToPlayer(login, page)
     })
   }
 
-  constructContent(login: string, page: number): string {
+  protected onOpen(info: ManialinkClickInfo): void {
+    //for now its getting update here but thats bad, should be on event
+    const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
+    const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
+    this.paginator.updatePageCount(prevCount + 1 + nextCount)
+    this.displayToPlayer(info.login, prevCount + 1)
+  }
+
+  protected constructHeader(login: string, page: number): string {
+    return headerIconTitleText('Map Info', this.windowWidth, this.titleHeight, ICONS.mapQuestionMark, 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
+  }
+
+  protected constructContent(login: string, page: number): string {
     const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
     const challenges = TM.challenges
     challenges.sort((a, b) => a.author.localeCompare(b.author))
@@ -111,14 +90,12 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
     return xml
   }
 
-  constructFooter(login: string, page: number): string {
+  protected constructFooter(login: string, page: number): string {
     return this.paginator.constructXml(page)
   }
 
   private getTMXXml(tmxInfo: TMXTrackInfo | null) {
-    if (tmxInfo === null) {
-      return ''
-    }
+    if (tmxInfo === null) { return '' }
     let lbRating: string = tmxInfo.leaderboardRating.toString()
     let lbIcon = ICN.star.white
     if (tmxInfo.isClassic === true) {
@@ -188,7 +165,7 @@ export default class TMXWidget extends PopupWindow implements IPopupWindow {
              image="${ICN.timer}"/>
             <quad posn="17.55 -39.5 3" sizen="1.9 1.9" 
              image="${ICN.calendar}"/>`
-    const positionIcons = [ICN.one, ICN.two,ICN.three ]
+    const positionIcons = [ICN.one, ICN.two, ICN.three]
     for (let i = 0; i < 3; i++) {
       const imgPos = -(41.7 + (2.3 * i))
       const txtPos = -(41.9 + (2.3 * i))

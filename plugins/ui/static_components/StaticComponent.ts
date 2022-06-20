@@ -1,6 +1,6 @@
 import IStaticComponent from "./StaticComponent.interface";
 import { TRAKMAN as TM } from "../../../src/Trakman.js"
-import CFG from '../UIConfig.json' assert { type: 'json' }
+import {CONFIG as CFG } from '../UiUtils.js'
 
 type DisplayMode = 'always' | 'race' | 'result'
 
