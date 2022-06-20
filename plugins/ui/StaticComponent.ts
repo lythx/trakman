@@ -1,10 +1,7 @@
-import IStaticComponent from "./StaticComponent.interface";
-import { TRAKMAN as TM } from "../../../src/Trakman.js"
-import {CONFIG as CFG } from '../UiUtils.js'
+import { TRAKMAN as TM } from "../../src/Trakman.js"
+import { CONFIG as CFG } from './UiUtils.js'
 
-type DisplayMode = 'always' | 'race' | 'result'
-
-export default abstract class StaticComponent implements IStaticComponent {
+export default abstract class StaticComponent {
 
   protected static readonly titleWidth = CFG.localRecordsWidget.width - 0.8
   protected _isDisplayed: boolean = false
@@ -24,7 +21,7 @@ export default abstract class StaticComponent implements IStaticComponent {
     [
       {
         event: 'TrackMania.EndChallenge',
-        callback: () => { this.close() }
+        callback: () => { this.hide() }
       },
       {
         event: 'Controller.BeginChallenge',
@@ -45,7 +42,7 @@ export default abstract class StaticComponent implements IStaticComponent {
       },
       {
         event: 'Controller.BeginChallenge',
-        callback: () => { this.close() }
+        callback: () => { this.hide() }
       },
       {
         event: 'Controller.PlayerJoin',
@@ -57,7 +54,7 @@ export default abstract class StaticComponent implements IStaticComponent {
     ]
   ]
 
-  constructor(displayMode: DisplayMode, id: number) {
+  constructor(id: number, displayMode: 'always' | 'race' | 'result') {
     this.displayMode = ['always', 'race', 'result'].indexOf(displayMode)
     this.id = id
     for (const e of this.displayModeListeners[this.displayMode]) { TM.addListener(e.event, e.callback) }
@@ -67,28 +64,11 @@ export default abstract class StaticComponent implements IStaticComponent {
     return this._isDisplayed
   }
 
-  display(): void {
-    this._isDisplayed = true
-    TM.sendManialink(
-      `<manialink id="1">
-        <label posn="0 0 0" sizen="100 0" 
-         halign="center" textsize="5" text="display method for manialink id ${this.id} not implemented"/> 
-        <format textsize="5" textcolor="F00F"/>
-      </manialink>`
-    )
-  }
+  abstract display(): void
 
-  displayToPlayer(login: string): void {
-    TM.sendManialink(
-      `<manialink id="1">
-        <label posn="0 0 0" sizen="100 0" 
-         halign="center" textsize="5" text="displayToPlayer method for manialink id ${this.id} not implemented"/> 
-        <format textsize="5" textcolor="F00F"/>
-      </manialink>`,
-      login)
-  }
+  abstract displayToPlayer(login: string): void
 
-  close(): void {
+  hide(): void {
     this._isDisplayed = false
     TM.sendManialink(`<manialink id="${this.id}"></manialink>`)
   }

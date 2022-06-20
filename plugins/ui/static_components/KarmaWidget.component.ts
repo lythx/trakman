@@ -1,9 +1,8 @@
-import { CONFIG as CFG } from '../UiUtils.js'
+import { CONFIG as CFG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import IStaticComponent from './StaticComponent.interface.js'
-import StaticComponent from './StaticComponent.js'
+import StaticComponent from '../StaticComponent.js'
 
-export default class KarmaWidget extends StaticComponent implements IStaticComponent {
+export default class KarmaWidget extends StaticComponent {
 
   private xml =
     `<manialink id="${this.id}">
@@ -19,8 +18,8 @@ export default class KarmaWidget extends StaticComponent implements IStaticCompo
     </frame>
   </manialink>`
 
-  constructor(id: number) {
-    super('race', id)
+  constructor() {
+    super(IDS.KarmaWidget, 'race')
   }
 
   display(): void {
