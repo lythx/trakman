@@ -1,0 +1,12 @@
+<frame posn="0 0 1"/>
+    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="1000"/>
+    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="penis" valign="center" halign="center"/>
+    </frame>
+<frame posn="30 0 1"/>
+    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="4321"/>
+    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="sussy petya" valign="center" halign="center"/>
+</frame>
+<frame posn="60 0 1"/>
+    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="432145"/>
+    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="heheheha" valign="center" halign="center"/>
+</frame>

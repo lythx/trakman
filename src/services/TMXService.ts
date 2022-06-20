@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { JukeboxService } from './JukeboxService.js'
+import 'dotenv/config'
 
 export abstract class TMXService {
 
@@ -11,9 +12,8 @@ export abstract class TMXService {
   private static readonly nextSize = 4
   private static readonly previousSize = 4
 
-  static async initialize(): Promise<void | Error> {
-    const status = await this.fetchTrackInfo('zwAbNlFSDcXjRBk0YSMyxc5kJJ8') // Fetching A12 to test if TMX is working
-    if (status instanceof Error) { return status }
+  static async initialize(): Promise<void> {
+    if (process.env.USE_TMX !== 'YES') { return }
     const current = await this.fetchTrackInfo(JukeboxService.current.id)
     this._current = current instanceof Error ? null : current
     for (let i = 0; i < Math.min(JukeboxService.queue.length, this.nextSize); i++) {
@@ -24,6 +24,7 @@ export abstract class TMXService {
   }
 
   static async nextChallenge(): Promise<void | Error> {
+    if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current)
     this._previous.length = Math.min(this._previous.length, this.previousSize)
     const next = this._next.shift()
@@ -37,33 +38,37 @@ export abstract class TMXService {
   }
 
   static restartChallenge(): void {
+    if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current === null ? null : { ...this._current })
     this._previous.length = Math.min(this._previous.length, this.previousSize)
   }
 
   static async add(id: string, index: number): Promise<void | Error> {
-    if (index >= this.nextSize) { return }
+    if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
     const track = await this.fetchTrackInfo(id)
     this._next.splice(index, 0, track instanceof Error ? null : track)
     this._next.length = this.nextSize
   }
 
   static async remove(index: number) {
-    if (index >= this.nextSize) { return }
+    if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
     this._next.splice(index, 1)
     const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(track instanceof Error ? null : track)
   }
 
   static get current(): TMXTrackInfo | null {
+    if (process.env.USE_TMX !== 'YES') { return null }
     return this._current === null ? null : { ...this._current }
   }
 
   static get next(): (TMXTrackInfo | null)[] {
+    if (process.env.USE_TMX !== 'YES') { return new Array(this.nextSize).fill(null) }
     return [...this._next]
   }
 
   static get previous(): (TMXTrackInfo | null)[] {
+    if (process.env.USE_TMX !== 'YES') { return new Array(this.previousSize).fill(null) }
     return [...this._previous]
   }
 
@@ -71,6 +76,7 @@ export abstract class TMXService {
    * Fetches track gbx file from tmx by track id, returns name and file in base64 string
    */
   static async fetchTrackFile(id: number, game: string = 'TMNF'): Promise<TMXFileData | Error> {
+    if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => err)
     if (res instanceof Error) {
@@ -90,6 +96,7 @@ export abstract class TMXService {
    * Fetches track gbx file from tmx by uid, returns name and file in base64 string
    */
   static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
+    if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {
@@ -115,6 +122,7 @@ export abstract class TMXService {
    * Fetches TMX info for track with given id
    */
   static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
+    if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     let data = ''
     let prefix = ''
     for (const p of this.prefixes) {

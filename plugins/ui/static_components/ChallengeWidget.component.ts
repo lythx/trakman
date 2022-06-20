@@ -1,4 +1,4 @@
-import CFG from '../UIConfig.json' assert { type: 'json' }
+import { CONFIG as CFG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import IStaticComponent from './StaticComponent.interface.js'
 import StaticComponent from './StaticComponent.js'
@@ -40,16 +40,14 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
     }
 
     let tmxInfo = ``
-    if (process.env.USE_TMX === "YES") {
-      const tmxTrackInfo = await TM.fetchTMXTrackInfo(TM.challenge.id)
-      if (!(tmxTrackInfo instanceof Error)) {
-        tmxTrackInfo
-        tmxInfo += `
+    const tmxTrackInfo = await TM.fetchTMXTrackInfo(TM.challenge.id)
+    if (!(tmxTrackInfo instanceof Error)) {
+      tmxTrackInfo
+      tmxInfo += `
           <quad posn="6 -6.25 0.04" sizen="1.5 1.7" image="https://cdn.discordapp.com/attachments/552460149957197845/986417064912777327/build.png"/>
           <label posn="7.6 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.lastUpdateDate.getFullYear()}/${(tmxTrackInfo.lastUpdateDate.getMonth() + 1).toString().padStart(2, '0')}"/>
           <quad posn="11.3 -6.25 0.04" sizen="1.6 1.6" style="Icons64x64_1" substyle="OfficialRace"/>
           <label posn="12.9 -6.55 0.04" sizen="1.9 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.awards}"/>`
-      }
     }
 
     const side: boolean = (CFG.challengeWidget.racePos.posX < 0) ? true : false
@@ -58,7 +56,7 @@ export default class ChallengeWidget extends StaticComponent implements IStaticC
         <frame posn="${CFG.challengeWidget.racePos.posX} ${CFG.challengeWidget.racePos.posY} 10">
           <format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
           <quad posn="0 0 0.01" sizen="${CFG.challengeWidget.width} ${CFG.challengeWidget.height}" 
-           action="1000" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
+           action="${IDS.TMXWindow}" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
           <quad posn="0.4 -0.36 0.02" sizen="${CFG.challengeWidget.width - 0.8} 2" 
            style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/>
           <quad posn="${side ? 12.5 + CFG.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" 

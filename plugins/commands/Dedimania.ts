@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 import 'dotenv/config'
 
 if (process.env.USE_DEDIMANIA === 'YES') {

@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 
 const commands: TMCommand[] = [
   // TODO: help consistency, tidy up

@@ -51,7 +51,7 @@ export abstract class JukeboxService {
         const index = this._queue.findIndex(a => a.isForced === false)
         this._queue.splice(index, 0, { challenge, isForced: true })
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
-        if (process.env.USE_TMX === 'YES') { TMXService.add(challengeId, index) }
+        TMXService.add(challengeId, index)
     }
 
     static remove(challengeId: string): boolean {
@@ -62,7 +62,7 @@ export abstract class JukeboxService {
         if (q !== undefined) { this._queue.push({ challenge: q, isForced: false }) }
         else { this._queue.push({ challenge: this._previous[0], isForced: false }) }
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
-        if (process.env.USE_TMX === 'YES') { TMXService.remove(index) }
+        TMXService.remove(index)
         return true
     }
 

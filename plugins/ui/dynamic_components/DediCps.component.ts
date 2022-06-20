@@ -1,14 +1,13 @@
-import PopupWindow from "./PopupWindow.js";
-import IPopupWindow from "./PopupWindow.interface.js";
+import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import CFG from '../UIConfig.json' assert { type: 'json' }
+import {CONFIG as CFG } from '../UiUtils.js'
 
 interface PlayerPage {
   readonly login: string
   page: number
 }
 
-export default class DediCps extends PopupWindow implements IPopupWindow {
+export default class DediCps extends PopupWindow{
 
   readonly gridWidth = 5
   readonly gridHeight = 4
@@ -18,11 +17,15 @@ export default class DediCps extends PopupWindow implements IPopupWindow {
   initialize(): void {
   }
 
-  constructContent(login: string): string {
+  protected constructHeader(login: string, params: any): string {
+      return ''
+  }
+
+  protected constructContent(login: string): string {
     return ''
   }
 
-  constructFooter(login: string): string {
+  protected constructFooter(login: string): string {
     return ''
   }
 } 
