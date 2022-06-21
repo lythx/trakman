@@ -1,0 +1,15 @@
+{
+    "PopupWindow": {
+        "open": 0,
+        "close": 1
+    },
+    "Paginator": {
+        "previous": 2,
+        "next": 3,
+        "first": 4,
+        "last": 5,
+        "jumpBackwards": 6,
+        "jumpForwards": 7
+    },
+    "DropdownMenu": 8
+}

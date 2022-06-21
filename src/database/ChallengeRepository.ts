@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS challenges(
   filename VARCHAR(254) NOT NULL,
   author VARCHAR(25) NOT NULL,
   environment VARCHAR(7) NOT NULL,
-  mood VARCHAR(100) NOT NULL,
+  mood VARCHAR(8) NOT NULL,
   bronzetime INT4 NOT NULL,
   silvertime INT4 NOT NULL,
   goldtime INT4 NOT NULL,

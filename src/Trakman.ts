@@ -17,6 +17,7 @@ import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
+import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -56,6 +57,10 @@ export const TRAKMAN = {
     const minutes: number = d.getUTCMinutes()
     const hours: number = d.getUTCHours()
     const days: number = d.getUTCDate() - 1
+    const months: number = d.getUTCMonth()
+    const years: number = d.getUTCFullYear() - 1970
+    if (years > 0) { str += years === 1 ? `${years} year, ` : `${years} years, ` }
+    if (months > 0) { str += months === 1 ? `${months} month, ` : `${months} months, ` }
     if (days > 0) { str += days === 1 ? `${days} day, ` : `${days} days, ` }
     if (hours > 0) { str += hours === 1 ? `${hours} hour, ` : `${hours} hours, ` }
     if (minutes > 0) { str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, ` }
@@ -393,7 +398,9 @@ export const TRAKMAN = {
     return await response.json()
   },
 
-  banlist: AdministrationService.banlist,
+  get banlist() {
+    return AdministrationService.banlist
+  },
 
   addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
@@ -403,7 +410,9 @@ export const TRAKMAN = {
     AdministrationService.removeFromBanlist(login)
   },
 
-  blacklist: AdministrationService.blacklist,
+  get blacklist() {
+    return AdministrationService.blacklist
+  },
 
   addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
@@ -413,7 +422,9 @@ export const TRAKMAN = {
     AdministrationService.removeFromBlacklist(login)
   },
 
-  mutelist: AdministrationService.mutelist,
+  get mutelist() {
+    return AdministrationService.mutelist
+  },
 
   addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
     AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
@@ -423,14 +434,16 @@ export const TRAKMAN = {
     AdministrationService.removeFromMutelist(login)
   },
 
-  guestlist: AdministrationService.guestlist,
-
-  addToGuestlist: (login: string, callerLogin: string): void => {
-    AdministrationService.addToGuestlist(login, callerLogin)
+  get guestlist() {
+    return AdministrationService.guestlist
   },
 
-  removeFromGuestlist: (login: string): void => {
-    AdministrationService.removeFromGuestlist(login)
+  addToGuestlist: async (login: string, callerLogin: string): Promise<void | Error> => {
+    await AdministrationService.addToGuestlist(login, callerLogin)
+  },
+
+  removeFromGuestlist: async (login: string): Promise<void | Error> => {
+    await AdministrationService.removeFromGuestlist(login)
   },
 
   parseParamTime: (timeString: string): number | null => {
@@ -460,6 +473,46 @@ export const TRAKMAN = {
 
   removeAllRecords: async (challengeId: string): Promise<any[]> => {
     return await RecordService.removeAll(challengeId)
+  },
+
+  nicknameToLogin: (nickName: string): string | undefined => {
+    const charmap = SpecialCharmap as any
+    const players = PlayerService.players
+    const guesses: { login: string, nickName: string, currentMatch: number, longestMatch: number }[] = []
+    for (const e of players) {
+      guesses.push({ login: e.login, nickName: TRAKMAN.strip(e.nickName.toLowerCase()), currentMatch: 0, longestMatch: 0 })
+    }
+    for (const guess of guesses) {
+      for (const [i, letter] of guess.nickName.split('').entries()) {
+        if (charmap?.[nickName[0]?.toString()]?.some((a: any) => a === letter) || nickName[0]?.toString() === letter) {
+          for (let j = 0; j < nickName.length + 1; j++) {
+            if (j === nickName.length + 1) {
+              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
+              break
+            }
+            if (nickName[j] === guess?.nickName?.[i + j] || charmap?.[nickName[j]?.toString()]?.some((a: any) => a === guess?.nickName?.[i + j])) {
+              guess.currentMatch++
+            }
+            else {
+              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
+              break
+            }
+          }
+        }
+      }
+    }
+    guesses.sort((a, b) => b.longestMatch - a.longestMatch)
+    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
+      return undefined
+    }
+    if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
+      return undefined
+    }
+    return guesses[0].login
+  },
+
+  get commandList() {
+    return ChatService.commandList
   }
 
 }

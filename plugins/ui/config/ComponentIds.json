@@ -1,0 +1,17 @@
+{
+    "PopupWindow": 0,
+    "ChallengeWidget": 10,
+    "DayTime": 20,
+    "PreviousAndBest": 30,
+    "RankWidget": 40,
+    "SpectatorWidget": 50,
+    "temp1": 60,
+    "TimerWidget": 70,
+    "KarmaWidget": 80,
+    "DediRanking": 200,
+    "LiveRanking": 300,
+    "LocalRanking": 400,
+    "HelpWindow": 1000,
+    "TMXWindow": 2000,
+    "JukeboxWindow": 10000
+}

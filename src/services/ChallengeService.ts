@@ -118,7 +118,7 @@ export class ChallengeService {
     for (const c of [...challengesInDBInfo, ...challengesNotInDBInfo]) {
       this._challenges.push(c)
     }
-    this.repo.add(...challengesNotInDBInfo)
+    await this.repo.add(...challengesNotInDBInfo)
   }
 
   static async add(fileName: string): Promise<TMChallenge | Error> {

@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 import fs from 'node:fs/promises'
 import fetch from 'node-fetch'
 
@@ -6,6 +6,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['al', 'addlocal'],
     help: 'Add a challenge from your pc.',
+    // todo params
     callback: async (info: MessageInfo) => {
       const split = info.text.split(' ')
       const fileName = split.shift() + '.Challenge.Gbx'
@@ -44,6 +45,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['afu', 'addfromurl'],
     help: 'Add a track from an url.',
+    // todo params
     callback: async (info: MessageInfo) => {
       const s = info.text.split(' ')
       const fileName = s[0] + '.Challenge.Gbx'
@@ -85,6 +87,7 @@ const commands: TMCommand[] = [
     help: 'Remove the current track from the playlist.',
     callback: async (info: MessageInfo) => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
+      // TODO: Implement remove challenge
       const challenge = TM.challenge
       const res = await TM.call('RemoveChallenge', [{ string: challenge.fileName }])
       if (res instanceof Error) { // This can happen if the challenge was already removed
@@ -136,31 +139,10 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previoustrack'],
     help: 'Requeue the previously played track.',
     callback: async (info: MessageInfo) => {
-      const index = await TM.call('GetCurrentChallengeIndex')
-      if (index instanceof Error) {
-        TM.sendMessage('${TM.palette.server}» ${TM.palette.error}Failed to fetch current challenge index', info.login)
-        TM.error('Failed to fetch current challenge index', index.message)
-        return
-      }
-      if (Number(index) === -1) { return }
-      const res = await TM.multiCall({
-        method: 'ChatSendServerMessage',
-        params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`
-        }]
-      },
-        {
-          method: 'SetNextChallengeIndex',
-          params: [{
-            int: Number(index) - 1
-          }]
-        })
-      if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to set next challenge index.`, info.login)
-        TM.error('Failed to set next challenge index', res.message)
-        return
-      }
+      // DOESNT SKIP
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
+      TM.addToJukebox(TM.previousChallenges[0].id)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
     },
@@ -169,23 +151,28 @@ const commands: TMCommand[] = [
   {
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
-    callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
+    callback: (info: MessageInfo, login: string, reason?: string) => {
+      const targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
       }
+      const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.${reasonString}`
         }]
       },
         {
           method: 'Kick',
-          params: [{ string: targetInfo.login }, { string: 'asdsasdasd' }]
+          params: [
+            { string: login },
+            { string: reason === undefined ? 'No reason specified' : reason }
+          ]
         })
     },
     privilege: 1
@@ -193,6 +180,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['m', 'mute'],
     help: 'Mute a specific player.',
+    // TODO params: [{}],
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
@@ -217,6 +205,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
+    // TODO params
     callback: (info: MessageInfo) => {
       const targetInfo = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
@@ -241,8 +230,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['fs', 'forcespec'],
     help: 'Force a player into specmode.',
-    callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    params: [{ name: 'login' }],
+    callback: (info: MessageInfo, login: string) => {
+      const targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -257,11 +247,11 @@ const commands: TMCommand[] = [
       },
         {
           method: 'ForceSpectator',
-          params: [{ string: targetInfo.login }, { int: 1 }]
+          params: [{ string: login }, { int: 1 }]
         },
         {
           method: 'ForceSpectator',
-          params: [{ string: targetInfo.login }, { int: 0 }]
+          params: [{ string: login }, { int: 0 }]
         }
       )
     },
@@ -270,8 +260,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['fp', 'forceplay'],
     help: 'Force a player into playermode.',
-    callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    params: [{ name: 'login' }],
+    callback: (info: MessageInfo, login: string) => {
+      const targetInfo = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -286,11 +277,11 @@ const commands: TMCommand[] = [
       },
         {
           method: 'ForceSpectator',
-          params: [{ string: targetInfo.login }, { int: 2 }]
+          params: [{ string: login }, { int: 2 }]
         },
         {
           method: 'ForceSpectator',
-          params: [{ string: targetInfo.login }, { int: 0 }]
+          params: [{ string: login }, { int: 0 }]
         }
       )
     },
@@ -299,22 +290,19 @@ const commands: TMCommand[] = [
   {
     aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
     help: 'Manipulate every soul on the server that you kicked someone.',
-    callback: (info: MessageInfo) => {
-      if (info.text.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
-        return
-      }
+    params: [{ name: 'login' }],
+    callback: (info: MessageInfo, login: string) => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(info.text)}${TM.palette.admin}.`
+            + `${TM.palette.highlight + TM.strip(login)}${TM.palette.admin}.`
         }]
       },
         {
           method: 'Kick',
-          params: [{ string: info.text }]
+          params: [{ string: login }]
         }
       )
     },
