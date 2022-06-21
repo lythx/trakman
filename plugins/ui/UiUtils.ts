@@ -13,12 +13,20 @@ const gridCell = (width: number, height: number, margin: number, color: string =
   return `<quad posn="${margin} -${margin} 1" sizen="${width - margin} ${height - margin}" bgcolor="${color}"/>`
 }
 
-const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, margin?: number, xOffset?: number, yOffset?: number }) => {
+const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
   const textScale = options?.textScale ?? 0.7
-  const margin = options?.margin ?? 1
+  const padding = options?.padding ?? 1
   const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
-  const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentWidth / 2) + options?.yOffset
-  return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (margin * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+  const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
+  return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+}
+
+const verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
+  const textScale = options?.textScale ?? 0.7
+  const posX = options?.xOffset === undefined ? 0 : options?.xOffset
+  const posY = options?.yOffset === undefined ? parentHeight / 2.2 : (parentHeight / 2.2) + options?.yOffset
+  const padding = options?.padding ?? 0.2
+  return `<label posn="${padding + posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center"/>`
 }
 
 const footerCloseButton = (width: number, closeId: number): string => {
@@ -40,15 +48,21 @@ const staticHeader = (text: string, icon: string,
     iconWidth?: number, iconHeight?: number,
     textScale?: number, rectangleWidth?: number, horizontalPadding?: number, verticalPadding?: number,
     iconVerticalPadding?: number, iconHorizontalPadding?: number, centerText?: true,
-    iconBackground?: string, textBackgrund?: string
+    iconBackground?: string, textBackgrund?: string, centerVertically?: true
   }) => {
   const CFG = CONFIG.staticHeader
   const textScale = options?.textScale ?? CFG.textScale
   const horizontalPadding = options?.horizontalPadding ?? CFG.horizontalPadding
   const rectWidth = options?.rectangleWidth ?? CFG.rectangleWidth
-  const label = options?.centerText ? centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, margin: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall }) :
-    `<label posn="${CFG.squareWidth + horizontalPadding} -${options?.verticalPadding ?? CFG.verticalPadding} 2" 
-  sizen="${(CFG.rectangleWidth * (1 / textScale)) - (horizontalPadding * 2)} 2" scale="${textScale}" text="${CFG.format}${text}"/>`
+  let label = ''
+  if (options?.centerText) {
+    label = centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
+  } else if (options?.centerVertically) {
+    label = verticallyCenteredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
+  } else {
+    label = `<label posn="${CFG.squareWidth + horizontalPadding} -${options?.verticalPadding ?? CFG.verticalPadding} 2" 
+    sizen="${(CFG.rectangleWidth * (1 / textScale)) - (horizontalPadding * 2)} 2" scale="${textScale}" text="${CFG.format}${text}"/>`
+  }
   return `
   <quad posn="0 0 1" sizen="${CFG.squareWidth} ${CFG.height}" bgcolor="${options?.iconBackground ?? CFG.iconBgColor}"/>
   <quad posn="${options?.iconHorizontalPadding ?? CFG.iconHorizontalPadding} -${options?.iconVerticalPadding ?? CFG.iconVerticalPadding} 2"
@@ -63,9 +77,9 @@ const calculateStaticPositionY = (widgetName: string): number => {
   let positionSum = 0
   for (const [k, v] of order.entries()) {
     if (v === widgetName) { break }
-    positionSum += (CONFIG as any)?.[v].height + CONFIG.static.marginBig
+    positionSum += (CONFIG as any)?.[v]?.height + CONFIG.static.marginBig
   }
   return CONFIG.static.topBorder - positionSum
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY }
+export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

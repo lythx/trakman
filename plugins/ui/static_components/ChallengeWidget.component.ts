@@ -63,7 +63,7 @@ export default class ChallengeWidget extends StaticComponent {
         </frame>
         <frame posn="${(CONFIG.staticHeader.rectangleWidth / 2) - (CONFIG.staticHeader.margin + (CONFIG.staticHeader.squareWidth / 2)) +
           CONFIG.staticHeader.squareWidth + (CONFIG.staticHeader.margin * 2)} -${CONFIG.static.marginSmall} 1">
-          ${staticHeader(texts[i + 1] ?? '', icons[i + 1], {
+          ${staticHeader(texts[i + 1] ?? 'N/A', icons[i + 1], {
             rectangleWidth: (CONFIG.staticHeader.rectangleWidth / 2) - (CONFIG.staticHeader.margin + (CONFIG.staticHeader.squareWidth / 2)),
             textScale: CONFIG.map.textScale,
             centerText: true,
@@ -74,9 +74,11 @@ export default class ChallengeWidget extends StaticComponent {
       return `
       <frame posn="0 -${CONFIG.static.marginSmall} 1">
         ${i === 0 ? staticHeader(texts[i] ?? '', icons[i]) :
-          staticHeader(texts[i] ?? '', icons[i], {
+          staticHeader(TM.strip(texts[i] ?? '', false), icons[i], {
             textScale: CONFIG.map.textScale,
-            textBackgrund: CONFIG.static.bgColor
+            textBackgrund: CONFIG.static.bgColor,
+            centerVertically: true,
+            horizontalPadding: 0.3
           })}
       </frame>`
     }
