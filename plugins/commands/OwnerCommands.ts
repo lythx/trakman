@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 
 const commands: TMCommand[] = [
   {
@@ -39,7 +39,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['addallfromdb'],
-    help: 'Adds all the maps present in database if they are on server based on filename.',
+    help: 'Adds all the maps present in database if they are on the server based on filename.',
     callback: async (info: MessageInfo) => {
       const res = await TM.queryDB('SELECT * FROM challenges;')
       if (res instanceof Error) {

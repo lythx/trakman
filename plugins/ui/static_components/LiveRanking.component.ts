@@ -1,12 +1,13 @@
-import CFG from '../UIConfig.json' assert { type: 'json' }
+import { CONFIG as CFG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import IStaticComponent from './StaticComponent.interface.js'
-import StaticComponent from './StaticComponent.js'
+import StaticComponent from '../StaticComponent.js'
 
-export default class LiveRanking extends StaticComponent implements IStaticComponent {
+//TODO USE 3 COLUMN GRID INSTEAD OF FOR LOOP HERE
 
-  constructor(id: number) {
-    super('race', id)
+export default class LiveRanking extends StaticComponent {
+
+  constructor() {
+    super(IDS.LiveRanking, 'race')
     TM.addListener('Controller.LiveRecord', () => {
       this.display()
     })

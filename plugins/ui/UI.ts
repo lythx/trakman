@@ -1,5 +1,5 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
-import UIConfig from './UIConfig.json' assert { type: 'json' }
+import { CONFIG as UIConfig } from './UiUtils.js'
 
 import CustomUi from './CustomUi.js'
 
@@ -14,13 +14,14 @@ import KarmaWidget from './static_components/KarmaWidget.component.js'
 import TimerWidget from './static_components/TimerWidget.component.js'
 import LocalRanking from './static_components/LocalRanking.component.js'
 import LiveRanking from './static_components/LiveRanking.component.js'
-import StaticComponent from './static_components/StaticComponent.js'
+import StaticComponent from './StaticComponent.js'
 
-import DynamicComponent from './dynamic_components/DynamicComponent.js'
-import JukeboxWidget from './dynamic_components/JukeboxWidget.component.js'
-import TestWindow from './dynamic_components/TestWindow.js'
-import TMXWidget from './dynamic_components/TMXWidget.component.js'
+import DynamicComponent from './DynamicComponent.js'
+import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
+import TestWindow from './test_widgets/TestWindow.js'
+import TMXWindow from './dynamic_components/TMXWindow.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
+import HelpWindow from './dynamic_components/HelpWindow.component.js'
 
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
@@ -112,22 +113,23 @@ const events: TMEvent[] = [
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-        new temp1(100),
-        new DayTime(101),
-        new RankWidget(102),
-        new SpectatorWidget(103),
-        new DediRanking(104),
-        new ChallengeWidget(105),
-        new PreviousAndBest(106),
-        new KarmaWidget(107),
-        new TimerWidget(108),
-        new LocalRanking(109),
-        new LiveRanking(110)
+        new temp1(),
+        new DayTime(),
+        new RankWidget(),
+        new SpectatorWidget(),
+        new DediRanking(),
+        new ChallengeWidget(),
+        new PreviousAndBest(),
+        new KarmaWidget(),
+        new TimerWidget(),
+        new LocalRanking(),
+        new LiveRanking()
       )
       for (const c of staticComponents) { c.display() }
       dynamicComponents.push(
-        new JukeboxWidget(10000, 50000),
-        new TMXWidget(1000, 2000)
+        new JukeboxWindow(),
+        new TMXWindow(),
+        new HelpWindow()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {

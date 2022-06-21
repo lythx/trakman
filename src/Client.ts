@@ -31,6 +31,7 @@ export abstract class Client {
     const request = new Request(method, params)
     const buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
+    void this.getProxyResponse(method, params, this.requestId)
   }
 
   static addProxy(methods: string[], callback: Function) {
@@ -40,6 +41,13 @@ export abstract class Client {
   private static callProxies(method: string, params: any[], response: any[]) {
     for (const e of this.proxies.filter(a => a.methods.some(b => b === method))) {
       e.callback(method, params, response)
+    }
+  }
+
+  private static async getProxyResponse(method: string, params: any[], requestId: number) {
+    const response = await this.socket.awaitResponse(requestId, method).catch((err: Error) => err)
+    if (!(response instanceof Error)) {
+      this.callProxies(method, params, response)
     }
   }
 

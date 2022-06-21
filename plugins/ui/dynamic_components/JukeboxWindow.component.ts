@@ -1,66 +1,60 @@
-import PopupWindow from "./PopupWindow.js";
-import IPopupWindow from "./PopupWindow.interface.js";
+import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import Config from '../UIConfig.json' assert { type: 'json' }
-import Paginator from '../Paginator.js'
-const CFG = Config.widgetStyleRace
+import { CONFIG, ICONS, IDS } from '../UiUtils.js'
+import { Paginator, headerIconTitleText } from "../UiUtils.js";
+const CFG = CONFIG.widgetStyleRace
 
-interface PlayerPage {
-  readonly login: string
-  page: number
-}
-
-export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
+const MAP_ADD_ID = 1000
+// TODO CHANGE SO IT USES GRID
+// TODO HANDLE CHALLENGE LIST LENGTH UPDATES
+export default class JukeboxWindow extends PopupWindow {
 
   readonly gridWidth = 5
   readonly gridHeight = 4
   private readonly paginator: Paginator
   private readonly challengeActionIds: string[] = []
-  private readonly playerPages: PlayerPage[] = []
 
-  constructor(openId: number, closeId: number) {
-    super(openId, closeId)
+  constructor() {
+    super(IDS.JukeboxWindow)
     this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(TM.challenges.length / (this.gridHeight * this.gridWidth)))
-  }
-
-  setupListeners(): void {
+    this.paginator.onPageChange((login: string, page: number) => {
+      this.displayToPlayer(login, page)
+    })
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.answer >= this.id + 1000 && info.answer <= this.id + 6000) {
-        const challengeId = this.challengeActionIds[info.answer - (this.id + 1000)]
-        this.handleMapClick(challengeId, info.answer, info.login, info.nickName)
-        const playerPage = this.playerPages.find(a => a.login === info.login)
-        if (playerPage === undefined) {
-          this.playerPages.push({ login: info.login, page: 1 })
+      if (info.answer >= this.openId + MAP_ADD_ID && info.answer <= this.openId + MAP_ADD_ID + 5000) {
+        const challengeId = this.challengeActionIds[info.answer - (this.openId + MAP_ADD_ID)]
+        if (challengeId === undefined) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
+          TM.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
+          return
+        }
+        this.handleMapClick(challengeId, info.login, info.nickName)
+        const page = this.paginator.getPageByLogin(info.login)
+        if (page === undefined) {
           this.displayToPlayer(info.login, 1)
           return
         }
-        this.displayToPlayer(info.login, playerPage.page)
-      }
-      else if (info.answer >= this.id + 1 && info.answer <= this.id + 6) {
-        const playerPage = this.playerPages.find(a => a.login === info.login)
-        if (playerPage === undefined) { // Should never happen
-          TM.error(`Can't find player ${info.login} in playerPages array in JukeboxWidget.`, `Clicked manialink id: ${info.answer}`)
-          this.closeToPlayer(info.login)
-          return
-        }
-        const page = this.paginator.getPageFromClick(info.answer, playerPage.page)
-        playerPage.page = page
         this.displayToPlayer(info.login, page)
-      } else if (info.answer === this.id) {
-        const playerPage = this.playerPages.find(a => a.login === info.login)
-        if (playerPage === undefined) {
-          this.playerPages.push({ login: info.login, page: 1 })
-          this.displayToPlayer(info.login, 1)
-          return
-        }
-        this.displayToPlayer(info.login, playerPage.page)
       }
-      else if (info.answer === this.closeId) { this.closeToPlayer(info.login) }
     })
   }
 
-  constructContent(login: string, page: number): string {
+  protected onOpen(info: ManialinkClickInfo): void {
+    const page = this.paginator.getPageByLogin(info.login)
+    if (page === undefined) {
+      this.displayToPlayer(info.login, 1)
+      return
+    }
+    this.displayToPlayer(info.login, page)
+  }
+
+  protected constructHeader(login: string, page: number): string {
+    return headerIconTitleText('Map List', this.windowWidth, this.titleHeight, ICONS.mapQuestionMark, 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
+  }
+
+  protected constructContent(login: string, page: number): string {
     const challenges = [...TM.challenges]
+    //TODO USE CHALLENGELISTUPDATE EVENT OR SOMETHING CUZ THIS IS GIGA INEFFECTIVE
     challenges.sort((a, b) => a.name.localeCompare(b.name))
     challenges.sort((a, b) => a.author.localeCompare(b.author))
     let xml = ''
@@ -94,16 +88,11 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
     return xml
   }
 
-  constructFooter(login: string, page: number): string {
+  protected constructFooter(login: string, page: number): string {
     return this.paginator.constructXml(page)
   }
 
-  private handleMapClick(challengeId: string, actionId: number, login: string, nickName: string) {
-    if (challengeId === undefined) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, login)
-      TM.error('Error while adding map to queue from jukebox', `Can't find actionId ${actionId} in memory`)
-      return
-    }
+  private handleMapClick(challengeId: string, login: string, nickName: string) {
     const challenge = TM.challenges.find(a => a.id === challengeId)
     if (challenge === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, login)
@@ -131,10 +120,10 @@ export default class JukeboxWidget extends PopupWindow implements IPopupWindow {
 
   private getActionId(challengeId: string): number {
     const challengeActionId = this.challengeActionIds.indexOf(challengeId)
-    if (challengeActionId !== -1) { return challengeActionId + this.id + 1000 }
+    if (challengeActionId !== -1) { return challengeActionId + this.openId + MAP_ADD_ID }
     else {
       this.challengeActionIds.push(challengeId)
-      return this.challengeActionIds.length - 1 + this.id + 1000
+      return this.challengeActionIds.length - 1 + this.openId + MAP_ADD_ID
     }
   }
 

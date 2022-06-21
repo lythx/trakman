@@ -63,9 +63,8 @@ async function main(): Promise<void> {
   await ServerConfig.update()
   if (process.env.USE_TMX === 'YES') {
     Logger.trace('Initializing TMX service...')
-    const status = await TMXService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize TMX service', status.message) }
-    else { Logger.info('TMX service instantiated') }
+    await TMXService.initialize()
+    Logger.info('TMX service instantiated')
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')

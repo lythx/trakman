@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { TRAKMAN as TM } from '../../src/Trakman.js'
 
 const commands: TMCommand[] = [
   // TODO: help consistency, tidy up
@@ -16,32 +16,35 @@ const commands: TMCommand[] = [
   {
     aliases: ['hi', 'hey', 'hello'],
     help: 'Greet a certain someone.',
-    callback: (info: MessageInfo) => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Hey, ${info.text || 'everyone'}!`)
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string) => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Hey, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
   {
     aliases: ['bb', 'bye'],
-    help: 'Bid your farewell.',
-    callback: (info: MessageInfo) => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Goodbye, ${info.text || 'everyone'}!`)
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string) => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Goodbye, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
   {
     aliases: ['ty', 'tx', 'thx', 'thanks'], // Can add like every single one of them idk
     help: 'Express your gratitude.',
-    callback: (info: MessageInfo) => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Thanks, ${info.text || 'everyone'}!`)
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string) => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Thanks, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
   {
     aliases: ['gg', 'goodgame'],
     help: 'Inform others that you\'ve enjoyed the race.',
-    callback: (info: MessageInfo) => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Good game, ${info.text || 'everyone'}!`)
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string) => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Good game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -88,8 +91,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['me', 'mfw'],
     help: 'Express the deep emotions hidden within your sinful soul.',
-    callback: (info: MessageInfo) => {
-      TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${info.text}`)
+    params: [{ name: 'thoughts', type: 'multiword', optional: true }],
+    callback: (info: MessageInfo, thoughts?: string) => {
+      TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
   },
@@ -113,11 +117,12 @@ const commands: TMCommand[] = [
     aliases: ['loool'],
     help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
     callback: (info: MessageInfo) => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
   },
   {
+    // TODO IMPLEMENT MAP SEARCH
     aliases: ['l', 'list'],
     help: 'Display list of maps.',
     callback: (info: MessageInfo) => {
@@ -145,6 +150,15 @@ const commands: TMCommand[] = [
         str += `${TM.strip(lr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(lr.score)}, `
       }
       TM.sendMessage(str.slice(0, -2), info.login)
+    },
+    privilege: 0
+  },
+  //DELETE LATER
+  {
+    aliases: ['qwe'],
+    params: [{ name: 'nickName' }],
+    callback: (info: MessageInfo, nickName: string) => {
+      TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
     },
     privilege: 0
   }
