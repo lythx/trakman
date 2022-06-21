@@ -122,11 +122,10 @@ const commands: TMCommand[] = [
     privilege: 0
   },
   {
-    // TODO IMPLEMENT MAP SEARCH
-    aliases: ['l', 'list'],
-    help: 'Display list of maps.',
+    aliases: ['h', 'help', 'helpall'],
+    help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo) => {
-      TM.openManialink(10000, info.login)
+      TM.openManialink(TM.UIIDS.HelpWindow, info.login)
     },
     privilege: 0
   },
@@ -134,22 +133,32 @@ const commands: TMCommand[] = [
     aliases: ['tmxinfo'],
     help: 'Display TMX info.',
     callback: (info: MessageInfo) => {
-      TM.openManialink(1000, info.login)
+      TM.openManialink(TM.UIIDS.TMXWindow, info.login)
     },
     privilege: 0
   },
-  //REMOVE THIS LATER
   {
-    aliases: ['recs'],
-    help: 'asdasd',
+    aliases: ['locals', 'cptms', 'recs'],
+    help: 'Display current map local records.',
     callback: (info: MessageInfo) => {
-      const localRecs: LocalRecord[] = TM.localRecords
-      let str = `${TM.palette.server}» ${TM.palette.message}Local records on `
-        + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
-      for (const lr of localRecs) {
-        str += `${TM.strip(lr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(lr.score)}, `
-      }
-      TM.sendMessage(str.slice(0, -2), info.login)
+      TM.openManialink(TM.UIIDS.LocalCps, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['dedis', 'dedicptms', 'dedirecs'],
+    help: 'Display current map dedimania records.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.DediCps, info.login)
+    },
+    privilege: 0
+  },
+  {
+    // TODO IMPLEMENT MAP SEARCH
+    aliases: ['l', 'list'],
+    help: 'Display list of maps.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.JukeboxWindow, info.login)
     },
     privilege: 0
   },

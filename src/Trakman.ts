@@ -18,6 +18,7 @@ import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
+import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -513,6 +514,10 @@ export const TRAKMAN = {
 
   get commandList() {
     return ChatService.commandList
+  },
+
+  get UIIDS() {
+    return { ..._UIIDS }
   }
 
 }

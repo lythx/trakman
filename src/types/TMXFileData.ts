@@ -1,4 +1,4 @@
 interface TMXFileData {
   readonly name: string
-  readonly content: string
+  readonly content: Buffer
 }

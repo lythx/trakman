@@ -89,7 +89,7 @@ export abstract class TMXService {
     const name = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
     const data = await res.arrayBuffer()
     const buffer = Buffer.from(data)
-    return { name, content: buffer.toString('base64') }
+    return { name, content: buffer}
   }
 
   /**

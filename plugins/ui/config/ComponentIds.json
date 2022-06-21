@@ -13,5 +13,7 @@
     "LocalRanking": 400,
     "HelpWindow": 1000,
     "TMXWindow": 2000,
+    "LocalCps": 3000,
+    "DediCps": 4000,
     "JukeboxWindow": 10000
 }
