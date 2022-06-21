@@ -57,38 +57,6 @@
         "scoreTable": true,
         "global": true
     },
-    "challengeWidget": {
-        "enabled": true,
-        "width": 15.5,
-        "height": 8.9,
-        "icons": {
-            "lastTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "NewTrack"
-            },
-            "currTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "Challenge"
-            },
-            "nextTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "LoadTrack"
-            }
-        },
-        "titles": {
-            "lastTrack": "Last Map",
-            "currTrack": "Ongoing",
-            "nextTrack": "Next Map"
-        },
-        "racePos": {
-            "posX": 49.2,
-            "posY": 48
-        },
-        "scorePos": {
-            "posX": 49.2,
-            "posY": 48
-        }
-    },
     "localRecordsWidget": {
         "enabled": true,
         "title": "Locals",
@@ -121,5 +89,66 @@
         "topCount": 3,
         "iconStyle": "Icons128x128_1",
         "iconSubStyle": "Rankings"
+    },
+    "staticHeader": {
+        "format": "$s",
+        "bgColor": "000a",
+        "iconBgColor": "000a",
+        "textScale": 1,
+        "squareWidth": 1.7,
+        "rectangleWidth": 12.8,
+        "height": 2.2,
+        "margin": 0.15,
+        "verticalPadding": 0.3,
+        "horizontalPadding": 0.5,
+        "iconWidth": 1.7,
+        "iconHeight": 2.2,
+        "iconVerticalPadding": 0,
+        "iconHorizontalPadding": 0
+    },
+    "static": {
+        "width": 14.65,
+        "topBorder": 48,
+        "rightPosition": 49.2,
+        "bgColor": "0006",
+        "marginBig": 0.27,
+        "marginSmall": 0.15,
+        "rightSideOrder": [
+            "map",
+            "previousAndBest",
+            "karma",
+            "timer"
+        ],
+        "leftSideOrder": []
+    },
+    "map": {
+        "height": 9.45,
+        "side": true,
+        "title": "Ongoing",
+        "icons": [
+            "mapQuestionMark",
+            "tag",
+            "account",
+            "timerA",
+            "tools"
+        ],
+        "textScale": 1,
+        "titles": {
+            "lastTrack": "Last Map",
+            "currTrack": "Ongoing",
+            "nextTrack": "Next Map"
+        }
+    },
+    "previousAndBest": {
+        "height": 4.6,
+        "side": true
+    },
+    "karma": {
+        "height": 9,
+        "side": true
+    },
+    "timer": {
+        "height": 6.2,
+        "side": true
     }
 }
