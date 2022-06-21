@@ -518,6 +518,13 @@ export const TRAKMAN = {
 
   get UIIDS() {
     return { ..._UIIDS }
+  },
+
+  formatDate(date: Date, displayDay?: true): string {
+    if (displayDay === true) {
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+    }
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   }
 
 }

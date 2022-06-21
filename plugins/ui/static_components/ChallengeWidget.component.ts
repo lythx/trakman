@@ -1,13 +1,23 @@
-import { CONFIG as CFG, IDS } from '../UiUtils.js'
+import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class ChallengeWidget extends StaticComponent {
 
   private xml: string = ''
+  private readonly grid: Grid
+  private readonly width: number
+  private readonly height: number
+  private readonly positionX: number
+  private readonly positionY: number
 
   constructor() {
     super(IDS.ChallengeWidget, 'race')
+    this.width = CFG.static.width
+    this.height = CFG.map.height
+    this.grid = new Grid(this.width, this.height, [1], new Array(4).fill(1))
+    this.positionX = CFG.static.rightPosition
+    this.positionY = calculateStaticPositionY('map')
   }
 
   display(): void {
@@ -37,38 +47,73 @@ export default class ChallengeWidget extends StaticComponent {
     else {
       author = authorLogin
     }
-
-    let tmxInfo = ``
-    const tmxTrackInfo = await TM.fetchTMXTrackInfo(TM.challenge.id)
-    if (!(tmxTrackInfo instanceof Error)) {
-      tmxTrackInfo
-      tmxInfo += `
-          <quad posn="6 -6.25 0.04" sizen="1.5 1.7" image="https://cdn.discordapp.com/attachments/552460149957197845/986417064912777327/build.png"/>
-          <label posn="7.6 -6.55 0.04" sizen="6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.lastUpdateDate.getFullYear()}/${(tmxTrackInfo.lastUpdateDate.getMonth() + 1).toString().padStart(2, '0')}"/>
-          <quad posn="11.3 -6.25 0.04" sizen="1.6 1.6" style="Icons64x64_1" substyle="OfficialRace"/>
-          <label posn="12.9 -6.55 0.04" sizen="1.9 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + tmxTrackInfo.awards}"/>`
-    }
-
-    const side: boolean = (CFG.challengeWidget.racePos.posX < 0) ? true : false
-    this.xml =
-      `<manialink id="${this.id}">
-        <frame posn="${CFG.challengeWidget.racePos.posX} ${CFG.challengeWidget.racePos.posY} 10">
-          <format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-          <quad posn="0 0 0.01" sizen="${CFG.challengeWidget.width} ${CFG.challengeWidget.height}" 
-           action="${IDS.TMXWindow}" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
-          <quad posn="0.4 -0.36 0.02" sizen="${CFG.challengeWidget.width - 0.8} 2" 
-           style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/>
-          <quad posn="${side ? 12.5 + CFG.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" 
-           style="${CFG.challengeWidget.icons.currTrack.style}" substyle="${CFG.challengeWidget.icons.currTrack.subStyle}"/>
-          <label posn="${side ? 12.4 + CFG.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" 
-           halign="${side ? 'right' : 'left'}" textsize="1" text="${CFG.widgetStyleRace.formattingCodes + CFG.challengeWidget.titles.currTrack}"/>
-          <label posn="1 -2.7 0.04" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.challenge.name, false)}"/>
-          <label posn="1 -4.5 0.04" sizen="14.85 2" scale="0.9" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.strip(author, false)}"/>
-          <quad posn="0.6 -6.22 0.04" sizen="1.7 1.7" style="BgRaceScore2" substyle="ScoreReplay"/>
-          <label posn="2.35 -6.55 0.04" sizen="4.6 2" scale="0.75" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(TM.challenge.authorTime)}"/>
-          ${tmxInfo}
+    const date = TM.TMXCurrent?.lastUpdateDate
+    const texts = [CFG.map.title, TM.safeString(TM.challenge.name), TM.safeString(author), TM.Utils.getTimeString(TM.challenge.authorTime), date === undefined ? undefined : TM.formatDate(date)]
+    const icons = CFG.map.icons.map(a => (ICONS as any)[a])
+    const cell = (i: number, j: number, w: number, h: number): string => {
+      if (i === 3) {
+        return `
+        <frame posn="0 -${CONFIG.static.marginSmall} 1">
+          ${staticHeader(texts[i] ?? '', icons[i], {
+          rectangleWidth: (CONFIG.staticHeader.rectangleWidth / 2) - (CONFIG.staticHeader.margin + (CONFIG.staticHeader.squareWidth / 2)),
+          textScale: CONFIG.map.textScale,
+          centerText: true,
+          textBackgrund: CONFIG.static.bgColor
+        })}
         </frame>
+        <frame posn="${(CONFIG.staticHeader.rectangleWidth / 2) - (CONFIG.staticHeader.margin + (CONFIG.staticHeader.squareWidth / 2)) +
+          CONFIG.staticHeader.squareWidth + (CONFIG.staticHeader.margin * 2)} -${CONFIG.static.marginSmall} 1">
+          ${staticHeader(texts[i + 1] ?? '', icons[i + 1], {
+            rectangleWidth: (CONFIG.staticHeader.rectangleWidth / 2) - (CONFIG.staticHeader.margin + (CONFIG.staticHeader.squareWidth / 2)),
+            textScale: CONFIG.map.textScale,
+            centerText: true,
+            textBackgrund: CONFIG.static.bgColor
+          })}
+        </frame>`
+      }
+      return `
+      <frame posn="0 -${CONFIG.static.marginSmall} 1">
+        ${i === 0 ? staticHeader(texts[i] ?? '', icons[i]) :
+          staticHeader(texts[i] ?? '', icons[i], {
+            textScale: CONFIG.map.textScale,
+            textBackgrund: CONFIG.static.bgColor
+          })}
+      </frame>`
+    }
+    const arr: Function[] = new Array(4).fill(cell)
+    this.xml = `<manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        <format textsize="1" textcolor="FFFF"/> 
+        ${this.grid.constructXml(arr)}
+      </frame>
       </manialink>`
   }
 
 }
+// `<frame posn="49.2 48 1">
+// <quad posn="0 0 2" sizen="15.5 9.2" action="2000"/>
+// <format textsize="1" textcolor="FFFF"/>
+// <frame posn="0 -0.1 1">
+//   <quad posn="0 0 1" sizen="1.7 2.2" bgcolor="0006"/>
+//   <quad posn="1.85 0 1" sizen="12.8 2.2" bgcolor="0006"/>
+//   <label posn="2.2 -0.2 2" sizen="11.8 2" scale="1.2" text="$sONGOING"/>
+// </frame>
+//   <frame posn="0 -2.45 1">
+//   <quad posn="0 0 1" sizen="1.7 2.2" bgcolor="0006"/>
+//   <quad posn="1.85 0 1" sizen="12.8 2.2" bgcolor="0006"/>
+//   <label posn="2.2 -0.2 2" sizen="11.8 2" scale="1" text="$sfsfdsfsd"/>
+// </frame>
+// <frame posn="0 -4.85 1">
+//   <quad posn="0 0 1" sizen="1.7 2.2" bgcolor="0006"/>
+//   <quad posn="1.85 0 1" sizen="12.8 2.2" bgcolor="0006"/>
+//   <label posn="2.2 -0.2 2" sizen="11.8 2" scale="1" text="$sdfdfsfsd"/>
+// </frame>
+// <frame posn="0 -7.25 1">
+//   <quad posn="0 0 1" sizen="1.7 2.2" bgcolor="0006"/>
+//   <quad posn="1.85 0 1" sizen="5.4 2.2" bgcolor="0006"/>
+//   <label posn="2.2 -0.2 2" sizen="11.8 2" scale="1.1" text="$s0:00.00"/>
+//   <quad posn="7.4 0 1" sizen="1.7 2.2" bgcolor="0006"/>
+//   <quad posn="9.25 0 1" sizen="5.4 2.2" bgcolor="0006"/>
+//   <label posn="9.6 -0.2 2" sizen="11.8 2" scale="1.1" text="$s2020/08"/>
+// </frame>
+// </frame>`

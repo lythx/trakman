@@ -35,7 +35,7 @@ export default class TMXWindow extends PopupWindow {
     const challenges = TM.challenges
     challenges.sort((a, b) => a.author.localeCompare(b.author))
     let xml = ''
-    const titles = [CFG.challengeWidget.titles.lastTrack, CFG.challengeWidget.titles.currTrack, CFG.challengeWidget.titles.nextTrack]
+    const titles = [CFG.map.titles.lastTrack, CFG.map.titles.currTrack, CFG.map.titles.nextTrack]
     const pages = [
       [TM.previousChallenges[3], TM.previousChallenges[2], TM.previousChallenges[1]],
       [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]],
