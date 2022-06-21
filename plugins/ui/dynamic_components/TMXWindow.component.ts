@@ -145,7 +145,7 @@ export default class TMXWindow extends PopupWindow {
               <quad posn="6 -49.2 3" sizen="3.2 3.2" image="${ICN.mapDownload}"
                url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
               <quad posn="11 -49.2 3" sizen="3.2 3.2" image="${ICN.lineGraph}"
-               url="${TM.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${TM.challenge.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
+               url="${TM.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
               <quad posn="16 -49.2 3" sizen="3.2 3.2" 
                image="${ICN.MX}"
                url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`

@@ -49,18 +49,18 @@ export default class HelpWindow extends PopupWindow {
   protected constructContent(login: string, params: { page: number, commands: TMCommand[], privilege: number }): string {
     const n = (params.page - 1) * this.itemsPerPage
     const headers = [
-      (i: number, j: number, h: number, w: number): string => centeredText('Aliases', w, h),
-      (i: number, j: number, h: number, w: number): string => centeredText('Arguments', w, h),
-      (i: number, j: number, h: number, w: number): string => centeredText('Comment ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number): string => centeredText('Aliases', w, h),
+      (i: number, j: number, w: number, h: number): string => centeredText('Arguments', w, h),
+      (i: number, j: number, w: number, h: number): string => centeredText('Comment ', w, h), // Space to prevent translation
     ]
-    const nameCell = (i: number, j: number, h: number, w: number): string => {
+    const nameCell = (i: number, j: number, w: number, h: number): string => {
       const command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text = command.aliases.join(', ')
       return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
       <label posn="${w / 2} -${h / 2} 1" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
     }
-    const paramsCell = (i: number, j: number, h: number, w: number): string => {
+    const paramsCell = (i: number, j: number, w: number, h: number): string => {
       const command = params.commands[i + n]
       if (command === undefined) { return '' }
       let text = ''
@@ -80,7 +80,7 @@ export default class HelpWindow extends PopupWindow {
       return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
       <label posn="${w / 2} -${h / 2} 3" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
     }
-    const commentCell = (i: number, j: number, h: number, w: number): string => {
+    const commentCell = (i: number, j: number, w: number, h: number): string => {
       const command = params.commands[i + n]
       if (command === undefined) { return '' }
       return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>

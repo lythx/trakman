@@ -17,12 +17,13 @@ import LiveRanking from './static_components/LiveRanking.component.js'
 import StaticComponent from './StaticComponent.js'
 
 import DynamicComponent from './DynamicComponent.js'
-import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
-import TestWindow from './test_widgets/TestWindow.js'
-import TMXWindow from './dynamic_components/TMXWindow.component.js'
-import DediCps from './dynamic_components/DediCps.component.js'
 import HelpWindow from './dynamic_components/HelpWindow.component.js'
+import TMXWindow from './dynamic_components/TMXWindow.component.js'
+import LocalCps from './dynamic_components/LocalCps.component.js'
+import DediCps from './dynamic_components/DediCps.component.js'
+import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
 
+import TestWindow from './test_widgets/TestWindow.js'
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
 
@@ -129,7 +130,9 @@ const events: TMEvent[] = [
       dynamicComponents.push(
         new JukeboxWindow(),
         new TMXWindow(),
-        new HelpWindow()
+        new HelpWindow(),
+        new DediCps(),
+        new LocalCps()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {
