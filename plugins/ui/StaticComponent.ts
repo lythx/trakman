@@ -3,7 +3,7 @@ import { CONFIG as CFG } from './UiUtils.js'
 
 export default abstract class StaticComponent {
 
-  protected static readonly titleWidth = CFG.localRecordsWidget.width - 0.8
+  protected static readonly titleWidth = 15.5 - 0.8
   protected _isDisplayed: boolean = false
 
   readonly id: number

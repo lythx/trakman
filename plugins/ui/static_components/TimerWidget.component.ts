@@ -16,20 +16,20 @@ export default class TimerWidget extends StaticComponent {
   display(): void {
     this._isDisplayed = true
     TM.sendManialink(`<manialink id="${this.id}">
-    <frame posn="${this.positionX} ${this.positionY} -37">
+    <frame posn="${this.positionX} ${this.positionY} -38">
       <format textsize="1" textcolor="FFFF"/> 
       ${staticHeader('Timer', ICONS.timer)}
-      <quad posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 0" sizen="${CONFIG.static.width} ${CONFIG.timer.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
+      <quad posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1" sizen="${CONFIG.static.width} ${CONFIG.timer.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
     </frame>
   </manialink>`)
   }
 
   displayToPlayer(login: string): void {
     TM.sendManialink(`<manialink id="${this.id}">
-    <frame posn="${this.positionX} ${this.positionY} -37">
+    <frame posn="${this.positionX} ${this.positionY} -38">
       <format textsize="1" textcolor="FFFF"/> 
       ${staticHeader('Timer', ICONS.timer)}
-      <quad posn="0 -${CONFIG.staticHeader.height} 0" sizen="${CONFIG.static.width} ${CONFIG.timer.height}" bgcolor="${CONFIG.static.bgColor}"/>
+      <quad posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1" sizen="${CONFIG.static.width} ${CONFIG.timer.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
     </frame>
   </manialink>`, login)
   }

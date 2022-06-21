@@ -1,15 +1,35 @@
-import { CONFIG as CFG, IDS } from '../UiUtils.js'
+import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
-//TODO USE 3 COLUMN GRID INSTEAD OF FOR LOOP HERE
+export default class LocalRanking extends StaticComponent {
 
-export default class LiveRanking extends StaticComponent {
+  private readonly height: number
+  private readonly width: number
+  private readonly markerWidth: number
+  private readonly positionX: number
+  private readonly positionY: number
+  private readonly grid: Grid
 
   constructor() {
     super(IDS.LiveRanking, 'race')
+    this.height = CONFIG.live.height
+    this.width = CONFIG.static.width
+    this.positionX = CONFIG.static.rightPosition
+    this.positionY = calculateStaticPositionY('live')
+    const proportions = [1, 1, 2.8, 4]
+    const insideProportions = proportions.reduce((acc, cur, i) => i === 0 ? acc += 0 : acc += cur)
+    const unitWidth = this.width / insideProportions
+    this.markerWidth = unitWidth * proportions[0]
+    this.grid = new Grid(this.width + this.markerWidth, this.height, proportions, new Array(CONFIG.live.entries).fill(1))
     TM.addListener('Controller.LiveRecord', () => {
       this.display()
+    })
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+      if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
+    })
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+      if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -21,107 +41,58 @@ export default class LiveRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false // Right/Left
-    const widgetHeight = 1.8 * CFG.liveRankingsWidget.entries + 3.3
-    const columnHeight = widgetHeight - 3.1
-    const columnWidth = CFG.liveRankingsWidget.width - 6.45
-    const content = this.getWidgetContent(login)
-    TM.sendManialink(
-      `<manialink id="${this.id}">
-        <frame posn="${CFG.liveRankingsWidget.posX} ${CFG.liveRankingsWidget.posY} 10">
-          <quad posn="0 0 0.01" sizen="${CFG.liveRankingsWidget.width} ${widgetHeight}" 
-           action="50003" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/> 
-          ${content}
-          <quad posn="0.4 -2.6 0.02" sizen="2 ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgRank}"/> 
-          <quad posn="2.4 -2.6 0.02" sizen="3.65 ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgScore}"/> 
-          <quad posn="6.05 -2.6 0.02" sizen="${columnWidth} ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgName}"/> 
-          <quad posn="0.4 -0.36 0.02" sizen="${StaticComponent.titleWidth} 2" style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/> 
-          <quad posn="${side ? 12.5 + CFG.liveRankingsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" 
-           style="${CFG.liveRankingsWidget.iconStyle}" substyle="${CFG.liveRankingsWidget.iconSubStyle}"/>
-          <label posn="${side ? 12.4 + CFG.liveRankingsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" 
-           halign="${side ? 'right' : 'left'}" textsize="1" text="${CFG.widgetStyleRace.formattingCodes + CFG.liveRankingsWidget.title}"/> 
-          <format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-          <quad posn="0.4 -2.6 0.03" sizen="${StaticComponent.titleWidth} ${1.8 * CFG.liveRankingsWidget.topCount + 0.3}" 
-           style="${CFG.widgetStyleRace.topStyle}" substyle="${CFG.widgetStyleRace.topSubStyle}"/>
+    TM.sendManialink(`<manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        <format textsize="1" textcolor="FFFF"/> 
+        ${staticHeader('Live Records', ICONS.sun)}
+        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + 0.05} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+          ${this.getContent(login)}
         </frame>
-      </manialink>`,
+      </frame>
+    </manialink>`,
       login
     )
   }
 
-  private getWidgetContent(login: string): string {
-    const titleWidth = CFG.liveRankingsWidget.width - 0.8
-    const side: boolean = (CFG.liveRankingsWidget.posX < 0) ? true : false // Right/Left
-    let xml = `<frame posn="0 -3 10">`
+  private getContent(login: string): string {
+    const liveRecs = TM.liveRecords
     const playerLive = TM.liveRecords.find(a => a.login === login)
     const playerLiveIndex = playerLive !== undefined ? TM.liveRecords.indexOf(playerLive) : Infinity
-    let personalStart = playerLiveIndex > TM.liveRecords.length - Math.ceil((CFG.liveRankingsWidget.entries - CFG.liveRankingsWidget.topCount) / 2) ?
-      TM.liveRecords.length - (CFG.liveRankingsWidget.entries - CFG.liveRankingsWidget.topCount) :
-      playerLiveIndex - Math.floor((CFG.liveRankingsWidget.entries - CFG.liveRankingsWidget.topCount) / 2)
+    let personalStart = playerLiveIndex > TM.liveRecords.length - Math.ceil((CFG.live.entries - CFG.live.topCount) / 2) ?
+      TM.liveRecords.length - (CFG.live.entries - CFG.live.topCount) :
+      playerLiveIndex - Math.floor((CFG.live.entries - CFG.live.topCount) / 2)
     if (playerLiveIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 // Display index is number of records that were displayed
-    for (const [i, p] of TM.liveRecords.entries()) {
-      if (i >= CFG.liveRankingsWidget.topCount && i < personalStart)
-        continue
+    const side = CONFIG.live.side
+    const markerCell = (i: number, j: number, w: number, h: number): string => {
+      if (TM.getPlayer(liveRecs?.[i]?.login) === undefined) { return '' }
+      const bg = `<quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>`
+      if (i < playerLiveIndex) { // Player faster than your record
+        return bg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${ICONS.star.yellow}"/>`
+      } if (i > playerLiveIndex) { // Player slower than your record
+        return bg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${ICONS.star.green}"/>`
+      }
+      return bg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${side ? ICONS.arrowDoubleR.orange : ICONS.arrowDoubleL.orange}"/>`
+    }
+    const positionCell = (i: number, j: number, w: number, h: number): string => {
+      return `<quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
+      ${centeredText(liveRecs[i] !== undefined ? (`${CONFIG.static.format}${i + 1}`).toString().padStart(2, '0') : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
+    }
+    const timeCell = (i: number, j: number, w: number, h: number): string => {
       const textColour = this.getTextColour(i, playerLiveIndex)
-      xml += // Record in XML
-        `<format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-        <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
-         text="${CFG.widgetStyleRace.formattingCodes}${i + 1}."/>
-        <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${textColour}" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>
-        <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.liveRankingsWidget.width - 5.7} 1.7" scale="0.9" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p.nickName), false)}"/>`
-      // Indicate online players
-      if (TM.getPlayer(p.login) !== undefined) { // Amount of records is bigger than max top entries (nullcheck)
-        if (i >= CFG.liveRankingsWidget.topCount) { // If this entry is inside the top records dont't add background shade as it would be doubled
-          xml += // Add line indicating player position
-            `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
-             style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
-        }
-        xml += // Add marker
-          `<quad posn="${side ? 15.4 : -1.9} ${-1.8 * displayIndex + 0.3} 0.04" sizen="2 2" 
-           style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
-          <quad posn="${side ? 15.6 : -1.7} ${-1.8 * displayIndex + 0.1} 0.05" sizen="1.6 1.6" `
-        if (i < playerLiveIndex) { // Player faster than your record
-          xml += `style="Icons128x128_1" substyle="ChallengeAuthor"/>`
-        } else if (i > playerLiveIndex) { // Player slower than your record
-          xml += `style="Icons128x128_1" substyle="Solo"/>`
-        } else { // Your record
-          xml += `style="Icons64x64_1" substyle="${side ? 'ArrowPrev' : 'ArrowNext'}"/>`
-        }
-      }
-      displayIndex++
-      if (displayIndex === CFG.liveRankingsWidget.entries || (playerLiveIndex === Infinity && displayIndex === CFG.liveRankingsWidget.entries - 1)) {
-        break // Break if theres max entries, leave one entry empty if player doesn't have a record
-      }
+      return `<quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      <format textsize="1" textcolor="${textColour}"/>
+      ${centeredText(liveRecs[i] !== undefined ? `${CONFIG.static.format}${TM.Utils.getTimeString(liveRecs[i].score)}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
     }
-    // Add empty entry at end if player has no record
-    if (playerLiveIndex === Infinity) {
-      const p = TM.getPlayer(login)
-      if (p === undefined) { // VERY unlikely to happen
-        TM.error(`Cannot find player ${login} in memory.`)
-        return `<frame posn="0 -3 10"></frame>`
-      }
-      // If this entry is inside the top records dont't add background shade as it would be doubled
-      const background = TM.liveRecords.length < CFG.liveRankingsWidget.topCount + 1 ? '' :
-        `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
-         style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
-      xml +=
-        `<format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-        <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
-         text="${CFG.widgetStyleRace.formattingCodes}--."/>
-        <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${CFG.widgetStyleRace.colours.self}" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
-        <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.liveRankingsWidget.width - 5.7} 1.7" scale="0.9" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p?.nickName), false)}"/>
-        ${background}
-        <quad posn="${side ? 15.4 : -1.9} ${-1.8 * displayIndex + 0.3} 0.04" sizen="2 2" 
-         style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
-        <quad posn="${side ? 15.6 : -1.7} ${-1.8 * displayIndex + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${side ? 'ArrowPrev' : 'ArrowNext'}"/>`
+    const nicknameCell = (i: number, j: number, w: number, h: number): string => {
+      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      ${verticallyCenteredText(liveRecs[i] !== undefined ? `${CONFIG.static.format}${TM.safeString(TM.strip(liveRecs[i].nickName, false))}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.2 })}`
     }
-    xml += '</frame>'
-    return xml
+    const arr: Function[] = []
+    for (let i = 0; i < CONFIG.live.entries; i++) {
+      const a = side ? [markerCell, positionCell, timeCell, nicknameCell] : [positionCell, timeCell, nicknameCell, markerCell]
+      arr.push(...a)
+    }
+    return this.grid.constructXml(arr)
   }
 
   /**
@@ -129,13 +100,13 @@ export default class LiveRanking extends StaticComponent {
    */
   private getTextColour(liveIndex: number, playerLiveIndex: number): string {
     if (liveIndex < playerLiveIndex) { // Player faster than your record
-      if (liveIndex >= CFG.liveRankingsWidget.topCount) {
+      if (liveIndex >= CFG.live.topCount) {
         return CFG.widgetStyleRace.colours.better
       } else { // Player is in top records
         return CFG.widgetStyleRace.colours.top
       }
     } else if (liveIndex > playerLiveIndex) { // Player slower than your record
-      if (liveIndex >= CFG.liveRankingsWidget.topCount) {
+      if (liveIndex >= CFG.live.topCount) {
         return CFG.widgetStyleRace.colours.worse
       } else { // Player is in top records
         return CFG.widgetStyleRace.colours.top
@@ -146,7 +117,3 @@ export default class LiveRanking extends StaticComponent {
   }
 
 }
-
-
-
-
