@@ -4,34 +4,40 @@ import StaticComponent from '../StaticComponent.js'
 
 export default class KarmaWidget extends StaticComponent {
 
+  private readonly width: number
+  private readonly height: number
   private readonly positionX: number
   private readonly positionY: number
+  private xml: string = ''
 
   constructor() {
     super(IDS.KarmaWidget, 'race')
+    this.width = CONFIG.static.width
+    this.height = CONFIG.karma.height
     this.positionX = CONFIG.static.rightPosition
     this.positionY = calculateStaticPositionY('karma')
+    this.updateXML()
   }
 
   display(): void {
     this._isDisplayed = true
-    TM.sendManialink(`<manialink id="${this.id}">
-    <frame posn="${this.positionX} ${this.positionY} -37">
-      <format textsize="1" textcolor="FFFF"/> 
-      ${staticHeader('Karma', ICONS.heart)}
-      <quad posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 0" sizen="${CONFIG.static.width} ${CONFIG.karma.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
-    </frame>
-  </manialink>`)
+    TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(`<manialink id="${this.id}">
-    <frame posn="${this.positionX} ${this.positionY} -37">
-      <format textsize="1" textcolor="FFFF"/> 
-      ${staticHeader('Karma', ICONS.heart)}
-      <quad posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 0" sizen="${CONFIG.static.width} ${CONFIG.karma.height}" bgcolor="${CONFIG.static.bgColor}"/>
-    </frame>
-  </manialink>`, login)
+    TM.sendManialink(this.xml, login)
+  }
+
+  private updateXML(): void {
+    const marginSmall = CONFIG.static.marginSmall
+    const headerHeight = CONFIG.staticHeader.height
+    this.xml = `<manialink id="${this.id}">
+    <frame posn="${this.positionX} ${this.positionY} 1">
+        <format textsize="1" textcolor="FFFF"/> 
+        ${staticHeader(CONFIG.karma.title, ICONS.heart)}
+        <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
+      </frame>
+    </manialink>`
   }
 
 }

@@ -2,7 +2,7 @@ import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, I
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
-export default class LocalRanking extends StaticComponent {
+export default class LiveRanking extends StaticComponent {
 
   private readonly height: number
   private readonly width: number
@@ -17,7 +17,7 @@ export default class LocalRanking extends StaticComponent {
     this.width = CONFIG.static.width
     this.positionX = CONFIG.static.rightPosition
     this.positionY = calculateStaticPositionY('live')
-    const proportions = [1, 1, 2.8, 4]
+    const proportions = CONFIG.live.columnProportions
     const insideProportions = proportions.reduce((acc, cur, i) => i === 0 ? acc += 0 : acc += cur)
     const unitWidth = this.width / insideProportions
     this.markerWidth = unitWidth * proportions[0]
@@ -41,11 +41,12 @@ export default class LocalRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
+    const offset = 0.05 // idk why but without this its offset, i see no reason for this whatsoever
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader('Live Records', ICONS.sun)}
-        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + 0.05} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
           ${this.getContent(login)}
         </frame>
       </frame>

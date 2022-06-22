@@ -98,7 +98,7 @@
     "static": {
         "format": "$s",
         "width": 14.65,
-        "topBorder": 48,
+        "topBorder": 47.85,
         "rightPosition": 49.2,
         "bgColor": "0006",
         "marginBig": 0.27,
@@ -114,7 +114,7 @@
         "leftSideOrder": []
     },
     "map": {
-        "height": 9.45,
+        "height": 9.13,
         "side": true,
         "title": "Ongoing",
         "icons": [
@@ -125,6 +125,7 @@
             "tools"
         ],
         "textScale": 1,
+        "noDateText": "N/A",
         "titles": {
             "lastTrack": "Last Map",
             "currTrack": "Ongoing",
@@ -132,29 +133,33 @@
         }
     },
     "previousAndBest": {
-        "height": 4.6,
+        "height": 4.95,
         "side": true
     },
     "karma": {
-        "height": 9,
-        "side": true
+        "height": 8.8,
+        "side": true,
+        "title": "Karma"
     },
     "timer": {
         "height": 6.2,
-        "side": true
+        "side": true,
+        "title": "Timer"
     },
     "locals": {
-        "title": "Locals",
+        "height": 34.12,
+        "title": "Local Records",
         "side": true,
         "entries": 15,
-        "height": 34.12,
+        "columnProportions": [1, 1, 2.8, 4],
         "topCount": 5
     },
     "live": {
-        "title": "Live",
+        "height": 12.72,
+        "title": "Live Records",
         "side": true,
         "entries": 6,
-        "height": 12.72,
+        "columnProportions": [1, 1, 2.8, 4],
         "topCount": 3
     }
 }
