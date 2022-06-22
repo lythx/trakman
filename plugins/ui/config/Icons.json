@@ -2,40 +2,85 @@
     "empty": "https://cdn.discordapp.com/attachments/618467373053247489/987801069247688744/emptek8.png",
     "blank": "http://maniacdn.net/undef.de/uaseco/blank.png",
     "mapNoImage": "https://cdn.discordapp.com/attachments/506852548938956800/987212401755713597/map_no_image.png",
-    "timerA": "https://cdn.discordapp.com/attachments/506852548938956800/987202802231173210/map_author_time_alt.png",
-    "environment": "https://cdn.discordapp.com/attachments/506852548938956800/987202803502043136/map_envi.png",
-    "heart": "https://cdn.discordapp.com/attachments/506852548938956800/987202827975815198/map_karma.png",
-    "addDate": "https://cdn.discordapp.com/attachments/506852548938956800/987202801794953246/map_added.png",
-    "sun": "https://cdn.discordapp.com/attachments/506852548938956800/987202828244238416/map_mood.png",
-    "barGraph": "https://cdn.discordapp.com/attachments/506852548938956800/987202850734096445/map_your_rank.png",
-    "lineGraph": "https://cdn.discordapp.com/attachments/506852548938956800/987202802709327872/map_check_dedimania.png",
-    "cash": "https://cdn.discordapp.com/attachments/506852548938956800/987202802931609680/map_cost.png",
+    "heart": "https://cdn.discordapp.com/attachments/502122268936110100/989201279878303794/KarmaNoStats.png",
+    "addDate": "https://cdn.discordapp.com/attachments/502122268936110100/989201250342014996/CalendarPlus.png",
+    "lineGraph": "https://cdn.discordapp.com/attachments/502122268936110100/989201332370038844/SearchStats.png",
+    "TM": "https://cdn.discordapp.com/attachments/502122268936110100/989201353467383858/Trackmania.png",
+    "MX": "https://cdn.discordapp.com/attachments/502122268936110100/989201303945216100/OpenTMX.png",
+    "account": "https://cdn.discordapp.com/attachments/502122268936110100/989201331946401803/PersonPin.png",
+    "routes": "https://cdn.discordapp.com/attachments/502122268936110100/989201332147744808/Routes.png",
+    "tag": "https://cdn.discordapp.com/attachments/502122268936110100/989201302103945256/NameTag.png",
+    "tools": "https://cdn.discordapp.com/attachments/502122268936110100/989201353144426536/Tools.png",
+    "globe": "https://cdn.discordapp.com/attachments/502122268936110100/989201279223996436/Globe.png",
+    "hourglass": "https://cdn.discordapp.com/attachments/502122268936110100/989201279446315028/Hourglass.png",
+    "karmaStats": "https://cdn.discordapp.com/attachments/502122268936110100/989201279651827722/Karma.png",
+    "clock": "https://cdn.discordapp.com/attachments/502122268936110100/989201352423006218/TimerClock.png",
+    "addTime": "https://cdn.discordapp.com/attachments/502122268936110100/989201352926326824/TimerPlus.png",
+    "cash": {
+        "normal": "https://cdn.discordapp.com/attachments/502122268936110100/989201250560131123/Cash.png",
+        "dollar": "https://cdn.discordapp.com/attachments/502122268936110100/989201250769854565/CashDollar.png"
+    },
+    "palm": {
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989201331426312232/PalmWhite.png",
+        "brown": "https://cdn.discordapp.com/attachments/502122268936110100/989201304154951690/PalmBrown.png"
+    },
+    "calendar": {
+        "added": "https://cdn.discordapp.com/attachments/502122268936110100/989201250342014996/CalendarPlus.png",
+        "times": "https://cdn.discordapp.com/attachments/502122268936110100/989201250161676318/Calendar.png"
+    },
     "star": {
-        "white": "https://cdn.discordapp.com/attachments/506852548938956800/987202850562142290/map_tmx_ranking_normal.png",
-        "yellow": "https://cdn.discordapp.com/attachments/506852548938956800/987202829930348584/map_tmx_ranking_classic.png",
-        "green": "https://cdn.discordapp.com/attachments/506852548938956800/987202850327236668/map_tmx_ranking_nadeo.png"
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989201333015945256/StarWhite.png",
+        "yellow": "https://cdn.discordapp.com/attachments/502122268936110100/989201332562968586/StarGold.png",
+        "green": "https://cdn.discordapp.com/attachments/502122268936110100/989201332768505916/StarGreen.png"
     },
     "difficulty": {
-        "beginner": "https://cdn.discordapp.com/attachments/618467373053247489/987806592131010580/map_difficulty_beginner.png",
-        "intermediate": "https://cdn.discordapp.com/attachments/618467373053247489/987806592835649616/map_difficulty_intermediate.png",
-        "expert": "https://cdn.discordapp.com/attachments/618467373053247489/987806592483360828/map_difficulty_expert.png",
-        "lunatic": "https://cdn.discordapp.com/attachments/618467373053247489/987806593133457448/map_difficulty_lunatic.png"
+        "beginner": "https://cdn.discordapp.com/attachments/502122268936110100/989201251201851442/DifficultyBeginner.png",
+        "intermediate": "https://cdn.discordapp.com/attachments/502122268936110100/989201278355791963/DifficultyIntermediate.png",
+        "expert": "https://cdn.discordapp.com/attachments/502122268936110100/989201251612889088/DifficultyExtreme.png",
+        "lunatic": "https://cdn.discordapp.com/attachments/502122268936110100/989201278582276096/DifficultyLunatic.png"
     },
-    "mapQuestionMark": "https://cdn.discordapp.com/attachments/506852548938956800/987203422518407178/map_type.png",
-    "routes": "https://cdn.discordapp.com/attachments/506852548938956800/987202829531885568/map_routes.png",
-    "tag": "https://cdn.discordapp.com/attachments/506852548938956800/987202829737398332/map_style.png",
-    "tools": "https://cdn.discordapp.com/attachments/506852548938956800/987202802440884264/map_built.png",
-    "trophy": "https://cdn.discordapp.com/attachments/506852548938956800/987204614124367872/map_awards.png",
-    "TM": "https://cdn.discordapp.com/attachments/506852548938956800/987202803724320858/map_game.png",
-    "mapDownload": "https://cdn.discordapp.com/attachments/506852548938956800/987202803330072627/map_download.png",
-    "MX": "https://cdn.discordapp.com/attachments/506852548938956800/987202828424601671/map_open_tmx.png",
-    "account": "https://cdn.discordapp.com/attachments/506852548938956800/987202828915314688/map_replay_players.png",
-    "timer": "https://cdn.discordapp.com/attachments/506852548938956800/987202829129244682/map_replay_times.png",
-    "calendar": "https://cdn.discordapp.com/attachments/506852548938956800/987202829313777684/map_replay_uploaded.png",
-    "one": "https://cdn.discordapp.com/attachments/506852548938956800/987211349996208148/map_replay_first.png",
-    "two": "https://cdn.discordapp.com/attachments/506852548938956800/987211350264676442/map_replays_second.png",
-    "three": "https://cdn.discordapp.com/attachments/506852548938956800/987211350470168606/map_replays_third.png",
-    "download": "https://cdn.discordapp.com/attachments/506852548938956800/987202828651102218/map_replay_download.png",
+    "mood": {
+        "sunrise": "https://cdn.discordapp.com/attachments/502122268936110100/989201333485727744/Sunrise.png",
+        "day": "https://cdn.discordapp.com/attachments/502122268936110100/989201250966990908/Day.png",
+        "sunset": "https://cdn.discordapp.com/attachments/502122268936110100/989201333691236352/Sunset.png",
+        "night": "https://cdn.discordapp.com/attachments/502122268936110100/989201280675221594/Moon.png"
+    },
+    "nametag": {
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989201302103945256/NameTag.png",
+        "yellow": "https://cdn.discordapp.com/attachments/502122268936110100/989201302531751987/NameTagGold.png",
+        "green": "https://cdn.discordapp.com/attachments/502122268936110100/989201302783401984/NameTagGreen.png",
+        "kacky": "https://cdn.discordapp.com/attachments/502122268936110100/989201303022473346/NameTagKacky.png",
+        "cab": "https://cdn.discordapp.com/attachments/502122268936110100/989201302309449818/NameTagCab.png"
+    },
+    "trophy": {
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989202764733235240/TrophyWhite.png",
+        "yellow": "https://cdn.discordapp.com/attachments/502122268936110100/989202764519309352/TrophyGold.png"
+    },
+    "person": {
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989201331736678400/Person.png",
+        "green": "https://cdn.discordapp.com/attachments/502122268936110100/989207996506718208/PersonGreen.png",
+        "orange": "https://cdn.discordapp.com/attachments/502122268936110100/989207996733206539/PersonOrange.png"
+    },
+    "map": {
+        "white": "https://cdn.discordapp.com/attachments/502122268936110100/989201280054472765/Map.png",
+        "questionMark": "https://cdn.discordapp.com/attachments/502122268936110100/989201280465502228/MapQuestionMark.png",
+        "download": "https://cdn.discordapp.com/attachments/502122268936110100/989201280272597042/MapDownload.png"
+    },
+    "timer": {
+        "default": "https://cdn.discordapp.com/attachments/502122268936110100/989201351810613318/Timer.png",
+        "author": "https://cdn.discordapp.com/attachments/502122268936110100/989201352192327750/TimerA.png",
+        "download": "https://cdn.discordapp.com/attachments/502122268936110100/989211180855853067/TimerDownload.png"
+    },
+    "chart": {
+        "locals": "https://cdn.discordapp.com/attachments/502122268936110100/989201249347977296/BarChart.png",
+        "live": "https://cdn.discordapp.com/attachments/502122268936110100/989201249926803546/BarChartLive.png",
+        "dedi": "https://cdn.discordapp.com/attachments/502122268936110100/989201249654169600/BarChartDedi.png"
+    },
+    "ranking": {
+        "first": "https://cdn.discordapp.com/attachments/502122268936110100/989201303202836520/NumberOne.png",
+        "second": "https://cdn.discordapp.com/attachments/502122268936110100/989201303693565982/NumberTwo.png",
+        "third": "https://cdn.discordapp.com/attachments/502122268936110100/989201303441924156/NumberThree.png"
+    },
     "X": {
         "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png",
         "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
