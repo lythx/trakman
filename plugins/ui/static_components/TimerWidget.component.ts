@@ -1,4 +1,4 @@
-import { calculateStaticPositionY, CONFIG, ICONS, IDS, staticHeader } from '../UiUtils.js'
+import { calculateStaticPositionY, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -23,7 +23,7 @@ export default class TimerWidget extends StaticComponent {
     this._isDisplayed = true
     TM.sendManialink(this.xml)
   }
- 
+
   displayToPlayer(login: string): void {
     TM.sendManialink(this.xml, login)
   }
@@ -35,7 +35,7 @@ export default class TimerWidget extends StaticComponent {
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.timer.title, ICONS.timer)}
+        ${staticHeader(CONFIG.timer.title, stringToObjectProperty(CONFIG.timer.icon, ICONS))}
         <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
       </frame>
     </manialink>`

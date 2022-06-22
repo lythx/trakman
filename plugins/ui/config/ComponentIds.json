@@ -9,11 +9,11 @@
     "TimerWidget": 70,
     "KarmaWidget": 80,
     "DediRanking": 200,
-    "LiveRanking": 400,
     "HelpWindow": 1000,
     "TMXWindow": 2000,
     "LocalCps": 3000,
     "DediCps": 4000,
+    "LiveRanking": 5000,
     "LocalRanking": 10000,
     "JukeboxWindow": 20000
 }
