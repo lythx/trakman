@@ -86,7 +86,7 @@ export default class HelpWindow extends PopupWindow {
       return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
       <label posn="${w / 2} -${h / 2} 3" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(command.help ?? '')}" valign="center" halign="center"/>`
     }
-    const arr: Function[] = []
+    const arr = []
     arr.push(...headers)
     for (let i = 0; i < this.itemsPerPage; i++) {
       arr.push(nameCell, paramsCell, commentCell)

@@ -13,7 +13,7 @@ const gridCell = (width: number, height: number, margin: number, color: string =
   return `<quad posn="${margin} -${margin} 1" sizen="${width - margin} ${height - margin}" bgcolor="${color}"/>`
 }
 
-const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale: number, padding?: number, xOffset?: number, yOffset?: number }) => {
+const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
   const textScale = options?.textScale ?? 0.7
   const padding = options?.padding ?? 1
   const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
@@ -82,4 +82,8 @@ const calculateStaticPositionY = (widgetName: string): number => {
   return CONFIG.static.topBorder - positionSum
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const fullScreenListener = (actionId: number, zIndex: number = -100): string => {
+  return `<quad posn="-70 50 ${zIndex}" sizen="140 100" action="${actionId}"/>`
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

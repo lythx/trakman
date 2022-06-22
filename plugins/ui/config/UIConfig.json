@@ -151,7 +151,12 @@
         "title": "Local Records",
         "side": true,
         "entries": 15,
-        "columnProportions": [1, 1, 2.8, 4],
+        "columnProportions": [
+            1,
+            1,
+            2.8,
+            4
+        ],
         "topCount": 5
     },
     "live": {
@@ -159,7 +164,19 @@
         "title": "Live Records",
         "side": true,
         "entries": 6,
-        "columnProportions": [1, 1, 2.8, 4],
+        "columnProportions": [
+            1,
+            1,
+            2.8,
+            4
+        ],
         "topCount": 3
+    },
+    "recordInfo": {
+        "maxRows": 4,
+        "minColumns": 3,
+        "columnWidth": 4,
+        "cpsPerRow": 3,
+        "bgColor": "000a"
     }
 }

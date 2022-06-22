@@ -88,7 +88,7 @@ export default class LiveRanking extends StaticComponent {
       return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
       ${verticallyCenteredText(liveRecs[i] !== undefined ? `${CONFIG.static.format}${TM.safeString(TM.strip(liveRecs[i].nickName, false))}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.2 })}`
     }
-    const arr: Function[] = []
+    const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
     for (let i = 0; i < CONFIG.live.entries; i++) {
       const a = side ? [markerCell, positionCell, timeCell, nicknameCell] : [positionCell, timeCell, nicknameCell, markerCell]
       arr.push(...a)
