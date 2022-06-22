@@ -87,7 +87,7 @@ export default class MapWidget extends StaticComponent {
           })}
       </frame>`
     }
-    const arr: Function[] = new Array(4).fill(cell)
+    const arr= new Array(4).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

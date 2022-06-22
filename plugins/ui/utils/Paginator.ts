@@ -27,7 +27,7 @@ export default class Paginator {
     if (pageCount > 10) { this.buttonCount = 3 }
   }
 
-  onPageChange(callback: Function) {
+  onPageChange(callback: (login: string, page: number) => void) {
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (this.ids.includes(info.answer)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)

@@ -22,7 +22,7 @@ export default class Grid {
     this.outlineColor = outlineColor
   }
 
-  constructXml(cellConstructFunctions: Function[]) {
+  constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]) {
     let xml = ``
     if (this.outlineColor !== undefined) {
       xml += `<quad posn="0 0 3" sizen="${this.width} ${this.lineWidth}" bgcolor="${this.outlineColor}"/>
