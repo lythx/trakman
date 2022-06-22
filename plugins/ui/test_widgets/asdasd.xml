@@ -1,12 +1,52 @@
-<frame posn="0 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="1000"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="penis" valign="center" halign="center"/>
-    </frame>
-<frame posn="30 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="4321"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="sussy petya" valign="center" halign="center"/>
-</frame>
-<frame posn="60 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="432145"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="heheheha" valign="center" halign="center"/>
-</frame>
+<manialink id="10">
+    <frame posn="49.2 48 1">
+        <format textsize="1" textcolor="FFFF"/>
+        <frame posn="0 0 1">
+            <frame posn="0 0 1">
+
+                <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+                <quad posn="0 -0 2"
+               sizen="1.7 2.2" image="https://cdn.discordapp.com/attachments/506852548938956800/987203422518407178/map_type.png"/>
+                <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="000a"/>
+                <label posn="2.2 -0.3 2"
+                   sizen="11.8 2" scale="1" text="$sOngoing"/>
+
+            </frame>
+        </frame>
+    <frame posn="0 -2.32 1">
+    <frame posn="0 0 1">
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0 -0 2"
+          sizen="1.7 2.2" image="https://cdn.discordapp.com/attachments/506852548938956800/987202829737398332/map_style.png"/>
+        <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="0006"/>
+        <label posn="2.15 -0.9863636363636362 3" sizen="12.200000000000001 2.17" scale="1" text="$s$50830s$708|$908sunset $c08o15" valign="center"/>
+    </frame></frame><frame posn="0 -4.64 1">
+      <frame posn="0 0 1">
+
+  <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+  <quad posn="0 -0 2"
+   sizen="1.7 2.2" image="https://cdn.discordapp.com/attachments/506852548938956800/987202828915314688/map_replay_players.png"/>      
+  <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="0006"/>
+  <label posn="2.15 -0.9863636363636362 3" sizen="12.200000000000001 2.17" scale="1" text="$sbelleepoque" valign="center"/>
+
+      </frame></frame><frame posn="0 -6.959999999999999 1">
+        <frame posn="0 0 1">
+
+  <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+  <quad posn="0 -0 2"
+   sizen="1.7 2.2" image="https://cdn.discordapp.com/attachments/506852548938956800/987202802231173210/map_author_time_alt.png"/>     
+  <quad posn="1.8499999999999999 0 1" sizen="5.4 2.17" bgcolor="0006"/>
+  <label posn="4.55 -1.085 3" sizen="4.4 2.17" scale="1" text="$s0:31.49" valign="center" halign="center"/>
+
+        </frame>
+        <frame posn="7.4 0 1">
+
+  <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+  <quad posn="0 -0 2"
+   sizen="1.7 2.2" image="https://cdn.discordapp.com/attachments/506852548938956800/987202802440884264/map_built.png"/>
+  <quad posn="1.8499999999999999 0 1" sizen="5.4 2.17" bgcolor="0006"/>
+  <label posn="4.55 -1.085 3" sizen="4.4 2.17" scale="1" text="$sN/A" valign="center" halign="center"/>
+
+        </frame></frame>
+      </frame>
+      </manialink>

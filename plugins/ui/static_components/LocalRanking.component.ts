@@ -17,12 +17,12 @@ export default class LocalRanking extends StaticComponent {
     this.width = CONFIG.static.width
     this.positionX = CONFIG.static.rightPosition
     this.positionY = calculateStaticPositionY('locals')
-    const proportions = [1, 1, 2.8, 4]
+    const proportions = CONFIG.locals.columnProportions
     const insideProportions = proportions.reduce((acc, cur, i) => i === 0 ? acc += 0 : acc += cur)
     const unitWidth = this.width / insideProportions
     this.markerWidth = unitWidth * proportions[0]
     this.grid = new Grid(this.width + this.markerWidth, this.height - CONFIG.staticHeader.height, proportions, new Array(CONFIG.locals.entries).fill(1))
-    TM.addListener('Controller.PlayerFinish', () => {
+    TM.addListener('Controller.PlayerRecord', () => {
       this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
@@ -35,6 +35,7 @@ export default class LocalRanking extends StaticComponent {
 
   display(): void {
     this._isDisplayed = true
+    // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
     }
@@ -44,7 +45,7 @@ export default class LocalRanking extends StaticComponent {
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader('Local Records', ICONS.barGraph)}
+        ${staticHeader(CONFIG.locals.title, ICONS.barGraph)}
         <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + 0.05} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
           ${this.getContent(login)}
         </frame>

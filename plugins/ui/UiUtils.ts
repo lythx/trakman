@@ -6,14 +6,14 @@ import CONFIG from './config/UIConfig.json' assert { type: 'json' }
 import ICONS from './config/Icons.json' assert { type: 'json' }
 import BACKGROUNDS from './config/Backgrounds.json' assert { type: 'json' }
 import IDS from './config/ComponentIds.json' assert { type: 'json' }
-
 import { TRAKMAN as TM } from '../../src/Trakman.js'
+
 
 const gridCell = (width: number, height: number, margin: number, color: string = '5556'): string => {
   return `<quad posn="${margin} -${margin} 1" sizen="${width - margin} ${height - margin}" bgcolor="${color}"/>`
 }
 
-const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
+const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale: number, padding?: number, xOffset?: number, yOffset?: number }) => {
   const textScale = options?.textScale ?? 0.7
   const padding = options?.padding ?? 1
   const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
@@ -35,9 +35,9 @@ const footerCloseButton = (width: number, closeId: number): string => {
     image="https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png"/>`
 }
 
-const headerIconTitleText = (title: string, width: number, height: number, iconUrl: string, iconWidth: number, iconHeight: number, rightText: string, optionalParams?: { titleScale?: number, rightTextScale?: number }): string => {
-  const titleScale = optionalParams?.titleScale ?? 1
-  const rightTextScale = optionalParams?.rightTextScale ?? 0.8
+const headerIconTitleText = (title: string, width: number, height: number, iconUrl: string, iconWidth: number, iconHeight: number, rightText: string, options?: { titleScale?: number, rightTextScale?: number }): string => {
+  const titleScale = options?.titleScale ?? 1
+  const rightTextScale = options?.rightTextScale ?? 0.8
   return `<quad posn="2 -${height / 2} 1" sizen="${iconWidth} ${iconHeight}" halign="center" valign="center" image="${iconUrl}"/>
         <label posn="${width / 2} -${height / 2} 1" sizen="${width * (1 / titleScale)} ${height}" halign="center" valign="center" scale="${titleScale}" text="${title}"/>
         <label posn="${width - 3} -${height / 2} 1" sizen="${width * (1 / rightTextScale)} ${height}" halign="center" valign="center" scale="${rightTextScale}" text="${rightText}"/>`

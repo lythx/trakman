@@ -8,7 +8,7 @@ import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
 import SpectatorWidget from './static_components/SpectatorWidget.component.js'
 import DediRanking from './static_components/DediRanking.component.js'
-import ChallengeWidget from './static_components/ChallengeWidget.component.js'
+import MapWidget from './static_components/MapWidget.js'
 import PreviousAndBest from './static_components/PreviousAndBest.component.js'
 import KarmaWidget from './static_components/KarmaWidget.component.js'
 import TimerWidget from './static_components/TimerWidget.component.js'
@@ -119,7 +119,7 @@ const events: TMEvent[] = [
         new RankWidget(),
         new SpectatorWidget(),
         new DediRanking(),
-        new ChallengeWidget(),
+        new MapWidget(),
         new PreviousAndBest(),
         new KarmaWidget(),
         new TimerWidget(),
