@@ -49,7 +49,7 @@ export default class JukeboxWindow extends PopupWindow {
   }
 
   protected constructHeader(login: string, page: number): string {
-    return headerIconTitleText('Map List', this.windowWidth, this.titleHeight, ICONS.mapQuestionMark, 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
+    return headerIconTitleText('Map List', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
   }
 
   protected constructContent(login: string, page: number): string {

@@ -90,10 +90,10 @@
         "margin": 0.15,
         "verticalPadding": 0.3,
         "horizontalPadding": 0.5,
-        "iconWidth": 1.7,
-        "iconHeight": 2.2,
-        "iconVerticalPadding": 0,
-        "iconHorizontalPadding": 0
+        "iconWidth": 1.55,
+        "iconHeight": 2,
+        "iconHorizontalPadding": 0.075,
+        "iconVerticalPadding": 0.1
     },
     "static": {
         "format": "$s",
@@ -118,10 +118,10 @@
         "side": true,
         "title": "Ongoing",
         "icons": [
-            "mapQuestionMark",
-            "tag",
-            "account",
-            "timerA",
+            "map.white",
+            "nametag.white",
+            "person.white",
+            "timer.author",
             "tools"
         ],
         "textScale": 1,
@@ -139,17 +139,20 @@
     "karma": {
         "height": 8.8,
         "side": true,
-        "title": "Karma"
+        "title": "Karma",
+        "icon": "karmaStats"
     },
     "timer": {
         "height": 6.2,
         "side": true,
-        "title": "Timer"
+        "title": "Timer",
+        "icon": "clock"
     },
     "locals": {
         "height": 34.12,
-        "title": "Local Records",
         "side": true,
+        "title": "Local Records",
+        "icon": "chart.locals",
         "entries": 15,
         "columnProportions": [
             1,
@@ -157,12 +160,18 @@
             2.8,
             4
         ],
+        "markers": {
+            "you": "arrowDoubleR.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
         "topCount": 5
     },
     "live": {
-        "height": 12.72,
-        "title": "Live Records",
+        "height": 15.07,
         "side": true,
+        "title": "Live Records",
+        "icon": "chart.live",
         "entries": 6,
         "columnProportions": [
             1,
@@ -170,13 +179,17 @@
             2.8,
             4
         ],
+        "markers": {
+            "you": "arrowDoubleR.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
         "topCount": 3
     },
     "recordInfo": {
-        "maxRows": 4,
-        "minColumns": 3,
-        "columnWidth": 4,
-        "cpsPerRow": 3,
-        "bgColor": "000a"
+        "minColumns": 5,
+        "columnWidth": 3,
+        "bgColor": "0006",
+        "icon": "info"
     }
 }

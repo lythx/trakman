@@ -1,4 +1,4 @@
-import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener } from '../UiUtils.js'
+import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
@@ -27,7 +27,7 @@ export default class LocalRanking extends StaticComponent {
     this.markerWidth = unitWidth * proportions[0]
     this.grid = new Grid(this.width + this.markerWidth, this.height - CONFIG.staticHeader.height, proportions, new Array(CONFIG.locals.entries).fill(1))
     const cpAmount = TM.challenge.checkpointsAmount
-    this.detailedInfoRows = Math.min(Math.ceil(cpAmount / 3) + 1, CONFIG.recordInfo.maxRows)
+    this.detailedInfoRows = Math.ceil(cpAmount / 3) + 1
     if (cpAmount / (this.detailedInfoRows - 1) > CONFIG.recordInfo.minColumns) {
       this.detailedInfoColumns = Math.ceil(cpAmount / (this.detailedInfoRows - 1))
     } else {
@@ -62,7 +62,7 @@ export default class LocalRanking extends StaticComponent {
     })
     TM.addListener('Controller.BeginChallenge', (info: BeginChallengeInfo) => {
       const cpAmount = TM.challenge.checkpointsAmount
-      this.detailedInfoRows = Math.min(Math.ceil(cpAmount / 3) + 1, CONFIG.recordInfo.maxRows)
+      this.detailedInfoRows = Math.ceil(cpAmount / 3) + 1
       if (cpAmount / (this.detailedInfoRows - 1) > CONFIG.recordInfo.minColumns) {
         this.detailedInfoColumns = Math.ceil(cpAmount / (this.detailedInfoRows - 1))
       } else {
@@ -80,11 +80,12 @@ export default class LocalRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
+    const offset = 0.05 // idk why but without this its offset, i see no reason for this whatsoever
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.locals.title, ICONS.barGraph)}
-        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + 0.0} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+        ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS))}
+        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
           ${this.getContent(login)}
         </frame>
       </frame>
@@ -100,25 +101,30 @@ export default class LocalRanking extends StaticComponent {
     const markers = this.calculateMarkers(locals, playerLocalIndex, login)
     const side = CONFIG.locals.side
     const markerCell = (i: number, j: number, w: number, h: number): string => {
+      const height = h - (2 * CONFIG.static.marginSmall)
+      const width = CONFIG.staticHeader.iconWidth
+      const posY = CONFIG.static.marginSmall / 2
+      const posX = CONFIG.staticHeader.iconVerticalPadding
       if (markers[i] === undefined) { return '' }
       const markerBg = `<quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>`
       const infoPosition = markers[i]?.infoPosition
+      let window = ''
       if (infoPosition !== undefined) {
         const width = CONFIG.recordInfo.columnWidth * this.detailedInfoColumns
-        return `<frame posn="${(-width - ((width ) * (infoPosition))) + w} 0 2">${this.contructRecordInfo(width, h, locals[i])}</frame> 
+        window += `<frame posn="${(-width - ((width + CONFIG.static.marginSmall) * (infoPosition))) + w} 0 2">${this.contructRecordInfo(width, h, locals[i])}</frame> 
         ${fullScreenListener(this.id + 1)}`
       } if (markers[i].marker === 'faster') {
-        return markerBg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${ICONS.star.yellow}"/>`
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.locals.markers.faster, ICONS)}"/>`
       } if (markers[i].marker === 'slower') {
-        return markerBg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${ICONS.star.green}"/>`
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.locals.markers.slower, ICONS)}"/>`
       } if (markers[i].marker === 'you') {
-        return markerBg + `<quad posn="0 0 2" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" image="${side ? ICONS.arrowDoubleR.orange : ICONS.arrowDoubleL.orange}"/>`
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.locals.markers.you, ICONS)}"/>`
       }
-      return ''
+      return window
     }
     const positionCell = (i: number, j: number, w: number, h: number): string => {
       return `<quad posn="0 0 4" sizen="${this.width} ${h - CONFIG.static.marginSmall}" action="${this.id + i + 2}"/>
-      <quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall - 0.04} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
+      <quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
       ${centeredText(locals[i] !== undefined ? (`${CONFIG.static.format}${i + 1}`).toString().padStart(2, '0') : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
     }
     const timeCell = (i: number, j: number, w: number, h: number): string => {
@@ -161,7 +167,7 @@ export default class LocalRanking extends StaticComponent {
   }
 
   private calculateMarkers(locals: LocalRecord[], playerLocalIndex: number, login: string): { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined }[] {
-    const arr: boolean[][] = []
+    const arr: (boolean | 'half')[][] = []
     for (let i = 0; i < locals.length; i++) {
       arr.push(new Array(this.detailedInfoRows).fill(false))
     }
@@ -170,11 +176,12 @@ export default class LocalRanking extends StaticComponent {
     if (infos !== undefined) {
       for (const [i, e] of locals.entries()) {
         if (infos.includes(i + 1)) {
-          const position = arr[i].indexOf(false)
-          detailedInfos.push({ index: i, position })
+          const position = arr[i].findIndex(a => a === false)
+          detailedInfos.push({ index: i, position: arr[i].indexOf(false) })
+          const n = TM.challenge.checkpointsAmount % this.detailedInfoColumns === 0 ? 0 : 1
           for (let j = 0; j < this.detailedInfoRows; j++) {
             if (arr[i + j] === undefined) { break }
-            arr[i + j][position] = true
+            arr[i + j][position] = (this.detailedInfoRows - n) === j ? 'half' : true
           }
         }
       }
@@ -182,7 +189,7 @@ export default class LocalRanking extends StaticComponent {
     const ret: { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined }[] = []
     for (const [i, e] of locals.entries()) {
       let marker: 'faster' | 'slower' | 'you' | null = null
-      if (TM.getPlayer(locals?.[i]?.login) !== undefined && arr[i][0] === false) {
+      if (TM.getPlayer(locals?.[i]?.login) !== undefined && arr?.[i]?.[0] !== true) {
         if (i < playerLocalIndex) { // Player faster than your record
           marker = 'faster'
         } else if (i > playerLocalIndex) { // Player slower than your record
@@ -199,17 +206,24 @@ export default class LocalRanking extends StaticComponent {
   private contructRecordInfo = (width: number, rowHeight: number, local: LocalRecord): string => {
     const margin = CONFIG.static.marginSmall
     const bg = CONFIG.recordInfo.bgColor
-    let xml = `<quad posn="0 0 1" sizen="${(width / 2) - margin} ${rowHeight - margin}" bgcolor="${bg}"/>
-    ${centeredText(local.login, (width / 2) - margin, rowHeight - margin, { padding: 0.1 })}
-    <quad posn="${width / 2} 0 1" sizen="${(width / 2) - margin} ${rowHeight - margin}" bgcolor="${bg}"/>
-    ${centeredText(TM.formatDate(local.date, true), (width / 2) - margin, rowHeight - margin, { xOffset: width / 2, padding: 0.2 })}`
+    const headerBg = CONFIG.staticHeader.bgColor
+    const squareW = CONFIG.staticHeader.squareWidth
+    const iconPadding = CONFIG.staticHeader.iconHorizontalPadding
+    const iconW = CONFIG.staticHeader.iconWidth
+    const icon = stringToObjectProperty(CONFIG.recordInfo.icon, ICONS)
+    let xml = `<quad posn="0 0 1" sizen="${squareW} ${rowHeight - margin}" bgcolor="${headerBg}"/>
+    <quad posn="${iconPadding} -${margin / 2} 2" sizen="${iconW} ${rowHeight - (margin * 2)}" image="${icon}"/>
+    <quad posn="${squareW + margin} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}"/>
+    ${centeredText(local.login, ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { padding: 0.4, xOffset: squareW + margin })}
+    <quad posn="${((width - (squareW + margin)) / 2) + (squareW + margin)} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}"/>
+    ${centeredText(TM.formatDate(local.date, true), ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { xOffset: ((width - (squareW + margin)) / 2) + (squareW + margin), padding: 0.4 })}`
     const w = width / this.detailedInfoColumns
-    for (let i = 0; i <= this.detailedInfoRows; i++) {
+    for (let i = 0; i < this.detailedInfoRows; i++) {
       for (let j = 0; j < this.detailedInfoColumns; j++) {
-        const cpTime = local.checkpoints?.[(i * this.detailedInfoRows) + j]
+        const cpTime = local.checkpoints?.[(i * this.detailedInfoColumns) + j]
         if (cpTime === undefined) { break }
-        xml += `<quad posn="${w * j} -${rowHeight * (i + 1)} 1" sizen="${(width / w) - margin} ${rowHeight - margin}" bgcolor="${bg}"/>
-        ${centeredText(TM.Utils.getTimeString(cpTime), (width / w) - margin, rowHeight - margin, { xOffset: w * j, yOffset: rowHeight * (i + 1), padding: 0.1 })}`
+        xml += `<quad posn="${w * j} -${rowHeight * (i + 1)} 1" sizen="${w - margin} ${rowHeight - margin}" bgcolor="${bg}"/>
+        ${centeredText(TM.Utils.getTimeString(cpTime), w - margin, rowHeight - margin, { xOffset: w * j, yOffset: rowHeight * (i + 1), padding: 0.4 })}`
       }
     }
     return xml

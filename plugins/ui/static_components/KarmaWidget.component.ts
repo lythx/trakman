@@ -1,4 +1,4 @@
-import { calculateStaticPositionY, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader } from '../UiUtils.js'
+import { calculateStaticPositionY, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -34,7 +34,7 @@ export default class KarmaWidget extends StaticComponent {
     this.xml = `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.karma.title, ICONS.heart)}
+        ${staticHeader(CONFIG.karma.title, stringToObjectProperty(CONFIG.karma.icon, ICONS))}
         <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
       </frame>
     </manialink>`

@@ -1,4 +1,4 @@
-import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY } from '../UiUtils.js'
+import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -53,7 +53,7 @@ export default class MapWidget extends StaticComponent {
     }
     const date = TM.TMXCurrent?.lastUpdateDate
     const texts = [CFG.map.title, TM.safeString(TM.challenge.name), TM.safeString(author), TM.Utils.getTimeString(TM.challenge.authorTime), date === undefined ? undefined : TM.formatDate(date)]
-    const icons = CFG.map.icons.map(a => (ICONS as any)[a])
+    const icons = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     const headerCFG = CONFIG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 3) {

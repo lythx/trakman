@@ -43,7 +43,7 @@ export default class HelpWindow extends PopupWindow {
   }
 
   protected constructHeader(login: string, params: { page: number, pageCount: number }): string {
-    return headerIconTitleText('Command List', this.windowWidth, this.titleHeight, ICN.trophy, 2.5, 2.5, `${params.page}/${params.pageCount}`)
+    return headerIconTitleText('Command List', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
   }
 
   protected constructContent(login: string, params: { page: number, commands: TMCommand[], privilege: number }): string {

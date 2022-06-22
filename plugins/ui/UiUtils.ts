@@ -86,4 +86,12 @@ const fullScreenListener = (actionId: number, zIndex: number = -100): string => 
   return `<quad posn="-70 50 ${zIndex}" sizen="140 100" action="${actionId}"/>`
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const stringToObjectProperty = (str: string, obj: any) => {
+  const split = str.split('.')
+  for (const e of split) {
+    obj = obj[e]
+  }
+  return obj
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

@@ -35,7 +35,7 @@ export default class DediCps extends PopupWindow {
   }
 
   protected constructHeader(login: string, params: { page: number, pageCount: number }): string {
-    return headerIconTitleText('Dedimania Checkpoints', this.windowWidth, this.titleHeight, ICONS.barGraph, 2.5, 2.5, `${params.page}/${params.pageCount}`)
+    return headerIconTitleText('Dedimania Checkpoints', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
   }
 
   protected constructContent(login: string, params: { page: number, pageCount: number, dedis: TMDedi[] }): string {
