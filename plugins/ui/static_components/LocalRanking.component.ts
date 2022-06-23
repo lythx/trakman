@@ -1,4 +1,4 @@
-import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
+import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty, getBestWorstEqualCps } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
@@ -12,6 +12,7 @@ export default class LocalRanking extends StaticComponent {
   private readonly positionY: number
   private readonly grid: Grid
   private readonly detailedInfos: { login: string, indexes: number[] }[] = []
+  private readonly maxLocals = Number(process.env.LOCALS_AMOUNT)
   private detailedInfoRows: number
   private detailedInfoColumns: number
 
@@ -50,17 +51,24 @@ export default class LocalRanking extends StaticComponent {
         }
         this.displayToPlayer(info.login)
       }
-      if (info.answer > this.id + 1 && info.answer <= this.id + Number(process.env.LOCALS_AMOUNT) + 1) {
+      if (info.answer > this.id + 1 && info.answer <= this.id + this.maxLocals + 1) {
+        const index = info.answer - this.id - 1
         const detailedInfo = this.detailedInfos.find(a => a.login === info.login)
         if (detailedInfo === undefined) {
-          this.detailedInfos.push({ login: info.login, indexes: [info.answer - this.id - 1] })
+          this.detailedInfos.push({ login: info.login, indexes: [index] })
+        } else if (!detailedInfo.indexes.includes(index)) {
+          detailedInfo.indexes.push(index)
         } else {
-          detailedInfo.indexes.push(info.answer - this.id - 1)
+          const index = detailedInfo.indexes.indexOf(info.answer - this.id - 1)
+          if (index !== -1) {
+            detailedInfo.indexes.splice(index, 1)
+          }
         }
         this.displayToPlayer(info.login)
       }
     })
     TM.addListener('Controller.BeginChallenge', (info: BeginChallengeInfo) => {
+      this.detailedInfos.length = 0
       const cpAmount = TM.challenge.checkpointsAmount
       this.detailedInfoRows = Math.ceil(cpAmount / 3) + 1
       if (cpAmount / (this.detailedInfoRows - 1) > CONFIG.recordInfo.minColumns) {
@@ -111,7 +119,7 @@ export default class LocalRanking extends StaticComponent {
       let window = ''
       if (infoPosition !== undefined) {
         const width = CONFIG.recordInfo.columnWidth * this.detailedInfoColumns
-        window += `<frame posn="${(-width - ((width + CONFIG.static.marginSmall) * (infoPosition))) + w} 0 2">${this.contructRecordInfo(width, h, locals[i])}</frame> 
+        window += `<frame posn="${(-width - ((width + CONFIG.static.marginSmall) * (infoPosition))) + w} 0 2">${this.contructRecordInfo(width, h, i, locals[i], markers[i].cpTypes)}</frame> 
         ${fullScreenListener(this.id + 1)}`
       } if (markers[i].marker === 'faster') {
         return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.locals.markers.faster, ICONS)}"/>`
@@ -166,19 +174,24 @@ export default class LocalRanking extends StaticComponent {
     }
   }
 
-  private calculateMarkers(locals: LocalRecord[], playerLocalIndex: number, login: string): { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined }[] {
+  private calculateMarkers(locals: LocalRecord[], playerLocalIndex: number, login: string): { marker: 'faster' | 'slower' | 'you' | null, infoPosition: number | undefined, cpTypes: ('best' | 'worst' | 'equal' | undefined)[] }[] {
     const arr: (boolean | 'half')[][] = []
     for (let i = 0; i < locals.length; i++) {
       arr.push(new Array(this.detailedInfoRows).fill(false))
     }
     const detailedInfos: { index: number, position: number }[] = []
     const infos = this.detailedInfos.find(a => a.login === login)?.indexes
+    const cpAmount = TM.challenge.checkpointsAmount
+    const cps: number[][] = Array.from(Array(cpAmount - 1), () => [])
     if (infos !== undefined) {
       for (const [i, e] of locals.entries()) {
         if (infos.includes(i + 1)) {
           const position = arr[i].findIndex(a => a === false)
           detailedInfos.push({ index: i, position: arr[i].indexOf(false) })
-          const n = TM.challenge.checkpointsAmount % this.detailedInfoColumns === 0 ? 0 : 1
+          for (const [j, cp] of e.checkpoints.entries()) {
+            cps[j][i] = cp
+          }
+          const n = cpAmount % this.detailedInfoColumns === 0 ? 0 : 1
           for (let j = 0; j < this.detailedInfoRows; j++) {
             if (arr[i + j] === undefined) { break }
             arr[i + j][position] = (this.detailedInfoRows - n) === j ? 'half' : true
@@ -186,7 +199,8 @@ export default class LocalRanking extends StaticComponent {
         }
       }
     }
-    const ret: { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined }[] = []
+    const cpTypes = cps?.[0]?.filter(a => !isNaN(a)).length === 1 ? getBestWorstEqualCps(cps.map((a, i) => [...a, locals[playerLocalIndex].checkpoints[i]])) : getBestWorstEqualCps(cps)
+    const ret: { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined, cpTypes: ('best' | 'worst' | 'equal' | undefined)[] }[] = []
     for (const [i, e] of locals.entries()) {
       let marker: 'faster' | 'slower' | 'you' | null = null
       if (TM.getPlayer(locals?.[i]?.login) !== undefined && arr?.[i]?.[0] !== true) {
@@ -198,12 +212,12 @@ export default class LocalRanking extends StaticComponent {
           marker = 'you'
         }
       }
-      ret.push({ marker, infoPosition: detailedInfos.find(a => a.index === i)?.position })
+      ret.push({ marker, infoPosition: detailedInfos.find(a => a.index === i)?.position, cpTypes: cpTypes[i] })
     }
     return ret
   }
 
-  private contructRecordInfo = (width: number, rowHeight: number, local: LocalRecord): string => {
+  private contructRecordInfo = (width: number, rowHeight: number, index: number, local: LocalRecord, cpTypes: ('best' | 'worst' | 'equal' | undefined)[]): string => {
     const margin = CONFIG.static.marginSmall
     const bg = CONFIG.recordInfo.bgColor
     const headerBg = CONFIG.staticHeader.bgColor
@@ -211,19 +225,31 @@ export default class LocalRanking extends StaticComponent {
     const iconPadding = CONFIG.staticHeader.iconHorizontalPadding
     const iconW = CONFIG.staticHeader.iconWidth
     const icon = stringToObjectProperty(CONFIG.recordInfo.icon, ICONS)
-    let xml = `<quad posn="0 0 1" sizen="${squareW} ${rowHeight - margin}" bgcolor="${headerBg}"/>
-    <quad posn="${iconPadding} -${margin / 2} 2" sizen="${iconW} ${rowHeight - (margin * 2)}" image="${icon}"/>
-    <quad posn="${squareW + margin} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}"/>
-    ${centeredText(local.login, ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { padding: 0.4, xOffset: squareW + margin })}
-    <quad posn="${((width - (squareW + margin)) / 2) + (squareW + margin)} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}"/>
-    ${centeredText(TM.formatDate(local.date, true), ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { xOffset: ((width - (squareW + margin)) / 2) + (squareW + margin), padding: 0.4 })}`
+    const actionId = this.id + 2 + index
+    let xml = `<quad posn="0 0 1" sizen="${squareW} ${rowHeight - margin}" bgcolor="${headerBg}" action="${actionId}"/>
+    <quad posn="${iconPadding} -${margin / 2} 2" sizen="${iconW} ${rowHeight - (margin * 2)}" image="${icon}" action="${actionId}"/>
+    <quad posn="${squareW + margin} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}" action="${actionId}"/>
+    ${centeredText(local.login, ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { padding: 0.2, xOffset: squareW + margin, textScale: 0.8 })}
+    <quad posn="${((width - (squareW + margin)) / 2) + (squareW + margin)} 0 1" sizen="${((width - (squareW + margin)) / 2) - margin} ${rowHeight - margin}" bgcolor="${headerBg}" action="${actionId}"/>
+    ${centeredText(TM.formatDate(local.date, true), ((width - (squareW + margin)) / 2) - margin, rowHeight - margin, { xOffset: ((width - (squareW + margin)) / 2) + (squareW + margin), padding: 0.2, textScale: 0.8 })}`
     const w = width / this.detailedInfoColumns
+    const colours = {
+      best: '0F0F',
+      worst: 'F00F',
+      equal: 'FF0F'
+    }
     for (let i = 0; i < this.detailedInfoRows; i++) {
       for (let j = 0; j < this.detailedInfoColumns; j++) {
         const cpTime = local.checkpoints?.[(i * this.detailedInfoColumns) + j]
         if (cpTime === undefined) { break }
-        xml += `<quad posn="${w * j} -${rowHeight * (i + 1)} 1" sizen="${w - margin} ${rowHeight - margin}" bgcolor="${bg}"/>
-        ${centeredText(TM.Utils.getTimeString(cpTime), w - margin, rowHeight - margin, { xOffset: w * j, yOffset: rowHeight * (i + 1), padding: 0.4 })}`
+        let colour = 'FFFF'
+        const type = cpTypes?.[(i * this.detailedInfoColumns) + j]
+        if (type !== undefined) {
+          colour = (colours as any)[type]
+        }
+        xml += `<quad posn="${w * j} -${rowHeight * (i + 1)} 1" sizen="${w - margin} ${rowHeight - margin}" bgcolor="${bg}" action="${actionId}"/>
+        <format textcolor="${colour}"/>
+        ${centeredText(TM.Utils.getTimeString(cpTime), w - margin, rowHeight - margin, { xOffset: w * j, yOffset: rowHeight * (i + 1), padding: 0.2, textScale: 0.7 })}`
       }
     }
     return xml
