@@ -6,7 +6,6 @@
     "addDate": "https://cdn.discordapp.com/attachments/502122268936110100/989201250342014996/CalendarPlus.png",
     "lineGraph": "https://cdn.discordapp.com/attachments/502122268936110100/989201332370038844/SearchStats.png",
     "TM": "https://cdn.discordapp.com/attachments/502122268936110100/989201353467383858/Trackmania.png",
-    "MX": "https://cdn.discordapp.com/attachments/502122268936110100/989201303945216100/OpenTMX.png",
     "account": "https://cdn.discordapp.com/attachments/502122268936110100/989201331946401803/PersonPin.png",
     "routes": "https://cdn.discordapp.com/attachments/502122268936110100/989201332147744808/Routes.png",
     "tag": "https://cdn.discordapp.com/attachments/502122268936110100/989201302103945256/NameTag.png",
@@ -17,6 +16,22 @@
     "clock": "https://cdn.discordapp.com/attachments/502122268936110100/989201352423006218/TimerClock.png",
     "addTime": "https://cdn.discordapp.com/attachments/502122268936110100/989201352926326824/TimerPlus.png",
     "info": "https://cdn.discordapp.com/attachments/502122268936110100/989281115049177138/Info.png",
+    "git": "https://cdn.discordapp.com/attachments/502122268936110100/989520209545162792/Git.png",
+    "github": "https://cdn.discordapp.com/attachments/502122268936110100/989520211734573116/GitHub.png",
+    "numberedList": "https://cdn.discordapp.com/attachments/502122268936110100/989520211961053224/NumberedList.png",
+    "people": "https://cdn.discordapp.com/attachments/502122268936110100/989520212191764480/People.png",
+    "stats": "https://cdn.discordapp.com/attachments/502122268936110100/989520213580087336/Stats.png",
+    "timeList": "https://cdn.discordapp.com/attachments/502122268936110100/989520213978542120/TimeList.png",
+    "mxLogo": "https://cdn.discordapp.com/attachments/502122268936110100/989520230306955324/ManiaExchange.png",
+    "mxOpen": "https://cdn.discordapp.com/attachments/502122268936110100/989201303945216100/OpenTMX.png",
+    "vote": {
+        "skip": "https://cdn.discordapp.com/attachments/502122268936110100/989520213353578526/SkipDemocracy.png",
+        "replay": "https://cdn.discordapp.com/attachments/502122268936110100/989520212686688286/ReplayDemocracy.png"
+    },
+    "pay": {
+        "skip": "https://cdn.discordapp.com/attachments/502122268936110100/989520212917358632/SkipCapitalist.png",
+        "replay": "https://cdn.discordapp.com/attachments/502122268936110100/989520212489568356/ReplayCapitalist.png"
+    },
     "cash": {
         "normal": "https://cdn.discordapp.com/attachments/502122268936110100/989201250560131123/Cash.png",
         "dollar": "https://cdn.discordapp.com/attachments/502122268936110100/989201250769854565/CashDollar.png"
