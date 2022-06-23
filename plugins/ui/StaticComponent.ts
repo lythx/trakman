@@ -64,7 +64,7 @@ export default abstract class StaticComponent {
     return this._isDisplayed
   }
 
-  abstract display(): void
+  abstract display(): void | Promise<void>
 
   abstract displayToPlayer(login: string): void
 

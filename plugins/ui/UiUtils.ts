@@ -29,6 +29,14 @@ const verticallyCenteredText = (text: string, parentWidth: number, parentHeight:
   return `<label posn="${padding + posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center"/>`
 }
 
+const horizontallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
+  const textScale = options?.textScale ?? 0.7
+  const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
+  const posY = options?.yOffset === undefined ? 0 : options?.yOffset
+  const padding = options?.padding ?? 0.2
+  return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" halign="center"/>`
+}
+
 const footerCloseButton = (width: number, closeId: number): string => {
   return `<quad posn="${width / 2} -2 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${closeId}" 
     imagefocus="https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
@@ -95,7 +103,7 @@ const stringToObjectProperty = (str: string, obj: any) => {
 }
 
 const getBestWorstEqualCps = (cps: number[][]): ('best' | 'worst' | 'equal' | undefined)[][] => {
-  if(cps.length === 0) {
+  if (cps.length === 0) {
     return []
   }
   const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), () => [])
@@ -125,4 +133,11 @@ const getBestWorstEqualCps = (cps: number[][]): ('best' | 'worst' | 'equal' | un
   return cpTypes
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS,getBestWorstEqualCps, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const constuctButton = (width: number, height: number, iconUrl: string, text1: string, text2: string): string => {
+  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
+  <quad posn="0 0 1" sizen="${width} ${2}" image="${iconUrl}"/>
+  ${horizontallyCenteredText(text1, width, height, { yOffset: 2.3, textScale: 0.55 })}
+  ${horizontallyCenteredText(text2, width, height, { yOffset: 3.75, textScale: 0.43, padding: 0.8 })}`
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, horizontallyCenteredText, constuctButton, getBestWorstEqualCps, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

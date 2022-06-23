@@ -79,6 +79,27 @@
         "iconStyle": "Icons128x128_1",
         "iconSubStyle": "Rankings"
     },
+    "static": {
+        "format": "$s",
+        "width": 14.65,
+        "topBorder": 47.85,
+        "rightPosition": 49.2,
+        "leftPosition": -63.85,
+        "bgColor": "0006",
+        "marginBig": 0.27,
+        "marginSmall": 0.15,
+        "rightSideOrder": [
+            "map",
+            "previousAndBest",
+            "karma",
+            "timer",
+            "locals",
+            "live"
+        ],
+        "leftSideOrder": [
+            "buttons"
+        ]
+    },
     "staticHeader": {
         "format": "$s",
         "bgColor": "000a",
@@ -94,24 +115,6 @@
         "iconHeight": 2,
         "iconHorizontalPadding": 0.075,
         "iconVerticalPadding": 0.1
-    },
-    "static": {
-        "format": "$s",
-        "width": 14.65,
-        "topBorder": 47.85,
-        "rightPosition": 49.2,
-        "bgColor": "0006",
-        "marginBig": 0.27,
-        "marginSmall": 0.15,
-        "rightSideOrder": [
-            "map",
-            "previousAndBest",
-            "karma",
-            "timer",
-            "locals",
-            "live"
-        ],
-        "leftSideOrder": []
     },
     "map": {
         "height": 9.13,
@@ -185,6 +188,16 @@
             "slower": "person.green"
         },
         "topCount": 3
+    },
+    "buttons": {
+        "height": 15,
+        "side": false,
+        "titles": [
+            "VISITORS"
+        ],
+        "icons": [
+            "visitorsAmount"
+        ]
     },
     "recordInfo": {
         "minColumns": 5,

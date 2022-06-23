@@ -17,6 +17,7 @@ export default class KarmaWidget extends StaticComponent {
     this.positionX = CONFIG.static.rightPosition
     this.positionY = calculateStaticPositionY('karma')
     this.updateXML()
+    this.display()
   }
 
   display(): void {
