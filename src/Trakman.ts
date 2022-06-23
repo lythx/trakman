@@ -292,10 +292,9 @@ export const TRAKMAN = {
       '&': '&amp;',
       '<': '&lt;',
       '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
+      '"': '&quot;'
     }
-    return str.replace(/[&<>"']/g, (m) => { return map[m as keyof typeof map] })
+    return str.replace(/[&<>"]/g, (m) => { return map[m as keyof typeof map] })
   },
 
   /**

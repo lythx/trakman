@@ -84,7 +84,7 @@
         "width": 14.65,
         "topBorder": 47.85,
         "rightPosition": 49.13,
-        "leftPosition": -63.85,
+        "leftPosition": -63.75,
         "bgColor": "0006",
         "marginBig": 0.27,
         "marginSmall": 0.15,
@@ -97,7 +97,11 @@
             "live"
         ],
         "leftSideOrder": [
-            "buttons"
+            "buttons",
+            "rank",
+            "spectator",
+            "dedis",
+            "tmx"
         ]
     },
     "staticHeader": {
@@ -149,7 +153,8 @@
         "height": 6.2,
         "side": true,
         "title": "Timer",
-        "icon": "clock"
+        "icon": "clock",
+        "hourglassOverlay": "hourglass"
     },
     "locals": {
         "height": 34.12,
@@ -190,17 +195,135 @@
         "topCount": 3
     },
     "buttons": {
-        "height": 15,
+        "height": 14.5,
         "side": false,
         "titles": [
             "VISITORS",
             "SPECS PLAYERS",
-            "VERSION"
+            "VERSION",
+            "TIME",
+            "MAPS",
+            "PLAYER STATS",
+            "SECTOR RECORDS",
+            "GITHUB REPO",
+            "VOTE TO $F00SKIP",
+            "VOTE TO $0F0RES",
+            "PAY $F00$$ TO $F00SKIP",
+            "PAY $0F0$$ TO $0F0RES"
         ],
         "icons": [
-            "people",
-            "people",
-            "git"
+            {
+                "name": "people",
+                "width": 3.2,
+                "height": 3.4,
+                "padding": -0.5
+            },
+            {
+                "name": "people",
+                "width": 3.2,
+                "height": 3.4,
+                "padding": -0.5
+            },
+            {
+                "name": "git",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.3
+            },
+            {
+                "name": "clock",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "numberedList",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "stats",
+                "width": 1.9,
+                "height": 1.9,
+                "padding": 0.2
+            },
+            {
+                "name": "timeList",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "github",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "vote.skip",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "vote.replay",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "pay.skip",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "pay.replay",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            }
+        ]
+    },
+    "rank": {
+        "height": 3.8,
+        "side": false
+    },
+    "spectator": {
+        "height": 6.3,
+        "side": false
+    },
+    "dedis": {
+        "height": 34.12,
+        "side": false,
+        "title": "Dedi Records",
+        "icon": "chart.dedi",
+        "entries": 15,
+        "columnProportions": [
+            1,
+            2.8,
+            4,
+            1
+        ],
+        "markers": {
+            "you": "arrowDoubleL.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
+        "topCount": 5
+    },
+    "tmx": {
+        "height": 8.68,
+        "side": false,
+        "title": "TMX Records",
+        "icon": "mxLogo",
+        "entries": 3,
+        "columnProportions": [
+            1,
+            2.8,
+            4,
+            1
         ]
     },
     "recordInfo": {

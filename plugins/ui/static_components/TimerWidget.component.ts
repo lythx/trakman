@@ -37,6 +37,7 @@ export default class TimerWidget extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.timer.title, stringToObjectProperty(CONFIG.timer.icon, ICONS))}
         <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
+        <quad posn="10.8 -2.6 3" sizen="4.2 3.3" image="${stringToObjectProperty(CONFIG.timer.hourglassOverlay, ICONS)}"/>
       </frame>
     </manialink>`
   }
