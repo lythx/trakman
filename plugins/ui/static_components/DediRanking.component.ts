@@ -1,14 +1,41 @@
-import { CONFIG as CFG, IDS } from '../UiUtils.js'
+import { calculateStaticPositionY, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty, getBestWorstEqualCps } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
-
-//TODO USE 3 COLUMN GRID INSTEAD OF FOR LOOP HERE
+import 'dotenv/config'
 
 export default class DediRanking extends StaticComponent {
 
+  private readonly height: number
+  private readonly width: number
+  private readonly markerWidth: number
+  private readonly positionX: number
+  private readonly positionY: number
+  private readonly grid: Grid
+  private readonly detailedInfos: { login: string, indexes: number[] }[] = []
+  private readonly maxDedis = Number(process.env.DEDIS_AMOUNT)
+  private readonly offset = 0.03
+  private detailedInfoRows: number
+  private detailedInfoColumns: number
+
   constructor() {
     super(IDS.DediRanking, 'race')
-    TM.addListener('Controller.DedimaniaRecords', () => {
+    this.height = CONFIG.dedis.height
+    this.width = CONFIG.static.width
+    this.positionX = CONFIG.static.leftPosition
+    this.positionY = calculateStaticPositionY('dedis')
+    const proportions = CONFIG.dedis.columnProportions
+    const insideProportions = proportions.reduce((acc, cur, i) => i === 0 ? acc += 0 : acc += cur)
+    const unitWidth = this.width / insideProportions
+    this.markerWidth = unitWidth * proportions[0]
+    this.grid = new Grid(this.width + this.markerWidth, this.height - CONFIG.staticHeader.height, proportions, new Array(CONFIG.dedis.entries).fill(1))
+    const cpAmount = TM.challenge.checkpointsAmount
+    this.detailedInfoRows = Math.ceil(cpAmount / 3) + 1
+    if (cpAmount / (this.detailedInfoRows - 1) > CONFIG.recordInfo.minColumns) {
+      this.detailedInfoColumns = Math.ceil(cpAmount / (this.detailedInfoRows - 1))
+    } else {
+      this.detailedInfoColumns = CONFIG.recordInfo.minColumns
+    }
+    TM.addListener('Controller.DedimaniaRecord', () => {
       this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
@@ -17,120 +44,113 @@ export default class DediRanking extends StaticComponent {
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
       if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.DedimaniaRecord', () => {
-      this.display()
+    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+      if (info.answer === this.id + 1) {
+        const detailedInfoIndex = this.detailedInfos.findIndex(a => a.login === info.login)
+        if (detailedInfoIndex !== -1) {
+          this.detailedInfos.splice(detailedInfoIndex, 1)
+        }
+        this.displayToPlayer(info.login)
+      }
+      if (info.answer > this.id + 1 && info.answer <= this.id + this.maxDedis + 1) {
+        const index = info.answer - this.id - 1
+        const detailedInfo = this.detailedInfos.find(a => a.login === info.login)
+        if (detailedInfo === undefined) {
+          this.detailedInfos.push({ login: info.login, indexes: [index] })
+        } else if (!detailedInfo.indexes.includes(index)) {
+          detailedInfo.indexes.push(index)
+        } else {
+          const index = detailedInfo.indexes.indexOf(info.answer - this.id - 1)
+          if (index !== -1) {
+            detailedInfo.indexes.splice(index, 1)
+          }
+        }
+        this.displayToPlayer(info.login)
+      }
+    })
+    TM.addListener('Controller.DedimaniaRecords', (info: BeginChallengeInfo) => {
+      this.detailedInfos.length = 0
+      const cpAmount = TM.challenge.checkpointsAmount
+      this.detailedInfoRows = Math.ceil(cpAmount / 3) + 1
+      if (cpAmount / (this.detailedInfoRows - 1) > CONFIG.recordInfo.minColumns) {
+        this.detailedInfoColumns = Math.ceil(cpAmount / (this.detailedInfoRows - 1))
+      } else {
+        this.detailedInfoColumns = CONFIG.recordInfo.minColumns
+      }
     })
   }
 
   display(): void {
     this._isDisplayed = true
+    // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    const side: boolean = (CFG.dediRecordsWidget.posX < 0) ? true : false // Right/Left
-    const widgetHeight = 1.8 * CFG.dediRecordsWidget.entries + 3.3
-    const columnHeight = widgetHeight - 3.1
-    const columnWidth = CFG.dediRecordsWidget.width - 6.45
-    const content = this.getWidgetContent(login)
-    TM.sendManialink(
-      `<manialink id="${this.id}">
-        <frame posn="${CFG.dediRecordsWidget.posX} ${CFG.dediRecordsWidget.posY} 10">
-          <quad posn="0 0 0.01" sizen="${CFG.dediRecordsWidget.width} ${widgetHeight}" 
-           action="50002" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/> 
-          ${content}
-          <quad posn="0.4 -2.6 0.02" sizen="2 ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgRank}"/> 
-          <quad posn="2.4 -2.6 0.02" sizen="3.65 ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgScore}"/> 
-          <quad posn="6.05 -2.6 0.02" sizen="${columnWidth} ${columnHeight}" bgcolor="${CFG.widgetStyleRace.colours.bgName}"/> 
-          <quad posn="0.4 -0.36 0.02" sizen="${StaticComponent.titleWidth} 2" style="${CFG.widgetStyleRace.titleStyle}" substyle="${CFG.widgetStyleRace.titleSubStyle}"/> 
-          <quad posn="${side ? 12.5 + CFG.dediRecordsWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" 
-           style="${CFG.dediRecordsWidget.iconStyle}" substyle="${CFG.dediRecordsWidget.iconSubStyle}"/>
-          <label posn="${side ? 12.4 + CFG.dediRecordsWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" 
-           halign="${side ? 'right' : 'left'}" textsize="1" text="${CFG.widgetStyleRace.formattingCodes + CFG.dediRecordsWidget.title}"/> 
-          <format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-          <quad posn="0.4 -2.6 0.03" sizen="${StaticComponent.titleWidth} ${1.8 * CFG.dediRecordsWidget.topCount + 0.3}" 
-           style="${CFG.widgetStyleRace.topStyle}" substyle="${CFG.widgetStyleRace.topSubStyle}"/>
+    TM.sendManialink(`<manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        <format textsize="1" textcolor="FFFF"/> 
+        ${staticHeader(CONFIG.dedis.title, stringToObjectProperty(CONFIG.dedis.icon, ICONS))}
+        <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+          ${this.getContent(login)}
         </frame>
-      </manialink>`,
+      </frame>
+    </manialink>`,
       login
     )
   }
 
-  private getWidgetContent(login: string): string {
-    const titleWidth = CFG.dediRecordsWidget.width - 0.8
-    const side: boolean = (CFG.dediRecordsWidget.posX < 0) ? true : false // Right/Left
-    let xml = `<frame posn="0 -3 10">`
-    const playerDedi = TM.dediRecords.find(a => a.login === login)
-    const playerDediIndex = playerDedi !== undefined ? TM.dediRecords.indexOf(playerDedi) : Infinity
-    let personalStart = playerDediIndex > TM.dediRecords.length - Math.ceil((CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) / 2) ?
-      TM.dediRecords.length - (CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) :
-      playerDediIndex - Math.floor((CFG.dediRecordsWidget.entries - CFG.dediRecordsWidget.topCount) / 2)
-    if (playerDediIndex === Infinity) { personalStart++ }
-    let displayIndex = 0 // Display index is number of records that were displayed
-    for (const [i, p] of TM.dediRecords.entries()) {
-      if (i >= CFG.dediRecordsWidget.topCount && i < personalStart)
-        continue
+  private getContent(login: string): string {
+    const dedis = TM.dediRecords
+    const playerDedi = dedis.find(a => a.login === login)
+    const playerDediIndex = playerDedi !== undefined ? dedis.indexOf(playerDedi) : Infinity
+    const markers = this.calculateMarkers(dedis, playerDediIndex, login)
+    const side = CONFIG.dedis.side
+    const markerCell = (i: number, j: number, w: number, h: number): string => {
+      const height = h - (2 * CONFIG.static.marginSmall)
+      const width = CONFIG.staticHeader.iconWidth
+      const posY = CONFIG.static.marginSmall / 2
+      const posX = CONFIG.staticHeader.iconVerticalPadding + (CONFIG.static.marginSmall * 2) 
+      if (markers[i] === undefined) { return '' }
+      const markerBg = `<quad posn="${CONFIG.static.marginSmall * 2} 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>`
+      const infoPosition = markers[i]?.infoPosition
+      let window = ''
+      if (infoPosition !== undefined) {
+        const width = CONFIG.recordInfo.columnWidth * this.detailedInfoColumns
+        window += `<frame posn="${posX + ((width + CONFIG.static.marginSmall) * (infoPosition))} 0 2">${this.contructRecordInfo(width, h, i, dedis[i], markers[i].cpTypes)}</frame> 
+        ${fullScreenListener(this.id + 1)}`
+      } if (markers[i].marker === 'faster') {
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.dedis.markers.faster, ICONS)}"/>`
+      } if (markers[i].marker === 'slower') {
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.dedis.markers.slower, ICONS)}"/>`
+      } if (markers[i].marker === 'you') {
+        return window + markerBg + `<quad posn="${posX} -${posY} 2" sizen="${width} ${height}" image="${stringToObjectProperty(CONFIG.dedis.markers.you, ICONS)}"/>`
+      }
+      return window
+    }
+    const positionCell = (i: number, j: number, w: number, h: number): string => {
+      return `<quad posn="0 0 4" sizen="${this.width} ${h - CONFIG.static.marginSmall}" action="${this.id + i + 2}"/>
+      <quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
+      ${centeredText(dedis[i] !== undefined ? (`${CONFIG.static.format}${i + 1}`).toString().padStart(2, '0') : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
+    }
+    const timeCell = (i: number, j: number, w: number, h: number): string => {
       const textColour = this.getTextColour(i, playerDediIndex)
-      xml += // Record in XML
-        `<format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-        <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
-         text="${CFG.widgetStyleRace.formattingCodes}${i + 1}."/>
-        <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${textColour}" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(p.score)}"/>
-        <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p.nickName), false)}"/>`
-      // Indicate online players
-      if (TM.getPlayer(p.login) !== undefined) { // Amount of records is bigger than max top entries (nullcheck)
-        if (i >= CFG.dediRecordsWidget.topCount) { // If this entry is inside the top records dont't add background shade as it would be doubled
-          xml += // Add line indicating player position
-            `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
-             style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
-        }
-        xml += // Add marker
-          `<quad posn="${side ? 15.4 : -1.9} ${-1.8 * displayIndex + 0.3} 0.04" sizen="2 2" 
-           style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
-          <quad posn="${side ? 15.6 : -1.7} ${-1.8 * displayIndex + 0.1} 0.05" sizen="1.6 1.6" `
-        if (i < playerDediIndex) { // Player faster than your record
-          xml += `style="Icons128x128_1" substyle="ChallengeAuthor"/>`
-        } else if (i > playerDediIndex) { // Player slower than your record
-          xml += `style="Icons128x128_1" substyle="Solo"/>`
-        } else { // Your record
-          xml += `style="Icons64x64_1" substyle="${side ? 'ArrowPrev' : 'ArrowNext'}"/>`
-        }
-      }
-      displayIndex++
-      if (displayIndex === CFG.dediRecordsWidget.entries || (playerDediIndex === Infinity && displayIndex === CFG.dediRecordsWidget.entries - 1)) {
-        break // Break if theres max entries, leave one entry empty if player doesn't have a record
-      }
+      return `<quad posn="0 0 1" sizen="${w - CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      <format textsize="1" textcolor="${textColour}"/>
+      ${centeredText(dedis[i] !== undefined ? `${CONFIG.static.format}${TM.Utils.getTimeString(dedis[i].score)}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
     }
-    // Add empty entry at end if player has no record
-    if (playerDediIndex === Infinity) {
-      const p = TM.getPlayer(login)
-      if (p === undefined) { // VERY unlikely to happen
-        TM.error(`Cannot find player ${login} in memory.`)
-        return `<frame posn="0 -3 10"></frame>`
-      }
-      // If this entry is inside the top records dont't add background shade as it would be doubled
-      const background = TM.dediRecords.length < CFG.dediRecordsWidget.topCount + 1 ? '' :
-        `<quad posn="0.4 ${-1.8 * displayIndex + 0.3} 0.03" sizen="${titleWidth} ${1.8 + 0.3}" 
-         style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>`
-      xml +=
-        `<format textsize="1" textcolor="${CFG.widgetStyleRace.colours.default}"/>
-        <label posn="2.3 ${-1.8 * displayIndex} 0.04" sizen="1.7 1.7" scale="0.9" halign="right" 
-         text="${CFG.widgetStyleRace.formattingCodes}--."/>
-        <label posn="5.9 ${-1.8 * displayIndex} 0.04" sizen="3.8 1.7" scale="0.9" halign="right" 
-         textcolor="${CFG.widgetStyleRace.colours.self}" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
-        <label posn="6.1 ${(-1.8 * displayIndex) + 0.05} 0.04" sizen="${CFG.dediRecordsWidget.width - 5.7} 1.7" scale="0.9" 
-         text="${CFG.widgetStyleRace.formattingCodes + TM.strip(TM.safeString(p?.nickName), false)}"/>
-        ${background}
-        <quad posn="${side ? 15.4 : -1.9} ${-1.8 * displayIndex + 0.3} 0.04" sizen="2 2" 
-         style="${CFG.widgetStyleRace.hlSelfStyle}" substyle="${CFG.widgetStyleRace.hlSelfSubStyle}"/>
-        <quad posn="${side ? 15.6 : -1.7} ${-1.8 * displayIndex + 0.1} 0.05" sizen="1.6 1.6" style="Icons64x64_1" substyle="${side ? 'ArrowPrev' : 'ArrowNext'}"/>`
+    const nicknameCell = (i: number, j: number, w: number, h: number): string => {
+      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall + this.offset} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      ${verticallyCenteredText(dedis[i] !== undefined ? `${CONFIG.static.format}${TM.safeString(TM.strip(dedis[i].nickName, false))}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.2 })}`
     }
-    xml += '</frame>'
-    return xml
+    const arr = []
+    for (let i = 0; i < CONFIG.dedis.entries; i++) {
+      const a = side ? [markerCell, positionCell, timeCell, nicknameCell] : [positionCell, timeCell, nicknameCell, markerCell]
+      arr.push(...a)
+    }
+    return this.grid.constructXml(arr)
   }
 
   /**
@@ -138,13 +158,13 @@ export default class DediRanking extends StaticComponent {
    */
   private getTextColour(dediIndex: number, playerDediIndex: number): string {
     if (dediIndex < playerDediIndex) { // Player faster than your record
-      if (dediIndex >= CFG.dediRecordsWidget.topCount) {
+      if (dediIndex >= CFG.dedis.topCount) {
         return CFG.widgetStyleRace.colours.better
       } else { // Player is in top records
         return CFG.widgetStyleRace.colours.top
       }
     } else if (dediIndex > playerDediIndex) { // Player slower than your record
-      if (dediIndex >= CFG.dediRecordsWidget.topCount) {
+      if (dediIndex >= CFG.dedis.topCount) {
         return CFG.widgetStyleRace.colours.worse
       } else { // Player is in top records
         return CFG.widgetStyleRace.colours.top
@@ -152,6 +172,85 @@ export default class DediRanking extends StaticComponent {
     } else { // Your record 
       return CFG.widgetStyleRace.colours.self
     }
+  }
+
+  private calculateMarkers(dedis: TMDedi[], playerDediRecord: number, login: string): { marker: 'faster' | 'slower' | 'you' | null, infoPosition: number | undefined, cpTypes: ('best' | 'worst' | 'equal' | undefined)[] }[] {
+    const arr: (boolean | 'half')[][] = []
+    for (let i = 0; i < dedis.length; i++) {
+      arr.push(new Array(this.detailedInfoRows).fill(false))
+    }
+    const detailedInfos: { index: number, position: number }[] = []
+    const infos = this.detailedInfos.find(a => a.login === login)?.indexes
+    const cpAmount = TM.challenge.checkpointsAmount
+    const cps: number[][] = Array.from(Array(cpAmount), () => [])
+    if (infos !== undefined) {
+      for (const [i, e] of dedis.entries()) {
+        if (infos.includes(i + 1)) {
+          const position = arr[i].findIndex(a => a === false)
+          detailedInfos.push({ index: i, position: arr[i].indexOf(false) })
+          for (const [j, cp] of e.checkpoints.entries()) {
+            cps[j][i] = cp
+          }
+          const n = cpAmount % this.detailedInfoColumns === 0 ? 0 : 1
+          for (let j = 0; j < this.detailedInfoRows; j++) {
+            if (arr[i + j] === undefined) { break }
+            arr[i + j][position] = (this.detailedInfoRows - n) === j ? 'half' : true
+          }
+        }
+      }
+    }
+    const cpTypes = cps?.[0]?.filter(a => !isNaN(a)).length === 1 ? getBestWorstEqualCps(cps.map((a, i) => [...a, dedis?.[playerDediRecord]?.checkpoints?.[i]])) : getBestWorstEqualCps(cps)
+    const ret: { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined, cpTypes: ('best' | 'worst' | 'equal' | undefined)[] }[] = []
+    for (const [i, e] of dedis.entries()) {
+      let marker: 'faster' | 'slower' | 'you' | null = null
+      if (TM.getPlayer(dedis?.[i]?.login) !== undefined && arr?.[i]?.[0] === false) {
+        if (i < playerDediRecord) { // Player faster than your record
+          marker = 'faster'
+        } else if (i > playerDediRecord) { // Player slower than your record
+          marker = 'slower'
+        } else {
+          marker = 'you'
+        }
+      }
+      ret.push({ marker, infoPosition: detailedInfos.find(a => a.index === i)?.position, cpTypes: cpTypes[i] })
+    }
+    return ret
+  }
+
+  private contructRecordInfo = (width: number, rowHeight: number, index: number, dedi: TMDedi, cpTypes: ('best' | 'worst' | 'equal' | undefined)[]): string => {
+    const margin = CONFIG.static.marginSmall
+    const bg = CONFIG.recordInfo.bgColor
+    const headerBg = CONFIG.staticHeader.bgColor
+    const squareW = CONFIG.staticHeader.squareWidth
+    const iconPadding = CONFIG.staticHeader.iconHorizontalPadding
+    const iconW = CONFIG.staticHeader.iconWidth
+    const icon = stringToObjectProperty(CONFIG.recordInfo.icon, ICONS)
+    const actionId = this.id + 2 + index
+    let xml = `<quad posn="0 0 1" sizen="${squareW} ${rowHeight - margin}" bgcolor="${headerBg}" action="${actionId}"/>
+    <quad posn="${iconPadding} -${margin / 2} 2" sizen="${iconW} ${rowHeight - (margin * 2)}" image="${icon}" action="${actionId}"/>
+    <quad posn="${squareW + margin} 0 1" sizen="${(width - (squareW + margin)) - margin} ${rowHeight - margin}" bgcolor="${headerBg}" action="${actionId}"/>
+    ${centeredText(dedi.login, (width - (squareW + margin)) - margin, rowHeight - margin, { padding: 0.2, xOffset: squareW + margin, textScale: 0.8 })}`
+    const w = width / this.detailedInfoColumns
+    const colours = {
+      best: '0F0F',
+      worst: 'F00F',
+      equal: 'FF0F'
+    }
+    for (let i = 0; i < this.detailedInfoRows; i++) {
+      for (let j = 0; j < this.detailedInfoColumns; j++) {
+        const cpTime = dedi.checkpoints?.[(i * this.detailedInfoColumns) + j]
+        if (cpTime === undefined) { break }
+        let colour = 'FFFF'
+        const type = cpTypes?.[(i * this.detailedInfoColumns) + j]
+        if (type !== undefined) {
+          colour = (colours as any)[type]
+        }
+        xml += `<quad posn="${w * j} -${rowHeight * (i + 1)} 1" sizen="${w - margin} ${rowHeight - margin}" bgcolor="${bg}" action="${actionId}"/>
+        <format textcolor="${colour}"/>
+        ${centeredText(TM.Utils.getTimeString(cpTime), w - margin, rowHeight - margin, { xOffset: w * j, yOffset: rowHeight * (i + 1), padding: 0.2, textScale: 0.7 })}`
+      }
+    }
+    return xml
   }
 
 }

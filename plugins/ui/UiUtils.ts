@@ -133,10 +133,14 @@ const getBestWorstEqualCps = (cps: number[][]): ('best' | 'worst' | 'equal' | un
   return cpTypes
 }
 
-const constuctButton = (width: number, height: number, iconUrl: string, text1: string, text2: string, options?: { equalTexts?: true }): string => {
-  const t1 = options?.equalTexts ? horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.43, padding: 0.6 }) : horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.55, padding: 0.6 })
-  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
-  <quad posn="0 ${0.8} 2" sizen="${width} ${4}" image="${iconUrl}"/>
+const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number, iconHeight: number, topPadding: number, options?: { equalTexts?: true, actionId?: number, link?: string }): string => {
+  const t1 = options?.equalTexts ?
+    horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.43, padding: 0.6 }) :
+    horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.52, padding: 0.6 })
+  const actionId = options?.actionId === undefined ? '' : `action="${options.actionId}"`
+  const link = options?.link === undefined ? '' : `url="${options.link}"`
+  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}" ${actionId} ${link}/>
+  <quad posn="${(width - iconWidth) / 2} ${-topPadding} 5" sizen="${iconWidth} ${iconHeight}" image="${iconUrl}"/>
   ${t1}
   ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.43, padding: 0.6 })}`
 }
