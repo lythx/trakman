@@ -189,7 +189,7 @@
     "recordInfo": {
         "minColumns": 5,
         "columnWidth": 3,
-        "bgColor": "0006",
+        "bgColor": "0009",
         "icon": "info"
     }
 }

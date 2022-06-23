@@ -94,4 +94,35 @@ const stringToObjectProperty = (str: string, obj: any) => {
   return obj
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const getBestWorstEqualCps = (cps: number[][]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  if(cps.length === 0) {
+    return []
+  }
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), () => [])
+  for (const [i, e] of cps.entries()) {
+    if (cps?.[0]?.length < 2) {
+      break
+    }
+    const max = Math.max(...e.filter(a => !isNaN(a)))
+    const worst = e.filter(a => a === max)
+    const min = Math.min(...e.filter(a => !isNaN(a)))
+    const best = e.filter(a => a === min)
+    if (max === min) {
+      continue
+    }
+    if (worst.length === 1) {
+      cpTypes[e.indexOf(worst[0])][i] = 'worst'
+    }
+    if (best.length === 1) {
+      cpTypes[e.indexOf(best[0])][i] = 'best'
+    } else {
+      const indexes = e.reduce((acc: number[], cur, i) => cur === min ? [...acc, i] : acc, [])
+      for (const index of indexes) {
+        cpTypes[index][i] = 'equal'
+      }
+    }
+  }
+  return cpTypes
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS,getBestWorstEqualCps, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
