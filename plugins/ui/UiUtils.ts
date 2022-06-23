@@ -133,11 +133,12 @@ const getBestWorstEqualCps = (cps: number[][]): ('best' | 'worst' | 'equal' | un
   return cpTypes
 }
 
-const constuctButton = (width: number, height: number, iconUrl: string, text1: string, text2: string): string => {
+const constuctButton = (width: number, height: number, iconUrl: string, text1: string, text2: string, options?: { equalTexts?: true }): string => {
+  const t1 = options?.equalTexts ? horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.43, padding: 0.6 }) : horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.55, padding: 0.6 })
   return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}"/>
-  <quad posn="0 0 1" sizen="${width} ${2}" image="${iconUrl}"/>
-  ${horizontallyCenteredText(text1, width, height, { yOffset: 2.3, textScale: 0.55 })}
-  ${horizontallyCenteredText(text2, width, height, { yOffset: 3.75, textScale: 0.43, padding: 0.8 })}`
+  <quad posn="0 ${0.8} 2" sizen="${width} ${4}" image="${iconUrl}"/>
+  ${t1}
+  ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.43, padding: 0.6 })}`
 }
 
 export { Paginator, Grid, Navbar, DropdownMenu, CONFIG, ICONS, BACKGROUNDS, IDS, horizontallyCenteredText, constuctButton, getBestWorstEqualCps, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

@@ -11,6 +11,7 @@ export default class LiveRanking extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly grid: Grid
+  private readonly offset = 0.03
   private readonly detailedInfos: { login: string, indexes: number[] }[] = []
   private readonly maxRecords = 250
   private detailedInfoRows: number
@@ -88,12 +89,11 @@ export default class LiveRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    const offset = 0.05 // idk why but without this its offset, i see no reason for this whatsoever
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.live.title, stringToObjectProperty(CONFIG.live.icon, ICONS))}
-        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + this.offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
           ${this.getContent(login)}
         </frame>
       </frame>
@@ -142,7 +142,7 @@ export default class LiveRanking extends StaticComponent {
       ${centeredText(records[i] !== undefined ? `${CONFIG.static.format}${TM.Utils.getTimeString(records[i].score)}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
     }
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall + this.offset} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
       ${verticallyCenteredText(records[i] !== undefined ? `${CONFIG.static.format}${TM.safeString(TM.strip(records[i].nickName, false))}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.2 })}`
     }
     const arr = []
