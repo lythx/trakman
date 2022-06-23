@@ -13,6 +13,7 @@ export default class LocalRanking extends StaticComponent {
   private readonly grid: Grid
   private readonly detailedInfos: { login: string, indexes: number[] }[] = []
   private readonly maxLocals = Number(process.env.LOCALS_AMOUNT)
+  private readonly offset = 0.03
   private detailedInfoRows: number
   private detailedInfoColumns: number
 
@@ -88,12 +89,11 @@ export default class LocalRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    const offset = 0.05 // idk why but without this its offset, i see no reason for this whatsoever
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS))}
-        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+        <frame posn="-${this.markerWidth + CONFIG.static.marginSmall + this.offset} -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
           ${this.getContent(login)}
         </frame>
       </frame>
@@ -142,7 +142,7 @@ export default class LocalRanking extends StaticComponent {
       ${centeredText(locals[i] !== undefined ? `${CONFIG.static.format}${TM.Utils.getTimeString(locals[i].score)}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.1 })}`
     }
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
+      return `<quad posn="0 0 1" sizen="${w + CONFIG.static.marginSmall + this.offset} ${h - CONFIG.static.marginSmall}" bgcolor="${CONFIG.static.bgColor}"/>
       ${verticallyCenteredText(locals[i] !== undefined ? `${CONFIG.static.format}${TM.safeString(TM.strip(locals[i].nickName, false))}` : '', w - CONFIG.static.marginSmall, h - CONFIG.static.marginSmall, { textScale: 0.85, padding: 0.2 })}`
     }
     const arr = []
@@ -199,7 +199,7 @@ export default class LocalRanking extends StaticComponent {
         }
       }
     }
-    const cpTypes = cps?.[0]?.filter(a => !isNaN(a)).length === 1 ? getBestWorstEqualCps(cps.map((a, i) => [...a, locals[playerLocalIndex].checkpoints[i]])) : getBestWorstEqualCps(cps)
+    const cpTypes = cps?.[0]?.filter(a => !isNaN(a)).length === 1 ? getBestWorstEqualCps(cps.map((a, i) => [...a, locals?.[playerLocalIndex]?.checkpoints?.[i]])) : getBestWorstEqualCps(cps)
     const ret: { marker: ('faster' | 'slower' | 'you' | null), infoPosition: number | undefined, cpTypes: ('best' | 'worst' | 'equal' | undefined)[] }[] = []
     for (const [i, e] of locals.entries()) {
       let marker: 'faster' | 'slower' | 'you' | null = null

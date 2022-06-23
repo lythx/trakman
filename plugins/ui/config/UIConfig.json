@@ -83,7 +83,7 @@
         "format": "$s",
         "width": 14.65,
         "topBorder": 47.85,
-        "rightPosition": 49.2,
+        "rightPosition": 49.13,
         "leftPosition": -63.85,
         "bgColor": "0006",
         "marginBig": 0.27,
@@ -193,10 +193,14 @@
         "height": 15,
         "side": false,
         "titles": [
-            "VISITORS"
+            "VISITORS",
+            "SPECS PLAYERS",
+            "VERSION"
         ],
         "icons": [
-            "visitorsAmount"
+            "people",
+            "people",
+            "git"
         ]
     },
     "recordInfo": {
