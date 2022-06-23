@@ -3,8 +3,7 @@ import { CONFIG as UIConfig } from './UiUtils.js'
 
 import CustomUi from './CustomUi.js'
 
-import temp1 from './static_components/temp1.component.js'
-import DayTime from './static_components/DayTime.component.js'
+//import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
 import SpectatorWidget from './static_components/SpectatorWidget.component.js'
 import DediRanking from './static_components/DediRanking.component.js'
@@ -15,6 +14,7 @@ import TimerWidget from './static_components/TimerWidget.component.js'
 import LocalRanking from './static_components/LocalRanking.component.js'
 import LiveRanking from './static_components/LiveRanking.component.js'
 import StaticComponent from './StaticComponent.js'
+import ButtonsWidget from './static_components/ButtonsWidget.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
 import HelpWindow from './dynamic_components/HelpWindow.component.js'
@@ -110,12 +110,12 @@ const events: TMEvent[] = [
   {
     event: 'Controller.Ready',
     callback: async () => {
+      await TM.call('SendHideManialinkPage')
       loadMod()
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-        new temp1(),
-        new DayTime(),
+        //new DayTime(),
         new RankWidget(),
         new SpectatorWidget(),
         new DediRanking(),
@@ -124,9 +124,10 @@ const events: TMEvent[] = [
         new KarmaWidget(),
         new TimerWidget(),
         new LocalRanking(),
-        new LiveRanking()
+        new LiveRanking(),
+        new ButtonsWidget()
       )
-      for (const c of staticComponents) { c.display() }
+      for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(
         new JukeboxWindow(),
         new TMXWindow(),
