@@ -174,3 +174,13 @@ const commands: TMCommand[] = [
 ]
 
 for (const command of commands) { TM.addCommand(command) }
+
+// votes
+
+TM.addListener('Controller.PlayerChat', (info: MessageInfo) => {
+  if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
+    TM.sendMessage(`${info.nickName} voted ${info.text.trim()}`)
+    void TM.addVote(TM.challenge.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
+  }
+})
+

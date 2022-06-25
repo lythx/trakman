@@ -19,6 +19,7 @@ import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
+import { VoteService } from './services/VoteService.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -524,6 +525,22 @@ export const TRAKMAN = {
       return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  },
+
+  async addVote(mapId: string, login: string, vote: number) {
+    await VoteService.add(mapId, login, vote)
+  },
+
+  async fetchVotes(mapId: string) {
+    return await VoteService.fetch(mapId)
+  },
+
+  get votes() {
+    return VoteService.votes
+  },
+
+  get voteRatios() {
+    return VoteService.voteRatios
   }
 
 }

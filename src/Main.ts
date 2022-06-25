@@ -16,6 +16,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
+import { VoteService } from './services/VoteService.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -50,6 +51,9 @@ async function main(): Promise<void> {
   await ChallengeService.initialize()
   Logger.info('Challenge service instantiated')
   JukeboxService.initialize()
+  Logger.trace('Fetching votes...')
+  await VoteService.initialize()
+  Logger.info('Vote service instantiated')
   Logger.trace('Fetching player info...')
   await PlayerService.initialize()
   await PlayerService.addAllFromList()
