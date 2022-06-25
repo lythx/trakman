@@ -36,7 +36,7 @@ export default class LocalCps extends PopupWindow {
   }
 
   protected constructHeader(login: string, params: { page: number, pageCount: number }): string {
-    return headerIconTitleText('Dedimania Checkpoints', this.windowWidth, this.titleHeight,'', 2.5, 2.5, `${params.page}/${params.pageCount}`)
+    return headerIconTitleText('Dedimania Checkpoints', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
   }
 
   protected constructContent(login: string, params: { page: number, pageCount: number, locals: LocalRecord[] }): string {
@@ -75,7 +75,7 @@ export default class LocalCps extends PopupWindow {
         return ''
       }
       if (j === 3 + TM.challenge.checkpointsAmount) {
-        return centeredText(format + TM.Utils.getTimeString(params.locals[i + n].score), w, h)
+        return centeredText(format + TM.Utils.getTimeString(params.locals[i + n].time), w, h)
       }
       if (params.locals[i + n]?.checkpoints?.[j - 3] === undefined) {
         return ''

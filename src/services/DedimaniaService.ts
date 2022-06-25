@@ -82,7 +82,7 @@ export abstract class DedimaniaService {
       return new Error(`Failed to fetch records`)
     }
     for (const d of dedis[0].Records) {
-      const record: TMDedi = { login: d.Login, nickName: d.NickName, score: d.Best, checkpoints: d.Checks }
+      const record: TMDedi = { login: d.Login, nickName: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
       this._dedis.push(record)
     }
     const temp: any = ChallengeService.current
@@ -111,8 +111,8 @@ export abstract class DedimaniaService {
         {
           struct: {
             Login: { string: d.login },
-            Best: { int: d.score },
-            Checks: { string: [...d.checkpoints, d.score].join(',') }
+            Best: { int: d.time },
+            Checks: { string: [...d.checkpoints, d.time].join(',') }
           }
         }
       )
@@ -134,14 +134,14 @@ export abstract class DedimaniaService {
   }
 
   private static addRecord(info: FinishInfo): void {
-    const pb = this._dedis.find(a => a.login === info.login)?.score
-    const position = this._dedis.filter(a => a.score <= info.score).length + 1
-    if (position > Number(process.env.DEDIS_AMOUNT) || info.score > (pb || Infinity)) { return }
+    const pb = this._dedis.find(a => a.login === info.login)?.time
+    const position = this._dedis.filter(a => a.time <= info.time).length + 1
+    if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
     if (pb == null) {
       const dediRecordInfo: DediRecordInfo = {
         challenge: info.challenge,
         login: info.login,
-        score: info.score,
+        time: info.time,
         checkpoints: info.checkpoints,
         nickName: info.nickName,
         nation: info.nation,
@@ -152,24 +152,24 @@ export abstract class DedimaniaService {
         privilege: info.privilege,
         visits: info.visits,
         position,
-        previousScore: -1,
+        previousTime: -1,
         previousPosition: -1,
         playerId: info.playerId,
         ip: info.ip,
         region: info.region,
         isUnited: info.isUnited
       }
-      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
-      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
+      this._newDedis.push({ login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
     }
-    if (info.score === pb) {
+    if (info.time === pb) {
       const previousPosition = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = {
         challenge: info.challenge,
         login: info.login,
-        score: info.score,
+        time: info.time,
         checkpoints: info.checkpoints,
         nickName: info.nickName,
         nation: info.nation,
@@ -180,7 +180,7 @@ export abstract class DedimaniaService {
         privilege: info.privilege,
         visits: info.visits,
         position: previousPosition,
-        previousScore: info.score,
+        previousTime: info.time,
         previousPosition,
         playerId: info.playerId,
         ip: info.ip,
@@ -190,16 +190,16 @@ export abstract class DedimaniaService {
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
       return
     }
-    if (info.score < pb) {
-      const previousScore = this._dedis.find(a => a.login === info.login)?.score
-      if (previousScore === undefined) {
+    if (info.time < pb) {
+      const previousTime = this._dedis.find(a => a.login === info.login)?.time
+      if (previousTime === undefined) {
         ErrorHandler.error(`Can't find player ${info.login} in memory`)
         return
       }
       const dediRecordInfo: DediRecordInfo = {
         challenge: info.challenge,
         login: info.login,
-        score: info.score,
+        time: info.time,
         checkpoints: info.checkpoints,
         nickName: info.nickName,
         nation: info.nation,
@@ -210,7 +210,7 @@ export abstract class DedimaniaService {
         privilege: info.privilege,
         visits: info.visits,
         position,
-        previousScore,
+        previousTime: previousTime,
         previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1,
         playerId: info.playerId,
         ip: info.ip,
@@ -218,9 +218,9 @@ export abstract class DedimaniaService {
         isUnited: info.isUnited
       }
       this._dedis = this._dedis.filter(a => a.login !== info.login)
-      this._dedis.splice(position - 1, 0, { login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       this._newDedis = this._newDedis.filter(a => a.login !== info.login)
-      this._newDedis.push({ login: info.login, score: info.score, nickName: info.nickName, checkpoints: [...info.checkpoints] })
+      this._newDedis.push({ login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
       Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
     }
   }

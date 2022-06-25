@@ -10,4 +10,5 @@ interface TMXReplay {
   readonly expires: any
   readonly lockspan: any
   readonly url: string
+  login?: string
 }

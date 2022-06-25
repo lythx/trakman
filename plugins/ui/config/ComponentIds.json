@@ -7,14 +7,15 @@
     "SpectatorWidget": 50,
     "temp1": 60,
     "TimerWidget": 70,
-    "TMXRanking": 80,
     "KarmaWidget": 300,
+    "AdminPanel": 400,
     "HelpWindow": 1000,
     "TMXWindow": 2000,
     "LocalCps": 3000,
     "DediCps": 4000,
     "LiveRanking": 5000,
     "DediRanking": 6000,
+    "TMXRanking": 7000,
     "LocalRanking": 10000,
     "JukeboxWindow": 20000
 }

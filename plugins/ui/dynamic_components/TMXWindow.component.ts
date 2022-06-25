@@ -123,36 +123,36 @@ export default class TMXWindow extends PopupWindow {
       default:
         tmxDiffImage = ICN.empty
     }
-  //   return `
-  //             <quad posn="0.4 -34.2 3" sizen="1.9 1.9" 
-  //              image="${ICN.mapQuestionMark}"/>
-  //             <label posn="2.5 -34.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.type} "/>
-  //             <quad posn="0.4 -36.2 3" sizen="1.9 1.9" image="${ICN.routes}"/>
-  //             <label posn="2.5 -36.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.routes}"/>
-  //             <quad posn="8 -32.2 3" sizen="1.9 1.9" image="${ICN.tag}"/>
-  //             <label posn="10.1 -32.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.style}"/>
-  //             <quad posn="8 -34.2 3" sizen="1.9 1.9" image="${tmxDiffImage}"/>
-  //             <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.difficulty}"/>
-  //             <quad posn="8 -36.2 3" sizen="1.9 1.9" image="${ICN.tools}"/>
-  //             <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1" 
-  //              text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.lastUpdateDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.lastUpdateDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.lastUpdateDate.getFullYear()}"/>
-  //             <quad posn="17.5 -32.2 3" sizen="1.9 1.9" image="${lbIcon}"/>
-  //             <label posn="19.6 -32.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + lbRating}"/>
-  //             <quad posn="17.5 -34.2 3" sizen="1.9 1.9" image="${ICN.trophy}"/>
-  //             <label posn="19.6 -34.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.awards}"/>
-  //             <quad posn="17.5 -36.2 3" sizen="1.9 1.9" image="${ICN.TM}"/>
-  //             <label posn="19.6 -36.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.game}"/>
-  //             <quad posn="6 -49.2 3" sizen="3.2 3.2" image="${ICN.mapDownload}"
-  //              url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
-  //             <quad posn="11 -49.2 3" sizen="3.2 3.2" image="${ICN.lineGraph}"
-  //              url="${TM.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
-  //             <quad posn="16 -49.2 3" sizen="3.2 3.2" 
-  //              image="${ICN.MX}"
-  //              url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
- }
+    //   return `
+    //             <quad posn="0.4 -34.2 3" sizen="1.9 1.9" 
+    //              image="${ICN.mapQuestionMark}"/>
+    //             <label posn="2.5 -34.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.type} "/>
+    //             <quad posn="0.4 -36.2 3" sizen="1.9 1.9" image="${ICN.routes}"/>
+    //             <label posn="2.5 -36.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.routes}"/>
+    //             <quad posn="8 -32.2 3" sizen="1.9 1.9" image="${ICN.tag}"/>
+    //             <label posn="10.1 -32.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.style}"/>
+    //             <quad posn="8 -34.2 3" sizen="1.9 1.9" image="${tmxDiffImage}"/>
+    //             <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.difficulty}"/>
+    //             <quad posn="8 -36.2 3" sizen="1.9 1.9" image="${ICN.tools}"/>
+    //             <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1" 
+    //              text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.lastUpdateDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.lastUpdateDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.lastUpdateDate.getFullYear()}"/>
+    //             <quad posn="17.5 -32.2 3" sizen="1.9 1.9" image="${lbIcon}"/>
+    //             <label posn="19.6 -32.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + lbRating}"/>
+    //             <quad posn="17.5 -34.2 3" sizen="1.9 1.9" image="${ICN.trophy}"/>
+    //             <label posn="19.6 -34.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.awards}"/>
+    //             <quad posn="17.5 -36.2 3" sizen="1.9 1.9" image="${ICN.TM}"/>
+    //             <label posn="19.6 -36.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.game}"/>
+    //             <quad posn="6 -49.2 3" sizen="3.2 3.2" image="${ICN.mapDownload}"
+    //              url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
+    //             <quad posn="11 -49.2 3" sizen="3.2 3.2" image="${ICN.lineGraph}"
+    //              url="${TM.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
+    //             <quad posn="16 -49.2 3" sizen="3.2 3.2" 
+    //              image="${ICN.MX}"
+    //              url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
+  }
 
   private getPositionString(login: string, challengeId: string): string {
-    const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.score - b.score).findIndex(a => a.login === login) + 1
+    const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
     if (recordIndex === 0) { return "--." }
     else { return TM.Utils.getPositionString(recordIndex) }
   }

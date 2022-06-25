@@ -1,7 +1,7 @@
 interface RecordInfo {
   readonly challenge: string
   readonly login: string
-  readonly score: number
+  readonly time: number
   readonly date: Date
   readonly checkpoints: number[]
   readonly nickName: string
@@ -14,7 +14,7 @@ interface RecordInfo {
   readonly visits: number
   readonly position: number
   readonly previousPosition: number
-  readonly previousScore: number
+  readonly previousTime: number
   readonly playerId: number
   readonly ip: string
   readonly region: string

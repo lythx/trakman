@@ -1,6 +1,6 @@
 interface TMDedi {
   login: string
   nickName: string
-  score: number
+  time: number
   checkpoints: number[]
 }

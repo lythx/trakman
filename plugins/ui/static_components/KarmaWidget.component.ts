@@ -14,7 +14,7 @@ export default class KarmaWidget extends StaticComponent {
     super(IDS.KarmaWidget, 'race')
     this.width = CONFIG.static.width
     this.height = CONFIG.karma.height
-    this.positionX = CONFIG.static.rightPosition
+    this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('karma')
     this.updateXML()
     this.display()
@@ -35,7 +35,7 @@ export default class KarmaWidget extends StaticComponent {
     this.xml = `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.karma.title, stringToObjectProperty(CONFIG.karma.icon, ICONS))}
+        ${staticHeader(CONFIG.karma.title, stringToObjectProperty(CONFIG.karma.icon, ICONS), false)}
         <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
       </frame>
     </manialink>`
