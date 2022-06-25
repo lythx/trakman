@@ -383,7 +383,7 @@ export default class RecordList {
     const posX = 0
     const height = this.rowHeight - this.rowGap
     const width = this.columnWidths[0] - this.colGap
-    const n = index === undefined ? '' : `${this.format}${(index + 1)}`
+    const n = index === undefined ? '' : `${(index + 1)}`
     return `<quad posn="${posX} 0  1" sizen="${width} ${height}" bgcolor="${this.headerBg}"/>
       ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
   }
@@ -393,7 +393,7 @@ export default class RecordList {
     const height = this.rowHeight - this.rowGap
     const width = this.columnWidths[1] - this.colGap
     const colour = timeColour === undefined ? 'FFFF' : (CFG.timeColours as any)[timeColour]
-    const t = (`${this.format}${time === undefined ? '' : TM.Utils.getTimeString(time)}`).toString().padStart(2, '0')
+    const t = (`${time === undefined ? '' : TM.Utils.getTimeString(time)}`).toString()
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
     <format textsize="1" textcolor="${time === -1 ? CFG.timeColours.you : colour}"/>
     ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}
@@ -405,7 +405,7 @@ export default class RecordList {
     const height = this.rowHeight - this.rowGap
     const width = this.columnWidths[2] - this.colGap
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
-    ${this.verticallyCenteredText((`${this.format}${TM.strip(name ?? '', false)}`), width, height, posX)}`
+    ${this.verticallyCenteredText((`${TM.strip(name ?? '', false)}`), width, height, posX)}`
   }
 
   private centeredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number, yOffset: number = 0) => {
@@ -413,7 +413,7 @@ export default class RecordList {
     const padding = 0.2
     const posX = (parentWidth / 2) + xOffset
     const posY = (parentHeight / 2) + yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.format + TM.safeString(text)}" valign="center" halign="center"/>`
   }
 
   private verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number) => {
@@ -421,7 +421,7 @@ export default class RecordList {
     const padding = 0.2
     const posX = xOffset + padding
     const posY = parentHeight / 2
-    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.format + TM.safeString(text)}" valign="center"/>`
   }
 
   private stringToIcon = (str: string) => {
