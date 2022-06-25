@@ -12,6 +12,7 @@ import { JukeboxService } from './services/JukeboxService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
+import { VoteService } from './services/VoteService.js'
 
 export class Listeners {
   private static readonly listeners: TMEvent[] = [
@@ -152,7 +153,10 @@ export class Listeners {
         const lastId = JukeboxService.current.id
         JukeboxService.nextChallenge()
         if (lastId === JukeboxService.current.id) { TMXService.restartChallenge() }
-        else { await TMXService.nextChallenge() }
+        else { 
+          await TMXService.nextChallenge()
+          await VoteService.nextMap()
+        }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginChallenge', info)
         if (process.env.USE_DEDIMANIA === 'YES') { await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author) }
