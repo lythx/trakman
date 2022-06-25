@@ -23,7 +23,7 @@ export class RecordRepository extends Repository {
   }
 
   async add(record: RecordInfo): Promise<void> {
-    await this.db.query(insertQuery, [record.challenge, record.login, record.score, record.date, record.checkpoints])
+    await this.db.query(insertQuery, [record.challenge, record.login, record.time, record.date, record.checkpoints])
   }
 
   async get(challengeId: string): Promise<any[]> {
@@ -48,7 +48,7 @@ export class RecordRepository extends Repository {
 
   async update(record: RecordInfo): Promise<void> {
     await this.db.query('UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE challenge=$4 AND login=$5',
-      [record.score, record.date, record.checkpoints, record.challenge, record.login])
+      [record.time, record.date, record.checkpoints, record.challenge, record.login])
   }
 
   async getByLogin(challengeId: string, login: string): Promise<any[]> {

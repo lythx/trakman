@@ -3,26 +3,29 @@ import { CONFIG as UIConfig } from './UiUtils.js'
 
 import CustomUi from './CustomUi.js'
 
-import temp1 from './static_components/temp1.component.js'
-import DayTime from './static_components/DayTime.component.js'
+//import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
 import SpectatorWidget from './static_components/SpectatorWidget.component.js'
 import DediRanking from './static_components/DediRanking.component.js'
-import ChallengeWidget from './static_components/ChallengeWidget.component.js'
+import MapWidget from './static_components/MapWidget.js'
 import PreviousAndBest from './static_components/PreviousAndBest.component.js'
 import KarmaWidget from './static_components/KarmaWidget.component.js'
 import TimerWidget from './static_components/TimerWidget.component.js'
 import LocalRanking from './static_components/LocalRanking.component.js'
 import LiveRanking from './static_components/LiveRanking.component.js'
 import StaticComponent from './StaticComponent.js'
+import ButtonsWidget from './static_components/ButtonsWidget.component.js'
+import TMXRanking from './static_components/TMXRanking.component.js'
+import AdminPanel from './static_components/AdminPanel.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
-import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
-import TestWindow from './test_widgets/TestWindow.js'
-import TMXWindow from './dynamic_components/TMXWindow.component.js'
-import DediCps from './dynamic_components/DediCps.component.js'
 import HelpWindow from './dynamic_components/HelpWindow.component.js'
+import TMXWindow from './dynamic_components/TMXWindow.component.js'
+import LocalCps from './dynamic_components/LocalCps.component.js'
+import DediCps from './dynamic_components/DediCps.component.js'
+import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
 
+import TestWindow from './test_widgets/TestWindow.js'
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
 // EVENT DESCRIPTIONS TAKEN FROM RE/EYEPIECE
 
@@ -49,43 +52,43 @@ import HelpWindow from './dynamic_components/HelpWindow.component.js'
 // 50004 - KarmaVotesWidget
 
 
-abstract class UIScore {
-  /**
-   * build challenge widget for score
-   * @param info challenge info from callback
-   * @returns xml of the widget
-   */
-  static buildChallengeWidget(info: any): string {
-    const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
-    const xml: string = // Challenge widget for podium/score
-      `<manialink id="20000">`
-      + `<frame posn="${UIConfig.challengeWidget.scorePos.posX} ${UIConfig.challengeWidget.scorePos.posY} 10">`
-      + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
-      + `<quad posn="0 0 0.01" sizen="${UIConfig.challengeWidget.width} ${UIConfig.challengeWidget.height + 5.2}" `
-      + `style="${UIConfig.widgetStyleScore.bgStyle}" substyle="${UIConfig.widgetStyleScore.bgSubStyle}"/>`
-      + `<quad posn="0.4 -0.36 0.02" sizen="${UIConfig.challengeWidget.width - 0.8} 2" `
-      + `style="${UIConfig.widgetStyleScore.titleStyle}" substyle="${UIConfig.widgetStyleScore.titleSubStyle}"/>`
-      + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
-      + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.subStyle}"/>`
-      + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
-      + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.nextTrack}"/>`
-      + `<label posn="1.35 -3 0.11" sizen="15 2" text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(info[0].Name, false)}"/>`
-      + `<frame posn="0.5 -10 0">`
-      + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info[0].Author}"/>`
-      + `<quad posn="2.95 3.38 0.11" sizen="2.5 2.5" halign="right" style="Icons128x128_1" substyle="Advanced"/>`
-      + `<label posn="3.3 2.9 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Environnement}"/>`
-      + `</frame>`
-      + `<frame posn="0.5 -14.3 0">`
-      + `<quad posn="2.75 5.25 0.11" sizen="2 2" halign="right" style="Icons128x128_1" substyle="Manialink"/>`
-      + `<label posn="3.3 5 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Mood}"/>`
-      + `<quad posn="2.75 3.1 0.11" sizen="2 2" halign="right" style="BgRaceScore2" substyle="ScoreReplay"/>`
-      + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(info[0].AuthorTime)}"/>`
-      + `</frame>`
-      + `</frame>`
-      + `</manialink>`
-    return xml
-  }
-}
+// abstract class UIScore {
+//   /**
+//    * build challenge widget for score
+//    * @param info challenge info from callback
+//    * @returns xml of the widget
+//    */
+//   static buildChallengeWidget(info: any): string {
+//     const pos: boolean = (UIConfig.challengeWidget.racePos.posX < 0) ? true : false
+//     const xml: string = // Challenge widget for podium/score
+//       `<manialink id="20000">`
+//       + `<frame posn="${UIConfig.challengeWidget.scorePos.posX} ${UIConfig.challengeWidget.scorePos.posY} 10">`
+//       + `<format textsize="1" textcolor="${UIConfig.widgetStyleRace.colours.default}"/>`
+//       + `<quad posn="0 0 0.01" sizen="${UIConfig.challengeWidget.width} ${UIConfig.challengeWidget.height + 5.2}" `
+//       + `style="${UIConfig.widgetStyleScore.bgStyle}" substyle="${UIConfig.widgetStyleScore.bgSubStyle}"/>`
+//       + `<quad posn="0.4 -0.36 0.02" sizen="${UIConfig.challengeWidget.width - 0.8} 2" `
+//       + `style="${UIConfig.widgetStyleScore.titleStyle}" substyle="${UIConfig.widgetStyleScore.titleSubStyle}"/>`
+//       + `<quad posn="${pos ? 12.5 + UIConfig.challengeWidget.width - 15.5 : 0.6} 0 0.04" sizen="2.5 2.5" `
+//       + `style="${UIConfig.challengeWidget.icons.nextTrack.style}" substyle="${UIConfig.challengeWidget.icons.nextTrack.subStyle}"/>`
+//       + `<label posn="${pos ? 12.4 + UIConfig.challengeWidget.width - 15.5 : 3.2} -0.55 0.04" sizen="10.2 0" `
+//       + `halign="${pos ? 'right' : 'left'}" textsize="1" text="${UIConfig.widgetStyleRace.formattingCodes + UIConfig.challengeWidget.titles.nextTrack}"/>`
+//       + `<label posn="1.35 -3 0.11" sizen="15 2" text="${UIConfig.widgetStyleRace.formattingCodes + TM.strip(info[0].Name, false)}"/>`
+//       + `<frame posn="0.5 -10 0">`
+//       + `<label posn="0.85 5 0.11" sizen="14.5 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes}by ${info[0].Author}"/>`
+//       + `<quad posn="2.95 3.38 0.11" sizen="2.5 2.5" halign="right" style="Icons128x128_1" substyle="Advanced"/>`
+//       + `<label posn="3.3 2.9 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Environnement}"/>`
+//       + `</frame>`
+//       + `<frame posn="0.5 -14.3 0">`
+//       + `<quad posn="2.75 5.25 0.11" sizen="2 2" halign="right" style="Icons128x128_1" substyle="Manialink"/>`
+//       + `<label posn="3.3 5 0.11" sizen="12 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + info[0].Mood}"/>`
+//       + `<quad posn="2.75 3.1 0.11" sizen="2 2" halign="right" style="BgRaceScore2" substyle="ScoreReplay"/>`
+//       + `<label posn="3.3 2.9 0.11" sizen="6 2" scale="0.9" text="${UIConfig.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(info[0].AuthorTime)}"/>`
+//       + `</frame>`
+//       + `</frame>`
+//       + `</manialink>`
+//     return xml
+//   }
+// }
 
 let customUi: CustomUi
 const staticComponents: StaticComponent[] = []
@@ -109,32 +112,38 @@ const events: TMEvent[] = [
   {
     event: 'Controller.Ready',
     callback: async () => {
+      await TM.call('SendHideManialinkPage')
       loadMod()
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-        new temp1(),
-        new DayTime(),
+        //new DayTime(),
         new RankWidget(),
         new SpectatorWidget(),
         new DediRanking(),
-        new ChallengeWidget(),
+        new MapWidget(),
         new PreviousAndBest(),
         new KarmaWidget(),
         new TimerWidget(),
         new LocalRanking(),
-        new LiveRanking()
+        new LiveRanking(),
+        new ButtonsWidget(),
+        new TMXRanking(),
+        new AdminPanel()
       )
-      for (const c of staticComponents) { c.display() }
+      for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(
         new JukeboxWindow(),
         new TMXWindow(),
-        new HelpWindow()
+        new HelpWindow(),
+        new DediCps(),
+        new LocalCps()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {
       //   testWindow.displayToPlayer('ciekma_czakwal')
-      //   testWindow.displayToPlayer('redgreendevil')
+      //   testWindow.displayToPlayer('creamsoda')
+      //   testWindow.displayToPlayer('wiksonek10')
       // }, 1000)
     }
   },

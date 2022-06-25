@@ -57,49 +57,6 @@
         "scoreTable": true,
         "global": true
     },
-    "challengeWidget": {
-        "enabled": true,
-        "width": 15.5,
-        "height": 8.9,
-        "icons": {
-            "lastTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "NewTrack"
-            },
-            "currTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "Challenge"
-            },
-            "nextTrack": {
-                "style": "Icons128x128_1",
-                "subStyle": "LoadTrack"
-            }
-        },
-        "titles": {
-            "lastTrack": "Last Map",
-            "currTrack": "Ongoing",
-            "nextTrack": "Next Map"
-        },
-        "racePos": {
-            "posX": 49.2,
-            "posY": 48
-        },
-        "scorePos": {
-            "posX": 49.2,
-            "posY": 48
-        }
-    },
-    "localRecordsWidget": {
-        "enabled": true,
-        "title": "Locals",
-        "width": 15.5,
-        "posX": 49.2,
-        "posY": 17.8,
-        "entries": 16,
-        "topCount": 5,
-        "iconStyle": "Icons128x128_1",
-        "iconSubStyle": "Rankings"
-    },
     "dediRecordsWidget": {
         "enabled": true,
         "title": "Dedis",
@@ -121,5 +78,304 @@
         "topCount": 3,
         "iconStyle": "Icons128x128_1",
         "iconSubStyle": "Rankings"
+    },
+    "static": {
+        "format": "$s",
+        "width": 14.65,
+        "topBorder": 47.85,
+        "rightPosition": 49.13,
+        "leftPosition": -63.75,
+        "bgColor": "0006",
+        "marginBig": 0.27,
+        "marginSmall": 0.15,
+        "rightSideOrder": [
+            "map",
+            "previousAndBest",
+            "tmx",
+            "timer",
+            "locals",
+            "live"
+        ],
+        "leftSideOrder": [
+            "buttons",
+            "rank",
+            "karma",
+            "dedis",
+            "admin"
+        ]
+    },
+    "staticHeader": {
+        "format": "$s",
+        "bgColor": "000a",
+        "iconBgColor": "000a",
+        "textScale": 1,
+        "squareWidth": 1.7,
+        "rectangleWidth": 12.8,
+        "height": 2.17,
+        "margin": 0.15,
+        "verticalPadding": 0.3,
+        "horizontalPadding": 0.5,
+        "iconWidth": 1.55,
+        "iconHeight": 2,
+        "iconHorizontalPadding": 0.075,
+        "iconVerticalPadding": 0.1
+    },
+    "map": {
+        "height": 9.13,
+        "side": true,
+        "title": "Ongoing",
+        "icons": [
+            "map.white",
+            "nametag.white",
+            "person.white",
+            "timer.author",
+            "tools"
+        ],
+        "textScale": 1,
+        "noDateText": "N/A",
+        "titles": {
+            "lastTrack": "Last Map",
+            "currTrack": "Ongoing",
+            "nextTrack": "Next Map"
+        }
+    },
+    "previousAndBest": {
+        "height": 4.95,
+        "side": true
+    },
+    "karma": {
+        "height": 8.8,
+        "side": false,
+        "title": "Karma",
+        "icon": "karmaStats"
+    },
+    "timer": {
+        "height": 6.2,
+        "side": true,
+        "title": "Timer",
+        "icon": "clock",
+        "hourglassOverlay": "hourglass"
+    },
+    "locals": {
+        "height": 34.12,
+        "side": true,
+        "title": "Local Records",
+        "icon": "chart.locals",
+        "entries": 15,
+        "columnProportions": [
+            1,
+            1,
+            2.8,
+            4
+        ],
+        "topCount": 5,
+        "displayNoRecordEntry": true
+    },
+    "live": {
+        "height": 15.07,
+        "side": true,
+        "title": "Live Records",
+        "icon": "chart.live",
+        "entries": 6,
+        "columnProportions": [
+            1,
+            1,
+            2.8,
+            4
+        ],
+        "topCount": 3,
+        "displayNoRecordEntry": true
+    },
+    "buttons": {
+        "height": 14.5,
+        "side": false,
+        "titles": [
+            "VISITORS",
+            "SPECS PLAYERS",
+            "VERSION",
+            "TIME",
+            "MAPS",
+            "PLAYER STATS",
+            "SECTOR RECORDS",
+            "GITHUB REPO",
+            "VOTE TO $F00SKIP",
+            "VOTE TO $0F0RES",
+            "PAY $F00$$ TO $F00SKIP",
+            "PAY $0F0$$ TO $0F0RES"
+        ],
+        "icons": [
+            {
+                "name": "people",
+                "width": 3.2,
+                "height": 3.4,
+                "padding": -0.5
+            },
+            {
+                "name": "people",
+                "width": 3.2,
+                "height": 3.4,
+                "padding": -0.5
+            },
+            {
+                "name": "git",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.3
+            },
+            {
+                "name": "clock",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "numberedList",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "stats",
+                "width": 1.9,
+                "height": 1.9,
+                "padding": 0.2
+            },
+            {
+                "name": "timeList",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "github",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "vote.skip",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "vote.replay",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "pay.skip",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            },
+            {
+                "name": "pay.replay",
+                "width": 1.8,
+                "height": 1.8,
+                "padding": 0.2
+            }
+        ]
+    },
+    "rank": {
+        "height": 3.8,
+        "side": false
+    },
+    "spectator": {
+        "height": 6.3,
+        "side": false
+    },
+    "dedis": {
+        "height": 34.12,
+        "side": false,
+        "title": "Dedi Records",
+        "icon": "chart.dedi",
+        "entries": 15,
+        "columnProportions": [
+            1,
+            2.8,
+            4,
+            1
+        ],
+        "markers": {
+            "you": "arrowDoubleL.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
+        "topCount": 5,
+        "displayNoRecordEntry": true
+    },
+    "tmx": {
+        "height": 8.68,
+        "side": true,
+        "title": "TMX Records",
+        "icon": "mxLogo",
+        "entries": 3,
+        "columnProportions": [
+            1,
+            1,
+            2.8,
+            4
+        ],
+        "topCount": 3,
+        "downloadIcon": "timer.download",
+        "displayNoRecordEntry": false
+    },
+    "admin": {
+        "height": 5,
+        "side": false,
+        "title": "Admin Panel",
+        "icon": "chart.dedi",
+        "icons": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "recordsList": {
+        "columnProportions": [
+            1,
+            2.8,
+            4
+        ],
+        "markerWidth": 1.7,
+        "columnGap": 0.15,
+        "rowGap": 0.15,
+        "downloadIcon": "timer.download",
+        "iconVerticalPadding": 0.15,
+        "iconHorizontalPadding": 0.15,
+        "markersLeft": {
+            "you": "arrowDoubleL.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
+        "markersRight": {
+            "you": "arrowDoubleR.orange",
+            "faster": "person.orange",
+            "slower": "person.green"
+        },
+        "timeColours": {
+            "slower": "FFFF",
+            "faster": "F00F",
+            "you": "0F0F",
+            "top": "FF0F"
+        },
+        "info": {
+            "iconWidth": 1.7,
+            "columns": 5,
+            "columnWidth": 3,
+            "bgColor": "0009",
+            "icon": "info"
+        }
+    },
+    "recordInfo": {
+        "minColumns": 5,
+        "columnWidth": 3,
+        "bgColor": "0009",
+        "icon": "info"
     }
 }
