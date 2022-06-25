@@ -37,7 +37,7 @@ export default class VisitorAmount extends StaticComponent {
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
     const marginSmall = CONFIG.static.marginSmall
     for (const e of this.iconData) {
-      arr.push((i: number, j: number, w: number, h: number) => constuctButton(e.icon, e.text1, e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
+      arr.push((i: number, j: number, w: number, h: number) => constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
     }
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
