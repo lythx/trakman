@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { JukeboxService } from './JukeboxService.js'
+import { GBXParser } from '../GBXParser.js'
 import 'dotenv/config'
 
 export abstract class TMXService {
@@ -33,6 +34,17 @@ export abstract class TMXService {
       return
     }
     this._current = next
+    const replays = this._current?.replays
+    if (replays !== undefined && replays.length > 0) {
+      for (let i = 0; i < Math.min(3, replays.length); i++) {
+        const res = await fetch(replays[i].url).catch((err: Error) => err)
+        if (!(res instanceof Error)) {
+          const file = await res.arrayBuffer()
+          const parser = new GBXParser(Buffer.from(file))
+          replays[i].login = parser.getLogin()
+        }
+      }
+    }
     const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(track instanceof Error ? null : track)
   }
@@ -89,7 +101,7 @@ export abstract class TMXService {
     const name = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
     const data = await res.arrayBuffer()
     const buffer = Buffer.from(data)
-    return { name, content: buffer.toString('base64') }
+    return { name, content: buffer }
   }
 
   /**

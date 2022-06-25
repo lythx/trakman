@@ -18,6 +18,7 @@ import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
+import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -291,10 +292,9 @@ export const TRAKMAN = {
       '&': '&amp;',
       '<': '&lt;',
       '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
+      '"': '&quot;'
     }
-    return str.replace(/[&<>"']/g, (m) => { return map[m as keyof typeof map] })
+    return str.replace(/[&<>"]/g, (m) => { return map[m as keyof typeof map] })
   },
 
   /**
@@ -513,6 +513,17 @@ export const TRAKMAN = {
 
   get commandList() {
     return ChatService.commandList
+  },
+
+  get UIIDS() {
+    return { ..._UIIDS }
+  },
+
+  formatDate(date: Date, displayDay?: true): string {
+    if (displayDay === true) {
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+    }
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   }
 
 }

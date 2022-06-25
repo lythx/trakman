@@ -16,7 +16,7 @@ export class RecordService {
     this.repo = repo
     await this.repo.initialize()
     const res = await this.repo.getAll()
-    for (const record of res) { this._records.push({ challenge: record.challenge, score: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
+    for (const record of res) { this._records.push({ challenge: record.challenge, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
   }
 
   static async fetchRecords(challengeId: string): Promise<LocalRecord[]> {
@@ -34,7 +34,7 @@ export class RecordService {
       const localRecord: LocalRecord = {
         challenge: challengeId,
         login: records[i].login,
-        score: records[i].score,
+        time: records[i].score,
         date: records[i].date,
         checkpoints: records[i].checkpoints,
         position: i + 1,
@@ -55,7 +55,7 @@ export class RecordService {
   static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | null> {
     const res = (await this.repo.getByLogin(challengeId, login))?.[0]
     if (res == null) { return null }
-    return { challenge: challengeId, score: res.score, login, date: res.date, checkpoints: res.checkpoints }
+    return { challenge: challengeId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
   static get records(): TMRecord[] {
@@ -104,13 +104,13 @@ export class RecordService {
       checkpoints.length = 0
       return
     }
-    const pb = this._localRecords.find(a => a.login === login)?.score
-    const position = this._localRecords.filter(a => a.score <= score).length + 1
+    const pb = this._localRecords.find(a => a.login === login)?.time
+    const position = this._localRecords.filter(a => a.time <= score).length + 1
     if (pb == null) {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -122,19 +122,19 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position,
-        previousScore: -1,
+        previousTime: -1,
         previousPosition: -1,
         playerId: player.playerId,
         ip: player.ip,
         region: player.region,
         isUnited: player.isUnited
       }
-      this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      this._records.splice(position - 1, 0, { challenge, login, time: score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         const localRecord: LocalRecord = {
           challenge,
           login,
-          score,
+          time: score,
           date,
           checkpoints,
           nickName: player.nickName,
@@ -157,7 +157,7 @@ export class RecordService {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -169,7 +169,7 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position: previousPosition,
-        previousScore: score,
+        previousTime: score,
         previousPosition,
         playerId: player.playerId,
         ip: player.ip,
@@ -180,7 +180,7 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore = this._localRecords.find(a => a.login === login)?.score
+      const previousScore = this._localRecords.find(a => a.login === login)?.time
       if (previousScore === undefined) {
         ErrorHandler.error(`Can't find player ${login} in memory`)
         return
@@ -188,7 +188,7 @@ export class RecordService {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -201,20 +201,20 @@ export class RecordService {
         visits: player.visits,
         position,
         previousPosition: this._localRecords.findIndex(a => a.login === login) + 1,
-        previousScore,
+        previousTime: previousScore,
         playerId: player.playerId,
         ip: player.ip,
         region: player.region,
         isUnited: player.isUnited
       }
       this._records = this._records.filter(a => !(a.login == login && a.challenge === challenge))
-      this._records.splice(position - 1, 0, { challenge, login, score, date, checkpoints })
+      this._records.splice(position - 1, 0, { challenge, login, time: score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords = this._localRecords.filter(a => a.login !== login)
         const localRecord: LocalRecord = {
           challenge,
           login,
-          score,
+          time: score,
           date,
           checkpoints,
           nickName: player.nickName,
@@ -238,13 +238,13 @@ export class RecordService {
       checkpoints.length = 0
       return
     }
-    const pb = this._liveRecords.find(a => a.login === login)?.score
-    const position = this._liveRecords.filter(a => a.score <= score).length + 1
+    const pb = this._liveRecords.find(a => a.login === login)?.time
+    const position = this._liveRecords.filter(a => a.time <= score).length + 1
     if (pb == null) {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -256,7 +256,7 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position,
-        previousScore: -1,
+        previousTime: -1,
         previousPosition: -1,
         playerId: player.playerId,
         ip: player.ip,
@@ -266,7 +266,7 @@ export class RecordService {
       this._liveRecords.splice(position - 1, 0, {
         login,
         nickName: player.nickName,
-        score,
+        time: score,
         checkpoints,
         timePlayed: player.timePlayed,
         joinTimestamp: player.joinTimestamp,
@@ -289,7 +289,7 @@ export class RecordService {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -301,7 +301,7 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position: previousPosition,
-        previousScore: score,
+        previousTime: score,
         previousPosition,
         playerId: player.playerId,
         ip: player.ip,
@@ -312,7 +312,7 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore = this._liveRecords.find(a => a.login === login)?.score
+      const previousScore = this._liveRecords.find(a => a.login === login)?.time
       if (previousScore === undefined) {
         ErrorHandler.error(`Can't find player ${login} in memory`)
         return
@@ -320,7 +320,7 @@ export class RecordService {
       const recordInfo: RecordInfo = {
         challenge,
         login,
-        score,
+        time: score,
         date,
         checkpoints,
         nickName: player.nickName,
@@ -333,7 +333,7 @@ export class RecordService {
         visits: player.visits,
         position,
         previousPosition: this._liveRecords.findIndex(a => a.login === login) + 1,
-        previousScore,
+        previousTime: previousScore,
         playerId: player.playerId,
         ip: player.ip,
         region: player.region,
@@ -343,7 +343,7 @@ export class RecordService {
       this._liveRecords.splice(position - 1, 0, {
         login,
         nickName: player.nickName,
-        score,
+        time: score,
         checkpoints,
         timePlayed: player.timePlayed,
         joinTimestamp: player.joinTimestamp,

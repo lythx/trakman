@@ -13,13 +13,17 @@ export default abstract class PopupWindow extends DynamicComponent {
   private readonly frameBottom: string
   protected readonly windowWidth: number
   protected readonly windowHeight: number
+  protected readonly contentWidth: number
+  protected readonly contentHeight: number
   //TODO THIS IN CONFIG FILE
-  protected readonly titleHeight: number = 4
+  protected readonly titleHeight: number = 0
 
-  constructor(windowId: number, contentHeight: number = 50, contentWidth: number = 80) {
+  constructor(windowId: number, contentHeight: number = 60, contentWidth: number = 80) {
     super(IDS.PopupWindow)
     this.openId = windowId + UTILIDS.PopupWindow.open
     this.closeId = windowId + UTILIDS.PopupWindow.close
+    this.contentWidth = contentWidth
+    this.contentHeight = contentHeight
     this.windowHeight = contentHeight + (2 * this.titleHeight)
     this.windowWidth = contentWidth;
     [this.frameTop, this.frameTopMid, this.frameMidBottom, this.frameBottom] = this.constructFrame()

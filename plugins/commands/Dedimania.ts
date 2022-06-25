@@ -11,7 +11,7 @@ if (process.env.USE_DEDIMANIA === 'YES') {
         let str = `${TM.palette.server}» ${TM.palette.dedimessage}Dedimania records on `
           + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
         for (const dr of dediRecs) {
-          str += `${TM.strip(dr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(dr.score)}, `
+          str += `${TM.strip(dr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(dr.time)}, `
         }
         TM.sendMessage(str.slice(0, -2), info.login)
       },

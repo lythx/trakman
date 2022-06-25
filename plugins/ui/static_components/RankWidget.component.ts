@@ -1,19 +1,22 @@
-import { CONFIG as CFG, IDS } from '../UiUtils.js'
+import { calculateStaticPositionY, CONFIG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class RankWidget extends StaticComponent {
 
-  private xml =
-    `<manialink id="${this.id}">
-      <frame posn="-64.7 33.25 10">
-        <quad posn="0 0 0.01" sizen="15.5 4.5" 
-         action="50008" style="${CFG.widgetStyleRace.bgStyle}" substyle="${CFG.widgetStyleRace.bgSubStyle}"/>
-      </frame>
-    </manialink>`
+  private readonly width: number
+  private readonly height: number
+  private readonly positionY: number
+  private readonly positionX: number
+  private xml: string = ''
 
   constructor() {
     super(IDS.RankWidget, 'race')
+    this.width = CONFIG.static.width
+    this.height = CONFIG.rank.height
+    this.positionX = CONFIG.static.leftPosition
+    this.positionY = calculateStaticPositionY('rank')
+    this.constructXml()
   }
 
   display(): void {
@@ -23,6 +26,16 @@ export default class RankWidget extends StaticComponent {
 
   displayToPlayer(login: string): void {
     TM.sendManialink(this.xml, login)
+  }
+
+  private constructXml() {
+    // Z posn is set to -37 because the rank text is at around -36 
+    this.xml = `
+    <manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} -37">
+        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${CONFIG.static.bgColor}"/>
+      </frame>
+    </manialink>`
   }
 
 }

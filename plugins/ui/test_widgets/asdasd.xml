@@ -1,12 +1,14 @@
-<frame posn="0 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="1000"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="penis" valign="center" halign="center"/>
-    </frame>
-<frame posn="30 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="4321"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="sussy petya" valign="center" halign="center"/>
-</frame>
-<frame posn="60 0 1"/>
-    <quad posn="0 0 1" sizen="30 3" imagehover="https://cdn.discordapp.com/attachments/522878388269088782/988025192527851530/unknown.png" action="432145"/>
-    <label posn="15 -1.5 2" sizen="38 3" scale="0.75" text="heheheha" valign="center" halign="center"/>
-</frame>
+<manialink id="30">
+      <frame posn="-63.85 47.85 1">
+        <frame posn="0 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
+  <quad posn="0.15625 --1 5" sizen="3.2 3.4" image="https://cdn.discordapp.com/attachments/502122268936110100/989520212191764480/People.png"/>
+  <label posn="1.75625 -2.2 3" sizen="5.1863636363636365 4.85" scale="0.55" text="20" halign="center"/>
+  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="VISITORS" halign="center"/></frame><frame posn="3.6625 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
+  <quad posn="0.15625 --1 5" sizen="3.2 3.4" image="https://cdn.discordapp.com/attachments/502122268936110100/989520212191764480/People.png"/>
+  <label posn="1.75625 -2.4 3" sizen="6.968604651162791 4.85" scale="0.43" text="0 SPECS" halign="center"/>
+  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="3 PLAYERS" halign="center"/></frame><frame posn="7.325 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
+  <quad posn="0.7562500000000001 --1 5" sizen="2 2" image="https://cdn.discordapp.com/attachments/502122268936110100/989520209545162792/Git.png"/>
+  <label posn="1.75625 -2.2 3" sizen="5.1863636363636365 4.85" scale="0.55" text="0.0.1" halign="center"/>
+  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="VERSION" halign="center"/></frame>
+      </frame>
+    </manialink>
