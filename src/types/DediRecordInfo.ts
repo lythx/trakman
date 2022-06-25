@@ -1,7 +1,7 @@
 interface DediRecordInfo {
     readonly challenge: string
     readonly login: string
-    readonly score: number
+    readonly time: number
     readonly checkpoints: number[]
     readonly nickName: string
     readonly nation: string
@@ -13,7 +13,7 @@ interface DediRecordInfo {
     readonly visits: number
     readonly position: number
     readonly previousPosition: number
-    readonly previousScore: number
+    readonly previousTime: number
     readonly playerId: number
     readonly ip: string
     readonly region: string

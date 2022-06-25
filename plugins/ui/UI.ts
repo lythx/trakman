@@ -15,6 +15,8 @@ import LocalRanking from './static_components/LocalRanking.component.js'
 import LiveRanking from './static_components/LiveRanking.component.js'
 import StaticComponent from './StaticComponent.js'
 import ButtonsWidget from './static_components/ButtonsWidget.component.js'
+import TMXRanking from './static_components/TMXRanking.component.js'
+import AdminPanel from './static_components/AdminPanel.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
 import HelpWindow from './dynamic_components/HelpWindow.component.js'
@@ -125,7 +127,9 @@ const events: TMEvent[] = [
         new TimerWidget(),
         new LocalRanking(),
         new LiveRanking(),
-        new ButtonsWidget()
+        new ButtonsWidget(),
+        new TMXRanking(),
+        new AdminPanel()
       )
       for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(

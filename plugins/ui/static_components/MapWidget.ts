@@ -59,7 +59,7 @@ export default class MapWidget extends StaticComponent {
       if (i === 3) {
         return `
         <frame posn="0 0 1">
-          ${staticHeader(texts[i] ?? '', icons[i] ?? '', {
+          ${staticHeader(texts[i] ?? '', icons[i] ?? '', true, {
           rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
           textScale: CONFIG.map.textScale,
           centerText: true,
@@ -68,7 +68,7 @@ export default class MapWidget extends StaticComponent {
         </frame>
         <frame posn="${(headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)) +
           headerCFG.squareWidth + (headerCFG.margin * 2)} 0 1">
-          ${staticHeader(texts[i + 1] ?? CONFIG.map.noDateText, icons[i + 1] ?? '', {
+          ${staticHeader(texts[i + 1] ?? CONFIG.map.noDateText, icons[i + 1] ?? '', true, {
             rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
             textScale: CONFIG.map.textScale,
             centerText: true,
@@ -78,8 +78,8 @@ export default class MapWidget extends StaticComponent {
       }
       return `
       <frame posn="0 0 1">
-        ${i === 0 ? staticHeader(texts[i] ?? '', icons[i] ?? '') :
-          staticHeader(TM.strip(texts[i] ?? '', false), icons[i] ?? '', {
+        ${i === 0 ? staticHeader(texts[i] ?? '', icons[i] ?? '', true) :
+          staticHeader(TM.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
             textScale: CONFIG.map.textScale,
             textBackgrund: CONFIG.static.bgColor,
             centerVertically: true,

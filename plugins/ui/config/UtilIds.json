@@ -11,5 +11,6 @@
         "jumpBackwards": 6,
         "jumpForwards": 7
     },
-    "DropdownMenu": 8
+    "DropdownMenu": 8,
+    "ClearAlerts": 9
 }

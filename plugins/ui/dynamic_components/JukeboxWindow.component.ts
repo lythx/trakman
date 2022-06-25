@@ -113,7 +113,7 @@ export default class JukeboxWindow extends PopupWindow {
 
   private getRecordIndexString(login: string, challengeId: string): string {
     // IDK IF I NEED TO SORT HERE NEED TO CHECK LATER
-    const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.score - b.score).findIndex(a => a.login === login) + 1
+    const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
     if (recordIndex === 0) { return "--." }
     else { return TM.Utils.getPositionString(recordIndex) }
   }
