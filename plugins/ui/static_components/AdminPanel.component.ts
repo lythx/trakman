@@ -41,7 +41,7 @@ export default class AdminPanel extends StaticComponent {
     for (const [i, e] of icons.entries()) {
       iconsXml += `
       <quad posn="${iconWidth * i} -${CONFIG.staticHeader.height + marginSmall} 1" sizen="${iconWidth - marginSmall} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${iconWidth * i} -${CONFIG.staticHeader.height + marginSmall} 2" sizen="${iconWidth - marginSmall} ${this.height - (headerHeight + marginSmall)}" image="${stringToObjectProperty(e, ICONS)}"/>`
+      <quad posn="${iconWidth * i + marginSmall} -${CONFIG.staticHeader.height+ marginSmall*2} 2" sizen="${iconWidth - marginSmall * 3} ${this.height - (headerHeight + marginSmall * 3)}" image="${stringToObjectProperty(e, ICONS)}"/>`
     }
     this.xml = `
     <manialink id="${this.id}">

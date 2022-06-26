@@ -88,26 +88,26 @@ export default class Paginator {
   constructXml(page: number) {
     if (this.buttonCount === 0) {
       return `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-      imagefocus="${ICN.X.orange}"
-      image="${ICN.X.white}"/>`
+      imagefocus="${ICN.X}"
+      image="${ICN.X}"/>`
     }
     let xml = ''
     if (page !== 1) {
       xml += `<quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.previous}" 
-        imagefocus="${ICN.arrowL.orange}"
-        image="${ICN.arrowL.white}"/>`
+        imagefocus="${ICN.arrowL}"
+        image="${ICN.arrowL}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.first}" 
-            imagefocus="${ICN.arrowMaxL.orange}"
-            image="${ICN.arrowMaxL.white}"/>
+            imagefocus="${ICN.arrowLast}"
+            image="${ICN.arrowLast}"/>
             <quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.jumpBackwards}" 
-            imagefocus="${ICN.arrowDoubleL.orange}"
-            image="${ICN.arrowDoubleL.white}"/>`
+            imagefocus="${ICN.arrowDoubleL}"
+            image="${ICN.arrowDoubleL}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="31.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.first}" 
-        imagefocus="${ICN.arrowMaxL.orange}"
-        image="${ICN.arrowMaxL.white}"/>`
+        imagefocus="${ICN.arrowLast}"
+        image="${ICN.arrowLast}"/>`
       }
     }
     else {
@@ -120,24 +120,24 @@ export default class Paginator {
       }
     }
     xml += `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-        imagefocus="${ICN.X.orange}"
-        image="${ICN.X.white}"/>`
+        imagefocus="${ICN.X}"
+        image="${ICN.X}"/>`
     if (page !== this.pageCount) {
       xml += `<quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.next}" 
-      imagefocus="${ICN.arrowR.orange}"
-      image="${ICN.arrowR.white}"/>`
+      imagefocus="${ICN.arrowR}"
+      image="${ICN.arrowR}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.jumpForwards}" 
-          imagefocus="${ICN.arrowDoubleR.orange}"
-          image="${ICN.arrowDoubleR.white}"/>
+          imagefocus="${ICN.arrowDoubleR}"
+          image="${ICN.arrowDoubleR}"/>
           <quad posn="51.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${ICN.arrowMaxR.orange}"
-          image="${ICN.arrowMaxR.white}"/>`
+          imagefocus="${ICN.arrowLast}"
+          image="${ICN.arrowFirst}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="47.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${ICN.arrowMaxR.orange}"
-          image="${ICN.arrowMaxR.white}"/>`
+          imagefocus="${ICN.arrowLast}"
+          image="${ICN.arrowFirst}"/>`
       }
     }
     else {

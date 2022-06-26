@@ -21,12 +21,10 @@ export default class MapWidget extends StaticComponent {
     this.positionY = calculateStaticPositionY('map')
     this.grid = new Grid(this.width, this.height, [1], new Array(4).fill(1))
     void this.updateXML()
-    TM.addListener('Controller.EndChallenge', (info: EndChallengeInfo) => {
-      void this.updateXML()
-    })
   }
 
-  display(): void {
+  async display(): Promise<void> {
+    await this.updateXML()
     this._isDisplayed = true
     TM.sendManialink(this.xml)
   }
