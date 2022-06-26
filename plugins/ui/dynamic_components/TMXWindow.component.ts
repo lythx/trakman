@@ -1,61 +1,61 @@
-import PopupWindow from "../PopupWindow.js";
-import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { CONFIG as CFG, headerIconTitleText, ICONS as ICN, ICONS, IDS } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js";
+// import PopupWindow from "../PopupWindow.js";
+// import { TRAKMAN as TM } from "../../../src/Trakman.js";
+// import { CONFIG as CFG, headerIconTitleText, ICONS as ICN, ICONS, IDS } from '../UiUtils.js'
+// import { Paginator } from "../UiUtils.js";
 
-export default class TMXWindow extends PopupWindow {
+// export default class TMXWindow extends PopupWindow {
 
-  private readonly itemsPerPage = 3
-  private readonly queueMapsCount = 4
-  private readonly previousMapsCount = 4
-  private readonly paginator: Paginator
+//   private readonly itemsPerPage = 3
+//   private readonly queueMapsCount = 4
+//   private readonly previousMapsCount = 4
+//   private readonly paginator: Paginator
 
-  constructor() {
-    super(IDS.TMXWindow)
-    this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(1 + this.queueMapsCount / this.itemsPerPage))
-    this.paginator.onPageChange((login: string, page: number) => {
-      this.displayToPlayer(login, page)
-    })
-  }
+//   constructor() {
+//     super(IDS.TMXWindow)
+//     this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(1 + this.queueMapsCount / this.itemsPerPage))
+//     this.paginator.onPageChange((login: string, page: number) => {
+//       this.displayToPlayer(login, page)
+//     })
+//   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
-    //for now its getting update here but thats bad, should be on event
-    const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
-    const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
-    this.paginator.updatePageCount(prevCount + 1 + nextCount)
-    this.displayToPlayer(info.login, prevCount + 1)
-  }
+//   protected onOpen(info: ManialinkClickInfo): void {
+//     //for now its getting update here but thats bad, should be on event
+//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
+//     const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
+//     this.paginator.updatePageCount(prevCount + 1 + nextCount)
+//     this.displayToPlayer(info.login, prevCount + 1)
+//   }
 
-  protected constructHeader(login: string, page: number): string {
-    return headerIconTitleText('Map Info', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
-  }
+//   protected constructHeader(login: string, page: number): string {
+//     return headerIconTitleText('Map Info', this.windowWidth, this.headerHeight, '', 2.5, 2.5, `${page}/${this.paginator.pageCount}`)
+//   }
 
-  protected constructContent(login: string, page: number): string {
-    const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
-    const challenges = TM.challenges
-    challenges.sort((a, b) => a.author.localeCompare(b.author))
-    let xml = ''
-    const titles = [CFG.map.titles.lastTrack, CFG.map.titles.currTrack, CFG.map.titles.nextTrack]
-    const pages = [
-      [TM.previousChallenges[3], TM.previousChallenges[2], TM.previousChallenges[1]],
-      [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]],
-      [TM.challengeQueue[1], TM.challengeQueue[2], TM.challengeQueue[3]]
-    ]
-    const TMXPages = [
-      [TM.TMXPrevious[3], TM.TMXPrevious[2], TM.TMXPrevious[1]],
-      [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]],
-      [TM.TMXNext[1], TM.TMXNext[2], TM.TMXNext[3]]
-    ]
-    for (let i = 0; i < this.itemsPerPage; i++) {
-      const challenge = pages[page - prevCount][i]
-      if (challenge === undefined) { continue }
-      const tmxInfo = TMXPages[page - prevCount][i]
-      const tmxXml = this.getTMXXml(tmxInfo)
-      const positionString = this.getPositionString(login, challenge.id)
-      const replaysXml = this.getReplaysXml(tmxInfo)
-      const image = tmxInfo === null
-        ? ICN.mapNoImage
-        : TM.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
+//   protected constructContent(login: string, page: number): string {
+//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
+//     const challenges = TM.challenges
+//     challenges.sort((a, b) => a.author.localeCompare(b.author))
+//     let xml = ''
+//     const titles = [CFG.map.titles.lastTrack, CFG.map.titles.currTrack, CFG.map.titles.nextTrack]
+//     const pages = [
+//       [TM.previousChallenges[3], TM.previousChallenges[2], TM.previousChallenges[1]],
+//       [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]],
+//       [TM.challengeQueue[1], TM.challengeQueue[2], TM.challengeQueue[3]]
+//     ]
+//     const TMXPages = [
+//       [TM.TMXPrevious[3], TM.TMXPrevious[2], TM.TMXPrevious[1]],
+//       [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]],
+//       [TM.TMXNext[1], TM.TMXNext[2], TM.TMXNext[3]]
+//     ]
+//     for (let i = 0; i < this.itemsPerPage; i++) {
+//       const challenge = pages[page - prevCount][i]
+//       if (challenge === undefined) { continue }
+//       const tmxInfo = TMXPages[page - prevCount][i]
+//       const tmxXml = this.getTMXXml(tmxInfo)
+//       const positionString = this.getPositionString(login, challenge.id)
+//       const replaysXml = this.getReplaysXml(tmxInfo)
+//       const image = tmxInfo === null
+//         ? ICN.mapNoImage
+//         : TM.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
       // xml += `
       //   <frame posn="${i * 26} 0 0.02">
       //     <quad posn="0 0 1" sizen="25 53" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
@@ -86,43 +86,43 @@ export default class TMXWindow extends PopupWindow {
       //     ${tmxXml}
       //     ${replaysXml}
       //   </frame>`
-    }
-    return xml
-  }
+  //   }
+  //   return xml
+  // }
 
-  protected constructFooter(login: string, page: number): string {
-    return this.paginator.constructXml(page)
-  }
+  // protected constructFooter(login: string, page: number): string {
+  //   return this.paginator.constructXml(page)
+  // }
 
-  private getTMXXml(tmxInfo: TMXTrackInfo | null) {
-    if (tmxInfo === null) { return '' }
-    let lbRating: string = tmxInfo.leaderboardRating.toString()
-    let lbIcon = ICN.star.white
-    if (tmxInfo.isClassic === true) {
-      lbRating = 'Classic'
-      lbIcon = ICN.star.yellow
-    }
-    if (tmxInfo.isNadeo === true) {
-      lbRating = 'Nadeo'
-      lbIcon = ICN.star.green
-    }
-    let tmxDiffImage: string
-    switch (tmxInfo.difficulty) {
-      case 'Beginner':
-        tmxDiffImage = ICN.difficulty.beginner
-        break
-      case 'Intermediate':
-        tmxDiffImage = ICN.difficulty.intermediate
-        break
-      case 'Expert':
-        tmxDiffImage = ICN.difficulty.expert
-        break
-      case 'Lunatic':
-        tmxDiffImage = ICN.difficulty.lunatic
-        break
-      default:
-        tmxDiffImage = ICN.empty
-    }
+  // private getTMXXml(tmxInfo: TMXTrackInfo | null) {
+  //   if (tmxInfo === null) { return '' }
+  //   let lbRating: string = tmxInfo.leaderboardRating.toString()
+  //   let lbIcon = ICN.star.white
+  //   if (tmxInfo.isClassic === true) {
+  //     lbRating = 'Classic'
+  //     lbIcon = ICN.star.yellow
+  //   }
+  //   if (tmxInfo.isNadeo === true) {
+  //     lbRating = 'Nadeo'
+  //     lbIcon = ICN.star.green
+  //   }
+  //   let tmxDiffImage: string
+  //   switch (tmxInfo.difficulty) {
+  //     case 'Beginner':
+  //       tmxDiffImage = ICN.difficulty.beginner
+  //       break
+  //     case 'Intermediate':
+  //       tmxDiffImage = ICN.difficulty.intermediate
+  //       break
+  //     case 'Expert':
+  //       tmxDiffImage = ICN.difficulty.expert
+  //       break
+  //     case 'Lunatic':
+  //       tmxDiffImage = ICN.difficulty.lunatic
+  //       break
+  //     default:
+  //       tmxDiffImage = ICN.empty
+  //   }
     //   return `
     //             <quad posn="0.4 -34.2 3" sizen="1.9 1.9" 
     //              image="${ICN.mapQuestionMark}"/>
@@ -149,27 +149,27 @@ export default class TMXWindow extends PopupWindow {
     //             <quad posn="16 -49.2 3" sizen="3.2 3.2" 
     //              image="${ICN.MX}"
     //              url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
-  }
+  // }
 
-  private getPositionString(login: string, challengeId: string): string {
-    const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
-    if (recordIndex === 0) { return "--." }
-    else { return TM.Utils.getPositionString(recordIndex) }
-  }
+  // private getPositionString(login: string, challengeId: string): string {
+  //   const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
+  //   if (recordIndex === 0) { return "--." }
+  //   else { return TM.Utils.getPositionString(recordIndex) }
+  // }
 
-  private getReplaysXml(tmxInfo: TMXTrackInfo | null): string {
-    let replaysXml = `<quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
-            <quad posn="5.55 -39.5 3" sizen="1.9 1.9" 
-             image="${ICN.account}"/>
-            <quad posn="11.55 -39.5 3" sizen="1.9 1.9" 
-             image="${ICN.timer}"/>
-            <quad posn="17.55 -39.5 3" sizen="1.9 1.9" 
-             image="${ICN.calendar}"/>`
+  // private getReplaysXml(tmxInfo: TMXTrackInfo | null): string {
+  //   let replaysXml = `<quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
+  //           <quad posn="5.55 -39.5 3" sizen="1.9 1.9" 
+  //            image="${ICN.account}"/>
+  //           <quad posn="11.55 -39.5 3" sizen="1.9 1.9" 
+  //            image="${ICN.timer}"/>
+  //           <quad posn="17.55 -39.5 3" sizen="1.9 1.9" 
+  //            image="${ICN.calendar}"/>`
     //const positionIcons = [ICN.one, ICN.two, ICN.three]
-    for (let i = 0; i < 3; i++) {
-      const imgPos = -(41.7 + (2.3 * i))
-      const txtPos = -(41.9 + (2.3 * i))
-      if (tmxInfo !== null && tmxInfo.replays[i] !== undefined) {
+    // for (let i = 0; i < 3; i++) {
+    //   const imgPos = -(41.7 + (2.3 * i))
+    //   const txtPos = -(41.9 + (2.3 * i))
+    //   if (tmxInfo !== null && tmxInfo.replays[i] !== undefined) {
         // replaysXml += `
         //   <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
         //   <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" 
@@ -181,16 +181,16 @@ export default class TMXWindow extends PopupWindow {
         //   <quad posn="22.15 ${imgPos + 0.2} 3" sizen="1.9 1.9" 
         //    image="${ICN.download}" 
         //    url="${tmxInfo.replays[i].url.replace(/^https:\/\//, '')}"/>`
-      }
-      else {
+      // }
+      // else {
         // replaysXml += `
         //   <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
         //   <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}N/A"/>
         //   <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
         //   <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}--/--/----"/>`
-      }
-    }
-    return replaysXml
-  }
+//       }
+//     }
+//     return replaysXml
+//   }
 
-} 
+// } 

@@ -1,20 +1,18 @@
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { Paginator, Grid, ICONS as ICN, Navbar, centeredText, headerIconTitleText, IDS } from "../UiUtils.js";
+import { Paginator, Grid, ICONS, Navbar, centeredText, headerIconTitleText, IDS, CONFIG } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
 
-export default class HelpWindow extends PopupWindow {
+export default class CommandList extends PopupWindow {
 
   private readonly paginators: Paginator[] = []
   private readonly table: Grid
   private readonly itemsPerPage = 15
   private readonly textScale = 0.7
   private readonly minPrivilege: number
-  private readonly margin = 0.2
-  private readonly navbar: Navbar
   private readonly commandLists: TMCommand[][] = []
 
   constructor() {
-    super(IDS.HelpWindow, 56, 90)
+    super(IDS.CommandList, ICONS.mxLogo, 'Command List', [{ name: 'penis', action: 1000 }, { name: 'sussy petya', action: 4321 }, { name: 'heheheha', action: 432145 }])
     const privileges = TM.commandList.map(a => a.privilege)
     this.minPrivilege = Math.min(...privileges)
     const diff = Math.max(...privileges) - this.minPrivilege
@@ -22,14 +20,13 @@ export default class HelpWindow extends PopupWindow {
       const commands = TM.commandList.filter(a => a.help !== undefined && a.privilege <= this.minPrivilege + i)
       this.commandLists.push(commands)
       const pageCount = Math.ceil(commands.length / this.itemsPerPage)
-      const paginator = new Paginator(this.openId + (i * 10), this.closeId, pageCount)
+      const paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.contentHeight, pageCount)
       paginator.onPageChange((login: string, page: number) => {
         this.displayToPlayer(login, { page, paginator, commands, privilege: this.minPrivilege + i, pageCount })
       })
       this.paginators.push(paginator)
     }
-    this.navbar = new Navbar([{ name: 'penis', action: 1000 }, { name: 'sussy petya', action: 4321 }, { name: 'heheheha', action: 432145 }], 90)
-    this.table = new Grid(90 - this.margin, 56 - (this.margin + this.navbar.height), [1, 2, 2], new Array(this.itemsPerPage).fill(1))
+    this.table = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { headerBg: CONFIG.grid.headerBg, background: CONFIG.grid.bg })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -43,11 +40,11 @@ export default class HelpWindow extends PopupWindow {
   }
 
   protected constructHeader(login: string, params: { page: number, pageCount: number }): string {
-    return headerIconTitleText('Command List', this.windowWidth, this.titleHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
+    return headerIconTitleText('Command List', this.windowWidth, this.headerHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
   }
 
   protected constructContent(login: string, params: { page: number, commands: TMCommand[], privilege: number }): string {
-    const n = (params.page - 1) * this.itemsPerPage
+    const n = ((params.page - 1) * this.itemsPerPage) - 1
     const headers = [
       (i: number, j: number, w: number, h: number): string => centeredText('Aliases', w, h),
       (i: number, j: number, w: number, h: number): string => centeredText('Arguments', w, h),
@@ -57,8 +54,7 @@ export default class HelpWindow extends PopupWindow {
       const command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text = command.aliases.join(', ')
-      return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
-      <label posn="${w / 2} -${h / 2} 1" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
     }
     const paramsCell = (i: number, j: number, w: number, h: number): string => {
       const command = params.commands[i + n]
@@ -77,24 +73,19 @@ export default class HelpWindow extends PopupWindow {
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
-      <label posn="${w / 2} -${h / 2} 3" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
     }
     const commentCell = (i: number, j: number, w: number, h: number): string => {
       const command = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<quad posn="${this.margin} -${this.margin} 1" sizen="${w - this.margin} ${h - this.margin}" bgcolor="5556"/>
-      <label posn="${w / 2} -${h / 2} 3" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(command.help ?? '')}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(command.help ?? '')}" valign="center" halign="center"/>`
     }
     const arr = []
     arr.push(...headers)
-    for (let i = 0; i < this.itemsPerPage; i++) {
+    for (let i = 0; i < this.itemsPerPage, params.commands[i + n + 1] !== undefined; i++) {
       arr.push(nameCell, paramsCell, commentCell)
     }
-    return `${this.navbar.constructXml()}
-    <frame posn="0 -${this.navbar.height} 1">
-    ${this.table.constructXml(arr)}
-    </frame>`
+    return this.table.constructXml(arr)
   }
 
   protected constructFooter(login: string, params: { page: number, paginator: Paginator }): string {
