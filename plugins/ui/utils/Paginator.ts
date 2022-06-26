@@ -1,6 +1,7 @@
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import ICN from '../config/Icons.json' assert { type: 'json'}
 import IDS from '../config/UtilIds.json' assert { type: 'json'}
+import { CONFIG } from '../UiUtils.js'
 
 const ID = IDS.Paginator
 
@@ -10,15 +11,19 @@ export default class Paginator {
 
   buttonCount = 0
   readonly parentId: number
-  readonly closeId: number
   readonly loginPages: { readonly login: string, page: number }[] = []
   readonly defaultPage: number
-  private readonly ids: number[] = []
+  readonly buttonW = CONFIG.paginator.buttonWidth
+  readonly buttonH = CONFIG.paginator.buttonHeight
+  readonly ids: number[] = []
+  readonly width: number
+  readonly height: number
   pageCount: number
 
-  constructor(parentId: number, closeId: number, pageCount: number, defaultPage: number = 1) {
+  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1) {
     this.parentId = parentId
-    this.closeId = closeId
+    this.width = parentWidth
+    this.height = parentHeight
     this.pageCount = pageCount
     this.defaultPage = defaultPage
     this.ids = Object.entries(ID).map(a => this.parentId + a[1])
@@ -87,13 +92,12 @@ export default class Paginator {
 
   constructXml(page: number) {
     if (this.buttonCount === 0) {
-      return `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-      imagefocus="${ICN.X}"
-      image="${ICN.X}"/>`
+      return ``
     }
+    const h = this.height / 2 - this.buttonH / 2
     let xml = ''
     if (page !== 1) {
-      xml += `<quad posn="35.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.previous}" 
+      xml += `<quad posn="${this.width / 2 - this.buttonW} ${h} 3" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.previous}" 
         imagefocus="${ICN.arrowL}"
         image="${ICN.arrowL}"/>`
       if (this.buttonCount > 2) {
@@ -119,9 +123,6 @@ export default class Paginator {
         xml += `<quad posn="27.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" image="${ICN.empty}"/>`
       }
     }
-    xml += `<quad posn="39.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.closeId}" 
-        imagefocus="${ICN.X}"
-        image="${ICN.X}"/>`
     if (page !== this.pageCount) {
       xml += `<quad posn="43.6 -2.15 0.01" sizen="3.5 3.5" halign="center" valign="center" action="${this.parentId + ID.next}" 
       imagefocus="${ICN.arrowR}"

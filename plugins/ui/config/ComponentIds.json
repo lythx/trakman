@@ -8,7 +8,7 @@
     "TimerWidget": 70,
     "KarmaWidget": 300,
     "AdminPanel": 400,
-    "HelpWindow": 1000,
+    "CommandList": 1000,
     "TMXWindow": 2000,
     "LocalCps": 3000,
     "DediCps": 4000,

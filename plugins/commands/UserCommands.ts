@@ -125,7 +125,7 @@ const commands: TMCommand[] = [
     aliases: ['h', 'help', 'helpall'],
     help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo) => {
-      TM.openManialink(TM.UIIDS.HelpWindow, info.login)
+      TM.openManialink(TM.UIIDS.CommandList, info.login)
     },
     privilege: 0
   },

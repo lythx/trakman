@@ -1,3 +1,5 @@
+import { CONFIG } from "../UiUtils.js"
+
 export default class Grid {
 
   readonly width: number
@@ -7,10 +9,11 @@ export default class Grid {
   readonly columns: number
   readonly rows: number
   //TODO THIS IN CONFIG FILE
-  readonly lineWidth = 0.1
-  readonly outlineColor: string | undefined
+  readonly background: string | undefined
+  readonly margin: number
+  readonly headerBg: string | undefined
 
-  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], outlineColor?: string) {
+  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBg?: string }) {
     this.width = width
     this.height = height
     const columnSum = columnProportions.reduce((acc, cur) => acc + cur)
@@ -19,17 +22,13 @@ export default class Grid {
     this.rowHeights = rowProportions.map(a => (a / rowSum) * this.height)
     this.columns = columnProportions.length
     this.rows = rowProportions.length
-    this.outlineColor = outlineColor
+    this.background = options?.background
+    this.headerBg = options?.headerBg
+    this.margin = options?.margin ?? CONFIG.grid.margin
   }
 
   constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]) {
     let xml = ``
-    if (this.outlineColor !== undefined) {
-      xml += `<quad posn="0 0 3" sizen="${this.width} ${this.lineWidth}" bgcolor="${this.outlineColor}"/>
-            <quad posn="0 0 3" sizen="${this.lineWidth} ${this.height}" bgcolor="${this.outlineColor}"/>
-            <quad posn="0 -${this.height - this.lineWidth} 3" sizen="${this.width} ${this.lineWidth}" bgcolor="${this.outlineColor}"/>
-            <quad posn="${this.width - this.lineWidth} 0 3" sizen="${this.lineWidth} ${this.height}" bgcolor="${this.outlineColor}"/>`
-    }
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.columns; j++) {
         if (cellConstructFunctions[(i * this.columns) + j] === undefined) { break }
@@ -38,11 +37,10 @@ export default class Grid {
         const h = this.rowHeights[i]
         const w = this.columnWidths[j]
         xml += `<frame posn="${posX} ${posY} 1">`
-        if (this.outlineColor !== undefined) {
-          if (i !== 0) { xml += `<quad posn="0 0 3" sizen="${w} ${this.lineWidth}" bgcolor="${this.outlineColor}"/>` }
-          if (j !== 0) { xml += `<quad posn="0 0 3" sizen="${this.lineWidth} ${h}" bgcolor="${this.outlineColor}"/>` }
-          if (i !== this.rows - 1) { xml += `<quad posn="0 -${h} 3" sizen="${w} ${this.lineWidth}" bgcolor="${this.outlineColor}"/>` }
-          if (j !== this.columns - 1) { xml += `<quad posn="${w} 0 3" sizen="${this.lineWidth} ${h}" bgcolor="${this.outlineColor}"/>` }
+        if (this.headerBg !== undefined  && i === 0) {
+          xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.headerBg}"/>`
+        } else if (this.background !== undefined && i !== 0) {
+          xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.background}"/>`
         }
         xml += cellConstructFunctions[(i * this.columns) + j](i, j, w, h)
         xml += `</frame>`
