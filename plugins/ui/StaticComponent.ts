@@ -12,9 +12,9 @@ export default abstract class StaticComponent {
     [
       {
         event: 'Controller.PlayerJoin',
-        callback: (info: JoinInfo) => {
+        callback: async (info: JoinInfo) => {
           if (this._isDisplayed)
-            this.displayToPlayer(info.login)
+            await this.displayToPlayer(info.login)
         }
       }
     ],
@@ -25,20 +25,20 @@ export default abstract class StaticComponent {
       },
       {
         event: 'Controller.BeginChallenge',
-        callback: () => { this.display() }
+        callback: async () => { await this.display() }
       },
       {
         event: 'Controller.PlayerJoin',
-        callback: (info: JoinInfo) => {
+        callback: async (info: JoinInfo) => {
           if (this._isDisplayed)
-            this.displayToPlayer(info.login)
+            await this.displayToPlayer(info.login)
         }
       }
     ],
     [
       {
         event: 'TrackMania.EndChallenge',
-        callback: () => { this.display() }
+        callback: async () => { await this.display() }
       },
       {
         event: 'Controller.BeginChallenge',
@@ -46,16 +46,16 @@ export default abstract class StaticComponent {
       },
       {
         event: 'Controller.PlayerJoin',
-        callback: (info: JoinInfo) => {
+        callback: async (info: JoinInfo) => {
           if (this._isDisplayed)
-            this.displayToPlayer(info.login)
+            await this.displayToPlayer(info.login)
         }
       }
     ]
   ]
 
   constructor(id: number, displayMode: 'always' | 'race' | 'result') {
-    this.displayMode = ['always', 'race', 'result'].indexOf(displayMode)
+    this.displayMode = ['always', 'race', 'result', 'none'].indexOf(displayMode)
     this.id = id
     for (const e of this.displayModeListeners[this.displayMode]) { TM.addListener(e.event, e.callback) }
   }
@@ -66,7 +66,7 @@ export default abstract class StaticComponent {
 
   abstract display(): void | Promise<void>
 
-  abstract displayToPlayer(login: string): void
+  abstract displayToPlayer(login: string): void | Promise<void>
 
   hide(): void {
     this._isDisplayed = false

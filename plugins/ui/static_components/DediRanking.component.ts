@@ -23,6 +23,9 @@ export default class DediRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo) => {
       this.displayToPlayer(info.login)
     })
+    TM.addListener('Controller.DedimaniaRecords', () => {
+      this.display()
+    })
     TM.addListener('Controller.DedimaniaRecord', () => {
       this.display()
     })
