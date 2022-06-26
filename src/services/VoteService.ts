@@ -1,5 +1,6 @@
 import { VoteRepository } from "../database/VoteRepository.js";
 import { JukeboxService } from "./JukeboxService.js";
+import { ManiakarmaClient } from '../maniakarma/ManiakarmaClient.js'
 
 export abstract class VoteService {
 
