@@ -97,32 +97,11 @@
         "second": "https://cdn.discordapp.com/attachments/502122268936110100/989201303693565982/NumberTwo.png",
         "third": "https://cdn.discordapp.com/attachments/502122268936110100/989201303441924156/NumberThree.png"
     },
-    "X": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427880932278322/closek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425551008976956/closek8.png"
-    },
-    "arrowL": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427882190553088/prevek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425552527298601/prevek8.png"
-    },
-    "arrowMaxL": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427881192296448/firstek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425551449370634/firstek8.png"
-    },
-    "arrowDoubleL": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427881590779934/jumpekbw8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425551835250738/jumpekbw8.png"
-    },
-    "arrowR": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427881985048616/nextek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425552246276187/nextek8.png"
-    },
-    "arrowMaxR": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427881792086046/lastek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425552019816489/lastek8.png"
-    },
-    "arrowDoubleR": {
-        "white": "https://cdn.discordapp.com/attachments/599381118633902080/986427881402019941/jumpek8w.png",
-        "orange": "https://cdn.discordapp.com/attachments/599381118633902080/986425551654887514/jumpek8.png"
-    }
+    "X": "https://cdn.discordapp.com/attachments/502122268936110100/990584748386680894/Close.png",
+    "arrowFirst": "https://cdn.discordapp.com/attachments/502122268936110100/990584747082272828/ArrowFirst.png",
+    "arrowLast": "https://cdn.discordapp.com/attachments/502122268936110100/990584747359088640/ArrowLast.png",
+    "arrowDoubleL": "https://cdn.discordapp.com/attachments/502122268936110100/990584747602346064/ArrowLeftDouble.png",
+    "arrowDoubleR": "https://cdn.discordapp.com/attachments/502122268936110100/990584747996631050/ArrowRightDouble.png",
+    "arrowL": "https://cdn.discordapp.com/attachments/502122268936110100/990584747770134609/ArrowLeftSingle.png",
+    "arrowR": "https://cdn.discordapp.com/attachments/502122268936110100/990584748185366568/ArrowRightSingle.png"
 }
