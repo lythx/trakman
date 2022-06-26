@@ -282,10 +282,6 @@
         "height": 3.8,
         "side": false
     },
-    "spectator": {
-        "height": 6.3,
-        "side": false
-    },
     "dedis": {
         "height": 34.12,
         "side": false,
@@ -328,12 +324,12 @@
         "title": "Admin Panel",
         "icon": "chart.dedi",
         "icons": [
+            "person",
             "",
             "",
-            "",
-            "",
-            "",
-            ""
+            "arrowL",
+            "restart",
+            "arrowR"
         ]
     },
     "recordsList": {
@@ -354,7 +350,7 @@
             "slower": "person.green"
         },
         "markersRight": {
-            "you": "arrowDoubleR.orange",
+            "you": "arrowDoubleR",
             "faster": "person.orange",
             "slower": "person.green"
         },
