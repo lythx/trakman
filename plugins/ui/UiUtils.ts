@@ -41,7 +41,7 @@ const horizontallyCenteredText = (text: string, parentWidth: number, parentHeigh
 const rightAlignedText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
   const textScale = options?.textScale ?? 0.7
   const padding = options?.padding ?? 1
-  const posX = options?.xOffset === undefined ? parentWidth - 0.5  : (parentWidth) + options?.xOffset- 0.5 
+  const posX = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
   const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="right"/>`
 }
@@ -141,4 +141,14 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
   ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.43, padding: 0.6 })}`
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, horizontallyCenteredText, constuctButton,  stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
+  const width = options?.width ?? CONFIG.closeButton.buttonWidth
+  const height = options?.height ?? CONFIG.closeButton.buttonHeight
+  const padding = options?.padding ?? CONFIG.closeButton.padding
+  return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" valign="center" bgcolor="${CONFIG.closeButton.background}"/>
+  <quad posn="${parentWidth / 2} ${-parentHeight / 2} 3" sizen="${width - padding * 2} ${height - padding * 2}" halign="center" valign="center" action="${actionId}" 
+  imagefocus="${stringToObjectProperty(CONFIG.closeButton.iconHover, ICONS)}"
+  image="${stringToObjectProperty(CONFIG.closeButton.icon, ICONS)}"/>`
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
