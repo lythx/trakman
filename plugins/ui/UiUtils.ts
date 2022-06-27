@@ -151,4 +151,44 @@ const closeButton = (actionId: number, parentWidth: number, parentHeight: number
   image="${stringToObjectProperty(CONFIG.closeButton.icon, ICONS)}"/>`
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  if (checkpoints.length === 0 || checkpoints?.[0]?.length === 0) {
+    return []
+  }
+  const cpAmount = checkpoints[0].length
+  const cps: number[][] = Array.from(new Array(cpAmount), () => [])
+  for (let i = 0; i < checkpoints.length; i++) {
+    const cpRow = checkpoints?.[i]
+    if (cpRow === undefined) { break }
+    for (let j = 0; j < cpAmount; j++) {
+      cps[j][i] = cpRow[j]
+    }
+  }
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), () => new Array(cps.length).fill(undefined))
+  for (const [i, e] of cps.entries()) {
+    if (cps?.[0]?.length < 2) {
+      break
+    }
+    const max = Math.max(...e.filter(a => !isNaN(a)))
+    const worst = e.filter(a => a === max)
+    const min = Math.min(...e.filter(a => !isNaN(a)))
+    const best = e.filter(a => a === min)
+    if (max === min) {
+      continue
+    }
+    if (worst.length === 1) {
+      cpTypes[e.indexOf(worst[0])][i] = 'worst'
+    }
+    if (best.length === 1) {
+      cpTypes[e.indexOf(best[0])][i] = 'best'
+    } else {
+      const indexes = e.reduce((acc: number[], cur, i) => cur === min ? [...acc, i] : acc, [])
+      for (const index of indexes) {
+        cpTypes[index][i] = 'equal'
+      }
+    }
+  }
+  return cpTypes
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, getCpTypes, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }

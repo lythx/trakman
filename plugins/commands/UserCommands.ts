@@ -138,18 +138,50 @@ const commands: TMCommand[] = [
     privilege: 0
   },
   {
-    aliases: ['locals', 'cptms', 'recs'],
-    help: 'Display current map local records.',
+    aliases: ['cp', 'cptms', 'recs'],
+    help: 'Display current map local checkpoints.',
     callback: (info: MessageInfo) => {
       TM.openManialink(TM.UIIDS.LocalCps, info.login)
     },
     privilege: 0
   },
   {
-    aliases: ['dedis', 'dedicptms', 'dedirecs'],
-    help: 'Display current map dedimania records.',
+    aliases: ['dcp', 'dedicptms', 'dedirecs'],
+    help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo) => {
       TM.openManialink(TM.UIIDS.DediCps, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['lcp', 'livecptms', 'liverecs'],
+    help: 'Display current map live checkpoints.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.LiveCps, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['sc', 'sectms'],
+    help: 'Display current map local sectors.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.LocalSectors, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['dsc', 'dedisectms'],
+    help: 'Display current map dedimania sectors.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.DediSectors, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['lsc', 'livesectms'],
+    help: 'Display current map live sectors.',
+    callback: (info: MessageInfo) => {
+      TM.openManialink(TM.UIIDS.LiveSectors, info.login)
     },
     privilege: 0
   },

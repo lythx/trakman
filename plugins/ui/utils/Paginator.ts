@@ -5,8 +5,6 @@ import { CONFIG } from '../UiUtils.js'
 
 const ID = IDS.Paginator
 
-//TODO IMPLEMENT OPTIONAL PARAMS FOR ICON SIZE AND MAKE POSITION RELATIVE IF POSSIBLE
-
 export default class Paginator {
 
   buttonCount = 0
@@ -26,22 +24,35 @@ export default class Paginator {
   pageCount: number
   yPos: number
   xPos: number[]
+  noMidGap: boolean
 
-  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1) {
+  constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
     this.parentId = parentId
     this.width = parentWidth
     this.height = parentHeight
     this.pageCount = pageCount
     this.defaultPage = defaultPage
     this.yPos = -(parentHeight / 2)
-    this.xPos = [
-      parentWidth / 2 - (this.buttonW + this.margin) * 3,
-      parentWidth / 2 - (this.buttonW + this.margin) * 2,
-      parentWidth / 2 - (this.buttonW + this.margin) * 1,
-      parentWidth / 2 + (this.buttonW + this.margin) * 1,
-      parentWidth / 2 + (this.buttonW + this.margin) * 2,
-      parentWidth / 2 + (this.buttonW + this.margin) * 3,
-    ]
+    this.noMidGap = noMidGap ?? false
+    if(noMidGap === undefined) {
+      this.xPos = [
+        parentWidth / 2 - (this.buttonW + this.margin) * 3,
+        parentWidth / 2 - (this.buttonW + this.margin) * 2,
+        parentWidth / 2 - (this.buttonW + this.margin) * 1,
+        parentWidth / 2 + (this.buttonW + this.margin) * 1,
+        parentWidth / 2 + (this.buttonW + this.margin) * 2,
+        parentWidth / 2 + (this.buttonW + this.margin) * 3,
+      ]
+    } else {
+      this.xPos = [
+        parentWidth / 2 - (this.buttonW + this.margin) * 2.5,
+        parentWidth / 2 - (this.buttonW + this.margin) * 1.5,
+        parentWidth / 2 - (this.buttonW + this.margin) * 0.5,
+        parentWidth / 2 + (this.buttonW + this.margin) * 0.5,
+        parentWidth / 2 + (this.buttonW + this.margin) * 1.5,
+        parentWidth / 2 + (this.buttonW + this.margin) * 2.5,
+      ]
+    }
     this.ids = Object.entries(ID).map(a => this.parentId + a[1])
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }

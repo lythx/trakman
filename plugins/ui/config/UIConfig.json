@@ -324,6 +324,54 @@
             "icon": "info"
         }
     },
+    "dediCps": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.dedi",
+        "title": "Dedi Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "dediSectors": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.dedi",
+        "title": "Dedi Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "liveCps": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.live",
+        "title": "Live Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "liveSectors": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.live",
+        "title": "Live Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "localCps": {
+        "entries": 15,
+        "cpsPerPage": 8,
+        "icon": "chart.local",
+        "title": "Local Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "localSectors": {
+        "entries": 15,
+        "cpsPerPage": 8,
+        "icon": "chart.local",
+        "title": "Local Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
     "recordInfo": {
         "minColumns": 5,
         "columnWidth": 3,
