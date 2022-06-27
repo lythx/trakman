@@ -18,11 +18,15 @@ import TMXRanking from './static_components/TMXRanking.component.js'
 import AdminPanel from './static_components/AdminPanel.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
-import HelpWindow from './dynamic_components/HelpWindow.component.js'
-import TMXWindow from './dynamic_components/TMXWindow.component.js'
+import CommandList from './dynamic_components/CommandList.component.js'
+//import TMXWindow from './dynamic_components/TMXWindow.component.js'
 import LocalCps from './dynamic_components/LocalCps.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
-import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
+import LiveCps from './dynamic_components/LiveSectors.component.js'
+import DediSectors from './dynamic_components/DediSectors.component.js'
+import LocalSectors from './dynamic_components/LocalSectors.component.js'
+import LiveSectors from './dynamic_components/LiveCps.component.js'
+// import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
 
 import TestWindow from './test_widgets/TestWindow.js'
 // THIS IS A BIG, HUGE, GIGANTIC TODO FOR NOW!!!
@@ -130,11 +134,15 @@ const events: TMEvent[] = [
       )
       for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(
-        new JukeboxWindow(),
-        new TMXWindow(),
-        new HelpWindow(),
+        //  new JukeboxWindow(),
+        //new TMXWindow(),
+        new CommandList(),
         new DediCps(),
-        new LocalCps()
+        new LiveCps(),
+        new LocalCps(),
+        new DediSectors(),
+        new LocalSectors(),
+        new LiveSectors()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {

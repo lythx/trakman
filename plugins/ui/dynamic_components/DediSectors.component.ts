@@ -1,24 +1,24 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { headerIconTitleText, ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
+import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
 
-export default class DediCps extends PopupWindow {
+export default class DediSectors extends PopupWindow {
 
-  readonly cpsPerPage: number = CONFIG.dediCps.cpsPerPage
-  readonly entries: number = CONFIG.dediCps.entries
+  readonly sectorsPerPage: number = CONFIG.dediSectors.cpsPerPage
+  readonly entries: number = CONFIG.dediSectors.entries
   readonly paginator: Paginator
   readonly cpPaginator: Paginator
-  readonly selfColour = CONFIG.dediCps.selfColour
+  readonly selfColour = CONFIG.dediSectors.selfColour
   readonly colours = {
     best: '0F0F',
     worst: 'F00F',
     equal: 'FF0F'
   }
-  readonly paginatorOffset = CONFIG.dediCps.paginatorOffset
+  readonly paginatorOffset = CONFIG.dediSectors.paginatorOffset
   cpAmount: number
 
   constructor() {
-    super(IDS.DediCps, stringToObjectProperty(CONFIG.dediCps.icon, ICONS), CONFIG.dediCps.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
+    super(IDS.DediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
     const dedis = TM.dediRecords
     this.cpAmount = TM.challenge.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(dedis.length / this.entries))
@@ -30,9 +30,9 @@ export default class DediCps extends PopupWindow {
     })
     let cpPages = 1
     for (let i = 0; i < this.cpAmount; i++) {
-      if (cpPages == 1 && i > this.cpsPerPage * cpPages) {
+      if (cpPages == 1 && i > this.sectorsPerPage * cpPages) {
         cpPages++
-      } else if (i > (this.cpsPerPage + 2) * cpPages) {
+      } else if (i > (this.sectorsPerPage + 2) * cpPages) {
         cpPages++
       }
     }
@@ -56,17 +56,19 @@ export default class DediCps extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number, dedis: TMDedi[] }): string {
-    let cpsDisplay = Math.min(this.cpAmount, this.cpsPerPage)
-    let cpIndex = 0
+    const sectors: number[][] = params.dedis.map(a => [...a.checkpoints, a.time]).map(a => a
+      .reduce((acc: number[], cur, i, arr) => i === 0 ? [cur] : [...acc, cur - arr[i - 1]], []))
+    let sectorsDisplay = Math.min(this.cpAmount + 1, this.sectorsPerPage)
+    let sectorIndex = 0
     if (params.cpPage > 1) {
-      cpIndex = this.cpsPerPage + 1
+      sectorIndex = this.sectorsPerPage + 1
       for (let i = 2; i < params.cpPage; i++) {
-        cpIndex += this.cpsPerPage + 2
+        sectorIndex += this.sectorsPerPage + 2
       }
-      cpsDisplay = Math.min(this.cpAmount - (cpIndex - 1), this.cpsPerPage + 2)
+      sectorsDisplay = Math.min(this.cpAmount - (sectorIndex - 2), this.sectorsPerPage + 2)
     }
     const n = (params.page - 1) * this.entries - 1
-    const cpTypes = getCpTypes(params.dedis.map(a => a.checkpoints))
+    const cpTypes = getCpTypes(sectors)
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.dedis?.[i + n] === undefined) { return '' }
       return centeredText(TM.strip(params.dedis[i + n].nickName, false), w, h)
@@ -81,27 +83,28 @@ export default class DediCps extends PopupWindow {
     }
     const cell = (i: number, j: number, w: number, h: number): string => {
       const dedi = params.dedis?.[i + n]
+      const playerSectors = sectors?.[i + n]
       if (dedi === undefined) {
         return ''
       }
-      const type = cpTypes?.[i + n]?.[j + cpIndex - 2]
+      const type = cpTypes?.[i + n]?.[j + sectorIndex - 2]
       let colour = 'FFFF'
       if (type !== undefined) {
         colour = (this.colours as any)[type]
       }
-      if (((j - 2 === this.cpsPerPage && params.cpPage === 1) || (j - 3 === this.cpsPerPage && params.cpPage !== 1))
-        && dedi?.checkpoints?.[(j - 2) + cpIndex] !== undefined) {
+      if (((j - 2 === this.sectorsPerPage && params.cpPage === 1) || (j - 3 === this.sectorsPerPage && params.cpPage !== 1))
+        && playerSectors?.[(j - 2) + sectorIndex] !== undefined) {
         return centeredText(TM.Utils.getTimeString(dedi.time), w, h)
       }
-      if (dedi?.checkpoints?.[(j - 2) + cpIndex] === undefined) {
-        if (dedi?.checkpoints?.[(j - 3) + cpIndex] !== undefined) {
+      if (playerSectors?.[(j - 2) + sectorIndex] === undefined) {
+        if (playerSectors?.[(j - 3) + sectorIndex] !== undefined) {
           return `<format textcolor="${colour}"/>
             ${centeredText(TM.Utils.getTimeString(dedi.time), w, h)}`
         }
         return ''
       }
       return `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(dedi.checkpoints[(j - 2) + cpIndex]), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(playerSectors[(j - 2) + sectorIndex]), w, h)}`
     }
     let grid: Grid
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
@@ -109,26 +112,26 @@ export default class DediCps extends PopupWindow {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText('Login', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 1).toString(), w, h)),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 1).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
-        ...new Array(this.cpsPerPage - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array(this.sectorsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, ...new Array(this.sectorsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 1) + cpIndex).toString(), w, h)),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 1) + sectorIndex).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
-        ...new Array((this.cpsPerPage + 2) - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array((this.sectorsPerPage + 2) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.cpsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.sectorsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     }
     const arr = [...headers]
     for (let i = 0; i < params.dedis.length; i++) {
       if (params.cpPage === 1) {
-        arr.push(nickNameCell, loginCell, ...new Array(this.cpsPerPage + 1).fill(cell))
+        arr.push(nickNameCell, loginCell, ...new Array(this.sectorsPerPage + 1).fill(cell))
       } else {
-        arr.push(nickNameCell, ...new Array(this.cpsPerPage + 3).fill(cell))
+        arr.push(nickNameCell, ...new Array(this.sectorsPerPage + 3).fill(cell))
       }
     }
     return `<frame posn="0 ${-this.margin} 3">

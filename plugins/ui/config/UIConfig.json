@@ -1,52 +1,4 @@
 {
-    "widgetStyleRace": {
-        "bgStyle": "Bgs1InRace",
-        "bgSubStyle": "NavButton",
-        "titleStyle": "BgsPlayerCard",
-        "titleSubStyle": "BgCardSystem",
-        "topStyle": "BgsPlayerCard",
-        "topSubStyle": "BgCardSystem",
-        "hlSelfStyle": "BgsPlayerCard",
-        "hlSelfSubStyle": "BgCardSystem",
-        "hlOtherStyle": "BgsPlayerCard",
-        "hlOtherSubStyle": "BgCardSystem",
-        "formattingCodes": "$s",
-        "colours": {
-            "default": "FFFF",
-            "scores": "DDDF",
-            "top": "FF0F",
-            "better": "F00F",
-            "worse": "CCCF",
-            "self": "3F5F",
-            "bgRank": "0000",
-            "bgScore": "0000",
-            "bgName": "0000"
-        }
-    },
-    "widgetStyleScore": {
-        "bgStyle": "Bgs1InRace",
-        "bgSubStyle": "NavButton",
-        "titleStyle": "BgsPlayerCard",
-        "titleSubStyle": "BgCardSystem",
-        "topStyle": "BgsPlayerCard",
-        "topSubStyle": "BgCardSystem",
-        "hlSelfStyle": "BgsPlayerCard",
-        "hlSelfSubStyle": "BgCardSystem",
-        "hlOtherStyle": "BgsPlayerCard",
-        "hlOtherSubStyle": "BgCardSystem",
-        "formattingCodes": "$s",
-        "colours": {
-            "default": "FFFF",
-            "scores": "DDDF",
-            "top": "FF0F",
-            "better": "F00F",
-            "worse": "CCCF",
-            "self": "3F5F",
-            "bgRank": "0000",
-            "bgScore": "0000",
-            "bgName": "0000"
-        }
-    },
     "customUi": {
         "notice": false,
         "challengeInfo": false,
@@ -56,28 +8,6 @@
         "roundScores": true,
         "scoreTable": true,
         "global": true
-    },
-    "dediRecordsWidget": {
-        "enabled": true,
-        "title": "Dedis",
-        "width": 15.5,
-        "posX": -64.7,
-        "posY": 23.65,
-        "entries": 18,
-        "topCount": 5,
-        "iconStyle": "Icons128x128_1",
-        "iconSubStyle": "Rankings"
-    },
-    "liveRankingsWidget": {
-        "enabled": true,
-        "title": "Live",
-        "width": 15.5,
-        "posX": 49.2,
-        "posY": -14.15,
-        "entries": 6,
-        "topCount": 3,
-        "iconStyle": "Icons128x128_1",
-        "iconSubStyle": "Rankings"
     },
     "static": {
         "format": "$s",
@@ -119,6 +49,32 @@
         "iconHeight": 2,
         "iconHorizontalPadding": 0.075,
         "iconVerticalPadding": 0.1
+    },
+    "popup": {
+        "headerBg": "000C",
+        "bg": "000C",
+        "margin": 0.15,
+        "titleHeight": 5
+    },
+    "grid": {
+        "bg": "9996",
+        "margin": 0.15,
+        "headerBg": "333C"
+    },
+    "closeButton": {
+        "buttonWidth": 3,
+        "buttonHeight": 3,
+        "icon": "X",
+        "iconHover": "X",
+        "padding": 0.2,
+        "background": "000D"
+    },
+    "paginator": {
+        "buttonWidth": 3,
+        "buttonHeight": 3,
+        "margin": 0.4,
+        "padding": 0.2,
+        "background": "000D"
     },
     "map": {
         "height": 9.13,
@@ -367,6 +323,54 @@
             "bgColor": "0009",
             "icon": "info"
         }
+    },
+    "dediCps": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.dedi",
+        "title": "Dedi Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "dediSectors": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.dedi",
+        "title": "Dedi Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "liveCps": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.live",
+        "title": "Live Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "liveSectors": {
+        "entries": 15,
+        "cpsPerPage": 10,
+        "icon": "chart.live",
+        "title": "Live Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "localCps": {
+        "entries": 15,
+        "cpsPerPage": 8,
+        "icon": "chart.local",
+        "title": "Local Checkpoints",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
+    },
+    "localSectors": {
+        "entries": 15,
+        "cpsPerPage": 8,
+        "icon": "chart.local",
+        "title": "Local Sectors",
+        "selfColour": "0F0F",
+        "paginatorOffset": 14.9
     },
     "recordInfo": {
         "minColumns": 5,

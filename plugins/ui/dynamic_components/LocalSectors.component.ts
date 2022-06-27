@@ -2,23 +2,23 @@ import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
 import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
 
-export default class LocalCps extends PopupWindow {
+export default class LocalSectors extends PopupWindow {
 
-  readonly cpsPerPage: number = CONFIG.localCps.cpsPerPage
-  readonly entries: number = CONFIG.localCps.entries
+  readonly cpsPerPage: number = CONFIG.localSectors.cpsPerPage
+  readonly entries: number = CONFIG.localSectors.entries
   readonly paginator: Paginator
   readonly cpPaginator: Paginator
-  readonly selfColour = CONFIG.localCps.selfColour
+  readonly selfColour = CONFIG.localSectors.selfColour
   readonly colours = {
     best: '0F0F',
     worst: 'F00F',
     equal: 'FF0F'
   }
-  readonly paginatorOffset = CONFIG.localCps.paginatorOffset
+  readonly paginatorOffset = CONFIG.localSectors.paginatorOffset
   cpAmount: number
 
   constructor() {
-    super(IDS.LocalCps, stringToObjectProperty(CONFIG.localCps.icon, ICONS), CONFIG.localCps.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }])
+    super(IDS.LocalSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalSectors }, { name: 'Local Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalSectors }, { name: 'Local Sectors', action: 6969696 }])
     const records = TM.localRecords
     this.cpAmount = TM.challenge.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
@@ -56,17 +56,19 @@ export default class LocalCps extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number, records: LocalRecord[] }): string {
-    let cpsDisplay = Math.min(this.cpAmount, this.cpsPerPage)
-    let cpIndex = 0
+    const sectors: number[][] = params.records.map(a => [...a.checkpoints, a.time]).map(a => a
+      .reduce((acc: number[], cur, i, arr) => i === 0 ?  [cur] : [...acc, cur - arr[i - 1]], []))
+    let sectorsDisplay = Math.min(this.cpAmount, this.cpsPerPage)
+    let sectorIndex = 0
     if (params.cpPage > 1) {
-      cpIndex = this.cpsPerPage + 2
+      sectorIndex = this.cpsPerPage + 2
       for (let i = 2; i < params.cpPage; i++) {
-        cpIndex += this.cpsPerPage + 3
+        sectorIndex += this.cpsPerPage + 3
       }
-      cpsDisplay = Math.min(this.cpAmount - (cpIndex - 2), this.cpsPerPage + 3)
+      sectorsDisplay = Math.min(this.cpAmount - (sectorIndex - 3), this.cpsPerPage + 3)
     }
     const n = (params.page - 1) * this.entries - 1
-    const cpTypes = getCpTypes(params.records.map(a => a.checkpoints))
+    const cpTypes = getCpTypes(sectors)
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
       return centeredText(TM.strip(params.records[i + n].nickName, false), w, h)
@@ -85,27 +87,28 @@ export default class LocalCps extends PopupWindow {
     }
     const cell = (i: number, j: number, w: number, h: number): string => {
       const record = params.records?.[i + n]
+      const playerSectors = sectors?.[i + n]
       if (record === undefined) {
         return ''
       }
-      const type = cpTypes?.[i + n]?.[j + cpIndex - 3]
+      const type = cpTypes?.[i + n]?.[j + sectorIndex - 3]
       let colour = 'FFFF'
       if (type !== undefined) {
         colour = (this.colours as any)[type]
       }
       if (((j - 3 === this.cpsPerPage && params.cpPage === 1) || (j - 4 === this.cpsPerPage && params.cpPage !== 1))
-        && record?.checkpoints?.[(j - 3) + cpIndex] !== undefined) {
+        && playerSectors?.[(j - 3) + sectorIndex] !== undefined) {
         return centeredText(TM.Utils.getTimeString(record.time), w, h)
       }
-      if (record?.checkpoints?.[(j - 3) + cpIndex] === undefined) {
-        if (record?.checkpoints?.[(j - 4) + cpIndex] !== undefined) {
+      if (playerSectors?.[(j - 3) + sectorIndex] === undefined) {
+        if (playerSectors?.[(j - 4) + sectorIndex] !== undefined) {
           return `<format textcolor="${colour}"/>
             ${centeredText(TM.Utils.getTimeString(record.time), w, h)}`
         }
         return ''
       }
       return `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(record.checkpoints[(j - 3) + cpIndex]), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(playerSectors[(j - 3) + sectorIndex]), w, h)}`
     }
     let grid: Grid
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
@@ -114,17 +117,17 @@ export default class LocalCps extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText('Login', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText('Date', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 2).toString(), w, h)),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 2).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
-        ...new Array(this.cpsPerPage - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array(this.cpsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 2) + cpIndex).toString(), w, h)),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 2) + sectorIndex).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
-        ...new Array((this.cpsPerPage + 4) - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array((this.cpsPerPage + 4) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.cpsPerPage + 5).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     }
