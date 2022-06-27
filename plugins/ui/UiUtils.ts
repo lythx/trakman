@@ -41,7 +41,7 @@ const horizontallyCenteredText = (text: string, parentWidth: number, parentHeigh
 const rightAlignedText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
   const textScale = options?.textScale ?? 0.7
   const padding = options?.padding ?? 1
-  const posX = options?.xOffset === undefined ? parentWidth - 0.5  : (parentWidth) + options?.xOffset- 0.5 
+  const posX = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
   const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="right"/>`
 }
@@ -141,4 +141,54 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
   ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.43, padding: 0.6 })}`
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, horizontallyCenteredText, constuctButton,  stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
+const closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
+  const width = options?.width ?? CONFIG.closeButton.buttonWidth
+  const height = options?.height ?? CONFIG.closeButton.buttonHeight
+  const padding = options?.padding ?? CONFIG.closeButton.padding
+  return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" valign="center" bgcolor="${CONFIG.closeButton.background}"/>
+  <quad posn="${parentWidth / 2} ${-parentHeight / 2} 3" sizen="${width - padding * 2} ${height - padding * 2}" halign="center" valign="center" action="${actionId}" 
+  imagefocus="${stringToObjectProperty(CONFIG.closeButton.iconHover, ICONS)}"
+  image="${stringToObjectProperty(CONFIG.closeButton.icon, ICONS)}"/>`
+}
+
+const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  if (checkpoints.length === 0 || checkpoints?.[0]?.length === 0) {
+    return []
+  }
+  const cpAmount = checkpoints[0].length
+  const cps: number[][] = Array.from(new Array(cpAmount), () => [])
+  for (let i = 0; i < checkpoints.length; i++) {
+    const cpRow = checkpoints?.[i]
+    if (cpRow === undefined) { break }
+    for (let j = 0; j < cpAmount; j++) {
+      cps[j][i] = cpRow[j]
+    }
+  }
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), () => new Array(cps.length).fill(undefined))
+  for (const [i, e] of cps.entries()) {
+    if (cps?.[0]?.length < 2) {
+      break
+    }
+    const max = Math.max(...e.filter(a => !isNaN(a)))
+    const worst = e.filter(a => a === max)
+    const min = Math.min(...e.filter(a => !isNaN(a)))
+    const best = e.filter(a => a === min)
+    if (max === min) {
+      continue
+    }
+    if (worst.length === 1) {
+      cpTypes[e.indexOf(worst[0])][i] = 'worst'
+    }
+    if (best.length === 1) {
+      cpTypes[e.indexOf(best[0])][i] = 'best'
+    } else {
+      const indexes = e.reduce((acc: number[], cur, i) => cur === min ? [...acc, i] : acc, [])
+      for (const index of indexes) {
+        cpTypes[index][i] = 'equal'
+      }
+    }
+  }
+  return cpTypes
+}
+
+export { Paginator, Grid, Navbar, DropdownMenu, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, getCpTypes, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, footerCloseButton, headerIconTitleText, calculateStaticPositionY, verticallyCenteredText }
