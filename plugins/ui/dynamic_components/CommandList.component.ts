@@ -1,5 +1,5 @@
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { Paginator, Grid, ICONS, Navbar, centeredText, headerIconTitleText, IDS, CONFIG } from "../UiUtils.js";
+import { Paginator, Grid, ICONS, centeredText, headerIconTitleText, IDS, CONFIG, closeButton } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
 
 export default class CommandList extends PopupWindow {
@@ -20,13 +20,13 @@ export default class CommandList extends PopupWindow {
       const commands = TM.commandList.filter(a => a.help !== undefined && a.privilege <= this.minPrivilege + i)
       this.commandLists.push(commands)
       const pageCount = Math.ceil(commands.length / this.itemsPerPage)
-      const paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.contentHeight, pageCount)
+      const paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.headerHeight - this.margin, pageCount)
       paginator.onPageChange((login: string, page: number) => {
         this.displayToPlayer(login, { page, paginator, commands, privilege: this.minPrivilege + i, pageCount })
       })
       this.paginators.push(paginator)
     }
-    this.table = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { headerBg: CONFIG.grid.headerBg, background: CONFIG.grid.bg })
+    this.table = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { headerBg: CONFIG.grid.headerBg, background: CONFIG.grid.bg })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -85,11 +85,13 @@ export default class CommandList extends PopupWindow {
     for (let i = 0; i < this.itemsPerPage, params.commands[i + n + 1] !== undefined; i++) {
       arr.push(nameCell, paramsCell, commentCell)
     }
-    return this.table.constructXml(arr)
+    return `<frame posn="0 ${-this.margin} 1">
+    ${this.table.constructXml(arr)}
+    </frame>`
   }
 
   protected constructFooter(login: string, params: { page: number, paginator: Paginator }): string {
-    return params.paginator.constructXml(params.page)
+    return closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin) + params.paginator.constructXml(params.page)
   }
 
 }
