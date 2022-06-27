@@ -15,6 +15,10 @@
     "LiveRanking": 5000,
     "DediRanking": 6000,
     "TMXRanking": 7000,
+    "LiveCps": 8000,
+    "DediSectors": 9000,
     "LocalRanking": 10000,
-    "JukeboxWindow": 20000
+    "JukeboxWindow": 20000,
+    "LocalSectors": 30000,
+    "LiveSectors": 40000
 }
