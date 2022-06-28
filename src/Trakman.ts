@@ -47,9 +47,13 @@ export const TRAKMAN = {
   },
 
   strip(str: string, removeColours: boolean = true) {
-    return removeColours
-      ? str.replace(/\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
-      : str.replace(/\$(?:[^][]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]/gi, '')
+    let regex: RegExp
+    if (removeColours) {
+      regex = /\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][]|(?=[][])|$)|\$[LHP]\[.*?\](.*?)\$[LHP]|\$[LHP]\[.*?\]|\$[SHWIPLONGTZ]|\$[^\$]{1}/gi
+    } else {
+      regex = /\$(?:[^][]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[SHWIPLONGTZ]|\$[^\$]{1}/gi
+    }
+    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$')
   },
 
   msToTime(ms: number) {

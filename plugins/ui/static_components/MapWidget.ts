@@ -37,7 +37,6 @@ export default class MapWidget extends StaticComponent {
     let author
     const authorLogin = TM.challenge.author
     const regex: RegExp = /[\da-z_ +.-]/
-    console.log(regex.test(authorLogin))
     if (process.env.USE_WEBSERVICES === "YES" && regex.test(authorLogin)) {
       const json = await TM.fetchWebServices(authorLogin)
       if (json instanceof Error) {
