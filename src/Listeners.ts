@@ -18,22 +18,22 @@ export class Listeners {
   private static readonly listeners: TMEvent[] = [
     {
       event: 'TrackMania.PlayerConnect',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Login, [1] = IsSpectator
         if (params[0] === undefined) {
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
-        const playerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
+        const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         if (playerInfo instanceof Error) {
           ErrorHandler.error(`Failed to get player ${params[0]} info`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
-        const ip = playerInfo[0].IPAddress.split(':')[0]
+        const ip: string = playerInfo[0].IPAddress.split(':')[0]
         const canJoin = AdministrationService.checkIfCanJoin(params[0], ip)
         if (canJoin !== true) {
-          const reason = typeof canJoin.reason === 'string' ? `\nReason: ${canJoin.reason}` : ''
+          const reason: string = typeof canJoin.reason === 'string' ? `\nReason: ${canJoin.reason}` : ''
           Client.callNoRes('Kick', [{ string: params[0] },
           { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
           return
@@ -45,14 +45,14 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerDisconnect',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Login
         await PlayerService.leave(params[0])
       }
     },
     {
       event: 'TrackMania.PlayerChat',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCmd
         if (params[0] === 0) { // Ignore server messages
           return
@@ -62,7 +62,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerCheckpoint',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         if (params[0] === 0) { // Ignore inexistent people
           return
@@ -79,7 +79,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
         if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
           return
@@ -89,7 +89,7 @@ export class Listeners {
           // PlayerService.getPlayer(params[1]).checkpoints.length = 0
           return
         }
-        const status = await Client.call('GetStatus') // seems kinda useless innit
+        const status: any[] | Error = await Client.call('GetStatus') // seems kinda useless innit
         if (status instanceof Error) {
           ErrorHandler.error('Failed to get game status', status.message)
           return
@@ -102,37 +102,37 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BeginRace',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Challenge
       }
     },
     {
       event: 'TrackMania.EndRace',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[arr], [1] = Challenge
       }
     },
     {
       event: 'TrackMania.BeginRound',
-      callback: async () => {
+      callback: async (): Promise<void> => {
         // No params, rounds mode only
       }
     },
     {
       event: 'TrackMania.EndRound',
-      callback: async () => {
+      callback: async (): Promise<void> => {
         // No params, rounds mode only
       }
     },
     {
       event: 'TrackMania.BeginChallenge',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         await ServerConfig.update()
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
         await ChallengeService.setCurrent()
-        const c = params[0]
+        const c: any = params[0]
         const info: BeginChallengeInfo = {
           id: c.UId,
           name: c.Name,
@@ -150,10 +150,10 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.records
         }
-        const lastId = JukeboxService.current.id
+        const lastId: string = JukeboxService.current.id
         JukeboxService.nextChallenge()
         if (lastId === JukeboxService.current.id) { TMXService.restartChallenge() }
-        else { 
+        else {
           await TMXService.nextChallenge()
           await VoteService.nextMap()
         }
@@ -164,7 +164,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         const temp: any = ChallengeService.current
         temp.records = RecordService.records
@@ -177,7 +177,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.StatusChanged',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
         // Handle server changing status, e.g. from Sync to Play
@@ -187,7 +187,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerManialinkPageAnswer',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         const temp: any = PlayerService.getPlayer(params[1])
         temp.answer = params[2]
@@ -197,24 +197,24 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BillUpdated',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
         // Related to payments: donations, payouts, etc
       }
     },
     {
       event: 'TrackMania.ChallengeListModified',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         Client.callNoRes('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
       }
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerInfo
-        const spec = params[0].SpectatorStatus.toString()
-        const flags = params[0].Flags.toString()
+        const spec: any = params[0].SpectatorStatus.toString()
+        const flags: any = params[0].Flags.toString()
         const info: InfoChangedInfo = {
           login: params[0].Login,
           nickName: params[0].NickName,
@@ -241,14 +241,14 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerIncoherence',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login
         // No real use case. Game will tell you about redtime anyway
       }
     },
     {
       event: 'TrackMania.Echo',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Internal, [1] = Public
         // Have to understand what this thing actually does first
         // 8 results on Google, either xaseco source or callbacks list lol
@@ -256,7 +256,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.VoteUpdated',
-      callback: async (params: any[]) => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = StateName, [1] = Login, [2] = CmdName, [3] = CmdParam
         // Tied to CallVotes. Very unlikely we'll use those at all
       }

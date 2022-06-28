@@ -2,10 +2,10 @@ import xml2js from 'xml2js'
 import { ErrorHandler } from './ErrorHandler.js'
 
 export class Response {
-  private _status = 'pending'
+  private _status: string = 'pending'
   private readonly _targetLength: number
   private readonly _id: number
-  private _data = Buffer.from('')
+  private _data: Buffer = Buffer.from('')
   private _overload: Buffer | null = null
   private _json: any = null
   private _isEvent: boolean = false
@@ -31,7 +31,7 @@ export class Response {
   * @param {Buffer} data buffer received from dedicated server
   */
   addData(data: Buffer): void {
-    const newBuffer = Buffer.concat([this._data, data])
+    const newBuffer: Buffer = Buffer.concat([this._data, data])
     if (newBuffer.length > this._targetLength) {
       this._data = newBuffer.subarray(0, this._targetLength)
       this._overload = newBuffer.subarray(this._targetLength)
@@ -87,7 +87,7 @@ export class Response {
       ErrorHandler.error('Error in extractOverload()', 'Overload is null')
       return Buffer.from('')
     }
-    const overload = this._overload
+    const overload: Buffer = this._overload
     this._overload = null
     return overload
   }
@@ -106,7 +106,7 @@ export class Response {
   private generateJson(): void {
     let json: any
     // parse xml to json
-    xml2js.parseString(this._data.toString(), (err, result) => {
+    xml2js.parseString(this._data.toString(), (err, result): void => {
       if (err != null) {
         throw err
       }
@@ -131,9 +131,9 @@ export class Response {
 
   // i hate XML
   private fixNesting(obj: any): any[] {
-    const arr = []
-    const changeType: any = (value: any, type: string) => {
-      const arr = []
+    const arr: any[] = []
+    const changeType: any = (value: any, type: string): any => {
+      const arr: any[] = []
       const obj: any = {}
       switch (type) {
         case 'boolean':
@@ -146,17 +146,17 @@ export class Response {
           return Buffer.from(value, 'base64')
         case 'struct':
           for (const el of value.member) {
-            const key = el.name[0]
-            const t = Object.keys(el.value[0])[0]
-            const val = el.value[0][t][0]
+            const key: any = el.name[0]
+            const t: string = Object.keys(el.value[0])[0]
+            const val: any = el.value[0][t][0]
             obj[key] = changeType(val, t)
           }
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value == null) { continue }// NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
-            const t = Object.keys(el.value[0])[0]
-            const val = el.value[0][t][0]
+            if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            const t: string = Object.keys(el.value[0])[0]
+            const val: any = el.value[0][t][0]
             arr.push(changeType(val, t))
           }
           return arr
@@ -170,22 +170,22 @@ export class Response {
     }
     for (const param of obj.params) {
       for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
-        const value = p.value[0]
+        const value: any = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
             if (el.data[0]?.value == null) { // some methods dont return value here too
               continue
             }
             for (const val of el.data[0].value) {
-              const type = Object.keys(val)[0]
+              const type: string = Object.keys(val)[0]
               arr.push(changeType(val[type][0], type))
             }
           }
         } else if (Object.keys(value)[0] === 'struct') {
           const obj: any = {}
           for (const el of value.struct[0].member) {
-            const key = el.name[0]
-            const type = Object.keys(el.value[0])[0]
+            const key: any = el.name[0]
+            const type: string = Object.keys(el.value[0])[0]
             obj[key] = changeType(el.value[0][type][0], type)
           }
           arr.push(obj)

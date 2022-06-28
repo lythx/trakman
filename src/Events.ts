@@ -1,6 +1,6 @@
 export abstract class Events {
   private static readonly eventListeners: TMEvent[] = []
-  private static controllerReady = false
+  private static controllerReady: boolean = false
 
   static initialize(): void {
     this.controllerReady = true
@@ -24,7 +24,7 @@ export abstract class Events {
    */
   static emitEvent(event: string, json: any): void {
     if (!this.controllerReady) { return }
-    const matchingEvents = this.eventListeners.filter(a => a.event === event)
+    const matchingEvents: TMEvent[] = this.eventListeners.filter(a => a.event === event)
     for (const listener of matchingEvents) {
       listener.callback(json)
     }
