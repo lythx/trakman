@@ -268,12 +268,13 @@ export default class RecordList {
         return ret
       }
     }
+    if (playerIndex === -1) { playerIndex = Infinity }
     for (let i = 0; i < records.length; i++) {
       if (playerIndex === i) {
         ret.push('you')
       } else if (i < this.topCount) {
         ret.push('top')
-      } else if (records[i].time > records?.[playerIndex]?.time) {
+      } else if (i > playerIndex) {
         ret.push('slower')
       } else {
         ret.push('faster')

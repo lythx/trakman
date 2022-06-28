@@ -87,7 +87,7 @@ export default class Paginator {
     if (pageCount > 10) { this.buttonCount = 3 }
   }
 
-  getPageFromClick(id: number, page: number) {
+ private getPageFromClick(id: number, page: number) {
     switch (id) {
       case this.parentId + ID.previous:
         page--
