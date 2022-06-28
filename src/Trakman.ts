@@ -26,19 +26,25 @@ if (process.env.USE_WEBSERVICES === 'YES') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
 
-const DB = new Database()
+const DB: Database = new Database()
 DB.initialize()
 
 export const TRAKMAN = {
 
+  // TODO THIS IN A CONFIG FILE
   specialTitles: [
     { login: 'redgreendevil', title: 'Venti the Anemo Archon' },
     { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
   ],
   titles: ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner'],
 
+  /**
+   * Determines the player title on join/actions
+   * @param player Player to get the title for
+   * @returns The title string
+   */
   getTitle(player: any): string {
-    const title = TRAKMAN.titles[player.privilege]
+    const title: string = TRAKMAN.titles[player.privilege]
     const specialTitle = TRAKMAN.specialTitles.find(a => a.login === player.login)
     if (specialTitle != null) {
       return specialTitle.title
@@ -46,7 +52,13 @@ export const TRAKMAN = {
     return title
   },
 
-  strip(str: string, removeColours: boolean = true) {
+  /**
+   * Removes all TM formatting from a string
+   * @param str String to strip tags off of
+   * @param removeColours Whether to strip colour tags
+   * @returns String without format tags
+   */
+  strip(str: string, removeColours: boolean = true): string {
     let regex: RegExp
     if (removeColours) {
       regex = /\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][]|(?=[][])|$)|\$[LHP]\[.*?\](.*?)\$[LHP]|\$[LHP]\[.*?\]|\$[SHWIPLONGTZ]|\$[^\$]{1}/gi
@@ -56,7 +68,12 @@ export const TRAKMAN = {
     return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$')
   },
 
-  msToTime(ms: number) {
+  /**
+   * Converts milliseconds to humanly readable time
+   * @param ms Time to convert (in milliseconds)
+   * @returns Humanly readable time string
+   */
+  msToTime(ms: number): string {
     const d: Date = new Date(ms)
     let str: string = ''
     const seconds: number = d.getUTCSeconds()
@@ -72,22 +89,514 @@ export const TRAKMAN = {
     if (minutes > 0) { str += minutes === 1 ? `${minutes} minute, ` : `${minutes} minutes, ` }
     if (seconds > 0) { str += seconds === 1 ? `${seconds} second, ` : `${seconds} seconds, ` }
     str = str.substring(0, str.length - 2)
-    const index = str.lastIndexOf(',')
+    const index: number = str.lastIndexOf(',')
     if (index !== -1) { str = str.substring(0, index) + ' and' + str.substring(index + 1) }
     if (str === '') { return '0 seconds' }
     return str
   },
 
   /**
-     * Returns an object containing various information about game state
-     */
+   * Fetches TMX for map information
+   * @param trackId Map UID
+   * @returns Map info from TMX or error if unsuccessful
+   */
+  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
+    return await TMXService.fetchTrackInfo(trackId)
+  },
+
+  /**
+   * Gets the player information
+   * @param login Player login
+   * @returns Player object or undefined if the player isn't online
+   */
+  getPlayer(login: string): TMPlayer | undefined {
+    return PlayerService.players.find(a => a.login === login)
+  },
+
+  /**
+   * Fetches the player information from the database
+   * @param login Player login
+   * @returns Player object or undefined if the player isn't in the database
+   */
+  async fetchPlayer(login: string): Promise<any | undefined> {
+    return (await PlayerService.fetchPlayer(login))
+  },
+
+
+  /**
+   * Gets the player record on the ongoing map
+   * @param login Player login
+   * @returns Record object or undefined if the player doesn't have a local record
+   */
+  getPlayerRecord(login: string): TMRecord | undefined {
+    return RecordService.records.find(a => a.login === login)
+  },
+
+  /**
+   * Gets the player dedimania record on the ongoing map
+   * @param login Player login
+   * @returns Dedi record object or undefined if the player doesn't have a dedi record
+   */
+  getPlayerDedi(login: string): TMDedi | undefined {
+    return DedimaniaService.dedis.find(a => a.login === login)
+  },
+
+  /**
+   * Gets the recent player messages
+   * @param login Player login
+   * @returns Array of recent player messages
+   */
+  getPlayerMessages(login: string): TMMessage[] {
+    return ChatService.messages.filter(a => a.login === login)
+  },
+
+  /**
+   * Calls a dedicated server method and awaits the response
+   * @param method Dedicated server method to be executed
+   * @param params Params for the dedicated server method
+   * @returns Server response or error if the server returns one
+   */
+  async call(method: string, params: any[] = []): Promise<any[] | Error> {
+    return await Client.call(method, params)
+  },
+
+  /**
+   * Calls a dedicated server method without caring for the response
+   * @param method Dedicated server method to be executed
+   * @param params Params for the dedicated server method
+   */
+  callNoRes(method: string, params: any[] = []): void {
+    Client.callNoRes(method, params)
+  },
+
+  /**
+   * Calls multiple dedicated server methods simultaneously and awaits the response
+   * @param calls Array of dedicated server calls
+   * @returns Server response or error if the server returns one
+   */
+  async multiCall(...calls: TMCall[]): Promise<CallResponse[] | Error> {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params = c.params == null ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    const res = await Client.call('system.multicall', [{ array: arr }])
+    if (res instanceof Error) {
+      return res
+    }
+    const ret: CallResponse[] = []
+    for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
+    return ret
+  },
+
+  /**
+   * Calls multiple dedicated server methods simultaneously without caring for the response
+   * @param calls Array of dedicated server calls
+   */
+  multiCallNoRes(...calls: TMCall[]): void {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params = c.params == null ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    Client.callNoRes('system.multicall', [{ array: arr }])
+  },
+
+  /**
+   * Sends a server message
+   * @param message Message to be sent
+   * @param login Optional player login (or comma-joined list of logins)
+   */
+  sendMessage(message: string, login?: string): void {
+    if (login != null) {
+      Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
+      return
+    }
+    Client.callNoRes('ChatSendServerMessage', [{ string: message }])
+  },
+
+  /**
+   * Sends a server manialink
+   * @param manialink Manialink XML to be sent
+   * @param login Optional player login (or comma-joined list of logins)
+   * @param deleteOnClick Whether to remove the manialink on player interaction
+   * @param expireTime Amount of time (in seconds) for the manialink to disappear
+   */
+  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void {
+    if (login !== undefined) {
+      Client.callNoRes('SendDisplayManialinkPageToLogin', [
+        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+      return
+    }
+    Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+  },
+
+  /**
+   * Adds a chat command to the server
+   * @param command Chat command to register
+   */
+  addCommand(command: TMCommand): void {
+    ChatService.addCommand(command)
+  },
+
+  /**
+   * Removes certain HTML tags that may harm XML manialinks
+   * @param str Original string
+   * @returns Escaped string
+   */
+  safeString(str: string): string {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;'
+    }
+    return str.replace(/[&<>"]/g, (m): string => { return map[m as keyof typeof map] })
+  },
+
+  /**
+   * Adds a listener to an event to execute callbacks
+   * @param event Event to register the callback on
+   * @param callback Callback to register on given event
+   */
+  addListener(event: string, callback: Function): void {
+    Events.addListener(event, callback)
+  },
+
+  /**
+   * Adds a map to the server
+   * @param fileName Path to the map file
+   * @returns Added map object or error if unsuccessful
+   */
+  async addChallenge(fileName: string): Promise<TMChallenge | Error> {
+    return await ChallengeService.add(fileName)
+  },
+
+  /**
+   * Generates a random UUID
+   * @returns Random UUID
+   */
+  randomUUID(): string {
+    return randomUUID()
+  },
+
+  /**
+   * Executes a query on the database
+   * @param query Query to execute
+   * @returns Database response or error on invalid query
+   */
+  async queryDB(query: string): Promise<any[] | Error> {
+    let res
+    try {
+      res = await DB.query(query)
+    } catch (err: any) {
+      return new Error(err)
+    } finally {
+      if (res === undefined) {
+        return new Error('Database response undefined')
+      }
+      return res.rows
+    }
+  },
+
+  /**
+   * Fetches the map from TMX via its UID
+   * @param trackId Map UID
+   * @returns TMX map data or error if unsuccessful
+   */
+  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
+    return await TMXService.fetchTrackFileByUid(trackId)
+  },
+
+  /**
+   * Outputs an error message into the console
+   * @param lines Error messages
+   */
+  error(...lines: string[]): void {
+    ErrorHandler.error(...lines)
+  },
+
+  /**
+   * Outputs an error message into the console and exits the process
+   * @param lines Error messages
+   */
+  fatalError(...lines: string[]): void {
+    ErrorHandler.fatal(...lines)
+  },
+
+  /**
+   * Sets a player privilege level
+   * @param login Player login
+   * @param privilege Privilege level
+   */
+  setPrivilege(login: string, privilege: number): void {
+    PlayerService.setPrivilege(login, privilege)
+  },
+
+  /**
+   * Adds a map to the queue
+   * @param challengeId Map UID
+   */
+  addToJukebox(challengeId: string): void {
+    JukeboxService.add(challengeId)
+  },
+
+  /**
+   * Removes a map from the queue
+   * @param challengeId Map UID
+   */
+  removeFromJukebox(challengeId: string): void {
+    JukeboxService.remove(challengeId)
+  },
+
+  /**
+   * Handles manialink interaction
+   * @param id Manialink ID
+   * @param login Player login
+   */
+  openManialink(id: number, login: string): void {
+    const temp: any = PlayerService.getPlayer(login)
+    temp.answer = id
+    const info: ManialinkClickInfo = temp
+    Events.emitEvent('Controller.ManialinkClick', info)
+  },
+
+  /**
+   * Fetches Trackmania Webservices for player information
+   * @param login Player login
+   * @returns Player information in JSON or error if unsuccessful
+   */
+  async fetchWebServices(login: string): Promise<any | Error> {
+    if (process.env.USE_WEBSERVICES !== "YES") {
+      return new Error('Use webservices set to false')
+    }
+    const au = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
+    const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
+      headers: {
+        "Authorization": au
+      }
+    }).catch(err => err)
+    if (response instanceof Error) {
+      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
+      return response
+    }
+    return await response.json()
+  },
+
+  /**
+   * Adds a player to the server ban list
+   * @param ip Player IP address
+   * @param login Player login
+   * @param callerLogin Admin login
+   * @param reason Optional ban reason
+   * @param expireDate Optional ban expire date
+   */
+  addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
+  },
+
+  /**
+   * Removes a player from the server ban list
+   * @param login Player login
+   */
+  removeFromBanlist: (login: string): void => {
+    AdministrationService.removeFromBanlist(login)
+  },
+
+  /**
+   * Adds a player to the server blacklist
+   * @param login Player login
+   * @param callerLogin Admin login
+   * @param reason Optional blacklist reason
+   * @param expireDate Optional blacklist expire date
+   */
+  addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
+  },
+
+  /**
+   * Removes a player from the server blacklist
+   * @param login Player login
+   */
+  removeFromBlacklist: (login: string): void => {
+    AdministrationService.removeFromBlacklist(login)
+  },
+
+  /**
+   * Adds a player to the server mute list
+   * @param login Player login
+   * @param callerLogin Admin login
+   * @param reason Optional mute reason
+   * @param expireDate Optional mute expire date
+   */
+  addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
+    AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
+  },
+
+  /**
+   * Removes a player from the server mute list
+   * @param login Player login
+   */
+  removeFromMutelist: (login: string): void => {
+    AdministrationService.removeFromMutelist(login)
+  },
+
+  /**
+   * Adds a player to the server guest list
+   * @param login Player login
+   * @param callerLogin Admin login
+   */
+  addToGuestlist: async (login: string, callerLogin: string): Promise<void | Error> => {
+    await AdministrationService.addToGuestlist(login, callerLogin)
+  },
+
+  /**
+   * Removes a player from the server guest list
+   * @param login Player login
+   */
+  removeFromGuestlist: async (login: string): Promise<void | Error> => {
+    await AdministrationService.removeFromGuestlist(login)
+  },
+
+  /**
+   * Parses the 'time' type of TMCommand parameter
+   * @param timeString String to be parsed to number
+   * @returns Parsed number (in milliseconds) or null if no number supplied
+   */
+  parseParamTime: (timeString: string): number | null => {
+    if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes
+    const unit: string = timeString.substring(timeString.length - 1).toLowerCase()
+    const time: number = Number(timeString.substring(0, timeString.length - 1))
+    if (isNaN(time)) { return null }
+    switch (unit) {
+      case 's':
+        return time * 1000
+      case 'm':
+        return time * 1000 * 60
+      case 'h':
+        return time * 1000 * 60 * 60
+      case 'd':
+        return time * 1000 * 60 * 60 * 24
+      default:
+        return null
+    }
+  },
+
+  /**
+   * TODO
+   * @param methods 
+   * @param callback 
+   */
+  addProxy: (methods: string[], callback: Function): void => {
+    Client.addProxy(methods, callback)
+  },
+
+  /**
+   * TODO
+   * @param login Player login
+   * @param challengeId Map UID
+   * @returns 
+   */
+  removeRecord: async (login: string, challengeId: string): Promise<any[]> => {
+    return await RecordService.remove(login, challengeId)
+  },
+
+  /**
+   * TODO
+   * @param challengeId 
+   * @returns 
+   */
+  removeAllRecords: async (challengeId: string): Promise<any[]> => {
+    return await RecordService.removeAll(challengeId)
+  },
+
+  /**
+   * Attempts to convert the player nickname to their login via charmap
+   * @param nickName Player nickname
+   * @returns Possibly matching login or undefined if unsuccessful
+   */
+  nicknameToLogin: (nickName: string): string | undefined => {
+    const charmap: any = SpecialCharmap
+    const players: TMPlayer[] = PlayerService.players
+    const guesses: { login: string, nickName: string, currentMatch: number, longestMatch: number }[] = []
+    for (const e of players) {
+      guesses.push({ login: e.login, nickName: TRAKMAN.strip(e.nickName.toLowerCase()), currentMatch: 0, longestMatch: 0 })
+    }
+    for (const guess of guesses) {
+      for (const [i, letter] of guess.nickName.split('').entries()) {
+        if (charmap?.[nickName[0]?.toString()]?.some((a: any): boolean => a === letter) || nickName[0]?.toString() === letter) {
+          for (let j: number = 0; j < nickName.length + 1; j++) {
+            if (j === nickName.length + 1) {
+              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
+              break
+            }
+            if (nickName[j] === guess?.nickName?.[i + j] || charmap?.[nickName[j]?.toString()]?.some((a: any): boolean => a === guess?.nickName?.[i + j])) {
+              guess.currentMatch++
+            }
+            else {
+              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
+              break
+            }
+          }
+        }
+      }
+    }
+    guesses.sort((a, b): number => b.longestMatch - a.longestMatch)
+    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
+      return undefined
+    }
+    if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
+      return undefined
+    }
+    return guesses[0].login
+  },
+
+  /**
+   * Formats date into calendar display
+   * @param date Date to be formatted
+   * @param displayDay Whether to display day
+   * @returns Formatted date string
+   */
+  formatDate(date: Date, displayDay?: true): string {
+    if (displayDay === true) {
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+    }
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  },
+
+  /**
+   * Adds a player vote to the database
+   * @param mapId Map UID
+   * @param login Player login
+   * @param vote Player vote
+   */
+  async addVote(mapId: string, login: string, vote: number): Promise<void> {
+    await VoteService.add(mapId, login, vote)
+  },
+
+  /**
+   * Fetches all votes for a map
+   * @param mapId Map UID
+   * @returns Database response
+   */
+  async fetchVotes(mapId: string): Promise<any[]> {
+    return await VoteService.fetch(mapId)
+  },
+
   get gameInfo(): TMGame {
     return Object.assign(GameService.game)
   },
 
-  /**
-     * Returns an array of objects containing information about current server players
-     */
   get players(): TMPlayer[] {
     return PlayerService.players
   },
@@ -96,9 +605,6 @@ export const TRAKMAN = {
     return RecordService.records
   },
 
-  /**
-    * Returns an array of objects containing information about top local record players on current map
-    */
   get localRecords(): LocalRecord[] {
     return RecordService.localRecords
   },
@@ -111,30 +617,18 @@ export const TRAKMAN = {
     return RecordService.liveRecords
   },
 
-  /**
-   * Returns an object containing various information about current challenge
-   */
   get challenge(): TMChallenge {
     return Object.assign(ChallengeService.current)
   },
 
-  /**
-     * Returns an array of objects containing information about recent messages
-     */
   get messages(): TMMessage[] {
     return [...ChatService.messages]
   },
 
-  /**
-   * Returns an object containing various colors as keys, and their 3-digit hexes as values. Useful for text colouring in plugins
-   */
   get colours() {
     return colours
   },
 
-  /**
-   * Returns an object containing the current server palette values
-   */
   get palette() {
     return {
       // All admin commands
@@ -174,184 +668,19 @@ export const TRAKMAN = {
     return ChallengeService.challenges
   },
 
-  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
-    return await TMXService.fetchTrackInfo(trackId)
-  },
-
   get TMXInfo(): TMXTrackInfo | null {
     return TMXService.current
   },
 
-  /**
-    * Returns an object containing information about specified player or undefined if player is not on the server
-    */
-  getPlayer(login: string): TMPlayer | undefined {
-    return PlayerService.players.find(a => a.login === login)
-  },
-
-  /**
-     * Searches the database for player information, returns object containing player info or undefined if player isn't in the database
-     */
-  async fetchPlayer(login: string): Promise<any | undefined> {
-    return (await PlayerService.fetchPlayer(login))
-  },
-
-  /**
-     * Returns an object containing information about specified player's record on current map
-     * or undefined if the player doesn't have a record
-     */
-  getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.records.find(a => a.login === login)
-  },
-
-  getPlayerDedi(login: string): TMDedi | undefined {
-    return DedimaniaService.dedis.find(a => a.login === login)
-  },
-
-  /**
-     * Returns an array of objects containing information about recent messages from a specified player
-     */
-  getPlayerMessages(login: string): TMMessage[] {
-    return ChatService.messages.filter(a => a.login === login)
-  },
-
-  /**
-     * Calls a dedicated server method. Throws error if the server responds with error.
-     */
-  async call(method: string, params: any[] = []): Promise<any[] | Error> {
-    return await Client.call(method, params)
-  },
-
-  callNoRes(method: string, params: any[] = []): void {
-    Client.callNoRes(method, params)
-  },
-
-  async multiCall(...calls: TMCall[]): Promise<CallResponse[] | Error> {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params = c.params == null ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    const res = await Client.call('system.multicall', [{ array: arr }])
-    if (res instanceof Error) {
-      return res
-    }
-    const ret: CallResponse[] = []
-    for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
-    return ret
-  },
-
-  multiCallNoRes(...calls: TMCall[]): void {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params = c.params == null ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    Client.callNoRes('system.multicall', [{ array: arr }])
-  },
-
-  /**
-     * Sends a server message. If login is specified the message is sent only to login, otherwise it's sent to everyone
-     */
-  sendMessage(message: string, login?: string): void {
-    if (login != null) {
-      Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
-      return
-    }
-    Client.callNoRes('ChatSendServerMessage', [{ string: message }])
-  },
-
-  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0) {
-    if (login !== undefined) {
-      Client.callNoRes('SendDisplayManialinkPageToLogin', [
-        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
-      return
-    }
-    Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
-  },
-
-  /**
-     * Adds a chat command
-     */
-  addCommand(command: TMCommand) {
-    ChatService.addCommand(command)
-  },
-
-  /**
-   * copypaste of escape html
-   * @param str string to safer d
-   * @returns string but safe
-   */
-  safeString(str: string): string {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;'
-    }
-    return str.replace(/[&<>"]/g, (m) => { return map[m as keyof typeof map] })
-  },
-
-  /**
-     * Adds callback function to execute on given event
-     */
-  addListener(event: string, callback: Function) {
-    Events.addListener(event, callback)
-  },
-
-  async addChallenge(fileName: string): Promise<TMChallenge | Error> {
-    return await ChallengeService.add(fileName)
-  },
-
-  randomUUID(): string {
-    return randomUUID()
-  },
-
-  async queryDB(query: string): Promise<any[] | Error> {
-    let res
-    try {
-      res = await DB.query(query)
-    } catch (err: any) {
-      return new Error(err)
-    } finally {
-      if (res === undefined) {
-        return new Error('Database response undefined')
-      }
-      return res.rows
-    }
-  },
-
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
-    return await TMXService.fetchTrackFileByUid(trackId)
-  },
-
-  error(...lines: string[]): void {
-    ErrorHandler.error(...lines)
-  },
-
-  fatalError(...lines: string[]): void {
-    ErrorHandler.fatal(...lines)
-  },
-
-  get challengeQueue() {
+  get challengeQueue(): TMChallenge[] {
     return JukeboxService.queue
   },
 
-  get jukebox() {
+  get jukebox(): TMChallenge[] {
     return JukeboxService.jukebox
   },
 
-  get previousChallenges() {
+  get previousChallenges(): TMChallenge[] {
     return JukeboxService.previous
   },
 
@@ -367,156 +696,15 @@ export const TRAKMAN = {
     return TMXService.next
   },
 
-  setPrivilege(login: string, privilege: number) {
-    PlayerService.setPrivilege(login, privilege)
+  get votes(): TMVote[] {
+    return VoteService.votes
   },
 
-  addToJukebox(challengeId: string) {
-    JukeboxService.add(challengeId)
+  get voteRatios() {
+    return VoteService.voteRatios
   },
 
-  removeFromJukebox(challengeId: string) {
-    JukeboxService.remove(challengeId)
-  },
-
-  openManialink(id: number, login: string) {
-    const temp: any = PlayerService.getPlayer(login)
-    temp.answer = id
-    const info: ManialinkClickInfo = temp
-    Events.emitEvent('Controller.ManialinkClick', info)
-  },
-
-  async fetchWebServices(login: string): Promise<any | Error> {
-    if (process.env.USE_WEBSERVICES !== "YES") {
-      return new Error('Use webservices set to false')
-    }
-    const au = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
-    const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
-      headers: {
-        "Authorization": au
-      }
-    }).catch(err => err)
-    if (response instanceof Error) {
-      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
-      return response
-    }
-    return await response.json()
-  },
-
-  get banlist() {
-    return AdministrationService.banlist
-  },
-
-  addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
-  },
-
-  removeFromBanlist: (login: string): void => {
-    AdministrationService.removeFromBanlist(login)
-  },
-
-  get blacklist() {
-    return AdministrationService.blacklist
-  },
-
-  addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
-  },
-
-  removeFromBlacklist: (login: string): void => {
-    AdministrationService.removeFromBlacklist(login)
-  },
-
-  get mutelist() {
-    return AdministrationService.mutelist
-  },
-
-  addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
-  },
-
-  removeFromMutelist: (login: string): void => {
-    AdministrationService.removeFromMutelist(login)
-  },
-
-  get guestlist() {
-    return AdministrationService.guestlist
-  },
-
-  addToGuestlist: async (login: string, callerLogin: string): Promise<void | Error> => {
-    await AdministrationService.addToGuestlist(login, callerLogin)
-  },
-
-  removeFromGuestlist: async (login: string): Promise<void | Error> => {
-    await AdministrationService.removeFromGuestlist(login)
-  },
-
-  parseParamTime: (timeString: string): number | null => {
-    if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes
-    const unit = timeString.substring(timeString.length - 1).toLowerCase()
-    const time = Number(timeString.substring(0, timeString.length - 1))
-    if (isNaN(time)) { return null }
-    switch (unit) {
-      case 's':
-        return time * 1000
-      case 'm':
-        return time * 1000 * 60
-      case 'h':
-        return time * 1000 * 60 * 60
-      case 'd':
-        return time * 1000 * 60 * 60 * 24
-      default:
-        return null
-    }
-  },
-
-  addProxy: (methods: string[], callback: Function): void => { Client.addProxy(methods, callback) },
-
-  removeRecord: async (login: string, challengeId: string): Promise<any[]> => {
-    return await RecordService.remove(login, challengeId)
-  },
-
-  removeAllRecords: async (challengeId: string): Promise<any[]> => {
-    return await RecordService.removeAll(challengeId)
-  },
-
-  nicknameToLogin: (nickName: string): string | undefined => {
-    const charmap = SpecialCharmap as any
-    const players = PlayerService.players
-    const guesses: { login: string, nickName: string, currentMatch: number, longestMatch: number }[] = []
-    for (const e of players) {
-      guesses.push({ login: e.login, nickName: TRAKMAN.strip(e.nickName.toLowerCase()), currentMatch: 0, longestMatch: 0 })
-    }
-    for (const guess of guesses) {
-      for (const [i, letter] of guess.nickName.split('').entries()) {
-        if (charmap?.[nickName[0]?.toString()]?.some((a: any) => a === letter) || nickName[0]?.toString() === letter) {
-          for (let j = 0; j < nickName.length + 1; j++) {
-            if (j === nickName.length + 1) {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-            if (nickName[j] === guess?.nickName?.[i + j] || charmap?.[nickName[j]?.toString()]?.some((a: any) => a === guess?.nickName?.[i + j])) {
-              guess.currentMatch++
-            }
-            else {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-          }
-        }
-      }
-    }
-    guesses.sort((a, b) => b.longestMatch - a.longestMatch)
-    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
-      return undefined
-    }
-    if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
-      return undefined
-    }
-    return guesses[0].login
-  },
-
-  get commandList() {
+  get commandList(): TMCommand[] {
     return ChatService.commandList
   },
 
@@ -524,27 +712,19 @@ export const TRAKMAN = {
     return { ..._UIIDS }
   },
 
-  formatDate(date: Date, displayDay?: true): string {
-    if (displayDay === true) {
-      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
-    }
-    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  get banlist() {
+    return AdministrationService.banlist
   },
 
-  async addVote(mapId: string, login: string, vote: number) {
-    await VoteService.add(mapId, login, vote)
+  get blacklist() {
+    return AdministrationService.blacklist
   },
 
-  async fetchVotes(mapId: string) {
-    return await VoteService.fetch(mapId)
+  get mutelist() {
+    return AdministrationService.mutelist
   },
 
-  get votes() {
-    return VoteService.votes
+  get guestlist() {
+    return AdministrationService.guestlist
   },
-
-  get voteRatios() {
-    return VoteService.voteRatios
-  }
-
 }
