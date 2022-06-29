@@ -94,7 +94,7 @@ const commands: TMCommand[] = [
       },
         {
           method: 'SetServerPasswordForSpectator',
-          params: [{ string: password === undefined ? '' : password  }]
+          params: [{ string: password === undefined ? '' : password }]
         })
     },
     privilege: 3
@@ -200,8 +200,8 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
-    aliases: ['acdl', 'allowchallengedownload'],
-    help: 'Set whether challenge download is enabled.',
+    aliases: ['amdl', 'allowmapdownload'],
+    help: 'Set whether map download is enabled.',
     params: [{ name: 'allowed', type: 'boolean' }],
     callback: (info: MessageInfo, allowed: boolean) => {
       TM.multiCall({
@@ -209,7 +209,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.palette.admin} the challenge download.`
+            + `${TM.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.palette.admin} the map download.`
         }]
       },
         {

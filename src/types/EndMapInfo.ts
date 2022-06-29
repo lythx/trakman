@@ -1,4 +1,4 @@
-interface EndChallengeInfo {
+interface EndMapInfo {
     readonly id: string
     readonly name: string
     readonly fileName: string
@@ -16,5 +16,5 @@ interface EndChallengeInfo {
     readonly records: TMRecord[]
     readonly isRestarted: boolean
     readonly wasWarmUp: boolean
-    readonly continuesOnNextChallenge: boolean
+    readonly continuesOnNextMap: boolean
 }

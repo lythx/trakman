@@ -1,34 +1,34 @@
 import { Client } from '../Client.js'
-import { ChallengeRepository } from '../database/ChallengeRepository.js'
+import { MapRepository } from '../database/MapRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
-export class ChallengeService {
-  private static _current: TMChallenge
-  private static readonly _challenges: TMChallenge[] = []
-  private static repo: ChallengeRepository
+export class MapService {
+  private static _current: TMMap
+  private static readonly _maps: TMMap[] = []
+  private static repo: MapRepository
 
   static async initialize(): Promise<void> {
-    this.repo = new ChallengeRepository()
+    this.repo = new MapRepository()
     await this.repo.initialize()
     await this.initializeList()
     await this.setCurrent()
   }
 
-  static get current(): TMChallenge {
+  static get current(): TMMap {
     return this._current
   }
 
-  static get challenges(): TMChallenge[] {
-    return this._challenges
+  static get maps(): TMMap[] {
+    return this._maps
   }
 
   /**
-   * Sets the current challenge.
+   * Sets the current map.
    */
   static async setCurrent(): Promise<void> {
     const res: any[] | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
-      ErrorHandler.error('Unable to retrieve current challenge info.', res.message)
+      ErrorHandler.error('Unable to retrieve current map info.', res.message)
       return
     }
     const info: any = res[0]
@@ -53,28 +53,28 @@ export class ChallengeService {
   }
 
   /**
-   * Download all the challenges from the server and store them in a field
+   * Download all the maps from the server and store them in a field
    */
   private static async initializeList(): Promise<void> {
-    const challengeList: any[] | Error = await Client.call('GetChallengeList', [
+    const mapList: any[] | Error = await Client.call('GetChallengeList', [
       { int: 5000 }, { int: 0 }
     ])
-    if (challengeList instanceof Error) {
-      ErrorHandler.fatal('Error getting the challenge list', challengeList.message)
+    if (mapList instanceof Error) {
+      ErrorHandler.fatal('Error getting the map list', mapList.message)
       return
     }
-    const DBChallengeList: any[] = await this.repo.getAll()
-    const challengesInDB: any[] = challengeList.filter(a => DBChallengeList.some(b => a.UId === b.id))
-    const challengesNotInDB: any[] = challengeList.filter(a => !DBChallengeList.some(b => a.UId === b.id))
-    const challengesNotInDBInfo: TMChallenge[] = []
-    for (const c of challengesNotInDB) {
+    const DBMapList: any[] = await this.repo.getAll()
+    const mapsInDB: any[] = mapList.filter(a => DBMapList.some(b => a.UId === b.id))
+    const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
+    const mapsNotInDBInfo: TMMap[] = []
+    for (const c of mapsNotInDB) {
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
       if (res instanceof Error) {
-        ErrorHandler.error('Unable to retrieve challenge info.', `Map id: ${c.id}, filename: ${c.fileName}`, res.message)
+        ErrorHandler.error('Unable to retrieve map info.', `Map id: ${c.id}, filename: ${c.fileName}`, res.message)
         return
       }
       const info: any = res[0]
-      const obj: TMChallenge = {
+      const obj: TMMap = {
         id: info.UId,
         name: info.Name,
         fileName: info.FileName,
@@ -91,12 +91,12 @@ export class ChallengeService {
         checkpointsAmount: info.NbCheckpoints,
         addDate: new Date()
       }
-      challengesNotInDBInfo.push(obj)
+      mapsNotInDBInfo.push(obj)
     }
-    const challengesInDBInfo: TMChallenge[] = []
-    for (const challenge of challengesInDB) {
-      const c: any = DBChallengeList.find((a: any): boolean => a.id === challenge.UId)
-      const info: TMChallenge = {
+    const mapsInDBInfo: TMMap[] = []
+    for (const map of mapsInDB) {
+      const c: any = DBMapList.find((a: any): boolean => a.id === map.UId)
+      const info: TMMap = {
         id: c.id,
         name: c.name,
         fileName: c.filename,
@@ -113,22 +113,22 @@ export class ChallengeService {
         checkpointsAmount: c.checkpointsamount,
         addDate: new Date(c.adddate)
       }
-      challengesInDBInfo.push(info)
+      mapsInDBInfo.push(info)
     }
-    for (const c of [...challengesInDBInfo, ...challengesNotInDBInfo]) {
-      this._challenges.push(c)
+    for (const c of [...mapsInDBInfo, ...mapsNotInDBInfo]) {
+      this._maps.push(c)
     }
-    await this.repo.add(...challengesNotInDBInfo)
+    await this.repo.add(...mapsNotInDBInfo)
   }
 
-  static async add(fileName: string): Promise<TMChallenge | Error> {
+  static async add(fileName: string): Promise<TMMap | Error> {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }
-    if (insert[0] === false) { return new Error(`Failed to insert challenge ${fileName}`) }
+    if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
     const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: fileName }])
     if (res instanceof Error) { return res }
     const info: any = res[0]
-    const obj: TMChallenge = {
+    const obj: TMMap = {
       id: info.UId,
       name: info.Name,
       fileName: info.FileName,
@@ -145,14 +145,14 @@ export class ChallengeService {
       checkpointsAmount: info.NbCheckpoints,
       addDate: new Date()
     }
-    this._challenges.push(obj)
+    this._maps.push(obj)
     return obj
   }
 
-  static async setNextChallenge(id: string): Promise<void | Error> {
-    const challenge: TMChallenge | undefined = this.challenges.find(a => a.id === id)
-    if (challenge === undefined) { return new Error(`Cant find challenge with UId ${id} in memory`) }
-    const res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: challenge.fileName }])
-    if (res instanceof Error) { return new Error(`Failed to queue challenge ${challenge.name}`) }
+  static async setNextMap(id: string): Promise<void | Error> {
+    const map: TMMap | undefined = this.maps.find(a => a.id === id)
+    if (map === undefined) { return new Error(`Cant find map with UId ${id} in memory`) }
+    const res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+    if (res instanceof Error) { return new Error(`Failed to queue map ${map.name}`) }
   }
 }

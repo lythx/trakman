@@ -1,7 +1,7 @@
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
-import { ChallengeService } from './services/ChallengeService.js'
+import { MapService } from './services/MapService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './Client.js'
 import { ChatService } from './services/ChatService.js'
@@ -61,11 +61,11 @@ export const TRAKMAN = {
   strip(str: string, removeColours: boolean = true): string {
     let regex: RegExp
     if (removeColours) {
-      regex = /\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][]|(?=[][])|$)|\$[LHP]\[.*?\](.*?)\$[LHP]|\$[LHP]\[.*?\]|\$[^\$]{1}/gi
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
     } else {
-      regex = /\$(?:[^][]|(?=[][])|$)|\$[LHP]\[.*?](.*?)\$[LHP]|\$[LHP]\[.*?]|\$[^\$]{1}/gi
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
     }
-    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$')
+    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
   },
 
   /**
@@ -129,7 +129,7 @@ export const TRAKMAN = {
    * @returns Record object or undefined if the player doesn't have a local record
    */
   getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.records.find(a => a.login === login)
+    return RecordService.records.find(a => a.login === login && a.map === MapService.current.id)
   },
 
   /**
@@ -278,8 +278,8 @@ export const TRAKMAN = {
    * @param fileName Path to the map file
    * @returns Added map object or error if unsuccessful
    */
-  async addChallenge(fileName: string): Promise<TMChallenge | Error> {
-    return await ChallengeService.add(fileName)
+  async addMap(fileName: string): Promise<TMMap | Error> {
+    return await MapService.add(fileName)
   },
 
   /**
@@ -345,18 +345,18 @@ export const TRAKMAN = {
 
   /**
    * Adds a map to the queue
-   * @param challengeId Map UID
+   * @param mapId Map UID
    */
-  addToJukebox(challengeId: string): void {
-    JukeboxService.add(challengeId)
+  addToJukebox(mapId: string): void {
+    JukeboxService.add(mapId)
   },
 
   /**
    * Removes a map from the queue
-   * @param challengeId Map UID
+   * @param mapId Map UID
    */
-  removeFromJukebox(challengeId: string): void {
-    JukeboxService.remove(challengeId)
+  removeFromJukebox(mapId: string): void {
+    JukeboxService.remove(mapId)
   },
 
   /**
@@ -504,20 +504,20 @@ export const TRAKMAN = {
   /**
    * Removes a player record
    * @param login Player login
-   * @param challengeId Map UID
+   * @param mapId Map UID
    * @returns Database response
    */
-  removeRecord: async (login: string, challengeId: string): Promise<any[]> => {
-    return await RecordService.remove(login, challengeId)
+  removeRecord: async (login: string, mapId: string): Promise<any[]> => {
+    return await RecordService.remove(login, mapId)
   },
 
   /**
    * Removes all player records on given map
-   * @param challengeId Map UID
+   * @param mapId Map UID
    * @returns Databse response
    */
-  removeAllRecords: async (challengeId: string): Promise<any[]> => {
-    return await RecordService.removeAll(challengeId)
+  removeAllRecords: async (mapId: string): Promise<any[]> => {
+    return await RecordService.removeAll(mapId)
   },
 
   /**
@@ -617,8 +617,8 @@ export const TRAKMAN = {
     return RecordService.liveRecords
   },
 
-  get challenge(): TMChallenge {
-    return Object.assign(ChallengeService.current)
+  get map(): TMMap {
+    return Object.assign(MapService.current)
   },
 
   get messages(): TMMessage[] {
@@ -664,23 +664,23 @@ export const TRAKMAN = {
     return Utils
   },
 
-  get challenges(): TMChallenge[] {
-    return ChallengeService.challenges
+  get maps(): TMMap[] {
+    return MapService.maps
   },
 
   get TMXInfo(): TMXTrackInfo | null {
     return TMXService.current
   },
 
-  get challengeQueue(): TMChallenge[] {
+  get mapQueue(): TMMap[] {
     return JukeboxService.queue
   },
 
-  get jukebox(): TMChallenge[] {
+  get jukebox(): TMMap[] {
     return JukeboxService.jukebox
   },
 
-  get previousChallenges(): TMChallenge[] {
+  get previousMaps(): TMMap[] {
     return JukeboxService.previous
   },
 

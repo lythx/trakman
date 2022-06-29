@@ -10,7 +10,7 @@ export class ServerConfig {
         // Client.addProxy(<methods> , ()=>{
         //    this.update()
         // }) TODO: ADD PROXY FOR ALL COMMANDS WHICH CHANGE SERVER CONFIG
-        // then call this method instead of update on new challenge
+        // then call this method instead of update on new map
     }
 
     static async update(): Promise<void> {
@@ -38,7 +38,7 @@ export class ServerConfig {
             currentCallVoteTimeOut: options.CurrentCallVoteTimeOut,
             nextCallVoteTimeOut: options.NextCallVoteTimeOut,
             callVoteRatio: options.CallVoteRatio,
-            allowChallengeDownload: options.AllowChallengeDownload,
+            allowMapDownload: options.AllowChallengeDownload,
             autoSaveReplays: options.AutoSaveReplays
         }
     }

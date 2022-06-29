@@ -1,6 +1,6 @@
 import { Client } from './Client.js'
 import { Logger } from './Logger.js'
-import { ChallengeService } from './services/ChallengeService.js'
+import { MapService } from './services/MapService.js'
 import 'dotenv/config'
 import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
@@ -47,9 +47,9 @@ async function main(): Promise<void> {
   }
   await RecordService.initialize()
   Logger.info('Callbacks enabled')
-  Logger.trace('Fetching challenges...')
-  await ChallengeService.initialize()
-  Logger.info('Challenge service instantiated')
+  Logger.trace('Fetching maps...')
+  await MapService.initialize()
+  Logger.info('Map service instantiated')
   JukeboxService.initialize()
   Logger.trace('Fetching votes...')
   await VoteService.initialize()
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
   await ChatService.loadLastSessionMessages()
   Logger.info('Chat service instantiated')
   Listeners.initialize()
-  await RecordService.fetchRecords(ChallengeService.current.id)
+  await RecordService.fetchRecords(MapService.current.id)
   await ServerConfig.update()
   if (process.env.USE_TMX === 'YES') {
     Logger.trace('Initializing TMX service...')
