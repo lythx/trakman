@@ -18,6 +18,13 @@ export default class LiveCheckpoint extends StaticComponent {
   constructor() {
     super(IDS.LiveCheckpoint, 'race')
     this.positionY = calculateStaticPositionY('liveCheckpoint')
+    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+      const cpTime = info.time
+      const cpIndex = info.index
+      const pb = info.player.checkpoints[cpIndex]
+      const difference = pb.time - info.time
+      this.displayToPlayer(info.player.login, cpTime, difference)
+    })
   }
 
   display(): void {
@@ -35,11 +42,17 @@ export default class LiveCheckpoint extends StaticComponent {
     </manialink>`)
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string, checkpoint?: number, difference?: number): void {
+    console.log(checkpoint, difference)
+    const iconUrl = stringToObjectProperty(this.icon, ICONS)
     TM.sendManialink(`
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
+        <format textsize="1"/>
+        ${staticHeader(this.title, iconUrl, this.side)}
+        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
+          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
+        </frame>
       </frame>
     </manialink>`, login)
   }

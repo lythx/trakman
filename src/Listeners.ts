@@ -69,11 +69,14 @@ export class Listeners {
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         PlayerService.addCP(params[1], checkpoint) // FIX CP EVENT BEING EMITTED ON FINISH // or not? idk
-        const temp: any = PlayerService.getPlayer(params[1])
-        temp.time = params[2]
-        temp.lap = params[3]
-        temp.index = params[4]
-        const info: CheckpointInfo = temp
+        const player= PlayerService.getPlayer(params[1])
+        if(player === undefined) { return }
+        const info: CheckpointInfo = {
+          time: params[2],
+          lap: params[3],
+          index: params[4],
+          player
+        }
         Events.emitEvent('Controller.PlayerCheckpoint', info)
       }
     },
