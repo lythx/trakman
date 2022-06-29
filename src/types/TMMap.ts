@@ -1,4 +1,4 @@
-interface TMChallenge {
+interface TMMap {
   readonly id: string
   readonly name: string
   readonly fileName: string

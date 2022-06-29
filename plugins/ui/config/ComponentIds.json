@@ -20,5 +20,6 @@
     "LocalRanking": 10000,
     "JukeboxWindow": 20000,
     "LocalSectors": 30000,
-    "LiveSectors": 40000
+    "LiveSectors": 40000,
+    "LiveCheckpoint": 70000
 }

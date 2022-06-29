@@ -1,5 +1,5 @@
 interface LocalRecord {
-  readonly challenge: string
+  readonly map: string
   readonly login: string
   readonly time: number
   readonly date: Date

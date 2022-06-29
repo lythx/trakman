@@ -97,6 +97,7 @@ const events: TMEvent[] = [
   {
     event: 'Controller.DedimaniaRecord',
     callback: async (info: DediRecordInfo) => {
+      console.log(JSON.stringify(info, null, 4))
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }

@@ -38,7 +38,7 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   private updateXML(): void {
-    // const votes = TM.votes.filter(a => a.mapId === TM.challenge.id)
+    //const votes = TM.votes.filter(a => a.mapId === TM.map.id)
     const votes: { vote: number }[] = []
     const f = [-3, -2, -1, 1, 2, 3]
     for (let i = 0; i < 100; i++) {

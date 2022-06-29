@@ -9,7 +9,7 @@ if (process.env.USE_DEDIMANIA === 'YES') {
       callback: (info: MessageInfo) => {
         const dediRecs: TMDedi[] = TM.dediRecords
         let str = `${TM.palette.server}» ${TM.palette.dedimessage}Dedimania records on `
-          + `${TM.palette.highlight + TM.strip(TM.challenge.name, true)}${TM.palette.highlight}: `
+          + `${TM.palette.highlight + TM.strip(TM.map.name, true)}${TM.palette.highlight}: `
         for (const dr of dediRecs) {
           str += `${TM.strip(dr.nickName, false)}$z$s ${TM.palette.highlight + '- ' + TM.Utils.getTimeString(dr.time)}, `
         }

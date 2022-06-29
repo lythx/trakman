@@ -1,6 +1,6 @@
 import { RecordRepository } from '../database/RecordRepository.js'
 import { PlayerService } from './PlayerService.js'
-import { ChallengeService } from './ChallengeService.js'
+import { MapService } from './MapService.js'
 import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
 import 'dotenv/config'
@@ -16,13 +16,13 @@ export class RecordService {
     this.repo = repo
     await this.repo.initialize()
     const res: any[] = await this.repo.getAll()
-    for (const record of res) { this._records.push({ challenge: record.challenge, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
+    for (const record of res) { this._records.push({ map: record.map, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
   }
 
-  static async fetchRecords(challengeId: string): Promise<LocalRecord[]> {
+  static async fetchRecords(mapId: string): Promise<LocalRecord[]> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
-    const records: any[] = await this.repo.get(challengeId)
+    const records: any[] = await this.repo.get(mapId)
     records.sort((a, b): number => a.score - b.score)
     const n: number = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
     for (let i: number = 0; i < n; i++) {
@@ -32,7 +32,7 @@ export class RecordService {
         return []
       }
       const localRecord: LocalRecord = {
-        challenge: challengeId,
+        map: mapId,
         login: records[i].login,
         time: records[i].score,
         date: records[i].date,
@@ -52,10 +52,10 @@ export class RecordService {
     return this._localRecords
   }
 
-  static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | undefined> {
-    const res: any = (await this.repo.getByLogin(challengeId, login))?.[0]
+  static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {
+    const res: any = (await this.repo.getByLogin(mapId, login))?.[0]
     if (res === undefined) { return undefined }
-    return { challenge: challengeId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
+    return { map: mapId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
   static get records(): TMRecord[] {
@@ -70,36 +70,36 @@ export class RecordService {
     return [...this._liveRecords]
   }
 
-  static async add(challenge: string, login: string, score: number): Promise<void> {
+  static async add(map: string, login: string, time: number): Promise<void> {
     const date: Date = new Date()
     const player: TMPlayer | undefined = PlayerService.getPlayer(login)
     if (player === undefined) {
       return
     }
-    const cpsPerLap: number = ChallengeService.current.checkpointsAmount
+    const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps
-    if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
+    if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
       laps = 1
     } else if (GameService.game.gameMode === 3) {
       laps = GameService.game.lapsNo
     } else if (GameService.game.gameMode === 4) {
       return // TODO STUNTS MODE
     } else {
-      laps = ChallengeService.current.lapsAmount
+      laps = MapService.current.lapsAmount
     }
     const cpAmount: number = cpsPerLap * laps
     const checkpoints: number[] = [...player.checkpoints.map(a => a.time)]
     const temp: any = player
     temp.checkpoints = [...checkpoints] // break the reference
-    temp.challenge = challenge
-    temp.score = score
+    temp.map = map
+    temp.time = time
     const finishInfo: FinishInfo = temp
-    await this.handleLocalRecord(challenge, login, score, date, cpAmount, [...checkpoints], player)
-    this.handleLiveRecord(challenge, login, score, date, cpAmount, [...checkpoints], player)
+    await this.handleLocalRecord(map, login, time, date, cpAmount, [...checkpoints], player)
+    this.handleLiveRecord(map, login, time, date, cpAmount, [...checkpoints], player)
     Events.emitEvent('Controller.PlayerFinish', finishInfo)
   }
 
-  private static async handleLocalRecord(challenge: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
+  private static async handleLocalRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
     if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
       return
@@ -108,7 +108,7 @@ export class RecordService {
     const position: number = this._localRecords.filter(a => a.time <= score).length + 1
     if (pb === undefined) {
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -129,10 +129,10 @@ export class RecordService {
         region: player.region,
         isUnited: player.isUnited
       }
-      this._records.splice(position - 1, 0, { challenge, login, time: score, date, checkpoints })
+      this._records.splice(position - 1, 0, { map: map, login, time: score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         const localRecord: LocalRecord = {
-          challenge,
+          map: map,
           login,
           time: score,
           date,
@@ -155,7 +155,7 @@ export class RecordService {
     if (score === pb) {
       const previousPosition: number = this.records.findIndex(a => a.login === this.records.find(a => a.login === login)?.login) + 1
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -186,7 +186,7 @@ export class RecordService {
         return
       }
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -207,12 +207,12 @@ export class RecordService {
         region: player.region,
         isUnited: player.isUnited
       }
-      this._records = this._records.filter(a => !(a.login == login && a.challenge === challenge))
-      this._records.splice(position - 1, 0, { challenge, login, time: score, date, checkpoints })
+      this._records = this._records.filter(a => !(a.login == login && a.map === map))
+      this._records.splice(position - 1, 0, { map: map, login, time: score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords = this._localRecords.filter(a => a.login !== login)
         const localRecord: LocalRecord = {
-          challenge,
+          map: map,
           login,
           time: score,
           date,
@@ -233,7 +233,7 @@ export class RecordService {
     }
   }
 
-  private static handleLiveRecord(challenge: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer): void {
+  private static handleLiveRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer): void {
     if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
       return
@@ -242,7 +242,7 @@ export class RecordService {
     const position: number = this._liveRecords.filter(a => a.time <= score).length + 1
     if (pb === undefined) {
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -273,7 +273,7 @@ export class RecordService {
         visits: player.visits,
         wins: player.wins,
         privilege: player.privilege,
-        challenge,
+        map: map,
         nation: player.nation,
         nationCode: player.nationCode,
         playerId: player.playerId,
@@ -287,7 +287,7 @@ export class RecordService {
     if (score === pb) {
       const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === login)?.login) + 1
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -318,7 +318,7 @@ export class RecordService {
         return
       }
       const recordInfo: RecordInfo = {
-        challenge,
+        map: map,
         login,
         time: score,
         date,
@@ -350,7 +350,7 @@ export class RecordService {
         visits: player.visits,
         wins: player.wins,
         privilege: player.privilege,
-        challenge,
+        map: map,
         nation: player.nation,
         nationCode: player.nationCode,
         playerId: player.playerId,
@@ -362,22 +362,22 @@ export class RecordService {
     }
   }
 
-  static async remove(login: string, challengeId: string): Promise<any[]> {
-    this._records.splice(this._records.findIndex(a => a.login === login && a.challenge === challengeId), 1)
-    this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.challenge === challengeId), 1)
+  static async remove(login: string, mapId: string): Promise<any[]> {
+    this._records.splice(this._records.findIndex(a => a.login === login && a.map === mapId), 1)
+    this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.map === mapId), 1)
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    return await this.repo.remove(login, challengeId)
+    return await this.repo.remove(login, mapId)
   }
 
-  static async removeAll(challengeId: string): Promise<any[]> {
-    while (this._records.some(a => a.challenge === challengeId)) {
-      this._records.splice(this._records.findIndex(a => a.challenge === challengeId), 1)
+  static async removeAll(mapId: string): Promise<any[]> {
+    while (this._records.some(a => a.map === mapId)) {
+      this._records.splice(this._records.findIndex(a => a.map === mapId), 1)
     }
-    while (this._localRecords.some(a => a.challenge === challengeId)) {
-      this._localRecords.splice(this._localRecords.findIndex(a => a.challenge === challengeId), 1)
+    while (this._localRecords.some(a => a.map === mapId)) {
+      this._localRecords.splice(this._localRecords.findIndex(a => a.map === mapId), 1)
     }
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    return await this.repo.removeAll(challengeId)
+    return await this.repo.removeAll(mapId)
   }
 
 }

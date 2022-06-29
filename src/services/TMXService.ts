@@ -24,7 +24,7 @@ export abstract class TMXService {
     }
   }
 
-  static async nextChallenge(): Promise<void | Error> {
+  static async nextMap(): Promise<void | Error> {
     if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current)
     this._previous.length = Math.min(this._previous.length, this.previousSize)
@@ -49,7 +49,7 @@ export abstract class TMXService {
     this._next.push(track instanceof Error ? null : track)
   }
 
-  static restartChallenge(): void {
+  static restartMap(): void {
     if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current === null ? null : { ...this._current })
     this._previous.length = Math.min(this._previous.length, this.previousSize)

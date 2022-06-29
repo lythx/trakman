@@ -23,7 +23,7 @@ export default abstract class StaticComponent {
         callback: () => { this.hide() }
       },
       {
-        event: 'Controller.BeginChallenge',
+        event: 'Controller.BeginMap',
         callback: async () => { await this.display() }
       },
       {
@@ -40,7 +40,7 @@ export default abstract class StaticComponent {
         callback: async () => { await this.display() }
       },
       {
-        event: 'Controller.BeginChallenge',
+        event: 'Controller.BeginMap',
         callback: () => { this.hide() }
       },
       {
