@@ -211,7 +211,9 @@ for (const command of commands) { TM.addCommand(command) }
 
 TM.addListener('Controller.PlayerChat', (info: MessageInfo) => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
-    TM.sendMessage(`${info.nickName} voted ${info.text.trim()}`)
+    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
+      + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `
+      + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
     void TM.addVote(TM.challenge.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
   }
 })
