@@ -146,6 +146,7 @@ export class MapService {
       addDate: new Date()
     }
     this._maps.push(obj)
+    await this.repo.add(obj)
     return obj
   }
 

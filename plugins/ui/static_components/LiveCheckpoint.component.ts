@@ -27,8 +27,6 @@ export default class LiveCheckpoint extends StaticComponent {
       const pb = TM.getPlayerRecord(info.player.login)
       if (pb !== undefined) {
         const cpIndex = info.index
-        console.log(pb.checkpoints[cpIndex])
-        console.log(cpIndex)
         const diff = pb.checkpoints[cpIndex] - info.time
         this.displayToPlayer(info.player.login, info.time, diff)
       } else {

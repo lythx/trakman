@@ -28,8 +28,6 @@ export abstract class DedimaniaService {
       this.sendRecords(info)
     })
     Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
-      console.log(info)
-      console.log('===========')
       this.addRecord(info)
     })
   }
