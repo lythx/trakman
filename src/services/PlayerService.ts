@@ -180,10 +180,10 @@ export class PlayerService {
    * @param {TMCheckpoint} cp
    * @return {Promise<void>}
    */
-  static addCP(login: string, cp: TMCheckpoint): void {
+  static addCP(login: string, cp: TMCheckpoint): boolean {
     const player: TMPlayer | undefined = this.getPlayer(login)
     if (player === undefined) {
-      return
+      return false
     }
     let laps
     if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
@@ -199,12 +199,19 @@ export class PlayerService {
       if (laps === 1 && MapService.current.checkpointsAmount === 1) {
         player.checkpoints.length = 0
         RecordService.add(MapService.current.id, login, cp.time)
+        return true
       }
-      return
+      return false
     }
-    if (player.checkpoints.length === 0) { return }
+    if (player.checkpoints.length === 0) { return false }
     const correctLap: number = player.checkpoints[0].lap + laps
-    if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(MapService.current.id, login, cp.time)
+    if (cp.lap < correctLap) {
+      player.checkpoints.push(cp)
+      return false
+    } else {
+      RecordService.add(MapService.current.id, login, cp.time)
+      return true
+    }
   }
 
   static setPlayerSpectatorStatus(login: string, status: boolean): boolean {

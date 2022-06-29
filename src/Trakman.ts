@@ -129,7 +129,7 @@ export const TRAKMAN = {
    * @returns Record object or undefined if the player doesn't have a local record
    */
   getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.records.find(a => a.login === login)
+    return RecordService.records.find(a => a.login === login && a.map === MapService.current.id)
   },
 
   /**
