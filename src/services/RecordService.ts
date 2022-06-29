@@ -70,7 +70,7 @@ export class RecordService {
     return [...this._liveRecords]
   }
 
-  static async add(map: string, login: string, score: number): Promise<void> {
+  static async add(map: string, login: string, time: number): Promise<void> {
     const date: Date = new Date()
     const player: TMPlayer | undefined = PlayerService.getPlayer(login)
     if (player === undefined) {
@@ -92,10 +92,10 @@ export class RecordService {
     const temp: any = player
     temp.checkpoints = [...checkpoints] // break the reference
     temp.map = map
-    temp.score = score
+    temp.time = time
     const finishInfo: FinishInfo = temp
-    await this.handleLocalRecord(map, login, score, date, cpAmount, [...checkpoints], player)
-    this.handleLiveRecord(map, login, score, date, cpAmount, [...checkpoints], player)
+    await this.handleLocalRecord(map, login, time, date, cpAmount, [...checkpoints], player)
+    this.handleLiveRecord(map, login, time, date, cpAmount, [...checkpoints], player)
     Events.emitEvent('Controller.PlayerFinish', finishInfo)
   }
 
