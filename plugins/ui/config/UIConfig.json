@@ -276,7 +276,7 @@
         "displayNoRecordEntry": false
     },
     "liveCheckpoint": {
-        "height": 10,
+        "height": 6,
         "title": "Live Checkpoint",
         "side": true,
         "icon": "clock"

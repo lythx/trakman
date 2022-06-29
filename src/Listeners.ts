@@ -68,9 +68,12 @@ export class Listeners {
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        PlayerService.addCP(params[1], checkpoint) // FIX CP EVENT BEING EMITTED ON FINISH // or not? idk
-        const player= PlayerService.getPlayer(params[1])
-        if(player === undefined) { return }
+        const isFinish = PlayerService.addCP(params[1], checkpoint)
+        if (isFinish === true) {
+          return
+        }
+        const player = PlayerService.getPlayer(params[1])
+        if (player === undefined) { return }
         const info: CheckpointInfo = {
           time: params[2],
           lap: params[3],
