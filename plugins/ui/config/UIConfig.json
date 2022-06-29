@@ -23,6 +23,7 @@
             "previousAndBest",
             "tmx",
             "timer",
+            "liveCheckpoint",
             "locals",
             "live"
         ],
@@ -273,6 +274,12 @@
         "topCount": 3,
         "downloadIcon": "timer.download",
         "displayNoRecordEntry": false
+    },
+    "liveCheckpoint": {
+        "height": 10,
+        "title": "Live Checkpoint",
+        "side": true,
+        "icon": "clock"
     },
     "admin": {
         "height": 5,

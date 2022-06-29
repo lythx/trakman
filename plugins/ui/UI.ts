@@ -16,6 +16,7 @@ import StaticComponent from './StaticComponent.js'
 import ButtonsWidget from './static_components/ButtonsWidget.component.js'
 import TMXRanking from './static_components/TMXRanking.component.js'
 import AdminPanel from './static_components/AdminPanel.component.js'
+import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
@@ -120,6 +121,7 @@ const events: TMEvent[] = [
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
+        new LiveCheckpoint(),
         new RankWidget(),
         new DediRanking(),
         new MapWidget(),
