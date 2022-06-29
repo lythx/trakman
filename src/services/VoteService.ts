@@ -11,7 +11,7 @@ export abstract class VoteService {
   static async initialize(): Promise<void> {
     this.repo = new VoteRepository()
     await this.repo.initialize()
-    const res = await this.repo.getAll()
+    const res: any[] = await this.repo.getAll()
     const maps: { readonly mapId: string, votes: number[] }[] = []
     for (const e of res) {
       const map = maps.find(a => a.mapId === e.map)
@@ -22,13 +22,13 @@ export abstract class VoteService {
       }
     }
     for (const e of maps) {
-      const amount = e.votes.length
-      const sum = e.votes.reduce((acc, cur) => acc + cur)
-      const ratio = ((sum / amount) / 6) + 1
+      const amount: number = e.votes.length
+      const sum: number = e.votes.reduce((acc, cur): number => acc + cur)
+      const ratio: number = ((sum / amount) / 6) + 1
       this._voteRatios.push({ mapId: e.mapId, ratio })
     }
-    for (let i = 0; i < 4; i++) {
-      const res = await this.repo.get([JukeboxService.current, ...JukeboxService.queue][i].id)
+    for (let i: number = 0; i < 4; i++) {
+      const res: any[] = await this.repo.get([JukeboxService.current, ...JukeboxService.queue][i].id)
       for (const e of res) {
         this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
       }
@@ -44,12 +44,12 @@ export abstract class VoteService {
   }
 
   static async nextMap(): Promise<void> {
-    const res = await this.repo.get(JukeboxService.queue[2].id)
+    const res: any[] = await this.repo.get(JukeboxService.queue[2].id)
     for (const e of res) {
       this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
     }
-    const valid = [JukeboxService.current]
-    for (let i = 0; i < 3; i++) {
+    const valid: TMChallenge[] = [JukeboxService.current]
+    for (let i: number = 0; i < 3; i++) {
       valid.push(JukeboxService.previous[i])
       valid.push(JukeboxService.queue[i])
     }
@@ -59,7 +59,7 @@ export abstract class VoteService {
     if (this._votes.some(a => a.mapId === mapId)) {
       return [...this._votes.filter(a => a.mapId === mapId)]
     }
-    const res = await this.repo.get(mapId)
+    const res: any[] = await this.repo.get(mapId)
     const ret: TMVote[] = []
     for (const e of res) {
       ret.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
@@ -68,14 +68,14 @@ export abstract class VoteService {
   }
 
   static async add(mapId: string, login: string, vote: number): Promise<void> {
-    const date = new Date()
-    const v = this._votes.find(a => a.mapId === mapId && a.login === login)
+    const date: Date = new Date()
+    const v: TMVote | undefined = this._votes.find(a => a.mapId === mapId && a.login === login)
     if (v !== undefined) {
       v.date = date
       v.vote = vote
       void this.repo.update(mapId, login, vote, date)
     } else {
-      const res = await this.repo.getOne(mapId, login)
+      const res: any[] = await this.repo.getOne(mapId, login)
       if (res.length === 0) {
         void this.repo.add(mapId, login, vote, date)
         if (this._votes.some(a => a.mapId === mapId)) {
