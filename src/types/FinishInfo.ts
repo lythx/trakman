@@ -9,7 +9,7 @@ interface FinishInfo {
   readonly visits: number
   readonly wins: number
   readonly privilege: number
-  readonly challenge: string
+  readonly map: string
   readonly time: number
   readonly playerId: number
   readonly ip: string

@@ -214,7 +214,7 @@ TM.addListener('Controller.PlayerChat', (info: MessageInfo) => {
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
       + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `
       + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
-    void TM.addVote(TM.challenge.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
+    void TM.addVote(TM.map.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
   }
 })
 

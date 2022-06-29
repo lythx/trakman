@@ -35,9 +35,9 @@ export default class MapWidget extends StaticComponent {
 
   private async updateXML(): Promise<void> {
     let author
-    const authorLogin = TM.challenge.author
-    const regex: RegExp = /[\da-z_ +.-]/
-    if (process.env.USE_WEBSERVICES === "YES" && regex.test(authorLogin)) {
+    const authorLogin = TM.map.author
+    const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
+    if (process.env.USE_WEBSERVICES === "YES" && !regex.test(authorLogin)) {
       const json = await TM.fetchWebServices(authorLogin)
       if (json instanceof Error) {
         TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
@@ -51,7 +51,7 @@ export default class MapWidget extends StaticComponent {
       author = authorLogin
     }
     const date = TM.TMXCurrent?.lastUpdateDate
-    const texts = [CFG.map.title, TM.safeString(TM.challenge.name), TM.safeString(author), TM.Utils.getTimeString(TM.challenge.authorTime), date === undefined ? undefined : TM.formatDate(date)]
+    const texts = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
     const icons = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     const headerCFG = CONFIG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {
