@@ -11,13 +11,13 @@ import { RecordService } from './RecordService.js'
 export class PlayerService {
   private static _players: TMPlayer[] = []
   private static repo: PlayerRepository
-  private static newOwnerLogin: string | null = null
+  private static newOwnerLogin: string | null
 
   static async initialize(repo: PlayerRepository = new PlayerRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
-    const oldOwnerLogin = (await this.repo.getOwner())?.[0]?.login
-    const newOwnerLogin = process.env.SERVER_OWNER_LOGIN
+    const oldOwnerLogin: string = (await this.repo.getOwner())?.[0]?.login
+    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
     if (newOwnerLogin === undefined || newOwnerLogin === '') { throw Error('Server owner login not specified') }
     if (oldOwnerLogin === newOwnerLogin) { return }
     this.newOwnerLogin = newOwnerLogin
@@ -38,13 +38,13 @@ export class PlayerService {
    * @returns {Promise<void>}
    */
   static async addAllFromList(): Promise<void> {
-    const playerList = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
+    const playerList: any[] | Error = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
     if (playerList instanceof Error) {
       ErrorHandler.error('Error when fetching players from the server', playerList.message)
       return
     }
     for (const player of playerList) {
-      const detailedPlayerInfo = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      const detailedPlayerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
       if (detailedPlayerInfo instanceof Error) {
         ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
         return
@@ -62,15 +62,15 @@ export class PlayerService {
    * @returns {Promise<void>}
    */
   static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean): Promise<void> {
-    const nation = path.split('|')[1]
-    let nationCode = countries.find(a => a.name === path.split('|')[1])?.code
-    if (nationCode == null) {
+    const nation: string = path.split('|')[1]
+    let nationCode: string | undefined = countries.find(a => a.name === path.split('|')[1])?.code
+    if (nationCode === undefined) {
       nationCode = 'OTH'
       ErrorHandler.error('Error adding player ' + login, 'Nation ' + nation + ' is not in the country list.')
     }
-    const playerData = (await this.repo.get(login))?.[0]
+    const playerData: any = (await this.repo.get(login))?.[0]
     let player: TMPlayer
-    if (playerData == null) {
+    if (playerData === undefined) {
       player = {
         login,
         nickName,
@@ -124,12 +124,12 @@ export class PlayerService {
    * @returns {Promise<void>}
    */
   static async leave(login: string): Promise<void> {
-    const player = this.getPlayer(login)
+    const player: TMPlayer | undefined = this.getPlayer(login)
     if (player === undefined) {
       return
     }
-    const sessionTime = Date.now() - player.joinTimestamp
-    const totalTimePlayed = sessionTime + player.timePlayed
+    const sessionTime: number = Date.now() - player.joinTimestamp
+    const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
       login: player.login,
       nickName: player.nickName,
@@ -151,11 +151,11 @@ export class PlayerService {
     this._players = this._players.filter(p => p.login !== player.login)
   }
 
-  static async fetchPlayer(login: string): Promise<DBPlayerInfo | null> {
-    const res = (await this.repo.get(login))?.[0]
-    if (res == null) { return null }
-    const nation = countries.find(a => a.code === res.nation)?.name
-    if (nation == null) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
+  static async fetchPlayer(login: string): Promise<DBPlayerInfo | undefined> {
+    const res: any = (await this.repo.get(login))?.[0]
+    if (res === undefined) { return undefined }
+    const nation: string | undefined = countries.find(a => a.code === res.nation)?.name
+    if (nation === undefined) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
     return {
       login: res.login,
       nickName: res.nickname,
@@ -170,8 +170,8 @@ export class PlayerService {
 
   static async setPrivilege(login: string, privilege: number): Promise<void> {
     await this.repo.setPrivilege(login, privilege)
-    const player = this.players.find(a => a.login === login)
-    if (player != null) { player.privilege = privilege }
+    const player: TMPlayer | undefined = this.players.find(a => a.login === login)
+    if (player !== undefined) { player.privilege = privilege }
   }
 
   /**
@@ -181,7 +181,7 @@ export class PlayerService {
    * @return {Promise<void>}
    */
   static addCP(login: string, cp: TMCheckpoint): void {
-    const player = this.getPlayer(login)
+    const player: TMPlayer | undefined = this.getPlayer(login)
     if (player === undefined) {
       return
     }
@@ -203,12 +203,12 @@ export class PlayerService {
       return
     }
     if (player.checkpoints.length === 0) { return }
-    const correctLap = player.checkpoints[0].lap + laps
+    const correctLap: number = player.checkpoints[0].lap + laps
     if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(ChallengeService.current.id, login, cp.time)
   }
 
   static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
-    const player = this._players.find(a => a.login === login)
+    const player: TMPlayer | undefined = this._players.find(a => a.login === login)
     if (player === undefined) { return false }
     player.isSpectator = status
     return true

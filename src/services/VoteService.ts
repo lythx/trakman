@@ -8,7 +8,7 @@ export abstract class VoteService {
   private static readonly _voteRatios: { readonly mapId: string, ratio: number }[] = []
   private static _votes: TMVote[] = []
 
-  static async initialize() {
+  static async initialize(): Promise<void> {
     this.repo = new VoteRepository()
     await this.repo.initialize()
     const res = await this.repo.getAll()
@@ -35,7 +35,7 @@ export abstract class VoteService {
     }
   }
 
-  static get votes() {
+  static get votes(): TMVote[] {
     return [...this._votes]
   }
 
@@ -43,7 +43,7 @@ export abstract class VoteService {
     return [...this._voteRatios]
   }
 
-  static async nextMap() {
+  static async nextMap(): Promise<void> {
     const res = await this.repo.get(JukeboxService.queue[2].id)
     for (const e of res) {
       this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
@@ -55,7 +55,7 @@ export abstract class VoteService {
     }
     this._votes = this._votes.filter(a => valid.some(b => b.id === a.mapId))
   }
-  static async fetch(mapId: string) {
+  static async fetch(mapId: string): Promise<any[]> {
     if (this._votes.some(a => a.mapId === mapId)) {
       return [...this._votes.filter(a => a.mapId === mapId)]
     }
@@ -67,7 +67,7 @@ export abstract class VoteService {
     return res
   }
 
-  static async add(mapId: string, login: string, vote: number) {
+  static async add(mapId: string, login: string, vote: number): Promise<void> {
     const date = new Date()
     const v = this._votes.find(a => a.mapId === mapId && a.login === login)
     if (v !== undefined) {
