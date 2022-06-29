@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS maps(
   laprace BOOLEAN NOT NULL,
   lapsamount INT2 NOT NULL,
   checkpointsamount INT2 NOT NULL,
-  adddate TIMESTAMP NOT NUll
+  adddate TIMESTAMP NOT NULL
 );
 `
 
