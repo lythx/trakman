@@ -16,6 +16,6 @@ interface ServerInfo {
     currentCallVoteTimeOut: number
     nextCallVoteTimeOut: number
     callVoteRatio: number
-    allowChallengeDownload: boolean
+    allowMapDownload: boolean
     autoSaveReplays: boolean
 }

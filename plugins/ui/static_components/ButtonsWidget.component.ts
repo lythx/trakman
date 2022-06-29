@@ -93,7 +93,7 @@ export default class VisitorAmount extends StaticComponent {
     // Map list
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[4].name, ICONS),
-      text1: TM.challenges.length.toString(),
+      text1: TM.maps.length.toString(),
       text2: CONFIG.buttons.titles[4],
       iconWidth: CONFIG.buttons.icons[4].width,
       iconHeight: CONFIG.buttons.icons[4].height,

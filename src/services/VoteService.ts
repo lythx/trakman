@@ -48,7 +48,7 @@ export abstract class VoteService {
     for (const e of res) {
       this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
     }
-    const valid: TMChallenge[] = [JukeboxService.current]
+    const valid: TMMap[] = [JukeboxService.current]
     for (let i: number = 0; i < 3; i++) {
       valid.push(JukeboxService.previous[i])
       valid.push(JukeboxService.queue[i])

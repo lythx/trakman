@@ -5,34 +5,34 @@ const commands: TMCommand[] = [
     aliases: ['fetchallfromdb'],
     help: 'Adds all the maps present in database if they are on TMX based on id',
     callback: async (info: MessageInfo) => {
-      const res = await TM.queryDB('SELECT * FROM challenges;')
+      const res = await TM.queryDB('SELECT * FROM maps;')
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get challenges from the database.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get maps from the database.`, info.login)
         return
       }
-      for (const challenge of res) {
-        if (TM.challenges.some(a => a.id === challenge.id))
+      for (const map of res) {
+        if (TM.maps.some(a => a.id === map.id))
           continue
-        const file = await TM.fetchTrackFileByUid(challenge.id)
+        const file = await TM.fetchTrackFileByUid(map.id)
         if (file instanceof Error) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Track ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
           continue
         }
         const write = await TM.call('WriteFile', [{ string: file.name }, { base64: file.content }])
         if (write instanceof Error) {
           TM.error('Failed to write file', write.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}file to the server.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the track ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}file to the server.`, info.login)
           continue
         }
         const insert = await TM.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
-          TM.error('Failed to insert challenge to jukebox', insert.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
+          TM.error('Failed to insert map to jukebox', insert.message)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
           continue
         }
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
           + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
-          + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from TMX.`)
+          + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
       }
     },
     privilege: 4
@@ -41,23 +41,23 @@ const commands: TMCommand[] = [
     aliases: ['addallfromdb'],
     help: 'Adds all the maps present in database if they are on the server based on filename.',
     callback: async (info: MessageInfo) => {
-      const res = await TM.queryDB('SELECT * FROM challenges;')
+      const res = await TM.queryDB('SELECT * FROM maps;')
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get challenges from the database.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get maps from the database.`, info.login)
         return
       }
-      for (const challenge of res) {
-        if (TM.challenges.some(a => a.id === challenge.id))
+      for (const map of res) {
+        if (TM.maps.some(a => a.id === map.id))
           continue
-        const insert = await TM.call('InsertChallenge', [{ string: challenge.filename }])
+        const insert = await TM.call('InsertChallenge', [{ string: map.filename }])
         if (insert instanceof Error) {
-          TM.error('Failed to insert challenge to jukebox', insert.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(challenge.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
+          TM.error('Failed to insert map to jukebox', insert.message)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the track ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
           continue
         }
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
           + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
-          + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from server files.`)
+          + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from server files.`)
       }
     },
     privilege: 4

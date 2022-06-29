@@ -20,7 +20,7 @@ export default class DediSectors extends PopupWindow {
   constructor() {
     super(IDS.DediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
     const dedis = TM.dediRecords
-    this.cpAmount = TM.challenge.checkpointsAmount - 1
+    this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(dedis.length / this.entries))
     this.paginator.onPageChange((login: string, page: number) => {
       const dedis = TM.dediRecords
@@ -43,8 +43,8 @@ export default class DediSectors extends PopupWindow {
       const page = this.paginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, dedis }, `${page}/${Math.max(1, pageCount)}`)
     })
-    TM.addListener('Controller.BeginChallenge', () => {
-      this.cpAmount = TM.challenge.checkpointsAmount
+    TM.addListener('Controller.BeginMap', () => {
+      this.cpAmount = TM.map.checkpointsAmount
       this.paginator.updatePageCount(Math.ceil(TM.dediRecords.length / this.entries))
     })
   }

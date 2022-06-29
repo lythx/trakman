@@ -3,7 +3,7 @@ import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
-import { ChallengeService } from './ChallengeService.js'
+import { MapService } from './MapService.js'
 import { Client } from '../Client.js'
 import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
@@ -22,9 +22,9 @@ export abstract class DedimaniaService {
       return status
     }
     this.updateServerPlayers()
-    const challengeDedisInfo: void | Error = await DedimaniaService.getRecords(ChallengeService.current.id, ChallengeService.current.name, ChallengeService.current.environment, ChallengeService.current.author)
-    Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
-    Events.addListener('Controller.EndChallenge', (info: EndChallengeInfo): void => {
+    const mapDedisInfo: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
+    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+    Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
       this.sendRecords(info)
     })
     Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
@@ -85,26 +85,26 @@ export abstract class DedimaniaService {
       const record: TMDedi = { login: d.Login, nickName: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
       this._dedis.push(record)
     }
-    const temp: any = ChallengeService.current
+    const temp: any = MapService.current
     temp.dedis = this._dedis
-    const challengeDedisInfo: ChallengeDedisInfo = temp
-    Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
+    const mapDedisInfo: MapDedisInfo = temp
+    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
   }
 
   private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean): Promise<void> {
     if (isRetry) { return }
     await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
-    ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`)
+    ErrorHandler.error(`Failed to fetch dedimania records for map: ${name}`)
     Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
     let status
     do {
       await new Promise((resolve) => setTimeout(resolve, 10000))
-      if (ChallengeService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
+      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
       else { return }
     } while (status instanceof Error)
   }
 
-  static async sendRecords(info: EndChallengeInfo): Promise<void> {
+  static async sendRecords(info: EndMapInfo): Promise<void> {
     const recordsArray: any = []
     for (const d of this._newDedis) {
       recordsArray.push(
@@ -130,7 +130,7 @@ export abstract class DedimaniaService {
         { array: recordsArray }
       ]
     )
-    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for challenge ${info.name}`, status.message) }
+    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for map ${info.name}`, status.message) }
   }
 
   private static addRecord(info: FinishInfo): void {
@@ -139,7 +139,7 @@ export abstract class DedimaniaService {
     if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
     if (pb === undefined) {
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
@@ -167,7 +167,7 @@ export abstract class DedimaniaService {
     if (info.time === pb) {
       const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
@@ -197,7 +197,7 @@ export abstract class DedimaniaService {
         return
       }
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
