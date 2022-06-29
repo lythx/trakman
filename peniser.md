@@ -511,6 +511,7 @@ export default class LiveCheckpoint extends StaticComponent {
 ```
 
 The widget is finished now. It should display time and difference with proper formatting like this: 
+
 ![](https://cdn.discordapp.com/attachments/522878388269088782/991816352241287249/unknown.png)
 
 Thanks for watching guys, scrubscibe
