@@ -19,7 +19,7 @@ export abstract class Client {
     const request: Request = new Request(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
-    const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method).catch((err: Error): Error => err)
+    const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
     if (!(response instanceof Error)) {
       this.callProxies(method, params, response)
     }
@@ -45,7 +45,7 @@ export abstract class Client {
   }
 
   private static async getProxyResponse(method: string, params: any[], requestId: number): Promise<void> {
-    const response: any[] | Error = await this.socket.awaitResponse(requestId, method).catch((err: Error): Error => err)
+    const response: any[] | Error = await this.socket.awaitResponse(requestId, method).catch((err: Error) => err)
     if (!(response instanceof Error)) {
       this.callProxies(method, params, response)
     }
