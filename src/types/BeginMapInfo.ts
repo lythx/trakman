@@ -1,6 +1,7 @@
-interface ChallengeDedisInfo {
+interface BeginMapInfo {
   readonly id: string
   readonly name: string
+  readonly fileName: string
   readonly author: string
   readonly environment: string
   readonly mood: string
@@ -12,5 +13,5 @@ interface ChallengeDedisInfo {
   readonly lapRace: boolean
   readonly lapsAmount: number
   readonly checkpointsAmount: number
-  readonly dedis: TMDedi[]
+  readonly records: TMRecord[]
 }

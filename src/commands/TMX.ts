@@ -20,32 +20,32 @@ const command: TMCommand = {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to write file.`, info.login)
       return
     }
-    const challenge = await TM.addChallenge(file.name)
-    if (challenge instanceof Error) {
-      if (challenge.message.trim() === 'Challenge already added. Code: -1000') {
+    const map = await TM.addMap(file.name)
+    if (map instanceof Error) {
+      if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content = file.content.toString()
         let i = 0
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
             const id = content.substring(i + 12, i + 12 + 27)
-            const challenge = TM.challenges.find(a => a.id === id)
-            if (challenge === undefined) {
-              TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the challenge.`, info.login)
+            const map = TM.maps.find(a => a.id === id)
+            if (map === undefined) {
+              TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the map.`, info.login)
               return
             }
             TM.addToJukebox(id)
-            TM.sendMessage(`${TM.palette.server}»${TM.palette.admin} Map ${TM.strip(challenge.name)} was already in the server files, added it to jukebox`)
+            TM.sendMessage(`${TM.palette.server}»${TM.palette.admin} Map ${TM.strip(map.name)} was already in the server files, added it to jukebox`)
             return
           }
           i++
         }
       }
-      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the challenge.`, info.login)
+      TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the map.`, info.login)
       return
     }
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
       `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued ` +
-      `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from TMX.`)
+      `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
   },
   privilege: 1
 }

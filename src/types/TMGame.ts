@@ -1,7 +1,7 @@
 interface TMGame {
   gameMode: number
   chatTime: number // what the fuck is this
-  challengeNo: number
+  mapNo: number
   roundsPointsLimit: number
   roundsUseNewRules: boolean // or this
   roundsForcedLaps: number
@@ -19,7 +19,7 @@ interface TMGame {
   roundsPointsLimitNewRules: number
   teamPointsLimitNewRules: number
   cupPointsLimit: number
-  cupRoundsPerChallenge: number
+  cupRoundsPerMap: number
   cupWinnersNo: number
   cupWarmUpDuration: number
 }

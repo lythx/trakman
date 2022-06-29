@@ -4,7 +4,7 @@ import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
-import { ChallengeService } from './ChallengeService.js'
+import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { RecordService } from './RecordService.js'
 
@@ -186,25 +186,25 @@ export class PlayerService {
       return
     }
     let laps
-    if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
+    if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
       laps = 1
     } else if (GameService.game.gameMode === 3) {
       laps = GameService.game.lapsNo
     } else {
-      laps = ChallengeService.current.lapsAmount
+      laps = MapService.current.lapsAmount
     }
     if (cp.index === 0) {
       player.checkpoints.unshift(cp)
       player.checkpoints.length = 1
-      if (laps === 1 && ChallengeService.current.checkpointsAmount === 1) {
+      if (laps === 1 && MapService.current.checkpointsAmount === 1) {
         player.checkpoints.length = 0
-        RecordService.add(ChallengeService.current.id, login, cp.time)
+        RecordService.add(MapService.current.id, login, cp.time)
       }
       return
     }
     if (player.checkpoints.length === 0) { return }
     const correctLap: number = player.checkpoints[0].lap + laps
-    if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(ChallengeService.current.id, login, cp.time)
+    if (cp.lap < correctLap) { player.checkpoints.push(cp) } else RecordService.add(MapService.current.id, login, cp.time)
   }
 
   static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
