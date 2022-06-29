@@ -20,7 +20,7 @@ export default class LiveCps extends PopupWindow {
   constructor() {
     super(IDS.LiveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
     const records = TM.liveRecords
-    this.cpAmount = TM.challenge.checkpointsAmount - 1
+    this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
     this.paginator.onPageChange((login: string, page: number) => {
       const records = TM.liveRecords
@@ -43,8 +43,8 @@ export default class LiveCps extends PopupWindow {
       const page = this.paginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
     })
-    TM.addListener('Controller.BeginChallenge', () => {
-      this.cpAmount = TM.challenge.checkpointsAmount
+    TM.addListener('Controller.BeginMap', () => {
+      this.cpAmount = TM.map.checkpointsAmount
       this.paginator.updatePageCount(Math.ceil(TM.liveRecords.length / this.entries))
     })
   }

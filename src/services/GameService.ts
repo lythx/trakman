@@ -15,7 +15,7 @@ export class GameService {
     this._game = {
       gameMode: info.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       chatTime: info.ChatTime,
-      challengeNo: info.NbChallenge,
+      mapNo: info.NbChallenge,
       roundsPointsLimit: info.RoundsPointsLimit,
       roundsUseNewRules: info.RoundsUseNewRules,
       roundsForcedLaps: info.RoundsForcedLaps,
@@ -33,7 +33,7 @@ export class GameService {
       roundsPointsLimitNewRules: info.RoundsPointsLimitNewRules,
       teamPointsLimitNewRules: info.TeamPointsLimitNewRules,
       cupPointsLimit: info.CupPointsLimit,
-      cupRoundsPerChallenge: info.CupRoundsPerChallenge,
+      cupRoundsPerMap: info.CupRoundsPerChallenge,
       cupWinnersNo: info.CupNbWinners,
       cupWarmUpDuration: info.CupWarmUpDuration
     }
