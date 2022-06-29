@@ -15,19 +15,19 @@ export class RecordService {
   static async initialize(repo: RecordRepository = new RecordRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
-    const res = await this.repo.getAll()
+    const res: any[] = await this.repo.getAll()
     for (const record of res) { this._records.push({ challenge: record.challenge, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
   }
 
   static async fetchRecords(challengeId: string): Promise<LocalRecord[]> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
-    const records = await this.repo.get(challengeId)
-    records.sort((a, b) => a.score - b.score)
-    const n = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
-    for (let i = 0; i < n; i++) {
-      const player = await PlayerService.fetchPlayer(records[i].login)
-      if (player == null) {
+    const records: any[] = await this.repo.get(challengeId)
+    records.sort((a, b): number => a.score - b.score)
+    const n: number = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
+    for (let i: number = 0; i < n; i++) {
+      const player: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(records[i].login)
+      if (player === undefined) {
         ErrorHandler.fatal('Cant find login in players table even though it has record in records table.')
         return []
       }
@@ -52,9 +52,9 @@ export class RecordService {
     return this._localRecords
   }
 
-  static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | null> {
-    const res = (await this.repo.getByLogin(challengeId, login))?.[0]
-    if (res == null) { return null }
+  static async fetchRecord(challengeId: string, login: string): Promise<TMRecord | undefined> {
+    const res: any = (await this.repo.getByLogin(challengeId, login))?.[0]
+    if (res === undefined) { return undefined }
     return { challenge: challengeId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
 
@@ -71,12 +71,12 @@ export class RecordService {
   }
 
   static async add(challenge: string, login: string, score: number): Promise<void> {
-    const date = new Date()
-    const player = PlayerService.getPlayer(login)
+    const date: Date = new Date()
+    const player: TMPlayer | undefined = PlayerService.getPlayer(login)
     if (player === undefined) {
       return
     }
-    const cpsPerLap = ChallengeService.current.checkpointsAmount
+    const cpsPerLap: number = ChallengeService.current.checkpointsAmount
     let laps
     if (GameService.game.gameMode === 1 || !ChallengeService.current.lapRace) {
       laps = 1
@@ -87,8 +87,8 @@ export class RecordService {
     } else {
       laps = ChallengeService.current.lapsAmount
     }
-    const cpAmount = cpsPerLap * laps
-    const checkpoints = [...player.checkpoints.map(a => a.time)]
+    const cpAmount: number = cpsPerLap * laps
+    const checkpoints: number[] = [...player.checkpoints.map(a => a.time)]
     const temp: any = player
     temp.checkpoints = [...checkpoints] // break the reference
     temp.challenge = challenge
@@ -104,9 +104,9 @@ export class RecordService {
       checkpoints.length = 0
       return
     }
-    const pb = this._localRecords.find(a => a.login === login)?.time
-    const position = this._localRecords.filter(a => a.time <= score).length + 1
-    if (pb == null) {
+    const pb: number | undefined = this._localRecords.find(a => a.login === login)?.time
+    const position: number = this._localRecords.filter(a => a.time <= score).length + 1
+    if (pb === undefined) {
       const recordInfo: RecordInfo = {
         challenge,
         login,
@@ -153,7 +153,7 @@ export class RecordService {
       return
     }
     if (score === pb) {
-      const previousPosition = this.records.findIndex(a => a.login === this.records.find(a => a.login === login)?.login) + 1
+      const previousPosition: number = this.records.findIndex(a => a.login === this.records.find(a => a.login === login)?.login) + 1
       const recordInfo: RecordInfo = {
         challenge,
         login,
@@ -180,7 +180,7 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore = this._localRecords.find(a => a.login === login)?.time
+      const previousScore: number | undefined = this._localRecords.find(a => a.login === login)?.time
       if (previousScore === undefined) {
         ErrorHandler.error(`Can't find player ${login} in memory`)
         return
@@ -238,9 +238,9 @@ export class RecordService {
       checkpoints.length = 0
       return
     }
-    const pb = this._liveRecords.find(a => a.login === login)?.time
-    const position = this._liveRecords.filter(a => a.time <= score).length + 1
-    if (pb == null) {
+    const pb: number | undefined = this._liveRecords.find(a => a.login === login)?.time
+    const position: number = this._liveRecords.filter(a => a.time <= score).length + 1
+    if (pb === undefined) {
       const recordInfo: RecordInfo = {
         challenge,
         login,
@@ -285,7 +285,7 @@ export class RecordService {
       return
     }
     if (score === pb) {
-      const previousPosition = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === login)?.login) + 1
+      const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === login)?.login) + 1
       const recordInfo: RecordInfo = {
         challenge,
         login,
@@ -312,7 +312,7 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore = this._liveRecords.find(a => a.login === login)?.time
+      const previousScore: number | undefined = this._liveRecords.find(a => a.login === login)?.time
       if (previousScore === undefined) {
         ErrorHandler.error(`Can't find player ${login} in memory`)
         return

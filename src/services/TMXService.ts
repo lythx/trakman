@@ -9,17 +9,17 @@ export abstract class TMXService {
   private static readonly _previous: (TMXTrackInfo | null)[] = []
   private static _current: TMXTrackInfo | null
   private static readonly _next: (TMXTrackInfo | null)[] = []
-  private static readonly prefixes = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
+  private static readonly prefixes: string[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly nextSize = 4
   private static readonly previousSize = 4
 
   static async initialize(): Promise<void> {
     if (process.env.USE_TMX !== 'YES') { return }
-    const current = await this.fetchTrackInfo(JukeboxService.current.id)
+    const current: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.current.id)
     this._current = current instanceof Error ? null : current
-    for (let i = 0; i < Math.min(JukeboxService.queue.length, this.nextSize); i++) {
-      const id = JukeboxService.queue[i].id
-      const track = await this.fetchTrackInfo(id)
+    for (let i: number = 0; i < Math.min(JukeboxService.queue.length, this.nextSize); i++) {
+      const id: string = JukeboxService.queue[i].id
+      const track: TMXTrackInfo | Error = await this.fetchTrackInfo(id)
       this._next.push(track instanceof Error ? null : track)
     }
   }
@@ -28,24 +28,24 @@ export abstract class TMXService {
     if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current)
     this._previous.length = Math.min(this._previous.length, this.previousSize)
-    const next = this._next.shift()
+    const next: TMXTrackInfo | null | undefined = this._next.shift()
     if (next === undefined) {
       ErrorHandler.error(`TMX didn't get prefetched for some reason, this should never happen`)
       return
     }
     this._current = next
-    const replays = this._current?.replays
+    const replays: TMXReplay[] | undefined = this._current?.replays
     if (replays !== undefined && replays.length > 0) {
-      for (let i = 0; i < Math.min(3, replays.length); i++) {
+      for (let i: number = 0; i < Math.min(3, replays.length); i++) {
         const res = await fetch(replays[i].url).catch((err: Error) => err)
         if (!(res instanceof Error)) {
-          const file = await res.arrayBuffer()
+          const file: ArrayBuffer = await res.arrayBuffer()
           const parser = new GBXParser(Buffer.from(file))
           replays[i].login = parser.getLogin()
         }
       }
     }
-    const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(track instanceof Error ? null : track)
   }
 
@@ -57,15 +57,15 @@ export abstract class TMXService {
 
   static async add(id: string, index: number): Promise<void | Error> {
     if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
-    const track = await this.fetchTrackInfo(id)
+    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(id)
     this._next.splice(index, 0, track instanceof Error ? null : track)
     this._next.length = this.nextSize
   }
 
-  static async remove(index: number) {
+  static async remove(index: number): Promise<void> {
     if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
     this._next.splice(index, 1)
-    const track = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(track instanceof Error ? null : track)
   }
 
@@ -89,18 +89,18 @@ export abstract class TMXService {
    */
   static async fetchTrackFile(id: number, game: string = 'TMNF'): Promise<TMXFileData | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
-    const prefix = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
+    const prefix: string = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => err)
     if (res instanceof Error) {
       ErrorHandler.error(res.message)
       return res
     }
-    const nameHeader = res.headers.get('content-disposition')
+    const nameHeader: string | null = res.headers.get('content-disposition')
     if (nameHeader === null) { return new Error('Cannot read track name') }
     // The header is inconsistent for some reason, I hate TMX
-    const name = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
-    const data = await res.arrayBuffer()
-    const buffer = Buffer.from(data)
+    const name: string = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
+    const data: ArrayBuffer = await res.arrayBuffer()
+    const buffer: Buffer = Buffer.from(data)
     return { name, content: buffer }
   }
 
@@ -109,8 +109,8 @@ export abstract class TMXService {
    */
   static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
-    let data = ''
-    let prefix = ''
+    let data: string = ''
+    let prefix: string = ''
     for (const p of this.prefixes) {
       const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
       if (res instanceof Error) {
@@ -124,9 +124,9 @@ export abstract class TMXService {
       }
     }
     if (prefix === '') { return new Error('Cannot fetch track data from TMX') }
-    const s = data.split('\t')
-    const id = Number(s[0])
-    const site = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
+    const s: string[] = data.split('\t')
+    const id: number = Number(s[0])
+    const site: string = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
     return await this.fetchTrackFile(id, site)
   }
 
@@ -135,8 +135,8 @@ export abstract class TMXService {
    */
   static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
-    let data = ''
-    let prefix = ''
+    let data: string = ''
+    let prefix: string = ''
     for (const p of this.prefixes) {
       const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
       if (res instanceof Error) {
@@ -153,14 +153,18 @@ export abstract class TMXService {
       this._current = null
       return new Error('Cannot fetch track data from TMX')
     }
-    const s = data.split('\t')
-    const TMXId = Number(s[0])
-    const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`)
-    const replaysData = (await replaysRes.text()).split('\r\n')
+    const s: string[] = data.split('\t')
+    const TMXId: number = Number(s[0])
+    const replaysRes = await fetch(`https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`).catch((err: Error) => err)
+    if (replaysRes instanceof Error) {
+      ErrorHandler.error(replaysRes.message)
+      return replaysRes
+    }
+    const replaysData: string[] = (await replaysRes.text()).split('\r\n')
     replaysData.pop()
     const replays: TMXReplay[] = []
     for (const r of replaysData) {
-      const rs = r.split('\t')
+      const rs: string[] = r.split('\t')
       replays.push({
         id: Number(rs[0]),
         userId: Number(rs[1]),

@@ -40,7 +40,7 @@ export default class LiveCps extends PopupWindow {
     this.cpPaginator.onPageChange((login: string, cpPage: number) => {
       const records = TM.liveRecords
       const pageCount = this.paginator.pageCount
-      const page = this.paginator.getPageByLogin(login)?? 1
+      const page = this.paginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
     })
     TM.addListener('Controller.BeginChallenge', () => {
@@ -69,11 +69,11 @@ export default class LiveCps extends PopupWindow {
     const cpTypes = getCpTypes(params.records.map(a => a.checkpoints))
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(TM.strip(params.records[i + n].nickName, false), w, h)
+      return centeredText(CONFIG.static.format + TM.strip(params.records[i + n].nickName, false), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      let ret = centeredText(params.records[i + n].login, w, h)
+      let ret = centeredText(CONFIG.static.format + params.records[i + n].login, w, h)
       if (login === params.records[i + n].login) {
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -91,34 +91,34 @@ export default class LiveCps extends PopupWindow {
       }
       if (((j - 2 === this.cpsPerPage && params.cpPage === 1) || (j - 3 === this.cpsPerPage && params.cpPage !== 1))
         && record?.checkpoints?.[(j - 2) + cpIndex] !== undefined) {
-        return centeredText(TM.Utils.getTimeString(record.time), w, h)
+        return centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)
       }
       if (record?.checkpoints?.[(j - 2) + cpIndex] === undefined) {
         if (record?.checkpoints?.[(j - 3) + cpIndex] !== undefined) {
           return `<format textcolor="${colour}"/>
-            ${centeredText(TM.Utils.getTimeString(record.time), w, h)}`
+            ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)}`
         }
         return ''
       }
       return `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(record.checkpoints[(j - 2) + cpIndex]), w, h)}`
+        ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.checkpoints[(j - 2) + cpIndex]), w, h)}`
     }
     let grid: Grid
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText('Login', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 1).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
+        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j - 1).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array(this.cpsPerPage - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText('Nickname ', w, h),
-        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 1) + cpIndex).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
+        ...new Array(cpsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + ((j - 1) + cpIndex).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array((this.cpsPerPage + 2) - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.cpsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })

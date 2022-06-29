@@ -13,27 +13,27 @@ export abstract class JukeboxService {
     private static _current: TMChallenge
     private static readonly _previous: TMChallenge[] = []
 
-    static initialize() {
+    static initialize(): void {
         this._current = { ...ChallengeService.current }
-        const currentIndex = ChallengeService.challenges.findIndex(a => a.id === this._current.id)
-        const lgt = ChallengeService.challenges.length
-        for (let i = 1; i <= 30; i++) {
+        const currentIndex: number = ChallengeService.challenges.findIndex(a => a.id === this._current.id)
+        const lgt: number = ChallengeService.challenges.length
+        for (let i: number = 1; i <= 30; i++) {
             this._queue.push({ challenge: ChallengeService.challenges[(i + currentIndex) % lgt], isForced: false })
         }
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
     }
 
-    static nextChallenge() {
+    static nextChallenge(): void {
         this._previous.unshift(this._current)
         this._previous.length = Math.min(30, this._previous.length)
         this._current = ChallengeService.current
         if (this._current.id === this._queue[0].challenge.id) {
             this._queue.shift()
             if (this._queue.length < 30) {
-                let currentIndex = ChallengeService.challenges.findIndex(a => a.id === this._current.id)
-                const lgt = ChallengeService.challenges.length
+                let currentIndex: number = ChallengeService.challenges.findIndex(a => a.id === this._current.id)
+                const lgt: number = ChallengeService.challenges.length
                 let current: TMChallenge
-                let i = 0
+                let i: number = 0
                 do {
                     i++
                     current = ChallengeService.challenges[(i + currentIndex) % lgt]
@@ -45,10 +45,10 @@ export abstract class JukeboxService {
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
     }
 
-    static add(challengeId: string) {
-        const challenge = ChallengeService.challenges.find(a => a.id === challengeId)
+    static add(challengeId: string): void | Error {
+        const challenge: TMChallenge | undefined = ChallengeService.challenges.find(a => a.id === challengeId)
         if (challenge === undefined) { return new Error(`Can't find map with id ${challengeId} in`) }
-        const index = this._queue.findIndex(a => a.isForced === false)
+        const index: number = this._queue.findIndex(a => a.isForced === false)
         this._queue.splice(index, 0, { challenge, isForced: true })
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
         TMXService.add(challengeId, index)
@@ -56,9 +56,9 @@ export abstract class JukeboxService {
 
     static remove(challengeId: string): boolean {
         if (!this._queue.filter(a => a.isForced === true).some(a => a.challenge.id === challengeId)) { return false }
-        const index = this._queue.findIndex(a => a.challenge.id === challengeId)
+        const index: number = this._queue.findIndex(a => a.challenge.id === challengeId)
         this._queue.splice(index, 1)
-        const q = ChallengeService.challenges.find(a => !this._queue.some(b => b.challenge.id === a.id))
+        const q: TMChallenge | undefined = ChallengeService.challenges.find(a => !this._queue.some(b => b.challenge.id === a.id))
         if (q !== undefined) { this._queue.push({ challenge: q, isForced: false }) }
         else { this._queue.push({ challenge: this._previous[0], isForced: false }) }
         ChallengeService.setNextChallenge(this._queue[0].challenge.id)
@@ -66,19 +66,19 @@ export abstract class JukeboxService {
         return true
     }
 
-    static get jukebox() {
+    static get jukebox(): TMChallenge[] {
         return [...this._queue.filter(a => a.isForced === true).map(a => a.challenge)]
     }
 
-    static get queue() {
+    static get queue(): TMChallenge[] {
         return [...this._queue.map(a => a.challenge)]
     }
 
-    static get previous() {
+    static get previous(): TMChallenge[] {
         return [...this._previous]
     }
 
-    static get current() {
+    static get current(): TMChallenge {
         return this._current
     }
 

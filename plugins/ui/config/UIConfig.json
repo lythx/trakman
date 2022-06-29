@@ -107,7 +107,7 @@
         "icon": "karmaStats"
     },
     "timer": {
-        "height": 6.2,
+        "height": 6.45,
         "side": true,
         "title": "Timer",
         "icon": "clock",
@@ -318,9 +318,9 @@
             "slower": "person.green"
         },
         "timeColours": {
-            "slower": "FFFF",
+            "slower": "CCCF",
             "faster": "F00F",
-            "you": "0F0F",
+            "you": "3F5F",
             "top": "FF0F"
         },
         "info": {

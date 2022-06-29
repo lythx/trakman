@@ -36,7 +36,8 @@ export default class MapWidget extends StaticComponent {
   private async updateXML(): Promise<void> {
     let author
     const authorLogin = TM.challenge.author
-    if (process.env.USE_WEBSERVICES === "YES" && authorLogin.match(/[\da - z_ +.-]/)) {
+    const regex: RegExp = /[\da-z_ +.-]/
+    if (process.env.USE_WEBSERVICES === "YES" && regex.test(authorLogin)) {
       const json = await TM.fetchWebServices(authorLogin)
       if (json instanceof Error) {
         TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
@@ -85,7 +86,7 @@ export default class MapWidget extends StaticComponent {
           })}
       </frame>`
     }
-    const arr= new Array(4).fill(cell)
+    const arr = new Array(4).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
