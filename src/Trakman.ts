@@ -46,7 +46,7 @@ export const TRAKMAN = {
   getTitle(player: any): string {
     const title: string = TRAKMAN.titles[player.privilege]
     const specialTitle = TRAKMAN.specialTitles.find(a => a.login === player.login)
-    if (specialTitle != null) {
+    if (specialTitle !== undefined) {
       return specialTitle.title
     }
     return title
@@ -153,7 +153,7 @@ export const TRAKMAN = {
   /**
    * Calls a dedicated server method and awaits the response
    * @param method Dedicated server method to be executed
-   * @param params Params for the dedicated server method
+   * @param params Optional params for the dedicated server method
    * @returns Server response or error if the server returns one
    */
   async call(method: string, params: any[] = []): Promise<any[] | Error> {
@@ -163,7 +163,7 @@ export const TRAKMAN = {
   /**
    * Calls a dedicated server method without caring for the response
    * @param method Dedicated server method to be executed
-   * @param params Params for the dedicated server method
+   * @param params Optional params for the dedicated server method
    */
   callNoRes(method: string, params: any[] = []): void {
     Client.callNoRes(method, params)
@@ -177,7 +177,7 @@ export const TRAKMAN = {
   async multiCall(...calls: TMCall[]): Promise<CallResponse[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
-      const params = c.params == null ? [] : c.params
+      const params: any[] = c.params === undefined ? [] : c.params
       arr.push({
         struct: {
           methodName: { string: c.method },
@@ -185,7 +185,7 @@ export const TRAKMAN = {
         }
       })
     }
-    const res = await Client.call('system.multicall', [{ array: arr }])
+    const res: any[] | Error = await Client.call('system.multicall', [{ array: arr }])
     if (res instanceof Error) {
       return res
     }
@@ -201,7 +201,7 @@ export const TRAKMAN = {
   multiCallNoRes(...calls: TMCall[]): void {
     const arr: any[] = []
     for (const c of calls) {
-      const params = c.params == null ? [] : c.params
+      const params: any[] = c.params === undefined ? [] : c.params
       arr.push({
         struct: {
           methodName: { string: c.method },
@@ -218,7 +218,7 @@ export const TRAKMAN = {
    * @param login Optional player login (or comma-joined list of logins)
    */
   sendMessage(message: string, login?: string): void {
-    if (login != null) {
+    if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
       return
     }
@@ -471,13 +471,13 @@ export const TRAKMAN = {
   /**
    * Parses the 'time' type of TMCommand parameter
    * @param timeString String to be parsed to number
-   * @returns Parsed number (in milliseconds) or null if no number supplied
+   * @returns Parsed number (in milliseconds) or undefined if no number supplied
    */
-  parseParamTime: (timeString: string): number | null => {
+  parseParamTime: (timeString: string): number | undefined => {
     if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes
     const unit: string = timeString.substring(timeString.length - 1).toLowerCase()
     const time: number = Number(timeString.substring(0, timeString.length - 1))
-    if (isNaN(time)) { return null }
+    if (isNaN(time)) { return undefined }
     switch (unit) {
       case 's':
         return time * 1000
@@ -488,33 +488,33 @@ export const TRAKMAN = {
       case 'd':
         return time * 1000 * 60 * 60 * 24
       default:
-        return null
+        return undefined
     }
   },
 
   /**
-   * TODO
-   * @param methods 
-   * @param callback 
+   * Adds a callback listener which will be executed when one of the specified dedicated methods gets called
+   * @param methods Array of dedicated server methods
+   * @param callback Callback to execute
    */
   addProxy: (methods: string[], callback: Function): void => {
     Client.addProxy(methods, callback)
   },
 
   /**
-   * TODO
+   * Removes a player record
    * @param login Player login
    * @param challengeId Map UID
-   * @returns 
+   * @returns Database response
    */
   removeRecord: async (login: string, challengeId: string): Promise<any[]> => {
     return await RecordService.remove(login, challengeId)
   },
 
   /**
-   * TODO
-   * @param challengeId 
-   * @returns 
+   * Removes all player records on given map
+   * @param challengeId Map UID
+   * @returns Databse response
    */
   removeAllRecords: async (challengeId: string): Promise<any[]> => {
     return await RecordService.removeAll(challengeId)
