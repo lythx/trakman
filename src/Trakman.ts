@@ -61,11 +61,11 @@ export const TRAKMAN = {
   strip(str: string, removeColours: boolean = true): string {
     let regex: RegExp
     if (removeColours) {
-      regex = /\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][]|(?=[][])|$)|\$[LHP]\[.*?\](.*?)\$[LHP]|\$[LHP]\[.*?\]|\$[SHWIPLONGTZ]/gi
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
     } else {
-      regex = /\$(?:[^][]|(?=[][])|$),\$[LHP]\[.*?\](.*?)\$[LHP]|\$[LHP]\[.*?\]|\$[SHWIPLONGTZ]/gi
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
     }
-    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$')
+    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
   },
 
   /**
