@@ -6,7 +6,7 @@ import { ChatService } from './services/ChatService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
 import 'dotenv/config'
 import { GameService } from './services/GameService.js'
-import { ChallengeService } from './services/ChallengeService.js'
+import { MapService } from './services/MapService.js'
 import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { ServerConfig } from './ServerConfig.js'
@@ -134,9 +134,9 @@ export class Listeners {
         await ServerConfig.update()
         await GameService.initialize()
         await RecordService.fetchRecords(params[0].UId)
-        await ChallengeService.setCurrent()
+        await MapService.setCurrent()
         const c: any = params[0]
-        const info: BeginChallengeInfo = {
+        const info: BeginMapInfo = {
           id: c.UId,
           name: c.Name,
           fileName: c.FileName,
@@ -154,14 +154,14 @@ export class Listeners {
           records: RecordService.records
         }
         const lastId: string = JukeboxService.current.id
-        JukeboxService.nextChallenge()
-        if (lastId === JukeboxService.current.id) { TMXService.restartChallenge() }
+        JukeboxService.nextMap()
+        if (lastId === JukeboxService.current.id) { TMXService.restartMap() }
         else {
-          await TMXService.nextChallenge()
+          await TMXService.nextMap()
           await VoteService.nextMap()
         }
         ServerConfig.update()
-        Events.emitEvent('Controller.BeginChallenge', info)
+        Events.emitEvent('Controller.BeginMap', info)
         if (process.env.USE_DEDIMANIA === 'YES') { await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author) }
       }
     },
@@ -169,13 +169,13 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
-        const temp: any = ChallengeService.current
+        const temp: any = MapService.current
         temp.records = RecordService.records
         temp.isRestarted = params[4]
         temp.wasWarmUp = params[2]
-        temp.continuesOnNextChallenge = params[3]
-        const endChallengeInfo: EndChallengeInfo = temp
-        Events.emitEvent('Controller.EndChallenge', endChallengeInfo)
+        temp.continuesOnNextMap = params[3]
+        const endMapInfo: EndMapInfo = temp
+        Events.emitEvent('Controller.EndMap', endMapInfo)
       }
     },
     {

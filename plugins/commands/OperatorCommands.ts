@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 const commands: TMCommand[] = [
   {
     aliases: ['al', 'addlocal'],
-    help: 'Add a challenge from your pc.',
+    help: 'Add a map from your pc.',
     // todo params
     callback: async (info: MessageInfo) => {
       const split = info.text.split(' ')
@@ -25,14 +25,14 @@ const commands: TMCommand[] = [
       }
       const insert = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        TM.error('Failed to insert challenge to jukebox', insert.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the challenge into queue.`, info.login)
+        TM.error('Failed to insert map to jukebox', insert.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const res = await TM.call('GetNextChallengeInfo')
       if (res instanceof Error) {
-        TM.error('Failed to get next challenge info', res.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next challenge info.`, info.login)
+        TM.error('Failed to get next map info', res.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
       const name = res[0].Name
@@ -65,14 +65,14 @@ const commands: TMCommand[] = [
       }
       const insert = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        TM.error('Failed to insert challenge to jukebox', insert.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the challenge into queue.`, info.login)
+        TM.error('Failed to insert map to jukebox', insert.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const nextInfo = await TM.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
-        TM.error('Failed to get next challenge info', nextInfo.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next challenge info.`, info.login)
+        TM.error('Failed to get next map info', nextInfo.message)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
       const name = nextInfo[0].Name
@@ -87,17 +87,17 @@ const commands: TMCommand[] = [
     help: 'Remove the current track from the playlist.',
     callback: async (info: MessageInfo) => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
-      // TODO: Implement remove challenge
-      const challenge = TM.challenge
-      const res = await TM.call('RemoveChallenge', [{ string: challenge.fileName }])
-      if (res instanceof Error) { // This can happen if the challenge was already removed
-        TM.error(`Couldn't remove ${challenge.fileName} from the playlist.`, res.message)
+      // TODO: Implement remove map
+      const map = TM.map
+      const res = await TM.call('RemoveChallenge', [{ string: map.fileName }])
+      if (res instanceof Error) { // This can happen if the map was already removed
+        TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.admin} from the playlist.`)
+        + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from the playlist.`)
     },
     privilege: 1
   },
@@ -142,7 +142,7 @@ const commands: TMCommand[] = [
       // DOESNT SKIP
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
-      TM.addToJukebox(TM.previousChallenges[0].id)
+      TM.addToJukebox(TM.previousMaps[0].id)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
     },
