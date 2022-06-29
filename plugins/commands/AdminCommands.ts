@@ -387,6 +387,55 @@ const commands: TMCommand[] = [
       )
     },
     privilege: 2
+  },
+  {
+    aliases: ['tmpl', 'teammaxpoints'],
+    help: 'Set the maximum amount of points for team mode.',
+    params: [{name: 'limit', type: 'int'}],
+    callback: async(info: MessageInfo, limit: number) => {
+       	await TM.callNoRes('SetTeamPointsLimit', [{int: limit}])
+      TM.sendMessage(`${info.nickName} ${TM.palette.servermsg}set the points limit to ${TM.palette.highlight}${limit}.`)
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['fpt', 'forceteam'],
+    help: 'Force a player into a team.',
+    params: [{name: 'player'}, {name: 'team'}],
+    callback: async(info: MessageInfo, player: string, team: string) => {
+      let teamnum: number
+      let teamcolor: string
+      switch(team.toLowerCase()) {
+        case 'blue':
+          teamnum = 0
+          teamcolor = `${TM.colours.blue}`
+          break
+        case 'red':
+          teamnum = 1
+          teamcolor = `${TM.colours.red}`
+          break
+          default:
+            TM.sendMessage(`${TM.palette.error}Invalid team type.`, info.login)
+            return
+      }
+      const playerinfo = TM.getPlayer(player)
+      if(playerinfo === undefined) {
+        return TM.sendMessage(`${TM.palette.error}Player not found.`, info.login)
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has put `
+            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickName)} ${TM.palette.admin}to the ${teamcolor + team.toUpperCase()}${TM.palette.admin} team.`
+        }]
+      },
+        {
+          method: 'ForcePlayerTeam',
+          params: [{string: player}, {int: teamnum}]
+        })
+    },
+    privilege: 2
   }
 ]
 
