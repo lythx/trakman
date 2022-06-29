@@ -246,9 +246,10 @@ export default class LiveCheckpoint extends StaticComponent {
 }
 ```
 The widget should look like this
+
 ![](https://cdn.discordapp.com/attachments/522878388269088782/991745867008716810/unknown.png)
 
-Let's display the cp time now. For that we will need to add listener for Controller.PlayerCheckpoint event in constructor and display the widget with checkpoint on it.
+Let's display the cp time now. Cp time will be different for every player and has to be updated after player crosses a checkpoint so we will need to add listener for Controller.PlayerCheckpoint event in constructor and call displayToPlayer in it. We also need to pass the cp time in displayToPlayer params
 
 ## Paginator
 Pagintor is a tool which creates the buttons to switch pages, and adds functionality to them
