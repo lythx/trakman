@@ -28,7 +28,7 @@ export default class PreviousAndBest extends StaticComponent {
     TM.sendManialink(this.xml, login)
   }
 
-  private constructXml() {
+  private constructXml(): void {
     // Z posn is set to -37 because the previous best text is at around -36 
     this.xml = `
     <manialink id="${this.id}">

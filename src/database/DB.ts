@@ -5,7 +5,7 @@ import { ErrorHandler } from '../ErrorHandler.js'
 const { Pool } = postgres
 
 export class Database {
-  private readonly client = new Pool({
+  private readonly client: postgres.Pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,

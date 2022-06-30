@@ -10,26 +10,26 @@ export default class TMXRanking extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly recordList: RecordList
-  private readonly maxRecords = 20
+  private readonly maxRecords: number = 20
 
   constructor() {
     super(IDS.TMXRanking, 'race')
     this.height = CONFIG.tmx.height
     this.width = CONFIG.static.width
-    const side = CONFIG.tmx.side
+    const side: boolean = CONFIG.tmx.side
     this.positionX = side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('tmx')
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, true)
-    this.recordList.onClick((info: ManialinkClickInfo) => {
+    this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.LiveRecord', (info: RecordInfo) => {
+    TM.addListener('Controller.LiveRecord', (info: RecordInfo): void => {
       if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
@@ -44,7 +44,7 @@ export default class TMXRanking extends StaticComponent {
 
   displayToPlayer(login: string): void {
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo = TM.TMXCurrent
+    const tmxInfo: TMXTrackInfo | null = TM.TMXCurrent
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }

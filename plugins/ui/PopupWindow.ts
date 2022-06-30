@@ -1,6 +1,6 @@
 import { TRAKMAN as TM } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
-import {  CONFIG, IDS } from './UiUtils.js'
+import { CONFIG, IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.json' assert { type: 'json' }
 import Navbar from './utils/Navbar.js'
 
@@ -23,8 +23,8 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly headerHeight: number = 4
   protected readonly headerBg: string = CONFIG.popup.headerBg
   protected readonly bg: string = CONFIG.popup.bg
-  protected readonly margin = CONFIG.popup.margin
-  protected readonly headerPageWidth = 10
+  protected readonly margin: number = CONFIG.popup.margin
+  protected readonly headerPageWidth: number = 10
 
   constructor(windowId: number, headerIcon: string, title: string, navbar: { action: number, name: string }[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
@@ -39,7 +39,7 @@ export default abstract class PopupWindow extends DynamicComponent {
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight);
     [this.headerLeft, this.headerRight, this.frameMidBottom, this.frameBottom] = this.constructFrame()
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === this.openId) { this.onOpen(info) }
       else if (info.answer === this.closeId) { this.onClose(info) }
     })
@@ -54,9 +54,9 @@ export default abstract class PopupWindow extends DynamicComponent {
   }
 
   private constructFrame(): string[] {
-    let navbarBg = ''
-    const lgt = this.navbar.buttons.length
-    for (let i = 0; i < lgt; i++) {
+    let navbarBg: string = ''
+    const lgt: number = this.navbar.buttons.length
+    for (let i: number = 0; i < lgt; i++) {
       navbarBg += `<quad posn="${((this.windowWidth + this.margin) / lgt) * i} 0 2" sizen="${(this.windowWidth + this.margin) / lgt - this.margin} ${this.navbarHeight - this.margin}" bgcolor="${this.headerBg}"/>`
     }
     return [
@@ -96,8 +96,8 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected abstract constructFooter(login: string, params: any): string
 
   displayToPlayer(login: string, params?: any, topRightText?: string): void {
-    const content = this.constructContent(login, params)
-    const footer = this.constructFooter(login, params)
+    const content: string = this.constructContent(login, params)
+    const footer: string = this.constructFooter(login, params)
     TM.sendManialink(`${this.headerLeft}
     <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" valign="center" halign="center"/>
     ${this.headerRight}

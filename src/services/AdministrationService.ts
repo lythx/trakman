@@ -12,10 +12,10 @@ export class AdministrationService {
     private static readonly _guestlist: { readonly login: string, readonly date: Date, readonly callerLogin: string }[] = []
 
     // MUTELIST DOESNT DO ANYTHING YET, WILL IMPLEMENT AFTER WE DO MANUALCHATROUTING
-    static async initialize() {
+    static async initialize(): Promise<void> {
         this.repo = new AdministrationRepository()
         await this.repo.initialize()
-        let res = await this.repo.getBanlist()
+        let res: any[] = await this.repo.getBanlist()
         for (const e of res) {
             this._banlist.push({ ip: e.ip, login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason, expireDate: e.expires })
         }
@@ -31,8 +31,8 @@ export class AdministrationService {
         for (const e of res) {
             this._guestlist.push({ login: e.login, date: e.date, callerLogin: e.callerLogin })
         }
-        setInterval(() => {
-            const date = new Date()
+        setInterval((): void => {
+            const date: Date = new Date()
             for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
                 this.removeFromBanlist(e.login)
             }
@@ -40,22 +40,22 @@ export class AdministrationService {
                 this.removeFromBlacklist(e.login)
             }
         }, 5000)
-        const guestList = await Client.call('GetGuestList', [{ int: 5000 }, { int: 0 }])
+        const guestList: any[] | Error = await Client.call('GetGuestList', [{ int: 5000 }, { int: 0 }])
         if (guestList instanceof Error) {
             ErrorHandler.fatal('Failed to fetch guestlist', 'Server responded with error:', guestList.message)
             return
         }
         for (const login of this._guestlist.map(a => a.login)) {
-            if (!guestList.some((a: any) => a.Login === login)) {
-                const res = await Client.call('AddGuest', [{ string: login }])
+            if (!guestList.some((a: any): boolean => a.Login === login)) {
+                const res: any[] | Error = await Client.call('AddGuest', [{ string: login }])
                 if (res instanceof Error) {
                     ErrorHandler.error(`Failed to add login ${login} to guestlist`, `Server responded with error:`, res.message)
                 }
             }
         }
-        for (const login of guestList.map((a: any) => a.Login)) {
-            if (!this._guestlist.some((a: any) => a.login === login)) {
-                const res = await Client.call('RemoveGuest', [{ string: login }])
+        for (const login of guestList.map((a): any => a.Login)) {
+            if (!this._guestlist.some((a: any): boolean => a.login === login)) {
+                const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
                 if (res instanceof Error) {
                     ErrorHandler.error(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
                 }
@@ -79,13 +79,13 @@ export class AdministrationService {
         return [...this._banlist]
     }
 
-    static async addToBanlist(ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date) {
-        const date = new Date()
+    static async addToBanlist(ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+        const date: Date = new Date()
         this._banlist.push({ ip, login, date, callerLogin, reason, expireDate })
         await this.repo.addToBanlist(ip, login, date, callerLogin, reason, expireDate)
     }
 
-    static async removeFromBanlist(login: string) {
+    static async removeFromBanlist(login: string): Promise<void> {
         this._banlist.splice(this._banlist.findIndex(a => a.login === login), 1)
         await this.repo.removeFromBanlist(login)
     }
@@ -94,13 +94,13 @@ export class AdministrationService {
         return [...this._blacklist]
     }
 
-    static async addToBlacklist(login: string, callerLogin: string, reason?: string, expireDate?: Date) {
-        const date = new Date()
+    static async addToBlacklist(login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+        const date: Date = new Date()
         this._blacklist.push({ login, date, callerLogin, reason, expireDate })
         await this.repo.addToBlacklist(login, date, callerLogin, reason, expireDate)
     }
 
-    static async removeFromBlacklist(login: string) {
+    static async removeFromBlacklist(login: string): Promise<void> {
         this._blacklist.splice(this._blacklist.findIndex(a => a.login === login), 1)
         await this.repo.removeFromBlacklist(login)
     }
@@ -109,13 +109,13 @@ export class AdministrationService {
         return [...this._mutelist]
     }
 
-    static async addToMutelist(login: string, callerLogin: string, reason?: string, expireDate?: Date) {
-        const date = new Date()
+    static async addToMutelist(login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+        const date: Date = new Date()
         this._mutelist.push({ login, date, callerLogin, reason, expireDate })
         await this.repo.addToMutelist(login, date, callerLogin, reason, expireDate)
     }
 
-    static async removeFromMutelist(login: string) {
+    static async removeFromMutelist(login: string): Promise<void> {
         this._mutelist.splice(this._mutelist.findIndex(a => a.login === login), 1)
         await this.repo.removeFromMutelist(login)
     }
@@ -126,9 +126,9 @@ export class AdministrationService {
 
     static async addToGuestlist(login: string, callerLogin: string): Promise<void | Error> {
         if (this._guestlist.some(a => a.login === login)) { return }
-        const date = new Date()
+        const date: Date = new Date()
         // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
-        const add = await Client.call('AddGuest', [{ string: login }])
+        const add: any[] | Error = await Client.call('AddGuest', [{ string: login }])
         if (add instanceof Error) {
             return add
         }
@@ -140,7 +140,7 @@ export class AdministrationService {
     static async removeFromGuestlist(login: string): Promise<void | Error> {
         if (!this._guestlist.some(a => a.login === login)) { return }
         // TODO do multicall after implementing multicall errors, and check loading guestlist from different files
-        const remove = await Client.call('RemoveGuest', [{ string: login }])
+        const remove: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
         if (remove instanceof Error) {
             return remove
         }

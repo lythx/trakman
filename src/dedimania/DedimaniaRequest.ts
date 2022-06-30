@@ -1,5 +1,5 @@
 export class DedimaniaRequest {
-  readonly buffer = Buffer.from(
+  readonly buffer: Buffer = Buffer.from(
     'POST /Dedimania HTTP/1.1\r\n' +
     'Host: dedimania.net\r\n' +
     'User-Agent: XMLaccess\r\n' +
@@ -12,15 +12,15 @@ export class DedimaniaRequest {
   * Prepares XML string for a dedimania request.
   * @param {String} method dedimania method
   * @param {Object[]} params parameters, each param needs to be under key named after its type
-   * @param {string} sessionKey
+  * @param {string} sessionKey
   */
   constructor(method: string, params: object[], sessionKey?: string) {
-    let xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
+    let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       xml += `<param><value>${this.handleParamType(param)}</value></param>`
     }
     xml += '</params></methodCall>'
-    const xmlBuffer = Buffer.from(xml)
+    const xmlBuffer: Buffer = Buffer.from(xml)
     if (sessionKey === undefined) {
       this.buffer = Buffer.concat([
         this.buffer,
@@ -37,7 +37,7 @@ export class DedimaniaRequest {
   }
 
   private handleParamType(param: any): any {
-    const type = Object.keys(param)[0]
+    const type: string = Object.keys(param)[0]
     switch (Object.keys(param)[0]) {
       case 'boolean':
         return `<boolean>${param[type] === true ? '1' : '0'}</boolean>`
@@ -50,7 +50,7 @@ export class DedimaniaRequest {
       case 'base64':
         return `<base64>${param[type]}</base64>`
       case 'array': {
-        let arr = '<array><data>'
+        let arr: string = '<array><data>'
         for (const el of param[type]) {
           arr += `<value>${this.handleParamType(el)}</value>`
         }
@@ -58,7 +58,7 @@ export class DedimaniaRequest {
         return arr
       }
       case 'struct': {
-        let str = '<struct>'
+        let str: string = '<struct>'
         for (const key in param[type]) {
           str += `<member><name>${key}</name><value>${this.handleParamType(param[type][key])}</value></member>`
         }
@@ -76,6 +76,6 @@ export class DedimaniaRequest {
       '"': '&quot;',
       "'": '&#039;'
     }
-    return str.replace(/[&<>"']/g, (m) => { return map[m as keyof typeof map] })
+    return str.replace(/[&<>"']/g, (m): string => { return map[m as keyof typeof map] })
   }
 }

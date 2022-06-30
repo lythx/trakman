@@ -9,7 +9,7 @@ export class Socket extends net.Socket {
   private handshakeHeader: string = ''
   private handshakeStatus: string = ''
   private response: Response | null = null
-  private receivingResponse = false
+  private receivingResponse: boolean = false
   private responses: Response[] = []
   private incompleteHeader: Buffer | null = null
 
@@ -37,8 +37,8 @@ export class Socket extends net.Socket {
   * @returns {Promise<String>} handshake status
   */
   async awaitHandshake(): Promise<string> {
-    const startTimestamp = Date.now()
-    return await new Promise((resolve, reject) => {
+    const startTimestamp: number = Date.now()
+    return await new Promise((resolve, reject): void => {
       const poll = (): void => {
         if (this.handshakeStatus === 'Handshake success') {
           resolve(this.handshakeStatus)
@@ -61,10 +61,10 @@ export class Socket extends net.Socket {
   * @returns {Promise<any[]>} array of server return values
   */
   async awaitResponse(id: number, method: string): Promise<any[]> {
-    const startTimestamp = Date.now()
-    return await new Promise((resolve, reject) => {
+    const startTimestamp: number = Date.now()
+    return await new Promise((resolve, reject): void => {
       const poll = (): void => {
-        const response = this.responses.find(a => a.id === id && a.status === 'completed')
+        const response: Response | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
         if (response !== undefined) {
           if (response.isError) {
             reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
@@ -121,7 +121,7 @@ export class Socket extends net.Socket {
     if (this.response === null) { return }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {
-      const nextResponseBuffer = this.response.extractOverload()
+      const nextResponseBuffer: Buffer = this.response.extractOverload()
       if (this.response.isEvent) {
         Events.emitEvent(this.response.eventName, this.response.json)
       } else {

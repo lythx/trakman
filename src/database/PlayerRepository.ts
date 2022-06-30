@@ -1,7 +1,7 @@
 import { Repository } from './Repository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
-const createQuery = `
+const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
     login varchar(25) primary key not null,
     nickname varchar(45) not null,
@@ -12,7 +12,7 @@ const createQuery = `
     visits int4 not null default 1
   );
 `
-const updateQuery = `UPDATE players SET 
+const updateQuery: string = `UPDATE players SET 
         nickname=$1,
         nation=$2,
         wins=$3,
@@ -20,12 +20,12 @@ const updateQuery = `UPDATE players SET
         visits=$5
         WHERE login=$6;
 `
-const setTimeQuery = `UPDATE players SET 
+const setTimeQuery: string = `UPDATE players SET 
         timePlayed=$1
         WHERE login=$2;
 `
-const getQuery = 'SELECT * FROM players WHERE login = $1'
-const addQuery = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
+const getQuery: string = 'SELECT * FROM players WHERE login = $1'
+const addQuery: string = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
 
 export class PlayerRepository extends Repository {
   async initialize(): Promise<void> {

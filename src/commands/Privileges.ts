@@ -7,14 +7,14 @@ const commands: TMCommand[] = [
     aliases: ['mad', 'masteradmin'],
     help: 'Change player privilege to Masteradmin.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -42,14 +42,14 @@ const commands: TMCommand[] = [
     aliases: ['ad', 'admin'],
     help: 'Change player privilege to Admin.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -82,14 +82,14 @@ const commands: TMCommand[] = [
     aliases: ['op', 'operator'],
     help: 'Change player privilege to Operator.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -122,14 +122,14 @@ const commands: TMCommand[] = [
     aliases: ['rp', 'user'],
     help: 'Remove player priveleges.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -161,14 +161,14 @@ const commands: TMCommand[] = [
     aliases: ['dcmds', 'disablecommands'],
     help: 'Disable player commands.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
       if (targetLogin == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return

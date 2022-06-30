@@ -5,7 +5,7 @@ import { PlayerService } from './PlayerService.js'
 import { Client } from '../Client.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
-const messagesArraySize = 250
+const messagesArraySize: number = 250
 
 export abstract class ChatService {
 
@@ -19,13 +19,13 @@ export abstract class ChatService {
   }
 
   static addCommand(command: TMCommand): void {
-    const prefix = command.privilege === 0 ? '/' : '//'
+    const prefix: string = command.privilege === 0 ? '/' : '//'
     // this could be 1000x more effective. too bad
     this._commandList.push(command)
-    this._commandList.sort((a, b) => a.aliases[0].localeCompare(b.aliases[0]))
-    Events.addListener('Controller.PlayerChat', async (info: MessageInfo) => {
-      const input = info.text?.trim()
-      if (!command.aliases.some((alias: string) => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {
+    this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
+    Events.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
+      const input: string = info.text?.trim()
+      if (!command.aliases.some((alias: string): boolean => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {
         return
       }
       if (info.privilege < command.privilege) {
@@ -69,8 +69,8 @@ export abstract class ChatService {
                 parsedParams.push(Number(params[i]) * 1000 * 60)
                 break
               } // If there's no modifier then time is treated as minutes
-              const unit = params[i].substring(params[i].length - 1).toLowerCase()
-              const time = Number(params[i].substring(0, params[i].length - 1))
+              const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
+              const time: number = Number(params[i].substring(0, params[i].length - 1))
               if (isNaN(time)) {
                 TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.`, info.login)
                 return
@@ -93,10 +93,10 @@ export abstract class ChatService {
               }
               break
             case 'multiword':
-              const split = input.split(' ')
-              let n = 0
+              const split: string[] = input.split(' ')
+              let n: number = 0
               while (true) {
-                const chunk = split.shift()
+                const chunk: string | undefined = split.shift()
                 if (params[n] === chunk) {
                   if (n === i) {
                     parsedParams.push([chunk, ...split].join(' '))
@@ -133,7 +133,7 @@ export abstract class ChatService {
   }
 
   static async loadLastSessionMessages(): Promise<void> {
-    const result = await this.repo.get(messagesArraySize)
+    const result: any[] = await this.repo.get(messagesArraySize)
     for (const m of result) {
       const message: TMMessage = {
         id: m.id,
@@ -153,8 +153,8 @@ export abstract class ChatService {
       date: new Date()
     }
     this.messages.unshift(message)
-    const player = PlayerService.players.find(a => a.login === login)
-    if (player == null) { throw new Error(`Cannot find player ${login} in the memory`) }
+    const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
+    if (player === undefined) { throw new Error(`Cannot find player ${login} in the memory`) }
     const messageInfo: MessageInfo = {
       id: message.id,
       login,
@@ -181,7 +181,7 @@ export abstract class ChatService {
     return await this.repo.getByLogin(login, limit)
   }
 
-  static get commandList() {
+  static get commandList(): TMCommand[] {
     return [...this._commandList]
   }
 
