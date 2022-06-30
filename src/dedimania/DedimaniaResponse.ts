@@ -12,7 +12,7 @@ export class DedimaniaResponse {
 
   addData(data: string): void {
     this._data += data
-    const split = this._data.split('\n')
+    const split: string[] = this._data.split('\n')
     if (split[split.length - 1] === '</methodResponse>' && split[0] === 'HTTP/1.1 200 OK\r') {
       for (const row of split) {
         if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }
@@ -54,7 +54,7 @@ export class DedimaniaResponse {
   private generateJson(): void {
     let json: any
     // parse xml to json
-    xml2js.parseString(this._xml.toString(), (err, result) => {
+    xml2js.parseString(this._xml.toString(), (err, result): void => {
       if (err != null) {
         throw err
       }
@@ -81,9 +81,9 @@ export class DedimaniaResponse {
 
   // i hate XML
   private fixNesting(obj: any): any[] {
-    const arr = []
-    const changeType: any = (value: any, type: string) => {
-      const arr = []
+    const arr: any[] = []
+    const changeType: any = (value: any, type: string): any => {
+      const arr: any[] = []
       const obj: any = {}
       switch (type) {
         case 'boolean':
@@ -96,9 +96,9 @@ export class DedimaniaResponse {
           return Buffer.from(value, 'base64')
         case 'struct':
           for (const el of value.member) {
-            const key = el.name[0]
-            const t = Object.keys(el.value[0])[0]
-            const val = el.value[0][t][0]
+            const key: any = el.name[0]
+            const t: string = Object.keys(el.value[0])[0]
+            const val: any = el.value[0][t][0]
             obj[key] = changeType(val, t)
           }
           return obj
@@ -107,13 +107,13 @@ export class DedimaniaResponse {
             if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             if (el?.value?.[0] != null) { // dediman sends an array without telling you its an array
               for (const e of el.value) {
-                const t = Object.keys(e)[0]
-                const val = e[t][0]
+                const t: string = Object.keys(e)[0]
+                const val: any = e[t][0]
                 arr.push(changeType(val, t))
               }
             } else {
-              const t = Object.keys(el.value[0])[0]
-              const val = el.value[0][t][0]
+              const t: string = Object.keys(el.value[0])[0]
+              const val: any = el.value[0][t][0]
               arr.push(changeType(val, t))
             }
           }
@@ -128,22 +128,22 @@ export class DedimaniaResponse {
     }
     for (const param of obj.params) {
       for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
-        const value = p.value[0]
+        const value: any = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
             if (el.data[0]?.value == null) { // some methods dont return value here too
               continue
             }
             for (const val of el.data[0].value) {
-              const type = Object.keys(val)[0]
+              const type: string = Object.keys(val)[0]
               arr.push(changeType(val[type][0], type))
             }
           }
         } else if (Object.keys(value)[0] === 'struct') {
           const obj: any = {}
           for (const el of value.struct[0].member) {
-            const key = el.name[0]
-            const type = Object.keys(el.value[0])[0]
+            const key: any = el.name[0]
+            const type: string = Object.keys(el.value[0])[0]
             obj[key] = changeType(el.value[0][type][0], type)
           }
           arr.push(obj)
