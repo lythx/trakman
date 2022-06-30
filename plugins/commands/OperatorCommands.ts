@@ -178,53 +178,59 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['m', 'mute'],
-    help: 'Mute a specific player.',
-    // TODO params: [{}],
-    callback: (info: MessageInfo): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
+    help: 'Mutelist a specific player.',
+    params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
+    callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
+        targetInfo = await TM.fetchPlayer(login)
+        if (targetInfo === undefined) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
+          return
+        }
+      }
+      const res: void | Error = await TM.addToMutelist(targetInfo.login, info.login, reason, expireDate)
+      if (res instanceof Error) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to mute list.`, info.login)
         return
       }
-      TM.multiCallNoRes({
-        method: 'ChatSendServerMessage',
-        params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has muted `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
-        }]
-      },
-        {
-          method: 'Ignore',
-          params: [{ string: targetInfo.login }]
-        })
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
+      const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has muted `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
     },
-    privilege: 1
+    privilege: 2
   },
   {
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
-    // TODO params
-    callback: (info: MessageInfo): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
-      if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
+      if (TM.mutelist.some(a => a.login === login) === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not muted.`, info.login)
         return
       }
-      TM.multiCallNoRes({
-        method: 'ChatSendServerMessage',
-        params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unmuted `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
-        }]
-      },
-        {
-          method: 'UnIgnore',
-          params: [{ string: targetInfo.login }]
-        })
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      if (targetInfo === undefined) {
+        targetInfo = await TM.fetchPlayer(login)
+        if (targetInfo == null) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
+          return
+        }
+      }
+      const res: void | Error = await TM.removeFromMutelist(targetInfo.login)
+      if (res instanceof Error) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from mute list.`, info.login)
+        return
+      }
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unmuted `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+      )
     },
-    privilege: 1
+    privilege: 2
   },
   {
     aliases: ['fs', 'forcespec'],
