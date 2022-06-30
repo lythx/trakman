@@ -10,29 +10,29 @@ export default class DediRanking extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly recordList: RecordList
-  private readonly maxDedis = Number(process.env.DEDIS_AMOUNT)
+  private readonly maxDedis: number = Number(process.env.DEDIS_AMOUNT)
 
   constructor() {
     super(IDS.DediRanking, 'race')
     this.height = CONFIG.dedis.height
     this.width = CONFIG.static.width
-    const side = CONFIG.dedis.side
+    const side: boolean = CONFIG.dedis.side
     this.positionX = side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('dedis')
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall), CONFIG.dedis.entries, side, CONFIG.dedis.topCount, this.maxDedis, CONFIG.dedis.displayNoRecordEntry)
-    this.recordList.onClick((info: ManialinkClickInfo) => {
+    this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.DedimaniaRecords', () => {
+    TM.addListener('Controller.DedimaniaRecords', (): void => {
       this.display()
     })
-    TM.addListener('Controller.DedimaniaRecord', () => {
+    TM.addListener('Controller.DedimaniaRecord', (): void => {
       this.display()
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
   }

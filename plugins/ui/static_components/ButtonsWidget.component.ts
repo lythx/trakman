@@ -35,9 +35,9 @@ export default class VisitorAmount extends StaticComponent {
 
   private constructXml(): void {
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
-    const marginSmall = CONFIG.static.marginSmall
+    const marginSmall: number = CONFIG.static.marginSmall
     for (const e of this.iconData) {
-      arr.push((i: number, j: number, w: number, h: number) => constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
+      arr.push((i: number, j: number, w: number, h: number): string => constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
     }
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
@@ -48,7 +48,7 @@ export default class VisitorAmount extends StaticComponent {
 
   private initialize = async (): Promise<void> => {
     // Visit counter
-    const res = await TM.queryDB('SELECT count(*) FROM players;')
+    const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
@@ -61,8 +61,8 @@ export default class VisitorAmount extends StaticComponent {
       padding: CONFIG.buttons.icons[0].padding
     })
     // Player and spectator counter
-    const all = TM.players
-    const players = all.filter(a => !a.isSpectator).length
+    const all: TMPlayer[] = TM.players
+    const players: number = all.filter(a => !a.isSpectator).length
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[1].name, ICONS),
       text1: `${all.length - players} ${CONFIG.buttons.titles[1].split(' ')[0]}`,
@@ -135,7 +135,7 @@ export default class VisitorAmount extends StaticComponent {
       equalTexts: true
     })
     // Vote to skip
-    const s = CONFIG.buttons.titles[8].split(' ')
+    const s: string[] = CONFIG.buttons.titles[8].split(' ')
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[8].name, ICONS),
       text1: s.shift() as any,
@@ -146,7 +146,7 @@ export default class VisitorAmount extends StaticComponent {
       actionId: IDS.TMXWindow
     })
     // Vote to replay
-    const s2 = CONFIG.buttons.titles[9].split(' ')
+    const s2: string[] = CONFIG.buttons.titles[9].split(' ')
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[9].name, ICONS),
       text1: s2.shift() as any,
@@ -157,8 +157,8 @@ export default class VisitorAmount extends StaticComponent {
       actionId: IDS.TMXWindow
     })
     // Pay to skip
-    const title = CONFIG.buttons.titles[10]
-    const s3 = title.replace(/\$\$/, '300').split(' ')
+    const title: string = CONFIG.buttons.titles[10]
+    const s3: string[] = title.replace(/\$\$/, '300').split(' ')
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[10].name, ICONS),
       text1: (s3.shift() as any) + ' ' + (s3.shift() as any),
@@ -169,8 +169,8 @@ export default class VisitorAmount extends StaticComponent {
       actionId: IDS.TMXWindow
     })
     // Pay to replay
-    const title2 = CONFIG.buttons.titles[11]
-    const s4 = title2.replace(/\$\$/, '100').split(' ')
+    const title2: string = CONFIG.buttons.titles[11]
+    const s4: string[] = title2.replace(/\$\$/, '100').split(' ')
     this.iconData.push({
       icon: stringToObjectProperty(CONFIG.buttons.icons[11].name, ICONS),
       text1: (s4.shift() as any) + ' ' + (s4.shift() as any),

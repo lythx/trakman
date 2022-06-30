@@ -11,7 +11,7 @@ export default abstract class StaticComponent {
     [
       {
         event: 'Controller.PlayerJoin',
-        callback: async (info: JoinInfo) => {
+        callback: async (info: JoinInfo): Promise<void> => {
           if (this._isDisplayed)
             await this.displayToPlayer(info.login)
         }
@@ -20,15 +20,15 @@ export default abstract class StaticComponent {
     [
       {
         event: 'TrackMania.EndChallenge',
-        callback: () => { this.hide() }
+        callback: (): void => { this.hide() }
       },
       {
         event: 'Controller.BeginMap',
-        callback: async () => { await this.display() }
+        callback: async (): Promise<void> => { await this.display() }
       },
       {
         event: 'Controller.PlayerJoin',
-        callback: async (info: JoinInfo) => {
+        callback: async (info: JoinInfo): Promise<void> => {
           if (this._isDisplayed)
             await this.displayToPlayer(info.login)
         }
@@ -37,15 +37,15 @@ export default abstract class StaticComponent {
     [
       {
         event: 'TrackMania.EndChallenge',
-        callback: async () => { await this.display() }
+        callback: async (): Promise<void> => { await this.display() }
       },
       {
         event: 'Controller.BeginMap',
-        callback: () => { this.hide() }
+        callback: (): void => { this.hide() }
       },
       {
         event: 'Controller.PlayerJoin',
-        callback: async (info: JoinInfo) => {
+        callback: async (info: JoinInfo): Promise<void> => {
           if (this._isDisplayed)
             await this.displayToPlayer(info.login)
         }

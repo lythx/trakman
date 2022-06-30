@@ -6,9 +6,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['ct', 'colourtest'],
     help: 'Display all the colours in order [TO BE REMOVED].',
-    callback: () => {
-      const col = Object.values(TM.colours)
-      TM.sendMessage(col.map((v) => `${v}>`).join(' '))
+    callback: (): void => {
+      const col: string[] = Object.values(TM.colours)
+      TM.sendMessage(col.map((v): string => `${v}>`).join(' '))
     },
     privilege: 0
   },
@@ -17,7 +17,7 @@ const commands: TMCommand[] = [
     aliases: ['hi', 'hey', 'hello'],
     help: 'Greet a certain someone.',
     params: [{ name: 'name', optional: true }],
-    callback: (info: MessageInfo, name: string) => {
+    callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Hey, ${name || 'everyone'}!`)
     },
     privilege: 0
@@ -25,7 +25,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['bb', 'bye'],
     params: [{ name: 'name', optional: true }],
-    callback: (info: MessageInfo, name: string) => {
+    callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Goodbye, ${name || 'everyone'}!`)
     },
     privilege: 0
@@ -34,7 +34,7 @@ const commands: TMCommand[] = [
     aliases: ['ty', 'tx', 'thx', 'thanks'], // Can add like every single one of them idk
     help: 'Express your gratitude.',
     params: [{ name: 'name', optional: true }],
-    callback: (info: MessageInfo, name: string) => {
+    callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Thanks, ${name || 'everyone'}!`)
     },
     privilege: 0
@@ -43,7 +43,7 @@ const commands: TMCommand[] = [
     aliases: ['gg', 'goodgame'],
     help: 'Inform others that you\'ve enjoyed the race.',
     params: [{ name: 'name', optional: true }],
-    callback: (info: MessageInfo, name: string) => {
+    callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Good game, ${name || 'everyone'}!`)
     },
     privilege: 0
@@ -51,7 +51,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['bgm'],
     help: 'Let others know you didn\'t do your best.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Bad game for me! :,(`)
     },
     privilege: 0
@@ -59,7 +59,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['brb'],
     help: 'Notify people of your potential absence.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Be right back!`)
     },
     privilege: 0
@@ -67,7 +67,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       await TM.multiCall(
         {
           method: 'ForceSpectator',
@@ -92,7 +92,7 @@ const commands: TMCommand[] = [
     aliases: ['me', 'mfw'],
     help: 'Express the deep emotions hidden within your sinful soul.',
     params: [{ name: 'thoughts', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, thoughts?: string) => {
+    callback: (info: MessageInfo, thoughts?: string): void => {
       TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
@@ -100,7 +100,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['lol'],
     help: 'Indicate your amusement.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] LoL!`)
     },
     privilege: 0
@@ -108,7 +108,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['lool'],
     help: 'Indicate your excess amusement.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoL!`)
     },
     privilege: 0
@@ -116,7 +116,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['loool'],
     help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
@@ -124,7 +124,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['h', 'help', 'helpall'],
     help: 'Display current map dedimania checkpoints.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.CommandList, info.login)
     },
     privilege: 0
@@ -132,7 +132,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['tmxinfo'],
     help: 'Display TMX info.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.TMXWindow, info.login)
     },
     privilege: 0
@@ -140,7 +140,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['cp', 'cptms', 'recs'],
     help: 'Display current map local checkpoints.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.LocalCps, info.login)
     },
     privilege: 0
@@ -148,7 +148,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['dcp', 'dedicptms', 'dedirecs'],
     help: 'Display current map dedimania checkpoints.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.DediCps, info.login)
     },
     privilege: 0
@@ -156,7 +156,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['lcp', 'livecptms', 'liverecs'],
     help: 'Display current map live checkpoints.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.LiveCps, info.login)
     },
     privilege: 0
@@ -164,7 +164,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['sc', 'sectms'],
     help: 'Display current map local sectors.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.LocalSectors, info.login)
     },
     privilege: 0
@@ -172,7 +172,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['dsc', 'dedisectms'],
     help: 'Display current map dedimania sectors.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.DediSectors, info.login)
     },
     privilege: 0
@@ -180,7 +180,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['lsc', 'livesectms'],
     help: 'Display current map live sectors.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.LiveSectors, info.login)
     },
     privilege: 0
@@ -189,7 +189,7 @@ const commands: TMCommand[] = [
     // TODO IMPLEMENT MAP SEARCH
     aliases: ['l', 'list'],
     help: 'Display list of maps.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.JukeboxWindow, info.login)
     },
     privilege: 0
@@ -198,7 +198,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['qwe'],
     params: [{ name: 'nickName' }],
-    callback: (info: MessageInfo, nickName: string) => {
+    callback: (info: MessageInfo, nickName: string): void => {
       TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
     },
     privilege: 0
@@ -207,8 +207,8 @@ const commands: TMCommand[] = [
     aliases: ['pm', 'dm'],
     params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
     help: 'Message a player.',
-    callback: (info: MessageInfo, login: string, text: string) => {
-      const playerInfo = TM.getPlayer(login)
+    callback: (info: MessageInfo, login: string, text: string): void => {
+      const playerInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (playerInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
@@ -223,7 +223,7 @@ for (const command of commands) { TM.addCommand(command) }
 
 // votes
 
-TM.addListener('Controller.PlayerChat', (info: MessageInfo) => {
+TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
       + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `

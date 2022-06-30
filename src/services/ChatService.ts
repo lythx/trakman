@@ -5,7 +5,7 @@ import { PlayerService } from './PlayerService.js'
 import { Client } from '../Client.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
-const messagesArraySize = 250
+const messagesArraySize: number = 250
 
 export abstract class ChatService {
 
@@ -19,7 +19,7 @@ export abstract class ChatService {
   }
 
   static addCommand(command: TMCommand): void {
-    const prefix = command.privilege === 0 ? '/' : '//'
+    const prefix: string = command.privilege === 0 ? '/' : '//'
     // this could be 1000x more effective. too bad
     this._commandList.push(command)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))

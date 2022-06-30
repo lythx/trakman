@@ -7,20 +7,20 @@ const ID = IDS.Paginator
 
 export default class Paginator {
 
-  buttonCount = 0
+  buttonCount: number = 0
   readonly parentId: number
   readonly loginPages: { readonly login: string, page: number }[] = []
   readonly defaultPage: number
-  readonly buttonW = CONFIG.paginator.buttonWidth
-  readonly buttonH = CONFIG.paginator.buttonHeight
-  readonly padding = CONFIG.paginator.padding
-  readonly iconW = this.buttonW - this.padding * 2
-  readonly iconH = this.buttonH - this.padding * 2
+  readonly buttonW: number = CONFIG.paginator.buttonWidth
+  readonly buttonH: number = CONFIG.paginator.buttonHeight
+  readonly padding: number = CONFIG.paginator.padding
+  readonly iconW: number = this.buttonW - this.padding * 2
+  readonly iconH: number = this.buttonH - this.padding * 2
   readonly ids: number[] = []
   readonly width: number
   readonly height: number
-  readonly margin = CONFIG.paginator.margin
-  readonly emptyBg = CONFIG.paginator.background
+  readonly margin: number = CONFIG.paginator.margin
+  readonly emptyBg: string = CONFIG.paginator.background
   pageCount: number
   yPos: number
   xPos: number[]
@@ -34,7 +34,7 @@ export default class Paginator {
     this.defaultPage = defaultPage
     this.yPos = -(parentHeight / 2)
     this.noMidGap = noMidGap ?? false
-    if(noMidGap === undefined) {
+    if (noMidGap === undefined) {
       this.xPos = [
         parentWidth / 2 - (this.buttonW + this.margin) * 3,
         parentWidth / 2 - (this.buttonW + this.margin) * 2,
@@ -59,17 +59,17 @@ export default class Paginator {
     if (pageCount > 10) { this.buttonCount = 3 }
   }
 
-  onPageChange(callback: (login: string, page: number) => void) {
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+  onPageChange(callback: (login: string, page: number) => void): void {
+    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (this.ids.includes(info.answer)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)
         if (playerPage === undefined) { // Should never happen
-          const page = this.getPageFromClick(info.answer, this.defaultPage)
+          const page: number = this.getPageFromClick(info.answer, this.defaultPage)
           this.loginPages.push({ login: info.login, page: page })
           callback(info.login, page)
           return
         }
-        const page = this.getPageFromClick(info.answer, playerPage.page)
+        const page: number = this.getPageFromClick(info.answer, playerPage.page)
         playerPage.page = page
         callback(info.login, page)
       }
@@ -80,21 +80,21 @@ export default class Paginator {
     return this.loginPages.find(a => a.login === login)?.page
   }
 
-  updatePageCount(pageCount: number) {
+  updatePageCount(pageCount: number): void {
     this.pageCount = pageCount
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }
   }
 
- private getPageFromClick(id: number, page: number) {
+  private getPageFromClick(id: number, page: number): number {
     switch (id) {
       case this.parentId + ID.previous:
         page--
         if (page < 1) { return 1 }
         return page
       case this.parentId + ID.next: {
-        const lastPage = this.pageCount
+        const lastPage: number = this.pageCount
         page++
         if (page > lastPage) { return lastPage }
         return page
@@ -107,7 +107,7 @@ export default class Paginator {
         if (page < 1) { return page = 1 }
         return page
       case this.parentId + ID.jumpForwards: {
-        const lastPage = this.pageCount
+        const lastPage: number = this.pageCount
         page += 10
         if (page > lastPage) { return lastPage }
         return page
@@ -117,11 +117,11 @@ export default class Paginator {
     }
   }
 
-  constructXml(page: number) {
+  constructXml(page: number): string {
     if (this.buttonCount === 0) {
       return ``
     }
-    let xml = ''
+    let xml: string = ''
     if (page !== 1) {
       xml += `<quad posn="${this.xPos[2]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.previous}" 
         imagefocus="${ICN.arrowL}"
