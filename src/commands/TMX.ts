@@ -34,7 +34,9 @@ const command: TMCommand = {
               return
             }
             TM.addToJukebox(id)
-            TM.sendMessage(`${TM.palette.server}»${TM.palette.admin} Map ${TM.strip(map.name)} was already in the server files, added it to jukebox`)
+            TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin} ` +
+              `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} is already on the server, ` +
+              `it will be ${TM.palette.highlight}queued ${TM.palette.admin}instead.`, info.login)
             return
           }
           i++

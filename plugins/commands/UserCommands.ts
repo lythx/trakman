@@ -205,14 +205,15 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['pm', 'dm'],
-    params: [{name: 'login'}, {name: 'text', type: 'multiword', optional: true}],
+    params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
     help: 'Message a player.',
     callback: (info: MessageInfo, login: string, text: string) => {
-      if(TM.getPlayer(login) === undefined) {
-        TM.sendMessage(`${TM.palette.error}Player is not on server, or login is invalid.`, info.login)
+      const playerInfo = TM.getPlayer(login)
+      if (playerInfo === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
-      } 
-      TM.sendMessage(`${TM.palette.error}-PM-$g[${info.nickName}$z$s$g => ${TM.getPlayer(login)?.nickName}$z$s$g] ${text}`, [info.login, login].join())
+      }
+      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickName}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
   }
