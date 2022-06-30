@@ -21,7 +21,7 @@ export default class DediSectors extends PopupWindow {
     super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, ['dediCps', 'localCps', 'localSectors', 'liveCps', 'liveSectors'])
     const dedis: TMDedi[] = TM.dediRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(dedis.length / this.entries))
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(dedis.length / this.entries))
     this.paginator.onPageChange((login: string, page: number): void => {
       const dedis: TMDedi[] = TM.dediRecords
       const pageCount: number = this.paginator.pageCount
@@ -36,7 +36,7 @@ export default class DediSectors extends PopupWindow {
         cpPages++
       }
     }
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.footerHeight, cpPages, 1, true)
     this.cpPaginator.onPageChange((login: string, cpPage: number): void => {
       const dedis: TMDedi[] = TM.dediRecords
       const pageCount: number = this.paginator.pageCount
@@ -134,13 +134,11 @@ export default class DediSectors extends PopupWindow {
         arr.push(nickNameCell, ...new Array(this.sectorsPerPage + 3).fill(cell))
       }
     }
-    return `<frame posn="0 ${-this.margin} 3">
-    ${grid.constructXml(arr)}
-    </frame>`
+    return grid.constructXml(arr)
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
-    return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
+    return `${closeButton(this.closeId, this.windowWidth, this.footerHeight)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth - this.paginatorOffset} 0 3">
       ${this.cpPaginator.constructXml(params.cpPage)}
