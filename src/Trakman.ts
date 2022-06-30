@@ -428,8 +428,8 @@ export const TRAKMAN = {
    * Removes a player from the server blacklist
    * @param login Player login
    */
-  removeFromBlacklist: (login: string): void => {
-    AdministrationService.removeFromBlacklist(login)
+  removeFromBlacklist: async (login: string): Promise<void | Error> => {
+    return await AdministrationService.removeFromBlacklist(login)
   },
 
   /**
@@ -439,16 +439,16 @@ export const TRAKMAN = {
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
    */
-  addToMutelist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
+  addToMutelist: async (login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<void | Error> => {
+    return await AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
   },
 
   /**
    * Removes a player from the server mute list
    * @param login Player login
    */
-  removeFromMutelist: (login: string): void => {
-    AdministrationService.removeFromMutelist(login)
+  removeFromMutelist: async (login: string): Promise<void | Error> => {
+    return await AdministrationService.removeFromMutelist(login)
   },
 
   /**
