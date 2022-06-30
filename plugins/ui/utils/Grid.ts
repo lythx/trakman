@@ -39,7 +39,7 @@ export default class Grid {
         xml += `<frame posn="${posX} ${posY} 1">`
         if (this.headerBg !== undefined && i === 0) {
           xml += `<quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.headerBg}"/>`
-        } else if (this.background !== undefined && i !== 0) {
+        } else if ((this.background !== undefined && i !== 0) || (this.headerBg === undefined && this.background !== undefined)) {
           xml += `<quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.background}"/>`
         }
         xml += cellConstructFunctions[(i * this.columns) + j](i, j, w, h)

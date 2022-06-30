@@ -152,7 +152,9 @@ export abstract class ChatService {
       text,
       date: new Date()
     }
-    this.messages.unshift(message)
+    if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
+      this.messages.unshift(message)
+    }
     const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
     if (player === undefined) { throw new Error(`Cannot find player ${login} in the memory`) }
     const messageInfo: MessageInfo = {
@@ -174,7 +176,9 @@ export abstract class ChatService {
     }
     Events.emitEvent('Controller.PlayerChat', messageInfo)
     this.messages.length = Math.min(messagesArraySize, this.messages.length)
-    await this.repo.add(message)
+    if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
+      await this.repo.add(message)
+    }
   }
 
   static async getByLogin(login: string, limit: number): Promise<any[] | Error> {

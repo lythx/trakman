@@ -113,7 +113,7 @@ export default class DediCps extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array(this.cpsPerPage - cpsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight + this.margin, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
@@ -135,7 +135,7 @@ export default class DediCps extends PopupWindow {
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
-    return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
+    return `${closeButton(this.closeId, this.windowWidth, this.footerHeight)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth - this.paginatorOffset} 0 3">
       ${this.cpPaginator.constructXml(params.cpPage)}

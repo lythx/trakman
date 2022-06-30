@@ -39,7 +39,7 @@ export default abstract class PopupWindow extends DynamicComponent {
     this.navbar = new Navbar(buttons, this.windowWidth);
     this.navbarHeight = this.navbar.height
     this.contentWidth = windowWidth
-    this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 3 * this.margin);
+    this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.frameMidBottom, this.frameBottom] = this.constructFrame()
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === this.openId) { this.onOpen(info) }

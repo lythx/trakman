@@ -195,10 +195,11 @@ const commands: TMCommand[] = [
   },
   {
     // TODO IMPLEMENT MAP SEARCH
-    aliases: ['l', 'list'],
+    aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
-    callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.JukeboxWindow, info.login)
+    params: [{ name: 'mapName', optional: true }],
+    callback: (info: MessageInfo, mapName: string): void => {
+      TM.openManialink(TM.UIIDS.mapList, info.login)
     },
     privilege: 0
   },

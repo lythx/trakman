@@ -98,7 +98,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: CONFIG.buttons.icons[4].width,
       iconHeight: CONFIG.buttons.icons[4].height,
       padding: CONFIG.buttons.icons[4].padding,
-      actionId: IDS.JukeboxWindow
+      actionId: IDS.mapList
     })
     // Stats
     this.iconData.push({
