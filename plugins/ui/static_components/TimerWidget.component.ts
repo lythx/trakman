@@ -28,9 +28,9 @@ export default class TimerWidget extends StaticComponent {
     TM.sendManialink(this.xml, login)
   }
 
-  private constructXml() {
-    const headerHeight = CONFIG.staticHeader.height
-    const marginSmall = CONFIG.static.marginSmall
+  private constructXml(): void {
+    const headerHeight: number = CONFIG.staticHeader.height
+    const marginSmall: number = CONFIG.static.marginSmall
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">

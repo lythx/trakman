@@ -4,7 +4,7 @@ import ICN from '../config/Icons.json' assert { type: 'json' }
 import { CONFIG } from '../UiUtils.js'
 
 //TODO THIS IN CONFIG FILE
-const DEFAULT_HEIGHT = 3.5
+const DEFAULT_HEIGHT: number = 3.5
 
 export default class Navbar {
 
@@ -13,11 +13,11 @@ export default class Navbar {
   readonly buttons: { name: string, action: number }[]
   readonly buttonWidth: number
   //TODO THIS IN CONFIG FILE
-  readonly textScale = 0.75
+  readonly textScale: number = 0.75
   //AND THIS
-  readonly padding = 1
+  readonly padding: number = 1
   readonly hoverImage: string
-  readonly margin = 0.15
+  readonly margin: number = 0.15
 
   constructor(buttons: { name: string, action: number }[], width: number, height: number | null = DEFAULT_HEIGHT, hoverImgUrl: string = BGS.black40) {
     this.width = width
@@ -28,7 +28,7 @@ export default class Navbar {
   }
 
   constructXml(): string {
-    let xml = ``
+    let xml: string = ``
     for (const [i, e] of this.buttons.entries()) {
       xml += `<frame posn="${this.buttonWidth * i} 0 1">
             <quad posn="0 0 1" sizen="${this.buttonWidth} ${this.height}" image="${ICN.blank}" imagefocus="${this.hoverImage}" action="${e.action}"/>

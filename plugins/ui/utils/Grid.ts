@@ -16,8 +16,8 @@ export default class Grid {
   constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBg?: string }) {
     this.width = width
     this.height = height
-    const columnSum = columnProportions.reduce((acc, cur) => acc + cur)
-    const rowSum = rowProportions.reduce((acc, cur) => acc += cur)
+    const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur)
+    const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur)
     this.columnWidths = columnProportions.map(a => (a / columnSum) * this.width)
     this.rowHeights = rowProportions.map(a => (a / rowSum) * this.height)
     this.columns = columnProportions.length
@@ -27,17 +27,17 @@ export default class Grid {
     this.margin = options?.margin ?? CONFIG.grid.margin
   }
 
-  constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]) {
-    let xml = ``
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.columns; j++) {
+  constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]): string {
+    let xml: string = ``
+    for (let i: number = 0; i < this.rows; i++) {
+      for (let j: number = 0; j < this.columns; j++) {
         if (cellConstructFunctions[(i * this.columns) + j] === undefined) { break }
-        const posY = -this.rowHeights.filter((val, index) => index < i).reduce((acc, cur) => acc += cur, 0)
-        const posX = this.columnWidths.filter((val, index) => index < j).reduce((acc, cur) => acc += cur, 0)
-        const h = this.rowHeights[i]
-        const w = this.columnWidths[j]
+        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc += cur, 0)
+        const posX: number = this.columnWidths.filter((val, index): boolean => index < j).reduce((acc, cur): number => acc += cur, 0)
+        const h: number = this.rowHeights[i]
+        const w: number = this.columnWidths[j]
         xml += `<frame posn="${posX} ${posY} 1">`
-        if (this.headerBg !== undefined  && i === 0) {
+        if (this.headerBg !== undefined && i === 0) {
           xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.headerBg}"/>`
         } else if (this.background !== undefined && i !== 0) {
           xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.background}"/>`

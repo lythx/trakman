@@ -1,6 +1,6 @@
 import { Repository } from './Repository.js'
 
-const createQuery = `
+const createQuery: string = `
 CREATE TABLE IF NOT EXISTS maps(
   id VARCHAR(27) PRIMARY KEY NOT NULL,
   name VARCHAR(60) NOT NULL,
@@ -28,9 +28,9 @@ export class MapRepository extends Repository {
 
   async add(...objects: TMMap[]): Promise<any> {
     if (objects.length === 0) { return }
-    let query = 'INSERT INTO maps(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
-    const values = []
-    let i = 1
+    let query: string = 'INSERT INTO maps(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
+    const values: any[] = []
+    let i: number = 1
     for (const c of objects) {
       query += '($' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
         ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
@@ -42,12 +42,12 @@ export class MapRepository extends Repository {
   }
 
   async getAll(): Promise<any[]> {
-    const query = 'SELECT * FROM maps;'
+    const query: string = 'SELECT * FROM maps;'
     return (await this.db.query(query)).rows
   }
 
   async get(id: string): Promise<any[]> {
-    const query = 'SELECT * FROM maps WHERE id=$1;'
+    const query: string = 'SELECT * FROM maps WHERE id=$1;'
     return (await this.db.query(query, [id])).rows
   }
 

@@ -1,6 +1,6 @@
 import { Repository } from './Repository.js'
 
-const createQuery = `
+const createQuery: string = `
 CREATE TABLE IF NOT EXISTS votes(
     map varchar(27) NOT NULL,
     login varchar(25) NOT NULL,
@@ -18,27 +18,27 @@ export class VoteRepository extends Repository {
   }
 
   async add(mapId: string, login: string, vote: number, date: Date): Promise<any> {
-    const query = 'INSERT INTO votes(map, login, vote, date) VALUES($1, $2, $3, $4);'
+    const query: string = 'INSERT INTO votes(map, login, vote, date) VALUES($1, $2, $3, $4);'
     return (await this.db.query(query, [mapId, login, vote, date])).rows
   }
 
   async update(mapId: string, login: string, vote: number, date: Date): Promise<any> {
-    const query = 'UPDATE votes SET vote=$1, date=$2 WHERE map=$3 AND login=$4;'
+    const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map=$3 AND login=$4;'
     return (await this.db.query(query, [vote, date, mapId, login])).rows
   }
 
   async getAll(): Promise<any[]> {
-    const query = 'SELECT * FROM votes;'
+    const query: string = 'SELECT * FROM votes;'
     return (await this.db.query(query)).rows
   }
 
   async getOne(mapId: string, login: string): Promise<any[]> {
-    const query = 'SELECT * FROM votes WHERE map=$1 AND login=$2;'
+    const query: string = 'SELECT * FROM votes WHERE map=$1 AND login=$2;'
     return (await this.db.query(query, [mapId, login])).rows
   }
 
   async get(mapId: string): Promise<any[]> {
-    const query = 'SELECT * FROM votes WHERE map=$1;'
+    const query: string = 'SELECT * FROM votes WHERE map=$1;'
     return (await this.db.query(query, [mapId])).rows
   }
 

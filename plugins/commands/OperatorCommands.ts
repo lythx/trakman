@@ -7,35 +7,35 @@ const commands: TMCommand[] = [
     aliases: ['al', 'addlocal'],
     help: 'Add a map from your pc.',
     // todo params
-    callback: async (info: MessageInfo) => {
-      const split = info.text.split(' ')
-      const fileName = split.shift() + '.Challenge.Gbx'
-      const path = split.join(' ')
-      const file = await fs.readFile(path, 'base64').catch(err => err)
+    callback: async (info: MessageInfo): Promise<void> => {
+      const split: string[] = info.text.split(' ')
+      const fileName: string = split.shift() + '.Challenge.Gbx'
+      const path: string = split.join(' ')
+      const file: any = await fs.readFile(path, 'base64').catch(err => err)
       if (file instanceof Error) {
         TM.error('Error when reading file on addlocal', file.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}File ${TM.palette.highlight + path} is not accessible.`, info.login)
         return
       }
-      const write = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
+      const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
-      const insert = await TM.call('InsertChallenge', [{ string: fileName }])
+      const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
-      const res = await TM.call('GetNextChallengeInfo')
+      const res: any[] | Error = await TM.call('GetNextChallengeInfo')
       if (res instanceof Error) {
         TM.error('Failed to get next map info', res.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
-      const name = res[0].Name
+      const name: string = res[0].Name
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from local files.`)
@@ -46,36 +46,36 @@ const commands: TMCommand[] = [
     aliases: ['afu', 'addfromurl'],
     help: 'Add a track from an url.',
     // todo params
-    callback: async (info: MessageInfo) => {
-      const s = info.text.split(' ')
-      const fileName = s[0] + '.Challenge.Gbx'
-      const url = s[1]
+    callback: async (info: MessageInfo): Promise<void> => {
+      const s: string[] = info.text.split(' ')
+      const fileName: string = s[0] + '.Challenge.Gbx'
+      const url: string = s[1]
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         TM.sendMessage(`Failed to fetch map file from url ${url}`, info.login)
         return
       }
-      const data = await res.arrayBuffer()
-      const buffer = Buffer.from(data)
-      const write = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
+      const data: ArrayBuffer = await res.arrayBuffer()
+      const buffer: Buffer = Buffer.from(data)
+      const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
-      const insert = await TM.call('InsertChallenge', [{ string: fileName }])
+      const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
-      const nextInfo = await TM.call('GetNextChallengeInfo')
+      const nextInfo: any[] | Error = await TM.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
         TM.error('Failed to get next map info', nextInfo.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
-      const name = nextInfo[0].Name
+      const name: string = nextInfo[0].Name
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from URL.`)
@@ -85,11 +85,11 @@ const commands: TMCommand[] = [
   {
     aliases: ['rt', 'et', 'removethis', 'erasethis'],
     help: 'Remove the current track from the playlist.',
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
-      const map = TM.map
-      const res = await TM.call('RemoveChallenge', [{ string: map.fileName }])
+      const map: TMMap = TM.map
+      const res: any[] | Error = await TM.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
@@ -104,7 +104,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -121,7 +121,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['r', 'res'],
     help: 'Restart the current map.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -138,8 +138,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['pt', 'prev', 'previoustrack'],
     help: 'Requeue the previously played track.',
-    callback: async (info: MessageInfo) => {
-      // DOESNT SKIP
+    callback: async (info: MessageInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
       TM.addToJukebox(TM.previousMaps[0].id)
@@ -152,13 +151,13 @@ const commands: TMCommand[] = [
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, login: string, reason?: string) => {
-      const targetInfo = TM.getPlayer(login)
+    callback: (info: MessageInfo, login: string, reason?: string): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
       }
-      const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -181,8 +180,8 @@ const commands: TMCommand[] = [
     aliases: ['m', 'mute'],
     help: 'Mute a specific player.',
     // TODO params: [{}],
-    callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    callback: (info: MessageInfo): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -206,8 +205,8 @@ const commands: TMCommand[] = [
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
     // TODO params
-    callback: (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    callback: (info: MessageInfo): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -231,8 +230,8 @@ const commands: TMCommand[] = [
     aliases: ['fs', 'forcespec'],
     help: 'Force a player into specmode.',
     params: [{ name: 'login' }],
-    callback: (info: MessageInfo, login: string) => {
-      const targetInfo = TM.getPlayer(login)
+    callback: (info: MessageInfo, login: string): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -261,8 +260,8 @@ const commands: TMCommand[] = [
     aliases: ['fp', 'forceplay'],
     help: 'Force a player into playermode.',
     params: [{ name: 'login' }],
-    callback: (info: MessageInfo, login: string) => {
-      const targetInfo = TM.getPlayer(login)
+    callback: (info: MessageInfo, login: string): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
         return
@@ -291,7 +290,7 @@ const commands: TMCommand[] = [
     aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
     help: 'Manipulate every soul on the server that you kicked someone.',
     params: [{ name: 'login' }],
-    callback: (info: MessageInfo, login: string) => {
+    callback: (info: MessageInfo, login: string): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -311,7 +310,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
         return

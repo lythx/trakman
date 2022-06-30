@@ -3,11 +3,11 @@ import ICN from '../config/Icons.json' assert { type: 'json' }
 import BG from '../config/Backgrounds.json' assert { type: 'json' }
 
 //TODO THIS IN CONFIG FILE
-const DEFAULT_OPTION_HEIGHT = 2
-const DEFAULT_PADDING = 1
-const DEFAULT_TEXT_SCALE = 1
-const DEFAULT_BACKGROUND_IMAGE = ICN.blank
-const DEFAULT_HOVER_IMAGE = BG.darkblue
+const DEFAULT_OPTION_HEIGHT: number = 2
+const DEFAULT_PADDING: number = 1
+const DEFAULT_TEXT_SCALE: number = 1
+const DEFAULT_BACKGROUND_IMAGE: string = ICN.blank
+const DEFAULT_HOVER_IMAGE: string = BG.darkblue
 
 export default class DropdownMenu {
 
@@ -34,8 +34,8 @@ export default class DropdownMenu {
     this.hoverImage = optionalParams?.hoverImage ?? DEFAULT_HOVER_IMAGE
   }
 
-  constructXml() {
-    let xml = ''
+  constructXml(): string {
+    let xml: string = ''
     for (const [i, e] of this.options.entries()) {
       xml += `<frame posn="0 0 9">
             <quad posn="0 ${this.optionHeight * i} 1" sizen="${this.width} ${this.optionHeight}" image="${this.backgroundImage}" imagefocus="${this.hoverImage}" action="${e.action}"/>

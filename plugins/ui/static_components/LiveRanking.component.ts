@@ -10,26 +10,26 @@ export default class LiveRanking extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly recordList: RecordList
-  private readonly maxRecords = 250
+  private readonly maxRecords: number = 250
 
   constructor() {
     super(IDS.LiveRanking, 'race')
     this.height = CONFIG.live.height
     this.width = CONFIG.static.width
-    const side = CONFIG.live.side
+    const side: boolean = CONFIG.live.side
     this.positionX = side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('live')
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall), CONFIG.live.entries, side, CONFIG.live.topCount, this.maxRecords, CONFIG.live.displayNoRecordEntry)
-    this.recordList.onClick((info: ManialinkClickInfo) => {
+    this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.LiveRecord', () => {
+    TM.addListener('Controller.LiveRecord', (): void => {
       this.display()
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
     })
   }

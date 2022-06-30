@@ -10,8 +10,8 @@ export abstract class TMXService {
   private static _current: TMXTrackInfo | null
   private static readonly _next: (TMXTrackInfo | null)[] = []
   private static readonly prefixes: string[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
-  private static readonly nextSize = 4
-  private static readonly previousSize = 4
+  private static readonly nextSize: number = 4
+  private static readonly previousSize: number = 4
 
   static async initialize(): Promise<void> {
     if (process.env.USE_TMX !== 'YES') { return }
@@ -40,7 +40,7 @@ export abstract class TMXService {
         const res = await fetch(replays[i].url).catch((err: Error) => err)
         if (!(res instanceof Error)) {
           const file: ArrayBuffer = await res.arrayBuffer()
-          const parser = new GBXParser(Buffer.from(file))
+          const parser: GBXParser = new GBXParser(Buffer.from(file))
           replays[i].login = parser.getLogin()
         }
       }

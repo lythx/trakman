@@ -1,6 +1,6 @@
 import { Repository } from './Repository.js'
 
-const createQuery = `
+const createQuery: string = `
   CREATE TABLE IF NOT EXISTS records(
       map varchar(27) not null,
       login varchar(25) not null,
@@ -11,7 +11,7 @@ const createQuery = `
   );
 `
 
-const insertQuery = `
+const insertQuery: string = `
         INSERT INTO records(map, login, score, date, checkpoints)
         VALUES ($1, $2, $3, $4, $5);
       `
@@ -37,12 +37,12 @@ export class RecordRepository extends Repository {
   }
 
   async remove(login: string, map: string): Promise<any[]> {
-    const query = `DELETE FROM records WHERE login=$1 AND map=$2;`
+    const query: string = `DELETE FROM records WHERE login=$1 AND map=$2;`
     return (await this.db.query(query, [login, map])).rows
   }
 
   async removeAll(map: string): Promise<any[]> {
-    const query = `DELETE FROM records WHERE map=$1;`
+    const query: string = `DELETE FROM records WHERE map=$1;`
     return (await this.db.query(query, [map])).rows
   }
 

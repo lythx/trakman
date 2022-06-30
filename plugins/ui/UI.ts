@@ -5,7 +5,7 @@ import CustomUi from './CustomUi.js'
 //import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
 import DediRanking from './static_components/DediRanking.component.js'
-import MapWidget from './static_components/MapWidget.js'
+import MapWidget from './static_components/MapWidget.component.js'
 import PreviousAndBest from './static_components/PreviousAndBest.component.js'
 import KarmaWidget from './static_components/KarmaWidget.component.js'
 import TimerWidget from './static_components/TimerWidget.component.js'
@@ -32,7 +32,7 @@ import TestWindow from './test_widgets/TestWindow.js'
 let customUi: CustomUi
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
-const loadMod = () => {
+const loadMod = (): void => {
   TM.callNoRes('SetForcedMods',
     [{
       boolean: true
@@ -50,7 +50,7 @@ const loadMod = () => {
 const events: TMEvent[] = [
   {
     event: 'Controller.Ready',
-    callback: async () => {
+    callback: async (): Promise<void> => {
       await TM.call('SendHideManialinkPage')
       loadMod()
       customUi = new CustomUi()
