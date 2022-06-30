@@ -12,11 +12,11 @@ export default class MapWidget extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(IDS.MapWidget, 'race')
+    super(IDS.map, 'race')
     this.width = CFG.static.width
     // Here height is 4 headers instead of config height
     // To set correct height in config after changing header height copy this.height from debbuger / console.log()
-    this.height = (CFG.staticHeader.height + CFG.static.marginSmall) * 4
+    this.height = (CFG.staticHeader.height + CFG.static.marginSmall) * 4 + CFG.static.marginSmall
     this.positionX = CFG.static.rightPosition
     this.positionY = calculateStaticPositionY('map')
     this.grid = new Grid(this.width, this.height, [1], new Array(4).fill(1))

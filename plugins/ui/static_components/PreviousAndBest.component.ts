@@ -11,7 +11,7 @@ export default class PreviousAndBest extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.PreviousAndBest, 'race')
+    super(IDS.previousAndBest, 'race')
     this.width = CONFIG.static.width
     this.height = CONFIG.previousAndBest.height
     this.positionX = CONFIG.static.rightPosition

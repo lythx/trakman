@@ -18,7 +18,7 @@ export default class DediSectors extends PopupWindow {
   cpAmount: number
 
   constructor() {
-    super(IDS.DediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
+    super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, ['dediCps', 'localCps', 'localSectors', 'liveCps', 'liveSectors'])
     const dedis: TMDedi[] = TM.dediRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(dedis.length / this.entries))
@@ -116,7 +116,7 @@ export default class DediSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array(this.sectorsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, ...new Array(this.sectorsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.sectorsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
@@ -124,7 +124,7 @@ export default class DediSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array((this.sectorsPerPage + 2) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.sectorsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.sectorsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     }
     const arr = [...headers]
     for (let i: number = 0; i < params.dedis.length; i++) {

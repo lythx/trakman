@@ -16,15 +16,15 @@ export default class Grid {
   constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBg?: string }) {
     this.width = width
     this.height = height
+    this.margin = options?.margin ?? CONFIG.grid.margin
     const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur)
     const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur)
-    this.columnWidths = columnProportions.map(a => (a / columnSum) * this.width)
-    this.rowHeights = rowProportions.map(a => (a / rowSum) * this.height)
+    this.columnWidths = columnProportions.map(a => (a / columnSum) * (this.width - this.margin))
+    this.rowHeights = rowProportions.map(a => (a / rowSum) * (this.height - this.margin))
     this.columns = columnProportions.length
     this.rows = rowProportions.length
     this.background = options?.background
     this.headerBg = options?.headerBg
-    this.margin = options?.margin ?? CONFIG.grid.margin
   }
 
   constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]): string {
@@ -38,9 +38,9 @@ export default class Grid {
         const w: number = this.columnWidths[j]
         xml += `<frame posn="${posX} ${posY} 1">`
         if (this.headerBg !== undefined && i === 0) {
-          xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.headerBg}"/>`
+          xml += `<quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.headerBg}"/>`
         } else if (this.background !== undefined && i !== 0) {
-          xml += `<quad posn="${this.margin} 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.background}"/>`
+          xml += `<quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${this.background}"/>`
         }
         xml += cellConstructFunctions[(i * this.columns) + j](i, j, w, h)
         xml += `</frame>`
