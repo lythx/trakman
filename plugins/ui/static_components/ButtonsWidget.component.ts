@@ -13,12 +13,12 @@ export default class VisitorAmount extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(IDS.ButtonsWidget, 'race')
+    super(IDS.buttons, 'race')
     this.width = CONFIG.static.width
     this.height = CONFIG.buttons.height
     this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('buttons')
-    this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height + CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+    this.grid = new Grid(this.width + CONFIG.static.marginSmall * 2, this.height + CONFIG.static.marginSmall * 2, new Array(4).fill(1), new Array(3).fill(1))
   }
 
   async display(): Promise<void> {
@@ -108,7 +108,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: CONFIG.buttons.icons[5].width,
       iconHeight: CONFIG.buttons.icons[5].height,
       padding: CONFIG.buttons.icons[5].padding,
-      actionId: IDS.LocalCps,
+      actionId: IDS.localCps,
       equalTexts: true
     })
     // Sector records
@@ -119,7 +119,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: CONFIG.buttons.icons[6].width,
       iconHeight: CONFIG.buttons.icons[6].height,
       padding: CONFIG.buttons.icons[6].padding,
-      actionId: IDS.DediCps,
+      actionId: IDS.dediCps,
       equalTexts: true
     })
     this.constructXml()

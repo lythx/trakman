@@ -11,7 +11,7 @@ export default class TimerWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.TimerWidget, 'race')
+    super(IDS.timer, 'race')
     this.width = CONFIG.static.width
     this.height = CONFIG.timer.height
     this.positionX = CONFIG.static.rightPosition

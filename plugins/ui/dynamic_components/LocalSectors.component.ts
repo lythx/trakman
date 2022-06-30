@@ -18,7 +18,7 @@ export default class LocalSectors extends PopupWindow {
   cpAmount: number
 
   constructor() {
-    super(IDS.LocalSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalSectors }, { name: 'Local Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalSectors }, { name: 'Local Sectors', action: 6969696 }])
+    super(IDS.localSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, ['localCps', 'dediCps', 'dediSectors', 'liveCps', 'liveSectors'])
     const records: LocalRecord[] = TM.localRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
@@ -121,7 +121,7 @@ export default class LocalSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
         ...new Array(this.cpsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
@@ -129,7 +129,7 @@ export default class LocalSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array((this.cpsPerPage + 4) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.cpsPerPage + 5).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 5).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
     }
     const arr = [...headers]
     for (let i: number = 0; i < params.records.length; i++) {

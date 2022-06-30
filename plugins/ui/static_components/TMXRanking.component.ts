@@ -13,7 +13,7 @@ export default class TMXRanking extends StaticComponent {
   private readonly maxRecords: number = 20
 
   constructor() {
-    super(IDS.TMXRanking, 'race')
+    super(IDS.tmx, 'race')
     this.height = CONFIG.tmx.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.tmx.side
