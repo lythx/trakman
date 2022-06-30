@@ -7,7 +7,7 @@ const commands: TMCommand[] = [
     aliases: ['sgm', 'setgamemode'],
     help: 'Change the gamemode.',
     params: [{ name: 'mode' }],
-    callback: (info: MessageInfo, mode: string) => {
+    callback: (info: MessageInfo, mode: string): void => {
       let modeInt: number
       switch (mode.toLowerCase()) {
         case 'rounds': case 'round':
@@ -51,16 +51,16 @@ const commands: TMCommand[] = [
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, login: string, duration?: number, reason?: string) => {
-      const targetInfo = TM.getPlayer(login)
-      const expireDate = duration === undefined ? undefined : new Date(Date.now() + duration)
+    callback: (info: MessageInfo, login: string, duration?: number, reason?: string): void => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} is not on the server.`, info.login)
         return
       }
       TM.addToBanlist(targetInfo.ip, targetInfo.login, info.login, reason, expireDate)
-      const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
-      const durationString = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
+      const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -80,12 +80,12 @@ const commands: TMCommand[] = [
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       if (TM.banlist.some(a => a.login === login) === false) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not banned.`, info.login)
         return
       }
-      let targetInfo = TM.getPlayer(login)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -105,9 +105,9 @@ const commands: TMCommand[] = [
     aliases: ['bl', 'blacklist'],
     help: 'Blacklist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: MessageInfo, login: string, duration?: number, reason?: string) => {
-      const expireDate = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo = TM.getPlayer(login)
+    callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -116,8 +116,8 @@ const commands: TMCommand[] = [
         }
       }
       TM.addToBlacklist(targetInfo.login, info.login, reason, expireDate)
-      const reasonString = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
-      const durationString = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
+      const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -137,12 +137,12 @@ const commands: TMCommand[] = [
     aliases: ['ubl', 'unblacklist'],
     help: 'Unblacklist a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       if (TM.blacklist.some(a => a.login === login) === false) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not blacklisted.`, info.login)
         return
       }
-      let targetInfo = TM.getPlayer(login)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -162,7 +162,7 @@ const commands: TMCommand[] = [
     aliases: ['srp', 'setrefpwd', 'setrefereepassword'],
     help: 'Change the referee password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, password?: string) => {
+    callback: (info: MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (password !== undefined && !regex.test(password)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
@@ -187,7 +187,7 @@ const commands: TMCommand[] = [
     aliases: ['srm', 'setrefmode', 'setrefereemode'],
     help: 'Change the referee mode.',
     params: [{ name: 'mode', type: 'boolean' }],
-    callback: (info: MessageInfo, mode: boolean) => {
+    callback: (info: MessageInfo, mode: boolean): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -209,12 +209,12 @@ const commands: TMCommand[] = [
     aliases: ['ag', 'addguest'],
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       if (TM.guestlist.some(a => a.login === login) === true) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is already in the guestlist.`, info.login)
         return
       }
-      let targetInfo = TM.getPlayer(login)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -222,7 +222,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res = await TM.addToGuestlist(login, info.login)
+      const res: void | Error = await TM.addToGuestlist(login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to guest list.`, info.login)
         return
@@ -237,12 +237,12 @@ const commands: TMCommand[] = [
     aliases: ['rg', 'rmguest', 'removeguest'],
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string) => {
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
       if (TM.guestlist.some(a => a.login === login) !== true) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
         return
       }
-      let targetInfo = TM.getPlayer(login)
+      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -250,7 +250,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res = await TM.removeFromGuestlist(login)
+      const res: void | Error = await TM.removeFromGuestlist(login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from guest list.`, info.login)
         return
@@ -265,8 +265,8 @@ const commands: TMCommand[] = [
     aliases: ['hm', 'hardmute'],
     help: 'Mute a player and disable their commands.',
     // TODO params
-    callback: async (info: MessageInfo) => {
-      const targetInfo = TM.getPlayer(info.text)
+    callback: async (info: MessageInfo): Promise<void> => {
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player or no login specified.`, info.login)
         return
@@ -311,12 +311,12 @@ const commands: TMCommand[] = [
     aliases: ['hfs', 'hardforcespec'],
     help: 'Force player into specmode without ability to disable it.',
     // TODO params
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       if (info.text.length === 0) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
         return
       }
-      const targetInfo = TM.getPlayer(info.text)
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
@@ -340,12 +340,12 @@ const commands: TMCommand[] = [
           }]
         }
       )
-      TM.addListener('Controller.PlayerJoin', (i: JoinInfo) => {
+      TM.addListener('Controller.PlayerJoin', (i: JoinInfo): void => {
         if (hfsList.some(a => a === i.login)) {
           TM.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
         }
       })
-      TM.addListener('Controller.PlayerInfoChanged', async (i: InfoChangedInfo) => {
+      TM.addListener('Controller.PlayerInfoChanged', async (i: InfoChangedInfo): Promise<void> => {
         if (hfsList.some(a => a === i.login)) {
           await new Promise((r) => setTimeout(r, (Math.random() * 6800) + 200))
           TM.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
@@ -360,7 +360,7 @@ const commands: TMCommand[] = [
     aliases: ['uhfs', 'undohardforcespec'],
     help: 'Undo hardforcespec.',
     // TODO params
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       if (info.text.length === 0) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, info.login)
         return
@@ -370,7 +370,7 @@ const commands: TMCommand[] = [
         return
       }
       hfsList.splice(hfsList.indexOf(info.login), 1)
-      const targetInfo = TM.getPlayer(info.text)
+      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
       TM.multiCallNoRes(
         {
           method: 'ForceSpectator',
@@ -385,6 +385,70 @@ const commands: TMCommand[] = [
           }]
         }
       )
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['tmpl', 'teammaxpoints'],
+    help: 'Set the maximum amount of points for team mode.',
+    params: [{ name: 'limit', type: 'int' }],
+    callback: async (info: MessageInfo, limit: number): Promise<void> => {
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+            `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set the points limit ` +
+            `to ${TM.palette.highlight + limit}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetTeamPointsLimit',
+          params: [{ int: limit }]
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['fpt', 'forceteam', 'forceplayerteam'],
+    help: 'Force a player into a team.',
+    params: [{ name: 'player' }, { name: 'team' }],
+    callback: async (info: MessageInfo, player: string, team: string): Promise<void> => {
+      if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
+        return
+      }
+      let teamInt: number
+      let teamColour: string
+      const playerinfo: TMPlayer | undefined = TM.getPlayer(player)
+      if (playerinfo === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
+        return
+      }
+      switch (team.toLowerCase()) {
+        case 'blue':
+          teamInt = 0
+          teamColour = `${TM.colours.blue}`
+          break
+        case 'red':
+          teamInt = 1
+          teamColour = `${TM.colours.red}`
+          break
+        default:
+          TM.sendMessage(`${TM.palette.error}Invalid team type.`, info.login)
+          return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has put `
+            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickName)} ${TM.palette.admin}to the ${teamColour + team.toUpperCase()}${TM.palette.admin} team.`
+        }]
+      },
+        {
+          method: 'ForcePlayerTeam',
+          params: [{ string: player }, { int: teamInt }]
+        })
     },
     privilege: 2
   }

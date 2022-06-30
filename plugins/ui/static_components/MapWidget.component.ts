@@ -35,9 +35,10 @@ export default class MapWidget extends StaticComponent {
 
   private async updateXML(): Promise<void> {
     let author
-    const authorLogin = TM.challenge.author
-    if (process.env.USE_WEBSERVICES === "YES" && authorLogin.match(/[\da - z_ +.-]/)) {
-      const json = await TM.fetchWebServices(authorLogin)
+    const authorLogin: string = TM.map.author
+    const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
+    if (process.env.USE_WEBSERVICES === "YES" && !regex.test(authorLogin)) {
+      const json: any = await TM.fetchWebServices(authorLogin)
       if (json instanceof Error) {
         TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
         author = authorLogin
@@ -49,9 +50,9 @@ export default class MapWidget extends StaticComponent {
     else {
       author = authorLogin
     }
-    const date = TM.TMXCurrent?.lastUpdateDate
-    const texts = [CFG.map.title, TM.safeString(TM.challenge.name), TM.safeString(author), TM.Utils.getTimeString(TM.challenge.authorTime), date === undefined ? undefined : TM.formatDate(date)]
-    const icons = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
+    const date: any = TM.TMXCurrent?.lastUpdateDate
+    const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
+    const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     const headerCFG = CONFIG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 3) {
@@ -85,7 +86,7 @@ export default class MapWidget extends StaticComponent {
           })}
       </frame>`
     }
-    const arr= new Array(4).fill(cell)
+    const arr: any[] = new Array(4).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

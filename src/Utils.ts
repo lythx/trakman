@@ -1,20 +1,22 @@
 export const Utils = {
+
   /**
-   * Transforms a time in milliseconds into a (hh:m)m:ss:cc format
-   * @param {number} time time in milliseconds
-   * @returns {string} formatted time
+   * Formats time for prettier display
+   * @param time Time to format
+   * @returns Formatted time string
    */
   getTimeString(time: number): string {
     const timeLength: number = time.toString().length
-    const m = Math.floor(time / (1000 * 60)).toString()
-    const s = Math.floor((time - Number(m) * 60 * 1000) / 1000).toString()
-    const hs = time.toString().substring(timeLength - 3, timeLength - 1)
+    const m: string = Math.floor(time / (1000 * 60)).toString()
+    const s: string = Math.floor((time - Number(m) * 60 * 1000) / 1000).toString()
+    const hs: string = time.toString().substring(timeLength - 3, timeLength - 1)
     return `${m.padStart(1, '0')}:${s.padStart(2, '0')}.${hs.padStart(2, '0')}`
   },
 
   /**
-   * Add a positional suffix to a number.
-   * @param pos
+   * Adds an ordinal suffix to numbers
+   * @param pos Number to add the suffix to
+   * @returns Number with the suffix
    */
   getPositionString(pos: number): string {
     if (pos < 1 || pos % 1 !== 0) {

@@ -10,26 +10,26 @@ export default class LocalRanking extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly recordList: RecordList
-  private readonly maxRecords = Number(process.env.LOCALS_AMOUNT)
+  private readonly maxRecords: number = Number(process.env.LOCALS_AMOUNT)
 
   constructor() {
     super(IDS.LocalRanking, 'race')
     this.height = CONFIG.locals.height
     this.width = CONFIG.static.width
-    const side = CONFIG.locals.side
+    const side: boolean = CONFIG.locals.side
     this.positionX = side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('locals')
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall), CONFIG.locals.entries, side, CONFIG.locals.topCount, this.maxRecords, CONFIG.locals.displayNoRecordEntry)
-    this.recordList.onClick((info: ManialinkClickInfo) => {
+    this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.PlayerRecord', () => {
+    TM.addListener('Controller.PlayerRecord', (): void => {
       this.display()
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
   }

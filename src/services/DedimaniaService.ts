@@ -3,7 +3,7 @@ import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
-import { ChallengeService } from './ChallengeService.js'
+import { MapService } from './MapService.js'
 import { Client } from '../Client.js'
 import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
@@ -16,18 +16,18 @@ export abstract class DedimaniaService {
   static _newDedis: TMDedi[] = []
 
   static async initialize(): Promise<void | Error> {
-    const status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+    const status: void | Error = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
     if (status instanceof Error) {
       if (status.message !== 'No response from dedimania server') { ErrorHandler.fatal('Failed to connect to dedimania', status.message) }
       return status
     }
     this.updateServerPlayers()
-    const challengeDedisInfo = await DedimaniaService.getRecords(ChallengeService.current.id, ChallengeService.current.name, ChallengeService.current.environment, ChallengeService.current.author)
-    Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
-    Events.addListener('Controller.EndChallenge', (info: EndChallengeInfo) => {
+    const mapDedisInfo: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
+    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+    Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
       this.sendRecords(info)
     })
-    Events.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+    Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
       this.addRecord(info)
     })
   }
@@ -43,10 +43,10 @@ export abstract class DedimaniaService {
   static async getRecords(id: string, name: string, environment: string, author: string, isRetry: boolean = false): Promise<void | Error> {
     this._dedis.length = 0
     this._newDedis.length = 0
-    const cfg = ServerConfig.config
-    const nextIds = []
-    for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const dedis = await DedimaniaClient.call('dedimania.CurrentChallenge',
+    const cfg: ServerInfo = ServerConfig.config
+    const nextIds: any[] = []
+    for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+    const dedis: any[] | Error = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
         { string: id },
         { string: name },
@@ -85,26 +85,26 @@ export abstract class DedimaniaService {
       const record: TMDedi = { login: d.Login, nickName: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
       this._dedis.push(record)
     }
-    const temp: any = ChallengeService.current
+    const temp: any = MapService.current
     temp.dedis = this._dedis
-    const challengeDedisInfo: ChallengeDedisInfo = temp
-    Events.emitEvent('Controller.DedimaniaRecords', challengeDedisInfo)
+    const mapDedisInfo: MapDedisInfo = temp
+    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
   }
 
-  private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean) {
+  private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean): Promise<void> {
     if (isRetry) { return }
     await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
-    ErrorHandler.error(`Failed to fetch dedimania records for challenge: ${name}`)
+    ErrorHandler.error(`Failed to fetch dedimania records for map: ${name}`)
     Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
     let status
     do {
       await new Promise((resolve) => setTimeout(resolve, 10000))
-      if (ChallengeService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
+      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
       else { return }
     } while (status instanceof Error)
   }
 
-  static async sendRecords(info: EndChallengeInfo): Promise<void> {
+  static async sendRecords(info: EndMapInfo): Promise<void> {
     const recordsArray: any = []
     for (const d of this._newDedis) {
       recordsArray.push(
@@ -117,7 +117,7 @@ export abstract class DedimaniaService {
         }
       )
     }
-    const status = await DedimaniaClient.call('dedimania.ChallengeRaceTimes',
+    const status: any[] | Error = await DedimaniaClient.call('dedimania.ChallengeRaceTimes',
       [
         { string: info.id },
         { string: info.name },
@@ -130,16 +130,16 @@ export abstract class DedimaniaService {
         { array: recordsArray }
       ]
     )
-    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for challenge ${info.name}`, status.message) }
+    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for map ${info.name}`, status.message) }
   }
 
   private static addRecord(info: FinishInfo): void {
-    const pb = this._dedis.find(a => a.login === info.login)?.time
-    const position = this._dedis.filter(a => a.time <= info.time).length + 1
+    const pb: number | undefined = this._dedis.find(a => a.login === info.login)?.time
+    const position: number = this._dedis.filter(a => a.time <= info.time).length + 1
     if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
-    if (pb == null) {
+    if (pb === undefined) {
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
@@ -165,9 +165,9 @@ export abstract class DedimaniaService {
       return
     }
     if (info.time === pb) {
-      const previousPosition = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
+      const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
@@ -191,13 +191,13 @@ export abstract class DedimaniaService {
       return
     }
     if (info.time < pb) {
-      const previousTime = this._dedis.find(a => a.login === info.login)?.time
+      const previousTime: number | undefined = this._dedis.find(a => a.login === info.login)?.time
       if (previousTime === undefined) {
         ErrorHandler.error(`Can't find player ${info.login} in memory`)
         return
       }
       const dediRecordInfo: DediRecordInfo = {
-        challenge: info.challenge,
+        map: info.map,
         login: info.login,
         time: info.time,
         checkpoints: info.checkpoints,
@@ -227,10 +227,10 @@ export abstract class DedimaniaService {
 
   private static updateServerPlayers(): void {
     setInterval(async (): Promise<void> => {
-      const cfg = ServerConfig.config
-      const nextIds = []
-      for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-      const status = await DedimaniaClient.call('dedimania.UpdateServerPlayers',
+      const cfg: ServerInfo = ServerConfig.config
+      const nextIds: any[] = []
+      for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+      const status: any[] | Error = await DedimaniaClient.call('dedimania.UpdateServerPlayers',
         [
           { string: 'TMF' },
           { int: PlayerService.players.length },

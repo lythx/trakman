@@ -1,7 +1,7 @@
 import { Repository } from './Repository.js'
 
-const createQuery = `
-CREATE TABLE IF NOT EXISTS challenges(
+const createQuery: string = `
+CREATE TABLE IF NOT EXISTS maps(
   id VARCHAR(27) PRIMARY KEY NOT NULL,
   name VARCHAR(60) NOT NULL,
   filename VARCHAR(254) NOT NULL,
@@ -16,21 +16,21 @@ CREATE TABLE IF NOT EXISTS challenges(
   laprace BOOLEAN NOT NULL,
   lapsamount INT2 NOT NULL,
   checkpointsamount INT2 NOT NULL,
-  adddate TIMESTAMP NOT NUll
+  adddate TIMESTAMP NOT NULL
 );
 `
 
-export class ChallengeRepository extends Repository {
+export class MapRepository extends Repository {
   async initialize(): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
-  async add(...objects: TMChallenge[]): Promise<any> {
+  async add(...objects: TMMap[]): Promise<any> {
     if (objects.length === 0) { return }
-    let query = 'INSERT INTO challenges(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
-    const values = []
-    let i = 1
+    let query: string = 'INSERT INTO maps(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
+    const values: any[] = []
+    let i: number = 1
     for (const c of objects) {
       query += '($' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
         ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
@@ -42,12 +42,12 @@ export class ChallengeRepository extends Repository {
   }
 
   async getAll(): Promise<any[]> {
-    const query = 'SELECT * FROM challenges;'
+    const query: string = 'SELECT * FROM maps;'
     return (await this.db.query(query)).rows
   }
 
   async get(id: string): Promise<any[]> {
-    const query = 'SELECT * FROM challenges WHERE id=$1;'
+    const query: string = 'SELECT * FROM maps WHERE id=$1;'
     return (await this.db.query(query, [id])).rows
   }
 

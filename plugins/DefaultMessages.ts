@@ -3,7 +3,7 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 const events: TMEvent[] = [
   {
     event: 'Controller.Ready',
-    callback: async () => {
+    callback: async (): Promise<void> => {
       // Generate numba
       const flagSeed: number = Math.floor(Math.random() * 10) + 1
       // Make colours obj
@@ -52,7 +52,7 @@ const events: TMEvent[] = [
   },
   {
     event: 'Controller.PlayerJoin',
-    callback: async (player: JoinInfo) => {
+    callback: async (player: JoinInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickName, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
@@ -60,14 +60,14 @@ const events: TMEvent[] = [
   },
   {
     event: 'Controller.PlayerLeave',
-    callback: async (player: LeaveInfo) => {
+    callback: async (player: LeaveInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(player.nickName, true)}${TM.palette.servermsg} `
         + `has quit after ${TM.palette.highlight + TM.msToTime(player.sessionTime)}${TM.palette.servermsg}.`)
     }
   },
   {
     event: 'Controller.PlayerRecord',
-    callback: async (info: RecordInfo) => {
+    callback: async (info: RecordInfo): Promise<void> => {
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
@@ -76,7 +76,7 @@ const events: TMEvent[] = [
       else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
       if (rs.calcDiff) {
         diff = TM.Utils.getTimeString(info.previousTime - info.time)
-        let i = -1
+        let i: number = -1
         while (true) {
           i++
           if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
@@ -96,7 +96,7 @@ const events: TMEvent[] = [
   },
   {
     event: 'Controller.DedimaniaRecord',
-    callback: async (info: DediRecordInfo) => {
+    callback: async (info: DediRecordInfo): Promise<void> => {
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
@@ -105,7 +105,7 @@ const events: TMEvent[] = [
       else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
       if (rs.calcDiff) {
         diff = TM.Utils.getTimeString(info.previousTime - info.time)
-        let i = -1
+        let i: number = -1
         while (true) {
           i++
           if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }

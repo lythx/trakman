@@ -1,6 +1,6 @@
 import { Client } from './Client.js'
 import { Logger } from './Logger.js'
-import { ChallengeService } from './services/ChallengeService.js'
+import { MapService } from './services/MapService.js'
 import 'dotenv/config'
 import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
@@ -20,11 +20,11 @@ import { VoteService } from './services/VoteService.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
-  const connectionStatus = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
+  const connectionStatus: void | string = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
   if (connectionStatus != null) { Logger.info(connectionStatus) }
   Logger.trace('Authenticating...')
-  const auth = await Client.call('Authenticate', [
+  const auth: any[] | Error = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
@@ -39,7 +39,7 @@ async function main(): Promise<void> {
   Logger.trace('Fetching administration lists...')
   await AdministrationService.initialize()
   Logger.info('Administration service instantiated')
-  const cb = await Client.call('EnableCallbacks', [
+  const cb: any[] | Error = await Client.call('EnableCallbacks', [
     { boolean: true }
   ])
   if (cb instanceof Error) {
@@ -47,9 +47,9 @@ async function main(): Promise<void> {
   }
   await RecordService.initialize()
   Logger.info('Callbacks enabled')
-  Logger.trace('Fetching challenges...')
-  await ChallengeService.initialize()
-  Logger.info('Challenge service instantiated')
+  Logger.trace('Fetching maps...')
+  await MapService.initialize()
+  Logger.info('Map service instantiated')
   JukeboxService.initialize()
   Logger.trace('Fetching votes...')
   await VoteService.initialize()
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
   await ChatService.loadLastSessionMessages()
   Logger.info('Chat service instantiated')
   Listeners.initialize()
-  await RecordService.fetchRecords(ChallengeService.current.id)
+  await RecordService.fetchRecords(MapService.current.id)
   await ServerConfig.update()
   if (process.env.USE_TMX === 'YES') {
     Logger.trace('Initializing TMX service...')
@@ -72,7 +72,7 @@ async function main(): Promise<void> {
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to dedimania...')
-    const status = await DedimaniaService.initialize()
+    const status: void | Error = await DedimaniaService.initialize()
     if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
     else { Logger.info('Connected to dedimania') }
   }

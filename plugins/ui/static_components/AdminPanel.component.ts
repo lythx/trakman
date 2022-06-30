@@ -32,16 +32,16 @@ export default class AdminPanel extends StaticComponent {
     TM.sendManialink(this.xml, login)
   }
 
-  private constructXml() {
-    const headerHeight = CONFIG.staticHeader.height
-    const marginSmall = CONFIG.static.marginSmall
-    const icons = CONFIG.admin.icons
-    let iconsXml = ''
-    const iconWidth = this.width / icons.length
+  private constructXml(): void {
+    const headerHeight: number = CONFIG.staticHeader.height
+    const marginSmall: number = CONFIG.static.marginSmall
+    const icons: string[] = CONFIG.admin.icons
+    let iconsXml: string = ''
+    const iconWidth: number = this.width / icons.length
     for (const [i, e] of icons.entries()) {
       iconsXml += `
       <quad posn="${iconWidth * i} -${CONFIG.staticHeader.height + marginSmall} 1" sizen="${iconWidth - marginSmall} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${iconWidth * i + marginSmall} -${CONFIG.staticHeader.height+ marginSmall*2} 2" sizen="${iconWidth - marginSmall * 3} ${this.height - (headerHeight + marginSmall * 3)}" image="${stringToObjectProperty(e, ICONS)}"/>`
+      <quad posn="${iconWidth * i + marginSmall} -${CONFIG.staticHeader.height + marginSmall * 2} 2" sizen="${iconWidth - marginSmall * 3} ${this.height - (headerHeight + marginSmall * 3)}" image="${stringToObjectProperty(e, ICONS)}"/>`
     }
     this.xml = `
     <manialink id="${this.id}">

@@ -5,7 +5,7 @@ const commands: TMCommand[] = [
     aliases: ['ssn', 'setservername'],
     help: 'Change the server name.',
     params: [{ name: 'name', type: 'multiword' }],
-    callback: (info: MessageInfo, name: string) => {
+    callback: (info: MessageInfo, name: string): void => {
       if (name.length === 0) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No name specified.`, info.login)
         return
@@ -29,7 +29,7 @@ const commands: TMCommand[] = [
     aliases: ['sc', 'setcomment'],
     help: 'Change the server comment.',
     params: [{ name: 'comment', type: 'multiword' }],
-    callback: (info: MessageInfo, comment: string) => {
+    callback: (info: MessageInfo, comment: string): void => {
       if (comment.length === 0) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No comment specified.`, info.login)
         return
@@ -53,7 +53,7 @@ const commands: TMCommand[] = [
     aliases: ['sp', 'setpwd', 'setpassword'],
     help: 'Change the player password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, password?: string) => {
+    callback: (info: MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (password !== undefined && !regex.test(password)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
@@ -78,7 +78,7 @@ const commands: TMCommand[] = [
     aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
     help: 'Change the spectator password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
-    callback: (info: MessageInfo, password?: string) => {
+    callback: (info: MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (password !== undefined && !regex.test(password)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
@@ -94,7 +94,7 @@ const commands: TMCommand[] = [
       },
         {
           method: 'SetServerPasswordForSpectator',
-          params: [{ string: password === undefined ? '' : password  }]
+          params: [{ string: password === undefined ? '' : password }]
         })
     },
     privilege: 3
@@ -103,7 +103,7 @@ const commands: TMCommand[] = [
     aliases: ['smp', 'setmaxplayers'],
     help: 'Change the max players amount.',
     params: [{ name: 'amount', type: 'int' }],
-    callback: (info: MessageInfo, amount: number) => {
+    callback: (info: MessageInfo, amount: number): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -123,7 +123,7 @@ const commands: TMCommand[] = [
     aliases: ['sms', 'setmaxspecs'],
     help: 'Change the max spectators amount.',
     params: [{ name: 'amount', type: 'int' }],
-    callback: (info: MessageInfo, amount: number) => {
+    callback: (info: MessageInfo, amount: number): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -143,7 +143,7 @@ const commands: TMCommand[] = [
     aliases: ['sct', 'setchattime'],
     help: 'Change the time you spend on the podium screen.',
     params: [{ name: 'time', type: 'time' }],
-    callback: (info: MessageInfo, time: number) => {
+    callback: (info: MessageInfo, time: number): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -163,7 +163,7 @@ const commands: TMCommand[] = [
     aliases: ['stl', 'settimelimit'],
     help: 'Change the time you spend gaming.',
     params: [{ name: 'time', type: 'time' }],
-    callback: (info: MessageInfo, time: number) => {
+    callback: (info: MessageInfo, time: number): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -183,7 +183,7 @@ const commands: TMCommand[] = [
     aliases: ['sn', 'sendnotice'],
     help: 'Send a notice.',
     params: [{ name: 'time', type: 'time' }, /*{name: 'loginAvatar', optional: true},*/ { name: 'notice', type: 'multiword' }],
-    callback: (info: MessageInfo, time: number, notice: string) => {
+    callback: (info: MessageInfo, time: number, notice: string): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -200,16 +200,16 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
-    aliases: ['acdl', 'allowchallengedownload'],
-    help: 'Set whether challenge download is enabled.',
+    aliases: ['amdl', 'allowmapdownload'],
+    help: 'Set whether map download is enabled.',
     params: [{ name: 'allowed', type: 'boolean' }],
-    callback: (info: MessageInfo, allowed: boolean) => {
+    callback: (info: MessageInfo, allowed: boolean): void => {
       TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.palette.admin} the challenge download.`
+            + `${TM.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.palette.admin} the map download.`
         }]
       },
         {
@@ -225,7 +225,7 @@ const commands: TMCommand[] = [
     aliases: ['drp', 'disablerespawn'],
     help: 'Set whether checkpoint respawning is enabled.',
     params: [{ name: 'disabled', type: 'boolean' }],
-    callback: (info: MessageInfo, disabled: boolean) => {
+    callback: (info: MessageInfo, disabled: boolean): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
@@ -247,7 +247,7 @@ const commands: TMCommand[] = [
     aliases: ['fso', 'forceshowopp', 'forceshowopponents'],
     help: 'Set whether forced opponent display is enabled.',
     params: [{ name: 'enabled', type: 'boolean' }, { name: 'amount', type: 'int', optional: true }],
-    callback: (info: MessageInfo, enabled: boolean, amount?: number) => {
+    callback: (info: MessageInfo, enabled: boolean, amount?: number): void => {
       let n: number
       if (!enabled) {
         n = 0
@@ -277,9 +277,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['ccs', 'coppers', 'checkcoppers'],
     help: 'Check the amount of coppers the server owns.',
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Return immediately if the server isn't united. How to check tho..?
-      const coppers = await TM.call('GetServerCoppers')
+      const coppers: any[] | Error = await TM.call('GetServerCoppers')
       if (coppers instanceof Error) {
         TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't retrieve the coppers amount.`, info.login)
@@ -292,7 +292,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['kc', 'killcontroller'],
     help: 'Kill the controller.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): never => {
       TM.callNoRes('ChatSendServerMessage', [{
         string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
           + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has killed the controller :,(`

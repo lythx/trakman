@@ -1,17 +1,17 @@
 import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
-import net from 'node:net'
+import { Socket } from 'node:net'
 import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { PlayerService } from '../services/PlayerService.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
 import { Client } from '../Client.js'
-import colours from '../data/Colours.json' assert { type: 'json' }
 import { Logger } from '../Logger.js'
+import { TRAKMAN as TM } from '../Trakman.js'
 
 export abstract class DedimaniaClient {
-  private static readonly socket = new net.Socket()
+  private static readonly socket: Socket = new Socket()
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
   private static sessionId: string
@@ -29,10 +29,10 @@ export abstract class DedimaniaClient {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
-    const cfg = ServerConfig.config
-    const nextIds = []
-    for (let i = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const request = new DedimaniaRequest('system.multicall',
+    const cfg: ServerInfo = ServerConfig.config
+    const nextIds: any[] = []
+    for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+    const request: DedimaniaRequest = new DedimaniaRequest('system.multicall',
       [{
         array: [{
           struct: {
@@ -84,9 +84,9 @@ export abstract class DedimaniaClient {
     this.receivingResponse = true
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
-    const startDate = Date.now()
-    return await new Promise((resolve) => {
-      const poll = () => {
+    const startDate: number = Date.now()
+    return await new Promise((resolve): void => {
+      const poll = (): void => {
         if (this.response.status === 'completed') {
           this.receivingResponse = false
           if (this.response.isError !== null) {
@@ -126,7 +126,7 @@ export abstract class DedimaniaClient {
       if (this.tryingToReconnect === true) { return }
       this.tryingToReconnect = true
       this.connected = false
-      Client.call('ChatSendServerMessage', [{ string: `${colours.red}Disconnected from dedimania, attempting reconnect... ` }])
+      Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.error}Failed to connect to Dedimania. Retrying...` }])
       let status
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000))
@@ -134,7 +134,7 @@ export abstract class DedimaniaClient {
       } while (status instanceof Error)
       this.tryingToReconnect = false
       Logger.info(`Reconnected to dedimania after socket error`)
-      Client.call('ChatSendServerMessage', [{ string: `Reconnected to dedimania.` }])
+      Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.admin}Successfully re-established connection with Dedimania.` }])
     })
   }
 
@@ -143,12 +143,12 @@ export abstract class DedimaniaClient {
     // TODO: ensure that if theres 2 responses awaiting (basically never but ye) they get executed in good order
     while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 300)) }
     this.receivingResponse = true
-    const request = new DedimaniaRequest(method, params, this.sessionId)
+    const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
-    const startDate = Date.now()
+    const startDate: number = Date.now()
     return await new Promise((resolve) => {
-      const poll = () => {
+      const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
             ErrorHandler.error('Dedimania server responded with an error',

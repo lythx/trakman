@@ -14,35 +14,35 @@ const gridCell = (width: number, height: number, margin: number, color: string =
   return `<quad posn="${margin} -${margin} 1" sizen="${width - margin} ${height - margin}" bgcolor="${color}"/>`
 }
 
-const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
-  const textScale = options?.textScale ?? 0.7
-  const padding = options?.padding ?? 1
-  const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
-  const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
+const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  const textScale: number = options?.textScale ?? 0.7
+  const padding: number = options?.padding ?? 1
+  const posX: number = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
+  const posY: number = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
 }
 
-const verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
-  const textScale = options?.textScale ?? 0.7
-  const posX = options?.xOffset === undefined ? 0 : options?.xOffset
-  const posY = options?.yOffset === undefined ? parentHeight / 2.2 : (parentHeight / 2.2) + options?.yOffset
-  const padding = options?.padding ?? 0.2
+const verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  const textScale: number = options?.textScale ?? 0.7
+  const posX: number = options?.xOffset === undefined ? 0 : options?.xOffset
+  const posY: number = options?.yOffset === undefined ? parentHeight / 2.2 : (parentHeight / 2.2) + options?.yOffset
+  const padding: number = options?.padding ?? 0.2
   return `<label posn="${padding + posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center"/>`
 }
 
-const horizontallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
-  const textScale = options?.textScale ?? 0.7
-  const posX = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
-  const posY = options?.yOffset === undefined ? 0 : options?.yOffset
-  const padding = options?.padding ?? 0.2
+const horizontallyCenteredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  const textScale: number = options?.textScale ?? 0.7
+  const posX: number = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
+  const posY: number = options?.yOffset === undefined ? 0 : options?.yOffset
+  const padding: number = options?.padding ?? 0.2
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" halign="center"/>`
 }
 
-const rightAlignedText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }) => {
-  const textScale = options?.textScale ?? 0.7
-  const padding = options?.padding ?? 1
-  const posX = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
-  const posY = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
+const rightAlignedText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  const textScale: number = options?.textScale ?? 0.7
+  const padding: number = options?.padding ?? 1
+  const posX: number = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
+  const posY: number = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="right"/>`
 }
 
@@ -53,8 +53,8 @@ const footerCloseButton = (width: number, closeId: number): string => {
 }
 
 const headerIconTitleText = (title: string, width: number, height: number, iconUrl: string, iconWidth: number, iconHeight: number, rightText: string, options?: { titleScale?: number, rightTextScale?: number }): string => {
-  const titleScale = options?.titleScale ?? 1
-  const rightTextScale = options?.rightTextScale ?? 0.8
+  const titleScale: number = options?.titleScale ?? 1
+  const rightTextScale: number = options?.rightTextScale ?? 0.8
   return `<quad posn="2 -${height / 2} 1" sizen="${iconWidth} ${iconHeight}" halign="center" valign="center" image="${iconUrl}"/>
         <label posn="${width / 2} -${height / 2} 1" sizen="${width * (1 / titleScale)} ${height}" halign="center" valign="center" scale="${titleScale}" text="${title}"/>
         <label posn="${width - 3} -${height / 2} 1" sizen="${width * (1 / rightTextScale)} ${height}" halign="center" valign="center" scale="${rightTextScale}" text="${rightText}"/>`
@@ -66,13 +66,13 @@ const staticHeader = (text: string, icon: string, side: boolean,
     textScale?: number, rectangleWidth?: number, horizontalPadding?: number, verticalPadding?: number,
     iconVerticalPadding?: number, iconHorizontalPadding?: number, centerText?: true,
     iconBackground?: string, textBackgrund?: string, centerVertically?: true
-  }) => {
+  }): string => {
   const CFG = CONFIG.staticHeader
-  const textScale = options?.textScale ?? CFG.textScale
-  const horizontalPadding = options?.horizontalPadding ?? CFG.horizontalPadding
-  const rectWidth = options?.rectangleWidth ?? CFG.rectangleWidth
+  const textScale: number = options?.textScale ?? CFG.textScale
+  const horizontalPadding: number = options?.horizontalPadding ?? CFG.horizontalPadding
+  const rectWidth: number = options?.rectangleWidth ?? CFG.rectangleWidth
   if (side) {
-    let label = ''
+    let label: string = ''
     if (options?.centerText) {
       label = centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
     } else if (options?.centerVertically) {
@@ -89,7 +89,7 @@ const staticHeader = (text: string, icon: string, side: boolean,
       ${label}
      `
   } else {
-    let label = ''
+    let label: string = ''
     if (options?.centerText) {
       label = centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding })
     } else if (options?.centerVertically) {
@@ -108,8 +108,8 @@ const staticHeader = (text: string, icon: string, side: boolean,
 }
 
 const calculateStaticPositionY = (widgetName: string): number => {
-  const order = (CONFIG as any)[widgetName].side === true ? CONFIG.static.rightSideOrder : CONFIG.static.leftSideOrder
-  let positionSum = 0
+  const order: string[] = (CONFIG as any)[widgetName].side === true ? CONFIG.static.rightSideOrder : CONFIG.static.leftSideOrder
+  let positionSum: number = 0
   for (const [k, v] of order.entries()) {
     if (v === widgetName) { break }
     positionSum += (CONFIG as any)?.[v]?.height + CONFIG.static.marginBig
@@ -121,20 +121,21 @@ const fullScreenListener = (actionId: number, zIndex: number = -100): string => 
   return `<quad posn="-70 50 ${zIndex}" sizen="140 100" action="${actionId}"/>`
 }
 
-const stringToObjectProperty = (str: string, obj: any) => {
-  const split = str.split('.')
+const stringToObjectProperty = (str: string, obj: any): any => {
+  const split: string[] = str.split('.')
   for (const e of split) {
     obj = obj[e]
   }
   return obj
 }
 
-const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number, iconHeight: number, topPadding: number, options?: { equalTexts?: true, actionId?: number, link?: string }): string => {
-  const t1 = options?.equalTexts ?
+const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number, iconHeight: number, topPadding: number,
+  options?: { equalTexts?: true, actionId?: number, link?: string }): string => {
+  const t1: string = options?.equalTexts ?
     horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.43, padding: 0.6 }) :
     horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.52, padding: 0.6 })
-  const actionId = options?.actionId === undefined ? '' : `action="${options.actionId}"`
-  const link = options?.link === undefined ? '' : `url="${options.link}"`
+  const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
+  const link: string = options?.link === undefined ? '' : `url="${options.link}"`
   return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}" ${actionId} ${link}/>
   <quad posn="${(width - iconWidth) / 2} ${-topPadding} 5" sizen="${iconWidth} ${iconHeight}" image="${iconUrl}"/>
   ${t1}
@@ -142,9 +143,9 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
 }
 
 const closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
-  const width = options?.width ?? CONFIG.closeButton.buttonWidth
-  const height = options?.height ?? CONFIG.closeButton.buttonHeight
-  const padding = options?.padding ?? CONFIG.closeButton.padding
+  const width: number = options?.width ?? CONFIG.closeButton.buttonWidth
+  const height: number = options?.height ?? CONFIG.closeButton.buttonHeight
+  const padding: number = options?.padding ?? CONFIG.closeButton.padding
   return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" valign="center" bgcolor="${CONFIG.closeButton.background}"/>
   <quad posn="${parentWidth / 2} ${-parentHeight / 2} 3" sizen="${width - padding * 2} ${height - padding * 2}" halign="center" valign="center" action="${actionId}" 
   imagefocus="${stringToObjectProperty(CONFIG.closeButton.iconHover, ICONS)}"
@@ -155,24 +156,24 @@ const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | unde
   if (checkpoints.length === 0 || checkpoints?.[0]?.length === 0) {
     return []
   }
-  const cpAmount = checkpoints[0].length
-  const cps: number[][] = Array.from(new Array(cpAmount), () => [])
-  for (let i = 0; i < checkpoints.length; i++) {
-    const cpRow = checkpoints?.[i]
+  const cpAmount: number = checkpoints[0].length
+  const cps: number[][] = Array.from(new Array(cpAmount), (): never[] => [])
+  for (let i: number = 0; i < checkpoints.length; i++) {
+    const cpRow: number[] = checkpoints?.[i]
     if (cpRow === undefined) { break }
-    for (let j = 0; j < cpAmount; j++) {
+    for (let j: number = 0; j < cpAmount; j++) {
       cps[j][i] = cpRow[j]
     }
   }
-  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), () => new Array(cps.length).fill(undefined))
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), (): any[] => new Array(cps.length).fill(undefined))
   for (const [i, e] of cps.entries()) {
     if (cps?.[0]?.length < 2) {
       break
     }
-    const max = Math.max(...e.filter(a => !isNaN(a)))
-    const worst = e.filter(a => a === max)
-    const min = Math.min(...e.filter(a => !isNaN(a)))
-    const best = e.filter(a => a === min)
+    const max: number = Math.max(...e.filter(a => !isNaN(a)))
+    const worst: number[] = e.filter(a => a === max)
+    const min: number = Math.min(...e.filter(a => !isNaN(a)))
+    const best: number[] = e.filter(a => a === min)
     if (max === min) {
       continue
     }
@@ -182,7 +183,7 @@ const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | unde
     if (best.length === 1) {
       cpTypes[e.indexOf(best[0])][i] = 'best'
     } else {
-      const indexes = e.reduce((acc: number[], cur, i) => cur === min ? [...acc, i] : acc, [])
+      const indexes: number[] = e.reduce((acc: number[], cur, i): number[] => cur === min ? [...acc, i] : acc, [])
       for (const index of indexes) {
         cpTypes[index][i] = 'equal'
       }

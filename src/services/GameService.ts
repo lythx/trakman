@@ -6,16 +6,16 @@ export class GameService {
 
   static async initialize(): Promise<void> {
     // TODO: implement proxy here like in ServerConfig.js
-    const res = await Client.call('GetCurrentGameInfo', [{ int: 1 }])
+    const res: any[] | Error = await Client.call('GetCurrentGameInfo', [{ int: 1 }])
     if (res instanceof Error) {
       ErrorHandler.error('Failed to get game info', res.message)
       return
     }
-    const info = res[0]
+    const info: any = res[0]
     this._game = {
       gameMode: info.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       chatTime: info.ChatTime,
-      challengeNo: info.NbChallenge,
+      mapNo: info.NbChallenge,
       roundsPointsLimit: info.RoundsPointsLimit,
       roundsUseNewRules: info.RoundsUseNewRules,
       roundsForcedLaps: info.RoundsForcedLaps,
@@ -33,7 +33,7 @@ export class GameService {
       roundsPointsLimitNewRules: info.RoundsPointsLimitNewRules,
       teamPointsLimitNewRules: info.TeamPointsLimitNewRules,
       cupPointsLimit: info.CupPointsLimit,
-      cupRoundsPerChallenge: info.CupRoundsPerChallenge,
+      cupRoundsPerMap: info.CupRoundsPerChallenge,
       cupWinnersNo: info.CupNbWinners,
       cupWarmUpDuration: info.CupWarmUpDuration
     }
