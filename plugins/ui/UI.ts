@@ -56,7 +56,7 @@ const events: TMEvent[] = [
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-       new LiveCheckpoint(),
+      //  new LiveCheckpoint(),
         new RankWidget(),
         new DediRanking(),
         new MapWidget(),

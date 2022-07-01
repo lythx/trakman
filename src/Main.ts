@@ -80,18 +80,3 @@ async function main(): Promise<void> {
 }
 
 await main()
-
-/* call with array of structs in params example
-    const val = await client.call('SetCallVoteRatios', [
-    {
-      array:
-        [{
-            struct:
-              { Command: { string: 'command1' }, Ratio: { double: 0.4 } }
-          },
-          {
-            struct:
-                { Command: { string: 'command2' }, Ratio: { double: 0.7 } }
-        }]
-    }
-]) */

@@ -84,7 +84,7 @@ export default class KarmaWidget extends StaticComponent {
     const height: number = this.height - this.headerH
     const width: number = (this.width + this.margin - this.buttonW) / 2 - this.margin
     const colour: string = karma > 0 ? '$F00' : '$0F0'
-    const grid: Grid = new Grid(width + this.margin, height+ this.margin, new Array(3).fill(1), new Array(3).fill(1))
+    const grid: Grid = new Grid(width, height, new Array(3).fill(1), new Array(3).fill(1))
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = [
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
