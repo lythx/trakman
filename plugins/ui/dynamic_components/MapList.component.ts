@@ -72,7 +72,6 @@ export default class MapList extends PopupWindow {
     let trackIndex = (this.rows * this.columns) * (page - 1)
     const tracksToDisplay = challenges.length - (trackIndex + 1)
     const cell = (i: number, j: number, w: number, h: number) => {
-      console.log(trackIndex)
       const recordIndexString = this.getRecordIndexString(login, challenges[trackIndex].id)
       const actionId = this.getActionId(challenges[trackIndex].id)
       const header = this.getHeader(challenges[trackIndex].id, actionId, w, h)
@@ -138,13 +137,13 @@ export default class MapList extends PopupWindow {
       return `<quad posn="${this.grid.margin} ${-this.grid.margin} 4" sizen="${w - this.grid.margin * 2} ${h - this.grid.margin * 2}" action="${actionId}"
           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>
-          <quad posn="${this.grid.margin+ this.margin} ${-this.grid.margin- this.margin} 2" sizen="${w -(this.grid.margin * 2 + this.margin *2)} 2" bgcolor="${this.headerJukedBg}"/>`
+          <quad posn="${this.grid.margin+ this.margin} ${-this.grid.margin- this.margin} 2" sizen="${w -this.margin *2} 2" bgcolor="${this.headerJukedBg}"/>`
     }
     else {
       return `<quad posn="${this.grid.margin} ${-this.grid.margin} 4" sizen="${w - this.grid.margin * 2} ${h - this.grid.margin * 2}" action="${actionId}"
           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260547911740/plusek8.png"/>
-          <quad posn="${this.grid.margin + this.margin} ${-this.grid.margin- this.margin} 3" sizen="${w -( this.grid.margin * 2)} 2" bgcolor="${this.headerBackground}"/>`
+          <quad posn="${w/ 2} ${-this.margin} 3" sizen="${w -this.margin * 2} 2" bgcolor="${this.headerBackground}" halign="center"/>`
     }
   }
 

@@ -18,7 +18,7 @@ export default class VisitorAmount extends StaticComponent {
     this.height = CONFIG.buttons.height
     this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('buttons')
-    this.grid = new Grid(this.width + CONFIG.static.marginSmall * 2, this.height + CONFIG.static.marginSmall * 2, new Array(4).fill(1), new Array(3).fill(1))
+    this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height+ CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
   }
 
   async display(): Promise<void> {
