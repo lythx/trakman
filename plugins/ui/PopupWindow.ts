@@ -27,7 +27,7 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
 
-  constructor(windowId: number, headerIcon: string, title: string, navbar: string[], windowHeight: number = 60, windowWidth: number = 90) {
+  constructor(windowId: number, headerIcon: string, title: string, navbar: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
@@ -93,12 +93,17 @@ export default abstract class PopupWindow extends DynamicComponent {
     ]
   }
 
-  private getButtons(names: string[]): { name: string, action: number }[] {
+  private getButtons(names: (string | { name: string, action: number })[]): { name: string, action: number }[] {
     const ret: { name: string, action: number }[] = []
     for (const e of names) {
-      const name = (CONFIG as any)?.[e]?.title ?? e
-      const action = (IDS as any)?.[e] ?? ''
-      ret.push({ name, action })
+      if (typeof e === 'string') {
+        const name = (CONFIG as any)?.[e]?.title ?? e
+        const action = (IDS as any)?.[e] ?? ''
+        ret.push({ name, action })
+      }
+      else {
+        ret.push(e)
+      }
     }
     return ret
   }
