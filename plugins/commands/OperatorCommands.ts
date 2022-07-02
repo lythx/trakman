@@ -119,7 +119,7 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
-    aliases: ['r', 'res'],
+    aliases: ['r', 'res', 'restart'],
     help: 'Restart the current map.',
     callback: (info: MessageInfo): void => {
       TM.multiCallNoRes({
@@ -144,6 +144,16 @@ const commands: TMCommand[] = [
       TM.addToJukebox(TM.previousMaps[0].id)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['rq', 'requeue', 'replay'],
+    help: 'Requeue the ongoing map.',
+    callback: (info: MessageInfo) => {
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the ongoing map.`)
+      TM.addToJukebox(TM.map.id)
     },
     privilege: 1
   },
