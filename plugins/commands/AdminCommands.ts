@@ -760,7 +760,7 @@ const commands: TMCommand[] = [
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
         + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickName, true))}${TM.palette.admin} on the ongoing map.`)
     },
-    privilege: 3
+    privilege: 2
   },
 ]
 
