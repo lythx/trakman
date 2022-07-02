@@ -12,7 +12,7 @@ export default class CommandList extends PopupWindow {
   private readonly commandLists: TMCommand[][] = []
 
   constructor() {
-    super(IDS.CommandList, ICONS.mxLogo, 'Command List', [{ name: 'penis', action: 1000 }, { name: 'sussy petya', action: 4321 }, { name: 'heheheha', action: 432145 }])
+    super(IDS.commandList, ICONS.mxLogo, 'Command List', [])
     const privileges: number[] = TM.commandList.map(a => a.privilege)
     this.minPrivilege = Math.min(...privileges)
     const diff: number = Math.max(...privileges) - this.minPrivilege
@@ -26,7 +26,7 @@ export default class CommandList extends PopupWindow {
       })
       this.paginators.push(paginator)
     }
-    this.table = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { headerBg: CONFIG.grid.headerBg, background: CONFIG.grid.bg })
+    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -85,9 +85,7 @@ export default class CommandList extends PopupWindow {
     for (let i: number = 0; i < this.itemsPerPage, params.commands[i + n + 1] !== undefined; i++) {
       arr.push(nameCell, paramsCell, commentCell)
     }
-    return `<frame posn="0 ${-this.margin} 1">
-    ${this.table.constructXml(arr)}
-    </frame>`
+    return this.table.constructXml(arr)
   }
 
   protected constructFooter(login: string, params: { page: number, paginator: Paginator }): string {

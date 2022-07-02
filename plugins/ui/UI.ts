@@ -1,5 +1,4 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
-import { CONFIG as UIConfig } from './UiUtils.js'
 
 import CustomUi from './CustomUi.js'
 //import DayTime from './static_components/DayTime.component.js'
@@ -25,7 +24,8 @@ import LiveCps from './dynamic_components/LiveSectors.component.js'
 import DediSectors from './dynamic_components/DediSectors.component.js'
 import LocalSectors from './dynamic_components/LocalSectors.component.js'
 import LiveSectors from './dynamic_components/LiveCps.component.js'
-// import JukeboxWindow from './dynamic_components/JukeboxWindow.component.js'
+import CurrentCps from './dynamic_components/CurrentCps.component.js'
+import MapList from './dynamic_components/MapList.component.js'
 
 import TestWindow from './test_widgets/TestWindow.js'
 
@@ -56,7 +56,7 @@ const events: TMEvent[] = [
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-        new LiveCheckpoint(),
+      //  new LiveCheckpoint(),
         new RankWidget(),
         new DediRanking(),
         new MapWidget(),
@@ -72,14 +72,15 @@ const events: TMEvent[] = [
       for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(
         //  new JukeboxWindow(),
-        //new TMXWindow(),
+        new MapList(),
         new CommandList(),
         new DediCps(),
         new LiveCps(),
         new LocalCps(),
         new DediSectors(),
         new LocalSectors(),
-        new LiveSectors()
+        new LiveSectors(),
+        new CurrentCps()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {

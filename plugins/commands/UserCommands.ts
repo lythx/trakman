@@ -125,7 +125,7 @@ const commands: TMCommand[] = [
     aliases: ['h', 'help', 'helpall'],
     help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.CommandList, info.login)
+      TM.openManialink(TM.UIIDS.commandList, info.login)
     },
     privilege: 0
   },
@@ -141,7 +141,7 @@ const commands: TMCommand[] = [
     aliases: ['cp', 'cptms', 'recs'],
     help: 'Display current map local checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.LocalCps, info.login)
+      TM.openManialink(TM.UIIDS.localCps, info.login)
     },
     privilege: 0
   },
@@ -149,7 +149,7 @@ const commands: TMCommand[] = [
     aliases: ['dcp', 'dedicptms', 'dedirecs'],
     help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.DediCps, info.login)
+      TM.openManialink(TM.UIIDS.dediCps, info.login)
     },
     privilege: 0
   },
@@ -157,7 +157,7 @@ const commands: TMCommand[] = [
     aliases: ['lcp', 'livecptms', 'liverecs'],
     help: 'Display current map live checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.LiveCps, info.login)
+      TM.openManialink(TM.UIIDS.liveCps, info.login)
     },
     privilege: 0
   },
@@ -165,7 +165,7 @@ const commands: TMCommand[] = [
     aliases: ['sc', 'sectms'],
     help: 'Display current map local sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.LocalSectors, info.login)
+      TM.openManialink(TM.UIIDS.localSectors, info.login)
     },
     privilege: 0
   },
@@ -173,7 +173,7 @@ const commands: TMCommand[] = [
     aliases: ['dsc', 'dedisectms'],
     help: 'Display current map dedimania sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.DediSectors, info.login)
+      TM.openManialink(TM.UIIDS.dediSectors, info.login)
     },
     privilege: 0
   },
@@ -181,16 +181,25 @@ const commands: TMCommand[] = [
     aliases: ['lsc', 'livesectms'],
     help: 'Display current map live sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.LiveSectors, info.login)
+      TM.openManialink(TM.UIIDS.liveSectors, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['ccp', 'currentcps'],
+    help: 'Display each online players current cp.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.currentCps, info.login)
     },
     privilege: 0
   },
   {
     // TODO IMPLEMENT MAP SEARCH
-    aliases: ['l', 'list'],
+    aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
-    callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.JukeboxWindow, info.login)
+    params: [{ name: 'mapName', optional: true }],
+    callback: (info: MessageInfo, mapName: string): void => {
+      TM.openManialink(TM.UIIDS.mapList, info.login)
     },
     privilege: 0
   },

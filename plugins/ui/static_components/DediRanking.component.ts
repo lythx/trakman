@@ -13,7 +13,7 @@ export default class DediRanking extends StaticComponent {
   private readonly maxDedis: number = Number(process.env.DEDIS_AMOUNT)
 
   constructor() {
-    super(IDS.DediRanking, 'race')
+    super(IDS.dedis, 'race')
     this.height = CONFIG.dedis.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.dedis.side
