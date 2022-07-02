@@ -1,7 +1,6 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
 
 const commands: TMCommand[] = [
-  // TODO: help consistency, tidy up
   // Testing commands, remove those later into development
   {
     aliases: ['ct', 'colourtest'],
@@ -203,15 +202,6 @@ const commands: TMCommand[] = [
     },
     privilege: 0
   },
-  //DELETE LATER
-  {
-    aliases: ['qwe'],
-    params: [{ name: 'nickName' }],
-    callback: (info: MessageInfo, nickName: string): void => {
-      TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
-    },
-    privilege: 0
-  },
   {
     aliases: ['pm', 'dm'],
     params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
@@ -230,7 +220,7 @@ const commands: TMCommand[] = [
 
 for (const command of commands) { TM.addCommand(command) }
 
-// votes
+// Vote handler
 
 TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
