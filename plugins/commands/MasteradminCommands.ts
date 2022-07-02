@@ -372,6 +372,17 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
+    aliases: ['pr', 'prunerecs', 'prunerecords'],
+    help: 'Remove all records on the ongoing map.',
+    callback: async (info: MessageInfo): Promise<void> => {
+      await TM.removeAllRecords(TM.map.id)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+        + `${TM.palette.highlight + 'cleared out'}${TM.palette.admin} the current map records.`)
+    },
+    privilege: 3
+  },
+  {
     aliases: ['kc', 'killcontroller'],
     help: 'Kill the controller.',
     callback: (info: MessageInfo): never => {

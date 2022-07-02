@@ -514,7 +514,7 @@ export const TRAKMAN = {
   /**
    * Removes all player records on given map
    * @param mapId Map UID
-   * @returns Databse response
+   * @returns Database response
    */
   removeAllRecords: async (mapId: string): Promise<any[]> => {
     return await RecordService.removeAll(mapId)
