@@ -23,7 +23,6 @@
             "previousAndBest",
             "tmx",
             "timer",
-            "liveCheckpoint",
             "locals",
             "live"
         ],
@@ -384,5 +383,29 @@
         "columnWidth": 3,
         "bgColor": "0009",
         "icon": "info"
+    },
+    "currentCps": {
+        "entries": 15,
+        "icon": "clock",
+        "title": "Current Checkpoints",
+        "navbar": [
+            "liveCps",
+            "localCps",
+            "dediCps"
+        ],
+        "columnProportions": [
+            3,
+            3,
+            3,
+            2,
+            2
+        ]
+    },
+    "mapList": {
+        "title": "Map List",
+        "icon": "map.white",
+        "rows": 4,
+        "columns": 5,
+        "navbar": ["dediCps"]
     }
 }

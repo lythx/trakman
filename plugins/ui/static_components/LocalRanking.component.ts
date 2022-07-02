@@ -13,7 +13,7 @@ export default class LocalRanking extends StaticComponent {
   private readonly maxRecords: number = Number(process.env.LOCALS_AMOUNT)
 
   constructor() {
-    super(IDS.LocalRanking, 'race')
+    super(IDS.locals, 'race')
     this.height = CONFIG.locals.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.locals.side

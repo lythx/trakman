@@ -11,7 +11,7 @@ export default class RankWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.RankWidget, 'race')
+    super(IDS.rank, 'race')
     this.width = CONFIG.static.width
     this.height = CONFIG.rank.height
     this.positionX = CONFIG.static.leftPosition

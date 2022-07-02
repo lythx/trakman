@@ -18,10 +18,10 @@ export default class DediSectors extends PopupWindow {
   cpAmount: number
 
   constructor() {
-    super(IDS.DediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, [{ name: 'Dedi Sectors', action: 6969696 }, { name: 'Local Checkpoints', action: IDS.LocalCps }, { name: 'Local Sectors', action: 6969696 }, { name: 'Live Checkpoints', action: IDS.LocalCps }, { name: 'Live Sectors', action: 6969696 }])
+    super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, ['dediCps', 'localCps', 'localSectors', 'liveCps', 'liveSectors'])
     const dedis: TMDedi[] = TM.dediRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(dedis.length / this.entries))
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(dedis.length / this.entries))
     this.paginator.onPageChange((login: string, page: number): void => {
       const dedis: TMDedi[] = TM.dediRecords
       const pageCount: number = this.paginator.pageCount
@@ -36,7 +36,7 @@ export default class DediSectors extends PopupWindow {
         cpPages++
       }
     }
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.footerHeight, cpPages, 1, true)
     this.cpPaginator.onPageChange((login: string, cpPage: number): void => {
       const dedis: TMDedi[] = TM.dediRecords
       const pageCount: number = this.paginator.pageCount
@@ -116,7 +116,7 @@ export default class DediSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array(this.sectorsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, 2, ...new Array(this.sectorsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.sectorsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
@@ -124,7 +124,7 @@ export default class DediSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array((this.sectorsPerPage + 2) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth - this.margin, this.contentHeight - this.margin * 2, [2, ...new Array(this.sectorsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.sectorsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin})
     }
     const arr = [...headers]
     for (let i: number = 0; i < params.dedis.length; i++) {
@@ -134,13 +134,11 @@ export default class DediSectors extends PopupWindow {
         arr.push(nickNameCell, ...new Array(this.sectorsPerPage + 3).fill(cell))
       }
     }
-    return `<frame posn="0 ${-this.margin} 3">
-    ${grid.constructXml(arr)}
-    </frame>`
+    return grid.constructXml(arr)
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
-    return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
+    return `${closeButton(this.closeId, this.windowWidth, this.footerHeight)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth - this.paginatorOffset} 0 3">
       ${this.cpPaginator.constructXml(params.cpPage)}

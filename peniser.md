@@ -1,555 +1,530 @@
-# Static Components
-Manialinks which are displayed automatically at all times.
-## Static component tutorial
-The goal of this tutorial is to make a simple plugin which displays current checkpoint time and it's difference relative to pb checkpoint time like this:![](image.png)
+# Popup Window tutorial
+The goal of this tutorial is to make a simple plugin which displays window with live checkpoint times of every player in the server like this:
+![](image)
 
-Let's start by adding an id for our widget in plugins/ui/config/ComponentIds.json. Id should be a number followed by zeros and it should be different from all other id's declared in the file.
+Window should be displayed after clicking the Live Checkpoint widget which is covered in `this tutorial` or after typing /livecp command. If you didn't do that tutorial you can continue anyway using only the chat command.
+
+First we add an id in ComponentIds.json file and config entry in UiConfig.json file. Entries is the maximum number of players that can be displayed on one page.
 ```json
 {
-  //other ids
-  "LiveCheckpoint": 70000
-}
-```
-After that we go to ui config file plugins/ui/config/UiConfig.json. Here all component attributes are stored. We add an entry for our widget, set height to 10 (will adjust it later), set side to true (true is right side), set title to Live Checkpoint and set icon to clock
-```json
-{
-  //other components
-  "liveCheckpoint": {
-    "height": 10,
-    "title": "Live Checkpoint",
-    "side": true,
-    "icon": "clock"
-  }
-}
-```
-In the same file go to "static" property and add "liveCheckpoint" to rightSideOrder array after "timer" (because we want it to display under timer widget)
-```json
-{
-  //other components
-  "static": {
-    //other properties
-    "rightSideOrder": [
-      "map",
-      "previousAndBest",
-      "tmx",
-      "timer",
-      "liveCheckpoint", // our component
-      "locals",
-      "live"
-    ]
-  }
-}
-```
-Next let's create a LiveCheckpoint.component.ts file in plugins/ui/static_components directory. In that file create and export a class called LiveCheckpoint.
-```ts
-export default class LiveCheckpoint {
-
-}
-```
-After that we go back to our class file, import StaticComponent class from plugins/ui/StaticComponent.ts file and extend our class with it. That class has methods which are useful for static manialinks, and it displays them automatically. Notice that import declaration uses .js extension because the files get transpiled to javascript after build.
-```ts
-import StaticComponent from '../StaticComponent.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-}
-```
-After extending the class we should see an error. That's because we need to implement abstract methods derived from it. Before we do that though, let's write a constructor. 
-In constructor we first call super() method because of class extension. This method requires 2 parameters: id and displayMode. To get our id (which we specified before in ComponentIds.json file) we import IDS object from plugins/ui/UiUitls.js and use LiveCheckpoint key. For displayMode we set 'race' because we want the plugin to be displayed only during race and not during result screen.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { IDS } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-  }
-
-}
-```
-Next we import CONFIG from UiUtils.js and we set basic object properties: width, height, positionX and positionY. Notice how some of these properties are taken from CONFIG.static because they are common for every static manialink. For positionY we import calculateStaticPositionY() function from UiUtils.js and call it with "liveCheckpoint". That function returns our widget's Y position relative to other widgets.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { IDS, CONFIG, calculateStaticPositionY } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.leftPosition
-  private readonly positionY: number
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint') 
-  }
-
-}
-```
-Afterwards we implement abstract methods display() and displayToPlayer(). Display method is used on server start and map start, displayToPlayer is used when a player joins the server. These methods are responsible for sending the manialink to dedicated server. To do that we need to import TRAKMAN from src/Trakman.js and use it's sendManialink method. For now we are going to send an empty rectangle to see if positioning works well.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
-  }
-
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    // Sends empty rectangle
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string): void {
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
-      </frame>
-    </manialink>`, login)
-  }
-
-}
-```
-Next we go to plugins/ui/Ui.ts file and we import the class there.
-```ts
-import CheckpointWidget from './static_components/CheckpointWidget.component.js'
-```
-After importing the class we search for Controller.Ready listener in the file and we add its object to static components array
-```ts
-const events: TMEvent[] = [
-  {
-    event: 'Controller.Ready',
-    callback: async () => {
-      //...
-      staticComponents.push(
-        new CheckpointWidget(), // our class object
-        //other objects...
-```
-Now it's time to build and restart our server and see the widget. It should look like this: 
-![](https://media.discordapp.net/attachments/971865322858623097/991456807753101433/fsdfdsfds.png?width=1641&height=910)
-Let's make a header now. For that we need side, title, icon, headerHeight and marginSmall from CONFIG. To get icon url we need to import stringToObjectProperty and ICONS from UiUtils, and then pass icon from CONFIG with ICONS to the function. In display method we call staticHeader() function with title, iconUrl and side in params.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-  private readonly side = CONFIG.liveCheckpoint.side
-  private readonly title = CONFIG.liveCheckpoint.title
-  private readonly icon = CONFIG.liveCheckpoint.icon
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
-  }
-
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    const iconUrl = stringToObjectProperty(this.icon, ICONS) // Converts icon name to icon url
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string): void {
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
-      </frame>
-    </manialink>`, login)
-  }
-
-}
-```
-![](https://cdn.discordapp.com/attachments/522878388269088782/991462007628894318/unknown.png)
-
-Now after restarting the server we can see our header, but the text is too big and the title is overlapping with the background. To fix that we need to add format with textsize 1, make our background height smaller and position it a bit lower. For easier positioning let's just make another frame and put the background inside of it.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-  private readonly side = CONFIG.liveCheckpoint.side
-  private readonly title = CONFIG.liveCheckpoint.title
-  private readonly icon = CONFIG.liveCheckpoint.icon
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
-
-   constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
-  }
-
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    const iconUrl = stringToObjectProperty(this.icon, ICONS) // Converts icon name to icon url
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-        </frame>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string): void {
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${this.bg}"/>
-      </frame>
-    </manialink>`, login)
-  }
-
-}
-```
-The widget should look like this
-
-![](https://cdn.discordapp.com/attachments/522878388269088782/991745867008716810/unknown.png)
-
-Let's display the cp time now. Cp time will be different for every player and has to be updated after player crosses a checkpoint so we will need to add listener for Controller.PlayerCheckpoint event in constructor and call displayToPlayer in it. From the listener we pass the cpTime to display method. In display method we add second optional param for checkpoint time and parse the miliseconds to time string using TM.Utils.getTimeString() function. Notice that we need to check if time is null because displayToPlayer() is also called when a player joins the server and then the cpTime doesn't get passed to the function. Finally we call centeredText function from UiUtils to center the text relative to background.
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-  private readonly side = CONFIG.liveCheckpoint.side
-  private readonly title = CONFIG.liveCheckpoint.title
-  private readonly icon = CONFIG.liveCheckpoint.icon
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
-    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
-      // Passes players login and checkpoint time to displayToPlayer function
-      this.displayToPlayer(info.player.login, info.time)
-    })
-  }
-
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    const iconUrl = stringToObjectProperty(this.icon, ICONS) // Converts icon name to icon url
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-        </frame>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string, checkpointTime?: number): void {
-    const iconUrl = stringToObjectProperty(this.icon, ICONS)
-    // Initializes timeString as empty string so nothing gets displayed if checkpointTime isn't defined
-    let timeString = ''
-    // If checkpoint time is defined formats the miliseconds to time and assigns them to variable
-    if (checkpointTime !== undefined) { 
-      timeString = TM.Utils.getTimeString(checkpointTime)
-    }
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-          ${centeredText(timeString, this.width, this.height - (this.headerHeight + this.margin))}
-        </frame>
-      </frame>
-    </manialink>`, login)
-  }
-
-}
-```
-After passing a checkpoint we should see something like this:
-
-![](https://cdn.discordapp.com/attachments/793464821030322196/991789916352692224/unknown.png)
-
-The display is working, but text is way too small and widget height is too big. To fix that we set textSize property in centeredText options, and we decrease the width in UiConfig.json file
-
-```ts
-import StaticComponent from '../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
-
-export default class LiveCheckpoint extends StaticComponent {
-
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-  private readonly side = CONFIG.liveCheckpoint.side
-  private readonly title = CONFIG.liveCheckpoint.title
-  private readonly icon = CONFIG.liveCheckpoint.icon
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
-
-  constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
-    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
-      // Passes players login and checkpoint time to displayToPlayer function
-      this.displayToPlayer(info.player.login, info.time)
-    })
-  }
-
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    const iconUrl = stringToObjectProperty(this.icon, ICONS) // Converts icon name to icon url
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-        </frame>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string, checkpointTime?: number): void {
-    const iconUrl = stringToObjectProperty(this.icon, ICONS)
-    // Initializes timeString as empty string so nothing gets displayed if checkpointTime isn't defined
-    let timeString = ''
-    // If checkpoint time is defined formats the miliseconds to time and assigns them to variable
-    if (checkpointTime !== undefined) {
-      timeString = TM.Utils.getTimeString(checkpointTime)
-    } 
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-          ${centeredText(timeString, this.width, this.height - (this.headerHeight + this.margin), { textScale: 1.5})}
-        </frame>
-      </frame>
-    </manialink>`, login)
-  }
-
+  //...
+  "currentCps": 80000
 }
 ```
 ```json
 {
   //...
-  "liveCheckpoint": {
-        "height": 6, //change height to 6
-        "title": "Live Checkpoint",
-        "side": true,
-        "icon": "clock"
-    }
+  "currentCps": {
+    "entries": 15,
+    "icon": "clock",
+    "title": "Current Checkpoints",
+    "navbar": [
+      "liveCps",
+      "localCps",
+      "dediCps"
+    ],
+    "columnProportions": [
+      3,
+      3,
+      3,
+      2,
+      2
+    ]
+  }
+}
+```
+Next lets add listeners for the window to be displayed. (skip this step if you didn't do previous tutorial) Open LiveCheckpoint file from static component tutorial and add a quad inside of first frame with full width and height, positions X and Y set to 0, position Z set to 6 and action set to our new window id. It will create an overlaying invisible manialink which will be on top on the window due to high Z position. Now whenever we click the window it will execute the actionID
+```ts
+// Add the quad
+TM.sendManialink(`
+    <manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        <quad posn="0 0 6" sizen="${this.width} ${this.height}" action="${IDS.currentCps}"/>
+        ...
+```
+Now we add a chat command to display window in plugins/commands/UserCommands.ts. To get window ID we use TM.UIIDS object
+```ts
+const commands: TMCommand[] = [
+  //other commands
+  {
+    aliases: ['ccp', 'currentcps'],
+    help: 'Display each online players current cp.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.currentCps, info.login)
+    },
+    privilege: 0
+  },
+]
+```
+Next we create a CurrentCps.component.ts file in dynamic_components, import PopupWindow class from ui/PopupWindow.ts and extend our class with it. The popup window class has methods useful for windows and displays them automatically.
+```ts
+import PopupWindow from '../PopupWindow.js'
+
+class CurrentCps extends PopupWindow {
+
+}
+```
+We should see an error because we didn't implement abstract methods yet. Before we do that let's write a constructor. We take all params for super() method from config. We need to translate icon name to url using stringToObjectProperty function. Popup window will automatically construct the header from iconUrl and title, and navbar from the navbar array. What can be misleading though is id - all popup windows have the same id specified in UtilIds.json file (default is 0).
+Because of that when we open a new window the previous one gets closed automatically. If we want to access the id used to open the component we need to use this.openId instead of this.id. Windows also have id dedicated to close them which can be accessed using this.closeId. It's declared in UtilIds tile and by default it's set to openId + 1.
+```ts
+import PopupWindow from '../PopupWindow.js'
+import  { CONFIG, ICONS, IDS, stringToObjectProperty } from '../UiUtils.js'
+
+export default class CurrentCps extends PopupWindow {
+
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+  }
+
+}
+```
+Next we implement the abstract methods constructContent() and constructFooter(). These methods should return xml which is going to be displayed in the middle and bottom part of window. After calling displayToPlayer() PopupWindow will call these methods passing the login and send entire window to dedicated server. For now let's return an empty string.
+```ts
+import PopupWindow from '../PopupWindow.js'
+import { CONFIG, ICONS, IDS, stringToObjectProperty } from '../UiUtils.js'
+
+export default class CurrentCps extends PopupWindow {
+
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+  }
+
+  protected constructContent(login: string, params: any): string {
+    return ''
+  }
+
+  protected constructFooter(login: string, params: any): string {
+    return ''
+  }
+
+}
+```
+After that we import our class into Ui.ts file and create its object in ControllerReady event listener in dyncamicComponents array
+```ts
+import CurrentCps from './dynamic_components/CurrentCps.component.js'
+//...
+const events: TMEvent[] = [
+  {
+    event: 'Controller.Ready',
+    callback: async (): Promise<void> => {
+      dynamicComponents.push(
+        //... other components
+        new CurrentCps()
+      )
+```
+Now we build and restart our server. After clicking the Live Checkpoint manialink or typing /ccp in chat we should see this window:
+![](https://cdn.discordapp.com/attachments/522878388269088782/992062797649301594/unknown.png)
+
+The navbar buttons should open other windows.
+
+We will need a table to display the data. To make it we will use Grid util which we import from UiUtils file. Then we create a class property for grid and create Grid object in constructor. To create it we need content width and height, which are in {opupWindow class, column proportions from config and row proportions. Because all rows have the same height we can just get number of entries, create array with length of entries + 1 and fill it with 1's. We add 1 to entries because we want to display a header in first row. Let's also specify the background, header background and margin optional properties, which we can get from CONFIG.grid object.
+```ts
+import PopupWindow from '../PopupWindow.js'
+import  { CONFIG, ICONS, IDS, stringToObjectProperty, Grid } from '../UiUtils.js'
+
+export default class CurrentCps extends PopupWindow {
+
+  readonly entries = CONFIG.currentCps.entries
+  readonly grid: Grid
+
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    // Create grid object to display the table
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
+      { background: CONFIG.grid.bg, margin: CONFIG.grid.margin, headerBg: CONFIG.grid.headerBg })
+  }
+
+  protected constructContent(login: string, params: any): string {
+    return ''
+  }
+
+  protected constructFooter(login: string, params: any): string {
+    return ''
+  }
+
+}
+```
+Now let's make headers and close button. Each header has to be a centered text, so we will create an array of functions which return a centered text. For centered text parentWidth and parentHeight params we can use w and h arguments passed to the callback function. Next we need to pass the array to grid.constructXml() function and return it. For close button we will call closeButton() function from UiUtils passing closeId, window width and footerHeight to it and return it in constructFooter()
+```ts
+import PopupWindow from '../PopupWindow.js'
+import { CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, closeButton } from '../UiUtils.js'
+
+export default class CurrentCps extends PopupWindow {
+
+  readonly entries = CONFIG.currentCps.entries
+  readonly grid: Grid
+  readonly gridMargin = CONFIG.grid.margin
+
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    // Create grid object to display the table
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
+      { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
+  }
+
+  protected constructContent(login: string, params: any): string {
+    const headers = [
+      (i: number, j: number, w: number, h: number) => centeredText('Nickname ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number) => centeredText('Login', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Time', w, h),
+    ]
+    return this.grid.constructXml(headers)
+  }
+
+  protected constructFooter(login: string, params: any): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+  }
+
+}
+```
+Now the window has headers
+![](https://media.discordapp.net/attachments/793464821030322196/992074903304020008/unknown.png)
+
+To create the rest of the table we need to save player checkpoints. First we create an interface CurrentCheckpoint and an array to store data in it. Afterwards we add a listener for Controller.PlayerCheckpoint event. In that event callback we add and update objects in the array.
+```ts
+import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import PopupWindow from '../PopupWindow.js'
+import { CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, closeButton } from '../UiUtils.js'
+
+interface CurrentCheckpoint {
+  nickname: string
+  readonly login: string
+  checkpoint: number
+  pbCheckpoint: number | undefined
+  pbTime: number | undefined
+}
+
+export default class CurrentCps extends PopupWindow {
+
+  readonly entries = CONFIG.currentCps.entries
+  readonly grid: Grid
+  readonly gridMargin = CONFIG.grid.margin
+  readonly currentCheckpoints: CurrentCheckpoint[] = []
+
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    // Create grid object to display the table
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
+      { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
+    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+      const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
+      const pb = TM.getPlayerRecord(info.player.login)
+      if (currentCp === undefined) { // Add a player to array if he wasn't there
+        this.currentCheckpoints.push({
+          nickname: info.player.nickName,
+          login: info.player.login,
+          checkpoint: info.time,
+          pbCheckpoint: pb?.checkpoints?.[info.index] ?? undefined,
+          pbTime: pb?.time ?? undefined
+        })
+      } else { // Update object in array if player was in it
+        currentCp.nickname = info.player.nickName
+        currentCp.checkpoint = info.time
+        currentCp.pbCheckpoint = pb?.checkpoints?.[info.index] ?? undefined
+        currentCp.pbTime = pb?.time ?? undefined
+      }
+    })
+  }
+
+  protected constructContent(login: string, params: any): string {
+    const headers = [
+      (i: number, j: number, w: number, h: number) => centeredText('Nickname ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number) => centeredText('Login', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Time', w, h),
+    ]
+    return this.grid.constructXml(headers)
+  }
+
+  protected constructFooter(login: string, params: any): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+  }
+
 }
 ```
 
-Now the widget should look like this: 
-
-![](https://cdn.discordapp.com/attachments/580816468468301830/991798348908597368/unknown.png)
-
-The last thing we need to do is display the difference to personal best checkpoint. We will do calculations inside of listener callback and pass them to displayToPlayer in 3rd param. We also need to format the time difference with "+", "-" and colours.
-
+To render the data we need to create table callback functions which will display it. In our case its simple - we just return centered text, do some formatting for time display using TM.Utils.getTimeString function, and handle some exceptions like player not having a pb on the map. Lastly we add the cell functions to array along with headers and then pass them to grid.constructXml function
 ```ts
-import StaticComponent from '../StaticComponent.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
+import PopupWindow from '../PopupWindow.js'
+import { CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, closeButton } from '../UiUtils.js'
 
-export default class LiveCheckpoint extends StaticComponent {
+interface CurrentCheckpoint {
+  nickname: string
+  readonly login: string
+  checkpoint: number
+  pbCheckpoint: number | undefined
+  pbTime: number | undefined
+}
 
-  private readonly bg = CONFIG.static.bgColor
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.liveCheckpoint.height
-  private readonly positionX = CONFIG.static.rightPosition
-  private readonly positionY: number
-  private readonly side = CONFIG.liveCheckpoint.side
-  private readonly title = CONFIG.liveCheckpoint.title
-  private readonly icon = CONFIG.liveCheckpoint.icon
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
-  // Colours property for text formatting
-  private readonly colours = { 
+export default class CurrentCps extends PopupWindow {
+
+  readonly entries = CONFIG.currentCps.entries
+  readonly grid: Grid
+  readonly gridMargin = CONFIG.grid.margin
+  readonly currentCheckpoints: CurrentCheckpoint[] = []
+  private readonly colours = {
     worse: "$F00",
     better: "$00F",
     equal: "$FF0"
   }
 
   constructor() {
-    super(IDS.LiveCheckpoint, 'race')
-    // Gets manialink position relative to other manialinks
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    // Create grid object to display the table
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
+      { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
-      // Gets the player record on the current map
+      const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
       const pb = TM.getPlayerRecord(info.player.login)
-      // If player has a record calculates difference and passes it to displayToPlayer function
-      if (pb !== undefined) {
-        const cpIndex = info.index
-        const diff = pb.checkpoints[cpIndex] - info.time
-        this.displayToPlayer(info.player.login, info.time, diff)
-      } else { // If player doesn't have a record passes just the checkpoint time
-        this.displayToPlayer(info.player.login, info.time)
+      if (currentCp === undefined) { // Add a player to array if he wasn't there
+        this.currentCheckpoints.push({
+          nickname: info.player.nickName,
+          login: info.player.login,
+          checkpoint: info.time,
+          pbCheckpoint: pb?.checkpoints?.[info.index] ?? undefined,
+          pbTime: pb?.time ?? undefined
+        })
+      } else { // Update object in array if player was in it
+        currentCp.nickname = info.player.nickName
+        currentCp.checkpoint = info.time
+        currentCp.pbCheckpoint = pb?.checkpoints?.[info.index] ?? undefined
+        currentCp.pbTime = pb?.time ?? undefined
       }
     })
   }
 
-  display(): void {
-    // Sets isDisplayed to true so new players are able to see the manialink after joining
-    this._isDisplayed = true
-    const iconUrl = stringToObjectProperty(this.icon, ICONS) // Converts icon name to icon url
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-        </frame>
-      </frame>
-    </manialink>`)
-  }
-
-  displayToPlayer(login: string, checkpointTime?: number, difference?: number): void {
-    const iconUrl = stringToObjectProperty(this.icon, ICONS)
-    // Initializes timeString as empty string so nothing gets displayed if checkpointTime isn't defined
-    let timeString = ''
-    // If checkpoint time is defined formats the miliseconds to time and assigns them to variable
-    if (checkpointTime !== undefined) {
-      timeString = TM.Utils.getTimeString(checkpointTime)
-    } 
-    let differenceString = ''
-    // If difference was passed to the function formats the text depending if checkpoint is better, worse or equal relative to personal best checkpoint (if it's better difference is bigger than 0) and assigns it to variable
-    if (difference !== undefined) {
-      if (difference > 0) {
-        differenceString = `(${this.colours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
-      } else if (difference === 0) {
-        differenceString = `(${this.colours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
-      } else {
-        differenceString = `(${this.colours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+  protected constructContent(login: string, params: any): string {
+    const headers = [
+      (i: number, j: number, w: number, h: number) => centeredText('Nickname ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number) => centeredText('Login', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Time', w, h),
+    ]
+    const nickNameCell = (i: number, j: number, w: number, h: number): string => {
+      return centeredText(this.currentCheckpoints[i - 1].nickname, w, h)
+    }
+    const loginCell = (i: number, j: number, w: number, h: number): string => {
+      return centeredText(this.currentCheckpoints[i - 1].login, w, h)
+    }
+    const checkpointCell = (i: number, j: number, w: number, h: number): string => {
+      const entry = this.currentCheckpoints[i - 1]
+      if (entry?.pbCheckpoint === undefined) { // If player has no pb then just displays the formatted time
+        return centeredText(TM.Utils.getTimeString(entry.checkpoint), w, h)
+      }
+      else { // Else calculates the difference and displays formatted difference and time
+        const difference = entry.pbCheckpoint - entry.checkpoint
+        let differenceString: string = ''
+        if (difference !== undefined) {
+          if (difference > 0) {
+            differenceString = `(${this.colours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+          } else if (difference === 0) {
+            differenceString = `(${this.colours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+          } else {
+            differenceString = `(${this.colours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+          }
+        }
+        const str = TM.Utils.getTimeString(entry.checkpoint) + differenceString
+        return centeredText(str, w, h)
       }
     }
-    // Put both time and difference into variable to display them later
-    const txt = timeString + differenceString
-    TM.sendManialink(`
-    <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        <format textsize="1"/>
-        ${staticHeader(this.title, iconUrl, this.side)}
-        <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
-          <quad posn="0 0 0" sizen="${this.width} ${this.height - (this.headerHeight + this.margin)}" bgcolor="${this.bg}"/>
-          ${centeredText(txt, this.width, this.height - (this.headerHeight + this.margin), { textScale: 1.5 })}
-        </frame>
-      </frame>
-    </manialink>`, login)
+    const pbCheckpointCell = (i: number, j: number, w: number, h: number): string => {
+      const pbCheckpoint = this.currentCheckpoints[i - 1]?.pbCheckpoint
+      if (pbCheckpoint === undefined) { // If player has no pb display -:--.--
+        return centeredText('-:--.--', w, h)
+      } else { // Else display the formatted pb checkpoint
+        return centeredText(TM.Utils.getTimeString(pbCheckpoint), w, h)
+      }
+    }
+    const pbTimeCell = (i: number, j: number, w: number, h: number): string => {
+      const pbTime = this.currentCheckpoints[i - 1]?.pbTime
+      if (pbTime === undefined) { // If player has no pb display -:--.--
+        return centeredText('-:--.--', w, h)
+      } else { // Else display the formatted pb time
+        return centeredText(TM.Utils.getTimeString(pbTime), w, h)
+      }
+    }
+    const arr = headers
+    // Add the cells to array
+    for (const e of this.currentCheckpoints) {
+      arr.push(nickNameCell, loginCell, checkpointCell, pbCheckpointCell, pbTimeCell)
+    }
+    return this.grid.constructXml(arr)
+  }
+  
+  protected constructFooter(login: string, params: any): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 
 }
 ```
+Now if we open the window after finishing and crossing a checkpoint we should see something like this: 
+![](https://cdn.discordapp.com/attachments/522878388269088782/992095337529495644/unknown.png)
 
-The widget is finished now. It should display time and difference with proper formatting like this: 
+Next thing we need to add is paginator. In case theres more entries to display than entries per page we need a way to change pages. We start by importing Paginator from UiUtils and creating its object in constructor. For pageCount we set 1 because there is no entries at server start anyway. Then we need to add callback to paginator.onPageChange() method to update page count and display the window in it. Notice that in 2nd param of display we pass the object with page - we will need that to display entries relative to page. In 3rd param of display we page string to display in top right corner of the window. After that we need to override onOpen method (that gets called when people open the window) because we need to calculate and display number of pages now. In constructContent() method we create a variable which will store index of the first entry we should display. Next we add that varible to index of entry in every cell function. We also need to calculate how many entries will be displayed on a given page and change for loop which adds functions to array to use that variable. Lastly we add paginator to construct footer method.
+```ts
+import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import PopupWindow from '../PopupWindow.js'
+import { CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
 
-![](https://cdn.discordapp.com/attachments/522878388269088782/991816352241287249/unknown.png)
+interface CurrentCheckpoint {
+  nickname: string
+  readonly login: string
+  checkpoint: number
+  pbCheckpoint: number | undefined
+  pbTime: number | undefined
+}
 
-Thanks for watching guys, scrubscibe
+export default class CurrentCps extends PopupWindow {
 
+  readonly entries = CONFIG.currentCps.entries
+  readonly grid: Grid
+  readonly gridMargin = CONFIG.grid.margin
+  readonly currentCheckpoints: CurrentCheckpoint[] = []
+  private readonly colours = {
+    worse: "$F00",
+    better: "$00F",
+    equal: "$FF0"
+  }
+  readonly paginator: Paginator
 
-## Paginator
-Pagintor is a tool which creates the buttons to switch pages, and adds functionality to them
-#### Methods
-`constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true)` 
-- `parentId`: actionId used to open the parent manialink
-- `parentWidth`: width of parent element
-- `parentHeight`: height of parent element
-- `pageCount`: number of pages
-- `defaultPage`: page which is displayed after opening the window for the first time
-- `noMidGap`: if specified there will be no bonus gap separating left and right buttons
+  constructor() {
+    // Translate icon name to url
+    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
+    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    // Create grid object to display the table
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
+      { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
+    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+      const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
+      const pb = TM.getPlayerRecord(info.player.login)
+      if (currentCp === undefined) { // Add a player to array if he wasn't there
+        this.currentCheckpoints.push({
+          nickname: info.player.nickName,
+          login: info.player.login,
+          checkpoint: info.time,
+          pbCheckpoint: pb?.checkpoints?.[info.index] ?? undefined,
+          pbTime: pb?.time ?? undefined
+        })
+      } else { // Update object in array if player was in it
+        currentCp.nickname = info.player.nickName
+        currentCp.checkpoint = info.time
+        currentCp.pbCheckpoint = pb?.checkpoints?.[info.index] ?? undefined
+        currentCp.pbTime = pb?.time ?? undefined
+      }
+    })
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, 1)
+    this.paginator.onPageChange((login: string, page: number) => {
+      // Calculate and update page count
+      let pageCount = Math.ceil(this.currentCheckpoints.length / this.entries)
+      if (pageCount === 0) { // Fix 0 pages display if theres no entries
+        pageCount = 1
+      }
+      this.paginator.updatePageCount(pageCount)
+      // Display using page received in params
+      this.displayToPlayer(login, { page }, `${page}/${pageCount}`)
+    })
+  }
 
-`onPageChange(callback: (login: string, page: number) => void)` - Executes the passed callback function on page change, passing login and target page to it
+  // Override onOpen method to add page count to params and display it
+  protected onOpen(info: ManialinkClickInfo): void {
+    // Calculate and update page count
+    let pageCount = Math.ceil(this.currentCheckpoints.length / this.entries)
+    if (pageCount === 0) { // Fix 0 pages display if theres no entries
+      pageCount = 1
+    }
+    this.paginator.updatePageCount(pageCount)
+    this.displayToPlayer(info.login, { page: 1 }, `1/${pageCount}`)
+  }
 
-`getPageByLogin(login: string): number | undefined` - Returns page at which player with specified login is looking, returns undefined if player never changed pages
+  protected constructContent(login: string, params: { page: number }): string {
+    const headers = [
+      (i: number, j: number, w: number, h: number) => centeredText('Nickname ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number) => centeredText('Login', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Checkpoint', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText('PB Time', w, h),
+    ]
+    // Make entries relative to pages (subtract 1 from page because its 1-based)
+    const index = (params.page - 1) * this.entries
+    // Calculate how many entries will be displayed
+    const entriesToDisplay = this.currentCheckpoints.length - index
+    // Add n to index everywhere to make display relative to page
+    const nickNameCell = (i: number, j: number, w: number, h: number): string => {
+      return centeredText(this.currentCheckpoints[i - 1 + index].nickname, w, h)
+    }
+    const loginCell = (i: number, j: number, w: number, h: number): string => {
+      return centeredText(this.currentCheckpoints[i - 1 + index].login, w, h)
+    }
+    const checkpointCell = (i: number, j: number, w: number, h: number): string => {
+      const entry = this.currentCheckpoints[i - 1 + index]
+      if (entry?.pbCheckpoint === undefined) { // If player has no pb then just displays the formatted time
+        return centeredText(TM.Utils.getTimeString(entry.checkpoint), w, h)
+      }
+      else { // Else calculates the difference and displays formatted difference and time
+        const difference = entry.pbCheckpoint - entry.checkpoint
+        let differenceString: string = ''
+        if (difference !== undefined) {
+          if (difference > 0) {
+            differenceString = `(${this.colours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+          } else if (difference === 0) {
+            differenceString = `(${this.colours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+          } else {
+            differenceString = `(${this.colours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+          }
+        }
+        const str = TM.Utils.getTimeString(entry.checkpoint) + differenceString
+        return centeredText(str, w, h)
+      }
+    }
+    const pbCheckpointCell = (i: number, j: number, w: number, h: number): string => {
+      const pbCheckpoint = this.currentCheckpoints[i - 1 + index]?.pbCheckpoint
+      if (pbCheckpoint === undefined) { // If player has no pb display -:--.--
+        return centeredText('-:--.--', w, h)
+      } else { // Else display the formatted pb checkpoint
+        return centeredText(TM.Utils.getTimeString(pbCheckpoint), w, h)
+      }
+    }
+    const pbTimeCell = (i: number, j: number, w: number, h: number): string => {
+      const pbTime = this.currentCheckpoints[i - 1 + index]?.pbTime
+      if (pbTime === undefined) { // If player has no pb display -:--.--
+        return centeredText('-:--.--', w, h)
+      } else { // Else display the formatted pb time
+        return centeredText(TM.Utils.getTimeString(pbTime), w, h)
+      }
+    }
+    const arr = headers
+    // Add the cells to array depending on how many entries should be displayed
+    for (let i = 0; i < entriesToDisplay; i++) {
+      arr.push(nickNameCell, loginCell, checkpointCell, pbCheckpointCell, pbTimeCell)
+    }
+    return this.grid.constructXml(arr)
+  }
 
-`updatePageCount(pageCount: number)` - Updates the number of pages, renders buttons depending on page amount.
+  protected constructFooter(login: string, params: { page: number }): string {
+    // Return close button and paginator
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(params.page)
+  }
 
-`constructXml(page: number)` - Returns the manialink xml for buttons
-## Grid
-Grid is a tool used for positioning elements in a grid layout
-#### Methods
-`constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBg?: string })`
-- `width`: Width of the grid
-- `height`: Height of the grid
-- `columnProportions`: Proportions of the columns, number of columns depends on length of this array. Array is filled with numbers representing the proportion, for example [6,2,1] will create a 3-column grid in which 1st column is 3 times wider than the second, and second is 2 times wider than the third
-- `rowProportions`: Proportions of the rows, number of rows depends on length of this array. Array is filled with numbers representing the proportion, for example [6,2,1] will create a 3-row grid in which 1st row is 3 times wider than the second, and second is 2 times wider than the third
-- `options` - Optional parameters 
-  - `background` - Colour of the background. If not specified background won't be rendered.
-  - `margin` - Gap between background tiles
-  - `headerBg` - Background of the 1st row
+}
+```
+This is how widget should look like right now (I used sample data to display multiple pages):
+![](https://cdn.discordapp.com/attachments/793464821030322196/992107624055185458/unknown.png)
 
-`constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]) {` - constructs manialink XML based on passed array of functions. Each function should return a manialink XML which is going to be positioned accordingly to grid parameters. Functions can use the following params
-- `i` - row number
-- `j` - column number
-- `w` - width of the grid cell
-- `h` - height of the grid cell
+Thanks for watching guys asdsaas

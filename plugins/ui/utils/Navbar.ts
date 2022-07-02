@@ -32,7 +32,7 @@ export default class Navbar {
     for (const [i, e] of this.buttons.entries()) {
       xml += `<frame posn="${this.buttonWidth * i} 0 1">
             <quad posn="0 0 1" sizen="${this.buttonWidth} ${this.height}" image="${ICN.blank}" imagefocus="${this.hoverImage}" action="${e.action}"/>
-            <label posn="${this.buttonWidth / 2} -${(this.height / 2) - this.margin} 9" sizen="${(this.buttonWidth * (1 / this.textScale)) - (this.padding * 2)} ${this.height}" scale="${this.textScale}" text="${TM.safeString(e.name)}" valign="center" halign="center"/>
+            <label posn="${this.buttonWidth / 2} -${(this.height / 2)} 9" sizen="${(this.buttonWidth * (1 / this.textScale)) - (this.padding * 2)} ${this.height}" scale="${this.textScale}" text="${TM.safeString(e.name)}" valign="center" halign="center"/>
             </frame>`
     }
     return xml
