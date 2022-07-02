@@ -44,7 +44,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['afu', 'addfromurl'],
-    help: 'Add a track from an url.',
+    help: 'Add a map from an url.',
     // todo params
     callback: async (info: MessageInfo): Promise<void> => {
       const s: string[] = info.text.split(' ')
@@ -84,7 +84,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['rt', 'et', 'removethis', 'erasethis'],
-    help: 'Remove the current track from the playlist.',
+    help: 'Remove the current map from the playlist.',
     callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
@@ -92,7 +92,7 @@ const commands: TMCommand[] = [
       const res: any[] | Error = await TM.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current map.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
@@ -109,7 +109,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has skipped the ongoing track.`
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has skipped the ongoing map.`
         }]
       },
         {
@@ -126,7 +126,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has restarted the ongoing track.`
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has restarted the ongoing map.`
         }]
       },
         {
@@ -136,11 +136,11 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
-    aliases: ['pt', 'prev', 'previoustrack'],
-    help: 'Requeue the previously played track.',
+    aliases: ['pt', 'prev', 'previous'],
+    help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
