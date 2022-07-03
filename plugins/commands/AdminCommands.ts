@@ -434,7 +434,7 @@ const commands: TMCommand[] = [
           teamColour = `${TM.colours.red}`
           break
         default:
-          TM.sendMessage(`${TM.palette.error}Invalid team type.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid team type.`, info.login)
           return
       }
       TM.multiCallNoRes({
@@ -451,7 +451,317 @@ const commands: TMCommand[] = [
         })
     },
     privilege: 2
-  }
+  },
+  {
+    aliases: ['swu', 'setwarmup'],
+    help: 'Set whether the server is in warmup mode.',
+    params: [{ name: 'enabled', type: 'boolean' }],
+    callback: (info: MessageInfo, enabled: boolean): void => {
+      if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} warm-up mode.`
+        }]
+      },
+        {
+          method: 'SetWarmUp',
+          params: [{
+            boolean: enabled
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['sla', 'setlapsamount'],
+    help: 'Set the laps amount in laps mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 3) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in LAPS gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 laps.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the laps amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetNbLaps',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['srla', 'setroundslapsamount'],
+    help: 'Set the laps amount in rounds mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in ROUNDS gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 laps.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the laps amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetRoundForcedLaps',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['srpl', 'setroundspointlimit'],
+    help: 'Set the points limit for rounds mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in ROUNDS gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 points limit.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetRoundPointsLimit',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['stpl', 'setteamspointlimit'],
+    help: 'Set the points limit for teams mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 2) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in TEAMS gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 points limit.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetTeamPointsLimit',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['stmp', 'setteamsmaxpoints'],
+    help: 'Set the max obtainable points per round for teams mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 2) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in TEAMS gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 points limit.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the max points per team to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetTeamMaxPoints',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['scpl', 'setcuppointlimit'],
+    help: 'Set the points limit for cup mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 5) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in CUP gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 points limit.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetCupPointsLimit',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['scrpm', 'setcuproundspermap'],
+    help: 'Set the amount of rounds per map for cup mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 5) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in CUP gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 rounds per map.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the amount of rounds per map to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetCupRoundsPerChallenge',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['scwt', 'setcupwarmuptime'],
+    help: 'Set the amount of rounds in warmup for cup mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 5) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in CUP gamemode.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the amount of rounds in warm-up to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetCupWarmUpDuration',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['scwa', 'setcupwinnersamount'],
+    help: 'Set the amount of winners for cup mode.',
+    params: [{ name: 'amount', type: 'int' }],
+    callback: (info: MessageInfo, amount: number): void => {
+      if (TM.gameInfo.gameMode !== 5) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Only available in CUP gamemode.`, info.login)
+        return
+      }
+      if (amount <= 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't have <= 0 winners.`, info.login)
+        return
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `set the amount of cup winners to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetCupNbWinners',
+          params: [{
+            int: amount
+          }],
+        })
+    },
+    privilege: 2
+  },
+  {
+    aliases: ['dr', 'delrec', 'deleterecord'],
+    help: 'Remove a player\'s record on the ongoing map.',
+    params: [{ name: 'login' }],
+    callback: async (info: MessageInfo, login: string): Promise<void> => {
+      // Can also be done with TM.getPlayerRecord, however we need the player nickname
+      const playerRecord: LocalRecord | undefined = TM.localRecords.find(a => a.login === login)
+      if (playerRecord === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} has no record on this map.`, info.login)
+        return
+      }
+      await TM.removeRecord(playerRecord.login, TM.map.id)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+        + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickName, true))}${TM.palette.admin} on the ongoing map.`)
+    },
+    privilege: 2
+  },
 ]
 
 for (const command of commands) { TM.addCommand(command) }

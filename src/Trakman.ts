@@ -97,11 +97,11 @@ export const TRAKMAN = {
 
   /**
    * Fetches TMX for map information
-   * @param trackId Map UID
+   * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */
-  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
-    return await TMXService.fetchTrackInfo(trackId)
+  async fetchTMXMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
+    return await TMXService.fetchMapInfo(mapId)
   },
 
   /**
@@ -311,11 +311,11 @@ export const TRAKMAN = {
 
   /**
    * Fetches the map from TMX via its UID
-   * @param trackId Map UID
+   * @param mapId Map UID
    * @returns TMX map data or error if unsuccessful
    */
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
-    return await TMXService.fetchTrackFileByUid(trackId)
+  async fetchMapFileByUid(mapId: string): Promise<TMXFileData | Error> {
+    return await TMXService.fetchMapFileByUid(mapId)
   },
 
   /**
@@ -380,7 +380,7 @@ export const TRAKMAN = {
     if (process.env.USE_WEBSERVICES !== "YES") {
       return new Error('Use webservices set to false')
     }
-    const au = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
+    const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
     const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
       headers: {
         "Authorization": au
@@ -514,7 +514,7 @@ export const TRAKMAN = {
   /**
    * Removes all player records on given map
    * @param mapId Map UID
-   * @returns Databse response
+   * @returns Database response
    */
   removeAllRecords: async (mapId: string): Promise<any[]> => {
     return await RecordService.removeAll(mapId)
@@ -668,7 +668,7 @@ export const TRAKMAN = {
     return MapService.maps
   },
 
-  get TMXInfo(): TMXTrackInfo | null {
+  get TMXInfo(): TMXMapInfo | null {
     return TMXService.current
   },
 
@@ -684,15 +684,15 @@ export const TRAKMAN = {
     return JukeboxService.previous
   },
 
-  get TMXPrevious(): (TMXTrackInfo | null)[] {
+  get TMXPrevious(): (TMXMapInfo | null)[] {
     return TMXService.previous
   },
 
-  get TMXCurrent(): TMXTrackInfo | null {
+  get TMXCurrent(): TMXMapInfo | null {
     return TMXService.current
   },
 
-  get TMXNext(): (TMXTrackInfo | null)[] {
+  get TMXNext(): (TMXMapInfo | null)[] {
     return TMXService.next
   },
 
