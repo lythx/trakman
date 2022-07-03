@@ -150,7 +150,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['rq', 'requeue', 'replay'],
     help: 'Requeue the ongoing map.',
-    callback: (info: MessageInfo) => {
+    callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the ongoing map.`)
       TM.addToJukebox(TM.map.id)
