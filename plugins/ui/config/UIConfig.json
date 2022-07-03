@@ -251,7 +251,7 @@
             1
         ],
         "markers": {
-            "you": "arrowDoubleL.orange",
+            "you": "arrowDoubleL",
             "faster": "person.orange",
             "slower": "person.green"
         },
@@ -307,7 +307,7 @@
         "iconVerticalPadding": 0.15,
         "iconHorizontalPadding": 0.15,
         "markersLeft": {
-            "you": "arrowDoubleL.orange",
+            "you": "arrowDoubleL",
             "faster": "person.orange",
             "slower": "person.green"
         },
@@ -406,6 +406,8 @@
         "icon": "map.white",
         "rows": 4,
         "columns": 5,
-        "navbar": ["dediCps"]
+        "navbar": [
+            "dediCps"
+        ]
     }
 }
