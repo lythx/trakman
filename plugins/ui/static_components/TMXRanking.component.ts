@@ -44,7 +44,7 @@ export default class TMXRanking extends StaticComponent {
 
   displayToPlayer(login: string): void {
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo: TMXTrackInfo | null = TM.TMXCurrent
+    const tmxInfo: TMXMapInfo | null = TM.TMXCurrent
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }

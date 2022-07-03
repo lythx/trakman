@@ -4,7 +4,7 @@ interface TMXReplay {
   readonly name: string
   readonly time: number
   readonly recordDate: Date
-  readonly trackDate: Date
+  readonly mapDate: Date
   readonly approved: any
   readonly leaderboardScore: number
   readonly expires: any

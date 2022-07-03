@@ -6,21 +6,21 @@ import 'dotenv/config'
 
 export abstract class TMXService {
 
-  private static readonly _previous: (TMXTrackInfo | null)[] = []
-  private static _current: TMXTrackInfo | null
-  private static readonly _next: (TMXTrackInfo | null)[] = []
+  private static readonly _previous: (TMXMapInfo | null)[] = []
+  private static _current: TMXMapInfo | null
+  private static readonly _next: (TMXMapInfo | null)[] = []
   private static readonly prefixes: string[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly nextSize: number = 4
   private static readonly previousSize: number = 4
 
   static async initialize(): Promise<void> {
     if (process.env.USE_TMX !== 'YES') { return }
-    const current: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.current.id)
+    const current: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.current.id)
     this._current = current instanceof Error ? null : current
     for (let i: number = 0; i < Math.min(JukeboxService.queue.length, this.nextSize); i++) {
       const id: string = JukeboxService.queue[i].id
-      const track: TMXTrackInfo | Error = await this.fetchTrackInfo(id)
-      this._next.push(track instanceof Error ? null : track)
+      const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
+      this._next.push(map instanceof Error ? null : map)
     }
   }
 
@@ -28,7 +28,7 @@ export abstract class TMXService {
     if (process.env.USE_TMX !== 'YES') { return }
     this._previous.unshift(this._current)
     this._previous.length = Math.min(this._previous.length, this.previousSize)
-    const next: TMXTrackInfo | null | undefined = this._next.shift()
+    const next: TMXMapInfo | null | undefined = this._next.shift()
     if (next === undefined) {
       ErrorHandler.error(`TMX didn't get prefetched for some reason, this should never happen`)
       return
@@ -45,8 +45,8 @@ export abstract class TMXService {
         }
       }
     }
-    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
-    this._next.push(track instanceof Error ? null : track)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    this._next.push(map instanceof Error ? null : map)
   }
 
   static restartMap(): void {
@@ -57,37 +57,37 @@ export abstract class TMXService {
 
   static async add(id: string, index: number): Promise<void | Error> {
     if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
-    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(id)
-    this._next.splice(index, 0, track instanceof Error ? null : track)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
+    this._next.splice(index, 0, map instanceof Error ? null : map)
     this._next.length = this.nextSize
   }
 
   static async remove(index: number): Promise<void> {
     if (process.env.USE_TMX !== 'YES' || index >= this.nextSize) { return }
     this._next.splice(index, 1)
-    const track: TMXTrackInfo | Error = await this.fetchTrackInfo(JukeboxService.queue[this.nextSize - 1].id)
-    this._next.push(track instanceof Error ? null : track)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    this._next.push(map instanceof Error ? null : map)
   }
 
-  static get current(): TMXTrackInfo | null {
+  static get current(): TMXMapInfo | null {
     if (process.env.USE_TMX !== 'YES') { return null }
     return this._current === null ? null : { ...this._current }
   }
 
-  static get next(): (TMXTrackInfo | null)[] {
+  static get next(): (TMXMapInfo | null)[] {
     if (process.env.USE_TMX !== 'YES') { return new Array(this.nextSize).fill(null) }
     return [...this._next]
   }
 
-  static get previous(): (TMXTrackInfo | null)[] {
+  static get previous(): (TMXMapInfo | null)[] {
     if (process.env.USE_TMX !== 'YES') { return new Array(this.previousSize).fill(null) }
     return [...this._previous]
   }
 
   /**
-   * Fetches track gbx file from tmx by track id, returns name and file in base64 string
+   * Fetches map gbx file from tmx by map id, returns name and file in base64 string
    */
-  static async fetchTrackFile(id: number, game: string = 'TMNF'): Promise<TMXFileData | Error> {
+  static async fetchMapFile(id: number, game: string = 'TMNF'): Promise<TMXFileData | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     const prefix: string = this.prefixes[['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'].indexOf(game)]
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackgbx/${id}`).catch((err: Error) => err)
@@ -96,7 +96,7 @@ export abstract class TMXService {
       return res
     }
     const nameHeader: string | null = res.headers.get('content-disposition')
-    if (nameHeader === null) { return new Error('Cannot read track name') }
+    if (nameHeader === null) { return new Error('Cannot read map name') }
     // The header is inconsistent for some reason, I hate TMX
     const name: string = nameHeader[21] === '"' ? nameHeader.substring(22).split('"; filename*=')[0] : nameHeader.substring(21).split('; filename*=')[0]
     const data: ArrayBuffer = await res.arrayBuffer()
@@ -105,14 +105,14 @@ export abstract class TMXService {
   }
 
   /**
-   * Fetches track gbx file from tmx by uid, returns name and file in base64 string
+   * Fetches map gbx file from tmx by uid, returns name and file in base64 string
    */
-  static async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
+  static async fetchMapFileByUid(mapId: string): Promise<TMXFileData | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     let data: string = ''
     let prefix: string = ''
     for (const p of this.prefixes) {
-      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
+      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`).catch((err: Error) => err)
       if (res instanceof Error) {
         ErrorHandler.error(res.message)
         continue
@@ -123,22 +123,22 @@ export abstract class TMXService {
         break
       }
     }
-    if (prefix === '') { return new Error('Cannot fetch track data from TMX') }
+    if (prefix === '') { return new Error('Cannot fetch map data from TMX') }
     const s: string[] = data.split('\t')
     const id: number = Number(s[0])
     const site: string = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS'][['tmnforever', 'united', 'nations', 'original', 'sunrise'].indexOf(prefix)]
-    return await this.fetchTrackFile(id, site)
+    return await this.fetchMapFile(id, site)
   }
 
   /**
-   * Fetches TMX info for track with given id
+   * Fetches TMX info for map with given id
    */
-  static async fetchTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
+  static async fetchMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
     if (process.env.USE_TMX !== 'YES') { return new Error('TMX is not enabled in .env file') }
     let data: string = ''
     let prefix: string = ''
     for (const p of this.prefixes) {
-      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${trackId}`).catch((err: Error) => err)
+      const res = await fetch(`https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`).catch((err: Error) => err)
       if (res instanceof Error) {
         ErrorHandler.error(res.message)
         continue
@@ -151,7 +151,7 @@ export abstract class TMXService {
     }
     if (prefix === '') {
       this._current = null
-      return new Error('Cannot fetch track data from TMX')
+      return new Error('Cannot fetch map data from TMX')
     }
     const s: string[] = data.split('\t')
     const TMXId: number = Number(s[0])
@@ -171,7 +171,7 @@ export abstract class TMXService {
         name: rs[2],
         time: Number(rs[3]),
         recordDate: new Date(rs[4]),
-        trackDate: new Date(rs[5]),
+        mapDate: new Date(rs[5]),
         approved: rs[6],
         leaderboardScore: Number(rs[7]),
         expires: rs[8],
@@ -180,8 +180,8 @@ export abstract class TMXService {
       })
     }
     Object.freeze(replays)
-    const obj: TMXTrackInfo = {
-      id: trackId,
+    const obj: TMXMapInfo = {
+      id: mapId,
       TMXId,
       name: s[1],
       authorId: Number(s[2]),

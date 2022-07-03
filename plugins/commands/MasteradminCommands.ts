@@ -290,6 +290,99 @@ const commands: TMCommand[] = [
     privilege: 3
   },
   {
+    aliases: ['shs', 'sethideserver'],
+    help: 'Set whether the server is hidden.',
+    params: [{ name: 'value', type: 'int' }],
+    callback: (info: MessageInfo, value: number): void => {
+      if (![0, 1, 2].includes(value)) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Possible values are ${TM.palette.highlight}0, 1 & 2${TM.palette.error}.`, info.login)
+        return
+      }
+      let status: string
+      switch (value) {
+        case 1:
+          status = 'hidden'
+          break
+        case 2:
+          status = 'hidden for TMNF players'
+          break
+        default:
+          status = 'visible'
+      }
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `updated server visibility to${TM.palette.highlight + ':' + status}${TM.palette.admin}.`
+        }]
+      },
+        {
+          method: 'SetHideServer',
+          params: [{
+            // 0 = Visible, 1 = Hidden, 2 = Hidden for TMNF players
+            int: value
+          }],
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['asr', 'autosavereplays'],
+    help: 'Set whether replays should be autosaved by the server.',
+    params: [{ name: 'enabled', type: 'boolean' }],
+    callback: (info: MessageInfo, enabled: boolean): void => {
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} server replay autosaving.`
+        }]
+      },
+        {
+          method: 'AutoSaveReplays',
+          params: [{
+            boolean: enabled
+          }],
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['asvr', 'autosavevalreplays'],
+    help: 'Set whether validation replays should be autosaved by the server.',
+    params: [{ name: 'enabled', type: 'boolean' }],
+    callback: (info: MessageInfo, enabled: boolean): void => {
+      TM.multiCallNoRes({
+        method: 'ChatSendServerMessage',
+        params: [{
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} server validation replay autosaving.`
+        }]
+      },
+        {
+          method: 'AutoSaveValidationReplays',
+          params: [{
+            boolean: enabled
+          }],
+        })
+    },
+    privilege: 3
+  },
+  {
+    aliases: ['pr', 'prunerecs', 'prunerecords'],
+    help: 'Remove all records on the ongoing map.',
+    callback: async (info: MessageInfo): Promise<void> => {
+      await TM.removeAllRecords(TM.map.id)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+        + `${TM.palette.highlight + 'cleared out'}${TM.palette.admin} the current map records.`)
+    },
+    privilege: 3
+  },
+  {
     aliases: ['kc', 'killcontroller'],
     help: 'Kill the controller.',
     callback: (info: MessageInfo): never => {
@@ -304,7 +397,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
-    callback: async (info: MessageInfo) => {
+    callback: async (info: MessageInfo): Promise<void> => {
       await TM.call('ChatSendServerMessage', [{
         string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
           + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has killed the server :,(`
