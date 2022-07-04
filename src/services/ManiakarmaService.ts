@@ -11,7 +11,7 @@ export abstract class ManiakarmaService {
 
     private static authCode: string
     private static apiUrl: string
-    static _mapKarmaValue: number
+    static _mapKarmaValue: number = 0
     static _mapKarma = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
     static _playerVotes: TMVote[] = []
     static _newVotes: TMVote[] = []
