@@ -21,6 +21,6 @@ export abstract class ManiakarmaClient {
         this.socket?.destroy()
         this.socket.connect(port, host)
         this.socket.setKeepAlive(true)
-       // const request = new ManiakarmaRequest()
+        // const request = new ManiakarmaRequest()
     }
 }

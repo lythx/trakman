@@ -1,6 +1,6 @@
 import { VoteRepository } from "../database/VoteRepository.js";
 import { JukeboxService } from "./JukeboxService.js";
-import { ManiakarmaClient } from '../maniakarma/ManiakarmaClient.js'
+import { ManiakarmaService } from './ManiakarmaService.js'
 
 export abstract class VoteService {
 
@@ -68,6 +68,9 @@ export abstract class VoteService {
   }
 
   static async add(mapId: string, login: string, vote: number): Promise<void> {
+    if (this._votes.find(a => a.login === login && a.vote === vote && a.mapId === mapId)) {
+      return // Return if same vote already exists
+    }
     const date: Date = new Date()
     const v: TMVote | undefined = this._votes.find(a => a.mapId === mapId && a.login === login)
     if (v !== undefined) {
