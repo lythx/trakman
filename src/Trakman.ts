@@ -20,6 +20,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
+import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -593,6 +594,17 @@ export const TRAKMAN = {
     return await VoteService.fetch(mapId)
   },
 
+  /**
+   * Adds a vote to Maniakarma service
+   * @param mapId Map UID
+   * @param login Player login
+   * @param vote Player vote
+   * @param date Vote date
+   */
+  addMKVote(mapId: string, login: string, vote: number, date: Date): void {
+    ManiakarmaService._newVotes.push({ mapId: mapId, login: login, vote: vote, date: date })
+  },
+
   get gameInfo(): TMGame {
     return Object.assign(GameService.game)
   },
@@ -726,5 +738,21 @@ export const TRAKMAN = {
 
   get guestlist() {
     return AdministrationService.guestlist
+  },
+
+  get mkPlayerVotes(): TMVote[] {
+    return ManiakarmaService.playerVotes
+  },
+
+  get mkNewVotes(): TMVote[] {
+    return ManiakarmaService.newVotes
+  },
+
+  get mkMapKarmaValue(): number {
+    return ManiakarmaService.mapKarmaValue
+  },
+
+  get mkMapKarma() {
+    return ManiakarmaService.mapKarma
   },
 }
