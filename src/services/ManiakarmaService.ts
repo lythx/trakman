@@ -112,7 +112,12 @@ export abstract class ManiakarmaService {
 
     static getVoteString(): string[] {
         let voteString: string[] = []
-        for (const vote of this._newVotes) {
+        const count: any = Object.create(null)
+        for (const player of this._newVotes) {
+            count[player.login] = (count[player.login] || 0) + 1
+        }
+        const newVotesCopy: TMVote[] = this._newVotes.filter(a => count[a.login]-- === 1)
+        for (const vote of newVotesCopy) {
             voteString.push(vote.login + `=` + vote.vote)
         }
         return voteString

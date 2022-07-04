@@ -223,14 +223,6 @@ for (const command of commands) { TM.addCommand(command) }
 // Vote handler
 
 TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
-  // if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
-
-  //   TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
-  //     + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `
-  //     + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
-  //   void TM.addVote(TM.map.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
-  // }
-
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
@@ -239,9 +231,5 @@ TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
     void TM.addVote(TM.map.id, info.login, playerVote)
     TM.addMKVote(TM.map.id, info.login, playerVote, new Date())
   }
-
-
-
-
 })
 
