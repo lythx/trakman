@@ -40,8 +40,8 @@ export abstract class ManiakarmaService {
             + `?Action=Auth`
             + `&login=${process.env.SERVER_LOGIN}`
             + `&name=${Buffer.from(ServerConfig.config.name).toString('base64')}`
-            + `&game=TmForever`
-            + `&zone=Poland%7CMalopolskie`
+            + `&game=TmForever` // TODO
+            + `&zone=Poland%7CMalopolskie` // TODO
             + `&nation=${process.env.SERVER_NATION}`
         const res = await fetch(link).catch((err: Error) => err)
         if (res instanceof Error) {
