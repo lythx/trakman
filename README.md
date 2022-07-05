@@ -18,6 +18,7 @@ PostgreSQL [v14](https://www.postgresql.org/download/)+
 ### Settings
 The following settings are currently supported by the `.env` file:
 ##### Dedicated Server
+See [the TM-Forum post](https://www.tm-forum.com/viewtopic.php?t=14203) for Dedicated Server installation instructions.
 - `SERVER_IP`: IP address of the server
 - `SERVER_PORT`: Port used for the server communication (`5000` by [default](https://www.tm-forum.com/viewtopic.php?p=107361&hilit=5000#p107361))
 - `SUPERADMIN_NAME`: SuperAdmin name from your `dedicated_cfg.txt`
@@ -29,6 +30,7 @@ The following settings are currently supported by the `.env` file:
 - `SERVER_PACKMASK`: Current server packmask (`Stadium`, `Original`, etc.)
 - `SERVER_OWNER_LOGIN`: Trackmania login of the server owner, highest privilege user
 ##### Database
+You might want to take a look at the [official PostgreSQL docs](https://www.postgresql.org/docs/current/) before setting these.
 - `DB_USER`: PostgreSQL database user
 - `DB_PASSWORD`: Password for `DB_USER`
 - `DB_NAME`: Name of the PostgreSQL database
@@ -46,7 +48,10 @@ Before configuring this, please see the [wiki page](https://github.com/felacek/t
 - `WEBSERVICES_PASSWORD`: Your TMWS password
 ##### Trackmania Exchange
 - `USE_TMX`: Enable or disable track info fetching from TMExchange (`YES` or `NO`)
-- `TMX_PREFETCH_AMOUNT`: Amount of tracks to be pre-fetched from TMExchange (`6` by default)
+- `TMX_PREFETCH_AMOUNT`: Amount of tracks to be pre-fetched from TMExchange (`4` by default)
+#### ManiaKarma
+- `USE_MANIAKARMA`: Enable or disable the use of Maniakarma global votes (`YES` or `NO`)
+- `MANIAKARMA_PREFETCH_AMOUNT`: Amount of tracks to have Maniakarma fetched for (`4` by default)
 
 ### Limitations
 1. Stunts mode is not supported (yet?)
