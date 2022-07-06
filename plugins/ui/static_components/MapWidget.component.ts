@@ -1,5 +1,6 @@
 import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
 import countries from '../../../src/data/Countries.json' assert {type: 'json'}
+import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -56,7 +57,7 @@ export default class MapWidget extends StaticComponent {
     const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
     const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     if (nation !== undefined) {
-      icons[2] = `tmtp://Skins/Avatars/Flags/${nation}.dds`
+      icons[2] = (flags as any)[nation] // cope typescript
     }
     const headerCFG = CONFIG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {
