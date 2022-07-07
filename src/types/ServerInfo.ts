@@ -18,6 +18,7 @@ interface ServerInfo {
     callVoteRatio: number
     allowMapDownload: boolean
     autoSaveReplays: boolean
+    login: string
     id: number
     zone: string
     ipAddress: string
