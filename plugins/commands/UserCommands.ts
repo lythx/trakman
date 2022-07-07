@@ -196,8 +196,8 @@ const commands: TMCommand[] = [
     // TODO IMPLEMENT MAP SEARCH
     aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
-    params: [{ name: 'mapName', optional: true }],
-    callback: (info: MessageInfo, mapName: string): void => {
+    params: [{ name: 'query', optional: true }],
+    callback: (info: MessageInfo, query: string): void => {
       TM.openManialink(TM.UIIDS.mapList, info.login)
     },
     privilege: 0
