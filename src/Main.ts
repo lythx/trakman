@@ -17,6 +17,7 @@ import { TMXService } from './services/TMXService.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
+import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
   Logger.warn('Establishing connection with the server...')
@@ -71,10 +72,16 @@ async function main(): Promise<void> {
     Logger.info('TMX service instantiated')
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to dedimania...')
+    Logger.trace('Connecting to Dedimania...')
     const status: void | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
-    else { Logger.info('Connected to dedimania') }
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Dedimania service') }
+    else { Logger.info('Connected to Dedimania') }
+  }
+  if (process.env.USE_MANIAKARMA === 'YES') {
+    Logger.trace('Connecting to Maniakarma...')
+    const status: void | Error = await ManiakarmaService.initialize()
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Maniakarma service') }
+    else { Logger.info('Connected to Maniakarma') }
   }
   Events.initialize()
 }

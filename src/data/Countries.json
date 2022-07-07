@@ -20,44 +20,44 @@
     "name": "Austria"
   },
   {
-    "code": "BRN",
-    "name": "Bahrain"
-  },
-  {
     "code": "BAN",
     "name": "Bangladesh"
-  },
-  {
-    "code": "BLR",
-    "name": "Belarus"
   },
   {
     "code": "BEL",
     "name": "Belgium"
   },
   {
-    "code": "BOL",
-    "name": "Bolivia"
-  },
-  {
     "code": "BIH",
     "name": "Bosnia&Herzegovina"
+  },
+  {
+    "code": "BLR",
+    "name": "Belarus"
+  },
+  {
+    "code": "BOL",
+    "name": "Bolivia"
   },
   {
     "code": "BRA",
     "name": "Brazil"
   },
   {
+    "code": "BRN",
+    "name": "Bahrain"
+  },
+  {
     "code": "BUL",
     "name": "Bulgaria"
   },
   {
-    "code": "CMR",
-    "name": "Cameroon"
-  },
-  {
     "code": "CAN",
     "name": "Canada"
+  },
+  {
+    "code": "CGO",
+    "name": "Congo"
   },
   {
     "code": "CHI",
@@ -68,16 +68,16 @@
     "name": "China"
   },
   {
-    "code": "COL",
-    "name": "Colombia"
-  },
-  {
-    "code": "CGO",
-    "name": "Congo"
-  },
-  {
     "code": "CIV",
     "name": "Ivory Coast"
+  },
+  {
+    "code": "CMR",
+    "name": "Cameroon"
+  },
+  {
+    "code": "COL",
+    "name": "Colombia"
   },
   {
     "code": "CRO",
@@ -104,6 +104,10 @@
     "name": "Egypt"
   },
   {
+    "code": "ESP",
+    "name": "Spain"
+  },
+  {
     "code": "EST",
     "name": "Estonia"
   },
@@ -114,6 +118,10 @@
   {
     "code": "FRA",
     "name": "France"
+  },
+  {
+    "code": "GBR",
+    "name": "United Kingdom"
   },
   {
     "code": "GER",
@@ -132,24 +140,24 @@
     "name": "Hungary"
   },
   {
-    "code": "IND",
-    "name": "India"
-  },
-  {
     "code": "INA",
     "name": "Indonesia"
+  },
+  {
+    "code": "IND",
+    "name": "India"
   },
   {
     "code": "IRI",
     "name": "Iran"
   },
   {
-    "code": "IRQ",
-    "name": "Iraq"
-  },
-  {
     "code": "IRL",
     "name": "Ireland"
+  },
+  {
+    "code": "IRQ",
+    "name": "Iraq"
   },
   {
     "code": "ISR",
@@ -172,6 +180,10 @@
     "name": "Korea"
   },
   {
+    "code": "KSA",
+    "name": "Saudi Arabia"
+  },
+  {
     "code": "KUW",
     "name": "Kuwait"
   },
@@ -184,12 +196,12 @@
     "name": "Latvia"
   },
   {
-    "code": "LIB",
-    "name": "Lebanon"
-  },
-  {
     "code": "LBA",
     "name": "Libya"
+  },
+  {
+    "code": "LIB",
+    "name": "Lebanon"
   },
   {
     "code": "LTU",
@@ -200,8 +212,8 @@
     "name": "Luxembourg"
   },
   {
-    "code": "MKD",
-    "name": "Macedonia"
+    "code": "MAR",
+    "name": "Morocco"
   },
   {
     "code": "MAS",
@@ -216,16 +228,12 @@
     "name": "Mongolia"
   },
   {
-    "code": "MAR",
-    "name": "Morocco"
+    "code": "MKD",
+    "name": "Macedonia"
   },
   {
     "code": "NED",
     "name": "Netherlands"
-  },
-  {
-    "code": "NZL",
-    "name": "New Zealand"
   },
   {
     "code": "NGR",
@@ -236,8 +244,16 @@
     "name": "Norway"
   },
   {
+    "code": "NZL",
+    "name": "New Zealand"
+  },
+  {
     "code": "OMA",
     "name": "Oman"
+  },
+  {
+    "code": "OTH",
+    "name": "Other Countries"
   },
   {
     "code": "PAK",
@@ -272,44 +288,40 @@
     "name": "Romania"
   },
   {
-    "code": "RUS",
-    "name": "Russia"
+    "code": "RSA",
+    "name": "South Africa"
   },
   {
-    "code": "KSA",
-    "name": "Saudi Arabia"
+    "code": "RUS",
+    "name": "Russia"
   },
   {
     "code": "SEN",
     "name": "Senegal"
   },
   {
-    "code": "SVK",
-    "name": "Slovakia"
+    "code": "SIN",
+    "name": "Singapore"
   },
   {
     "code": "SLO",
     "name": "Slovenia"
   },
   {
-    "code": "SIN",
-    "name": "Singapore"
-  },
-  {
-    "code": "RSA",
-    "name": "South Africa"
-  },
-  {
-    "code": "ESP",
-    "name": "Spain"
-  },
-  {
-    "code": "SWE",
-    "name": "Sweden"
+    "code": "SRB",
+    "name": "Serbia"
   },
   {
     "code": "SUI",
     "name": "Switzerland"
+  },
+  {
+    "code": "SVK",
+    "name": "Slovakia"
+  },
+  {
+    "code": "SWE",
+    "name": "Sweden"
   },
   {
     "code": "SYR",
@@ -328,24 +340,20 @@
     "name": "Turkey"
   },
   {
-    "code": "UKR",
-    "name": "Ukraine"
-  },
-  {
     "code": "UAE",
     "name": "United Arab Emirates"
   },
   {
-    "code": "GBR",
-    "name": "United Kingdom"
-  },
-  {
-    "code": "USA",
-    "name": "United States of America"
+    "code": "UKR",
+    "name": "Ukraine"
   },
   {
     "code": "URU",
     "name": "Uruguay"
+  },
+  {
+    "code": "USA",
+    "name": "United States of America"
   },
   {
     "code": "UZB",
@@ -358,13 +366,5 @@
   {
     "code": "VIE",
     "name": "Vietnam"
-  },
-  {
-    "code": "SRB",
-    "name": "Serbia"
-  },
-  {
-    "code": "OTH",
-    "name": "Other Countries"
   }
 ]
