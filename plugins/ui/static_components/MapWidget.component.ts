@@ -44,16 +44,19 @@ export default class MapWidget extends StaticComponent {
       if (json instanceof Error) {
         TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
         author = authorLogin
+      } else {
+        if (json?.message === 'Unkown player') { // THANKS NADEO
+          TM.error(`Failed to fetch nickname for author login ${authorLogin} (no such login registered)`, json.message)
+          author = authorLogin
+        } else {
+          author = json?.nickname
+          nation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
+        }
       }
-      else {
-        author = json.nickname
-        nation = countries.find(a => a.name === json.path.split('|')[1])?.code
-      }
-    }
-    else {
+    } else {
       author = authorLogin
     }
-    const date: any = TM.TMXCurrent?.lastUpdateDate
+    const date: Date | undefined = TM.TMXCurrent?.lastUpdateDate
     const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
     const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     if (nation !== undefined) {
