@@ -51,34 +51,6 @@ export abstract class DedimaniaClient {
               }]
             }
           }
-        },
-        {
-          struct: {
-            methodName: { string: 'dedimania.UpdateServerPlayers' },
-            params: {
-              array: [
-                { string: 'TMF' },
-                { int: PlayerService.players.length },
-                {
-                  struct: {
-                    SrvName: { string: cfg.name },
-                    Comment: { string: cfg.comment },
-                    Private: { boolean: cfg.password === '' },
-                    SrvIP: { string: '127.0.0.1' },
-                    SrvPort: { string: '5000' },
-                    XmlRpcPort: { string: '5000' },
-                    NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
-                    MaxPlayers: { int: cfg.currentMaxPlayers },
-                    NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
-                    MaxSpecs: { int: cfg.currentMaxPlayers },
-                    LadderMode: { int: cfg.currentLadderMode },
-                    NextFiveUID: { string: nextIds.join('/') }
-                  }
-                },
-                { array: [] }
-              ]
-            }
-          }
         }]
       }])
     this.receivingResponse = true
@@ -147,7 +119,7 @@ export abstract class DedimaniaClient {
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
     const startDate: number = Date.now()
-    return await new Promise((resolve) => {
+    return await new Promise((resolve): void => {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
