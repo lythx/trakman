@@ -324,6 +324,46 @@ const commands: TMCommand[] = [
     privilege: 1
   }, //You're welcome wizer : - ) // Thank Znake
   {
+    aliases: ['dq', 'djb', 'dropqueue', 'dropjukebox'],
+    help: 'Drop the specified track from the map queue',
+    params: [{ name: 'index', type: 'int' }],
+    callback: (info: MessageInfo, index: number): void => {
+      if (TM.jukebox[index] === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No such index in the queue.`, info.login)
+        return
+      }
+      const map: TMMap | undefined = TM.jukebox.find(a => a === TM.jukebox[index])
+      if (map === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't find this index in the queue.`, info.login)
+        return
+      }
+      TM.removeFromJukebox(map.id)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
+      )
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
+    help: 'Clear the entirety of the current map queue',
+    callback: (info: MessageInfo): void => {
+      if (TM.jukebox.length === 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No maps in the queue.`, info.login)
+        return
+      }
+      for (const map of TM.jukebox) {
+        TM.removeFromJukebox(map.id)
+      }
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + 'all mapos'}${TM.palette.admin} from the queue.`
+      )
+    },
+    privilege: 1
+  },
+  {
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo): void => {
