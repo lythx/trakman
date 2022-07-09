@@ -26,7 +26,7 @@ import LocalSectors from './dynamic_components/LocalSectors.component.js'
 import LiveSectors from './dynamic_components/LiveCps.component.js'
 import CurrentCps from './dynamic_components/CurrentCps.component.js'
 import MapList from './dynamic_components/MapList.component.js'
-
+import DonationPanel from './static_components/DonationPanel.component.js'
 import TestWindow from './test_widgets/TestWindow.js'
 
 let customUi: CustomUi
@@ -67,7 +67,8 @@ const events: TMEvent[] = [
         new LiveRanking(),
         new ButtonsWidget(),
         new TMXRanking(),
-        new AdminPanel()
+        new AdminPanel(),
+        new DonationPanel()
       )
       for (const c of staticComponents) { await c.display() }
       dynamicComponents.push(
