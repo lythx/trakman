@@ -22,5 +22,6 @@
     "localSectors": 30000,
     "liveSectors": 40000,
     "liveCheckpoint": 70000,
-    "currentCps": 80000
+    "currentCps": 80000,
+    "donationPanel": 120000
 }
