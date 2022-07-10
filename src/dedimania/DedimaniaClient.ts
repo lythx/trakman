@@ -32,55 +32,17 @@ export abstract class DedimaniaClient {
     const cfg: ServerInfo = ServerConfig.config
     const nextIds: any[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const request: DedimaniaRequest = new DedimaniaRequest('system.multicall',
-      [{
-        array: [{
-          struct: {
-            methodName: { string: 'dedimania.Authenticate' },
-            params: {
-              array: [{
-                struct: {
-                  Game: { string: 'TMF' },
-                  Login: { string: process.env.SERVER_LOGIN },
-                  Password: { string: process.env.SERVER_PASSWORD },
-                  Tool: { string: 'Trakman' },
-                  Version: { string: '0.0.1' },
-                  Nation: { string: process.env.SERVER_NATION },
-                  Packmask: { string: process.env.SERVER_PACKMASK }
-                }
-              }]
-            }
-          }
-        },
-        {
-          struct: {
-            methodName: { string: 'dedimania.UpdateServerPlayers' },
-            params: {
-              array: [
-                { string: 'TMF' },
-                { int: PlayerService.players.length },
-                {
-                  struct: {
-                    SrvName: { string: cfg.name },
-                    Comment: { string: cfg.comment },
-                    Private: { boolean: cfg.password === '' },
-                    SrvIP: { string: '127.0.0.1' },
-                    SrvPort: { string: '5000' },
-                    XmlRpcPort: { string: '5000' },
-                    NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
-                    MaxPlayers: { int: cfg.currentMaxPlayers },
-                    NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
-                    MaxSpecs: { int: cfg.currentMaxPlayers },
-                    LadderMode: { int: cfg.currentLadderMode },
-                    NextFiveUID: { string: nextIds.join('/') }
-                  }
-                },
-                { array: [] }
-              ]
-            }
-          }
-        }]
-      }])
+    const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
+      struct: {
+        Game: { string: 'TMF' },
+        Login: { string: process.env.SERVER_LOGIN },
+        Password: { string: process.env.SERVER_PASSWORD },
+        Tool: { string: 'Trakman' },
+        Version: { string: '0.0.1' },
+        Nation: { string: process.env.SERVER_NATION },
+        Packmask: { string: process.env.SERVER_PACKMASK }
+      }
+    }])
     this.receivingResponse = true
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
@@ -147,7 +109,7 @@ export abstract class DedimaniaClient {
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
     const startDate: number = Date.now()
-    return await new Promise((resolve) => {
+    return await new Promise((resolve): void => {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {

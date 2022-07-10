@@ -472,7 +472,7 @@ export const TRAKMAN = {
   /**
    * Parses the 'time' type of TMCommand parameter
    * @param timeString String to be parsed to number
-   * @returns Parsed number (in milliseconds) or undefined if no number supplied
+   * @returns Parsed number (in milliseconds) or undefined if format is invalid
    */
   parseParamTime: (timeString: string): number | undefined => {
     if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes

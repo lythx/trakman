@@ -48,6 +48,15 @@ const commands: TMCommand[] = [
     privilege: 0
   },
   {
+    aliases: ['bg', 'badgame'],
+    help: 'Allow others to find out about your disenjoyment of the round.',
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string): void => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Bad game, ${name || 'everyone'}!`)
+    },
+    privilege: 0
+  },
+  {
     aliases: ['bgm'],
     help: 'Let others know you didn\'t do your best.',
     callback: (info: MessageInfo): void => {
@@ -122,9 +131,17 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['h', 'help', 'helpall'],
-    help: 'Display current map dedimania checkpoints.',
+    help: 'Display the commands list.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.commandList, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['time'],
+    help: 'Find out about the current server time.',
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server time is ${TM.palette.highlight + (new Date().toString())}${TM.palette.admin}.`, info.login)
     },
     privilege: 0
   },
@@ -196,8 +213,8 @@ const commands: TMCommand[] = [
     // TODO IMPLEMENT MAP SEARCH
     aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
-    params: [{ name: 'mapName', optional: true }],
-    callback: (info: MessageInfo, mapName: string): void => {
+    params: [{ name: 'query', optional: true }],
+    callback: (info: MessageInfo, query: string): void => {
       TM.openManialink(TM.UIIDS.mapList, info.login)
     },
     privilege: 0
