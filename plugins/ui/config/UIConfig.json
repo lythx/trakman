@@ -146,94 +146,124 @@
     "buttons": {
         "height": 14.5,
         "side": false,
-        "titles": [
-            "VISITORS",
-            "SPECS PLAYERS",
-            "VERSION",
-            "TIME",
-            "MAPS",
-            "PLAYER STATS",
-            "SECTOR RECORDS",
-            "GITHUB REPO",
-            "VOTE TO $F00SKIP",
-            "VOTE TO $0F0RES",
-            "PAY $F00$$ TO $F00SKIP",
-            "PAY $0F0$$ TO $0F0RES"
-        ],
-        "icons": [
-            {
-                "name": "people",
-                "width": 3.2,
-                "height": 3.4,
-                "padding": -0.5
-            },
-            {
-                "name": "people",
-                "width": 3.2,
-                "height": 3.4,
-                "padding": -0.5
-            },
-            {
-                "name": "git",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.3
-            },
-            {
-                "name": "clock",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "numberedList",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "stats",
-                "width": 1.9,
-                "height": 1.9,
-                "padding": 0.2
-            },
-            {
-                "name": "timeList",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "github",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "vote.skip",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "vote.replay",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "pay.skip",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            },
-            {
-                "name": "pay.replay",
-                "width": 1.8,
-                "height": 1.8,
-                "padding": 0.2
-            }
-        ]
+        "visitors": {
+            "index": 0,
+            "title": "VISITORS",
+            "icon": "people",
+            "width": 3.2,
+            "height": 3.4,
+            "padding": -0.5
+        },
+        "players": {
+            "index": 1,
+            "title1": "SPECS",
+            "title2": "PLAYERS",
+            "icon": "people",
+            "width": 3.2,
+            "height": 3.4,
+            "padding": -0.5
+        },
+        "version": {
+            "index": 2,
+            "title": "VERSION",
+            "icon": "git",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.3
+        },
+        "time": {
+            "index": 3,
+            "title": "TIME",
+            "icon": "clock",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "maps": {
+            "index": 4,
+            "title": "MAPS",
+            "icon": "numberedList",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "stats": {
+            "index": 5,
+            "title1": "PLAYER",
+            "title2": "STATS",
+            "icon": "stats",
+            "width": 1.9,
+            "height": 1.9,
+            "padding": 0.2
+        },
+        "sectorRecords": {
+            "index": 6,
+            "title1": "SECTOR",
+            "title2": "RECORDS",
+            "icon": "timeList",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "github": {
+            "index": 7,
+            "title1": "GITHUB",
+            "title2": "REPO",
+            "icon": "github",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "voteSkip": {
+            "index": 8,
+            "title1": "VOTE",
+            "title2": "TO $F00SKIP",
+            "icon": "vote.skip",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "voteRes": {
+            "index": 9,
+            "title1": "VOTE",
+            "title2": "TO $0F0RES",
+            "icon": "vote.replay",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2
+        },
+        "paySkip": {
+            "index": 10,
+            "title1": "PAY $F00$COST$",
+            "title2": "TO $F00SKIP",
+            "icon": "pay.skip",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2,
+            "costs": [
+                2,
+                3,
+                4
+            ]
+        },
+        "payRes": {
+            "index": 11,
+            "title1": "PAY $0F0$COST$",
+            "title2": "TO $0F0RES",
+            "title3": "$0F0RES$z$s LIMIT",
+            "title4": "REACHED",
+            "title5": "MAP IS",
+            "title6": "$0F0REPLAYED",
+            "icon": "pay.replay",
+            "width": 1.8,
+            "height": 1.8,
+            "padding": 0.2,
+            "costs": [
+                1,
+                2,
+                3
+            ]
+        }
     },
     "rank": {
         "height": 3.8,
