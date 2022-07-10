@@ -32,27 +32,17 @@ export abstract class DedimaniaClient {
     const cfg: ServerInfo = ServerConfig.config
     const nextIds: any[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const request: DedimaniaRequest = new DedimaniaRequest('system.multicall',
-      [{
-        array: [{
-          struct: {
-            methodName: { string: 'dedimania.Authenticate' },
-            params: {
-              array: [{
-                struct: {
-                  Game: { string: 'TMF' },
-                  Login: { string: process.env.SERVER_LOGIN },
-                  Password: { string: process.env.SERVER_PASSWORD },
-                  Tool: { string: 'Trakman' },
-                  Version: { string: '0.0.1' },
-                  Nation: { string: process.env.SERVER_NATION },
-                  Packmask: { string: process.env.SERVER_PACKMASK }
-                }
-              }]
-            }
-          }
-        }]
-      }])
+    const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
+      struct: {
+        Game: { string: 'TMF' },
+        Login: { string: process.env.SERVER_LOGIN },
+        Password: { string: process.env.SERVER_PASSWORD },
+        Tool: { string: 'Trakman' },
+        Version: { string: '0.0.1' },
+        Nation: { string: process.env.SERVER_NATION },
+        Packmask: { string: process.env.SERVER_PACKMASK }
+      }
+    }])
     this.receivingResponse = true
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()

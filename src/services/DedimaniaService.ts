@@ -24,11 +24,11 @@ export abstract class DedimaniaService {
     this.updateServerPlayers()
     const mapDedisInfo: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
     Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
-    Events.addListener('Controller.PlayerJoin', async (info: JoinInfo): Promise<void> => {
-      await this.playerArrive(info)
+    Events.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+      void this.playerArrive(info)
     })
-    Events.addListener('Controller.EndMap', async (info: EndMapInfo): Promise<void> => {
-      await this.sendRecords(info)
+    Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
+      void this.sendRecords(info)
     })
     Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
       this.addRecord(info)
@@ -136,7 +136,7 @@ export abstract class DedimaniaService {
     if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for map ${info.name}`, status.message) }
   }
 
-  private static addRecord(info: FinishInfo): void {
+  static addRecord(info: FinishInfo): void {
     const pb: number | undefined = this._dedis.find(a => a.login === info.login)?.time
     const position: number = this._dedis.filter(a => a.time <= info.time).length + 1
     if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
@@ -245,9 +245,9 @@ export abstract class DedimaniaService {
               SrvIP: { string: '127.0.0.1' },
               SrvPort: { string: '5000' },
               XmlRpcPort: { string: '5000' },
-              NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+              NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
               MaxPlayers: { int: cfg.currentMaxPlayers },
-              NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+              NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
               MaxSpecs: { int: cfg.currentMaxPlayers },
               LadderMode: { int: cfg.currentLadderMode },
               NextFiveUID: { string: nextIds.join('/') }
@@ -267,7 +267,7 @@ export abstract class DedimaniaService {
         { string: info.login },
         { string: info.nickName },
         { string: info.nationCode },
-        { string: '' },
+        { string: '' }, // TEAMNAME
         { int: 0 }, // TODO: PLAYER LADDER RANK
         { boolean: info.isSpectator },
         { boolean: false } // OFFICIAL MODE ALWAYS FALSE

@@ -1,4 +1,4 @@
-import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
+import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
 import countries from '../../../src/data/Countries.json' assert {type: 'json'}
 import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
@@ -21,7 +21,7 @@ export default class MapWidget extends StaticComponent {
     this.height = (CFG.staticHeader.height + CFG.static.marginSmall) * 4 + CFG.static.marginSmall
     this.positionX = CFG.static.rightPosition
     this.positionY = calculateStaticPositionY('map')
-    this.grid = new Grid(this.width, this.height, [1], new Array(4).fill(1))
+    this.grid = new Grid(this.width, this.height - CONFIG.static.marginSmall, [1], new Array(4).fill(1))
     void this.updateXML()
   }
 
