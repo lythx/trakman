@@ -24,7 +24,8 @@
             "tmx",
             "timer",
             "locals",
-            "live"
+            "live",
+            "donationPanel"
         ],
         "leftSideOrder": [
             "buttons",
@@ -408,6 +409,20 @@
         "columns": 5,
         "navbar": [
             "dediCps"
+        ]
+    },
+    "donationPanel": {
+        "title": "Donations",
+        "height": 8,
+        "icon": "cash.normal",
+        "side": true,
+        "amounts": [
+            50,
+            100,
+            200,
+            500,
+            1000,
+            5000
         ]
     }
 }
