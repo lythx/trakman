@@ -30,6 +30,9 @@ export abstract class DedimaniaService {
     Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
       void this.sendRecords(info)
     })
+    Events.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+      void this.playerLeave(info)
+    })
     Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
       this.addRecord(info)
     })
@@ -273,6 +276,15 @@ export abstract class DedimaniaService {
         { boolean: false } // OFFICIAL MODE ALWAYS FALSE
       ]
     )
+    if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
+  }
+
+  private static async playerLeave(info: LeaveInfo): Promise<void> {
+    const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
+      [
+        { string: 'TMF' },
+        { string: info.login }
+      ])
     if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
   }
 
