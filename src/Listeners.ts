@@ -205,7 +205,13 @@ export class Listeners {
       event: 'TrackMania.BillUpdated',
       callback: async (params: any[]): Promise<void> => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
-        // Related to payments: donations, payouts, etc
+        const bill: BillUpdatedInfo = {
+          id: params[0],
+          state: params[1],
+          stateName: params[2],
+          transactionId: params[3]
+        }
+        Events.emitEvent('Controller.BillUpdated', bill)
       }
     },
     {
