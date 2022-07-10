@@ -18,4 +18,12 @@ interface ServerInfo {
     callVoteRatio: number
     allowMapDownload: boolean
     autoSaveReplays: boolean
+    login: string
+    id: number
+    zone: string
+    ipAddress: string
+    isUnited: boolean
+    game: string
+    version: string
+    build: string
 }

@@ -1,4 +1,4 @@
-import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, centeredText, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
+import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
 import countries from '../../../src/data/Countries.json' assert {type: 'json'}
 import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
@@ -21,7 +21,7 @@ export default class MapWidget extends StaticComponent {
     this.height = (CFG.staticHeader.height + CFG.static.marginSmall) * 4 + CFG.static.marginSmall
     this.positionX = CFG.static.rightPosition
     this.positionY = calculateStaticPositionY('map')
-    this.grid = new Grid(this.width, this.height, [1], new Array(4).fill(1))
+    this.grid = new Grid(this.width, this.height - CONFIG.static.marginSmall, [1], new Array(4).fill(1))
     void this.updateXML()
   }
 
@@ -44,16 +44,19 @@ export default class MapWidget extends StaticComponent {
       if (json instanceof Error) {
         TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
         author = authorLogin
+      } else {
+        if (json?.message === 'Unkown player') { // THANKS NADEO
+          TM.error(`Failed to fetch nickname for author login ${authorLogin} (no such login registered)`, json.message)
+          author = authorLogin
+        } else {
+          author = json?.nickname
+          nation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
+        }
       }
-      else {
-        author = json.nickname
-        nation = countries.find(a => a.name === json.path.split('|')[1])?.code
-      }
-    }
-    else {
+    } else {
       author = authorLogin
     }
-    const date: any = TM.TMXCurrent?.lastUpdateDate
+    const date: Date | undefined = TM.TMXCurrent?.lastUpdateDate
     const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
     const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
     if (nation !== undefined) {
