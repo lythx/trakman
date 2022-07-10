@@ -21,6 +21,7 @@ import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
+import { ServerConfig } from './ServerConfig.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -29,6 +30,27 @@ if (process.env.USE_WEBSERVICES === 'YES') {
 
 const DB: Database = new Database()
 DB.initialize()
+
+const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
+Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
+  const billIndex = bills.findIndex(a => a.id === info.id)
+  if (billIndex !== -1) {
+    switch (info.state) {
+      case 4:
+        bills[billIndex].callback('accepted')
+        break
+      case 5:
+        bills[billIndex].callback('refused')
+        break
+      case 6:
+        bills[billIndex].callback('error', info.stateName)
+        break
+      default:
+        return
+    }
+    bills.splice(billIndex, 1)
+  }
+})
 
 export const TRAKMAN = {
 
@@ -603,6 +625,29 @@ export const TRAKMAN = {
    */
   addMKVote(mapId: string, login: string, vote: number, date: Date): void {
     ManiakarmaService._newVotes.push({ mapId: mapId, login: login, vote: vote, date: date })
+  },
+
+  async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
+    const billId = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
+    if (billId instanceof Error) { return billId }
+    return await new Promise((resolve): void => {
+      const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
+        switch (status) {
+          case 'accepted':
+            resolve(true)
+            if (targetLogin === '' /* || targetLogin === TODO check if server*/) {
+              // TODO push to donors table
+            }
+            break
+          case 'refused':
+            resolve(false)
+            break
+          case 'error':
+            resolve(new Error(errorString ?? 'error'))
+        }
+      }
+      bills.push({ id: billId[0], callback })
+    })
   },
 
   get gameInfo(): TMGame {

@@ -1,6 +1,16 @@
 import { Request } from './Request.js'
 import { Socket } from './Socket.js'
 
+interface CallParams {
+  string?: string
+  int?: number,
+  double?: number,
+  boolean?: boolean,
+  struct?: any,
+  base64?: string,
+  array?: CallParams[]
+}
+
 export abstract class Client {
 
   private static readonly socket: Socket = new Socket()
@@ -14,7 +24,7 @@ export abstract class Client {
     return await this.socket.awaitHandshake().catch(async err => await Promise.reject(err))
   }
 
-  static async call(method: string, params: object[] = []): Promise<any[] | Error> {
+  static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
     const request: Request = new Request(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
