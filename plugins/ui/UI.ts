@@ -47,7 +47,7 @@ const loadMod = (): void => {
     }])
 }
 
-const events: TMEvent[] = [
+const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (): Promise<void> => {
@@ -56,7 +56,7 @@ const events: TMEvent[] = [
       customUi = new CustomUi()
       customUi.display()
       staticComponents.push(
-      //  new LiveCheckpoint(),
+        //  new LiveCheckpoint(),
         new RankWidget(),
         new DediRanking(),
         new MapWidget(),
