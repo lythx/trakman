@@ -1,4 +1,4 @@
 interface TMEvent {
   readonly event: string
-  readonly callback: Function
+  readonly callback: ((params: any) => void)
 }
