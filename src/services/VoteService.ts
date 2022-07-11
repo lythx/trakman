@@ -28,7 +28,6 @@ export abstract class VoteService {
       const ratio: number = sum / amount
       this._voteRatios.push({ mapId: e.mapId, ratio })
     }
-    console.log(this._voteRatios)
     for (let i: number = 0; i < 4; i++) {
       const res: any[] = await this.repo.get([JukeboxService.current, ...JukeboxService.queue][i].id)
       for (const e of res) {

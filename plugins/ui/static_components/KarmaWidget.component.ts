@@ -38,6 +38,13 @@ export default class KarmaWidget extends StaticComponent {
       this.updateXML()
       this.display()
     })
+    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+      if (info.answer > this.id && info.answer <= this.id + 6) {
+        const index = info.answer - (this.id + 1)
+        const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
+        TM.addVote(TM.map.id, info.login, votes[index])
+      }
+    })
   }
 
   display(): void {
@@ -144,7 +151,7 @@ export default class KarmaWidget extends StaticComponent {
     for (const [i, e] of options.entries()) {
       const offsetFix: number = i > 2 ? -0.3 : 0
       const textScale: number = i > 2 ? 1 : 0.6
-      ret += `<quad posn="${this.margin} -${this.margin + h * i} 2" sizen="${this.buttonW - (this.margin * 2)} ${h - this.margin}" bgcolor="${colours[i]}"/>
+      ret += `<quad posn="${this.margin} -${this.margin + h * i} 2" sizen="${this.buttonW - (this.margin * 2)} ${h - this.margin}" bgcolor="${colours[i]}" action="${this.id + i + 1}"/>
       ${centeredText(CONFIG.static.format + e, this.buttonW - (this.margin * 2), h - this.margin, { xOffset: this.margin, yOffset: this.margin + h * i + offsetFix, padding: 0, textScale })}`
     }
     return ret
