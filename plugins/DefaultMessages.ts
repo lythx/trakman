@@ -1,6 +1,6 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-const events: TMEvent[] = [
+const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (): Promise<void> => {
