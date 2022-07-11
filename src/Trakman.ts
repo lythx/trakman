@@ -383,6 +383,20 @@ export const TRAKMAN = {
   },
 
   /**
+   * Removes all maps from jukebox
+   */
+  clearJukebox(): void {
+    JukeboxService.clear()
+  },
+
+  /**
+   * Shuffle the map list and jukebox
+   */
+  shuffleJukebox(): void {
+    JukeboxService.shuffle()
+  },
+
+  /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
