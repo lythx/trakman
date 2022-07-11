@@ -292,7 +292,7 @@ export const TRAKMAN = {
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
    */
-  addListener(event: string, callback: Function): void {
+  addListener(event: string, callback: ((parms: any) => void)): void {
     Events.addListener(event, callback)
   },
 
@@ -520,7 +520,7 @@ export const TRAKMAN = {
    * @param methods Array of dedicated server methods
    * @param callback Callback to execute
    */
-  addProxy: (methods: string[], callback: Function): void => {
+  addProxy: (methods: string[], callback: ((parms: any) => void)): void => {
     Client.addProxy(methods, callback)
   },
 

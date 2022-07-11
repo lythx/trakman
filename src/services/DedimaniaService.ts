@@ -22,8 +22,10 @@ export abstract class DedimaniaService {
       return status
     }
     this.updateServerPlayers()
-    const mapDedisInfo: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
-    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+    const recordStatus: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
+    if(!(recordStatus instanceof Error)) {
+      Events.emitEvent('Controller.DedimaniaRecords', this._dedis)
+    }
     Events.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       void this.playerArrive(info)
     })
@@ -76,7 +78,7 @@ export abstract class DedimaniaService {
             NextFiveUID: { string: nextIds.join('/') }
           }
         },
-        { int: process.env.DEDIS_AMOUNT },
+        { int: Number(process.env.DEDIS_AMOUNT) },
         { array: this.getPlayersArray() }
       ])
     if (dedis instanceof Error) {
@@ -132,7 +134,7 @@ export abstract class DedimaniaService {
         { string: 'TMF' },
         { int: GameService.gameMode },
         { int: info.checkpointsAmount },
-        { int: process.env.DEDIS_AMOUNT },
+        { int: Number(process.env.DEDIS_AMOUNT) },
         { array: recordsArray }
       ]
     )
