@@ -379,7 +379,7 @@
     },
     "liveCps": {
         "entries": 15,
-        "cpsPerPage": 10,
+        "cpsOnFirstPage": 10,
         "icon": "chart.live",
         "title": "Live Checkpoints",
         "selfColour": "0F0F",
