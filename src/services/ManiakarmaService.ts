@@ -11,16 +11,20 @@ export abstract class ManiakarmaService {
 
   private static authCode: string
   private static apiUrl: string
-  static _mapKarmaValue: number = 0
-  static _mapKarma = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
-  static _playerVotes: TMVote[] = []
-  static _newVotes: TMVote[] = []
+  private static _mapKarmaValue: number = 0
+  private static _mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
+  private static _playerVotes: MKVote[] = []
+  private static _newVotes: MKVote[] = []
 
   static async initialize(): Promise<void | Error> {
     const status: void | Error = await this.authenticate()
     if (status instanceof Error) {
       ErrorHandler.fatal(`Couldn't connect to Maniakarma`)
     }
+    for (const player of PlayerService.players) {
+      await this.receiveVotes(player.login)
+    }
+    Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     Events.addListener('Controller.PlayerJoin', async (info: JoinInfo): Promise<void> => {
       await this.receiveVotes(info.login)
     })
@@ -28,6 +32,7 @@ export abstract class ManiakarmaService {
       for (const player of PlayerService.players) {
         await this.receiveVotes(player.login)
       }
+      Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     })
     Events.addListener('Controller.EndMap', async (): Promise<void> => {
       await this.sendVotes()
@@ -35,14 +40,14 @@ export abstract class ManiakarmaService {
   }
 
   private static async authenticate(): Promise<void | Error> {
-    const link: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php`
+    const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php`
       + `?Action=Auth`
       + `&login=${process.env.SERVER_LOGIN}`
       + `&name=${Buffer.from(ServerConfig.config.name).toString('base64')}`
       + `&game=${ServerConfig.config.game}`
       + `&zone=${ServerConfig.config.zone}`
       + `&nation=${process.env.SERVER_NATION}`
-    const res = await fetch(link).catch((err: Error) => err)
+    const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       ErrorHandler.error(res.message)
       return
@@ -55,7 +60,7 @@ export abstract class ManiakarmaService {
   private static async receiveVotes(playerLogin: string): Promise<void | Error> {
     this._newVotes.length = 0
     this._playerVotes.length = 0
-    const link: string = `${this.apiUrl}`
+    const url: string = `${this.apiUrl}`
       + `?Action=Get`
       + `&login=${process.env.SERVER_LOGIN}`
       + `&authcode=${this.authCode}`
@@ -64,21 +69,21 @@ export abstract class ManiakarmaService {
       + `&author=${MapService.current.author}`
       + `&env=${MapService.current.environment}`
       + `&player=${playerLogin}`
-    const res = await fetch(link).catch((err: Error) => err)
+    const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       ErrorHandler.error(res.message)
       return
     }
     const json: any = this.getJson(await res.text())
-    this._mapKarmaValue = json?.result?.votes[0]?.karma[0]
+    this._mapKarmaValue = json?.result?.votes?.[0]?.karma?.[0]
     for (const key of Object.keys(this._mapKarma)) {
-      (this._mapKarma as any)[key] = json?.result?.votes[0]?.[key][0]?.$?.count
+      (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
-    this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), Number(json?.result?.players[0]?.player[0]?.$?.vote))
+    this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), Number(json?.result?.players[0]?.player[0]?.$?.vote) as any)
   }
 
   private static async sendVotes(): Promise<void | Error> {
-    const link: string = `${this.apiUrl}`
+    const url: string = `${this.apiUrl}`
       + `?Action=Vote`
       + `&login=${process.env.SERVER_LOGIN}`
       + `&authcode=${this.authCode}`
@@ -91,41 +96,40 @@ export abstract class ManiakarmaService {
       + `&nbchecks=${MapService.current.checkpointsAmount}`
       + `&mood=${MapService.current.mood}`
       + `&env=${MapService.current.environment}`
-      + `&votes=${this.getVoteString().join('|')}`
+      + `&votes=${this.getVoteString()}`
       + `&tmx=` // LEFTOVER FROM TM2
-    const res = await fetch(link).catch((err: Error) => err)
+    const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       ErrorHandler.error(res.message)
       return
     }
   }
 
-  static storePlayerVotes(login: string, vote: number): void {
+  private static storePlayerVotes(login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
     this._playerVotes.push({
       mapId: MapService.current.id,
       login: login,
-      vote: vote,
-      date: new Date()
+      vote: vote
     })
   }
 
-  static getVoteString(): string[] {
+  private static getVoteString(): string {
     let voteString: string[] = []
-    const count: any = Object.create(null)
+    const count: any = {}
     for (const player of this._newVotes) {
       count[player.login] = (count[player.login] || 0) + 1
     }
-    const newVotesCopy: TMVote[] = this._newVotes.filter(a => count[a.login]-- === 1)
+    const newVotesCopy: MKVote[] = this._newVotes.filter(a => count[a.login]-- === 1)
     for (const vote of newVotesCopy) {
       voteString.push(vote.login + `=` + vote.vote)
     }
-    return voteString
+    return voteString.join('|')
   }
 
   private static getJson(data: string): any {
     let json: any
     xml2js.parseString(data.toString(), (err, result): void => {
-      if (err != null) {
+      if (err !== null) {
         throw err
       }
       json = result
@@ -133,19 +137,37 @@ export abstract class ManiakarmaService {
     return json
   }
 
-  static get playerVotes(): TMVote[] {
+  static addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3) {
+    const v: MKVote = { mapId: mapId, login: login, vote: vote }
+    this._newVotes.push(v)
+    const prevVote = this._playerVotes.find(a => a.login === login && a.mapId === mapId)
+    const voteNames = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
+    (this._mapKarma as any)[voteNames[vote > 0 ? vote+ 2: vote + 3]]++
+    if (prevVote === undefined) {
+      this._playerVotes.push(v)
+    } else {
+      (this._mapKarma as any)[voteNames[prevVote.vote> 0 ?prevVote.vote + 2 : prevVote.vote + 3]]--
+      prevVote.vote = vote
+    }
+    const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
+    const count = Object.values(this._mapKarma).reduce((acc, cur) => acc + cur)
+    this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur) / count
+  }
+
+  static get playerVotes(): MKVote[] {
     return [...this._playerVotes]
   }
 
-  static get newVotes(): TMVote[] {
+  static get newVotes(): MKVote[] {
     return [...this._newVotes]
   }
 
   static get mapKarma(): { fantastic: number, beautiful: number, good: number, bad: number, poor: number, waste: number } {
-    return this._mapKarma
+    return { ...this._mapKarma }
   }
 
   static get mapKarmaValue(): number {
     return this._mapKarmaValue
   }
+
 }

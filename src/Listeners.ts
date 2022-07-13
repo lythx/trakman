@@ -15,7 +15,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 
 export class Listeners {
-  private static readonly listeners: TMEvent[] = [
+  private static readonly listeners: TMListener[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]): Promise<void> => {

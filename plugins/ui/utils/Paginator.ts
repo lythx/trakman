@@ -76,8 +76,8 @@ export default class Paginator {
     })
   }
 
-  getPageByLogin(login: string): number | undefined {
-    return this.loginPages.find(a => a.login === login)?.page
+  getPageByLogin(login: string): number {
+    return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
   }
 
   updatePageCount(pageCount: number): void {

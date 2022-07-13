@@ -1,12 +1,13 @@
+import { Events } from "../Events.js";
 import { VoteRepository } from "../database/VoteRepository.js";
 import { JukeboxService } from "./JukeboxService.js";
-import { ManiakarmaService } from './ManiakarmaService.js'
 
 export abstract class VoteService {
 
   private static repo: VoteRepository
   private static readonly _voteRatios: { readonly mapId: string, ratio: number }[] = []
   private static _votes: TMVote[] = []
+  private static readonly voteValues = [0, 20, 40, -1, 60, 80, 100]
 
   static async initialize(): Promise<void> {
     this.repo = new VoteRepository()
@@ -23,8 +24,8 @@ export abstract class VoteService {
     }
     for (const e of maps) {
       const amount: number = e.votes.length
-      const sum: number = e.votes.reduce((acc, cur): number => acc + cur)
-      const ratio: number = ((sum / amount) / 6) + 1
+      const sum: number = e.votes.map(a => this.voteValues[a + 3]).reduce((acc, cur): number => acc + cur)
+      const ratio: number = sum / amount
       this._voteRatios.push({ mapId: e.mapId, ratio })
     }
     for (let i: number = 0; i < 4; i++) {
@@ -67,16 +68,18 @@ export abstract class VoteService {
     return res
   }
 
-  static async add(mapId: string, login: string, vote: number): Promise<void> {
+  static async add(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
     if (this._votes.find(a => a.login === login && a.vote === vote && a.mapId === mapId)) {
       return // Return if same vote already exists
     }
+    this.updateVoteRatio(mapId)
     const date: Date = new Date()
     const v: TMVote | undefined = this._votes.find(a => a.mapId === mapId && a.login === login)
     if (v !== undefined) {
       v.date = date
       v.vote = vote
       void this.repo.update(mapId, login, vote, date)
+      Events.emitEvent('Controller.KarmaVote', v as KarmaVoteInfo)
     } else {
       const res: any[] = await this.repo.getOne(mapId, login)
       if (res.length === 0) {
@@ -84,14 +87,29 @@ export abstract class VoteService {
         if (this._votes.some(a => a.mapId === mapId)) {
           void this._votes.push({ login, mapId, vote, date })
         }
+        Events.emitEvent('Controller.KarmaVote', { mapId, login, vote, date } as KarmaVoteInfo)
       } else {
-        if (res[0].vote !== vote) {
-          void this.repo.update(mapId, login, vote, date)
-          if (this._votes.some(a => a.mapId === mapId)) {
-            void this._votes.push({ login, mapId, vote, date })
-          }
+        void this.repo.update(mapId, login, vote, date)
+        if (this._votes.some(a => a.mapId === mapId)) {
+          void this._votes.push({ login, mapId, vote, date })
         }
+        Events.emitEvent('Controller.KarmaVote', { mapId, login, vote, date } as KarmaVoteInfo)
       }
+    }
+  }
+
+  private static updateVoteRatio(mapId: string) {
+    const ratio = this._voteRatios.find(a=>a.mapId === mapId)
+    const mapVotes = this._votes.filter(a => a.mapId)
+    if(mapVotes.length === 0) {
+      return
+    }
+    const amount: number = mapVotes.length
+    const sum: number = mapVotes.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur)
+    if(ratio !== undefined) {
+      ratio.ratio = sum / amount
+    } else {
+      this._voteRatios.push({ mapId, ratio: sum / amount})
     }
   }
 

@@ -6,7 +6,9 @@ interface CallParams {
   int?: number,
   double?: number,
   boolean?: boolean,
-  struct?: any,
+  struct?: {
+    [key: string]: CallParams
+  },
   base64?: string,
   array?: CallParams[]
 }
@@ -15,7 +17,7 @@ export abstract class Client {
 
   private static readonly socket: Socket = new Socket()
   private static requestId: number = 0x80000000
-  private static readonly proxies: { methods: string[], callback: Function }[] = []
+  private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
   static async connect(host = 'localhost', port = 5000): Promise<string> {
     this.socket.connect(port, host)
@@ -36,7 +38,7 @@ export abstract class Client {
     return response
   }
 
-  static callNoRes(method: string, params: object[] = []): void {
+  static callNoRes(method: string, params: CallParams[] = []): void {
     this.requestId++
     const request: Request = new Request(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
@@ -44,17 +46,17 @@ export abstract class Client {
     void this.getProxyResponse(method, params, this.requestId)
   }
 
-  static addProxy(methods: string[], callback: Function): void {
+  static addProxy(methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void)): void {
     this.proxies.push({ methods, callback })
   }
 
-  private static callProxies(method: string, params: any[], response: any[]): void {
+  private static callProxies(method: string, params: CallParams[], response: any[]): void {
     for (const e of this.proxies.filter(a => a.methods.some(b => b === method))) {
       e.callback(method, params, response)
     }
   }
 
-  private static async getProxyResponse(method: string, params: any[], requestId: number): Promise<void> {
+  private static async getProxyResponse(method: string, params: CallParams[], requestId: number): Promise<void> {
     const response: any[] | Error = await this.socket.awaitResponse(requestId, method).catch((err: Error) => err)
     if (!(response instanceof Error)) {
       this.callProxies(method, params, response)

@@ -4,7 +4,7 @@ import { ErrorHandler } from '../ErrorHandler.js'
 
 export class MapService {
   private static _current: TMMap
-  private static readonly _maps: TMMap[] = []
+  private static _maps: TMMap[] = []
   private static repo: MapRepository
 
   static async initialize(): Promise<void> {
@@ -156,4 +156,9 @@ export class MapService {
     const res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
     if (res instanceof Error) { return new Error(`Failed to queue map ${map.name}`) }
   }
+
+  static shuffle(): void {
+    this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b) => a.rand - b.rand).map(a => a.map)
+  }
+  
 }
