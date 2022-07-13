@@ -60,7 +60,7 @@ export default class RecordList {
     this.maxCount = maxCount
     this.markers = side ? CFG.markersRight : CFG.markersLeft
     const columnProportions: number[] = CFG.columnProportions
-    const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur)
+    const proportionsSum: number = columnProportions.length ===0 ? 0 : columnProportions.reduce((acc, cur): number => acc += cur)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
     this.noRecordEntry = noRecordEntry
     this.getColoursFromPb = getColoursFromPb ?? false
