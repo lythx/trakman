@@ -1,4 +1,3 @@
-import { Events } from "../Events.js"
 import { MapService } from "./MapService.js"
 import { TMXService } from "./TMXService.js"
 
@@ -100,7 +99,7 @@ export abstract class JukeboxService {
   }
 
   static get current(): TMMap {
-    return this._current
+    return {...this._current}
   }
 
 }
