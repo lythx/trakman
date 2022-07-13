@@ -43,10 +43,8 @@ export default class PlayerList extends PopupWindow {
           } // Ban
 
           if(info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
-            console.log(info.answer - this.openId)
             const targetPlayer = TM.players[info.answer - this.openId - 3000]
             const status = await TM.addToMutelist(targetPlayer.login, info.login)
-            console.log(status)
             if(status instanceof Error) {
               TM.sendMessage(`${TM.palette.error}An error occured while muting the player.`, info.login)
             } else {
