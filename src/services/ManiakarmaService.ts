@@ -6,6 +6,7 @@ import { MapService } from './MapService.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
+import { VoteService } from './VoteService.js'
 
 export abstract class ManiakarmaService {
 
@@ -24,7 +25,6 @@ export abstract class ManiakarmaService {
     for (const player of PlayerService.players) {
       await this.receiveVotes(player.login)
     }
-    Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     Events.addListener('Controller.PlayerJoin', async (info: JoinInfo): Promise<void> => {
       await this.receiveVotes(info.login)
     })
@@ -79,7 +79,12 @@ export abstract class ManiakarmaService {
     for (const key of Object.keys(this._mapKarma)) {
       (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
-    this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), Number(json?.result?.players[0]?.player[0]?.$?.vote) as any)
+    const vote = Number(json?.result?.players[0]?.player[0]?.$?.vote)
+    if (![-3, -2, -1, 1, 2, 3].includes(vote)) {
+      return
+    }
+    this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
+    this.fixCoherence()
   }
 
   private static async sendVotes(): Promise<void | Error> {
@@ -142,16 +147,31 @@ export abstract class ManiakarmaService {
     this._newVotes.push(v)
     const prevVote = this._playerVotes.find(a => a.login === login && a.mapId === mapId)
     const voteNames = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
-    (this._mapKarma as any)[voteNames[vote > 0 ? vote+ 2: vote + 3]]++
+    (this._mapKarma as any)[voteNames[vote > 0 ? vote + 2 : vote + 3]]++
     if (prevVote === undefined) {
       this._playerVotes.push(v)
     } else {
-      (this._mapKarma as any)[voteNames[prevVote.vote> 0 ?prevVote.vote + 2 : prevVote.vote + 3]]--
+      (this._mapKarma as any)[voteNames[prevVote.vote > 0 ? prevVote.vote + 2 : prevVote.vote + 3]]--
       prevVote.vote = vote
     }
     const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
     const count = Object.values(this._mapKarma).reduce((acc, cur) => acc + cur)
     this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur) / count
+  }
+
+  private static fixCoherence() {
+    const localVotes = VoteService.votes.filter(a => a.mapId === MapService.current.id)
+    const mkVotes = this._playerVotes
+    for (const e of mkVotes) {
+      if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
+        VoteService.add(e.mapId, e.login, e.vote)
+      }
+    }
+    for (const e of localVotes) {
+      if (!mkVotes.some(a => a.login === e.login && a.vote === e.vote)) {
+        this.addVote(e.mapId, e.login, e.vote)
+      }
+    }
   }
 
   static get playerVotes(): MKVote[] {
