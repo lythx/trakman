@@ -27,6 +27,8 @@ import LiveSectors from './dynamic_components/LiveCps.component.js'
 import CurrentCps from './dynamic_components/CurrentCps.component.js'
 import MapList from './dynamic_components/MapList.component.js'
 import DonationPanel from './static_components/DonationPanel.component.js'
+import PlayerList from './dynamic_components/PlayerList.component.js'
+import BanList from './dynamic_components/BanList.component.js'
 import TestWindow from './test_widgets/TestWindow.js'
 
 let customUi: CustomUi
@@ -81,7 +83,9 @@ const events: TMListener[] = [
         new DediSectors(),
         new LocalSectors(),
         new LiveSectors(),
-        new CurrentCps()
+        new CurrentCps(),
+        new PlayerList(),
+        new BanList()
       )
       // const testWindow = new TestWindow()
       // setInterval(() => {
