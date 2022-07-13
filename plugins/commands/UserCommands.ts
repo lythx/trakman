@@ -1,4 +1,5 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { UI } from '../ui/UI.js'
 
 const commands: TMCommand[] = [
   // Testing commands, remove those later into development
@@ -219,15 +220,8 @@ const commands: TMCommand[] = [
         TM.openManialink(TM.UIIDS.mapList, info.login)
         return
       }
-      const m = TM.maps.map(a => ({ name: TM.stripSpecialChars(a.name), id: a.id }))
-      const match = TM.matchString(query, m.map(a => a.name))
-      const matchId = m.find(a => a.name === match)?.id
-      if (matchId === undefined) {
-        TM.openManialink(TM.UIIDS.mapList, info.login)
-        return
-      }
-      const index = TM.maps.findIndex(a => a.id === matchId)
-      TM.openManialink(TM.UIIDS.mapList + 6000 + index, info.login)
+      const mapList = UI.dynamicComponents.mapList
+      mapList.openWithQuery(info.login, query)
     },
     privilege: 0
   },
