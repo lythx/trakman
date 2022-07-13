@@ -608,8 +608,12 @@ export const TRAKMAN = {
     return s[0].login
   },
 
-  matchString(searchString: string, possibleMatches: string[]): string | undefined {
-    return dsc.simSort(searchString, possibleMatches)[0]
+  matchString(searchString: string, possibleMatches: string[]): string[] {
+    const arr: { str: string, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ str: e, value: dsc.twoStrings(searchString, e) })
+    }
+    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
   },
 
   /**

@@ -4,8 +4,7 @@ import { closeButton, CONFIG, Grid, ICONS, IDS, stringToObjectProperty } from '.
 import { Paginator } from "../UiUtils.js";
 
 const MAP_ADD_ID = 1000
-// TODO CHANGE SO IT USES GRID
-// TODO HANDLE CHALLENGE LIST LENGTH UPDATES
+
 export default class MapList extends PopupWindow {
 
   readonly columns = CONFIG.mapList.columns
@@ -50,6 +49,22 @@ export default class MapList extends PopupWindow {
         this.displayToPlayer(info.login, page, `${page}/${pageCount}`)
       }
     })
+  }
+  
+  openWithQuery(login: string, query: string) {
+    const m = TM.maps.map(a => ({ name: TM.stripSpecialChars(a.name), id: a.id }))
+    const matches = TM.matchString(query, m.map(a => a.name))
+    console.log(matches)
+    const page = this.paginator.getPageByLogin(login)
+    let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    this.paginator.updatePageCount(pageCount)
+    if (pageCount === 0) { pageCount++ }
+    // if (matchId === undefined) {
+    //   this.displayToPlayer(login, page, `${page}/${pageCount}`)
+    //   return
+    // }
+    // const index = TM.maps.findIndex(a => a.id === matchId)
+    // console.log(matc)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
