@@ -7,7 +7,7 @@ export default abstract class StaticComponent {
 
   readonly id: number
   readonly displayMode: number
-  private readonly displayModeListeners: TMEvent[][] = [
+  private readonly displayModeListeners: TMListener[][] = [
     [
       {
         event: 'Controller.PlayerJoin',

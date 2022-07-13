@@ -762,6 +762,14 @@ const commands: TMCommand[] = [
     },
     privilege: 2
   },
+  {
+    aliases: ['shf', 'shuffle'],
+    help: 'Shuffle the map queue.',
+    callback: async (info: MessageInfo): Promise<void> => {
+      TM.shuffleJukebox()
+    },
+    privilege: 2
+  }
 ]
 
 for (const command of commands) { TM.addCommand(command) }

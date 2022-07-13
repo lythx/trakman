@@ -26,6 +26,7 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly margin: number = CONFIG.popup.margin
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
+  protected static readonly playersWithWindowOpen: { login: string, id: number }[] = []
 
   constructor(windowId: number, headerIcon: string, title: string, navbar: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
@@ -45,6 +46,12 @@ export default abstract class PopupWindow extends DynamicComponent {
       if (info.answer === this.openId) { this.onOpen(info) }
       else if (info.answer === this.closeId) { this.onClose(info) }
     })
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+      const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+      if (index !== -1) {
+        PopupWindow.playersWithWindowOpen.splice(index, 1)
+      }
+    })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -52,6 +59,10 @@ export default abstract class PopupWindow extends DynamicComponent {
   }
 
   protected onClose(info: ManialinkClickInfo): void {
+    const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+    if (index !== -1) {
+      PopupWindow.playersWithWindowOpen.splice(index, 1)
+    }
     this.hideToPlayer(info.login)
   }
 
@@ -115,6 +126,11 @@ export default abstract class PopupWindow extends DynamicComponent {
   displayToPlayer(login: string, params?: any, topRightText?: string): void {
     const content: string = this.constructContent(login, params)
     const footer: string = this.constructFooter(login, params)
+    const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
+    if (index !== -1) {
+      PopupWindow.playersWithWindowOpen.splice(index, 1)
+    }
+    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId })
     TM.sendManialink(`${this.headerLeft}
     <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" valign="center" halign="center"/>
     ${this.headerRight}
@@ -122,6 +138,10 @@ export default abstract class PopupWindow extends DynamicComponent {
     ${this.frameMidBottom}
     ${footer}
     ${this.frameBottom}`, login)
+  }
+
+  protected getPlayersWithWindowOpen() {
+    return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId).map(a => a.login)
   }
 
 }

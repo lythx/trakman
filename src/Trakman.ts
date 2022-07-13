@@ -292,7 +292,7 @@ export const TRAKMAN = {
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
    */
-  addListener(event: string, callback: Function): void {
+  addListener(event: TMEvent, callback: ((params: any) => void)): void {
     Events.addListener(event, callback)
   },
 
@@ -380,6 +380,20 @@ export const TRAKMAN = {
    */
   removeFromJukebox(mapId: string): void {
     JukeboxService.remove(mapId)
+  },
+
+  /**
+   * Removes all maps from jukebox
+   */
+  clearJukebox(): void {
+    JukeboxService.clear()
+  },
+
+  /**
+   * Shuffle the map list and jukebox
+   */
+  shuffleJukebox(): void {
+    JukeboxService.shuffle()
   },
 
   /**
@@ -520,7 +534,7 @@ export const TRAKMAN = {
    * @param methods Array of dedicated server methods
    * @param callback Callback to execute
    */
-  addProxy: (methods: string[], callback: Function): void => {
+  addProxy: (methods: string[], callback: ((parms: any) => void)): void => {
     Client.addProxy(methods, callback)
   },
 
@@ -598,12 +612,15 @@ export const TRAKMAN = {
   },
 
   /**
-   * Adds a player vote to the database
+   * Adds a player vote to the database and to Maniakarma service if its running
    * @param mapId Map UID
    * @param login Player login
    * @param vote Player vote
    */
-  async addVote(mapId: string, login: string, vote: number): Promise<void> {
+  async addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+    if (process.env.USE_MANIAKARMA === 'YES') {
+      ManiakarmaService.addVote(mapId, login, vote)
+    }
     await VoteService.add(mapId, login, vote)
   },
 
@@ -614,17 +631,6 @@ export const TRAKMAN = {
    */
   async fetchVotes(mapId: string): Promise<any[]> {
     return await VoteService.fetch(mapId)
-  },
-
-  /**
-   * Adds a vote to Maniakarma service
-   * @param mapId Map UID
-   * @param login Player login
-   * @param vote Player vote
-   * @param date Vote date
-   */
-  addMKVote(mapId: string, login: string, vote: number, date: Date): void {
-    ManiakarmaService._newVotes.push({ mapId: mapId, login: login, vote: vote, date: date })
   },
 
   async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
@@ -785,11 +791,11 @@ export const TRAKMAN = {
     return AdministrationService.guestlist
   },
 
-  get mkPlayerVotes(): TMVote[] {
+  get mkPlayerVotes(): MKVote[] {
     return ManiakarmaService.playerVotes
   },
 
-  get mkNewVotes(): TMVote[] {
+  get mkNewVotes(): MKVote[] {
     return ManiakarmaService.newVotes
   },
 

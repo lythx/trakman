@@ -1,5 +1,3 @@
-import { CONFIG } from "../UiUtils.js"
-
 export default class Grid {
 
   readonly width: number

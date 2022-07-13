@@ -11,6 +11,8 @@ export default class VisitorAmount extends StaticComponent {
   private readonly iconData: { icon: string, text1: string, text2: string, iconWidth: number, iconHeight: number, padding: number, equalTexts?: true, actionId?: number, link?: string }[] = []
   private xml: string = ''
   private readonly grid: Grid
+  private skipCost = CONFIG.buttons.paySkip.costs[0]
+  private resCost = CONFIG.buttons.payRes.costs[0]
 
   constructor() {
     super(IDS.buttons, 'race')
@@ -18,7 +20,44 @@ export default class VisitorAmount extends StaticComponent {
     this.height = CONFIG.buttons.height
     this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('buttons')
-    this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height+ CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+    this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height + CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+    TM.addListener('Controller.BeginMap', (info: BeginMapInfo) => {
+      const cfg = CONFIG.buttons.payRes
+      if (this.resCost !== -1) {
+        this.iconData[cfg.index] = {
+          icon: stringToObjectProperty(cfg.icon, ICONS),
+          text1: cfg.title1.replace(/\$COST\$/, this.resCost.toString()),
+          text2: cfg.title2,
+          iconWidth: cfg.width,
+          iconHeight: cfg.height,
+          padding: cfg.padding,
+          actionId: this.id + 4
+        }
+      } else {
+        this.iconData[cfg.index] = {
+          icon: stringToObjectProperty(cfg.icon, ICONS),
+          text1: cfg.title3,
+          text2: cfg.title4,
+          iconWidth: cfg.width,
+          iconHeight: cfg.height,
+          padding: cfg.padding,
+          equalTexts: true
+        }
+      }
+      this.constructXml()
+      this.display()
+    })
+    TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
+      switch (info.answer - this.id) {
+        case 1:
+          break
+        case 2:
+          break
+        case 3:
+          break
+        case 4: this.onResButtonClick(info.login, info.nickName)
+      }
+    })
   }
 
   async display(): Promise<void> {
@@ -46,140 +85,156 @@ export default class VisitorAmount extends StaticComponent {
     </manialink>`
   }
 
+  private onResButtonClick = async (login: string, nickname: string): Promise<void> => {
+    const res = await TM.sendCoppers(login, this.resCost, 'Pay to restart the ongoing map')
+    if (res instanceof Error) {
+      TM.sendMessage(`${TM.palette.error}Failed to pay for map restart.`)
+    } else if (res === true) {
+      TM.sendMessage(`${nickname}$s$z${TM.palette.donation} paid ${this.resCost} to restart the ongoing map.`)
+      TM.addToJukebox(TM.map.id)
+      this.resCost = CONFIG.buttons.payRes.costs[CONFIG.buttons.payRes.costs.indexOf(this.resCost) + 1] ?? -1
+      const cfg = CONFIG.buttons.payRes
+      this.iconData[cfg.index] = {
+        icon: stringToObjectProperty(cfg.icon, ICONS),
+        text1: cfg.title5,
+        text2: cfg.title6,
+        iconWidth: cfg.width,
+        iconHeight: cfg.height,
+        padding: cfg.padding
+      }
+      this.constructXml()
+      this.display()
+    }
+  }
+
   private initialize = async (): Promise<void> => {
     // Visit counter
     const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[0].name, ICONS),
+    const cfg = CONFIG.buttons
+    this.iconData[cfg.visitors.index] = {
+      icon: stringToObjectProperty(cfg.visitors.icon, ICONS),
       text1: res[0].count,
-      text2: CONFIG.buttons.titles[0],
-      iconWidth: CONFIG.buttons.icons[0].width,
-      iconHeight: CONFIG.buttons.icons[0].height,
-      padding: CONFIG.buttons.icons[0].padding
-    })
+      text2: cfg.visitors.title,
+      iconWidth: cfg.visitors.width,
+      iconHeight: cfg.visitors.height,
+      padding: cfg.visitors.padding
+    }
     // Player and spectator counter
     const all: TMPlayer[] = TM.players
     const players: number = all.filter(a => !a.isSpectator).length
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[1].name, ICONS),
-      text1: `${all.length - players} ${CONFIG.buttons.titles[1].split(' ')[0]}`,
-      text2: `${players} ${CONFIG.buttons.titles[1].split(' ')[1]}`,
-      iconWidth: CONFIG.buttons.icons[1].width,
-      iconHeight: CONFIG.buttons.icons[1].height,
-      padding: CONFIG.buttons.icons[1].padding,
+    this.iconData[cfg.players.index] = {
+      icon: stringToObjectProperty(cfg.players.icon, ICONS),
+      text1: `${all.length - players} ${cfg.players.title1}`,
+      text2: `${players} ${cfg.players.title2}`,
+      iconWidth: cfg.players.width,
+      iconHeight: cfg.players.height,
+      padding: cfg.players.padding,
       equalTexts: true
-    })
+    }
     // Version
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[2].name, ICONS),
+    this.iconData[cfg.version.index] = {
+      icon: stringToObjectProperty(cfg.version.icon, ICONS),
       text1: '0.0.1',
-      text2: CONFIG.buttons.titles[2],
-      iconWidth: CONFIG.buttons.icons[2].width,
-      iconHeight: CONFIG.buttons.icons[2].height,
-      padding: CONFIG.buttons.icons[2].padding
-    })
+      text2: cfg.version.title,
+      iconWidth: cfg.version.width,
+      iconHeight: cfg.version.height,
+      padding: cfg.version.padding,
+    }
     // Time
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[3].name, ICONS),
+    this.iconData[cfg.time.index] = {
+      icon: stringToObjectProperty(cfg.time.icon, ICONS),
       text1: `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`,
-      text2: CONFIG.buttons.titles[3],
-      iconWidth: CONFIG.buttons.icons[3].width,
-      iconHeight: CONFIG.buttons.icons[3].height,
-      padding: CONFIG.buttons.icons[3].padding
-    })
+      text2: cfg.time.title,
+      iconWidth: cfg.time.width,
+      iconHeight: cfg.time.height,
+      padding: cfg.time.padding,
+    }
     // Map list
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[4].name, ICONS),
+    this.iconData[cfg.maps.index] = {
+      icon: stringToObjectProperty(cfg.maps.icon, ICONS),
       text1: TM.maps.length.toString(),
-      text2: CONFIG.buttons.titles[4],
-      iconWidth: CONFIG.buttons.icons[4].width,
-      iconHeight: CONFIG.buttons.icons[4].height,
-      padding: CONFIG.buttons.icons[4].padding,
+      text2: cfg.maps.title,
+      iconWidth: cfg.maps.width,
+      iconHeight: cfg.maps.height,
+      padding: cfg.maps.padding,
       actionId: IDS.mapList
-    })
+    }
     // Stats
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[5].name, ICONS),
-      text1: CONFIG.buttons.titles[5].split(' ')[0],
-      text2: CONFIG.buttons.titles[5].split(' ')[1],
-      iconWidth: CONFIG.buttons.icons[5].width,
-      iconHeight: CONFIG.buttons.icons[5].height,
-      padding: CONFIG.buttons.icons[5].padding,
+    this.iconData[cfg.stats.index] = {
+      icon: stringToObjectProperty(cfg.stats.icon, ICONS),
+      text1: cfg.stats.title1,
+      text2: cfg.stats.title2,
+      iconWidth: cfg.stats.width,
+      iconHeight: cfg.stats.height,
+      padding: cfg.stats.padding,
       actionId: IDS.localCps,
       equalTexts: true
-    })
+    }
     // Sector records
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[6].name, ICONS),
-      text1: CONFIG.buttons.titles[6].split(' ')[0],
-      text2: CONFIG.buttons.titles[6].split(' ')[1],
-      iconWidth: CONFIG.buttons.icons[6].width,
-      iconHeight: CONFIG.buttons.icons[6].height,
-      padding: CONFIG.buttons.icons[6].padding,
+    this.iconData[cfg.sectorRecords.index] = {
+      icon: stringToObjectProperty(cfg.sectorRecords.icon, ICONS),
+      text1: cfg.sectorRecords.title1,
+      text2: cfg.sectorRecords.title2,
+      iconWidth: cfg.sectorRecords.width,
+      iconHeight: cfg.sectorRecords.height,
+      padding: cfg.sectorRecords.padding,
       actionId: IDS.dediCps,
       equalTexts: true
-    })
-    this.constructXml()
+    }
     // Github repo
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[7].name, ICONS),
-      text1: CONFIG.buttons.titles[7].split(' ')[0],
-      text2: CONFIG.buttons.titles[7].split(' ')[1],
-      iconWidth: CONFIG.buttons.icons[7].width,
-      iconHeight: CONFIG.buttons.icons[7].height,
-      padding: CONFIG.buttons.icons[7].padding,
+    this.iconData[cfg.github.index] = {
+      icon: stringToObjectProperty(cfg.github.icon, ICONS),
+      text1: cfg.github.title1,
+      text2: cfg.github.title2,
+      iconWidth: cfg.github.width,
+      iconHeight: cfg.github.height,
+      padding: cfg.github.padding,
       link: `github.com/felacek/trakman/`,
       equalTexts: true
-    })
+    }
     // Vote to skip
-    const s: string[] = CONFIG.buttons.titles[8].split(' ')
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[8].name, ICONS),
-      text1: s.shift() as any,
-      text2: s.join(' '),
-      iconWidth: CONFIG.buttons.icons[8].width,
-      iconHeight: CONFIG.buttons.icons[8].height,
-      padding: CONFIG.buttons.icons[8].padding,
-      actionId: IDS.TMXWindow
-    })
+    this.iconData[cfg.voteSkip.index] = {
+      icon: stringToObjectProperty(cfg.voteSkip.icon, ICONS),
+      text1: cfg.voteSkip.title1,
+      text2: cfg.voteSkip.title2,
+      iconWidth: cfg.voteSkip.width,
+      iconHeight: cfg.voteSkip.height,
+      padding: cfg.voteSkip.padding,
+      actionId: this.id + 1
+    }
     // Vote to replay
-    const s2: string[] = CONFIG.buttons.titles[9].split(' ')
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[9].name, ICONS),
-      text1: s2.shift() as any,
-      text2: s2.join(' '),
-      iconWidth: CONFIG.buttons.icons[9].width,
-      iconHeight: CONFIG.buttons.icons[9].height,
-      padding: CONFIG.buttons.icons[9].padding,
-      actionId: IDS.TMXWindow
-    })
+    this.iconData[cfg.voteRes.index] = {
+      icon: stringToObjectProperty(cfg.voteRes.icon, ICONS),
+      text1: cfg.voteRes.title1,
+      text2: cfg.voteRes.title2,
+      iconWidth: cfg.voteRes.width,
+      iconHeight: cfg.voteRes.height,
+      padding: cfg.voteRes.padding,
+      actionId: this.id + 2
+    }
     // Pay to skip
-    const title: string = CONFIG.buttons.titles[10]
-    const s3: string[] = title.replace(/\$\$/, '300').split(' ')
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[10].name, ICONS),
-      text1: (s3.shift() as any) + ' ' + (s3.shift() as any),
-      text2: s3.join(' '),
-      iconWidth: CONFIG.buttons.icons[10].width,
-      iconHeight: CONFIG.buttons.icons[10].height,
-      padding: CONFIG.buttons.icons[10].padding,
-      actionId: IDS.TMXWindow
-    })
+    this.iconData[cfg.paySkip.index] = {
+      icon: stringToObjectProperty(cfg.paySkip.icon, ICONS),
+      text1: cfg.paySkip.title1.replace(/\$COST\$/, this.skipCost.toString()),
+      text2: cfg.paySkip.title2,
+      iconWidth: cfg.paySkip.width,
+      iconHeight: cfg.paySkip.height,
+      padding: cfg.paySkip.padding,
+      actionId: this.id + 3
+    }
     // Pay to replay
-    const title2: string = CONFIG.buttons.titles[11]
-    const s4: string[] = title2.replace(/\$\$/, '100').split(' ')
-    this.iconData.push({
-      icon: stringToObjectProperty(CONFIG.buttons.icons[11].name, ICONS),
-      text1: (s4.shift() as any) + ' ' + (s4.shift() as any),
-      text2: s4.join(' '),
-      iconWidth: CONFIG.buttons.icons[11].width,
-      iconHeight: CONFIG.buttons.icons[11].height,
-      padding: CONFIG.buttons.icons[11].padding,
-      actionId: IDS.TMXWindow
-    })
+    this.iconData[cfg.payRes.index] = {
+      icon: stringToObjectProperty(cfg.payRes.icon, ICONS),
+      text1: cfg.payRes.title1.replace(/\$COST\$/, this.resCost.toString()),
+      text2: cfg.payRes.title2,
+      iconWidth: cfg.payRes.width,
+      iconHeight: cfg.payRes.height,
+      padding: cfg.payRes.padding,
+      actionId: this.id + 4
+    }
     this.constructXml()
   }
 

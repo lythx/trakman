@@ -3,14 +3,26 @@ import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
 import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
-import { PlayerService } from '../services/PlayerService.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
 import { Client } from '../Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
+interface CallParams {
+  string?: string
+  int?: number,
+  double?: number,
+  boolean?: boolean,
+  struct?: {
+    [key: string]: CallParams
+  },
+  base64?: string,
+  array?: CallParams[]
+}
+
 export abstract class DedimaniaClient {
+
   private static readonly socket: Socket = new Socket()
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
@@ -100,10 +112,10 @@ export abstract class DedimaniaClient {
     })
   }
 
-  static async call(method: string, params: any[] = []): Promise<any[] | Error> {
+  static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     if (!this.connected) { return new Error('Not connected to dedimania') }
     // TODO: ensure that if theres 2 responses awaiting (basically never but ye) they get executed in good order
-    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 300)) }
+    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) } // cba just changed to 2 seconds so they dont overlap doesnt matter anyway
     this.receivingResponse = true
     const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
     this.socket.write(request.buffer)
