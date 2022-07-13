@@ -23,5 +23,7 @@
     "liveSectors": 40000,
     "liveCheckpoint": 70000,
     "currentCps": 80000,
-    "donationPanel": 120000
+    "donationPanel": 120000,
+    "playerList": 130000,
+    "banList": 140000
 }
