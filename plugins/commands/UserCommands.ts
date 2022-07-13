@@ -1,4 +1,5 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { UI } from '../ui/UI.js'
 
 const commands: TMCommand[] = [
   // Testing commands, remove those later into development
@@ -214,8 +215,13 @@ const commands: TMCommand[] = [
     aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
     params: [{ name: 'query', optional: true }],
-    callback: (info: MessageInfo, query: string): void => {
-      TM.openManialink(TM.UIIDS.mapList, info.login)
+    callback: (info: MessageInfo, query?: string): void => {
+      if (query === undefined) {
+        TM.openManialink(TM.UIIDS.mapList, info.login)
+        return
+      }
+      const mapList = UI.dynamicComponents.mapList
+      mapList.openWithQuery(info.login, query)
     },
     privilege: 0
   },
@@ -232,7 +238,15 @@ const commands: TMCommand[] = [
       TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickName}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
-  }
+  },
+  {
+    aliases: ['test'],
+    params: [{ name: 'nickname', type: 'multiword' }],
+    callback: (info: MessageInfo, nickname: string): void => {
+      TM.sendMessage(TM.nicknameToLogin(nickname) ?? 'didnt work lol')
+    },
+    privilege: 0
+  },
 ]
 
 for (const command of commands) { TM.addCommand(command) }

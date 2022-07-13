@@ -18,7 +18,7 @@
         "bgColor": "0006",
         "marginBig": 0.27,
         "marginSmall": 0.15,
-        "rightSideOrder": [ 
+        "rightSideOrder": [
             "map",
             "previousAndBest",
             "tmx",
@@ -383,7 +383,19 @@
         "icon": "chart.live",
         "title": "Live Checkpoints",
         "selfColour": "0F0F",
-        "paginatorOffset": 14.9
+        "cpColours": {
+            "best": "0F0F",
+            "worst": "F00F",
+            "equal": "FF0F"
+        },
+        "navbar": [
+            "liveSectors",
+            "dediCps",
+            "dediSectors",
+            "localCps",
+            "localSectors"
+        ],
+        "cpPaginatorMargin": 0.25
     },
     "liveSectors": {
         "entries": 15,
@@ -475,7 +487,7 @@
             2
         ]
     },
-    "banList" : {
+    "banList": {
         "title": "Banned players ",
         "icon": "X",
         "entries": 15,
@@ -484,7 +496,7 @@
             2,
             3
         ],
-        "navbar" : [
+        "navbar": [
             "blacklistList",
             "guestlistList"
         ]

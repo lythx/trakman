@@ -13,18 +13,13 @@ export default class LiveCps extends PopupWindow {
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
   private readonly selfColour: string = CONFIG.liveCps.selfColour
-  private readonly colours = {
-    best: '0F0F',
-    worst: 'F00F',
-    equal: 'FF0F'
-  }
-  private readonly paginatorOffset: number = CONFIG.liveCps.paginatorOffset
+  private readonly cpColours = CONFIG.liveCps.cpColours
 
   constructor() {
-    super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, ['liveSectors', 'dediCps', 'dediSectors', 'localCps', 'localSectors'])
+    super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, CONFIG.liveCps.navbar)
     const records: FinishInfo[] = TM.liveRecords
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, this.calculateCpPages(), 1, true)
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange((login: string): void => {
       this.getPagesAndOpen(login)
     })
@@ -69,7 +64,7 @@ export default class LiveCps extends PopupWindow {
       const startCells = params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages
       const record: FinishInfo = records[i + playerIndex]
       const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
-      const colour: string = cpType === undefined ? 'FFFF' : (this.colours as any)[cpType]
+      const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
         ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(cp), w, h)}`
@@ -87,7 +82,7 @@ export default class LiveCps extends PopupWindow {
       headers = [
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + 1  - this.startCellsOnFirstPage).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
@@ -113,9 +108,10 @@ export default class LiveCps extends PopupWindow {
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
+    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + CONFIG.liveCps.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
-    <frame posn="${this.windowWidth - this.paginatorOffset} 0 3">
+    <frame posn="${this.windowWidth / 2 - w} 0 3">
       ${this.cpPaginator.constructXml(params.cpPage)}
     </frame>`
   }
