@@ -18,7 +18,7 @@
         "bgColor": "0006",
         "marginBig": 0.27,
         "marginSmall": 0.15,
-        "rightSideOrder": [
+        "rightSideOrder": [ 
             "map",
             "previousAndBest",
             "tmx",
@@ -423,6 +423,40 @@
             500,
             1000,
             5000
+        ]
+    },
+    "playerList": {
+        "title": "Players ",
+        "icon": "person.white",
+        "ban": "X",
+        "mute": "mute",
+        "addGuest": "addGuest",
+        "removeGuest": "removeGuest",
+        "entries": 15,
+        "columnProportions": [
+            3,
+            3,
+            3,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+        ]
+    },
+    "banList" : {
+        "title": "Banned players ",
+        "icon": "X",
+        "entries": 15,
+        "columnProportions": [
+            2,
+            2,
+            3
+        ],
+        "navbar" : [
+            "blacklistList",
+            "guestlistList"
         ]
     }
 }

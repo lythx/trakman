@@ -385,6 +385,22 @@ const commands: TMCommand[] = [
     },
     privilege: 1
   },
+  {
+    aliases: ['players', 'playerlist'],
+    help: 'Display list of players',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.playerList, info.login)
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['banlist'],
+    help: 'Display list of banned players',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.banList, info.login)
+    },
+    privilege: 1
+  }
 ]
 
 for (const command of commands) { TM.addCommand(command) }
