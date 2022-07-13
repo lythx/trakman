@@ -17,11 +17,12 @@ import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
+import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
+import dsc from 'dice-similarity-coeff';
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -557,45 +558,62 @@ export const TRAKMAN = {
     return await RecordService.removeAll(mapId)
   },
 
+  stripSpecialChars(str: string): string {
+    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
+      return [a[0], [a[0], ...a[1]]]
+    }))
+    let strippedStr = ''
+    for (const letter of str) {
+      let foundLetter = false
+      for (const key in charmap) {
+        if (charmap[key].includes(letter)) {
+          strippedStr += key
+          foundLetter = true
+          break
+        }
+      }
+      if (!foundLetter) {
+        strippedStr += letter
+      }
+    }
+    return strippedStr
+  },
+
+
   /**
    * Attempts to convert the player nickname to their login via charmap
    * @param nickName Player nickname
    * @returns Possibly matching login or undefined if unsuccessful
    */
-  nicknameToLogin: (nickName: string): string | undefined => {
-    const charmap: any = SpecialCharmap
-    const players: TMPlayer[] = PlayerService.players
-    const guesses: { login: string, nickName: string, currentMatch: number, longestMatch: number }[] = []
-    for (const e of players) {
-      guesses.push({ login: e.login, nickName: TRAKMAN.strip(e.nickName.toLowerCase()), currentMatch: 0, longestMatch: 0 })
+  nicknameToLogin(nickName: string): string | undefined {
+    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickName).toLowerCase() }))
+    const strippedNicknames: { nickname: string, login: string }[] = []
+    for (const e of nicknames) {
+      strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })
     }
-    for (const guess of guesses) {
-      for (const [i, letter] of guess.nickName.split('').entries()) {
-        if (charmap?.[nickName[0]?.toString()]?.some((a: any): boolean => a === letter) || nickName[0]?.toString() === letter) {
-          for (let j: number = 0; j < nickName.length + 1; j++) {
-            if (j === nickName.length + 1) {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-            if (nickName[j] === guess?.nickName?.[i + j] || charmap?.[nickName[j]?.toString()]?.some((a: any): boolean => a === guess?.nickName?.[i + j])) {
-              guess.currentMatch++
-            }
-            else {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-          }
-        }
+    const matches: { login: string, value: number }[] = []
+    for (const e of strippedNicknames) {
+      const value = dsc.twoStrings(e.nickname, nickName.toLowerCase())
+      if (value > 0.4) {
+        matches.push({ login: e.login, value })
       }
     }
-    guesses.sort((a, b): number => b.longestMatch - a.longestMatch)
-    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
+    if (matches.length === 0) {
       return undefined
     }
-    if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
+    const s = matches.sort((a, b) => b.value - a.value)
+    if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
       return undefined
     }
-    return guesses[0].login
+    return s[0].login
+  },
+
+  matchString(searchString: string, possibleMatches: string[]): string[] {
+    const arr: { str: string, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ str: e, value: dsc.twoStrings(searchString, e) })
+    }
+    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
   },
 
   /**

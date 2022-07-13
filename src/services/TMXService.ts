@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { JukeboxService } from './JukeboxService.js'
-import { GBXParser } from '../GBXParser.js'
 import 'dotenv/config'
 
 export abstract class TMXService {
@@ -36,14 +35,12 @@ export abstract class TMXService {
     this._current = next
     const replays: TMXReplay[] | undefined = this._current?.replays
     if (replays !== undefined && replays.length > 0) {
-      for (let i: number = 0; i < Math.min(3, replays.length); i++) {
-        const res = await fetch(replays[i].url).catch((err: Error) => err)
-        if (!(res instanceof Error)) {
-          const file: ArrayBuffer = await res.arrayBuffer()
-          const parser: GBXParser = new GBXParser(Buffer.from(file))
-          replays[i].login = parser.getLogin()
-        }
-      }
+      // for (let i: number = 0; i < Math.min(3, replays.length); i++) {
+      //   const res = await fetch(replays[i].url).catch((err: Error) => err)
+      //   if (!(res instanceof Error)) {
+      //     const file: ArrayBuffer = await res.arrayBuffer()
+      //   }
+      // }
     }
     const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
