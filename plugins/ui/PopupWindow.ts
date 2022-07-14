@@ -111,8 +111,7 @@ export default abstract class PopupWindow extends DynamicComponent {
         const name = (CONFIG as any)?.[e]?.title ?? e
         const action = (IDS as any)?.[e] ?? ''
         ret.push({ name, action })
-      }
-      else {
+      } else {
         ret.push(e)
       }
     }

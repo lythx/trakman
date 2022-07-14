@@ -1,18 +1,6 @@
 import { Request } from './Request.js'
 import { Socket } from './Socket.js'
 
-interface CallParams {
-  string?: string
-  int?: number,
-  double?: number,
-  boolean?: boolean,
-  struct?: {
-    [key: string]: CallParams
-  },
-  base64?: string,
-  array?: CallParams[]
-}
-
 export abstract class Client {
 
   private static readonly socket: Socket = new Socket()

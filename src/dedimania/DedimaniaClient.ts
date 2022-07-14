@@ -9,18 +9,6 @@ import { Client } from '../Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
-interface CallParams {
-  string?: string
-  int?: number,
-  double?: number,
-  boolean?: boolean,
-  struct?: {
-    [key: string]: CallParams
-  },
-  base64?: string,
-  array?: CallParams[]
-}
-
 export abstract class DedimaniaClient {
 
   private static readonly socket: Socket = new Socket()
