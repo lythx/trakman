@@ -7,11 +7,11 @@ export abstract class Client {
   private static requestId: number = 0x80000000
   private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
-  static async connect(host = 'localhost', port = 5000): Promise<string> {
+  static async connect(host = 'localhost', port = 5000): Promise<true | Error> {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
-    return await this.socket.awaitHandshake().catch(async err => await Promise.reject(err))
+    return await this.socket.awaitHandshake()
   }
 
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {

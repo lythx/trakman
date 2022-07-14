@@ -7,17 +7,17 @@ export class ClientSocket extends net.Socket {
 
   private handshakeHeaderSize: number = 0
   private handshakeHeader: string = ''
-  private handshakeStatus: string = ''
+  private handshakeStatus: null | true | Error = null
   private response: ClientResponse | null = null
   private receivingResponse: boolean = false
-  private responses: ClientResponse[] = []
+  private readonly responses: ClientResponse[] = []
   private incompleteHeader: Buffer | null = null
 
   /**
   * Setup socket listeners for client - server communication
   */
   setupListeners(): void {
-    this.on('data', buffer => {
+    this.on('data', (buffer: Buffer): void => {
       // handshake header has no id so it has to be treated differently from normal data
       if (this.handshakeHeaderSize === 0) {
         this.setHandshakeHeaderSize(buffer)
@@ -29,25 +29,22 @@ export class ClientSocket extends net.Socket {
         this.handleResponseChunk(buffer)
       }
     })
-    this.on('error', (err: Error) => ErrorHandler.fatal('Socket error:', err.message))
+    this.on('error', (err: Error): void => ErrorHandler.fatal('Socket error:', err.message))
   }
 
   /**
   * Poll handshake status
-  * @returns {Promise<String>} handshake status
   */
-  async awaitHandshake(): Promise<string> {
+  async awaitHandshake(): Promise<true | Error> {
     const startTimestamp: number = Date.now()
-    return await new Promise((resolve, reject): void => {
+    return await new Promise((resolve): void => {
       const poll = (): void => {
-        if (this.handshakeStatus === 'Handshake success') {
+        if (this.handshakeStatus !== null) {
           resolve(this.handshakeStatus)
           return
-        } else if (this.handshakeStatus === 'Server uses wrong GBX protocol') {
-          reject(new Error(this.handshakeStatus))
-          return
-        } else if (Date.now() - startTimestamp > 5000) {
-          reject(new Error('No response from the server'))
+        }
+        if (Date.now() - startTimestamp > 5000) {
+          resolve(new Error('No response from the server'))
           return
         }
         setImmediate(poll)
@@ -58,22 +55,23 @@ export class ClientSocket extends net.Socket {
 
   /**
   * Poll dedicated server response
-  * @returns {Promise<any[]>} array of server return values
+  * @returns array of values returned by server or error
   */
-  async awaitResponse(id: number, method: string): Promise<any[]> {
+  async awaitResponse(id: number, method: string): Promise<any[] | Error> {
     const startTimestamp: number = Date.now()
-    return await new Promise((resolve, reject): void => {
+    return await new Promise((resolve): void => {
       const poll = (): void => {
         const response: ClientResponse | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
         if (response !== undefined) {
-          if (response.isError) {
-            reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
+          if (response.isError === true) {
+            resolve(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
           }
           resolve(response.json)
           return
-        } else if (Date.now() - startTimestamp > 15000) {
-          reject(new Error(`No server response for call ${method}`))
+        } 
+        if (Date.now() - startTimestamp > 15000) {
+          resolve(new Error(`No server response for call ${method}`))
           return
         }
         setImmediate(poll)
@@ -83,7 +81,7 @@ export class ClientSocket extends net.Socket {
   }
 
   private setHandshakeHeaderSize(buffer: Buffer): void {
-    if (buffer.length < 4) { ErrorHandler.fatal('Failed to read handshake header', `Received header: ${buffer.toString()}`, 'Buffer length too small') }
+    if (buffer.length < 4) { this.handshakeStatus = new Error(`Failed to read handshake header. Received header: ${buffer.toString()}. Buffer length too small`) }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
   }
 
@@ -92,15 +90,17 @@ export class ClientSocket extends net.Socket {
     if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
       this.handshakeHeader !== 'GBXRemote 2') {
       this.destroy()
-      this.handshakeStatus = 'Server uses wrong GBX protocol'
+      this.handshakeStatus = new Error('Server uses wrong GBX protocol')
       return
     }
-    this.handshakeStatus = 'Handshake success'
+    this.handshakeStatus = true
   }
 
-  // initiate a Response object with targetSize and Id
+  /** 
+   * Initiates a Response object with targetSize and id
+   */
   private handleResponseStart(buffer: Buffer): void {
-    this.responses.length = Math.min(this.responses.length, 20)
+    this.responses.length = Math.min(this.responses.length, 20) // trim responses array so it doesn't grow inifinitely
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.response = null
       this.receivingResponse = false
@@ -113,10 +113,12 @@ export class ClientSocket extends net.Socket {
     }
     this.response = new ClientResponse(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
     this.receivingResponse = true
-    if (buffer.subarray(8) != null) { this.handleResponseChunk(buffer.subarray(8)) }
+    this.handleResponseChunk(buffer.subarray(8))
   }
 
-  // add new buffer to response object
+  /**
+   * Adds data to response object and handles response end
+   */
   private handleResponseChunk(buffer: Buffer): void {
     if (this.response === null) { return }
     this.response.addData(buffer)
