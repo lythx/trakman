@@ -19,6 +19,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 
 async function main(): Promise<void> {
+  Logger.initialize()
   Logger.warn('Establishing connection with the server...')
   const connectionStatus: void | string = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
     .catch(err => { ErrorHandler.fatal('Connection failed', err) })
