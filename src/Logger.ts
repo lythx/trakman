@@ -1,64 +1,124 @@
 import fs from 'fs/promises'
 
-type Tag = 'Log' | 'Warn' | 'Fatal' | 'Debug' | 'Error' | 'Trace' | 'Info'
-
-// TODO: make logs appearance and file locations customizable in config
+type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
 export class Logger {
 
-  static readonly tagConsoleColours = {
-    Warn: '[33m',
-    Fatal: '[31m',
-    Error: '[31m',
-    Trace: '[35m',
-    Info: '[32m',
-    Debug: '[36m'
+  private static readonly tagConsoleColours = {
+    warn: '[33m',
+    fatal: '[31m',
+    error: '[31m',
+    info: '[32m',
+    debug: '[36m',
+    trace: '[35m'
+  } as const
+  private static readonly logDir = './logs'
+  private static readonly logs = {
+    combined: `${this.logDir}/combined.log`,
+    fatal: `${this.logDir}/fatal.log`,
+    error: `${this.logDir}/error.log`,
+    warn: `${this.logDir}/warn.log`,
+    info: `${this.logDir}/info.log`,
+    trace: `${this.logDir}/trace.log`,
+    debug: `${this.logDir}/debug.log`
   } as const
 
-  static log(str: string): void {
-    console.log(`<Log>${str}`)
+  static async initialize(): Promise<void> {
+    await fs.mkdir(this.logDir).catch((err: Error) => {
+      if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
+        throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
+      }
+    })
+    process.on('uncaughtException', async (err: Error) => {
+      Logger.fatal('Uncaught exception occured: ', err.message, err.stack ?? '')
+    })
+    process.on('unhandledRejection', async (err: Error) => {
+      Logger.fatal('Unhandled rejection occured: ', err.message, err.stack ?? '')
+    })
   }
 
-  static warn(str: string): void {
+  static warn(...lines: string[]): void {
     const date = new Date().toUTCString()
-    const s = `<Warn> [${date.substring(5, date.length - 4)}] ${str}`
-    fs.appendFile('./logs/warnLog.txt', s)
-    console.log(`\u001b[33m${s}\x1b[0m`)
+    const location = this.getLocation()
+    const tag: Tag = 'warn'
+    this.writeLog(tag, location, date, lines)
   }
 
-  static fatal(str: string): void {
-    console.log(`\u001b[31m<Fatal>${str}\x1b[0m`)
-  }
-
-  static error(str: string): void {
-    fs.appendFile('./logs/errorLog.txt', `<${new Date().toUTCString()}>${str}`)
-    console.log(`\u001b[31m<Fatal>${str}\x1b[0m`)
-  }
-
-  static trace(str: string): void {
-    console.log(`\u001b[35m<Trace>${str}\x1b[0m`)
-  }
-
-  static info(str: string): void {
-    console.log(`\u001b[32m<Info>${str}\x1b[0m`)
-  }
-
-  static debug(str: string): void {
-    console.log(`\u001b[36m<Debug>${str}\x1b[0m`)
-  }
-
-  private static formatString(tag: Tag, str: string): string {
+  static fatal(...lines: string[]): void {
     const date = new Date().toUTCString()
-    const colour = (this.tagConsoleColours as any)[tag]
-    const colourString = colour === undefined ? `\u001b${colour}` : ``
-    return `${colourString}<${tag}> [${date.substring(5, date.length - 4)}] ${str}\x1b[0m`
+    const location = this.getLocation()
+    const tag: Tag = 'fatal'
+    if (lines.length === 0) { return }
+    const logStr = this.getLogfileString(tag, lines, location, date)
+    console.log(this.getConsoleString(tag, lines, location, date))
+    void fs.appendFile(this.logs[tag], logStr)
+    void fs.appendFile(this.logs.error, logStr) // Fatal errors are appended to error log too
+    void fs.appendFile(this.logs.combined, logStr)
+    process.exit(1)
+  }
+
+  static error(...lines: string[]): void {
+    const date = new Date().toUTCString()
+    const location = this.getLocation()
+    const tag: Tag = 'error'
+    this.writeLog(tag, location, date, lines)
+  }
+
+  static trace(...lines: string[]): void {
+    const date = new Date().toUTCString()
+    const location = this.getLocation()
+    const tag: Tag = 'trace'
+    this.writeLog(tag, location, date, lines)
+  }
+
+  static info(...lines: string[]): void {
+    const date = new Date().toUTCString()
+    const location = this.getLocation()
+    const tag: Tag = 'info'
+    this.writeLog(tag, location, date, lines)
+  }
+
+  static debug(...lines: string[]): void {
+    const date = new Date().toUTCString()
+    const location = this.getLocation()
+    const tag: Tag = 'debug'
+    this.writeLog(tag, location, date, lines)
+  }
+
+  private static writeLog(tag: Tag, location: string, date: string, lines: string[]) {
+    if (lines.length === 0) { return }
+    const logStr = this.getLogfileString(tag, lines, location, date)
+    console.log(this.getConsoleString(tag, lines, location, date))
+    void fs.appendFile(this.logs[tag], logStr)
+    void fs.appendFile(this.logs.combined, logStr)
+  }
+
+  private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {
+    let ret = `<${tag.toUpperCase()}> [${date.substring(5, date.length - 4)}] (${location}) ${lines[0]}\n`
+    for (let i = 1; i < lines.length; i++) {
+      ret += `\t${lines[i]}\n`
+    }
+    return ret
+  }
+
+  private static getConsoleString(tag: Tag, lines: string[], location: string, date: string): string {
+    const colour = this.tagConsoleColours[tag]
+    const colourString = `\u001b${colour}`
+    let ret = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date.substring(5, date.length - 4)}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
+    for (let i = 1; i < lines.length; i++) {
+      ret += `\n\t${lines[i]}`
+    }
+    return ret
+  }
+
+  private static getLocation(): string {
+    const stack = new Error().stack
+    if (stack === undefined) {
+      return ''
+    }
+    const s = stack.split('\n')[3].split(' ').filter(a => a !== '')[2].split('/')
+    const str = s[s.length - 1]
+    return str.split(':').slice(0, 2).join(':')
   }
 
 }
-
-process.on('uncaughtException', async (err: Error) => {
-  Logger.fatal('Uncaught exception occured: ')
-  console.log(err.message + '\n' + err?.stack)
-  await fs.appendFile('./logs/crashLog.txt', `${new Date().toUTCString()}\n${err.message}\n${err?.stack}\n\n`)
-  process.exit(1)
-})
