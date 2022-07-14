@@ -1,16 +1,16 @@
 import net from 'node:net'
-import { Response } from './Response.js'
-import { Events } from './Events.js'
-import { ErrorHandler } from './ErrorHandler.js'
+import { ClientResponse } from './ClientResponse.js'
+import { Events } from '../Events.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
-export class Socket extends net.Socket {
+export class ClientSocket extends net.Socket {
 
   private handshakeHeaderSize: number = 0
   private handshakeHeader: string = ''
   private handshakeStatus: string = ''
-  private response: Response | null = null
+  private response: ClientResponse | null = null
   private receivingResponse: boolean = false
-  private responses: Response[] = []
+  private responses: ClientResponse[] = []
   private incompleteHeader: Buffer | null = null
 
   /**
@@ -29,7 +29,7 @@ export class Socket extends net.Socket {
         this.handleResponseChunk(buffer)
       }
     })
-    this.on('error', err => ErrorHandler.fatal('Socket error:', err.message))
+    this.on('error', (err: Error) => ErrorHandler.fatal('Socket error:', err.message))
   }
 
   /**
@@ -64,7 +64,7 @@ export class Socket extends net.Socket {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve, reject): void => {
       const poll = (): void => {
-        const response: Response | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
+        const response: ClientResponse | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
         if (response !== undefined) {
           if (response.isError) {
             reject(new Error(`${response.errorString} Code: ${response.errorCode}`))
@@ -111,7 +111,7 @@ export class Socket extends net.Socket {
       buffer = Buffer.concat([this.incompleteHeader, buffer])
       this.incompleteHeader = null
     }
-    this.response = new Response(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
+    this.response = new ClientResponse(buffer.readUInt32LE(0), buffer.readUInt32LE(4))
     this.receivingResponse = true
     if (buffer.subarray(8) != null) { this.handleResponseChunk(buffer.subarray(8)) }
   }

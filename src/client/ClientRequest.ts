@@ -1,6 +1,6 @@
-import { ErrorHandler } from './ErrorHandler.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
-export class Request {
+export class ClientRequest {
   private readonly xml: string
 
   /**

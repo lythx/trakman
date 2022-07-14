@@ -5,7 +5,7 @@ import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
