@@ -67,7 +67,7 @@ export default class KarmaWidget extends StaticComponent {
     const karma: number = TM.voteRatios.find(a => a.mapId === TM.map.id)?.ratio ?? 0
     const mkVotes = TM.mkMapKarma
     const mkKarmaValue = TM.mkMapKarmaValue
-    const totalMkVotes = Object.values(mkVotes).reduce((acc, cur) => acc += cur)
+    const totalMkVotes = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const maxMkAmount = Math.max(...Object.values(mkVotes))
     this.xml = `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
