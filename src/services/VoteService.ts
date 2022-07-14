@@ -30,7 +30,7 @@ export abstract class VoteService {
         this._voteRatios.push({ mapId: e.id, ratio: 0, amount: 0 })
       } else {
         const amount: number = m.votes.length
-        const sum: number = amount === 0 ? 0 : m.votes.map(a => this.voteValues[a + 3]).reduce((acc, cur): number => acc + cur)
+        const sum: number = m.votes.map(a => this.voteValues[a + 3]).reduce((acc, cur): number => acc + cur, 0)
         const ratio: number = sum / amount
         this._voteRatios.push({ mapId: m.mapId, ratio, amount })
       }
@@ -116,12 +116,12 @@ export abstract class VoteService {
     const mapVotes = this._votes.filter(a => a.mapId === mapId)
     if (this.mapsWithVotesStored.includes(mapId)) {
       const amount: number = mapVotes.length
-      const sum: number = mapVotes.length === 0 ? 0 : mapVotes.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur)
+      const sum: number =mapVotes.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
       ratio.ratio = sum / amount
     } else {
       const res = await this.repo.get(mapId)
       const amount: number = res.length
-      const sum: number = res.length === 0 ? 0 : res.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur)
+      const sum: number = res.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
       ratio.ratio = sum / amount
     }
   }

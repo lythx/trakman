@@ -155,8 +155,8 @@ export abstract class ManiakarmaService {
       prevVote.vote = vote
     }
     const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
-    const count = Object.values(this._mapKarma).reduce((acc, cur) => acc + cur)
-    this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur) / count
+    const count = Object.values(this._mapKarma).reduce((acc, cur) => acc + cur, 0)
+    this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
   }
 
   private static fixCoherence() {

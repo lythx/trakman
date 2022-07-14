@@ -60,7 +60,7 @@ export default class RecordList {
     this.maxCount = maxCount
     this.markers = side ? CFG.markersRight : CFG.markersLeft
     const columnProportions: number[] = CFG.columnProportions
-    const proportionsSum: number = columnProportions.length ===0 ? 0 : columnProportions.reduce((acc, cur): number => acc += cur)
+    const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
     this.noRecordEntry = noRecordEntry
     this.getColoursFromPb = getColoursFromPb ?? false
@@ -317,7 +317,7 @@ export default class RecordList {
       }
     }
     else {
-      posX = this.columnWidths.reduce((acc, cur): number => acc + cur) + (offset * (width + this.colGap))
+      posX = this.columnWidths.reduce((acc, cur): number => acc + cur) + (offset * (width + this.colGap), 0)
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? TM.formatDate(a, true) : a
       })
@@ -367,7 +367,7 @@ export default class RecordList {
 
   private constructMarker(marker: Marker | undefined): string {
     if (marker === undefined || marker === null) { return '' }
-    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur) : -(this.markerWidth + this.colGap)
+    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.colGap)
     let icon: string = ''
     if (marker === 'faster') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.stringToIcon(this.markers.faster)}"/>`
