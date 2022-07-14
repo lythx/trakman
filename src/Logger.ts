@@ -1,39 +1,46 @@
 import fs from 'fs/promises'
+import 'dotenv/config'
 
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
-export class Logger {
+export abstract class Logger {
 
-  private static readonly tagConsoleColours = {
-    warn: '[33m',
-    fatal: '[31m',
-    error: '[31m',
-    info: '[32m',
-    debug: '[36m',
-    trace: '[35m'
+  private static logLevel = 0
+  private static readonly consoleColours = {
+    black: '\u001b[30m',
+    red: '\u001b[31m',
+    green: '\u001b[32m',
+    yellow: '\u001b[33m',
+    blue: '\u001b[34m',
+    magenta: '\u001b[35m',
+    cyan: '\u001b[36m',
+    white: '\u001b[37m',
   } as const
   private static readonly logDir = './logs'
-  private static readonly logs = {
-    combined: `${this.logDir}/combined.log`,
-    fatal: `${this.logDir}/fatal.log`,
-    error: `${this.logDir}/error.log`,
-    warn: `${this.logDir}/warn.log`,
-    info: `${this.logDir}/info.log`,
-    trace: `${this.logDir}/trace.log`,
-    debug: `${this.logDir}/debug.log`
-  } as const
+  private static readonly logTypes = {
+    fatal: { level: 1, colour: this.consoleColours.red, files: [`${this.logDir}/fatal.log`, `${this.logDir}/error.log`, `${this.logDir}/combined.log`] },
+    error: { level: 1, colour: this.consoleColours.red, files: [`${this.logDir}/error.log`, `${this.logDir}/combined.log`] },
+    warn: { level: 2, colour: this.consoleColours.yellow, files: [`${this.logDir}/warn.log`, `${this.logDir}/combined.log`] },
+    info: { level: 3, colour: this.consoleColours.green, files: [`${this.logDir}/info.log`, `${this.logDir}/combined.log`] },
+    debug: { level: 4, colour: this.consoleColours.cyan, files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`] },
+    trace: { level: 5, colour: this.consoleColours.magenta, files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`] },
+  }
 
   static async initialize(): Promise<void> {
+    this.logLevel = Number(process.env.LOG_LEVEL)
+    if(isNaN(this.logLevel)) {
+      throw new Error('Error while initializing logger: LOG_LEVEL is not a number. Check if its set in the .env file.')
+    }
     await fs.mkdir(this.logDir).catch((err: Error) => {
       if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
     process.on('uncaughtException', async (err: Error) => {
-      Logger.fatal('Uncaught exception occured: ', err.message, err.stack ?? '')
+      Logger.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
     process.on('unhandledRejection', async (err: Error) => {
-      Logger.fatal('Unhandled rejection occured: ', err.message, err.stack ?? '')
+      Logger.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
   }
 
@@ -41,19 +48,14 @@ export class Logger {
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'warn'
-    this.writeLog(tag, location, date, lines)
+    void this.writeLog(tag, location, date, lines)
   }
 
-  static fatal(...lines: string[]): void {
+  static async fatal(...lines: string[]): Promise<void> {
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'fatal'
-    if (lines.length === 0) { return }
-    const logStr = this.getLogfileString(tag, lines, location, date)
-    console.log(this.getConsoleString(tag, lines, location, date))
-    void fs.appendFile(this.logs[tag], logStr)
-    void fs.appendFile(this.logs.error, logStr) // Fatal errors are appended to error log too
-    void fs.appendFile(this.logs.combined, logStr)
+    await this.writeLog(tag, location, date, lines)
     process.exit(1)
   }
 
@@ -85,12 +87,13 @@ export class Logger {
     this.writeLog(tag, location, date, lines)
   }
 
-  private static writeLog(tag: Tag, location: string, date: string, lines: string[]) {
-    if (lines.length === 0) { return }
+  private static async writeLog(tag: Tag, location: string, date: string, lines: string[]): Promise<void> {
+    if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
-    void fs.appendFile(this.logs[tag], logStr)
-    void fs.appendFile(this.logs.combined, logStr)
+    for (const file of this.logTypes[tag].files) {
+      await fs.appendFile(file, logStr)
+    }
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {
@@ -102,7 +105,7 @@ export class Logger {
   }
 
   private static getConsoleString(tag: Tag, lines: string[], location: string, date: string): string {
-    const colour = this.tagConsoleColours[tag]
+    const colour = this.logTypes[tag].colour
     const colourString = `\u001b${colour}`
     let ret = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date.substring(5, date.length - 4)}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
     for (let i = 1; i < lines.length; i++) {
