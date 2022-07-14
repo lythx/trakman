@@ -1,7 +1,7 @@
 import xml2js from 'xml2js'
-import { ErrorHandler } from './ErrorHandler.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
-export class Response {
+export class ClientResponse {
   private _status: string = 'pending'
   private readonly _targetLength: number
   private readonly _id: number

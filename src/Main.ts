@@ -1,4 +1,4 @@
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 import 'dotenv/config'

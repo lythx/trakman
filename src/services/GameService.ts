@@ -1,5 +1,5 @@
 import { ErrorHandler } from '../ErrorHandler.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 
 export class GameService {
   private static _game: TMGame

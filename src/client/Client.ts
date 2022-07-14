@@ -1,9 +1,9 @@
-import { Request } from './Request.js'
-import { Socket } from './Socket.js'
+import { ClientRequest } from './ClientRequest.js'
+import { ClientSocket } from './ClientSocket.js'
 
 export abstract class Client {
 
-  private static readonly socket: Socket = new Socket()
+  private static readonly socket: ClientSocket = new ClientSocket()
   private static requestId: number = 0x80000000
   private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
@@ -16,7 +16,7 @@ export abstract class Client {
 
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
-    const request: Request = new Request(method, params)
+    const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
     const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
@@ -28,7 +28,7 @@ export abstract class Client {
 
   static callNoRes(method: string, params: CallParams[] = []): void {
     this.requestId++
-    const request: Request = new Request(method, params)
+    const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
     void this.getProxyResponse(method, params, this.requestId)

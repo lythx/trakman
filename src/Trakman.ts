@@ -3,7 +3,7 @@ import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { MapService } from './services/MapService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
