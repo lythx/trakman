@@ -20,22 +20,24 @@ import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
-  Logger.initialize()
+  await Logger.initialize()
   Logger.info('Starting the controller...')
   Logger.trace('Establishing connection with the dedicated server...')
   const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
-  if (connectionStatus instanceof Error) { Logger.fatal('Connection to the dedicated server failed:', connectionStatus.message) }
+  if (connectionStatus instanceof Error) { await Logger.fatal('Connection to the dedicated server failed:', connectionStatus.message) }
   Logger.trace('Connection with the dedicated server established')
   Logger.trace('Authenticating...')
+  if (process.env.SUPERADMIN_NAME === undefined) { await Logger.fatal('SUPERADMIN_NAME is undefined. Check your .env file') }
+  if (process.env.SUPERADMIN_PASSWORD === undefined) { await Logger.fatal('SUPERADMIN_PASSWORD is undefined. Check your .env file') }
   const authenticationStatus: any[] | Error = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
-  if (authenticationStatus instanceof Error) { Logger.fatal('Authentication failed. Server responded with error:', authenticationStatus.message) }
+  if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
   Logger.trace('Retrieving game info...')
   const gameServiceStatus = await GameService.initialize()
-  if (gameServiceStatus instanceof Error) { Logger.fatal('Failed to retrieve game info. Error:', gameServiceStatus.message) }
+  if (gameServiceStatus instanceof Error) { await Logger.fatal('Failed to retrieve game info. Error:', gameServiceStatus.message) }
   Logger.trace('Game info fetched')
   Logger.trace('Fetching administration lists...')
   await AdministrationService.initialize()

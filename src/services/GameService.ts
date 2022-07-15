@@ -57,7 +57,7 @@ export class GameService {
     do {
       Logger.warn(`Retrying to update game info. Try ${tries}`)
       status = await this.update()
-      if (tries === 3 && status instanceof Error) { Logger.fatal(`Failed to update game info after ${tries} tries. Server responded with error: `, status.message) }
+      if (tries === 3 && status instanceof Error) { await Logger.fatal(`Failed to update game info after ${tries} tries. Server responded with error: `, status.message) }
       tries++
     } while (status instanceof Error)
   }

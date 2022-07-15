@@ -8,6 +8,9 @@ export abstract class Client {
   private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
   static async connect(host = 'localhost', port = 5000): Promise<true | Error> {
+    if (port < 0 || port >= 65536 || isNaN(port)) {
+      return new Error(`SERVER_PORT needs to be a number >= 0 and < 65536, received ${port}. Check your .env file`)
+    }
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
