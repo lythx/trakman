@@ -1,4 +1,5 @@
 export abstract class Events {
+  
   private static readonly eventListeners: { event: TMEvent, callback: ((params: any) => void) }[] = []
   private static controllerReady: boolean = false
 

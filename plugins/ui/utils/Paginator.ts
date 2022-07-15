@@ -82,6 +82,7 @@ export default class Paginator {
 
   updatePageCount(pageCount: number): void {
     this.pageCount = pageCount
+    this.buttonCount = 0
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }

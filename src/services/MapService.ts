@@ -1,4 +1,4 @@
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { MapRepository } from '../database/MapRepository.js'
 import { ErrorHandler } from '../ErrorHandler.js'
 
