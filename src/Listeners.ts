@@ -1,4 +1,4 @@
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'

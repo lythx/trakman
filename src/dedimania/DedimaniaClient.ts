@@ -5,21 +5,9 @@ import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
-
-interface CallParams {
-  string?: string
-  int?: number,
-  double?: number,
-  boolean?: boolean,
-  struct?: {
-    [key: string]: CallParams
-  },
-  base64?: string,
-  array?: CallParams[]
-}
 
 export abstract class DedimaniaClient {
 

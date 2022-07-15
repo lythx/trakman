@@ -1,4 +1,4 @@
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 import 'dotenv/config'
@@ -20,10 +20,12 @@ import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
-  Logger.warn('Establishing connection with the server...')
-  const connectionStatus: void | string = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
-    .catch(err => { ErrorHandler.fatal('Connection failed', err) })
-  if (connectionStatus != null) { Logger.info(connectionStatus) }
+  Logger.warn('Establishing connection with the dedicated server...')
+  const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
+  if (connectionStatus instanceof Error) {
+    ErrorHandler.fatal('Connection to dedicated server failed:', connectionStatus.message)
+  }
+  Logger.info('Connection with the dedicated server established.')
   Logger.trace('Authenticating...')
   const auth: any[] | Error = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },

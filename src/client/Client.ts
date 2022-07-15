@@ -1,34 +1,22 @@
-import { Request } from './Request.js'
-import { Socket } from './Socket.js'
-
-interface CallParams {
-  string?: string
-  int?: number,
-  double?: number,
-  boolean?: boolean,
-  struct?: {
-    [key: string]: CallParams
-  },
-  base64?: string,
-  array?: CallParams[]
-}
+import { ClientRequest } from './ClientRequest.js'
+import { ClientSocket } from './ClientSocket.js'
 
 export abstract class Client {
 
-  private static readonly socket: Socket = new Socket()
+  private static readonly socket: ClientSocket = new ClientSocket()
   private static requestId: number = 0x80000000
   private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
-  static async connect(host = 'localhost', port = 5000): Promise<string> {
+  static async connect(host = 'localhost', port = 5000): Promise<true | Error> {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
-    return await this.socket.awaitHandshake().catch(async err => await Promise.reject(err))
+    return await this.socket.awaitHandshake()
   }
 
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
-    const request: Request = new Request(method, params)
+    const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
     const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
@@ -40,7 +28,7 @@ export abstract class Client {
 
   static callNoRes(method: string, params: CallParams[] = []): void {
     this.requestId++
-    const request: Request = new Request(method, params)
+    const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
     void this.getProxyResponse(method, params, this.requestId)
