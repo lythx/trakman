@@ -1,14 +1,15 @@
 import xml2js from 'xml2js'
-import { ErrorHandler } from './ErrorHandler.js'
+import { ErrorHandler } from '../ErrorHandler.js'
 
-export class Response {
-  private _status: string = 'pending'
+export class ClientResponse {
+
+  private _status: 'pending' | 'overloaded' | 'completed' = 'pending'
   private readonly _targetLength: number
   private readonly _id: number
   private _data: Buffer = Buffer.from('')
   private _overload: Buffer | null = null
   private _json: any = null
-  private _isEvent: boolean = false
+  private _isEvent: boolean | null = null
   private _eventName: string = ''
   private _isError: boolean = false
   private _errorString: string = ''
@@ -16,8 +17,8 @@ export class Response {
 
   /**
   * Initiates an object to store buffers received from dedicated server
-  * @param {Number} targetLength first 4 bytes of response
-  * @param {Number} id second 4 bytes of response
+  * @param targetLength first 4 bytes of response
+  * @param id second 4 bytes of response
   */
   constructor(targetLength: number, id: number) {
     this._targetLength = targetLength
@@ -28,7 +29,7 @@ export class Response {
   * Concats new buffer with previous ones and sets status to completed if response reached its target length.
   * If response length is greater than target length (new data contains fragment of next response)
   * status is set to overloaded and next response buffer can be extracted using extractOverload() method
-  * @param {Buffer} data buffer received from dedicated server
+  * @param data buffer received from dedicated server
   */
   addData(data: Buffer): void {
     const newBuffer: Buffer = Buffer.concat([this._data, data])
@@ -40,7 +41,7 @@ export class Response {
       return
     }
     if (newBuffer.length === this._targetLength) {
-      this._data = newBuffer.subarray(0, this._targetLength)
+      this._data = newBuffer
       this._status = 'completed'
       this.generateJson()
       return
@@ -52,7 +53,7 @@ export class Response {
     return this._id
   }
 
-  get status(): string {
+  get status(): "pending" | "overloaded" | "completed" {
     return this._status
   }
 
@@ -60,7 +61,7 @@ export class Response {
     return this._eventName
   }
 
-  get isEvent(): boolean {
+  get isEvent(): boolean | null {
     return this._isEvent
   }
 
@@ -77,14 +78,25 @@ export class Response {
   }
 
   /**
+   * @returns {any[]} array created from server response
+   */
+  get json(): any[] {
+    if (this._isEvent === true) {
+      return this.fixNesting(this._json.methodCall)
+    } else {
+      return this.fixNesting(this._json.methodResponse)
+    }
+  }
+
+  /**
   * Returns buffer fragment written after reaching target length (next response buffer)
   * and sets status to completed
-  * @returns {Buffer} next response buffer
+  * @returns next response buffer
   */
   extractOverload(): Buffer {
     this._status = 'completed'
-    if (this._overload == null) {
-      ErrorHandler.error('Error in extractOverload()', 'Overload is null')
+    if (this._overload === null) {
+      ErrorHandler.error('Error in ClientResponse.extractOverload()', `Overload is null for response ${this._eventName}`)
       return Buffer.from('')
     }
     const overload: Buffer = this._overload
@@ -92,36 +104,25 @@ export class Response {
     return overload
   }
 
-  /**
-  * @returns {any[]} array created from server response
-  */
-  get json(): any[] {
-    if (this._isEvent) {
-      return this.fixNesting(this._json.methodCall)
-    } else {
-      return this.fixNesting(this._json.methodResponse)
-    }
-  }
-
   private generateJson(): void {
     let json: any
     // parse xml to json
     xml2js.parseString(this._data.toString(), (err, result): void => {
-      if (err != null) {
+      if (err !== null) {
         throw err
       }
       json = result
     })
 
-    if (json?.methodCall != null) {
+    if (json?.methodCall !== undefined) {
       this._json = json
       this._eventName = json.methodCall.methodName[0]
       this._isEvent = true
-    } else if (json.methodResponse != null) {
+    } else if (json.methodResponse !== undefined) {
       this._json = json
       this._isEvent = false
       // if server responded with error
-      if (json.methodResponse.fault != null) {
+      if (json.methodResponse.fault !== undefined) {
         this._isError = true
         this._errorCode = json.methodResponse.fault[0].value[0].struct[0].member[0].value[0].int[0]
         this._errorString = json.methodResponse.fault[0].value[0].struct[0].member[1].value[0].string[0]
@@ -154,7 +155,7 @@ export class Response {
           return obj
         case 'array':
           for (const el of value.data) {
-            if (el.value == null) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
+            if (el.value === undefined) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
             const t: string = Object.keys(el.value[0])[0]
             const val: any = el.value[0][t][0]
             arr.push(changeType(val, t))
@@ -165,7 +166,7 @@ export class Response {
       }
     }
     // change overnested object received from parsing the xml to an array of server return values
-    if (obj?.params[0].param === undefined) {
+    if (obj?.params?.[0]?.param === undefined) {
       return [] // some callbacks don't return params. NICE!!!!
     }
     for (const param of obj.params) {
@@ -173,7 +174,7 @@ export class Response {
         const value: any = p.value[0]
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
-            if (el.data[0]?.value == null) { // some methods dont return value here too
+            if (el?.data[0]?.value === undefined) { // some methods dont return value here too
               continue
             }
             for (const val of el.data[0].value) {
@@ -204,4 +205,5 @@ export class Response {
     }
     return arr
   }
+
 }

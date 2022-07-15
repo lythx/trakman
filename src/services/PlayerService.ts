@@ -1,4 +1,4 @@
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert {type: 'json'}
 import { Events } from '../Events.js'

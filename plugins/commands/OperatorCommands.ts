@@ -44,7 +44,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['afu', 'addfromurl'],
-    help: 'Add a track from an url.',
+    help: 'Add a map from an url.',
     // todo params
     callback: async (info: MessageInfo): Promise<void> => {
       const s: string[] = info.text.split(' ')
@@ -84,7 +84,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['rt', 'et', 'removethis', 'erasethis'],
-    help: 'Remove the current track from the playlist.',
+    help: 'Remove the current map from the playlist.',
     callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
@@ -92,7 +92,7 @@ const commands: TMCommand[] = [
       const res: any[] | Error = await TM.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current track.`, info.login)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current map.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
@@ -109,7 +109,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has skipped the ongoing track.`
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has skipped the ongoing map.`
         }]
       },
         {
@@ -119,14 +119,14 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
-    aliases: ['r', 'res'],
+    aliases: ['r', 'res', 'restart'],
     help: 'Restart the current map.',
     callback: (info: MessageInfo): void => {
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has restarted the ongoing track.`
+            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has restarted the ongoing map.`
         }]
       },
         {
@@ -136,14 +136,24 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
-    aliases: ['pt', 'prev', 'previoustrack'],
-    help: 'Requeue the previously played track.',
+    aliases: ['pt', 'prev', 'previous'],
+    help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous track.`)
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['rq', 'requeue', 'replay'],
+    help: 'Requeue the ongoing map.',
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the ongoing map.`)
+      TM.addToJukebox(TM.map.id)
     },
     privilege: 1
   },
@@ -314,6 +324,46 @@ const commands: TMCommand[] = [
     privilege: 1
   }, //You're welcome wizer : - ) // Thank Znake
   {
+    aliases: ['dq', 'djb', 'dropqueue', 'dropjukebox'],
+    help: 'Drop the specified track from the map queue',
+    params: [{ name: 'index', type: 'int' }],
+    callback: (info: MessageInfo, index: number): void => {
+      if (TM.jukebox[index] === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No such index in the queue.`, info.login)
+        return
+      }
+      const map: TMMap | undefined = TM.jukebox.find(a => a === TM.jukebox[index])
+      if (map === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't find this index in the queue.`, info.login)
+        return
+      }
+      TM.removeFromJukebox(map.id)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
+      )
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
+    help: 'Clear the entirety of the current map queue',
+    callback: (info: MessageInfo): void => {
+      if (TM.jukebox.length === 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No maps in the queue.`, info.login)
+        return
+      }
+      for (const map of TM.jukebox) {
+        TM.removeFromJukebox(map.id)
+      }
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + 'all mapos'}${TM.palette.admin} from the queue.`
+      )
+    },
+    privilege: 1
+  },
+  {
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo): void => {
@@ -335,6 +385,22 @@ const commands: TMCommand[] = [
     },
     privilege: 1
   },
+  {
+    aliases: ['players', 'playerlist'],
+    help: 'Display list of players',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.playerList, info.login)
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['banlist'],
+    help: 'Display list of banned players',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.banList, info.login)
+    },
+    privilege: 1
+  }
 ]
 
 for (const command of commands) { TM.addCommand(command) }

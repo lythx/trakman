@@ -76,12 +76,13 @@ export default class Paginator {
     })
   }
 
-  getPageByLogin(login: string): number | undefined {
-    return this.loginPages.find(a => a.login === login)?.page
+  getPageByLogin(login: string): number {
+    return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
   }
 
   updatePageCount(pageCount: number): void {
     this.pageCount = pageCount
+    this.buttonCount = 0
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }

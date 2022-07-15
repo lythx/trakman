@@ -4,8 +4,7 @@ import { closeButton, CONFIG, Grid, ICONS, IDS, stringToObjectProperty } from '.
 import { Paginator } from "../UiUtils.js";
 
 const MAP_ADD_ID = 1000
-// TODO CHANGE SO IT USES GRID
-// TODO HANDLE CHALLENGE LIST LENGTH UPDATES
+
 export default class MapList extends PopupWindow {
 
   readonly columns = CONFIG.mapList.columns
@@ -51,6 +50,22 @@ export default class MapList extends PopupWindow {
       }
     })
   }
+  
+  openWithQuery(login: string, query: string) {
+    const m = TM.maps.map(a => ({ name: TM.stripSpecialChars(a.name), id: a.id }))
+    const matches = TM.matchString(query, m.map(a => a.name))
+    console.log(matches)
+    const page = this.paginator.getPageByLogin(login)
+    let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    this.paginator.updatePageCount(pageCount)
+    if (pageCount === 0) { pageCount++ }
+    // if (matchId === undefined) {
+    //   this.displayToPlayer(login, page, `${page}/${pageCount}`)
+    //   return
+    // }
+    // const index = TM.maps.findIndex(a => a.id === matchId)
+    // console.log(matc)
+  }
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
@@ -79,7 +94,7 @@ export default class MapList extends PopupWindow {
       return `
         ${header}
         <format textsize="1.3" textcolor="FFFF"/>
-        <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${this.format}Track #${trackIndex}"/>
+        <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${this.format}Map #${trackIndex}"/>
         <label posn="0.7 -3.1 3" sizen="13 2" scale="1" text="${this.format + TM.safeString(TM.strip(challenges[trackIndex].name, false))}"/>
         <label posn="0.7 -5.3 3" sizen="13 2" scale="0.9" text="${this.format}by ${TM.safeString(challenges[trackIndex].author)}"/>
         <format textsize="1" textcolor="FFFF"/>
@@ -137,13 +152,13 @@ export default class MapList extends PopupWindow {
       return `<quad posn="${this.grid.margin} ${-this.grid.margin} 4" sizen="${w - this.grid.margin * 2} ${h - this.grid.margin * 2}" action="${actionId}"
           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>
-          <quad posn="${this.grid.margin+ this.margin} ${-this.grid.margin- this.margin} 2" sizen="${w -this.margin *2} 2" bgcolor="${this.headerJukedBg}"/>`
+          <quad posn="${this.grid.margin + this.margin} ${-this.grid.margin - this.margin} 2" sizen="${w - this.margin * 2} 2" bgcolor="${this.headerJukedBg}"/>`
     }
     else {
       return `<quad posn="${this.grid.margin} ${-this.grid.margin} 4" sizen="${w - this.grid.margin * 2} ${h - this.grid.margin * 2}" action="${actionId}"
           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260547911740/plusek8.png"/>
-          <quad posn="${w/ 2} ${-this.margin} 3" sizen="${w -this.margin * 2} 2" bgcolor="${this.headerBackground}" halign="center"/>`
+          <quad posn="${w / 2} ${-this.margin} 3" sizen="${w - this.margin * 2} 2" bgcolor="${this.headerBackground}" halign="center"/>`
     }
   }
 

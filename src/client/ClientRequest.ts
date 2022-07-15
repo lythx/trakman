@@ -1,25 +1,23 @@
-import { ErrorHandler } from './ErrorHandler.js'
+export class ClientRequest {
 
-export class Request {
   private readonly xml: string
 
   /**
   * Prepares XML string for a dedicated server request.
   * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
-  * @param {String} method dedicated server method
-  * @param {Object[]} params parameters, each param needs to be under key named after its type
   */
-  constructor(method: string, params: object[]) {
+  constructor(method: string, params: CallParams[]) {
     this.xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
-      this.xml += `<param><value>${this.handleParamType(param)}</value></param>`
+      const str = this.handleParamType(param)
+      if (str instanceof Error) { throw str }
+      this.xml += `<param><value>${str}</value></param>`
     }
     this.xml += '</params></methodCall>'
   }
 
   /**
   * Prepares and returns buffer from XML string
-  * @returns {Buffer} buffer from XML string
   */
   getPreparedBuffer(requestId: number): Buffer {
     const bufferLength: number = Buffer.byteLength(this.xml)
@@ -30,40 +28,54 @@ export class Request {
     return buffer
   }
 
-  // wraps params with type tags depending on type specified in param object
-  // calls itself recursively in case type is array or struct
-  private handleParamType(param: any): string {
-    const type: string = Object.keys(param)[0]
+  /**
+   * Wraps params with type tags depending on type specified in param object,
+   * calls itself recursively in case type is array or struct
+   */
+  private handleParamType(param: CallParams): string | Error {
+    type Keys = keyof typeof param
+    const type: Keys = Object.keys(param)[0] as Keys
+    const value = param[type]
+    if (value === undefined) {
+      return new Error(`Received undefined while creating XML request, expected ${type}.`)
+    }
     switch (type) {
       case 'boolean':
-        return `<boolean>${param[type] === true ? '1' : '0'}</boolean>`
+        return `<boolean>${value === true ? '1' : '0'}</boolean>`
       case 'int':
-        return `<int>${param[type]}</int>`
+        return `<int>${value}</int>`
       case 'double':
-        return `<double>${param[type]}</double>`
+        return `<double>${value}</double>`
       case 'string':
-        return `<string>${this.escapeHtml(param[type])}</string>`
+        if (typeof value !== 'string') {
+          return new Error(`Received ${type} instead of string while creating XML request.`)
+        }
+        return `<string>${this.escapeHtml(value)}</string>`
       case 'base64':
-        return `<base64>${param[type]}</base64>`
+        return `<base64>${value}</base64>`
       case 'array': {
+        if (!Array.isArray(value)) {
+          return new Error(`Received ${type} instead of array while creating XML request.`)
+        }
         let arr: string = '<array><data>'
-        for (const el of param[type]) {
+        for (const el of value) {
           arr += `<value>${this.handleParamType(el)}</value>`
         }
         arr += '</data></array>'
         return arr
       }
       case 'struct': {
+        if (typeof value !== 'object' || Array.isArray(value) || value === null) {
+          return new Error(`Received ${type} instead of object while creating XML request.`)
+        }
         let str: string = '<struct>'
-        for (const key in param[type]) {
-          str += `<member><name>${key}</name><value>${this.handleParamType(param[type][key])}</value></member>`
+        for (const key in value as any) {
+          str += `<member><name>${key}</name><value>${this.handleParamType(value[key])}</value></member>`
         }
         str += '</struct>'
         return str
       }
     }
-    ErrorHandler.error('Unknown type ' + type + ' of param.')
-    return ''
   }
 
   // php's htmlspecialchars() js implementation
@@ -78,4 +90,5 @@ export class Request {
     }
     return str.replace(/[&<>"']/g, (m): string => { return map[m as keyof typeof map] })
   }
+
 }

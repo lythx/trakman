@@ -1,4 +1,4 @@
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 import 'dotenv/config'
@@ -17,13 +17,16 @@ import { TMXService } from './services/TMXService.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
+import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
   Logger.initialize()
-  Logger.warn('Establishing connection with the server...')
-  const connectionStatus: void | string = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
-    .catch(err => { ErrorHandler.fatal('Connection failed', err) })
-  if (connectionStatus != null) { Logger.info(connectionStatus) }
+  Logger.warn('Establishing connection with the dedicated server...')
+  const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
+  if (connectionStatus instanceof Error) {
+    ErrorHandler.fatal('Connection to dedicated server failed:', connectionStatus.message)
+  }
+  Logger.info('Connection with the dedicated server established.')
   Logger.trace('Authenticating...')
   const auth: any[] | Error = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
@@ -72,10 +75,16 @@ async function main(): Promise<void> {
     Logger.info('TMX service instantiated')
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to dedimania...')
+    Logger.trace('Connecting to Dedimania...')
     const status: void | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize dedimania service') }
-    else { Logger.info('Connected to dedimania') }
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Dedimania service') }
+    else { Logger.info('Connected to Dedimania') }
+  }
+  if (process.env.USE_MANIAKARMA === 'YES') {
+    Logger.trace('Connecting to Maniakarma...')
+    const status: void | Error = await ManiakarmaService.initialize()
+    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Maniakarma service') }
+    else { Logger.info('Connected to Maniakarma') }
   }
   Events.initialize()
 }

@@ -1,4 +1,4 @@
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
@@ -15,7 +15,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 
 export class Listeners {
-  private static readonly listeners: TMEvent[] = [
+  private static readonly listeners: TMListener[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async (params: any[]): Promise<void> => {
@@ -205,7 +205,13 @@ export class Listeners {
       event: 'TrackMania.BillUpdated',
       callback: async (params: any[]): Promise<void> => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
-        // Related to payments: donations, payouts, etc
+        const bill: BillUpdatedInfo = {
+          id: params[0],
+          state: params[1],
+          stateName: params[2],
+          transactionId: params[3]
+        }
+        Events.emitEvent('Controller.BillUpdated', bill)
       }
     },
     {

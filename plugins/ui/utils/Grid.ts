@@ -1,5 +1,3 @@
-import { CONFIG } from "../UiUtils.js"
-
 export default class Grid {
 
   readonly width: number
@@ -17,8 +15,8 @@ export default class Grid {
     this.width = width
     this.height = height
     this.margin = options?.margin ?? 0
-    const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur)
-    const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur)
+    const columnSum: number =  columnProportions.reduce((acc, cur): number => acc + cur, 0)
+    const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / columnSum) * (this.width - this.margin))
     this.rowHeights = rowProportions.map(a => (a / rowSum) * (this.height - this.margin))
     this.columns = columnProportions.length
