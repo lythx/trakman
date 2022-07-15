@@ -22,6 +22,7 @@ export class PlayerService {
     if (oldOwnerLogin === newOwnerLogin) { return }
     this.newOwnerLogin = newOwnerLogin
     if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
+    await this.addAllFromList()
   }
 
   static getPlayer(login: string): TMPlayer | undefined {

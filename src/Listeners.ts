@@ -275,9 +275,13 @@ export class Listeners {
     }
   ]
 
-  static initialize(): void {
+  static async initialize(): Promise<true | Error> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
+    const cb: any[] | Error = await Client.call('EnableCallbacks', [
+      { boolean: true }
+    ])
+    return cb instanceof Error ? cb : true
   }
 }

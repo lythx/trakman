@@ -16,6 +16,7 @@ export abstract class ChatService {
   static async initialize(repo: ChatRepository = new ChatRepository()): Promise<void> {
     this.repo = repo
     await this.repo.initialize()
+    await this.loadLastSessionMessages()
   }
 
   static addCommand(command: TMCommand): void {

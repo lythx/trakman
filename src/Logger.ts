@@ -44,13 +44,6 @@ export abstract class Logger {
     })
   }
 
-  static warn(...lines: string[]): void {
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
-    const tag: Tag = 'warn'
-    void this.writeLog(tag, location, date, lines)
-  }
-
   static async fatal(...lines: string[]): Promise<void> {
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -66,11 +59,11 @@ export abstract class Logger {
     this.writeLog(tag, location, date, lines)
   }
 
-  static trace(...lines: string[]): void {
+  static warn(...lines: string[]): void {
     const date = new Date().toUTCString()
     const location = this.getLocation()
-    const tag: Tag = 'trace'
-    this.writeLog(tag, location, date, lines)
+    const tag: Tag = 'warn'
+    void this.writeLog(tag, location, date, lines)
   }
 
   static info(...lines: string[]): void {
@@ -84,6 +77,13 @@ export abstract class Logger {
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'debug'
+    this.writeLog(tag, location, date, lines)
+  }
+  
+  static trace(...lines: string[]): void {
+    const date = new Date().toUTCString()
+    const location = this.getLocation()
+    const tag: Tag = 'trace'
     this.writeLog(tag, location, date, lines)
   }
 

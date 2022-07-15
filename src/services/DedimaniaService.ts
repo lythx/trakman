@@ -23,7 +23,7 @@ export abstract class DedimaniaService {
     }
     this.updateServerPlayers()
     const recordStatus: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
-    if(!(recordStatus instanceof Error)) {
+    if (!(recordStatus instanceof Error)) {
       Events.emitEvent('Controller.DedimaniaRecords', this._dedis)
     }
     Events.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
@@ -61,7 +61,7 @@ export abstract class DedimaniaService {
         { string: environment },
         { string: author },
         { string: 'TMF' },
-        { int: GameService.gameMode },
+        { int: GameService.game.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
@@ -132,7 +132,7 @@ export abstract class DedimaniaService {
         { string: info.environment },
         { string: info.author },
         { string: 'TMF' },
-        { int: GameService.gameMode },
+        { int: GameService.game.gameMode },
         { int: info.checkpointsAmount },
         { int: Number(process.env.DEDIS_AMOUNT) },
         { array: recordsArray }
