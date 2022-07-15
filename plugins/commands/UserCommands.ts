@@ -1,7 +1,7 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { UI } from '../ui/UI.js'
 
 const commands: TMCommand[] = [
-  // TODO: help consistency, tidy up
   // Testing commands, remove those later into development
   {
     aliases: ['ct', 'colourtest'],
@@ -45,6 +45,15 @@ const commands: TMCommand[] = [
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickName}$z$s$g] Good game, ${name || 'everyone'}!`)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['bg', 'badgame'],
+    help: 'Allow others to find out about your disenjoyment of the round.',
+    params: [{ name: 'name', optional: true }],
+    callback: (info: MessageInfo, name: string): void => {
+      TM.sendMessage(`$g[${info.nickName}$z$s$g] Bad game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -123,9 +132,17 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['h', 'help', 'helpall'],
-    help: 'Display current map dedimania checkpoints.',
+    help: 'Display the commands list.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.commandList, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['time'],
+    help: 'Find out about the current server time.',
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server time is ${TM.palette.highlight + (new Date().toString())}${TM.palette.admin}.`, info.login)
     },
     privilege: 0
   },
@@ -197,18 +214,14 @@ const commands: TMCommand[] = [
     // TODO IMPLEMENT MAP SEARCH
     aliases: ['l', 'ml', 'list'],
     help: 'Display list of maps.',
-    params: [{ name: 'mapName', optional: true }],
-    callback: (info: MessageInfo, mapName: string): void => {
-      TM.openManialink(TM.UIIDS.mapList, info.login)
-    },
-    privilege: 0
-  },
-  //DELETE LATER
-  {
-    aliases: ['qwe'],
-    params: [{ name: 'nickName' }],
-    callback: (info: MessageInfo, nickName: string): void => {
-      TM.sendMessage(`${nickName} to ${TM.nicknameToLogin(nickName)}`)
+    params: [{ name: 'query', optional: true }],
+    callback: (info: MessageInfo, query?: string): void => {
+      if (query === undefined) {
+        TM.openManialink(TM.UIIDS.mapList, info.login)
+        return
+      }
+      const mapList = UI.dynamicComponents.mapList
+      mapList.openWithQuery(info.login, query)
     },
     privilege: 0
   },
@@ -225,19 +238,28 @@ const commands: TMCommand[] = [
       TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickName}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
-  }
+  },
+  {
+    aliases: ['test'],
+    params: [{ name: 'nickname', type: 'multiword' }],
+    callback: (info: MessageInfo, nickname: string): void => {
+      TM.sendMessage(TM.nicknameToLogin(nickname) ?? 'didnt work lol')
+    },
+    privilege: 0
+  },
 ]
 
 for (const command of commands) { TM.addCommand(command) }
 
-// votes
+// Vote handler
 
 TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
+    const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
       + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `
       + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
-    void TM.addVote(TM.map.id, info.login, ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3)
+    void TM.addVote(TM.map.id, info.login, playerVote as any)
   }
 })
 

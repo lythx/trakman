@@ -2,7 +2,7 @@ import { ChatRepository } from '../database/ChatRepository.js'
 import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
 const messagesArraySize: number = 250

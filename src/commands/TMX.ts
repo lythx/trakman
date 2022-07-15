@@ -1,14 +1,14 @@
 import { ChatService } from '../services/ChatService.js'
 import { TMXService } from '../services/TMXService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
 const command: TMCommand = {
   aliases: ['add'],
-  help: 'Add a track from TMX.',
+  help: 'Add a map from TMX.',
   params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
   callback: async (info: MessageInfo, id: number, tmxSite?: string): Promise<void> => {
-    const file: TMXFileData | Error = await TMXService.fetchTrackFile(id, tmxSite).catch((err: Error) => err)
+    const file: TMXFileData | Error = await TMXService.fetchMapFile(id, tmxSite).catch((err: Error) => err)
     if (file instanceof Error) {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + (tmxSite || 'TMNF')} TMX` +
         `${TM.palette.error}, check if you specified the correct game.`, info.login)

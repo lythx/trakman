@@ -103,5 +103,8 @@
     "arrowDoubleL": "https://cdn.discordapp.com/attachments/502122268936110100/990584747602346064/ArrowLeftDouble.png",
     "arrowDoubleR": "https://cdn.discordapp.com/attachments/502122268936110100/990584747996631050/ArrowRightDouble.png",
     "arrowL": "https://cdn.discordapp.com/attachments/502122268936110100/990584747770134609/ArrowLeftSingle.png",
-    "arrowR": "https://cdn.discordapp.com/attachments/502122268936110100/990584748185366568/ArrowRightSingle.png"
+    "arrowR": "https://cdn.discordapp.com/attachments/502122268936110100/990584748185366568/ArrowRightSingle.png",
+    "mute": "https://cdn.discordapp.com/attachments/622852563674464292/996446459014692924/MutePerson.png",
+    "addGuest": "https://cdn.discordapp.com/attachments/622852563674464292/996450046306426890/guestList.png",
+    "removeGuest": "https://cdn.discordapp.com/attachments/618467373053247489/996476010272919642/removeGuest.png"
 }

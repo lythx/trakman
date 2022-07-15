@@ -1,4 +1,4 @@
-interface TMXTrackInfo {
+interface TMXMapInfo {
   readonly id: string
   readonly TMXId: number
   readonly name: string

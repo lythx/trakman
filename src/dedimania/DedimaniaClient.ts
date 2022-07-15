@@ -3,14 +3,14 @@ import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
 import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
-import { PlayerService } from '../services/PlayerService.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
 
 export abstract class DedimaniaClient {
+
   private static readonly socket: Socket = new Socket()
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
@@ -32,55 +32,17 @@ export abstract class DedimaniaClient {
     const cfg: ServerInfo = ServerConfig.config
     const nextIds: any[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
-    const request: DedimaniaRequest = new DedimaniaRequest('system.multicall',
-      [{
-        array: [{
-          struct: {
-            methodName: { string: 'dedimania.Authenticate' },
-            params: {
-              array: [{
-                struct: {
-                  Game: { string: 'TMF' },
-                  Login: { string: process.env.SERVER_LOGIN },
-                  Password: { string: process.env.SERVER_PASSWORD },
-                  Tool: { string: 'Trakman' },
-                  Version: { string: '0.0.1' },
-                  Nation: { string: process.env.SERVER_NATION },
-                  Packmask: { string: process.env.SERVER_PACKMASK }
-                }
-              }]
-            }
-          }
-        },
-        {
-          struct: {
-            methodName: { string: 'dedimania.UpdateServerPlayers' },
-            params: {
-              array: [
-                { string: 'TMF' },
-                { int: PlayerService.players.length },
-                {
-                  struct: {
-                    SrvName: { string: cfg.name },
-                    Comment: { string: cfg.comment },
-                    Private: { boolean: cfg.password === '' },
-                    SrvIP: { string: '127.0.0.1' },
-                    SrvPort: { string: '5000' },
-                    XmlRpcPort: { string: '5000' },
-                    NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
-                    MaxPlayers: { int: cfg.currentMaxPlayers },
-                    NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
-                    MaxSpecs: { int: cfg.currentMaxPlayers },
-                    LadderMode: { int: cfg.currentLadderMode },
-                    NextFiveUID: { string: nextIds.join('/') }
-                  }
-                },
-                { array: [] }
-              ]
-            }
-          }
-        }]
-      }])
+    const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
+      struct: {
+        Game: { string: 'TMF' },
+        Login: { string: process.env.SERVER_LOGIN },
+        Password: { string: process.env.SERVER_PASSWORD },
+        Tool: { string: 'Trakman' },
+        Version: { string: '0.0.1' },
+        Nation: { string: process.env.SERVER_NATION },
+        Packmask: { string: process.env.SERVER_PACKMASK }
+      }
+    }])
     this.receivingResponse = true
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
@@ -138,16 +100,16 @@ export abstract class DedimaniaClient {
     })
   }
 
-  static async call(method: string, params: any[] = []): Promise<any[] | Error> {
+  static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     if (!this.connected) { return new Error('Not connected to dedimania') }
     // TODO: ensure that if theres 2 responses awaiting (basically never but ye) they get executed in good order
-    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 300)) }
+    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) } // cba just changed to 2 seconds so they dont overlap doesnt matter anyway
     this.receivingResponse = true
     const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
     const startDate: number = Date.now()
-    return await new Promise((resolve) => {
+    return await new Promise((resolve): void => {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {

@@ -26,12 +26,13 @@ import LocalSectors from './dynamic_components/LocalSectors.component.js'
 import LiveSectors from './dynamic_components/LiveCps.component.js'
 import CurrentCps from './dynamic_components/CurrentCps.component.js'
 import MapList from './dynamic_components/MapList.component.js'
-
+import DonationPanel from './static_components/DonationPanel.component.js'
+import PlayerList from './dynamic_components/PlayerList.component.js'
+import BanList from './dynamic_components/BanList.component.js'
 import TestWindow from './test_widgets/TestWindow.js'
+import PopupWindow from './PopupWindow.js'
 
 let customUi: CustomUi
-const staticComponents: StaticComponent[] = []
-const dynamicComponents: DynamicComponent[] = []
 const loadMod = (): void => {
   TM.callNoRes('SetForcedMods',
     [{
@@ -47,7 +48,36 @@ const loadMod = (): void => {
     }])
 }
 
-const events: TMEvent[] = [
+let staticComponents: {
+  rankWidget: RankWidget
+  dediRanking: DediRanking
+  mapWidget: MapWidget
+  previousAndBest: PreviousAndBest
+  karmaWidget: KarmaWidget
+  timerWidget: TimerWidget
+  localRanking: LocalRanking
+  liveRanking: LiveRanking
+  buttonsWidget: ButtonsWidget
+  tmxRanking: TMXRanking
+  adminPanel: AdminPanel
+  donationPanel: DonationPanel
+}
+
+let dynamicComponents: {
+  mapList: MapList
+  commandList: CommandList
+  dediCps: DediCps
+  liveCps: LiveCps
+  localCps: LocalCps
+  dediSectors: DediSectors
+  localSectors: LocalSectors
+  liveSectors: LiveSectors
+  currentCps: CurrentCps
+  playerList: PlayerList
+  banList: BanList
+} 
+
+const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (): Promise<void> => {
@@ -55,33 +85,34 @@ const events: TMEvent[] = [
       loadMod()
       customUi = new CustomUi()
       customUi.display()
-      staticComponents.push(
-      //  new LiveCheckpoint(),
-        new RankWidget(),
-        new DediRanking(),
-        new MapWidget(),
-        new PreviousAndBest(),
-        new KarmaWidget(),
-        new TimerWidget(),
-        new LocalRanking(),
-        new LiveRanking(),
-        new ButtonsWidget(),
-        new TMXRanking(),
-        new AdminPanel()
-      )
-      for (const c of staticComponents) { await c.display() }
-      dynamicComponents.push(
-        //  new JukeboxWindow(),
-        new MapList(),
-        new CommandList(),
-        new DediCps(),
-        new LiveCps(),
-        new LocalCps(),
-        new DediSectors(),
-        new LocalSectors(),
-        new LiveSectors(),
-        new CurrentCps()
-      )
+      staticComponents = {
+        rankWidget: new RankWidget(),
+        dediRanking: new DediRanking(),
+        mapWidget: new MapWidget(),
+        previousAndBest: new PreviousAndBest(),
+        karmaWidget: new KarmaWidget(),
+        timerWidget: new TimerWidget(),
+        localRanking: new LocalRanking(),
+        liveRanking: new LiveRanking(),
+        buttonsWidget: new ButtonsWidget(),
+        tmxRanking: new TMXRanking(),
+        adminPanel: new AdminPanel(),
+        donationPanel: new DonationPanel()
+      }
+      for (const c of Object.values(staticComponents)) { await c.display() }
+      dynamicComponents = {
+        mapList: new MapList(),
+        commandList: new CommandList(),
+        dediCps: new DediCps(),
+        liveCps: new LiveCps(),
+        localCps: new LocalCps(),
+        dediSectors: new DediSectors(),
+        localSectors: new LocalSectors(),
+        liveSectors: new LiveSectors(),
+        currentCps: new CurrentCps(),
+        playerList: new PlayerList(),
+        banList: new BanList()
+      }
       // const testWindow = new TestWindow()
       // setInterval(() => {
       //   testWindow.displayToPlayer('ciekma_czakwal')
@@ -216,3 +247,15 @@ const events: TMEvent[] = [
 ]
 
 for (const event of events) { TM.addListener(event.event, event.callback) }
+
+export const UI = {
+
+  get staticComponents() {
+    return staticComponents
+  },
+
+  get dynamicComponents() {
+    return dynamicComponents
+  }
+
+}

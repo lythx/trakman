@@ -3,7 +3,7 @@ import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { MapService } from './services/MapService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
-import { Client } from './Client.js'
+import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
 import { Events } from './Events.js'
@@ -17,9 +17,12 @@ import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import SpecialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
+import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
+import { ManiakarmaService } from './services/ManiakarmaService.js'
+import { ServerConfig } from './ServerConfig.js'
+import dsc from 'dice-similarity-coeff';
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -28,6 +31,27 @@ if (process.env.USE_WEBSERVICES === 'YES') {
 
 const DB: Database = new Database()
 DB.initialize()
+
+const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
+Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
+  const billIndex = bills.findIndex(a => a.id === info.id)
+  if (billIndex !== -1) {
+    switch (info.state) {
+      case 4:
+        bills[billIndex].callback('accepted')
+        break
+      case 5:
+        bills[billIndex].callback('refused')
+        break
+      case 6:
+        bills[billIndex].callback('error', info.stateName)
+        break
+      default:
+        return
+    }
+    bills.splice(billIndex, 1)
+  }
+})
 
 export const TRAKMAN = {
 
@@ -97,11 +121,11 @@ export const TRAKMAN = {
 
   /**
    * Fetches TMX for map information
-   * @param trackId Map UID
+   * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */
-  async fetchTMXTrackInfo(trackId: string): Promise<TMXTrackInfo | Error> {
-    return await TMXService.fetchTrackInfo(trackId)
+  async fetchTMXMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
+    return await TMXService.fetchMapInfo(mapId)
   },
 
   /**
@@ -174,7 +198,7 @@ export const TRAKMAN = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<CallResponse[] | Error> {
+  async multiCall(...calls: TMCall[]): Promise<({method: string, params: any[] } | Error)[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -189,8 +213,14 @@ export const TRAKMAN = {
     if (res instanceof Error) {
       return res
     }
-    const ret: CallResponse[] = []
-    for (const [i, r] of res.entries()) { ret.push({ method: calls[i].method, params: r }) }
+    const ret: ({method: string, params: any[] } | Error)[] = []
+    for (const [i, r] of res.entries()) {
+      if (r.faultCode !== undefined) {
+        ret.push(new Error(`Error in system.multicall in response for call ${calls[i].method}: ${r?.faultString ?? ''} Code: ${r.faultCode}`))
+      } else {
+        ret.push({ method: calls[i].method, params: r })
+      }
+    }
     return ret
   },
 
@@ -269,7 +299,7 @@ export const TRAKMAN = {
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
    */
-  addListener(event: string, callback: Function): void {
+  addListener(event: TMEvent, callback: ((params: any) => void)): void {
     Events.addListener(event, callback)
   },
 
@@ -311,11 +341,11 @@ export const TRAKMAN = {
 
   /**
    * Fetches the map from TMX via its UID
-   * @param trackId Map UID
+   * @param mapId Map UID
    * @returns TMX map data or error if unsuccessful
    */
-  async fetchTrackFileByUid(trackId: string): Promise<TMXFileData | Error> {
-    return await TMXService.fetchTrackFileByUid(trackId)
+  async fetchMapFileByUid(mapId: string): Promise<TMXFileData | Error> {
+    return await TMXService.fetchMapFileByUid(mapId)
   },
 
   /**
@@ -360,6 +390,20 @@ export const TRAKMAN = {
   },
 
   /**
+   * Removes all maps from jukebox
+   */
+  clearJukebox(): void {
+    JukeboxService.clear()
+  },
+
+  /**
+   * Shuffle the map list and jukebox
+   */
+  shuffleJukebox(): void {
+    JukeboxService.shuffle()
+  },
+
+  /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
@@ -380,7 +424,7 @@ export const TRAKMAN = {
     if (process.env.USE_WEBSERVICES !== "YES") {
       return new Error('Use webservices set to false')
     }
-    const au = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
+    const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
     const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
       headers: {
         "Authorization": au
@@ -471,7 +515,7 @@ export const TRAKMAN = {
   /**
    * Parses the 'time' type of TMCommand parameter
    * @param timeString String to be parsed to number
-   * @returns Parsed number (in milliseconds) or undefined if no number supplied
+   * @returns Parsed number (in milliseconds) or undefined if format is invalid
    */
   parseParamTime: (timeString: string): number | undefined => {
     if (!isNaN(Number(timeString))) { return Number(timeString) * 1000 * 60 } // If there's no modifier then time is treated as minutes
@@ -497,7 +541,7 @@ export const TRAKMAN = {
    * @param methods Array of dedicated server methods
    * @param callback Callback to execute
    */
-  addProxy: (methods: string[], callback: Function): void => {
+  addProxy: (methods: string[], callback: ((parms: any) => void)): void => {
     Client.addProxy(methods, callback)
   },
 
@@ -514,51 +558,68 @@ export const TRAKMAN = {
   /**
    * Removes all player records on given map
    * @param mapId Map UID
-   * @returns Databse response
+   * @returns Database response
    */
   removeAllRecords: async (mapId: string): Promise<any[]> => {
     return await RecordService.removeAll(mapId)
   },
+
+  stripSpecialChars(str: string): string {
+    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
+      return [a[0], [a[0], ...a[1]]]
+    }))
+    let strippedStr = ''
+    for (const letter of str) {
+      let foundLetter = false
+      for (const key in charmap) {
+        if (charmap[key].includes(letter)) {
+          strippedStr += key
+          foundLetter = true
+          break
+        }
+      }
+      if (!foundLetter) {
+        strippedStr += letter
+      }
+    }
+    return strippedStr
+  },
+
 
   /**
    * Attempts to convert the player nickname to their login via charmap
    * @param nickName Player nickname
    * @returns Possibly matching login or undefined if unsuccessful
    */
-  nicknameToLogin: (nickName: string): string | undefined => {
-    const charmap: any = SpecialCharmap
-    const players: TMPlayer[] = PlayerService.players
-    const guesses: { login: string, nickName: string, currentMatch: number, longestMatch: number }[] = []
-    for (const e of players) {
-      guesses.push({ login: e.login, nickName: TRAKMAN.strip(e.nickName.toLowerCase()), currentMatch: 0, longestMatch: 0 })
+  nicknameToLogin(nickName: string): string | undefined {
+    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickName).toLowerCase() }))
+    const strippedNicknames: { nickname: string, login: string }[] = []
+    for (const e of nicknames) {
+      strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })
     }
-    for (const guess of guesses) {
-      for (const [i, letter] of guess.nickName.split('').entries()) {
-        if (charmap?.[nickName[0]?.toString()]?.some((a: any): boolean => a === letter) || nickName[0]?.toString() === letter) {
-          for (let j: number = 0; j < nickName.length + 1; j++) {
-            if (j === nickName.length + 1) {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-            if (nickName[j] === guess?.nickName?.[i + j] || charmap?.[nickName[j]?.toString()]?.some((a: any): boolean => a === guess?.nickName?.[i + j])) {
-              guess.currentMatch++
-            }
-            else {
-              guess.longestMatch = Math.max(guess.longestMatch, guess.currentMatch)
-              break
-            }
-          }
-        }
+    const matches: { login: string, value: number }[] = []
+    for (const e of strippedNicknames) {
+      const value = dsc.twoStrings(e.nickname, nickName.toLowerCase())
+      if (value > 0.4) {
+        matches.push({ login: e.login, value })
       }
     }
-    guesses.sort((a, b): number => b.longestMatch - a.longestMatch)
-    if (guesses.length > 1 && Math.abs(guesses[0].longestMatch - guesses[1].longestMatch) < 3) {
+    if (matches.length === 0) {
       return undefined
     }
-    if (guesses[0].longestMatch < Math.min(5, guesses[0].nickName.length)) {
+    const s = matches.sort((a, b) => b.value - a.value)
+    if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
       return undefined
     }
-    return guesses[0].login
+    return s[0].login
+  },
+
+  matchString(searchString: string, possibleMatches: string[]): string[] {
+    const arr: { str: string, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ str: e, value: dsc.twoStrings(searchString, e) })
+    }
+    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
   },
 
   /**
@@ -575,12 +636,15 @@ export const TRAKMAN = {
   },
 
   /**
-   * Adds a player vote to the database
+   * Adds a player vote to the database and to Maniakarma service if its running
    * @param mapId Map UID
    * @param login Player login
    * @param vote Player vote
    */
-  async addVote(mapId: string, login: string, vote: number): Promise<void> {
+  async addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+    if (process.env.USE_MANIAKARMA === 'YES') {
+      ManiakarmaService.addVote(mapId, login, vote)
+    }
     await VoteService.add(mapId, login, vote)
   },
 
@@ -591,6 +655,29 @@ export const TRAKMAN = {
    */
   async fetchVotes(mapId: string): Promise<any[]> {
     return await VoteService.fetch(mapId)
+  },
+
+  async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
+    const billId = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
+    if (billId instanceof Error) { return billId }
+    return await new Promise((resolve): void => {
+      const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
+        switch (status) {
+          case 'accepted':
+            resolve(true)
+            if (targetLogin === '' /* || targetLogin === TODO check if server*/) {
+              // TODO push to donors table
+            }
+            break
+          case 'refused':
+            resolve(false)
+            break
+          case 'error':
+            resolve(new Error(errorString ?? 'error'))
+        }
+      }
+      bills.push({ id: billId[0], callback })
+    })
   },
 
   get gameInfo(): TMGame {
@@ -668,7 +755,7 @@ export const TRAKMAN = {
     return MapService.maps
   },
 
-  get TMXInfo(): TMXTrackInfo | null {
+  get TMXInfo(): TMXMapInfo | null {
     return TMXService.current
   },
 
@@ -684,15 +771,15 @@ export const TRAKMAN = {
     return JukeboxService.previous
   },
 
-  get TMXPrevious(): (TMXTrackInfo | null)[] {
+  get TMXPrevious(): (TMXMapInfo | null)[] {
     return TMXService.previous
   },
 
-  get TMXCurrent(): TMXTrackInfo | null {
+  get TMXCurrent(): TMXMapInfo | null {
     return TMXService.current
   },
 
-  get TMXNext(): (TMXTrackInfo | null)[] {
+  get TMXNext(): (TMXMapInfo | null)[] {
     return TMXService.next
   },
 
@@ -726,5 +813,21 @@ export const TRAKMAN = {
 
   get guestlist() {
     return AdministrationService.guestlist
+  },
+
+  get mkPlayerVotes(): MKVote[] {
+    return ManiakarmaService.playerVotes
+  },
+
+  get mkNewVotes(): MKVote[] {
+    return ManiakarmaService.newVotes
+  },
+
+  get mkMapKarmaValue(): number {
+    return ManiakarmaService.mapKarmaValue
+  },
+
+  get mkMapKarma() {
+    return ManiakarmaService.mapKarma
   },
 }

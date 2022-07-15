@@ -1,5 +1,5 @@
 import { ErrorHandler } from "../ErrorHandler.js";
-import { Client } from "../Client.js";
+import { Client } from "../client/Client.js";
 import { AdministrationRepository } from "../database/AdministrationRepository.js";
 
 

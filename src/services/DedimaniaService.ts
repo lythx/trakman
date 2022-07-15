@@ -4,7 +4,7 @@ import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
 import { MapService } from './MapService.js'
-import { Client } from '../Client.js'
+import { Client } from '../client/Client.js'
 import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from './JukeboxService.js'
@@ -22,10 +22,18 @@ export abstract class DedimaniaService {
       return status
     }
     this.updateServerPlayers()
-    const mapDedisInfo: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
-    Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+    const recordStatus: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
+    if(!(recordStatus instanceof Error)) {
+      Events.emitEvent('Controller.DedimaniaRecords', this._dedis)
+    }
+    Events.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+      void this.playerArrive(info)
+    })
     Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
-      this.sendRecords(info)
+      void this.sendRecords(info)
+    })
+    Events.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+      void this.playerLeave(info)
     })
     Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
       this.addRecord(info)
@@ -62,16 +70,16 @@ export abstract class DedimaniaService {
             SrvIP: { string: '127.0.0.1' },
             SrvPort: { string: '5000' },
             XmlRpcPort: { string: '5000' },
-            NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+            NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
             MaxPlayers: { int: cfg.currentMaxPlayers },
-            NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+            NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
             MaxSpecs: { int: cfg.currentMaxPlayers },
             LadderMode: { int: cfg.currentLadderMode },
             NextFiveUID: { string: nextIds.join('/') }
           }
         },
-        { int: process.env.DEDIS_AMOUNT },
-        { array: [] } // idk
+        { int: Number(process.env.DEDIS_AMOUNT) },
+        { array: this.getPlayersArray() }
       ])
     if (dedis instanceof Error) {
       this.retryGetRecords(id, name, environment, author, isRetry)
@@ -126,14 +134,14 @@ export abstract class DedimaniaService {
         { string: 'TMF' },
         { int: GameService.gameMode },
         { int: info.checkpointsAmount },
-        { int: process.env.DEDIS_AMOUNT },
+        { int: Number(process.env.DEDIS_AMOUNT) },
         { array: recordsArray }
       ]
     )
     if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for map ${info.name}`, status.message) }
   }
 
-  private static addRecord(info: FinishInfo): void {
+  static addRecord(info: FinishInfo): void {
     const pb: number | undefined = this._dedis.find(a => a.login === info.login)?.time
     const position: number = this._dedis.filter(a => a.time <= info.time).length + 1
     if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
@@ -242,18 +250,66 @@ export abstract class DedimaniaService {
               SrvIP: { string: '127.0.0.1' },
               SrvPort: { string: '5000' },
               XmlRpcPort: { string: '5000' },
-              NumPlayers: { int: PlayerService.players.filter(a => a.isSpectator).length },
+              NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
               MaxPlayers: { int: cfg.currentMaxPlayers },
-              NumSpecs: { int: PlayerService.players.filter(a => !a.isSpectator).length },
+              NumSpecs: { int: PlayerService.players.filter(a => a.isSpectator).length },
               MaxSpecs: { int: cfg.currentMaxPlayers },
               LadderMode: { int: cfg.currentLadderMode },
               NextFiveUID: { string: nextIds.join('/') }
             }
           },
-          { array: [] }
+          { array: this.getPlayersArray() }
         ]
       )
       if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
     }, 240000)
+  }
+
+  private static async playerArrive(info: JoinInfo): Promise<void> {
+    const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
+      [
+        { string: 'TMF' },
+        { string: info.login },
+        { string: info.nickName },
+        { string: info.nationCode },
+        { string: '' }, // TEAMNAME
+        { int: 0 }, // TODO: PLAYER LADDER RANK
+        { boolean: info.isSpectator },
+        { boolean: false } // OFFICIAL MODE ALWAYS FALSE
+      ]
+    )
+    if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
+  }
+
+  private static async playerLeave(info: LeaveInfo): Promise<void> {
+    const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
+      [
+        { string: 'TMF' },
+        { string: info.login }
+      ])
+    if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
+  }
+
+  static getPlayersArray(): any[] {
+    const players: TMPlayer[] = PlayerService.players
+    let arr: any[] = []
+    for (const player of players) {
+      arr.push(
+        [
+          {
+            struct: {
+              Login: { string: player.login },
+              Nation: { string: player.nationCode },
+              TeamName: { string: '' },
+              TeamId: { int: -1 },
+              IsSpec: { boolean: player.isSpectator },
+              Ranking: { int: 0 }, // TODO PLAYER LADDER RANKING
+              IsOff: { boolean: false } // OFFICIAL MODE ALWAYS FALSE
+            }
+          }
+        ]
+      )
+    }
+    return arr
   }
 }
