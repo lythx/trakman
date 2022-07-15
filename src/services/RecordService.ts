@@ -7,6 +7,7 @@ import 'dotenv/config'
 import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
+  
   private static repo: RecordRepository
   private static _records: TMRecord[] = []
   private static _localRecords: LocalRecord[] = []
@@ -17,6 +18,7 @@ export class RecordService {
     await this.repo.initialize()
     const res: any[] = await this.repo.getAll()
     for (const record of res) { this._records.push({ map: record.map, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
+    await this.fetchRecords(MapService.current.id)
   }
 
   static async fetchRecords(mapId: string): Promise<LocalRecord[]> {
