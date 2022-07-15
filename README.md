@@ -52,6 +52,8 @@ Before configuring this, please see the [wiki page](https://github.com/felacek/t
 #### ManiaKarma
 - `USE_MANIAKARMA`: Enable or disable the use of Maniakarma global votes (`YES` or `NO`)
 - `MANIAKARMA_PREFETCH_AMOUNT`: Amount of tracks to have Maniakarma fetched for (`4` by default)
+#### Miscellaneous
+- `LOG_LEVEL`: The level of logging (`1` - error, `2` - warn, `3` - info, `4` - debug, `5` - trace)
 
 ### Limitations
 1. Stunts mode is not supported (yet?)
