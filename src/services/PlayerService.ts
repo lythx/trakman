@@ -7,18 +7,22 @@ import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { RecordService } from './RecordService.js'
+import { Logger } from '../Logger.js'
 
 export class PlayerService {
-  private static _players: TMPlayer[] = []
-  private static repo: PlayerRepository
+
+  private static  _players: TMPlayer[] = []
+  private static readonly repo: PlayerRepository = new PlayerRepository()
   private static newOwnerLogin: string | null
 
-  static async initialize(repo: PlayerRepository = new PlayerRepository()): Promise<void> {
-    this.repo = repo
+  static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const oldOwnerLogin: string = (await this.repo.getOwner())?.[0]?.login
+    const oldOwnerLogin: string | undefined = (await this.repo.getOwner())?.login
     const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
-    if (newOwnerLogin === undefined || newOwnerLogin === '') { throw Error('Server owner login not specified') }
+    if (newOwnerLogin === undefined) {
+      Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
+      return
+    }
     if (oldOwnerLogin !== newOwnerLogin) {
       this.newOwnerLogin = newOwnerLogin
       if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
@@ -70,7 +74,7 @@ export class PlayerService {
       nationCode = 'OTH'
       ErrorHandler.error('Error adding player ' + login, 'Nation ' + nation + ' is not in the country list.')
     }
-    const playerData: any = (await this.repo.get(login))?.[0]
+    const playerData: any = await this.repo.get(login)
     let player: TMPlayer
     if (playerData === undefined) {
       player = {
@@ -154,7 +158,7 @@ export class PlayerService {
   }
 
   static async fetchPlayer(login: string): Promise<DBPlayerInfo | undefined> {
-    const res: any = (await this.repo.get(login))?.[0]
+    const res: any = await this.repo.get(login)
     if (res === undefined) { return undefined }
     const nation: string | undefined = countries.find(a => a.code === res.nation)?.name
     if (nation === undefined) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }

@@ -1,5 +1,4 @@
 import { Repository } from './Repository.js'
-import { ErrorHandler } from '../ErrorHandler.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
@@ -12,84 +11,61 @@ const createQuery: string = `
     visits int4 not null default 1
   );
 `
-const updateQuery: string = `UPDATE players SET 
-        nickname=$1,
-        nation=$2,
-        wins=$3,
-        timePlayed=$4,
-        visits=$5
-        WHERE login=$6;
-`
-const setTimeQuery: string = `UPDATE players SET 
-        timePlayed=$1
-        WHERE login=$2;
-`
-const getQuery: string = 'SELECT * FROM players WHERE login = $1'
-const addQuery: string = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
 
 export class PlayerRepository extends Repository {
+
   async initialize(): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
   /**
-   * Searches for a login name in the database
-   * @param {String} login
-   * @return {Promise<Object[]>}
+   * Searches for a player by login in the database
    */
-  async get(login: string): Promise<any> {
-    const res = await this.db.query(getQuery, [login])
-    return res.rows
+  async get(login: string): Promise<PlayersDBEntry | undefined> {
+    const query = 'SELECT * FROM players WHERE login = $1'
+    const res = await this.db.query(query, [login])
+    return res.rows[0]
   }
 
   /**
    * Adds a player to the database
-   * @param {Player} player the player
-   * @return {Promise<Object[]>}
    */
-  async add(player: TMPlayer): Promise<any> {
-    const res = await this.db.query(addQuery, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed, player.privilege])
-    return res.rows
+  async add(player: TMPlayer): Promise<void> {
+    const query = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
+    await this.db.query(query, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed, player.privilege])
   }
 
   /**
    * Updates the player information in the database
-   * @param {Player} player a player instance
-   * @return {Promise<Object[]>}
    */
-  async update(player: TMPlayer): Promise<any> {
-    const res = await this.db.query(updateQuery, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.visits, player.login])
-    if ((res?.rows) == null) {
-      throw Error('Error updating player ' + player.login + "'s data in the database.")
-    }
-    return res
+  async update(player: TMPlayer): Promise<void> {
+    const query = `UPDATE players SET nickname=$1, nation=$2, wins=$3, timePlayed=$4, visits=$5 WHERE login=$6;`
+    await this.db.query(query, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.visits, player.login])
   }
 
   /**
    * Set a player's timePlayed after they leave.
-   * @param login
-   * @param timePlayed
-   * @return {Promise<void>}
    */
   async setTimePlayed(login: string, timePlayed: number): Promise<void> {
-    await this.db.query(setTimeQuery, [timePlayed, login]).catch(err => {
-      ErrorHandler.error('Player ' + login + ' not found in the database.', err)
-    })
+    const query = `UPDATE players SET timePlayed=$1 WHERE login=$2;`
+    await this.db.query(query, [timePlayed, login])
   }
 
-  async setPrivilege(login: string, privilege: number): Promise<any[]> {
-    const res = await this.db.query('UPDATE players SET privilege = $1 WHERE login = $2', [privilege, login])
-    return res.rows
+  async setPrivilege(login: string, privilege: number): Promise<void> {
+    const query = 'UPDATE players SET privilege = $1 WHERE login = $2'
+    const res = await this.db.query(query, [privilege, login])
   }
 
-  async getOwner(): Promise<any[]> {
-    const res = await this.db.query('SELECT * FROM players WHERE privilege = 4')
-    return res.rows
+  async getOwner(): Promise<PlayersDBEntry | undefined> {
+    const query = 'SELECT * FROM players WHERE privilege = 4'
+    const res = await this.db.query(query)
+    return res.rows[0]
   }
 
-  async removeOwner(): Promise<any[]> {
-    const res = await this.db.query('UPDATE players SET privilege = 0 WHERE privilege = 4')
-    return res.rows
+  async removeOwner(): Promise<void> {
+    const query = 'UPDATE players SET privilege = 0 WHERE privilege = 4'
+    await this.db.query(query)
   }
+
 }
