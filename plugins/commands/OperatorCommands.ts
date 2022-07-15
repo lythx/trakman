@@ -200,7 +200,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.addToMutelist(targetInfo.login, info.login, reason, expireDate)
+      const res: true | Error = await TM.addToMutelist(targetInfo.login, info.login, reason, expireDate)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to mute list.`, info.login)
         return
@@ -230,7 +230,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.removeFromMutelist(targetInfo.login)
+      const res: boolean | Error = await TM.removeFromMutelist(targetInfo.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from mute list.`, info.login)
         return

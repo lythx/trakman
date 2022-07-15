@@ -210,10 +210,6 @@ const commands: TMCommand[] = [
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (TM.guestlist.some(a => a.login === login) === true) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is already in the guestlist.`, info.login)
-        return
-      }
       let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
@@ -222,9 +218,13 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.addToGuestlist(login, info.login)
+      const res: boolean | Error = await TM.addToGuestlist(login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to guest list.`, info.login)
+        return
+      }
+      if (res === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is already in the guestlist.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
@@ -238,10 +238,6 @@ const commands: TMCommand[] = [
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (TM.guestlist.some(a => a.login === login) !== true) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
-        return
-      }
       let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
@@ -250,9 +246,13 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.removeFromGuestlist(login)
+      const res: boolean | Error = await TM.removeFromGuestlist(login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from guest list.`, info.login)
+        return
+      }
+      if (res === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
