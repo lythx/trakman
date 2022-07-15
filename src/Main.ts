@@ -20,6 +20,7 @@ import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
+  Logger.initialize()
   Logger.warn('Establishing connection with the dedicated server...')
   const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
   if (connectionStatus instanceof Error) {
