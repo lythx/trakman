@@ -29,10 +29,10 @@ export class GameService {
     'SetCupNbWinners'
   ] 
 
-  static async initialize(): Promise<true | Error> {
+  static async initialize(): Promise<void> {
     const status = this.update()
     if (status instanceof Error) {
-      return status
+      await Logger.fatal('Failed to retrieve game info. Error:', status.message)
     }
     Events.addListener('Controller.BeginChallenge', async () => {
       const status = await this.update()
@@ -48,7 +48,6 @@ export class GameService {
         void this.retry()
       }
     })
-    return true
   }
 
   private static async retry() {

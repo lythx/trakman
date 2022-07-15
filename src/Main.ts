@@ -23,8 +23,7 @@ async function main(): Promise<void> {
   await Logger.initialize()
   Logger.info('Starting the controller...')
   Logger.trace('Establishing connection with the dedicated server...')
-  const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
-  if (connectionStatus instanceof Error) { await Logger.fatal('Connection to the dedicated server failed:', connectionStatus.message) }
+  await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
   Logger.trace('Connection with the dedicated server established')
   Logger.trace('Authenticating...')
   if (process.env.SUPERADMIN_NAME === undefined) { await Logger.fatal('SUPERADMIN_NAME is undefined. Check your .env file') }
@@ -33,12 +32,14 @@ async function main(): Promise<void> {
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
-  if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with error:', authenticationStatus.message) }
+  if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
   Logger.trace('Retrieving game info...')
-  const gameServiceStatus = await GameService.initialize()
-  if (gameServiceStatus instanceof Error) { await Logger.fatal('Failed to retrieve game info. Error:', gameServiceStatus.message) }
+  await GameService.initialize()
   Logger.trace('Game info fetched')
+  Logger.trace('Fetching player info...')
+  await PlayerService.initialize()
+  Logger.trace('Player service instantiated')
   Logger.trace('Fetching administration lists...')
   await AdministrationService.initialize()
   Logger.trace('Administration service instantiated')
@@ -53,9 +54,6 @@ async function main(): Promise<void> {
   Logger.trace('Fetching votes...')
   await VoteService.initialize()
   Logger.trace('Vote service instantiated')
-  Logger.trace('Fetching player info...')
-  await PlayerService.initialize()
-  Logger.trace('Player service instantiated')
   Logger.trace('Fetching chat history...')
   await ChatService.initialize()
   Logger.trace('Chat service instantiated')

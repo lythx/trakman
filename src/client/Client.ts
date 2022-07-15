@@ -1,3 +1,4 @@
+import { Logger } from '../Logger.js'
 import { ClientRequest } from './ClientRequest.js'
 import { ClientSocket } from './ClientSocket.js'
 
@@ -7,14 +8,17 @@ export abstract class Client {
   private static requestId: number = 0x80000000
   private static readonly proxies: { methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void) }[] = []
 
-  static async connect(host = 'localhost', port = 5000): Promise<true | Error> {
+  static async connect(host = 'localhost', port = 5000): Promise<void> {
     if (port < 0 || port >= 65536 || isNaN(port)) {
-      return new Error(`SERVER_PORT needs to be a number >= 0 and < 65536, received ${port}. Check your .env file`)
+      await Logger.fatal(`SERVER_PORT needs to be a number >= 0 and < 65536, received ${port}. Check your .env file`)
     }
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
-    return await this.socket.awaitHandshake()
+    const status = await this.socket.awaitHandshake()
+    if (status instanceof Error) {
+      await Logger.fatal('Connection to the dedicated server failed:', status.message)
+    }
   }
 
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {

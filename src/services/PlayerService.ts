@@ -19,9 +19,10 @@ export class PlayerService {
     const oldOwnerLogin: string = (await this.repo.getOwner())?.[0]?.login
     const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
     if (newOwnerLogin === undefined || newOwnerLogin === '') { throw Error('Server owner login not specified') }
-    if (oldOwnerLogin === newOwnerLogin) { return }
-    this.newOwnerLogin = newOwnerLogin
-    if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
+    if (oldOwnerLogin !== newOwnerLogin) {
+      this.newOwnerLogin = newOwnerLogin
+      if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
+    }
     await this.addAllFromList()
   }
 

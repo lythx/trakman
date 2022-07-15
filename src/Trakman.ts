@@ -198,7 +198,7 @@ export const TRAKMAN = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<({method: string, params: any[] } | Error)[] | Error> {
+  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -213,7 +213,7 @@ export const TRAKMAN = {
     if (res instanceof Error) {
       return res
     }
-    const ret: ({method: string, params: any[] } | Error)[] = []
+    const ret: ({ method: string, params: any[] } | Error)[] = []
     for (const [i, r] of res.entries()) {
       if (r.faultCode !== undefined) {
         ret.push(new Error(`Error in system.multicall in response for call ${calls[i].method}: ${r?.faultString ?? ''} Code: ${r.faultCode}`))
@@ -453,8 +453,8 @@ export const TRAKMAN = {
    * Removes a player from the server ban list
    * @param login Player login
    */
-  removeFromBanlist: (login: string): void => {
-    AdministrationService.removeFromBanlist(login)
+  removeFromBanlist: (login: string): boolean => {
+    return AdministrationService.removeFromBanlist(login)
   },
 
   /**
@@ -472,8 +472,8 @@ export const TRAKMAN = {
    * Removes a player from the server blacklist
    * @param login Player login
    */
-  removeFromBlacklist: async (login: string): Promise<void | Error> => {
-    return await AdministrationService.removeFromBlacklist(login)
+  removeFromBlacklist: (login: string): boolean => {
+    return AdministrationService.removeFromBlacklist(login)
   },
 
   /**
@@ -483,7 +483,7 @@ export const TRAKMAN = {
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
    */
-  addToMutelist: async (login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<void | Error> => {
+  addToMutelist: async (login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<true | Error> => {
     return await AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
   },
 
@@ -491,7 +491,7 @@ export const TRAKMAN = {
    * Removes a player from the server mute list
    * @param login Player login
    */
-  removeFromMutelist: async (login: string): Promise<void | Error> => {
+  removeFromMutelist: async (login: string): Promise<boolean | Error> => {
     return await AdministrationService.removeFromMutelist(login)
   },
 
@@ -500,16 +500,16 @@ export const TRAKMAN = {
    * @param login Player login
    * @param callerLogin Admin login
    */
-  addToGuestlist: async (login: string, callerLogin: string): Promise<void | Error> => {
-    await AdministrationService.addToGuestlist(login, callerLogin)
+  addToGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
+    return await AdministrationService.addToGuestlist(login, callerLogin)
   },
 
   /**
    * Removes a player from the server guest list
    * @param login Player login
    */
-  removeFromGuestlist: async (login: string): Promise<void | Error> => {
-    await AdministrationService.removeFromGuestlist(login)
+  removeFromGuestlist: async (login: string): Promise<boolean | Error> => {
+    return await AdministrationService.removeFromGuestlist(login)
   },
 
   /**
