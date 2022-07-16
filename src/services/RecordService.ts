@@ -3,20 +3,22 @@ import { PlayerService } from './PlayerService.js'
 import { MapService } from './MapService.js'
 import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
+import { Logger } from '../Logger.js'
 import 'dotenv/config'
-import { ErrorHandler } from '../ErrorHandler.js'
 
 export class RecordService {
-  
-  private static repo: RecordRepository
-  private static _records: TMRecord[] = []
-  private static _localRecords: LocalRecord[] = []
-  private static _liveRecords: FinishInfo[] = []
 
-  static async initialize(repo: RecordRepository = new RecordRepository()): Promise<void> {
-    this.repo = repo
+  private static repo: RecordRepository = new RecordRepository()
+  private static readonly _records: TMRecord[] = [] // TODO: dont hold all records in memory this is probably a bad idea since there is a lot of them
+  private static readonly _localRecords: LocalRecord[] = []
+  private static readonly _liveRecords: FinishInfo[] = []
+
+  static async initialize(): Promise<void> {
+    if (process.env.LOCALS_AMOUNT === undefined || Number(process.env.LOCALS_AMOUNT) === NaN) {
+      Logger.fatal('LOCALS_AMOUNT is undefined or not a number. Check your .env file')
+    }
     await this.repo.initialize()
-    const res: any[] = await this.repo.getAll()
+    const res: RecordsDBEntry[] = await this.repo.getAll()
     for (const record of res) { this._records.push({ map: record.map, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
     await this.fetchRecords(MapService.current.id)
   }
@@ -24,13 +26,13 @@ export class RecordService {
   static async fetchRecords(mapId: string): Promise<LocalRecord[]> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
-    const records: any[] = await this.repo.get(mapId)
+    const records: RecordsDBEntry[] = await this.repo.get(mapId)
     records.sort((a, b): number => a.score - b.score)
     const n: number = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
     for (let i: number = 0; i < n; i++) {
       const player: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(records[i].login)
       if (player === undefined) {
-        ErrorHandler.fatal('Cant find login in players table even though it has record in records table.')
+        Logger.fatal('Cant find login in players table even though it has record in records table.')
         return []
       }
       const localRecord: LocalRecord = {
@@ -55,7 +57,7 @@ export class RecordService {
   }
 
   static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {
-    const res: any = (await this.repo.getByLogin(mapId, login))?.[0]
+    const res = await this.repo.getByLogin(mapId, login)
     if (res === undefined) { return undefined }
     return { map: mapId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
   }
@@ -76,10 +78,11 @@ export class RecordService {
     const date: Date = new Date()
     const player: TMPlayer | undefined = PlayerService.getPlayer(login)
     if (player === undefined) {
+      Logger.error(`Failed to add record. Player ${login} is not in the memory`)
       return
     }
     const cpsPerLap: number = MapService.current.checkpointsAmount
-    let laps
+    let laps: number
     if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
       laps = 1
     } else if (GameService.game.gameMode === 3) {
@@ -101,6 +104,7 @@ export class RecordService {
     Events.emitEvent('Controller.PlayerFinish', finishInfo)
   }
 
+  // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
   private static async handleLocalRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
     if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
@@ -131,24 +135,9 @@ export class RecordService {
         region: player.region,
         isUnited: player.isUnited
       }
-      this._records.splice(position - 1, 0, { map: map, login, time: score, date, checkpoints })
+      this._records.splice(position - 1, 0, recordInfo)
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
-        const localRecord: LocalRecord = {
-          map: map,
-          login,
-          time: score,
-          date,
-          checkpoints,
-          nickName: player.nickName,
-          nation: player.nation,
-          nationCode: player.nationCode,
-          timePlayed: player.timePlayed,
-          wins: player.wins,
-          privilege: player.privilege,
-          visits: player.visits,
-          position
-        }
-        this._localRecords.splice(position - 1, 0, localRecord)
+        this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       this.repo.add(recordInfo)
@@ -182,11 +171,12 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore: number | undefined = this._localRecords.find(a => a.login === login)?.time
-      if (previousScore === undefined) {
-        ErrorHandler.error(`Can't find player ${login} in memory`)
+      const previousIndex = this._localRecords.findIndex(a => a.login === login)
+      if (previousIndex === -1) {
+        Logger.error(`Can't find player ${login} in memory`)
         return
       }
+      const previousScore: number | undefined = this._localRecords[previousIndex].time
       const recordInfo: RecordInfo = {
         map: map,
         login,
@@ -202,39 +192,25 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position,
-        previousPosition: this._localRecords.findIndex(a => a.login === login) + 1,
+        previousPosition: previousIndex + 1,
         previousTime: previousScore,
         playerId: player.playerId,
         ip: player.ip,
         region: player.region,
         isUnited: player.isUnited
       }
-      this._records = this._records.filter(a => !(a.login == login && a.map === map))
+      this._records.splice(this._records.findIndex(a => !(a.login == login && a.map === map)), 1)
       this._records.splice(position - 1, 0, { map: map, login, time: score, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
-        this._localRecords = this._localRecords.filter(a => a.login !== login)
-        const localRecord: LocalRecord = {
-          map: map,
-          login,
-          time: score,
-          date,
-          checkpoints,
-          nickName: player.nickName,
-          nation: player.nation,
-          nationCode: player.nationCode,
-          timePlayed: player.timePlayed,
-          wins: player.wins,
-          privilege: player.privilege,
-          visits: player.visits,
-          position
-        }
-        this._localRecords.splice(position - 1, 0, localRecord)
+        this._localRecords.splice(previousIndex, 1)
+        this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
       this.repo.update(recordInfo)
     }
   }
 
+  // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
   private static handleLiveRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer): void {
     if (checkpoints.length !== cpAmount - 1) {
       checkpoints.length = 0
@@ -265,24 +241,7 @@ export class RecordService {
         region: player.region,
         isUnited: player.isUnited
       }
-      this._liveRecords.splice(position - 1, 0, {
-        login,
-        nickName: player.nickName,
-        time: score,
-        checkpoints,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        visits: player.visits,
-        wins: player.wins,
-        privilege: player.privilege,
-        map: map,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      })
+      this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
       return
     }
@@ -314,11 +273,12 @@ export class RecordService {
       return
     }
     if (score < pb) {
-      const previousScore: number | undefined = this._liveRecords.find(a => a.login === login)?.time
-      if (previousScore === undefined) {
-        ErrorHandler.error(`Can't find player ${login} in memory`)
+      const previousIndex = this._liveRecords.findIndex(a => a.login === login)
+      if (previousIndex === -1) {
+        Logger.error(`Can't find player ${login} in memory`)
         return
       }
+      const previousScore: number | undefined = this._liveRecords[previousIndex].time
       const recordInfo: RecordInfo = {
         map: map,
         login,
@@ -334,44 +294,37 @@ export class RecordService {
         privilege: player.privilege,
         visits: player.visits,
         position,
-        previousPosition: this._liveRecords.findIndex(a => a.login === login) + 1,
+        previousPosition: previousIndex + 1,
         previousTime: previousScore,
         playerId: player.playerId,
         ip: player.ip,
         region: player.region,
         isUnited: player.isUnited
       }
-      this._liveRecords = this._liveRecords.filter(a => a.login !== login)
-      this._liveRecords.splice(position - 1, 0, {
-        login,
-        nickName: player.nickName,
-        time: score,
-        checkpoints,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        visits: player.visits,
-        wins: player.wins,
-        privilege: player.privilege,
-        map: map,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      })
+      this._liveRecords.splice(previousIndex, 1)
+      this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
     }
   }
 
-  static async remove(login: string, mapId: string): Promise<any[]> {
+  static remove(login: string, mapId: string, callerLogin?: string): void {
+    if (callerLogin !== undefined) {
+      Logger.info(`${callerLogin} has removed ${login} record on map ${mapId}`)
+    } else {
+      Logger.info(`${login} record on map ${mapId} has been removed`)
+    }
     this._records.splice(this._records.findIndex(a => a.login === login && a.map === mapId), 1)
     this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.map === mapId), 1)
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    return await this.repo.remove(login, mapId)
+    void this.repo.remove(login, mapId)
   }
 
-  static async removeAll(mapId: string): Promise<any[]> {
+  static removeAll(mapId: string, callerLogin?: string): void {
+    if (callerLogin !== undefined) {
+      Logger.info(`${callerLogin} has removed records on map ${mapId}`)
+    } else {
+      Logger.info(`Records on map ${mapId} have been removed`)
+    }
     while (this._records.some(a => a.map === mapId)) {
       this._records.splice(this._records.findIndex(a => a.map === mapId), 1)
     }
@@ -379,7 +332,7 @@ export class RecordService {
       this._localRecords.splice(this._localRecords.findIndex(a => a.map === mapId), 1)
     }
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    return await this.repo.removeAll(mapId)
+    void this.repo.removeAll(mapId)
   }
 
 }

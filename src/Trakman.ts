@@ -378,23 +378,23 @@ export const TRAKMAN = {
    * Adds a map to the queue
    * @param mapId Map UID
    */
-  addToJukebox(mapId: string): void {
-    JukeboxService.add(mapId)
+  addToJukebox(mapId: string, callerLogin: string): void {
+    JukeboxService.add(mapId, callerLogin)
   },
 
   /**
    * Removes a map from the queue
    * @param mapId Map UID
    */
-  removeFromJukebox(mapId: string): void {
-    JukeboxService.remove(mapId)
+  removeFromJukebox(mapId: string, callerLogin: string): void {
+    JukeboxService.remove(mapId, callerLogin)
   },
 
   /**
    * Removes all maps from jukebox
    */
-  clearJukebox(): void {
-    JukeboxService.clear()
+  clearJukebox(callerLogin: string): void {
+    JukeboxService.clear(callerLogin)
   },
 
   /**
@@ -552,8 +552,8 @@ export const TRAKMAN = {
    * @param mapId Map UID
    * @returns Database response
    */
-  removeRecord: async (login: string, mapId: string): Promise<any[]> => {
-    return await RecordService.remove(login, mapId)
+  removeRecord: (login: string, mapId: string, callerLogin?: string): void => {
+    RecordService.remove(login, mapId, callerLogin)
   },
 
   /**
@@ -561,8 +561,8 @@ export const TRAKMAN = {
    * @param mapId Map UID
    * @returns Database response
    */
-  removeAllRecords: async (mapId: string): Promise<any[]> => {
-    return await RecordService.removeAll(mapId)
+  removeAllRecords: (mapId: string, callerLogin?: string): void => {
+    RecordService.removeAll(mapId, callerLogin)
   },
 
   stripSpecialChars(str: string): string {

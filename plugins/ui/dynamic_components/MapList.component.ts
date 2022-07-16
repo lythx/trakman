@@ -120,12 +120,12 @@ export default class MapList extends PopupWindow {
       return
     }
     if (TM.jukebox.some(a => a.id === mapId)) {
-      TM.removeFromJukebox(mapId)
+      TM.removeFromJukebox(mapId, login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickName, true)} `
         + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
     }
     else {
-      TM.addToJukebox(mapId)
+      TM.addToJukebox(mapId, login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickName, true)} `
         + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} to the queue.`)
     }

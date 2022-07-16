@@ -141,7 +141,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous map.`)
-      TM.addToJukebox(TM.previousMaps[0].id)
+      TM.addToJukebox(TM.previousMaps[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
     },
@@ -153,7 +153,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the ongoing map.`)
-      TM.addToJukebox(TM.map.id)
+      TM.addToJukebox(TM.map.id, info.login)
     },
     privilege: 1
   },
@@ -337,7 +337,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't find this index in the queue.`, info.login)
         return
       }
-      TM.removeFromJukebox(map.id)
+      TM.removeFromJukebox(map.id, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
@@ -354,7 +354,7 @@ const commands: TMCommand[] = [
         return
       }
       for (const map of TM.jukebox) {
-        TM.removeFromJukebox(map.id)
+        TM.removeFromJukebox(map.id, info.login)
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
