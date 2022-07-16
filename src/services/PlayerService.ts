@@ -1,17 +1,15 @@
 import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
-import countries from '../data/Countries.json' assert {type: 'json'}
+import countries from '../data/Countries.json' assert { type: 'json' }
 import { Events } from '../Events.js'
-import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
-import { RecordService } from './RecordService.js'
 import { Logger } from '../Logger.js'
 
 export class PlayerService {
 
-  private static  _players: TMPlayer[] = []
+  private static readonly _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
   private static newOwnerLogin: string | null
 
@@ -20,7 +18,7 @@ export class PlayerService {
     const oldOwnerLogin: string | undefined = (await this.repo.getOwner())?.login
     const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
     if (newOwnerLogin === undefined) {
-      Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
+      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
       return
     }
     if (oldOwnerLogin !== newOwnerLogin) {
@@ -41,38 +39,35 @@ export class PlayerService {
   /**
    * Add all the players in the server into local storage and database
    * Only called in the beginning as a start job
-   * @returns {Promise<void>}
    */
-  static async addAllFromList(): Promise<void> {
+  private static async addAllFromList(): Promise<void> {
     const playerList: any[] | Error = await Client.call('GetPlayerList', [{ int: 250 }, { int: 0 }])
     if (playerList instanceof Error) {
-      ErrorHandler.error('Error when fetching players from the server', playerList.message)
+      Logger.fatal('Error when fetching players from the server', playerList.message)
       return
     }
     for (const player of playerList) {
       const detailedPlayerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
       if (detailedPlayerInfo instanceof Error) {
-        ErrorHandler.error(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
+        Logger.fatal(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
         return
       }
+      // OnlineRights is 0 for nations and 3 for united ?XD
       await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path, detailedPlayerInfo[0].IsSpectator,
-        detailedPlayerInfo[0].PlayerId, detailedPlayerInfo[0].IPAddress.split(':')[0], detailedPlayerInfo[0].OnlineRights === 3)
+        detailedPlayerInfo[0].PlayerId, detailedPlayerInfo[0].IPAddress.split(':')[0], detailedPlayerInfo[0].OnlineRights === 3, true)
     }
   }
 
   /**
    * Adds a player into the list and database
-   * @param {String} login
-   * @param {String} nickName
-   * @param {String} path
-   * @returns {Promise<void>}
    */
-  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean): Promise<void> {
+  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean, serverStart?: true): Promise<void> {
     const nation: string = path.split('|')[1]
     let nationCode: string | undefined = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode === undefined) {
-      nationCode = 'OTH'
-      ErrorHandler.error('Error adding player ' + login, 'Nation ' + nation + ' is not in the country list.')
+      // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
+      await Logger.fatal(`Error adding player ${login} to memory, nation ${nation} is not in the country list`)
+      return
     }
     const playerData: any = await this.repo.get(login)
     let player: TMPlayer
@@ -94,7 +89,7 @@ export class PlayerService {
         region: path,
         isUnited
       }
-      await this.repo.add(player)
+      await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
       player = {
         login,
@@ -103,7 +98,7 @@ export class PlayerService {
         nationCode,
         timePlayed: Number(playerData.timeplayed),
         joinTimestamp: Date.now(),
-        visits: Number(playerData.visits + 1 as string),
+        visits: serverStart === true ? Number(playerData.visits) : Number(playerData.visits) + 1, // Prevent adding visits on server start
         checkpoints: [],
         wins: Number(playerData.wins),
         privilege: Number(playerData.privilege),
@@ -113,27 +108,26 @@ export class PlayerService {
         region: path,
         isUnited
       }
-      await this.repo.update(player)
+      await this.repo.update(player) // need to await so owner privilege gets set after player is added
     }
     this._players.push(player)
-    if (player.login === this.newOwnerLogin && this.newOwnerLogin !== null) {
-      await this.setPrivilege(player.login, 4)
+    if (player.login === this.newOwnerLogin) {
+      void this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
-    const joinInfo: JoinInfo = player
-    Events.emitEvent('Controller.PlayerJoin', joinInfo)
+    Events.emitEvent('Controller.PlayerJoin', player as JoinInfo)
   }
 
   /**
-   * Remove the player
-   * @param {string} login
-   * @returns {Promise<void>}
+   * Remove the player from local memory, save timePlayed in database and emit playerLeave event
    */
-  static async leave(login: string): Promise<void> {
-    const player: TMPlayer | undefined = this.getPlayer(login)
-    if (player === undefined) {
-      return
+  static leave(login: string): boolean {
+    const playerIndex = this._players.findIndex(a => a.login === login)
+    if (playerIndex === -1) {
+      Logger.error(`Error removing player ${login} from memory, player is not in the memory`)
+      return false
     }
+    const player: TMPlayer | undefined = this._players[playerIndex]
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
@@ -152,26 +146,14 @@ export class PlayerService {
       region: player.region,
       isUnited: player.isUnited
     }
+    void this.repo.setTimePlayed(player.login, totalTimePlayed)
+    this._players.splice(playerIndex, 1)
     Events.emitEvent('Controller.PlayerLeave', leaveInfo)
-    await this.repo.setTimePlayed(player.login, totalTimePlayed)
-    this._players = this._players.filter(p => p.login !== player.login)
+    return true
   }
 
-  static async fetchPlayer(login: string): Promise<DBPlayerInfo | undefined> {
-    const res: any = await this.repo.get(login)
-    if (res === undefined) { return undefined }
-    const nation: string | undefined = countries.find(a => a.code === res.nation)?.name
-    if (nation === undefined) { throw new Error(`Cant find country ${JSON.stringify(res)}`) }
-    return {
-      login: res.login,
-      nickName: res.nickname,
-      nationCode: res.nation,
-      nation,
-      timePlayed: res.timeplayed,
-      privilege: res.privilege,
-      wins: res.wins,
-      visits: res.visits
-    }
+  static async fetchPlayer(login: string): Promise<PlayersDBEntry | undefined> {
+    return await this.repo.get(login)
   }
 
   static async setPrivilege(login: string, privilege: number): Promise<void> {
@@ -181,41 +163,37 @@ export class PlayerService {
   }
 
   /**
-   * Add a checkpoint time to the player object.
-   * @param {string} login
-   * @param {TMCheckpoint} cp
-   * @return {Promise<void>}
+   * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    */
   static addCP(login: string, cp: TMCheckpoint): boolean {
     const player: TMPlayer | undefined = this.getPlayer(login)
     if (player === undefined) {
+      Logger.error(`Error while adding checkpoint, player ${login} is not in the memory`)
       return false
     }
     let laps
-    if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
+    if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
       laps = 1
-    } else if (GameService.game.gameMode === 3) {
+    } else if (GameService.game.gameMode === 3) { // laps gamemode
       laps = GameService.game.lapsNo
-    } else {
+    } else { // rounds, cup, teams and lap map
       laps = MapService.current.lapsAmount
     }
     if (cp.index === 0) {
-      player.checkpoints.unshift(cp)
-      player.checkpoints.length = 1
-      if (laps === 1 && MapService.current.checkpointsAmount === 1) {
+      if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
         player.checkpoints.length = 0
-        RecordService.add(MapService.current.id, login, cp.time)
         return true
       }
+      player.checkpoints.unshift(cp)
+      player.checkpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.checkpoints.length === 0) { return false }
-    const correctLap: number = player.checkpoints[0].lap + laps
-    if (cp.lap < correctLap) {
+    if (player.checkpoints.length === 0) { return false } // handle people passing some cps before controller start
+    const endLap: number = player.checkpoints[0].lap + laps
+    if (cp.lap < endLap) {
       player.checkpoints.push(cp)
       return false
     } else {
-      RecordService.add(MapService.current.id, login, cp.time)
       return true
     }
   }
@@ -226,4 +204,5 @@ export class PlayerService {
     player.isSpectator = status
     return true
   }
+
 }
