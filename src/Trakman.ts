@@ -305,11 +305,12 @@ export const TRAKMAN = {
 
   /**
    * Adds a map to the server
-   * @param fileName Path to the map file
+   * @param filename Path to the map file
+   * @param adminLogin Login of the player who is adding the map
    * @returns Added map object or error if unsuccessful
    */
-  async addMap(fileName: string): Promise<TMMap | Error> {
-    return await MapService.add(fileName)
+  async addMap(filename: string, adminLogin?: string): Promise<TMMap | Error> {
+    return await MapService.add(filename, adminLogin)
   },
 
   /**
@@ -369,8 +370,8 @@ export const TRAKMAN = {
    * @param login Player login
    * @param privilege Privilege level
    */
-  setPrivilege(login: string, privilege: number): void {
-    PlayerService.setPrivilege(login, privilege)
+  setPrivilege(login: string, privilege: number, adminLogin: string): void {
+    PlayerService.setPrivilege(login, privilege, adminLogin)
   },
 
   /**
@@ -399,8 +400,8 @@ export const TRAKMAN = {
   /**
    * Shuffle the map list and jukebox
    */
-  shuffleJukebox(): void {
-    JukeboxService.shuffle()
+  shuffleJukebox(adminLogin: string): void {
+    JukeboxService.shuffle(adminLogin)
   },
 
   /**
@@ -453,8 +454,8 @@ export const TRAKMAN = {
    * Removes a player from the server ban list
    * @param login Player login
    */
-  removeFromBanlist: (login: string): boolean => {
-    return AdministrationService.removeFromBanlist(login)
+  removeFromBanlist: (login: string, callerLogin: string): boolean => {
+    return AdministrationService.removeFromBanlist(login, callerLogin)
   },
 
   /**
@@ -472,8 +473,8 @@ export const TRAKMAN = {
    * Removes a player from the server blacklist
    * @param login Player login
    */
-  removeFromBlacklist: (login: string): boolean => {
-    return AdministrationService.removeFromBlacklist(login)
+  removeFromBlacklist: (login: string, callerLogin: string): boolean => {
+    return AdministrationService.removeFromBlacklist(login, callerLogin)
   },
 
   /**
@@ -491,8 +492,8 @@ export const TRAKMAN = {
    * Removes a player from the server mute list
    * @param login Player login
    */
-  removeFromMutelist: async (login: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromMutelist(login)
+  removeFromMutelist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
+    return await AdministrationService.removeFromMutelist(login, callerLogin)
   },
 
   /**
@@ -508,8 +509,8 @@ export const TRAKMAN = {
    * Removes a player from the server guest list
    * @param login Player login
    */
-  removeFromGuestlist: async (login: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromGuestlist(login)
+  removeFromGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
+    return await AdministrationService.removeFromGuestlist(login, callerLogin)
   },
 
   /**

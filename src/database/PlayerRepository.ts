@@ -54,7 +54,7 @@ export class PlayerRepository extends Repository {
 
   async setPrivilege(login: string, privilege: number): Promise<void> {
     const query = 'UPDATE players SET privilege = $1 WHERE login = $2'
-    const res = await this.db.query(query, [privilege, login])
+    await this.db.query(query, [privilege, login])
   }
 
   async getOwner(): Promise<PlayersDBEntry | undefined> {

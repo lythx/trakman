@@ -20,7 +20,7 @@ const command: TMCommand = {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to write file.`, info.login)
       return
     }
-    const map: TMMap | Error = await TM.addMap(file.name)
+    const map: TMMap | Error = await TM.addMap(file.name, info.login)
     if (map instanceof Error) {
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content: string = file.content.toString()

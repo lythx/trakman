@@ -6,7 +6,7 @@ export class GameService {
 
   private static _game: TMGame
   private static readonly proxyMethods = [
-    'SetGameMode', 
+    'SetGameMode',
     'SetChatTime',
     'SetFinishTimeout',
     'SetAllWarmUpDuration',
@@ -27,7 +27,7 @@ export class GameService {
     'SetCupRoundsPerChallenge',
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
-  ] 
+  ]
 
   static async initialize(): Promise<void> {
     const status = this.update()
@@ -41,7 +41,8 @@ export class GameService {
         void this.retry()
       }
     })
-    Client.addProxy(this.proxyMethods, async () => { // TODO: ADD PROXY FOR ALL COMMANDS WHICH CHANGE GAME INFO
+    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
+      Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       const status = await this.update()
       if (status instanceof Error) {
         Logger.error('Failed to update game info. Server responded with an error:', status.message)

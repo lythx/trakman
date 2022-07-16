@@ -43,7 +43,7 @@ const commands: TMCommand[] = [
     privilege: 1
   },
   {
-    aliases: ['afu', 'addfromurl'],
+    aliases: ['afu', 'addfromurl'], // TODO: this doesnt use the tm method fix
     help: 'Add a map from an url.',
     // todo params
     callback: async (info: MessageInfo): Promise<void> => {
@@ -230,7 +230,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: boolean | Error = await TM.removeFromMutelist(targetInfo.login)
+      const res: boolean | Error = await TM.removeFromMutelist(targetInfo.login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from mute list.`, info.login)
         return

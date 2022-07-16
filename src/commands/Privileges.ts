@@ -31,7 +31,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Masteradmin.`)
-        await PlayerService.setPrivilege(targetLogin, 3)
+        await PlayerService.setPrivilege(targetLogin, 3, info.login)
       } else if (targetInfo.privilege === 3) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Masteradmin.`, callerLogin)
       }
@@ -66,14 +66,14 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Admin.`)
-        await PlayerService.setPrivilege(targetLogin, 2)
+        await PlayerService.setPrivilege(targetLogin, 2, info.login)
       } else if (targetInfo.privilege === 2) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Admin.`)
-        await PlayerService.setPrivilege(targetLogin, 2)
+        await PlayerService.setPrivilege(targetLogin, 2, info.login)
       }
     },
     privilege: 3
@@ -106,14 +106,14 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Operator.`)
-        await PlayerService.setPrivilege(targetLogin, 1)
+        await PlayerService.setPrivilege(targetLogin, 1, info.login)
       } else if (targetInfo.privilege === 1) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Operator.`)
-        await PlayerService.setPrivilege(targetLogin, 1)
+        await PlayerService.setPrivilege(targetLogin, 1, info.login)
       }
     },
     privilege: 2
@@ -146,7 +146,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed ` +
           `permissions of ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`)
-        await PlayerService.setPrivilege(targetLogin, 0)
+        await PlayerService.setPrivilege(targetLogin, 0, info.login)
       } else if (targetInfo.privilege === -1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has enabled ` +
@@ -188,7 +188,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
           `commands for ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`)
-        await PlayerService.setPrivilege(targetLogin, -1)
+        await PlayerService.setPrivilege(targetLogin, -1, info.login)
       }
       else {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)

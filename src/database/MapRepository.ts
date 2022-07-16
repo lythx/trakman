@@ -21,34 +21,37 @@ CREATE TABLE IF NOT EXISTS maps(
 `
 
 export class MapRepository extends Repository {
+
   async initialize(): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
-  async add(...objects: TMMap[]): Promise<any> {
-    if (objects.length === 0) { return }
+  async add(...maps: TMMap[]): Promise<void> {
+    if (maps.length === 0) { return }
     let query: string = 'INSERT INTO maps(id, name, filename, author, environment, mood, bronzetime, silvertime, goldtime, authortime, copperprice, laprace, lapsamount, checkpointsamount, adddate) VALUES'
     const values: any[] = []
     let i: number = 1
-    for (const c of objects) {
+    for (const e of maps) {
       query += '($' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
         ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() +
         ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + ', $' + (i++).toString() + '),'
-      values.push(c.id, c.name, c.fileName, c.author, c.environment, c.mood, c.bronzeTime, c.silverTime, c.goldTime, c.authorTime, c.copperPrice, c.lapRace, c.lapsAmount, c.checkpointsAmount, c.addDate)
+      values.push(e.id, e.name, e.fileName, e.author, e.environment, e.mood, e.bronzeTime, e.silverTime, e.goldTime, e.authorTime, e.copperPrice, e.lapRace, e.lapsAmount, e.checkpointsAmount, e.addDate)
     }
     query = query.slice(0, -1) + ';'
     await this.db.query(query, values)
   }
 
-  async getAll(): Promise<any[]> {
+  async getAll(): Promise<MapsDBEntry[]> {
     const query: string = 'SELECT * FROM maps;'
-    return (await this.db.query(query)).rows
+    const res = await this.db.query(query)
+    return res.rows
   }
 
-  async get(id: string): Promise<any[]> {
+  async get(id: string): Promise<MapsDBEntry | undefined> {
     const query: string = 'SELECT * FROM maps WHERE id=$1;'
-    return (await this.db.query(query, [id])).rows
+    const res = await this.db.query(query, [id])
+    return res.rows[0]
   }
 
 }
