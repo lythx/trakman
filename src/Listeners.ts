@@ -47,7 +47,7 @@ export class Listeners {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Login
-        await PlayerService.leave(params[0])
+        PlayerService.leave(params[0])
       }
     },
     {
@@ -62,14 +62,15 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerCheckpoint',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
-        if (params[0] === 0) { // Ignore inexistent people
+        if (params[0] === 0) { // Ignore inexistent people //please elaborate
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         const isFinish = PlayerService.addCP(params[1], checkpoint)
         if (isFinish === true) {
+          RecordService.add(MapService.current.id, params[1], checkpoint.time)
           return
         }
         const player = PlayerService.getPlayer(params[1])

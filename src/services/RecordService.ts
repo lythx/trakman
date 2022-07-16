@@ -28,7 +28,7 @@ export class RecordService {
     records.sort((a, b): number => a.score - b.score)
     const n: number = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
     for (let i: number = 0; i < n; i++) {
-      const player: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(records[i].login)
+      const player: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(records[i].login)
       if (player === undefined) {
         ErrorHandler.fatal('Cant find login in players table even though it has record in records table.')
         return []
@@ -40,9 +40,9 @@ export class RecordService {
         date: records[i].date,
         checkpoints: records[i].checkpoints,
         position: i + 1,
-        nickName: player.nickName,
+        nickName: player.nickname,
         nation: player.nation,
-        nationCode: player.nationCode,
+        nationCode: player.nation, // TODO: fix nation code or just dont store it idk (its not in db)
         privilege: player.privilege,
         timePlayed: player.timePlayed,
         wins: player.wins,
