@@ -91,7 +91,7 @@ export default class VisitorAmount extends StaticComponent {
       TM.sendMessage(`${TM.palette.error}Failed to pay for map restart.`)
     } else if (res === true) {
       TM.sendMessage(`${nickname}$s$z${TM.palette.donation} paid ${this.resCost} to restart the ongoing map.`)
-      TM.addToJukebox(TM.map.id)
+      TM.addToJukebox(TM.map.id, login)
       this.resCost = CONFIG.buttons.payRes.costs[CONFIG.buttons.payRes.costs.indexOf(this.resCost) + 1] ?? -1
       const cfg = CONFIG.buttons.payRes
       this.iconData[cfg.index] = {

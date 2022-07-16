@@ -11,48 +11,48 @@ const createQuery: string = `
   );
 `
 
-const insertQuery: string = `
-        INSERT INTO records(map, login, score, date, checkpoints)
-        VALUES ($1, $2, $3, $4, $5);
-      `
-
 export class RecordRepository extends Repository {
+
   async initialize(): Promise<void> {
     await super.initialize()
     await this.db.query(createQuery)
   }
 
   async add(record: RecordInfo): Promise<void> {
-    await this.db.query(insertQuery, [record.map, record.login, record.time, record.date, record.checkpoints])
+    const query: string = `INSERT INTO records(map, login, score, date, checkpoints) VALUES ($1, $2, $3, $4, $5);`
+    await this.db.query(query, [record.map, record.login, record.time, record.date, record.checkpoints])
   }
 
-  async get(mapId: string): Promise<any[]> {
-    const res = await this.db.query('SELECT * FROM records WHERE map=$1', [mapId])
+  async get(mapId: string): Promise<RecordsDBEntry[]> {
+    const query: string = `SELECT * FROM records WHERE map=$1`
+    const res = await this.db.query(query, [mapId])
     return res.rows
   }
 
-  async getAll(): Promise<any[]> {
-    const res = await this.db.query('SELECT * FROM records;')
+  async getAll(): Promise<RecordsDBEntry[]> {
+    const query: string = 'SELECT * FROM records;'
+    const res = await this.db.query(query)
     return res.rows
   }
 
-  async remove(login: string, map: string): Promise<any[]> {
+  async remove(login: string, map: string): Promise<void> {
     const query: string = `DELETE FROM records WHERE login=$1 AND map=$2;`
-    return (await this.db.query(query, [login, map])).rows
+    await this.db.query(query, [login, map])
   }
 
-  async removeAll(map: string): Promise<any[]> {
+  async removeAll(map: string): Promise<void> {
     const query: string = `DELETE FROM records WHERE map=$1;`
-    return (await this.db.query(query, [map])).rows
+    await this.db.query(query, [map])
   }
 
   async update(record: RecordInfo): Promise<void> {
-    await this.db.query('UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE map=$4 AND login=$5',
-      [record.time, record.date, record.checkpoints, record.map, record.login])
+    const query = 'UPDATE records SET score=$1, date=$2, checkpoints=$3 WHERE map=$4 AND login=$5'
+    await this.db.query(query, [record.time, record.date, record.checkpoints, record.map, record.login])
   }
 
-  async getByLogin(mapId: string, login: string): Promise<any[]> {
-    const res = await this.db.query('SELECT * FROM records WHERE map=$1 AND login=$2', [mapId, login])
-    return res.rows
+  async getByLogin(mapId: string, login: string): Promise<RecordsDBEntry | undefined> {
+    const query: string = 'SELECT * FROM records WHERE map=$1 AND login=$2'
+    const res = await this.db.query(query, [mapId, login])
+    return res.rows[0]
   }
 }

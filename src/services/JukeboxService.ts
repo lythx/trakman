@@ -1,3 +1,4 @@
+import { Logger } from "../Logger.js"
 import { MapService } from "./MapService.js"
 import { TMXService } from "./TMXService.js"
 
@@ -6,6 +7,9 @@ interface JukeboxMap {
   readonly isForced: boolean
 }
 
+/**
+ * This service is related to MapService and uses its methods
+ */
 export abstract class JukeboxService {
 
   private static readonly _queue: JukeboxMap[] = []
@@ -16,7 +20,7 @@ export abstract class JukeboxService {
     this._current = { ...MapService.current }
     const currentIndex: number = MapService.maps.findIndex(a => a.id === this._current.id)
     const lgt: number = MapService.maps.length
-    for (let i: number = 1; i <= 30; i++) {
+    for (let i: number = 1; i <= 30; i++) { // Handles less maps than jukebox length exception
       this._queue.push({ map: MapService.maps[(i + currentIndex) % lgt], isForced: false })
     }
     MapService.setNextMap(this._queue[0].map.id)
@@ -48,18 +52,28 @@ export abstract class JukeboxService {
     }
   }
 
-  static add(mapId: string): void | Error {
+  static add(mapId: string, callerLogin: string): void | Error {
     const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in`) }
     const index: number = this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true })
     MapService.setNextMap(this._queue[0].map.id)
     TMXService.add(mapId, index)
+    if (callerLogin !== undefined) {
+      Logger.trace(`${callerLogin} has added map ${map.name} by ${map.author} to the jukebox`)
+    } else {
+      Logger.trace(`Map ${map.name} by ${map.author} has been added to the jukebox`)
+    }
   }
 
-  static remove(mapId: string): boolean {
+  static remove(mapId: string, callerLogin?: string): boolean {
     if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
+    if (callerLogin !== undefined) {
+      Logger.trace(`${callerLogin} has removed map ${this._queue[index].map.name} by ${this._queue[index].map.author} from the jukebox`)
+    } else {
+      Logger.trace(`Map ${this._queue[index].map.name} by ${this._queue[index].map.author} has been removed from the jukebox`)
+    }
     this._queue.splice(index, 1)
     const q: TMMap | undefined = MapService.maps.find(a => !this._queue.some(b => b.map.id === a.id))
     if (q !== undefined) { this._queue.push({ map: q, isForced: false }) }
@@ -69,7 +83,7 @@ export abstract class JukeboxService {
     return true
   }
 
-  static clear(): void {
+  static clear(callerLogin: string): void {
     let n = this._queue.length
     for (let i = 0; i < n; i++) {
       if (this._queue[i].isForced) {
@@ -78,6 +92,11 @@ export abstract class JukeboxService {
       }
     }
     this.fillQueue()
+    if (callerLogin !== undefined) {
+      Logger.trace(`${callerLogin} has cleared the jukebox`)
+    } else {
+      Logger.trace(`The jukebox has been cleared`)
+    }
   }
 
   static shuffle(adminLogin: string): void {
@@ -99,7 +118,7 @@ export abstract class JukeboxService {
   }
 
   static get current(): TMMap {
-    return {...this._current}
+    return { ...this._current }
   }
 
 }

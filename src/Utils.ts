@@ -24,4 +24,5 @@ export const Utils = {
     }
     return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   }
+  
 }
