@@ -4,29 +4,29 @@ import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { Client } from '../client/Client.js'
 import { TRAKMAN as TM } from '../Trakman.js'
-
-const messagesArraySize: number = 250
+import { Logger } from '../Logger.js'
+import CONFIG from '../../config.json' assert { type: 'json' }
 
 export abstract class ChatService {
 
+  private static readonly messagesArraySize = CONFIG.messagesInRuntimeMemory
   static readonly messages: TMMessage[] = []
-  private static repo: ChatRepository
+  private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
 
-  static async initialize(repo: ChatRepository = new ChatRepository()): Promise<void> {
-    this.repo = repo
+  static async initialize(): Promise<void> {
     await this.repo.initialize()
     await this.loadLastSessionMessages()
   }
 
   static addCommand(command: TMCommand): void {
     const prefix: string = command.privilege === 0 ? '/' : '//'
-    // this could be 1000x more effective. too bad
     this._commandList.push(command)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
       const input: string = info.text?.trim()
-      if (!command.aliases.some((alias: string): boolean => input.split(' ').shift()?.toLowerCase() === (prefix + alias))) {
+      const usedAlias = input.split(' ').shift()?.toLowerCase()
+      if (!command.aliases.some((alias: string): boolean => usedAlias === (prefix + alias))) {
         return
       }
       if (info.privilege < command.privilege) {
@@ -34,6 +34,7 @@ export abstract class ChatService {
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
+      Logger.info(`${info.login} used command ${usedAlias} with params ${params.join(', ')}`)
       const parsedParams: (string | number | boolean | undefined)[] = []
       if (command.params) {
         for (const [i, param] of command.params.entries()) {
@@ -134,30 +135,30 @@ export abstract class ChatService {
   }
 
   static async loadLastSessionMessages(): Promise<void> {
-    const result: any[] = await this.repo.get(messagesArraySize)
+    const result: ChatDBEntry[] = await this.repo.get(this.messagesArraySize)
     for (const m of result) {
       const message: TMMessage = {
         id: m.id,
         login: m.login,
         text: m.message,
-        date: new Date(m.date)
+        date: m.date
       }
       this.messages.push(message)
     }
   }
 
-  static async add(login: string, text: string): Promise<void> {
+  static add(login: string, text: string): void {
     const message: TMMessage = {
       id: randomUUID(),
       login,
       text,
       date: new Date()
     }
-    if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
-      this.messages.unshift(message)
-    }
     const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
-    if (player === undefined) { throw new Error(`Cannot find player ${login} in the memory`) }
+    if (player === undefined) {
+      Logger.error(`Error while adding message. Cannot find player ${login} in the memory`)
+      return
+    }
     const messageInfo: MessageInfo = {
       id: message.id,
       login,
@@ -176,13 +177,15 @@ export abstract class ChatService {
       isUnited: player.isUnited
     }
     Events.emitEvent('Controller.PlayerChat', messageInfo)
-    this.messages.length = Math.min(messagesArraySize, this.messages.length)
     if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
-      await this.repo.add(message)
+      this.messages.unshift(message)
+      void this.repo.add(message)
+      Logger.trace(`${player.login} sent message: ${text}`)
     }
+    this.messages.length = Math.min(this.messagesArraySize, this.messages.length)
   }
 
-  static async getByLogin(login: string, limit: number): Promise<any[] | Error> {
+  static async getByLogin(login: string, limit: number): Promise<ChatDBEntry[]> {
     return await this.repo.getByLogin(login, limit)
   }
 

@@ -1,3 +1,4 @@
 {
-    "guestlistFilePath": "guestlist.txt"
+    "guestlistFilePath": "guestlist.txt",
+    "messagesInRuntimeMemory": 250
 }

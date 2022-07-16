@@ -17,29 +17,32 @@ export class VoteRepository extends Repository {
     await this.db.query(createQuery)
   }
 
-  async add(mapId: string, login: string, vote: number, date: Date): Promise<any> {
+  async add(mapId: string, login: string, vote: number, date: Date): Promise<void> {
     const query: string = 'INSERT INTO votes(map, login, vote, date) VALUES($1, $2, $3, $4);'
-    return (await this.db.query(query, [mapId, login, vote, date])).rows
+    await this.db.query(query, [mapId, login, vote, date])
   }
 
-  async update(mapId: string, login: string, vote: number, date: Date): Promise<any> {
+  async update(mapId: string, login: string, vote: number, date: Date): Promise<void> {
     const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map=$3 AND login=$4;'
-    return (await this.db.query(query, [vote, date, mapId, login])).rows
+    await this.db.query(query, [vote, date, mapId, login])
   }
 
-  async getAll(): Promise<any[]> {
+  async getAll(): Promise<VotesDBEntry[]> {
     const query: string = 'SELECT * FROM votes;'
-    return (await this.db.query(query)).rows
+    const res = await this.db.query(query)
+    return res.rows
   }
 
-  async getOne(mapId: string, login: string): Promise<any[]> {
+  async getOne(mapId: string, login: string): Promise<VotesDBEntry | undefined> {
     const query: string = 'SELECT * FROM votes WHERE map=$1 AND login=$2;'
-    return (await this.db.query(query, [mapId, login])).rows
+    const res = await this.db.query(query, [mapId, login])
+    return res.rows[0]
   }
 
-  async get(mapId: string): Promise<any[]> {
+  async get(mapId: string): Promise<VotesDBEntry[]> {
     const query: string = 'SELECT * FROM votes WHERE map=$1;'
-    return (await this.db.query(query, [mapId])).rows
+    const res = await this.db.query(query, [mapId])
+    return res.rows
   }
 
 }
