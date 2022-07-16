@@ -47,6 +47,9 @@ export class Listeners {
       event: 'TrackMania.PlayerDisconnect',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Login
+        if (AdministrationService.banlist.some(a => a.login === params[0]) || AdministrationService.blacklist.some(a => a.login === params[0])) {
+          return
+        }
         PlayerService.leave(params[0])
       }
     },

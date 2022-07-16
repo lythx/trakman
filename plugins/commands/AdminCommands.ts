@@ -93,7 +93,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      TM.removeFromBanlist(targetInfo.login)
+      TM.removeFromBanlist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
@@ -150,7 +150,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      TM.removeFromBlacklist(targetInfo.login)
+      TM.removeFromBlacklist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unblacklisted `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
@@ -246,7 +246,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: boolean | Error = await TM.removeFromGuestlist(login)
+      const res: boolean | Error = await TM.removeFromGuestlist(login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from guest list.`, info.login)
         return
@@ -286,7 +286,7 @@ const commands: TMCommand[] = [
         return
       }
       else if (targetInfo.privilege < 1) {
-        TM.setPrivilege(targetLogin, -1)
+        TM.setPrivilege(targetLogin, -1, info.login)
       }
       else {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)
@@ -766,7 +766,7 @@ const commands: TMCommand[] = [
     aliases: ['shf', 'shuffle'],
     help: 'Shuffle the map queue.',
     callback: async (info: MessageInfo): Promise<void> => {
-      TM.shuffleJukebox()
+      TM.shuffleJukebox(info.login)
     },
     privilege: 2
   }

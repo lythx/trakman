@@ -6,6 +6,7 @@ import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
+import { Utils } from '../Utils.js'
 
 export class PlayerService {
 
@@ -116,6 +117,10 @@ export class PlayerService {
       this.newOwnerLogin = null
     }
     Events.emitEvent('Controller.PlayerJoin', player as JoinInfo)
+    if (serverStart === undefined) {
+      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits},`,
+        `nickname: ${player.nickName}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
+    }
   }
 
   /**
@@ -149,6 +154,7 @@ export class PlayerService {
     void this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players.splice(playerIndex, 1)
     Events.emitEvent('Controller.PlayerLeave', leaveInfo)
+    Logger.info(`Player ${player.login} left after playing for ${Utils.getTimeString(sessionTime)}`)
     return true
   }
 
@@ -156,10 +162,15 @@ export class PlayerService {
     return await this.repo.get(login)
   }
 
-  static async setPrivilege(login: string, privilege: number): Promise<void> {
+  static async setPrivilege(login: string, privilege: number, adminLogin?: string): Promise<void> {
     await this.repo.setPrivilege(login, privilege)
     const player: TMPlayer | undefined = this.players.find(a => a.login === login)
     if (player !== undefined) { player.privilege = privilege }
+    if (adminLogin !== undefined) {
+      Logger.info(`Player ${adminLogin} changed ${login} privilege to ${privilege}`)
+    } else {
+      Logger.info(`${login} privilege set to ${privilege}`)
+    }
   }
 
   /**

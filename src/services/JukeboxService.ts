@@ -80,8 +80,8 @@ export abstract class JukeboxService {
     this.fillQueue()
   }
 
-  static shuffle(): void {
-    MapService.shuffle()
+  static shuffle(adminLogin: string): void {
+    MapService.shuffle(adminLogin)
     this._queue.length = 0
     this.fillQueue()
   }
