@@ -5,6 +5,7 @@ import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import 'dotenv/config'
+import { Utils } from '../Utils.js'
 
 export class RecordService {
 
@@ -140,7 +141,8 @@ export class RecordService {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      this.repo.add(recordInfo)
+      Logger.info(...this.getLogString(-1, position, -1, score, login, 'local'))
+      void this.repo.add(recordInfo)
       return
     }
     if (score === pb) {
@@ -168,6 +170,7 @@ export class RecordService {
         isUnited: player.isUnited
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
+      Logger.info(...this.getLogString(previousPosition, previousPosition, score, score, login, 'local'))
       return
     }
     if (score < pb) {
@@ -206,6 +209,7 @@ export class RecordService {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
+      Logger.info(...this.getLogString(previousIndex + 1, position, previousScore, score, login, 'local'))
       this.repo.update(recordInfo)
     }
   }
@@ -243,6 +247,7 @@ export class RecordService {
       }
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
+      Logger.trace(...this.getLogString(-1, position, -1, score, login, 'live'))
       return
     }
     if (score === pb) {
@@ -270,6 +275,7 @@ export class RecordService {
         isUnited: player.isUnited
       }
       Events.emitEvent('Controller.LiveRecord', recordInfo)
+      Logger.trace(...this.getLogString(previousPosition, previousPosition, score, score, login, 'live'))
       return
     }
     if (score < pb) {
@@ -304,6 +310,7 @@ export class RecordService {
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
+      Logger.trace(...this.getLogString(previousIndex + 1, position, previousScore, score, login, 'live'))
     }
   }
 
@@ -333,6 +340,30 @@ export class RecordService {
     }
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
     void this.repo.removeAll(mapId)
+  }
+
+  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string, recordType: 'live' | 'local'): string[] {
+    let rs = { str: '', calcDiff: false } // Rec status
+      let diff // Difference
+      if (previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
+      else if (previousPosition > position) { rs.str = 'obtained', rs.calcDiff = true }
+      else if (previousPosition === position && previousTime === time) { rs.str = 'equaled', rs.calcDiff = false }
+      else if (previousPosition === position) { rs.str = 'improved', rs.calcDiff = true }
+      if (rs.calcDiff) {
+        diff = Utils.getTimeString(previousTime - time)
+        let i: number = -1
+        while (true) {
+          i++
+          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
+          if (Number(diff[i]) !== 0) { continue }
+          diff = diff.substring(1)
+          i--
+          if (diff[i + 1] === ':') {
+            diff = diff.substring(1)
+          }
+        }
+      }
+      return [`${login} has ${rs.str} the ${Utils.getPositionString(position)} ${recordType} record.`,`Time: ${Utils.getTimeString(time)}${rs.calcDiff ? ` (${previousPosition} -${diff})` : ``}`]
   }
 
 }
