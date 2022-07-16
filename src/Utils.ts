@@ -1,3 +1,5 @@
+import { Client } from "./client/Client"
+
 export const Utils = {
 
   /**
@@ -23,6 +25,37 @@ export const Utils = {
       throw RangeError('The position must be a natural number.')
     }
     return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
-  }
-  
+  },
+
+  /**
+   * Calls multiple dedicated server methods simultaneously and awaits the response
+   * @param calls Array of dedicated server calls
+   * @returns Server response or error if the server returns one
+   */
+  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params: any[] = c.params === undefined ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    const res: any[] | Error = await Client.call('system.multicall', [{ array: arr }])
+    if (res instanceof Error) {
+      return res
+    }
+    const ret: ({ method: string, params: any[] } | Error)[] = []
+    for (const [i, r] of res.entries()) {
+      if (r.faultCode !== undefined) {
+        ret.push(new Error(`Error in system.multicall in response for call ${calls[i].method}: ${r?.faultString ?? ''} Code: ${r.faultCode}`))
+      } else {
+        ret.push({ method: calls[i].method, params: r })
+      }
+    }
+    return ret
+  },
+
 }

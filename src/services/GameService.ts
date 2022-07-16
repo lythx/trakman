@@ -34,38 +34,17 @@ export class GameService {
     if (status instanceof Error) {
       await Logger.fatal('Failed to retrieve game info. Error:', status.message)
     }
-    Events.addListener('Controller.BeginChallenge', async () => {
-      const status = await this.update()
-      if (status instanceof Error) {
-        Logger.error('Failed to update game info. Server responded with an error:', status.message)
-        void this.retry()
-      }
-    })
     Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
-      const status = await this.update()
-      if (status instanceof Error) {
-        Logger.error('Failed to update game info. Server responded with an error:', status.message)
-        void this.retry()
-      }
+      await this.update()
     })
   }
 
-  private static async retry() {
-    let tries = 1
-    let status: true | Error
-    do {
-      Logger.warn(`Retrying to update game info. Try ${tries}`)
-      status = await this.update()
-      if (tries === 3 && status instanceof Error) { await Logger.fatal(`Failed to update game info after ${tries} tries. Server responded with error: `, status.message) }
-      tries++
-    } while (status instanceof Error)
-  }
-
-  static async update(): Promise<true | Error> {
+  static async update(): Promise<void> {
     const res: any[] | Error = await Client.call('GetCurrentGameInfo', [{ int: 1 }]) // The int is game version (forever)
     if (res instanceof Error) {
-      return res
+      Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
+      return
     }
     const info: any = res[0]
     // TODO: check what the props of this actually mean if possible (like wtf is timeattacksynchstartperiod) and change names accordingly
@@ -94,7 +73,6 @@ export class GameService {
       cupWinnersNo: info.CupNbWinners,
       cupWarmUpDuration: info.CupWarmUpDuration
     }
-    return true
   }
 
   static get game(): TMGame {
