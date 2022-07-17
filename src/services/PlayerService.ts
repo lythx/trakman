@@ -62,13 +62,14 @@ export class PlayerService {
   /**
    * Adds a player into the list and database
    */
-  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean, serverStart?: true): Promise<void> {
+  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
     const nation: string = path.split('|')[1]
     let nationCode: string | undefined = countries.find(a => a.name === path.split('|')[1])?.code
     if (nationCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
       await Logger.fatal(`Error adding player ${login} to memory, nation ${nation} is not in the country list`)
-      return
+      let temp: any
+      return temp as JoinInfo // Shut up IDE
     }
     const playerData: any = await this.repo.get(login)
     let player: TMPlayer
@@ -116,21 +117,22 @@ export class PlayerService {
       void this.setPrivilege(player.login, 4)
       this.newOwnerLogin = null
     }
-    Events.emitEvent('Controller.PlayerJoin', player as JoinInfo)
     if (serverStart === undefined) {
       Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits},` +
         `nickname: ${player.nickName}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
+    return player
   }
 
   /**
-   * Remove the player from local memory, save timePlayed in database and emit playerLeave event
+   * Remove the player from local memory, save timePlayed in database
    */
-  static leave(login: string): boolean {
+  static leave(login: string): LeaveInfo | Error {
     const playerIndex = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
-      Logger.error(`Error removing player ${login} from memory, player is not in the memory`)
-      return false
+      const errStr = `Error removing player ${login} from memory, player is not in the memory`
+      Logger.error(errStr)
+      return new Error(errStr)
     }
     const player: TMPlayer | undefined = this._players[playerIndex]
     const sessionTime: number = Date.now() - player.joinTimestamp
@@ -153,9 +155,8 @@ export class PlayerService {
     }
     void this.repo.setTimePlayed(player.login, totalTimePlayed)
     this._players.splice(playerIndex, 1)
-    Events.emitEvent('Controller.PlayerLeave', leaveInfo)
     Logger.info(`Player ${player.login} left after playing for ${Utils.getTimeString(sessionTime)}`)
-    return true
+    return leaveInfo
   }
 
   static async fetchPlayer(login: string): Promise<PlayersDBEntry | undefined> {
@@ -176,12 +177,7 @@ export class PlayerService {
   /**
    * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    */
-  static addCP(login: string, cp: TMCheckpoint): boolean {
-    const player: TMPlayer | undefined = this.getPlayer(login)
-    if (player === undefined) {
-      Logger.error(`Error while adding checkpoint, player ${login} is not in the memory`)
-      return false
-    }
+  static addCP(player: TMPlayer, cp: TMCheckpoint): boolean {
     let laps
     if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
       laps = 1
