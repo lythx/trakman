@@ -25,10 +25,11 @@ export abstract class Logger {
     debug: { level: 4, colour: this.consoleColours.cyan, files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`] },
     trace: { level: 5, colour: this.consoleColours.magenta, files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`] },
   }
+  private static crashed: boolean = false
 
   static async initialize(): Promise<void> {
     this.logLevel = Number(process.env.LOG_LEVEL)
-    if(isNaN(this.logLevel)) {
+    if (isNaN(this.logLevel)) {
       throw new Error('Error while initializing logger: LOG_LEVEL is not a number. Check if its set in the .env file.')
     }
     await fs.mkdir(this.logDir).catch((err: Error) => {
@@ -36,15 +37,17 @@ export abstract class Logger {
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
-    process.on('uncaughtException', async (err: Error) => {
-      Logger.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
+    process.on('uncaughtException', (err: Error) => {
+      void Logger.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
-    process.on('unhandledRejection', async (err: Error) => {
-      Logger.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
+    process.on('unhandledRejection', (err: Error) => {
+      void Logger.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
   }
 
   static async fatal(...lines: string[]): Promise<void> {
+    if (this.crashed === true) { return }
+    this.crashed = true
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'fatal'
@@ -53,6 +56,7 @@ export abstract class Logger {
   }
 
   static error(...lines: string[]): void {
+    if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'error'
@@ -60,6 +64,7 @@ export abstract class Logger {
   }
 
   static warn(...lines: string[]): void {
+    if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'warn'
@@ -67,6 +72,7 @@ export abstract class Logger {
   }
 
   static info(...lines: string[]): void {
+    if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'info'
@@ -74,13 +80,15 @@ export abstract class Logger {
   }
 
   static debug(...lines: string[]): void {
+    if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'debug'
     this.writeLog(tag, location, date, lines)
   }
-  
+
   static trace(...lines: string[]): void {
+    if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
     const tag: Tag = 'trace'
