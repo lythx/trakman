@@ -8,7 +8,9 @@ const command: TMCommand = {
   help: 'Add a map from TMX.',
   params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
   callback: async (info: MessageInfo, id: number, tmxSite?: string): Promise<void> => {
-    const file: TMXFileData | Error = await TMXService.fetchMapFile(id, tmxSite).catch((err: Error) => err)
+    const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+    const site: TMXSite | undefined = tmxSites.find(a=>a===tmxSite)
+    const file: { name: string, content: Buffer } | Error = await TMXService.fetchMapFile(id, site).catch((err: Error) => err)
     if (file instanceof Error) {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + (tmxSite || 'TMNF')} TMX` +
         `${TM.palette.error}, check if you specified the correct game.`, info.login)

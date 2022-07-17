@@ -34,7 +34,7 @@ export abstract class ChatService {
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
-      Logger.info(`${info.login} used command ${usedAlias} with params ${params.join(', ')}`)
+      Logger.info(`${info.login} used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
       const parsedParams: (string | number | boolean | undefined)[] = []
       if (command.params) {
         for (const [i, param] of command.params.entries()) {
