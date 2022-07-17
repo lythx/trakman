@@ -14,4 +14,5 @@ type EventParams =
   MapDedisInfo |
   KarmaVoteInfo |
   MKVotesInfo |
+  MapAddedInfo |
   any[]

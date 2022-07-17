@@ -118,7 +118,7 @@ export class PlayerService {
     }
     Events.emitEvent('Controller.PlayerJoin', player as JoinInfo)
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits},`,
+      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits},` +
         `nickname: ${player.nickName}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
   }

@@ -1,6 +1,7 @@
 import { Logger } from '../Logger.js'
 import { Client } from '../client/Client.js'
 import { MapRepository } from '../database/MapRepository.js'
+import { Events } from '../Events.js'
 
 export class MapService {
 
@@ -32,29 +33,12 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const info: any = res[0]
-    const dbinfo = await this.repo.get(info.UId)
+    const dbinfo = await this.repo.get(res[0].UId)
     if (dbinfo === undefined) {
       Logger.error('Failed to fetch map info from database')
       return
     }
-    this._current = {
-      id: info.UId,
-      name: info.Name,
-      fileName: info.FileName,
-      author: info.Author,
-      environment: info.Environnement,
-      mood: info.Mood,
-      bronzeTime: info.BronzeTime,
-      silverTime: info.SilverTime,
-      goldTime: info.GoldTime,
-      authorTime: info.AuthorTime,
-      copperPrice: info.CopperPrice,
-      lapRace: info.LapRace,
-      lapsAmount: info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints,
-      addDate: dbinfo.adddate
-    }
+    this._current = this.constructMapObjectFromDB(dbinfo, res[0])
   }
 
   /**
@@ -68,6 +52,9 @@ export class MapService {
     }
     const DBMapList: MapsDBEntry[] = await this.repo.getAll()
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
+    if (mapsNotInDB.length > 100) { // TODO implement progress bar here perhaps (?)
+      Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
+    }
     const mapsNotInDBInfo: TMMap[] = []
     for (const c of mapsNotInDB) {
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
@@ -75,51 +62,18 @@ export class MapService {
         Logger.fatal(`Unable to retrieve map info for map id: ${c.id}, filename: ${c.fileName}`, res.message)
         return
       }
-      const info: any = res[0]
-      const obj: TMMap = {
-        id: info.UId,
-        name: info.Name,
-        fileName: info.FileName,
-        author: info.Author,
-        environment: info.Environnement,
-        mood: info.Mood,
-        bronzeTime: info.BronzeTime,
-        silverTime: info.SilverTime,
-        goldTime: info.GoldTime,
-        authorTime: info.AuthorTime,
-        copperPrice: info.CopperPrice,
-        lapRace: info.LapRace,
-        lapsAmount: info.NbLaps,
-        checkpointsAmount: info.NbCheckpoints,
-        addDate: new Date()
-      }
+      const obj: TMMap = this.constructNewMapObject(res[0])
       mapsNotInDBInfo.push(obj)
     }
     const mapsInDBInfo: TMMap[] = []
     for (const map of DBMapList) {
-      const info: TMMap = {
-        id: map.id,
-        name: map.name,
-        fileName: map.filename,
-        author: map.author,
-        environment: map.environment,
-        mood: map.mood,
-        bronzeTime: map.bronzetime,
-        silverTime: map.silvertime,
-        goldTime: map.goldtime,
-        authorTime: map.authortime,
-        copperPrice: map.copperprice,
-        lapRace: map.laprace,
-        lapsAmount: map.lapsamount,
-        checkpointsAmount: map.checkpointsamount,
-        addDate: map.adddate
-      }
+      const info: TMMap = this.constructMapObjectFromDB(map)
       mapsInDBInfo.push(info)
     }
     for (const c of [...mapsInDBInfo, ...mapsNotInDBInfo]) {
       this._maps.push(c)
     }
-    void this.repo.add(...mapsNotInDBInfo)
+    await this.repo.add(...mapsNotInDBInfo)
   }
 
   static async add(fileName: string, adminLogin?: string): Promise<TMMap | Error> {
@@ -128,24 +82,7 @@ export class MapService {
     if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
     const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: fileName }])
     if (res instanceof Error) { return res }
-    const info: any = res[0]
-    const obj: TMMap = {
-      id: info.UId,
-      name: info.Name,
-      fileName: info.FileName,
-      author: info.Author,
-      environment: info.Environnement,
-      mood: info.Mood,
-      bronzeTime: info.BronzeTime,
-      silverTime: info.SilverTime,
-      goldTime: info.GoldTime,
-      authorTime: info.AuthorTime,
-      copperPrice: info.CopperPrice,
-      lapRace: info.LapRace,
-      lapsAmount: info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints,
-      addDate: new Date()
-    }
+    const obj: TMMap = this.constructNewMapObject(res[0])
     this._maps.push(obj)
     void this.repo.add(obj)
     if (adminLogin !== undefined) {
@@ -153,6 +90,9 @@ export class MapService {
     } else {
       Logger.info(`Map ${obj.name} by ${obj.author} added`)
     }
+    const temp: any = obj
+    temp.callerLogin = adminLogin
+    Events.emitEvent('Controller.MapAdded', temp as MapAddedInfo)
     return obj
   }
 
@@ -171,6 +111,51 @@ export class MapService {
       Logger.info(`Player ${adminLogin} shuffled the maplist`)
     } else {
       Logger.info(`Maplist shuffled`)
+    }
+  }
+
+  /**
+   * Contstructs TMMap object from dedicated server response and date
+   * @param info - GetChallengeInfo dedicated server call response
+   */
+  private static constructNewMapObject(info: any): TMMap {
+    return {
+      id: info.UId,
+      name: info.Name,
+      fileName: info.FileName,
+      author: info.Author,
+      environment: info.Environnement,
+      mood: info.Mood,
+      bronzeTime: info.BronzeTime,
+      silverTime: info.SilverTime,
+      goldTime: info.GoldTime,
+      authorTime: info.AuthorTime,
+      copperPrice: info.CopperPrice,
+      lapRace: info.LapRace,
+      lapsAmount: info.NbLaps,
+      checkpointsAmount: info.NbCheckpoints,
+      addDate: new Date()
+    }
+  }
+
+  // Fix later cuz nadeo are apes and send -1 for laps and checkpoints on GetChallengeInfo
+  private static constructMapObjectFromDB(info: MapsDBEntry, callRes?: any) {
+    return {
+      id: info.id,
+      name: info.name,
+      fileName: info.filename,
+      author: info.author,
+      environment: info.environment,
+      mood: info.mood,
+      bronzeTime: info.bronzetime,
+      silverTime: info.silvertime,
+      goldTime: info.goldtime,
+      authorTime: info.authortime,
+      copperPrice: info.copperprice,
+      lapRace: info.laprace,
+      lapsAmount: callRes === undefined ? info.lapsamount : callRes.NbLaps,
+      checkpointsAmount: callRes === undefined ? info.checkpointsamount : callRes.NbCheckpoints,
+      addDate: info.adddate
     }
   }
 

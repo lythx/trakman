@@ -99,6 +99,12 @@ export class RecordService {
     temp.checkpoints = [...checkpoints] // break the reference
     temp.map = map
     temp.time = time
+    console.log(checkpoints.length, cpsPerLap, laps)
+    console.log(MapService.current)
+    if (checkpoints.length !== cpAmount - 1) {
+      checkpoints.length = 0
+      return
+    }
     const finishInfo: FinishInfo = temp
     await this.handleLocalRecord(map, login, time, date, cpAmount, [...checkpoints], player)
     this.handleLiveRecord(map, login, time, date, cpAmount, [...checkpoints], player)
@@ -106,211 +112,78 @@ export class RecordService {
   }
 
   // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
-  private static async handleLocalRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
-    if (checkpoints.length !== cpAmount - 1) {
-      checkpoints.length = 0
-      return
-    }
+  private static async handleLocalRecord(mapId: string, login: string, time: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer) {
     const pb: number | undefined = this._localRecords.find(a => a.login === login)?.time
-    const position: number = this._localRecords.filter(a => a.time <= score).length + 1
+    const position: number = this._localRecords.filter(a => a.time <= time).length + 1
+    console.log(pb, position)
     if (pb === undefined) {
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position,
-        previousTime: -1,
-        previousPosition: -1,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, -1, position, -1)
       this._records.splice(position - 1, 0, recordInfo)
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      Logger.info(...this.getLogString(-1, position, -1, score, login, 'local'))
+      Logger.info(...this.getLogString(-1, position, -1, time, login, 'local'))
       void this.repo.add(recordInfo)
       return
     }
-    if (score === pb) {
+    if (time === pb) {
       const previousPosition: number = this.records.findIndex(a => a.login === this.records.find(a => a.login === login)?.login) + 1
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position: previousPosition,
-        previousTime: score,
-        previousPosition,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, time, previousPosition, previousPosition)
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      Logger.info(...this.getLogString(previousPosition, previousPosition, score, score, login, 'local'))
+      Logger.info(...this.getLogString(previousPosition, previousPosition, time, time, login, 'local'))
       return
     }
-    if (score < pb) {
+    if (time < pb) {
       const previousIndex = this._localRecords.findIndex(a => a.login === login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${login} in memory`)
         return
       }
-      const previousScore: number | undefined = this._localRecords[previousIndex].time
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position,
-        previousPosition: previousIndex + 1,
-        previousTime: previousScore,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
-      this._records.splice(this._records.findIndex(a => !(a.login == login && a.map === map)), 1)
-      this._records.splice(position - 1, 0, { map: map, login, time: score, date, checkpoints })
+      const previousTime: number | undefined = this._localRecords[previousIndex].time
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, previousTime, position, previousIndex + 1)
+      this._records.splice(this._records.findIndex(a => !(a.login == login && a.map === mapId)), 1)
+      this._records.splice(position - 1, 0, { map: mapId, login, time: time, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords.splice(previousIndex, 1)
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Events.emitEvent('Controller.PlayerRecord', recordInfo)
-      Logger.info(...this.getLogString(previousIndex + 1, position, previousScore, score, login, 'local'))
+      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, login, 'local'))
       this.repo.update(recordInfo)
     }
   }
 
   // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
-  private static handleLiveRecord(map: string, login: string, score: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer): void {
-    if (checkpoints.length !== cpAmount - 1) {
-      checkpoints.length = 0
-      return
-    }
+  private static handleLiveRecord(mapId: string, login: string, time: number, date: Date, cpAmount: number, checkpoints: number[], player: TMPlayer): void {
     const pb: number | undefined = this._liveRecords.find(a => a.login === login)?.time
-    const position: number = this._liveRecords.filter(a => a.time <= score).length + 1
+    const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position,
-        previousTime: -1,
-        previousPosition: -1,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, -1, position, -1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
-      Logger.trace(...this.getLogString(-1, position, -1, score, login, 'live'))
+      Logger.trace(...this.getLogString(-1, position, -1, time, login, 'live'))
       return
     }
-    if (score === pb) {
+    if (time === pb) {
       const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === login)?.login) + 1
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position: previousPosition,
-        previousTime: score,
-        previousPosition,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, time, previousPosition, previousPosition)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
-      Logger.trace(...this.getLogString(previousPosition, previousPosition, score, score, login, 'live'))
+      Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, login, 'live'))
       return
     }
-    if (score < pb) {
+    if (time < pb) {
       const previousIndex = this._liveRecords.findIndex(a => a.login === login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${login} in memory`)
         return
       }
-      const previousScore: number | undefined = this._liveRecords[previousIndex].time
-      const recordInfo: RecordInfo = {
-        map: map,
-        login,
-        time: score,
-        date,
-        checkpoints,
-        nickName: player.nickName,
-        nation: player.nation,
-        nationCode: player.nationCode,
-        timePlayed: player.timePlayed,
-        joinTimestamp: player.joinTimestamp,
-        wins: player.wins,
-        privilege: player.privilege,
-        visits: player.visits,
-        position,
-        previousPosition: previousIndex + 1,
-        previousTime: previousScore,
-        playerId: player.playerId,
-        ip: player.ip,
-        region: player.region,
-        isUnited: player.isUnited
-      }
+      const previousTime: number | undefined = this._liveRecords[previousIndex].time
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, login, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Events.emitEvent('Controller.LiveRecord', recordInfo)
-      Logger.trace(...this.getLogString(previousIndex + 1, position, previousScore, score, login, 'live'))
+      Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, login, 'live'))
     }
   }
 
@@ -342,28 +215,54 @@ export class RecordService {
     void this.repo.removeAll(mapId)
   }
 
+  private static constructRecordObject(player: TMPlayer, mapId: string, login: string,
+    date: Date, checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): RecordInfo {
+    return {
+      map: mapId,
+      login,
+      time,
+      date,
+      checkpoints,
+      nickName: player.nickName,
+      nation: player.nation,
+      nationCode: player.nationCode,
+      timePlayed: player.timePlayed,
+      joinTimestamp: player.joinTimestamp,
+      wins: player.wins,
+      privilege: player.privilege,
+      visits: player.visits,
+      position,
+      previousTime,
+      previousPosition,
+      playerId: player.playerId,
+      ip: player.ip,
+      region: player.region,
+      isUnited: player.isUnited
+    }
+  }
+
   private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string, recordType: 'live' | 'local'): string[] {
     let rs = { str: '', calcDiff: false } // Rec status
-      let diff // Difference
-      if (previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-      else if (previousPosition > position) { rs.str = 'obtained', rs.calcDiff = true }
-      else if (previousPosition === position && previousTime === time) { rs.str = 'equaled', rs.calcDiff = false }
-      else if (previousPosition === position) { rs.str = 'improved', rs.calcDiff = true }
-      if (rs.calcDiff) {
-        diff = Utils.getTimeString(previousTime - time)
-        let i: number = -1
-        while (true) {
-          i++
-          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
-          if (Number(diff[i]) !== 0) { continue }
+    let diff // Difference
+    if (previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
+    else if (previousPosition > position) { rs.str = 'obtained', rs.calcDiff = true }
+    else if (previousPosition === position && previousTime === time) { rs.str = 'equaled', rs.calcDiff = false }
+    else if (previousPosition === position) { rs.str = 'improved', rs.calcDiff = true }
+    if (rs.calcDiff) {
+      diff = Utils.getTimeString(previousTime - time)
+      let i: number = -1
+      while (true) {
+        i++
+        if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
+        if (Number(diff[i]) !== 0) { continue }
+        diff = diff.substring(1)
+        i--
+        if (diff[i + 1] === ':') {
           diff = diff.substring(1)
-          i--
-          if (diff[i + 1] === ':') {
-            diff = diff.substring(1)
-          }
         }
       }
-      return [`${login} has ${rs.str} the ${Utils.getPositionString(position)} ${recordType} record.`,`Time: ${Utils.getTimeString(time)}${rs.calcDiff ? ` (${previousPosition} -${diff})` : ``}`]
+    }
+    return [`${login} has ${rs.str} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.calcDiff ? ` (${previousPosition} -${diff})` : ``}`]
   }
 
 }

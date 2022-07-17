@@ -1,6 +1,8 @@
 import { Logger } from "../Logger.js"
 import { MapService } from "./MapService.js"
 import { TMXService } from "./TMXService.js"
+import CONFIG from "../../config.json" assert { type: 'json' }
+import { Events } from "../Events.js"
 
 interface JukeboxMap {
   readonly map: TMMap
@@ -8,22 +10,31 @@ interface JukeboxMap {
 }
 
 /**
- * This service is related to MapService and uses its methods
+ * This service is related to MapService and TMXService
  */
 export abstract class JukeboxService {
 
   private static readonly _queue: JukeboxMap[] = []
   private static _current: TMMap
   private static readonly _previous: TMMap[] = []
+  static readonly queueLength = CONFIG.jukeboxQueueSize
+  static readonly previousLength = CONFIG.jukeboxPreviousMapsInRuntime
 
   static initialize(): void {
     this._current = { ...MapService.current }
     const currentIndex: number = MapService.maps.findIndex(a => a.id === this._current.id)
     const lgt: number = MapService.maps.length
-    for (let i: number = 1; i <= 30; i++) { // Handles less maps than jukebox length exception
+    for (let i: number = 1; i <= this.queueLength; i++) { // Handles less maps than jukebox length exception
       this._queue.push({ map: MapService.maps[(i + currentIndex) % lgt], isForced: false })
     }
     MapService.setNextMap(this._queue[0].map.id)
+    Events.addListener('Controller.MapAdded', (info: MapAddedInfo) => {
+      const status = this.add(info.id, info.callerLogin, true)
+      if(status instanceof Error) {
+        Logger.error(`Failed to insert newly added map ${info.name} into the jukebox, clearing the jukebox to prevent further errors...`)
+        this.clear()
+      }
+    })
   }
 
   static nextMap(): void {
@@ -38,7 +49,7 @@ export abstract class JukeboxService {
   }
 
   private static fillQueue(): void {
-    while (this._queue.length < 30) {
+    while (this._queue.length < this.queueLength) {
       let currentIndex: number = MapService.maps.findIndex(a => a.id === this._current.id)
       const lgt: number = MapService.maps.length
       let current: TMMap
@@ -52,13 +63,13 @@ export abstract class JukeboxService {
     }
   }
 
-  static add(mapId: string, callerLogin: string): void | Error {
+  static add(mapId: string, callerLogin?: string, setAsNextMap?: true): void | Error {
     const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
-    if (map === undefined) { return new Error(`Can't find map with id ${mapId} in`) }
-    const index: number = this._queue.findIndex(a => a.isForced === false)
+    if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
+    const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true })
     MapService.setNextMap(this._queue[0].map.id)
-    TMXService.add(mapId, index)
+    TMXService.addMap(mapId, index)
     if (callerLogin !== undefined) {
       Logger.trace(`${callerLogin} has added map ${map.name} by ${map.author} to the jukebox`)
     } else {
@@ -75,15 +86,13 @@ export abstract class JukeboxService {
       Logger.trace(`Map ${this._queue[index].map.name} by ${this._queue[index].map.author} has been removed from the jukebox`)
     }
     this._queue.splice(index, 1)
-    const q: TMMap | undefined = MapService.maps.find(a => !this._queue.some(b => b.map.id === a.id))
-    if (q !== undefined) { this._queue.push({ map: q, isForced: false }) }
-    else { this._queue.push({ map: this._previous[0], isForced: false }) }
+    this.fillQueue()
     MapService.setNextMap(this._queue[0].map.id)
-    TMXService.remove(index)
+    TMXService.removeMap(index)
     return true
   }
 
-  static clear(callerLogin: string): void {
+  static clear(callerLogin?: string): void {
     let n = this._queue.length
     for (let i = 0; i < n; i++) {
       if (this._queue[i].isForced) {
@@ -99,8 +108,8 @@ export abstract class JukeboxService {
     }
   }
 
-  static shuffle(adminLogin: string): void {
-    MapService.shuffle(adminLogin)
+  static shuffle(callerLogin?: string): void {
+    MapService.shuffle(callerLogin)
     this._queue.length = 0
     this.fillQueue()
   }
@@ -118,7 +127,7 @@ export abstract class JukeboxService {
   }
 
   static get current(): TMMap {
-    return { ...this._current }
+    return this._current
   }
 
 }

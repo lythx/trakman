@@ -323,7 +323,7 @@ export const TRAKMAN = {
    * @param mapId Map UID
    * @returns TMX map data or error if unsuccessful
    */
-  async fetchMapFileByUid(mapId: string): Promise<TMXFileData | Error> {
+  async fetchMapFileByUid(mapId: string): Promise<{ name: string, content: Buffer } | Error> {
     return await TMXService.fetchMapFileByUid(mapId)
   },
 

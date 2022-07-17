@@ -1,4 +1,4 @@
-import { Client } from "./client/Client"
+import { Client } from "./client/Client.js"
 
 export const Utils = {
 
