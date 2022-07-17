@@ -67,8 +67,8 @@ async function main(): Promise<void> {
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to Dedimania...')
-    const status: void | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Dedimania service') }
+    const status: true | Error = await DedimaniaService.initialize()
+    if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
     else { Logger.trace('Connected to Dedimania') }
   }
   if (process.env.USE_MANIAKARMA === 'YES') {

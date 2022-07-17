@@ -13,6 +13,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
+import { Logger } from './Logger.js'
 
 export class Listeners {
   private static readonly listeners: TMListener[] = [
@@ -26,7 +27,7 @@ export class Listeners {
         }
         const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         if (playerInfo instanceof Error) {
-          ErrorHandler.error(`Failed to get player ${params[0]} info`, playerInfo.message)
+          Logger.error(`Failed to get player ${params[0]} info`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
@@ -38,9 +39,11 @@ export class Listeners {
           { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
           return
         }
-        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
+        const joinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
-        await RecordService.fetchRecord(params[0].UId, params[0].Login)
+        Events.emitEvent('Controller.PlayerJoin', joinInfo)
+        // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
+        void DedimaniaService.playerJoin(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1])
       }
     },
     {
@@ -50,7 +53,12 @@ export class Listeners {
         if (AdministrationService.banlist.some(a => a.login === params[0]) || AdministrationService.blacklist.some(a => a.login === params[0])) {
           return
         }
-        PlayerService.leave(params[0])
+        const leaveInfo = PlayerService.leave(params[0])
+        if (!(leaveInfo instanceof Error)) {
+          Events.emitEvent('Controller.PlayerLeave', leaveInfo)
+        }
+        // Dedimania playerleave is just api info update irrelevant for controller hence its after the event
+        void DedimaniaService.playerLeave(params[0])
       }
     },
     {
@@ -60,7 +68,10 @@ export class Listeners {
         if (params[0] === 0) { // Ignore server messages
           return
         }
-        ChatService.add(params[1], params[2])
+        const messageInfo = ChatService.add(params[1], params[2])
+        if (!(messageInfo instanceof Error)) {
+          Events.emitEvent('Controller.PlayerChat', messageInfo)
+        }
       }
     },
     {
@@ -70,14 +81,30 @@ export class Listeners {
         if (params[0] === 0) { // Ignore inexistent people //please elaborate
           return
         }
-        const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        const isFinish = PlayerService.addCP(params[1], checkpoint)
-        if (isFinish === true) {
-          RecordService.add(MapService.current.id, params[1], checkpoint.time)
+        const player = PlayerService.getPlayer(params[1])
+        if (player === undefined) {
+          Logger.error(`Can't find player ${params[1]} in memory on checkpoint event`)
           return
         }
-        const player = PlayerService.getPlayer(params[1])
-        if (player === undefined) { return }
+        const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
+        const isFinish = PlayerService.addCP(player, checkpoint)
+        if (isFinish === true) {
+          const obj = RecordService.add(MapService.current.id, player, checkpoint.time)
+          if (obj !== false) {
+            const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
+            Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
+            if (obj.localRecord !== undefined) {
+              Events.emitEvent('Controller.PlayerRecord', obj.localRecord)
+            }
+            if (obj.liveRecord !== undefined) {
+              Events.emitEvent('Controller.LiveRecord', obj.liveRecord)
+            }
+            if (!(dediRecord instanceof Error) && dediRecord !== false) {
+              Events.emitEvent('Controller.DedimaniaRecord', dediRecord)
+            }
+          }
+          return
+        }
         const info: CheckpointInfo = {
           time: params[2],
           lap: params[3],
@@ -91,23 +118,23 @@ export class Listeners {
       event: 'TrackMania.PlayerFinish',
       callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
-        if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
-          return
-        }
-        if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
-          // reset cps
-          // PlayerService.getPlayer(params[1]).checkpoints.length = 0
-          return
-        }
-        const status: any[] | Error = await Client.call('GetStatus') // seems kinda useless innit
-        if (status instanceof Error) {
-          ErrorHandler.error('Failed to get game status', status.message)
-          return
-        }
-        if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-          // fun fact this is probably impossible to even get :D
-          // return
-        }
+        // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
+        //   return
+        // }
+        // if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
+        //   // reset cps
+        //   // PlayerService.getPlayer(params[1]).checkpoints.length = 0
+        //   return
+        // }
+        // const status: any[] | Error = await Client.call('GetStatus') // seems kinda useless innit
+        // if (status instanceof Error) {
+        //   Logger.error('Failed to get game status', status.message)
+        //   return
+        // }
+        // if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
+        //   // fun fact this is probably impossible to even get :D
+        //   // return
+        // }
       }
     },
     {
@@ -168,12 +195,12 @@ export class Listeners {
         }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginMap', info)
-        if (process.env.USE_DEDIMANIA === 'YES') { await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author) }
+        await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
       }
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: (params: any[]): void => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         const temp: any = MapService.current
         temp.records = RecordService.records
@@ -181,6 +208,7 @@ export class Listeners {
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]
         const endMapInfo: EndMapInfo = temp
+        await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         Events.emitEvent('Controller.EndMap', endMapInfo)
       }
     },

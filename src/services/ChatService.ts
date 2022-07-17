@@ -147,7 +147,7 @@ export abstract class ChatService {
     }
   }
 
-  static add(login: string, text: string): void {
+  static add(login: string, text: string): MessageInfo | Error {
     const message: TMMessage = {
       id: randomUUID(),
       login,
@@ -156,8 +156,9 @@ export abstract class ChatService {
     }
     const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
     if (player === undefined) {
-      Logger.error(`Error while adding message. Cannot find player ${login} in the memory`)
-      return
+      const errStr = `Error while adding message. Cannot find player ${login} in the memory`
+      Logger.error(errStr)
+      return new Error(errStr)
     }
     const messageInfo: MessageInfo = {
       id: message.id,
@@ -176,13 +177,13 @@ export abstract class ChatService {
       region: player.region,
       isUnited: player.isUnited
     }
-    Events.emitEvent('Controller.PlayerChat', messageInfo)
     if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
       this.messages.unshift(message)
       void this.repo.add(message)
       Logger.trace(`${player.login} sent message: ${text}`)
     }
     this.messages.length = Math.min(this.messagesArraySize, this.messages.length)
+    return messageInfo
   }
 
   static async getByLogin(login: string, limit: number): Promise<ChatDBEntry[]> {
