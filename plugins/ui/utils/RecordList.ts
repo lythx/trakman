@@ -317,7 +317,7 @@ export default class RecordList {
       }
     }
     else {
-      posX = this.columnWidths.reduce((acc, cur): number => acc + cur) + (offset * (width + this.colGap), 0)
+      posX = this.columnWidths.reduce((acc, cur): number => acc + cur, 0) + (offset * (width + this.colGap))
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? TM.formatDate(a, true) : a
       })
