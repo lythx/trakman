@@ -14,7 +14,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: PlayersDBEntry  | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -30,10 +30,10 @@ const commands: TMCommand[] = [
       if (targetInfo.privilege < 3) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Masteradmin.`)
-        await PlayerService.setPrivilege(targetLogin, 3)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Masteradmin.`)
+        await PlayerService.setPrivilege(targetLogin, 3, info.login)
       } else if (targetInfo.privilege === 3) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Masteradmin.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Masteradmin.`, callerLogin)
       }
     },
     privilege: 4
@@ -49,7 +49,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -65,15 +65,15 @@ const commands: TMCommand[] = [
       if (targetInfo.privilege < 2) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Admin.`)
-        await PlayerService.setPrivilege(targetLogin, 2)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Admin.`)
+        await PlayerService.setPrivilege(targetLogin, 2, info.login)
       } else if (targetInfo.privilege === 2) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Admin.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Admin.`, callerLogin)
       } else if (targetInfo.privilege > 2) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Admin.`)
-        await PlayerService.setPrivilege(targetLogin, 2)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Admin.`)
+        await PlayerService.setPrivilege(targetLogin, 2, info.login)
       }
     },
     privilege: 3
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -105,15 +105,15 @@ const commands: TMCommand[] = [
       if (targetInfo.privilege < 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has promoted ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Operator.`)
-        await PlayerService.setPrivilege(targetLogin, 1)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Operator.`)
+        await PlayerService.setPrivilege(targetLogin, 1, info.login)
       } else if (targetInfo.privilege === 1) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} is already Operator.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} is already Operator.`, callerLogin)
       } else if (targetInfo.privilege > 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has demoted ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin} to Operator.`)
-        await PlayerService.setPrivilege(targetLogin, 1)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin} to Operator.`)
+        await PlayerService.setPrivilege(targetLogin, 1, info.login)
       }
     },
     privilege: 2
@@ -129,7 +129,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -145,14 +145,14 @@ const commands: TMCommand[] = [
       if (targetInfo.privilege >= 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed ` +
-          `permissions of ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`)
-        await PlayerService.setPrivilege(targetLogin, 0)
+          `permissions of ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`)
+        await PlayerService.setPrivilege(targetLogin, 0, info.login)
       } else if (targetInfo.privilege === -1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has enabled ` +
-          `${TM.palette.highlight + TM.strip(targetInfo.nickName, true)} ${TM.palette.admin}commands.`)
+          `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)} ${TM.palette.admin}commands.`)
       } else if (targetInfo.privilege === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} has no priveleges.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} has no priveleges.`, callerLogin)
       }
     },
     privilege: 2
@@ -168,7 +168,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: DBPlayerInfo | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -182,13 +182,13 @@ const commands: TMCommand[] = [
         return
       }
       if (targetInfo.privilege === -1) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.error} already can't use commands.`, callerLogin)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} already can't use commands.`, callerLogin)
       }
       else if (targetInfo.privilege < 1) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
-          `commands for ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`)
-        await PlayerService.setPrivilege(targetLogin, -1)
+          `commands for ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`)
+        await PlayerService.setPrivilege(targetLogin, -1, info.login)
       }
       else {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)

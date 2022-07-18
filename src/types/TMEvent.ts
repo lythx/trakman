@@ -13,5 +13,7 @@ type TMEvent = StringAutocomplete<
 "Controller.BeginChallenge" | 
 "Controller.EndChallenge" | 
 "Controller.DedimaniaRecords" |
+"Controller.DedimaniaRecord" |
 "Controller.KarmaVote" |
-"Controller.ManiakarmaVotes">
+"Controller.ManiakarmaVotes" | 
+"Controller.MapAdded">

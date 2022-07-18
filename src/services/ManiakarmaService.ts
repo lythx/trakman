@@ -1,12 +1,12 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { ServerConfig } from '../ServerConfig.js'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { VoteService } from './VoteService.js'
+import { Logger } from '../Logger.js'
 
 export abstract class ManiakarmaService {
 
@@ -20,7 +20,7 @@ export abstract class ManiakarmaService {
   static async initialize(): Promise<void | Error> {
     const status: void | Error = await this.authenticate()
     if (status instanceof Error) {
-      ErrorHandler.fatal(`Couldn't connect to Maniakarma`)
+      Logger.fatal(`Couldn't connect to Maniakarma`)
     }
     for (const player of PlayerService.players) {
       await this.receiveVotes(player.login)
@@ -49,7 +49,7 @@ export abstract class ManiakarmaService {
       + `&nation=${process.env.SERVER_NATION}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      ErrorHandler.error(res.message)
+      Logger.error(res.message)
       return
     }
     const json: any = this.getJson(await res.text())
@@ -71,7 +71,7 @@ export abstract class ManiakarmaService {
       + `&player=${playerLogin}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      ErrorHandler.error(res.message)
+      Logger.error(res.message)
       return
     }
     const json: any = this.getJson(await res.text())
@@ -80,7 +80,8 @@ export abstract class ManiakarmaService {
       (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
     const vote = Number(json?.result?.players[0]?.player[0]?.$?.vote)
-    if (![-3, -2, -1, 1, 2, 3].includes(vote)) {
+    const v = [-3, -2, -1, 1, 2, 3].find(a=>a === vote)
+    if (v === undefined) {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
@@ -105,7 +106,7 @@ export abstract class ManiakarmaService {
       + `&tmx=` // LEFTOVER FROM TM2
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      ErrorHandler.error(res.message)
+      Logger.error(res.message)
       return
     }
   }

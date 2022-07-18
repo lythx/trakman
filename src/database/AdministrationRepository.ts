@@ -40,76 +40,83 @@ export class AdministrationRepository extends Repository {
     }
   }
 
-  async getBanlist(): Promise<any[]> {
+  async getBanlist(): Promise<BanlistDBEntry[]> {
     const query: string = `SELECT * FROM banlist;`
     const res = await this.db.query(query)
     return res.rows
   }
 
-  async addToBanlist(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<any[]> {
-    const query: string = `INSERT INTO banlist(ip, login, date, caller, reason, expires) VALUES ($1, $2, $3, $4, $5, $6);`
-    const res = await this.db.query(query, [ip, login, date, callerLogin, reason, expireDate])
-    return res.rows
+  async addToBanlist(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `INSERT INTO banlist(ip, login, date, caller, reason, expires) VALUES($1, $2, $3, $4, $5, $6);`
+    await this.db.query(query, [ip, login, date, callerLogin, reason, expireDate])
   }
 
-  async removeFromBanlist(login: string): Promise<any[]> {
+  async updateBanList(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `UPDATE banlist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE ip=$5 AND login=$6;`
+    await this.db.query(query, [date, callerLogin, reason, expireDate, ip, login])
+  }
+
+  async removeFromBanlist(login: string): Promise<void> {
     const query: string = `DELETE FROM banlist WHERE login=$1;`
-    const res = await this.db.query(query, [login])
-    return res.rows
+    await this.db.query(query, [login])
   }
 
-  async getBlacklist(): Promise<any[]> {
+  async getBlacklist(): Promise<BlacklistDBEntry[]> {
     const query: string = `SELECT * FROM blacklist;`
     const res = await this.db.query(query)
     return res.rows
   }
 
-  async addToBlacklist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<any[]> {
-    const query: string = `INSERT INTO blacklist(login, date, caller, reason, expires) VALUES ($1, $2, $3, $4, $5);`
-    const res = await this.db.query(query, [login, date, callerLogin, reason, expireDate])
-    return res.rows
+  async addToBlacklist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `INSERT INTO blacklist(login, date, caller, reason, expires) VALUES($1, $2, $3, $4, $5);`
+    await this.db.query(query, [login, date, callerLogin, reason, expireDate])
   }
 
-  async removeFromBlacklist(ip: string): Promise<any[]> {
+  async updateBlacklist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `UPDATE blacklist date=$1, caller=$2, reason=$3, expires=$4 WHERE login=$5;`
+    await this.db.query(query, [date, callerLogin, reason, expireDate, login])
+  }
+
+  async removeFromBlacklist(ip: string): Promise<void> {
     const query: string = `DELETE FROM blacklist WHERE login=$1;`
-    const res = await this.db.query(query, [ip])
-    return res.rows
+    await this.db.query(query, [ip])
   }
 
-  async getMutelist(): Promise<any[]> {
+  async getMutelist(): Promise<MutelistDBEntry[]> {
     const query: string = `SELECT * FROM mutelist;`
     const res = await this.db.query(query)
     return res.rows
   }
 
-  async addToMutelist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<any[]> {
-    const query: string = `INSERT INTO mutelist(login, date, caller, reason, expires) VALUES ($1, $2, $3, $4, $5);`
-    const res = await this.db.query(query, [login, date, callerLogin, reason, expireDate])
-    return res.rows
+  async addToMutelist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `INSERT INTO mutelist(login, date, caller, reason, expires) VALUES($1, $2, $3, $4, $5);`
+    await this.db.query(query, [login, date, callerLogin, reason, expireDate])
   }
 
-  async removeFromMutelist(ip: string): Promise<any[]> {
+  async updateMutelist(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
+    const query: string = `UPDATE mutelist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE login=$5;`
+    await this.db.query(query, [date, callerLogin, reason, expireDate, login])
+  }
+
+  async removeFromMutelist(ip: string): Promise<void> {
     const query: string = `DELETE FROM mutelist WHERE login=$1;`
-    const res = await this.db.query(query, [ip])
-    return res.rows
+    await this.db.query(query, [ip])
   }
 
-  async getGuestlist(): Promise<any[]> {
+  async getGuestlist(): Promise<GuestlistDBEntry[]> {
     const query: string = `SELECT * FROM guestlist;`
     const res = await this.db.query(query)
     return res.rows
   }
 
-  async addToGuestlist(login: string, date: Date, callerLogin: string): Promise<any[]> {
-    const query: string = `INSERT INTO guestlist(login, date, caller) VALUES ($1, $2, $3);`
-    const res = await this.db.query(query, [login, date, callerLogin])
-    return res.rows
+  async addToGuestlist(login: string, date: Date, callerLogin: string): Promise<void> {
+    const query: string = `INSERT INTO guestlist(login, date, caller) VALUES($1, $2, $3);`
+    await this.db.query(query, [login, date, callerLogin])
   }
 
-  async removeFromGuestlist(ip: string): Promise<any[]> {
+  async removeFromGuestlist(ip: string): Promise<void> {
     const query: string = `DELETE FROM guestlist WHERE login=$1;`
-    const res = await this.db.query(query, [ip])
-    return res.rows
+    await this.db.query(query, [ip])
   }
 
 }

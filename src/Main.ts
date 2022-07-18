@@ -20,73 +20,72 @@ import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 
 async function main(): Promise<void> {
-  Logger.initialize()
-  Logger.warn('Establishing connection with the dedicated server...')
-  const connectionStatus: true | Error = await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
-  if (connectionStatus instanceof Error) {
-    ErrorHandler.fatal('Connection to dedicated server failed:', connectionStatus.message)
-  }
-  Logger.info('Connection with the dedicated server established.')
+  await Logger.initialize()
+  Logger.info('Starting the controller...')
+  Logger.trace('Establishing connection with the dedicated server...')
+  await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
+  Logger.trace('Connection with the dedicated server established')
   Logger.trace('Authenticating...')
-  const auth: any[] | Error = await Client.call('Authenticate', [
+  if (process.env.SUPERADMIN_NAME === undefined) { await Logger.fatal('SUPERADMIN_NAME is undefined. Check your .env file') }
+  if (process.env.SUPERADMIN_PASSWORD === undefined) { await Logger.fatal('SUPERADMIN_PASSWORD is undefined. Check your .env file') }
+  const authenticationStatus: any[] | Error = await Client.call('Authenticate', [
     { string: process.env.SUPERADMIN_NAME },
     { string: process.env.SUPERADMIN_PASSWORD }
   ])
-  if (auth instanceof Error) {
-    ErrorHandler.fatal('Authentication failed', auth.message)
-  }
-  Logger.info('Authentication success')
-  Logger.trace('Retrieving game info')
+  if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
+  Logger.trace('Authentication success')
+  Logger.trace('Retrieving game info...')
   await GameService.initialize()
-  Logger.info('Game info fetched')
-  Logger.trace('Enabling callbacks...')
-  Logger.trace('Fetching administration lists...')
-  await AdministrationService.initialize()
-  Logger.info('Administration service instantiated')
-  const cb: any[] | Error = await Client.call('EnableCallbacks', [
-    { boolean: true }
-  ])
-  if (cb instanceof Error) {
-    ErrorHandler.fatal('Failed to enable callbacks', cb.message)
-  }
-  await RecordService.initialize()
-  Logger.info('Callbacks enabled')
-  Logger.trace('Fetching maps...')
-  await MapService.initialize()
-  Logger.info('Map service instantiated')
-  JukeboxService.initialize()
-  Logger.trace('Fetching votes...')
-  await VoteService.initialize()
-  Logger.info('Vote service instantiated')
+  Logger.trace('Game info fetched')
   Logger.trace('Fetching player info...')
   await PlayerService.initialize()
-  await PlayerService.addAllFromList()
-  Logger.info('Player service instantiated')
-  Logger.trace('Fetching message history...')
+  Logger.trace('Player service instantiated')
+  Logger.trace('Fetching administration lists...')
+  await AdministrationService.initialize()
+  Logger.trace('Administration service instantiated')
+  Logger.trace('Fetching maps...')
+  await MapService.initialize()
+  Logger.trace('Map service instantiated')
+  JukeboxService.initialize()
+  Logger.trace('Jukebox service instantiated')
+  Logger.trace('Fetching records...')
+  await RecordService.initialize()
+  Logger.trace('Records fetched')
+  Logger.trace('Fetching votes...')
+  await VoteService.initialize()
+  Logger.trace('Vote service instantiated')
+  Logger.trace('Fetching chat history...')
   await ChatService.initialize()
-  await ChatService.loadLastSessionMessages()
-  Logger.info('Chat service instantiated')
-  Listeners.initialize()
-  await RecordService.fetchRecords(MapService.current.id)
-  await ServerConfig.update()
+  Logger.trace('Chat service instantiated')
+  Logger.trace('Loading server config...')
+  await ServerConfig.initialize()
+  Logger.trace('Server config loaded')
   if (process.env.USE_TMX === 'YES') {
     Logger.trace('Initializing TMX service...')
     await TMXService.initialize()
-    Logger.info('TMX service instantiated')
+    Logger.trace('TMX service instantiated')
   }
   if (process.env.USE_DEDIMANIA === 'YES') {
     Logger.trace('Connecting to Dedimania...')
-    const status: void | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Dedimania service') }
-    else { Logger.info('Connected to Dedimania') }
+    const status: true | Error = await DedimaniaService.initialize()
+    if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
+    else { Logger.trace('Connected to Dedimania') }
   }
   if (process.env.USE_MANIAKARMA === 'YES') {
     Logger.trace('Connecting to Maniakarma...')
     const status: void | Error = await ManiakarmaService.initialize()
     if (status instanceof Error) { ErrorHandler.error('Failed to initialize Maniakarma service') }
-    else { Logger.info('Connected to Maniakarma') }
+    else { Logger.trace('Connected to Maniakarma') }
   }
+  Logger.trace('Enabling callbacks...')
+  const cb = await Listeners.initialize()
+  if (cb instanceof Error) {
+    Logger.fatal('Failed to enable callbacks', cb.message)
+  }
+  Logger.trace('Callbacks enabled')
   Events.initialize()
+  Logger.trace('Controller events enabled')
+  Logger.info('Controller started successfully')
 }
 
-await main()
+void main()

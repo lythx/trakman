@@ -13,7 +13,7 @@ const commands: TMCommand[] = [
       for (const map of res) {
         if (TM.maps.some(a => a.id === map.id))
           continue
-        const file: TMXFileData | Error = await TM.fetchMapFileByUid(map.id)
+        const file: { name: string, content: Buffer } | Error = await TM.fetchMapFileByUid(map.id)
         if (file instanceof Error) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
           continue

@@ -8,7 +8,9 @@ const command: TMCommand = {
   help: 'Add a map from TMX.',
   params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
   callback: async (info: MessageInfo, id: number, tmxSite?: string): Promise<void> => {
-    const file: TMXFileData | Error = await TMXService.fetchMapFile(id, tmxSite).catch((err: Error) => err)
+    const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+    const site: TMXSite | undefined = tmxSites.find(a=>a===tmxSite)
+    const file: { name: string, content: Buffer } | Error = await TMXService.fetchMapFile(id, site).catch((err: Error) => err)
     if (file instanceof Error) {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Failed to fetch file from ${TM.palette.highlight + (tmxSite || 'TMNF')} TMX` +
         `${TM.palette.error}, check if you specified the correct game.`, info.login)
@@ -20,7 +22,7 @@ const command: TMCommand = {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to write file.`, info.login)
       return
     }
-    const map: TMMap | Error = await TM.addMap(file.name)
+    const map: TMMap | Error = await TM.addMap(file.name, info.login)
     if (map instanceof Error) {
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content: string = file.content.toString()
@@ -33,7 +35,7 @@ const command: TMCommand = {
               TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the map.`, info.login)
               return
             }
-            TM.addToJukebox(id)
+            TM.addToJukebox(id, info.login)
             TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin} ` +
               `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} is already on the server, ` +
               `it will be ${TM.palette.highlight}queued ${TM.palette.admin}instead.`, info.login)

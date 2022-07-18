@@ -37,7 +37,7 @@ export class ClientRequest {
     const type: Keys = Object.keys(param)[0] as Keys
     const value = param[type]
     if (value === undefined) {
-      return new Error(`Received undefined while creating XML request, expected ${type}.`)
+      return new Error(`Received undefined while creating dedicated server XML request, expected ${type}.`)
     }
     switch (type) {
       case 'boolean':

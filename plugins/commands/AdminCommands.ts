@@ -93,7 +93,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      TM.removeFromBanlist(targetInfo.login)
+      TM.removeFromBanlist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
@@ -150,7 +150,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      TM.removeFromBlacklist(targetInfo.login)
+      TM.removeFromBlacklist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unblacklisted `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
@@ -210,10 +210,6 @@ const commands: TMCommand[] = [
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (TM.guestlist.some(a => a.login === login) === true) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is already in the guestlist.`, info.login)
-        return
-      }
       let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
@@ -222,9 +218,13 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.addToGuestlist(login, info.login)
+      const res: boolean | Error = await TM.addToGuestlist(login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to guest list.`, info.login)
+        return
+      }
+      if (res === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is already in the guestlist.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
@@ -238,10 +238,6 @@ const commands: TMCommand[] = [
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (TM.guestlist.some(a => a.login === login) !== true) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
-        return
-      }
       let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
@@ -250,9 +246,13 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: void | Error = await TM.removeFromGuestlist(login)
+      const res: boolean | Error = await TM.removeFromGuestlist(login, info.login)
       if (res instanceof Error) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from guest list.`, info.login)
+        return
+      }
+      if (res === false) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player is not in the guestlist.`, info.login)
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
@@ -286,7 +286,7 @@ const commands: TMCommand[] = [
         return
       }
       else if (targetInfo.privilege < 1) {
-        TM.setPrivilege(targetLogin, -1)
+        TM.setPrivilege(targetLogin, -1, info.login)
       }
       else {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You cannot disable commands of a privileged person.`, callerLogin)
@@ -748,14 +748,14 @@ const commands: TMCommand[] = [
     aliases: ['dr', 'delrec', 'deleterecord'],
     help: 'Remove a player\'s record on the ongoing map.',
     params: [{ name: 'login' }],
-    callback: async (info: MessageInfo, login: string): Promise<void> => {
+    callback: (info: MessageInfo, login: string): void => {
       // Can also be done with TM.getPlayerRecord, however we need the player nickname
       const playerRecord: LocalRecord | undefined = TM.localRecords.find(a => a.login === login)
       if (playerRecord === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} has no record on this map.`, info.login)
         return
       }
-      await TM.removeRecord(playerRecord.login, TM.map.id)
+       TM.removeRecord(playerRecord.login, TM.map.id, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
         + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickName, true))}${TM.palette.admin} on the ongoing map.`)
@@ -766,7 +766,7 @@ const commands: TMCommand[] = [
     aliases: ['shf', 'shuffle'],
     help: 'Shuffle the map queue.',
     callback: async (info: MessageInfo): Promise<void> => {
-      TM.shuffleJukebox()
+      TM.shuffleJukebox(info.login)
     },
     privilege: 2
   }

@@ -1,5 +1,5 @@
 interface TMCall {
   readonly method: string
-  readonly params?: any[]
+  readonly params?: CallParams[]
   readonly expectsResponse?: boolean
 }

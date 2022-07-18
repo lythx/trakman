@@ -1,8 +1,5 @@
 import { Database } from './DB.js'
 
-/**
- * @abstract
- */
 export abstract class Repository {
 
   protected db: Database = new Database()
@@ -10,4 +7,5 @@ export abstract class Repository {
   async initialize(): Promise<void> {
     await this.db.initialize()
   }
+  
 }
