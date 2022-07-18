@@ -8,6 +8,7 @@
     "timer": 70,
     "karma": 300,
     "admin": 400,
+    "bestCps": 500,
     "commandList": 1000,
     "TMXWindow": 2000,
     "localCps": 3000,

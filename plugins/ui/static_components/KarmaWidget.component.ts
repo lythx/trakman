@@ -30,7 +30,7 @@ export default class KarmaWidget extends StaticComponent {
       this.updateXML()
       this.display()
     })
-    TM.addListener('Controller.BeginChallenge', () => {
+    TM.addListener('Controller.BeginMap', () => {
       this.updateXML()
       this.display()
     })

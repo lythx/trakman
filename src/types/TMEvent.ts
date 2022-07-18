@@ -10,8 +10,8 @@ type TMEvent = StringAutocomplete<
 "Controller.PlayerInfoChanged" | 
 "Controller.ManialinkClick" | 
 "Controller.PlayerCheckpoint" | 
-"Controller.BeginChallenge" | 
-"Controller.EndChallenge" | 
+"Controller.BeginMap" | 
+"Controller.EndMap" | 
 "Controller.DedimaniaRecords" |
 "Controller.DedimaniaRecord" |
 "Controller.KarmaVote" |

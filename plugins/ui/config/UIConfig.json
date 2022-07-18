@@ -325,6 +325,18 @@
             "arrowR"
         ]
     },
+    "bestCps": {
+        "entries": 10,
+        "entryHeight": 1.45,
+        "width": 20,
+        "selfColour": "0F0F",
+        "newestColour": "FF0F",
+        "columnProportions": [
+            1,
+            3,
+            12
+        ]
+    },
     "recordsList": {
         "columnProportions": [
             1,
