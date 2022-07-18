@@ -76,6 +76,10 @@ export default class Paginator {
     })
   }
 
+  resetPlayerPages(): void {
+    this.loginPages.length = 0
+  }
+
   getPageByLogin(login: string): number {
     return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
   }

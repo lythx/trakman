@@ -101,7 +101,6 @@ export class RecordService {
     const finishInfo: FinishInfo = temp
     const localRecord = this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord = this.handleLiveRecord(map, time, date, [...checkpoints], player)
-    Events.emitEvent('Controller.PlayerFinish', finishInfo)
     return { localRecord, finishInfo, liveRecord }
   }
 
