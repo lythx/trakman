@@ -38,7 +38,7 @@ export default class BestCps extends StaticComponent {
     super(IDS.bestCps, 'race')
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
-    this.paginator = new Paginator(this.id, 0, 0, 1)
+    this.paginator = new Paginator(this.id, 0, 0, 0)
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
         this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickName }
@@ -50,7 +50,7 @@ export default class BestCps extends StaticComponent {
     TM.addListener('Controller.BeginMap', (info: BeginMapInfo) => {
       this.newestCp = -1
       this.cpAmount = TM.map.checkpointsAmount - 1
-      this.paginator.updatePageCount(1)
+      this.paginator.updatePageCount(0)
       this.paginator.resetPlayerPages()
       this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
       this.bestCps.length = 0
@@ -85,10 +85,10 @@ export default class BestCps extends StaticComponent {
   }
 
   private constructHeader(page: number, pageCount: number): string {
+    if(pageCount === 0) { return ''}
     let icons: (string | undefined)[] = [this.upIcon, this.downIcon]
     let ids: (number | undefined)[] = [this.paginator.ids[0], this.paginator.ids[1]]
     let buttonAmount = 2
-    console.log(page, pageCount)
     if (page === 1) {
       ids = [undefined, this.paginator.ids[1]]
       icons = [undefined, this.downIcon]
