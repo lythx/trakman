@@ -72,6 +72,7 @@ export default class BestFinishes extends StaticComponent {
   }
 
   private constructHeader(): string {
+    if (this.bestFinishes.length === 0) { return '' }
     return `
     <quad posn="0 0 1" sizen="${this.squareW} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
     <quad posn="${this.iconHPadding} ${-this.iconVPadding} 4" sizen="${this.iconW} ${this.iconH}" image="${this.icon}"/> 

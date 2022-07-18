@@ -10,6 +10,7 @@
     "admin": 400,
     "bestCps": 500,
     "bestFinishes": 600,
+    "runCps": 700,
     "commandList": 1000,
     "TMXWindow": 2000,
     "localCps": 3000,
