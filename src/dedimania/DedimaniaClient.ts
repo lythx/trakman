@@ -2,8 +2,6 @@ import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
 import 'dotenv/config'
-import { ErrorHandler } from '../ErrorHandler.js'
-import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from '../services/JukeboxService.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
@@ -18,9 +16,8 @@ export abstract class DedimaniaClient {
   private static connected: boolean
   private static host: string
   private static port: number
-  private static tryingToReconnect: boolean
 
-  static async connect(host: string, port: number): Promise<void | Error> {
+  static async connect(host: string, port: number): Promise<true | Error> {
     this.host = host
     this.port = port
     this.receivingResponse = false
@@ -29,9 +26,10 @@ export abstract class DedimaniaClient {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
-    const cfg: ServerInfo = ServerConfig.config
     const nextIds: any[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+    if (process.env.SERVER_NATION === undefined) { await Logger.fatal('SERVER_NATION is undefined. Check your .env file') }
+    if (process.env.SERVER_PACKMASK === undefined) { await Logger.fatal('SERVER_PACKMASK is undefined. Check your .env file') }
     const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
       struct: {
         Game: { string: 'TMF' },
@@ -52,24 +50,24 @@ export abstract class DedimaniaClient {
         if (this.response.status === 'completed') {
           this.receivingResponse = false
           if (this.response.isError !== null) {
-            ErrorHandler.error('Dedimania server responded with an error',
+            Logger.error('Dedimania server responded with an error',
               `${this.response.errorString} Code: ${this.response.errorCode}`)
             resolve(new Error(this.response.errorString?.toString()))
           } else {
             if (this.response.sessionId === null) {
-              ErrorHandler.error(`Dedimania server didn't send sessionId`, `Received: ${this.response.data}`)
+              Logger.error(`Dedimania server didn't send sessionId`, `Received: ${this.response.data}`)
               resolve(new Error(`Dedimania server didn't send sessionId`))
               return
             }
             this.sessionId = this.response.sessionId
             this.connected = true
-            resolve()
+            resolve(true)
           }
           return
         }
-        if (Date.now() - 15000 > startDate) { // stop polling after 15 seconds
+        if (Date.now() - 10000 > startDate) { // stop polling after 10 seconds
           this.receivingResponse = false
-          ErrorHandler.error('No response from dedimania server')
+          Logger.error('No response from dedimania server')
           resolve(new Error('No response from dedimania server'))
           return
         }
@@ -84,17 +82,15 @@ export abstract class DedimaniaClient {
       this.response.addData(buffer.toString())
     })
     this.socket.on('error', async err => {
-      ErrorHandler.error('Dedimania socket error:', err.message)
-      if (this.tryingToReconnect === true) { return }
-      this.tryingToReconnect = true
+      Logger.error('Dedimania socket error:', err.message)
+      if (this.connected === false) { return }
       this.connected = false
       Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.error}Failed to connect to Dedimania. Retrying...` }])
-      let status
+      let status: true | Error
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000))
         status = await this.connect(this.host, this.port)
-      } while (status instanceof Error)
-      this.tryingToReconnect = false
+      } while (status !== true)
       Logger.info(`Reconnected to dedimania after socket error`)
       Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.admin}Successfully re-established connection with Dedimania.` }])
     })
@@ -102,8 +98,7 @@ export abstract class DedimaniaClient {
 
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     if (!this.connected) { return new Error('Not connected to dedimania') }
-    // TODO: ensure that if theres 2 responses awaiting (basically never but ye) they get executed in good order
-    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) } // cba just changed to 2 seconds so they dont overlap doesnt matter anyway
+    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) }
     this.receivingResponse = true
     const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
     this.socket.write(request.buffer)
@@ -113,15 +108,15 @@ export abstract class DedimaniaClient {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
-            ErrorHandler.error('Dedimania server responded with an error',
+            Logger.error('Dedimania server responded with an error',
               `${this.response.errorString} Code: ${this.response.errorCode}`)
             resolve(new Error(this.response.errorString?.toString()))
           } else { resolve(this.response.json) }
           this.receivingResponse = false
           return
         }
-        if (Date.now() - 15000 > startDate) { // stop polling after 15 seconds
-          ErrorHandler.error('No response from dedimania server')
+        if (Date.now() - 10000 > startDate) { // stop polling after 10 seconds
+          Logger.error('No response from dedimania server')
           this.connected = false
           this.receivingResponse = false
           resolve(new Error('No response from dedimania server'))

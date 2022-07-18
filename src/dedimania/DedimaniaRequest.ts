@@ -10,14 +10,16 @@ export class DedimaniaRequest {
 
   /**
   * Prepares XML string for a dedimania request.
-  * @param {String} method dedimania method
-  * @param {Object[]} params parameters, each param needs to be under key named after its type
-  * @param {string} sessionKey
+  * @param method dedimania method
+  * @param params parameters
+  * @param sessionKey 
   */
-  constructor(method: string, params: object[], sessionKey?: string) {
+  constructor(method: string, params: CallParams[], sessionKey?: string) {
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
-      xml += `<param><value>${this.handleParamType(param)}</value></param>`
+      const str = this.handleParamType(param)
+      if (str instanceof Error) { throw str }
+      xml += `<param><value>${str}</value></param>`
     }
     xml += '</params></methodCall>'
     const xmlBuffer: Buffer = Buffer.from(xml)
@@ -36,31 +38,45 @@ export class DedimaniaRequest {
     }
   }
 
-  private handleParamType(param: any): any {
-    const type: string = Object.keys(param)[0]
-    switch (Object.keys(param)[0]) {
+  private handleParamType(param: CallParams): string | Error {
+    type Keys = keyof typeof param
+    const type: Keys = Object.keys(param)[0] as Keys
+    const value = param[type]
+    if (value === undefined) {
+      return new Error(`Received undefined while creating dedimania XML request, expected ${type}.`)
+    }
+    switch (type) {
       case 'boolean':
-        return `<boolean>${param[type] === true ? '1' : '0'}</boolean>`
+        return `<boolean>${value === true ? '1' : '0'}</boolean>`
       case 'int':
-        return `<int>${param[type]}</int>`
+        return `<int>${value}</int>`
       case 'double':
-        return `<double>${param[type]}</double>`
+        return `<double>${value}</double>`
       case 'string':
-        return `<string>${this.escapeHtml(param[type])}</string>`
+        if (typeof value !== 'string') {
+          return new Error(`Received ${type} instead of string while creating XML request.`)
+        }
+        return `<string>${this.escapeHtml(value)}</string>`
       case 'base64':
-        return `<base64>${param[type]}</base64>`
+        return `<base64>${value}</base64>`
       case 'array': {
+        if (!Array.isArray(value)) {
+          return new Error(`Received ${type} instead of array while creating XML request.`)
+        }
         let arr: string = '<array><data>'
-        for (const el of param[type]) {
+        for (const el of value) {
           arr += `<value>${this.handleParamType(el)}</value>`
         }
         arr += '</data></array>'
         return arr
       }
       case 'struct': {
+        if (typeof value !== 'object' || Array.isArray(value) || value === null) {
+          return new Error(`Received ${type} instead of object while creating XML request.`)
+        }
         let str: string = '<struct>'
-        for (const key in param[type]) {
-          str += `<member><name>${key}</name><value>${this.handleParamType(param[type][key])}</value></member>`
+        for (const key in value as any) {
+          str += `<member><name>${key}</name><value>${this.handleParamType(value[key])}</value></member>`
         }
         str += '</struct>'
         return str

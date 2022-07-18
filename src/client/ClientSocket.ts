@@ -1,7 +1,7 @@
 import net from 'node:net'
 import { ClientResponse } from './ClientResponse.js'
 import { Events } from '../Events.js'
-import { ErrorHandler } from '../ErrorHandler.js'
+import { Logger } from '../Logger.js'
 
 export class ClientSocket extends net.Socket {
 
@@ -29,7 +29,7 @@ export class ClientSocket extends net.Socket {
         this.handleResponseChunk(buffer)
       }
     })
-    this.on('error', (err: Error): void => ErrorHandler.fatal('Socket error:', err.message))
+    this.on('error', (err: Error): void => void Logger.fatal('Client socket error:', err.message))
   }
 
   /**

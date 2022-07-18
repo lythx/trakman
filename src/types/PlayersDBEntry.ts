@@ -1,10 +1,9 @@
-interface DBPlayerInfo {
+interface PlayersDBEntry {
   readonly login: string
-  readonly nickName: string
+  readonly nickname: string
   readonly nation: string
-  readonly nationCode: string
+  readonly wins: number
   readonly timePlayed: number
   readonly privilege: number
-  readonly wins: number
   readonly visits: number
 }

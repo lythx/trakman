@@ -1,5 +1,4 @@
 import { DedimaniaClient } from '../dedimania/DedimaniaClient.js'
-import { ErrorHandler } from '../ErrorHandler.js'
 import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
@@ -9,35 +8,41 @@ import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from './JukeboxService.js'
 import { Events } from '../Events.js'
+import { Logger } from '../Logger.js'
 
 export abstract class DedimaniaService {
 
   static _dedis: TMDedi[] = []
   static _newDedis: TMDedi[] = []
+  private static readonly dedisAmount = Number(process.env.DEDIS_AMOUNT)
+  private static readonly isActive = process.env.USE_DEDIMANIA === 'YES'
 
-  static async initialize(): Promise<void | Error> {
-    const status: void | Error = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+  static async initialize(): Promise<true | Error> {
+    if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
+    if (this.dedisAmount === NaN) { await Logger.fatal('DEDIS_AMOUNT is undefined or not a number. Check your .env file') }
+    const status: true | Error = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
     if (status instanceof Error) {
-      if (status.message !== 'No response from dedimania server') { ErrorHandler.fatal('Failed to connect to dedimania', status.message) }
+      if (status.message !== 'No response from dedimania server') { await Logger.fatal('Failed to connect to dedimania', status.message) }
+      else {
+        Logger.error(`${status.message}. Attempting to reconnect every 60 seconds...`)
+        void this.reinitialize()
+      }
       return status
     }
     this.updateServerPlayers()
-    const recordStatus: void | Error = await DedimaniaService.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
-    if(!(recordStatus instanceof Error)) {
-      Events.emitEvent('Controller.DedimaniaRecords', this._dedis)
-    }
-    Events.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      void this.playerArrive(info)
-    })
-    Events.addListener('Controller.EndMap', (info: EndMapInfo): void => {
-      void this.sendRecords(info)
-    })
-    Events.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      void this.playerLeave(info)
-    })
-    Events.addListener('Controller.PlayerFinish', (info: FinishInfo): void => {
-      this.addRecord(info)
-    })
+    await this.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
+    return true
+  }
+
+  private static async reinitialize(): Promise<void> {
+    let status: true | Error
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 60000))
+      status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+    } while (status !== true)
+    Logger.info('Initialized dedimania service after an error')
+    this.updateServerPlayers()
+    await this.getRecords(MapService.current.id, MapService.current.name, MapService.current.environment, MapService.current.author)
   }
 
   static get dedis(): TMDedi[] {
@@ -48,11 +53,12 @@ export abstract class DedimaniaService {
     return [...this._newDedis]
   }
 
-  static async getRecords(id: string, name: string, environment: string, author: string, isRetry: boolean = false): Promise<void | Error> {
+  static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
+    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
     this._dedis.length = 0
     this._newDedis.length = 0
     const cfg: ServerInfo = ServerConfig.config
-    const nextIds: any[] = []
+    const nextIds: string[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
     const dedis: any[] | Error = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
@@ -61,7 +67,7 @@ export abstract class DedimaniaService {
         { string: environment },
         { string: author },
         { string: 'TMF' },
-        { int: GameService.gameMode },
+        { int: GameService.game.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
@@ -78,15 +84,13 @@ export abstract class DedimaniaService {
             NextFiveUID: { string: nextIds.join('/') }
           }
         },
-        { int: Number(process.env.DEDIS_AMOUNT) },
+        { int: this.dedisAmount },
         { array: this.getPlayersArray() }
       ])
     if (dedis instanceof Error) {
-      this.retryGetRecords(id, name, environment, author, isRetry)
       return dedis
     }
     else if (dedis?.[0]?.Records === undefined) {
-      this.retryGetRecords(id, name, environment, author, isRetry)
       return new Error(`Failed to fetch records`)
     }
     for (const d of dedis[0].Records) {
@@ -97,22 +101,24 @@ export abstract class DedimaniaService {
     temp.dedis = this._dedis
     const mapDedisInfo: MapDedisInfo = temp
     Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+    return true
   }
 
   private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean): Promise<void> {
     if (isRetry) { return }
     await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
-    ErrorHandler.error(`Failed to fetch dedimania records for map: ${name}`)
+    Logger.error(`Failed to fetch dedimania records for map: ${name}`)
     Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
     let status
     do {
       await new Promise((resolve) => setTimeout(resolve, 10000))
-      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author, true) }
+      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author) }
       else { return }
     } while (status instanceof Error)
   }
 
-  static async sendRecords(info: EndMapInfo): Promise<void> {
+  static async sendRecords(mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> {
+    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
     const recordsArray: any = []
     for (const d of this._newDedis) {
       recordsArray.push(
@@ -127,110 +133,51 @@ export abstract class DedimaniaService {
     }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.ChallengeRaceTimes',
       [
-        { string: info.id },
-        { string: info.name },
-        { string: info.environment },
-        { string: info.author },
+        { string: mapId },
+        { string: name },
+        { string: environment },
+        { string: author },
         { string: 'TMF' },
-        { int: GameService.gameMode },
-        { int: info.checkpointsAmount },
-        { int: Number(process.env.DEDIS_AMOUNT) },
+        { int: GameService.game.gameMode },
+        { int: checkpointsAmount },
+        { int: this.dedisAmount },
         { array: recordsArray }
       ]
     )
-    if (status instanceof Error) { ErrorHandler.error(`Failed to send dedimania records for map ${info.name}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to send dedimania records for map ${name}`, status.message) }
+    return true
   }
 
-  static addRecord(info: FinishInfo): void {
-    const pb: number | undefined = this._dedis.find(a => a.login === info.login)?.time
-    const position: number = this._dedis.filter(a => a.time <= info.time).length + 1
-    if (position > Number(process.env.DEDIS_AMOUNT) || info.time > (pb || Infinity)) { return }
+  static addRecord(mapId: string, player: TMPlayer, time: number, checkpoints: number[]): false | Error | DediRecordInfo {
+    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
+    const pb: number | undefined = this._dedis.find(a => a.login === player.login)?.time
+    const position: number = this._dedis.filter(a => a.time <= time).length + 1
+    if (position > this.dedisAmount || time > (pb ?? Infinity)) { return false }
     if (pb === undefined) {
-      const dediRecordInfo: DediRecordInfo = {
-        map: info.map,
-        login: info.login,
-        time: info.time,
-        checkpoints: info.checkpoints,
-        nickName: info.nickName,
-        nation: info.nation,
-        nationCode: info.nationCode,
-        timePlayed: info.timePlayed,
-        joinTimestamp: info.joinTimestamp,
-        wins: info.wins,
-        privilege: info.privilege,
-        visits: info.visits,
-        position,
-        previousTime: -1,
-        previousPosition: -1,
-        playerId: info.playerId,
-        ip: info.ip,
-        region: info.region,
-        isUnited: info.isUnited
-      }
-      this._dedis.splice(position - 1, 0, { login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
-      this._newDedis.push({ login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
-      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
-      return
+      const dediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      return dediRecordInfo
     }
-    if (info.time === pb) {
-      const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === info.login)?.login) + 1
-      const dediRecordInfo: DediRecordInfo = {
-        map: info.map,
-        login: info.login,
-        time: info.time,
-        checkpoints: info.checkpoints,
-        nickName: info.nickName,
-        nation: info.nation,
-        nationCode: info.nationCode,
-        timePlayed: info.timePlayed,
-        joinTimestamp: info.joinTimestamp,
-        wins: info.wins,
-        privilege: info.privilege,
-        visits: info.visits,
-        position: previousPosition,
-        previousTime: info.time,
-        previousPosition,
-        playerId: info.playerId,
-        ip: info.ip,
-        region: info.region,
-        isUnited: info.isUnited
-      }
-      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
-      return
+    if (time === pb) {
+      const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login) + 1
+      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, position, previousPosition)
+      return dediRecordInfo
     }
-    if (info.time < pb) {
-      const previousTime: number | undefined = this._dedis.find(a => a.login === info.login)?.time
+    if (time < pb) {
+      const previousTime: number | undefined = this._dedis.find(a => a.login === player.login)?.time
       if (previousTime === undefined) {
-        ErrorHandler.error(`Can't find player ${info.login} in memory`)
-        return
+        Logger.error(`Can't find player ${player.login} in memory`)
+        return new Error(`Can't find player ${player.login} in memory`)
       }
-      const dediRecordInfo: DediRecordInfo = {
-        map: info.map,
-        login: info.login,
-        time: info.time,
-        checkpoints: info.checkpoints,
-        nickName: info.nickName,
-        nation: info.nation,
-        nationCode: info.nationCode,
-        timePlayed: info.timePlayed,
-        joinTimestamp: info.joinTimestamp,
-        wins: info.wins,
-        privilege: info.privilege,
-        visits: info.visits,
-        position,
-        previousTime: previousTime,
-        previousPosition: this._dedis.findIndex(a => a.login === info.login) + 1,
-        playerId: info.playerId,
-        ip: info.ip,
-        region: info.region,
-        isUnited: info.isUnited
-      }
-      this._dedis = this._dedis.filter(a => a.login !== info.login)
-      this._dedis.splice(position - 1, 0, { login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
-      this._newDedis = this._newDedis.filter(a => a.login !== info.login)
-      this._newDedis.push({ login: info.login, time: info.time, nickName: info.nickName, checkpoints: [...info.checkpoints] })
-      Events.emitEvent('Controller.DedimaniaRecord', dediRecordInfo)
+      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, previousTime, position, this._dedis.findIndex(a => a.login === player.login) + 1)
+      this._dedis = this._dedis.filter(a => a.login !== player.login)
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._newDedis = this._newDedis.filter(a => a.login !== player.login)
+      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      return dediRecordInfo
     }
+    return false
   }
 
   private static updateServerPlayers(): void {
@@ -261,36 +208,36 @@ export abstract class DedimaniaService {
           { array: this.getPlayersArray() }
         ]
       )
-      if (status instanceof Error) { ErrorHandler.error('Failed to update dedimania status', status.message) }
+      if (status instanceof Error) { Logger.error('Failed to update dedimania status', status.message) }
     }, 240000)
   }
 
-  private static async playerArrive(info: JoinInfo): Promise<void> {
+  static async playerJoin(login: string, nickname: string, region: string, isSpectator: boolean): Promise<void> {
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
       [
         { string: 'TMF' },
-        { string: info.login },
-        { string: info.nickName },
-        { string: info.nationCode },
+        { string: login },
+        { string: nickname },
+        { string: region },
         { string: '' }, // TEAMNAME
         { int: 0 }, // TODO: PLAYER LADDER RANK
-        { boolean: info.isSpectator },
+        { boolean: isSpectator },
         { boolean: false } // OFFICIAL MODE ALWAYS FALSE
       ]
     )
-    if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to update dedimania player information for ${login}`, status.message) }
   }
 
-  private static async playerLeave(info: LeaveInfo): Promise<void> {
+  static async playerLeave(login: string): Promise<void> {
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
       [
         { string: 'TMF' },
-        { string: info.login }
+        { string: login }
       ])
-    if (status instanceof Error) { ErrorHandler.error(`Failed to update player information for ${info.login}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to update player information for ${login}`, status.message) }
   }
 
-  static getPlayersArray(): any[] {
+  private static getPlayersArray(): any[] {
     const players: TMPlayer[] = PlayerService.players
     let arr: any[] = []
     for (const player of players) {
@@ -312,4 +259,30 @@ export abstract class DedimaniaService {
     }
     return arr
   }
+
+  private static constructRecordObject(player: TMPlayer, mapId: string, 
+    checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): DediRecordInfo {
+    return {
+      map: mapId,
+      login: player.login,
+      time,
+      checkpoints,
+      nickName: player.nickName,
+      nation: player.nation,
+      nationCode: player.nationCode,
+      timePlayed: player.timePlayed,
+      joinTimestamp: player.joinTimestamp,
+      wins: player.wins,
+      privilege: player.privilege,
+      visits: player.visits,
+      position,
+      previousTime,
+      previousPosition,
+      playerId: player.playerId,
+      ip: player.ip,
+      region: player.region,
+      isUnited: player.isUnited
+    }
+  }
+
 }

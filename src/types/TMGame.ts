@@ -22,4 +22,4 @@ interface TMGame {
   cupRoundsPerMap: number
   cupWinnersNo: number
   cupWarmUpDuration: number
-}
+} 

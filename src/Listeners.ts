@@ -13,6 +13,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
+import { Logger } from './Logger.js'
 
 export class Listeners {
   private static readonly listeners: TMListener[] = [
@@ -26,7 +27,7 @@ export class Listeners {
         }
         const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         if (playerInfo instanceof Error) {
-          ErrorHandler.error(`Failed to get player ${params[0]} info`, playerInfo.message)
+          Logger.error(`Failed to get player ${params[0]} info`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
@@ -38,42 +39,72 @@ export class Listeners {
           { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
           return
         }
-        await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
+        const joinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
-        await RecordService.fetchRecord(params[0].UId, params[0].Login)
+        Events.emitEvent('Controller.PlayerJoin', joinInfo)
+        // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
+        void DedimaniaService.playerJoin(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1])
       }
     },
     {
       event: 'TrackMania.PlayerDisconnect',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = Login
-        await PlayerService.leave(params[0])
+        if (AdministrationService.banlist.some(a => a.login === params[0]) || AdministrationService.blacklist.some(a => a.login === params[0])) {
+          return
+        }
+        const leaveInfo = PlayerService.leave(params[0])
+        if (!(leaveInfo instanceof Error)) {
+          Events.emitEvent('Controller.PlayerLeave', leaveInfo)
+        }
+        // Dedimania playerleave is just api info update irrelevant for controller hence its after the event
+        void DedimaniaService.playerLeave(params[0])
       }
     },
     {
       event: 'TrackMania.PlayerChat',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCmd
         if (params[0] === 0) { // Ignore server messages
           return
         }
-        await ChatService.add(params[1], params[2])
+        const messageInfo = ChatService.add(params[1], params[2])
+        if (!(messageInfo instanceof Error)) {
+          Events.emitEvent('Controller.PlayerChat', messageInfo)
+        }
       }
     },
     {
       event: 'TrackMania.PlayerCheckpoint',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
-        if (params[0] === 0) { // Ignore inexistent people
-          return
-        }
-        const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        const isFinish = PlayerService.addCP(params[1], checkpoint)
-        if (isFinish === true) {
+        if (params[0] === 0) { // Ignore inexistent people //please elaborate
           return
         }
         const player = PlayerService.getPlayer(params[1])
-        if (player === undefined) { return }
+        if (player === undefined) {
+          Logger.error(`Can't find player ${params[1]} in memory on checkpoint event`)
+          return
+        }
+        const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
+        const isFinish = PlayerService.addCP(player, checkpoint)
+        if (isFinish === true) {
+          const obj = RecordService.add(MapService.current.id, player, checkpoint.time)
+          if (obj !== false) {
+            const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
+            Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
+            if (obj.localRecord !== undefined) {
+              Events.emitEvent('Controller.PlayerRecord', obj.localRecord)
+            }
+            if (obj.liveRecord !== undefined) {
+              Events.emitEvent('Controller.LiveRecord', obj.liveRecord)
+            }
+            if (!(dediRecord instanceof Error) && dediRecord !== false) {
+              Events.emitEvent('Controller.DedimaniaRecord', dediRecord)
+            }
+          }
+          return
+        }
         const info: CheckpointInfo = {
           time: params[2],
           lap: params[3],
@@ -87,46 +118,46 @@ export class Listeners {
       event: 'TrackMania.PlayerFinish',
       callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
-        if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
-          return
-        }
-        if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
-          // reset cps
-          // PlayerService.getPlayer(params[1]).checkpoints.length = 0
-          return
-        }
-        const status: any[] | Error = await Client.call('GetStatus') // seems kinda useless innit
-        if (status instanceof Error) {
-          ErrorHandler.error('Failed to get game status', status.message)
-          return
-        }
-        if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
-          // fun fact this is probably impossible to even get :D
-          // return
-        }
+        // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
+        //   return
+        // }
+        // if (params[2] === 0) { // IGNORE THIS IS JUST A FUNNY BACKSPACE PRESS
+        //   // reset cps
+        //   // PlayerService.getPlayer(params[1]).checkpoints.length = 0
+        //   return
+        // }
+        // const status: any[] | Error = await Client.call('GetStatus') // seems kinda useless innit
+        // if (status instanceof Error) {
+        //   Logger.error('Failed to get game status', status.message)
+        //   return
+        // }
+        // if (status[0].Code !== 4) { // CHECK FOR GAME STATUS TO BE RUNNING - PLAY (code 4)
+        //   // fun fact this is probably impossible to even get :D
+        //   // return
+        // }
       }
     },
     {
       event: 'TrackMania.BeginRace',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = Challenge
       }
     },
     {
       event: 'TrackMania.EndRace',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = Rankings[arr], [1] = Challenge
       }
     },
     {
       event: 'TrackMania.BeginRound',
-      callback: async (): Promise<void> => {
+      callback: (): void => {
         // No params, rounds mode only
       }
     },
     {
       event: 'TrackMania.EndRound',
-      callback: async (): Promise<void> => {
+      callback: (): void => {
         // No params, rounds mode only
       }
     },
@@ -134,8 +165,7 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
-        await ServerConfig.update()
-        await GameService.initialize()
+        await GameService.update()
         await RecordService.fetchRecords(params[0].UId)
         await MapService.setCurrent()
         const c: any = params[0]
@@ -165,7 +195,7 @@ export class Listeners {
         }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginMap', info)
-        if (process.env.USE_DEDIMANIA === 'YES') { await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author) }
+        await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
       }
     },
     {
@@ -178,12 +208,13 @@ export class Listeners {
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]
         const endMapInfo: EndMapInfo = temp
+        await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         Events.emitEvent('Controller.EndMap', endMapInfo)
       }
     },
     {
       event: 'TrackMania.StatusChanged',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
         // Handle server changing status, e.g. from Sync to Play
@@ -193,7 +224,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerManialinkPageAnswer',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         const temp: any = PlayerService.getPlayer(params[1])
         temp.answer = params[2]
@@ -203,7 +234,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BillUpdated',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
         const bill: BillUpdatedInfo = {
           id: params[0],
@@ -216,14 +247,14 @@ export class Listeners {
     },
     {
       event: 'TrackMania.ChallengeListModified',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         Client.callNoRes('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
       }
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
-      callback: async (params: any[]): Promise<void> => {
+      callback: (params: any[]): void => {
         // [0] = PlayerInfo
         const spec: any = params[0].SpectatorStatus.toString()
         const flags: any = params[0].Flags.toString()
@@ -275,9 +306,13 @@ export class Listeners {
     }
   ]
 
-  static initialize(): void {
+  static async initialize(): Promise<true | Error> {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
+    const cb: any[] | Error = await Client.call('EnableCallbacks', [
+      { boolean: true }
+    ])
+    return cb instanceof Error ? cb : true
   }
 }
