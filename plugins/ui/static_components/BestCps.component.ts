@@ -20,7 +20,7 @@ export default class BestCps extends StaticComponent {
   private readonly bg = CONFIG.static.bgColor
   private readonly headerBg = CONFIG.staticHeader.bgColor
   private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly contentHeight = CONFIG.bestCps.height - (this.margin + this.headerHeight)
+  private readonly contentHeight = this.height - (this.margin + this.headerHeight)
   private readonly squareW = CONFIG.staticHeader.squareWidth
   private readonly iconW = CONFIG.staticHeader.iconWidth
   private readonly iconH = CONFIG.staticHeader.iconHeight
