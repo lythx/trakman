@@ -177,7 +177,7 @@ export class PlayerService {
   /**
    * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    */
-  static addCP(player: TMPlayer, cp: TMCheckpoint): boolean {
+  static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
     let laps
     if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
       laps = 1
@@ -195,7 +195,7 @@ export class PlayerService {
       player.checkpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.checkpoints.length === 0) { return false } // handle people passing some cps before controller start
+    if (player.checkpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
     const endLap: number = player.checkpoints[0].lap + laps
     if (cp.lap < endLap) {
       player.checkpoints.push(cp)

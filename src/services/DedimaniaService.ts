@@ -213,6 +213,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerJoin(login: string, nickname: string, region: string, isSpectator: boolean): Promise<void> {
+    if(this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
       [
         { string: 'TMF' },
@@ -229,6 +230,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerLeave(login: string): Promise<void> {
+    if(this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
       [
         { string: 'TMF' },

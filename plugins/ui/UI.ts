@@ -16,6 +16,7 @@ import TMXRanking from './static_components/TMXRanking.component.js'
 import AdminPanel from './static_components/AdminPanel.component.js'
 import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/BestCps.component.js'
+import BestFinishes from './static_components/BestFinishes.component.js'
 
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
@@ -64,6 +65,7 @@ let staticComponents: {
   readonly adminPanel: AdminPanel
   readonly donationPanel: DonationPanel
   readonly bestCps: BestCps
+  readonly bestFinishes: BestFinishes
 } 
 
 let dynamicComponents: {
@@ -101,7 +103,8 @@ const events: TMListener[] = [
         tmxRanking: new TMXRanking(),
         adminPanel: new AdminPanel(),
         donationPanel: new DonationPanel(),
-        bestCps: new BestCps()
+        bestCps: new BestCps(),
+        bestFinishes: new BestFinishes()
       }
       for (const c of Object.values(staticComponents)) { await c.display() }
       dynamicComponents = {
