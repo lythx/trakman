@@ -11,18 +11,83 @@ export default class VisitorAmount extends StaticComponent {
   private readonly iconData: { icon: string, text1: string, text2: string, iconWidth: number, iconHeight: number, padding: number, equalTexts?: true, actionId?: number, link?: string }[] = []
   private xml: string = ''
   private readonly grid: Grid
-  private skipCost = CONFIG.buttons.paySkip.costs[0]
-  private resCost = CONFIG.buttons.payRes.costs[0]
+  private readonly config = CONFIG.buttons
+  private readonly skipCost = this.config.paySkip.cost
+  private resCost = this.config.payRes.costs[0]
 
   constructor() {
-    super(IDS.buttons, 'race')
+    super(IDS.buttons, { displayOnRace: true, hideOnResult: true })
     this.width = CONFIG.static.width
-    this.height = CONFIG.buttons.height
+    this.height = this.config.height
     this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('buttons')
     this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height + CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+  }
+
+  async display(): Promise<void> {
+    if (this.xml === '') { await this.initialize() }
+    this.constructXml()
+    this._isDisplayed = true
+    TM.sendManialink(this.xml)
+  }
+
+
+  displayToPlayer(login: string): void {
+    TM.sendManialink(this.xml, login)
+  }
+
+  private constructXml(): void {
+    const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
+    const marginSmall: number = CONFIG.static.marginSmall
+    for (const e of this.iconData) {
+      arr.push((i: number, j: number, w: number, h: number): string => constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
+    }
+    this.xml = `<manialink id="${this.id}">
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        ${this.grid.constructXml(arr)}
+      </frame>
+    </manialink>`
+  }
+
+  private pollTimeUpdate(timeString: string) {
+    setInterval(() => {
+      const newTimeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
+      if (timeString !== newTimeString) {
+        timeString = newTimeString
+        if (this._isDisplayed === true) {
+          const cfg = this.config.time
+          this.iconData[cfg.index].text1 = timeString
+          void this.display()
+        }
+      }
+    }, 1000)
+  }
+
+  private updatePlayerCount() {
+    const players = TM.players
+    this.iconData[this.config.players.index].text1 = `${players.filter(a => a.isSpectator === true).length} SPECS`
+    this.iconData[this.config.players.index].text2 = `${players.filter(a => a.isSpectator === false).length} PLAYERS`
+  }
+
+  private setupListeners() {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+      this.updatePlayerCount()
+      if (info.visits === 0) {
+        const prevAmount = Number(this.iconData[this.config.visitors.index].text1)
+        this.iconData[this.config.visitors.index].text1 = (prevAmount + 1).toString()
+      }
+      if (this._isDisplayed === true) { void this.display() }
+    })
+    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+      this.updatePlayerCount()
+      if (this._isDisplayed === true) { void this.display() }
+    })
+    TM.addListener('Controller.PlayerInfoChanged', () => {
+      this.updatePlayerCount()
+      if (this._isDisplayed === true) { void this.display() }
+    })
     TM.addListener('Controller.BeginMap', (info: BeginMapInfo) => {
-      const cfg = CONFIG.buttons.payRes
+      const cfg = this.config.payRes
       if (this.resCost !== -1) {
         this.iconData[cfg.index] = {
           icon: stringToObjectProperty(cfg.icon, ICONS),
@@ -43,46 +108,62 @@ export default class VisitorAmount extends StaticComponent {
           padding: cfg.padding,
           equalTexts: true
         }
+        this.iconData[this.config.paySkip.index].text1 = this.config.paySkip.title1.replace(/\$COST\$/, this.skipCost.toString())
+        this.iconData[this.config.paySkip.index].text2 = this.config.paySkip.title2
+        this.iconData[this.config.paySkip.index].actionId = this.id + 3
+        this.iconData[this.config.paySkip.index].equalTexts = undefined
       }
-      this.constructXml()
-      this.display()
+      if (this._isDisplayed === true) { void this.display() }
     })
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
       switch (info.answer - this.id) {
         case 1:
           break
-        case 2:
+        case 2: this.onResVoteButtonClick(info.login, info.nickName)
           break
-        case 3:
+        case 3: this.onSkipButtonClick(info.login, info.nickName)
           break
         case 4: this.onResButtonClick(info.login, info.nickName)
       }
     })
+    TM.addListener('Controller.MapAdded', () => {
+      this.iconData[this.config.maps.index].text1 = (TM.maps.length).toString()
+    })
+    TM.addListener('Controller.MapRemoved', () => {
+      this.iconData[this.config.maps.index].text1 = (TM.maps.length).toString()
+    })
   }
 
-  async display(): Promise<void> {
-    if (this.xml === '') {
-      await this.initialize()
+  private onResVoteButtonClick(login: string, nickname: string) {
+
+  }
+
+  private onSkipButtonClick = async (login: string, nickname: string): Promise<void> => {
+    const res = await TM.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
+    if (res instanceof Error) {
+      TM.sendMessage(`${TM.palette.error}Failed to pay for map skip.`)
+    } else if (res === true) {
+      const cfg = this.config.paySkip
+      let countDown = cfg.timeout
+      const startTime = Date.now()
+      TM.sendMessage(`${nickname}$z$s${TM.palette.donation} paid ${this.resCost} to skip the ongoing map. Skipping in ${countDown}`)
+      TM.addToJukebox(TM.map.id, login)
+      this.iconData[cfg.index].text1 = cfg.title3
+      this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
+      if (this._isDisplayed === true) { await this.display() }
+      const interval = setInterval(async () => {
+        if (Date.now() > startTime + 1000 * (cfg.timeout - countDown)) { // TODO HANDLE CHALLENGE ENDING BEFORE COUNTDOWN
+          countDown--
+          this.iconData[cfg.index].text1 = cfg.title3
+          this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
+          if (this._isDisplayed === true) { await this.display() }
+          if (countDown === 0) {
+            TM.callNoRes('NextChallenge')
+            clearInterval(interval)
+          }
+        }
+      }, 100)
     }
-    this._isDisplayed = true
-    TM.sendManialink(this.xml)
-  }
-
-  displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
-  }
-
-  private constructXml(): void {
-    const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
-    const marginSmall: number = CONFIG.static.marginSmall
-    for (const e of this.iconData) {
-      arr.push((i: number, j: number, w: number, h: number): string => constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall, h - marginSmall, e.iconWidth, e.iconHeight, e.padding, { equalTexts: e.equalTexts, actionId: e.actionId, link: e.link }))
-    }
-    this.xml = `<manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} 1">
-        ${this.grid.constructXml(arr)}
-      </frame>
-    </manialink>`
   }
 
   private onResButtonClick = async (login: string, nickname: string): Promise<void> => {
@@ -92,18 +173,16 @@ export default class VisitorAmount extends StaticComponent {
     } else if (res === true) {
       TM.sendMessage(`${nickname}$s$z${TM.palette.donation} paid ${this.resCost} to restart the ongoing map.`)
       TM.addToJukebox(TM.map.id, login)
-      this.resCost = CONFIG.buttons.payRes.costs[CONFIG.buttons.payRes.costs.indexOf(this.resCost) + 1] ?? -1
-      const cfg = CONFIG.buttons.payRes
-      this.iconData[cfg.index] = {
-        icon: stringToObjectProperty(cfg.icon, ICONS),
-        text1: cfg.title5,
-        text2: cfg.title6,
-        iconWidth: cfg.width,
-        iconHeight: cfg.height,
-        padding: cfg.padding
-      }
-      this.constructXml()
-      this.display()
+      this.resCost = this.config.payRes.costs[this.config.payRes.costs.indexOf(this.resCost) + 1] ?? -1
+      const cfg = this.config.payRes
+      this.iconData[cfg.index].text1 = cfg.title5
+      this.iconData[cfg.index].text2 = cfg.title6
+      this.iconData[cfg.index].actionId = undefined
+      this.iconData[this.config.paySkip.index].text1 = this.config.paySkip.title5
+      this.iconData[this.config.paySkip.index].text2 = this.config.paySkip.title6
+      this.iconData[this.config.paySkip.index].equalTexts = true
+      this.iconData[this.config.paySkip.index].actionId = undefined
+      if (this._isDisplayed === true) { void this.display() }
     }
   }
 
@@ -113,7 +192,7 @@ export default class VisitorAmount extends StaticComponent {
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
-    const cfg = CONFIG.buttons
+    const cfg = this.config
     this.iconData[cfg.visitors.index] = {
       icon: stringToObjectProperty(cfg.visitors.icon, ICONS),
       text1: res[0].count,
@@ -144,9 +223,10 @@ export default class VisitorAmount extends StaticComponent {
       padding: cfg.version.padding,
     }
     // Time
+    const timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
     this.iconData[cfg.time.index] = {
       icon: stringToObjectProperty(cfg.time.icon, ICONS),
-      text1: `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`,
+      text1: timeString,
       text2: cfg.time.title,
       iconWidth: cfg.time.width,
       iconHeight: cfg.time.height,
@@ -235,7 +315,8 @@ export default class VisitorAmount extends StaticComponent {
       padding: cfg.payRes.padding,
       actionId: this.id + 4
     }
-    this.constructXml()
+    this.pollTimeUpdate(timeString)
+    this.setupListeners()
   }
 
 }

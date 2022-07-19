@@ -15,7 +15,7 @@ export default class KarmaWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.karma, 'race')
+    super(IDS.karma, { displayOnRace: true, hideOnResult: true })
     this.width = CONFIG.static.width
     this.height = CONFIG.karma.height
     this.positionX = CONFIG.static.leftPosition

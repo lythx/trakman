@@ -31,7 +31,7 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(IDS.bestFinishes, 'race')
+    super(IDS.bestFinishes, { displayOnRace: true, hideOnResult: true })
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
     TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
       let index = this.bestFinishes.findIndex(a => a.time > info.time)

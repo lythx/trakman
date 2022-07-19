@@ -132,14 +132,14 @@ const stringToObjectProperty = (str: string, obj: any): any => {
 const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number, iconHeight: number, topPadding: number,
   options?: { equalTexts?: true, actionId?: number, link?: string }): string => {
   const t1: string = options?.equalTexts ?
-    horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.43, padding: 0.6 }) :
-    horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.52, padding: 0.6 })
+    horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.36, padding: 0.6 }) :
+    horizontallyCenteredText(text1, width, height, { yOffset: 2.2, textScale: 0.5, padding: 0.6 })
   const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
   const link: string = options?.link === undefined ? '' : `url="${options.link}"`
   return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${CONFIG.staticHeader.bgColor}" ${actionId} ${link}/>
   <quad posn="${(width - iconWidth) / 2} ${-topPadding} 5" sizen="${iconWidth} ${iconHeight}" image="${iconUrl}"/>
   ${t1}
-  ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.43, padding: 0.6 })}`
+  ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.36, padding: 0.6 })}`
 }
 
 const closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {

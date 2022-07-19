@@ -11,7 +11,7 @@ export default class AdminPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.admin, 'race')
+    super(IDS.admin, { displayOnRace: true, hideOnResult: true })
     this.width = CONFIG.static.width
     this.height = CONFIG.admin.height
     this.positionX = CONFIG.static.leftPosition

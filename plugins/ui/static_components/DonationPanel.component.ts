@@ -14,7 +14,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.liveCheckpoint, 'race')
+    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
     this.positionY = calculateStaticPositionY('donationPanel')
     this.constructXML()
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
