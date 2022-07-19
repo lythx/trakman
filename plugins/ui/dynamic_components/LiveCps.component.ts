@@ -8,7 +8,7 @@ export default class LiveCps extends PopupWindow {
   private readonly startCellsOnNextPages: number = 1
   private readonly startCellWidth: number = 2
   private readonly cpsOnFirstPage: number = CONFIG.liveCps.cpsOnFirstPage
-  private readonly cpsOnNextPages: number = CONFIG.liveCps.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
+  private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
   private readonly entries: number = CONFIG.liveCps.entries
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator

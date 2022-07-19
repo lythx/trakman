@@ -14,7 +14,7 @@ export default class MapWidget extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(IDS.map, 'race')
+    super(IDS.map, { displayOnRace: true, hideOnResult: true })
     this.width = CFG.static.width
     // Here height is 4 headers instead of config height
     // To set correct height in config after changing header height copy this.height from debbuger / console.log()

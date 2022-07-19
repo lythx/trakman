@@ -284,11 +284,15 @@ export const TRAKMAN = {
   /**
    * Adds a map to the server
    * @param filename Path to the map file
-   * @param adminLogin Login of the player who is adding the map
+   * @param callerLogin Login of the player who is adding the map
    * @returns Added map object or error if unsuccessful
    */
-  async addMap(filename: string, adminLogin?: string): Promise<TMMap | Error> {
-    return await MapService.add(filename, adminLogin)
+  async addMap(filename: string, callerLogin?: string): Promise<TMMap | Error> {
+    return await MapService.add(filename, callerLogin)
+  },
+
+  async removeMap(id: string, callerLogin?: string): Promise<boolean | Error> {
+    return await MapService.remove(id, callerLogin)
   },
 
   /**

@@ -76,7 +76,7 @@ export class MapService {
     await this.repo.add(...mapsNotInDBInfo)
   }
 
-  static async add(fileName: string, adminLogin?: string): Promise<TMMap | Error> {
+  static async add(fileName: string, callerLogin?: string): Promise<TMMap | Error> {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }
     if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
@@ -85,15 +85,36 @@ export class MapService {
     const obj: TMMap = this.constructNewMapObject(res[0])
     this._maps.push(obj)
     void this.repo.add(obj)
-    if (adminLogin !== undefined) {
-      Logger.info(`Player ${adminLogin} added map ${obj.name} by ${obj.author}`)
+    if (callerLogin !== undefined) {
+      Logger.info(`Player ${callerLogin} added map ${obj.name} by ${obj.author}`)
     } else {
       Logger.info(`Map ${obj.name} by ${obj.author} added`)
     }
     const temp: any = obj
-    temp.callerLogin = adminLogin
+    temp.callerLogin = callerLogin
     Events.emitEvent('Controller.MapAdded', temp as MapAddedInfo)
     return obj
+  }
+
+  static async remove(id: string, callerLogin?: string): Promise<boolean | Error> {
+    const map = this._maps.find(a => id === a.fileName)
+    if(map === undefined) {
+      return false
+    }
+    const insert: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
+    if (insert instanceof Error) { return insert }
+    if (insert[0] === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
+    this._maps.splice(this._maps.findIndex(a => a.id === id), 1)
+    // void this.repo.remove(fileName) TODO IMPLEMENT REMOVAL AFTER REWRITING DB
+    if (callerLogin !== undefined) {
+      Logger.info(`Player ${callerLogin} removed map ${map.name} by ${map.author}`)
+    } else {
+      Logger.info(`Map ${map.name} by ${map.author} removed`)
+    }
+    const temp: any = map
+    temp.callerLogin = callerLogin
+    Events.emitEvent('Controller.MapRemoved', temp as MapRemovedInfo)
+    return true
   }
 
   static async setNextMap(id: string): Promise<true | Error> {

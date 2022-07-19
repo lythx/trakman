@@ -13,7 +13,7 @@ export default class LiveRanking extends StaticComponent {
   private readonly maxRecords: number = 250
 
   constructor() {
-    super(IDS.live, 'race')
+    super(IDS.live, { displayOnRace: true, hideOnResult: true })
     this.height = CONFIG.live.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.live.side
