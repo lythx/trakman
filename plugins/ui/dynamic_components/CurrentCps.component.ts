@@ -35,14 +35,14 @@ export default class CurrentCps extends PopupWindow {
       const pb = TM.getPlayerRecord(info.player.login)
       if (currentCp === undefined) { // Add a player to array if he wasn't there
         this.currentCheckpoints.push({
-          nickname: info.player.nickName,
+          nickname: info.player.nickname,
           login: info.player.login,
           checkpoint: info.time,
           pbCheckpoint: pb?.checkpoints?.[info.index] ?? undefined,
           pbTime: pb?.time ?? undefined
         })
       } else { // Update object in array if player was in it
-        currentCp.nickname = info.player.nickName
+        currentCp.nickname = info.player.nickname
         currentCp.checkpoint = info.time
         currentCp.pbCheckpoint = pb?.checkpoints?.[info.index] ?? undefined
         currentCp.pbTime = pb?.time ?? undefined

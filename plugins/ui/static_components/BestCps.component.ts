@@ -41,7 +41,7 @@ export default class BestCps extends StaticComponent {
     this.paginator = new Paginator(this.id, 0, 0, 0)
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
-        this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickName }
+        this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickname }
         this.paginator.updatePageCount(Math.ceil(this.bestCps.length / this.entries))
         this.newestCp = info.index
         this.display()

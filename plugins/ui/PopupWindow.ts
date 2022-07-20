@@ -118,12 +118,12 @@ export default abstract class PopupWindow extends DynamicComponent {
     return ret
   }
 
-  protected abstract constructContent(login: string, params: any): string
+  protected abstract constructContent(login: string, params: any): string | Promise<string>
 
   protected abstract constructFooter(login: string, params: any): string
 
-  displayToPlayer(login: string, params?: any, topRightText?: string): void {
-    const content: string = this.constructContent(login, params)
+  async displayToPlayer(login: string, params?: any, topRightText?: string): Promise<void> {
+    const content: string = await this.constructContent(login, params)
     const footer: string = this.constructFooter(login, params)
     const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
     if (index !== -1) {

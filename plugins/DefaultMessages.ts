@@ -54,7 +54,7 @@ const events: TMListener[] = [
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
-        + `${TM.strip(player.nickName, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
+        + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
     }
   },

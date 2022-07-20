@@ -76,7 +76,7 @@ export class PlayerService {
     if (playerData === undefined) {
       player = {
         login,
-        nickName,
+        nickname: nickName,
         nation,
         nationCode,
         timePlayed: 0,
@@ -95,7 +95,7 @@ export class PlayerService {
     } else {
       player = {
         login,
-        nickName,
+        nickname: nickName,
         nation,
         nationCode,
         timePlayed: Number(playerData.timeplayed),
@@ -119,7 +119,7 @@ export class PlayerService {
     }
     if (serverStart === undefined) {
       Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits}, ` +
-        `nickname: ${player.nickName}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
+        `nickname: ${player.nickname}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
   }
@@ -139,7 +139,7 @@ export class PlayerService {
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
       login: player.login,
-      nickName: player.nickName,
+      nickName: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: totalTimePlayed,

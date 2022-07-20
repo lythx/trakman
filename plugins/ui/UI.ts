@@ -32,8 +32,10 @@ import MapList from './dynamic_components/MapList.component.js'
 import DonationPanel from './static_components/DonationPanel.component.js'
 import PlayerList from './dynamic_components/PlayerList.component.js'
 import BanList from './dynamic_components/BanList.component.js'
+import BlackListList from './dynamic_components/BlacklistList.component.js'
 import TestWindow from './test_widgets/TestWindow.js'
 import PopupWindow from './PopupWindow.js'
+import GuestListList from './dynamic_components/GuestlistList.component.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -80,6 +82,8 @@ let dynamicComponents: {
   readonly currentCps: CurrentCps
   readonly playerList: PlayerList
   readonly banList: BanList
+  readonly blacklistList: BlackListList
+  readonly guestlistList: GuestListList
 } 
 
 const events: TMListener[] = [
@@ -118,7 +122,9 @@ const events: TMListener[] = [
         liveSectors: new LiveSectors(),
         currentCps: new CurrentCps(),
         playerList: new PlayerList(),
-        banList: new BanList()
+        banList: new BanList(),
+        blacklistList: new BlackListList(),
+        guestlistList: new GuestListList()
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {
