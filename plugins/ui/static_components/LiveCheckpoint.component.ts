@@ -21,7 +21,7 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   constructor() {
-    super(IDS.liveCheckpoint, 'race')
+    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
     this.positionY = calculateStaticPositionY('liveCheckpoint')
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
       const pb: TMRecord | undefined = TM.getPlayerRecord(info.player.login)

@@ -94,7 +94,7 @@ export abstract class DedimaniaService {
       return new Error(`Failed to fetch records`)
     }
     for (const d of dedis[0].Records) {
-      const record: TMDedi = { login: d.Login, nickName: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
+      const record: TMDedi = { login: d.Login, nickname: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
       this._dedis.push(record)
     }
     const temp: any = MapService.current
@@ -102,19 +102,6 @@ export abstract class DedimaniaService {
     const mapDedisInfo: MapDedisInfo = temp
     Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
     return true
-  }
-
-  private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean): Promise<void> {
-    if (isRetry) { return }
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
-    Logger.error(`Failed to fetch dedimania records for map: ${name}`)
-    Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
-    let status
-    do {
-      await new Promise((resolve) => setTimeout(resolve, 10000))
-      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author) }
-      else { return }
-    } while (status instanceof Error)
   }
 
   static async sendRecords(mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> {
@@ -155,13 +142,13 @@ export abstract class DedimaniaService {
     if (position > this.dedisAmount || time > (pb ?? Infinity)) { return false }
     if (pb === undefined) {
       const dediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
-      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
-      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+      this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       return dediRecordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login) + 1
-      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, position, previousPosition)
+      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, previousPosition, previousPosition)
       return dediRecordInfo
     }
     if (time < pb) {
@@ -172,9 +159,9 @@ export abstract class DedimaniaService {
       }
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, previousTime, position, this._dedis.findIndex(a => a.login === player.login) + 1)
       this._dedis = this._dedis.filter(a => a.login !== player.login)
-      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this._newDedis = this._newDedis.filter(a => a.login !== player.login)
-      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       return dediRecordInfo
     }
     return false
@@ -213,6 +200,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerJoin(login: string, nickname: string, region: string, isSpectator: boolean): Promise<void> {
+    if(this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
       [
         { string: 'TMF' },
@@ -229,6 +217,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerLeave(login: string): Promise<void> {
+    if(this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
       [
         { string: 'TMF' },
@@ -267,7 +256,7 @@ export abstract class DedimaniaService {
       login: player.login,
       time,
       checkpoints,
-      nickName: player.nickName,
+      nickname: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: player.timePlayed,

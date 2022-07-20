@@ -13,7 +13,7 @@ export default class LocalRanking extends StaticComponent {
   private readonly maxRecords: number = Number(process.env.LOCALS_AMOUNT)
 
   constructor() {
-    super(IDS.locals, 'race')
+    super(IDS.locals, { displayOnRace: true, hideOnResult: true })
     this.height = CONFIG.locals.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.locals.side
@@ -48,7 +48,7 @@ export default class LocalRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS), true)}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickName, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })))}
         </frame>
       </frame>
     </manialink>`,

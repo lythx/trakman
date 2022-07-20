@@ -76,8 +76,24 @@ export default class Paginator {
     })
   }
 
+  resetPlayerPages(): void {
+    this.loginPages.length = 0
+  }
+
   getPageByLogin(login: string): number {
     return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
+  }
+
+  setPageForLogin(login: string, page: number): number {
+    const loginPage = this.loginPages.find(a => a.login === login)
+    if (page > this.pageCount) { page = this.pageCount }
+    if (page < 1) { page = 1 }
+    if (loginPage === undefined) {
+      this.loginPages.push({ login, page })
+    } else {
+      loginPage.page = page
+    }
+    return page
   }
 
   updatePageCount(pageCount: number): void {

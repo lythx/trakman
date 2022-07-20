@@ -15,6 +15,9 @@ import ButtonsWidget from './static_components/ButtonsWidget.component.js'
 import TMXRanking from './static_components/TMXRanking.component.js'
 import AdminPanel from './static_components/AdminPanel.component.js'
 import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
+import BestCps from './static_components/BestCps.component.js'
+import BestFinishes from './static_components/BestFinishes.component.js'
+
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
 //import TMXWindow from './dynamic_components/TMXWindow.component.js'
@@ -29,8 +32,10 @@ import MapList from './dynamic_components/MapList.component.js'
 import DonationPanel from './static_components/DonationPanel.component.js'
 import PlayerList from './dynamic_components/PlayerList.component.js'
 import BanList from './dynamic_components/BanList.component.js'
+import BlackListList from './dynamic_components/BlacklistList.component.js'
 import TestWindow from './test_widgets/TestWindow.js'
 import PopupWindow from './PopupWindow.js'
+import GuestListList from './dynamic_components/GuestlistList.component.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -49,32 +54,36 @@ const loadMod = (): void => {
 }
 
 let staticComponents: {
-  rankWidget: RankWidget
-  dediRanking: DediRanking
-  mapWidget: MapWidget
-  previousAndBest: PreviousAndBest
-  karmaWidget: KarmaWidget
-  timerWidget: TimerWidget
-  localRanking: LocalRanking
-  liveRanking: LiveRanking
-  buttonsWidget: ButtonsWidget
-  tmxRanking: TMXRanking
-  adminPanel: AdminPanel
-  donationPanel: DonationPanel
-}
+  readonly rankWidget: RankWidget
+  readonly dediRanking: DediRanking
+  readonly mapWidget: MapWidget
+  readonly previousAndBest: PreviousAndBest
+  readonly karmaWidget: KarmaWidget
+  readonly timerWidget: TimerWidget
+  readonly localRanking: LocalRanking
+  readonly liveRanking: LiveRanking
+  readonly buttonsWidget: ButtonsWidget
+  readonly tmxRanking: TMXRanking
+  readonly adminPanel: AdminPanel
+  readonly donationPanel: DonationPanel
+  readonly bestCps: BestCps
+  readonly bestFinishes: BestFinishes
+} 
 
 let dynamicComponents: {
-  mapList: MapList
-  commandList: CommandList
-  dediCps: DediCps
-  liveCps: LiveCps
-  localCps: LocalCps
-  dediSectors: DediSectors
-  localSectors: LocalSectors
-  liveSectors: LiveSectors
-  currentCps: CurrentCps
-  playerList: PlayerList
-  banList: BanList
+  readonly mapList: MapList
+  readonly commandList: CommandList
+  readonly dediCps: DediCps
+  readonly liveCps: LiveCps
+  readonly localCps: LocalCps
+  readonly dediSectors: DediSectors
+  readonly localSectors: LocalSectors
+  readonly liveSectors: LiveSectors
+  readonly currentCps: CurrentCps
+  readonly playerList: PlayerList
+  readonly banList: BanList
+  readonly blacklistList: BlackListList
+  readonly guestlistList: GuestListList
 } 
 
 const events: TMListener[] = [
@@ -97,7 +106,9 @@ const events: TMListener[] = [
         buttonsWidget: new ButtonsWidget(),
         tmxRanking: new TMXRanking(),
         adminPanel: new AdminPanel(),
-        donationPanel: new DonationPanel()
+        donationPanel: new DonationPanel(),
+        bestCps: new BestCps(),
+        bestFinishes: new BestFinishes()
       }
       for (const c of Object.values(staticComponents)) { await c.display() }
       dynamicComponents = {
@@ -111,7 +122,9 @@ const events: TMListener[] = [
         liveSectors: new LiveSectors(),
         currentCps: new CurrentCps(),
         playerList: new PlayerList(),
-        banList: new BanList()
+        banList: new BanList(),
+        blacklistList: new BlackListList(),
+        guestlistList: new GuestListList()
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {

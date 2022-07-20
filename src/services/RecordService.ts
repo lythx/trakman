@@ -43,7 +43,7 @@ export class RecordService {
         date: records[i].date,
         checkpoints: records[i].checkpoints,
         position: i + 1,
-        nickName: player.nickname,
+        nickname: player.nickname,
         nation: player.nation,
         nationCode: player.nation, // TODO: fix nation code or just dont store it idk (its not in db)
         privilege: player.privilege,
@@ -101,7 +101,6 @@ export class RecordService {
     const finishInfo: FinishInfo = temp
     const localRecord = this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord = this.handleLiveRecord(map, time, date, [...checkpoints], player)
-    Events.emitEvent('Controller.PlayerFinish', finishInfo)
     return { localRecord, finishInfo, liveRecord }
   }
 
@@ -212,7 +211,7 @@ export class RecordService {
       time,
       date,
       checkpoints,
-      nickName: player.nickName,
+      nickname: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: player.timePlayed,

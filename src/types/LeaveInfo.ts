@@ -1,6 +1,6 @@
 interface LeaveInfo {
   readonly login: string
-  readonly nickName: string
+  readonly nickname: string
   readonly nation: string
   readonly nationCode: string
   readonly timePlayed: number

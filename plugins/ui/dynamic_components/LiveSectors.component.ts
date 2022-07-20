@@ -71,7 +71,7 @@ export default class LiveSectors extends PopupWindow {
     const cpTypes = getCpTypes(sectors)
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(CONFIG.static.format + TM.strip(params.records[i + n].nickName, false), w, h)
+      return centeredText(CONFIG.static.format + TM.strip(params.records[i + n].nickname, false), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }

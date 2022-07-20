@@ -2,7 +2,7 @@ interface MessageInfo {
   readonly id: string
   readonly login: string
   readonly text: string
-  readonly nickName: string
+  readonly nickname: string
   readonly nation: string
   readonly nationCode: string
   readonly wins: number

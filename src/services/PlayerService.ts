@@ -76,7 +76,7 @@ export class PlayerService {
     if (playerData === undefined) {
       player = {
         login,
-        nickName,
+        nickname: nickName,
         nation,
         nationCode,
         timePlayed: 0,
@@ -95,7 +95,7 @@ export class PlayerService {
     } else {
       player = {
         login,
-        nickName,
+        nickname: nickName,
         nation,
         nationCode,
         timePlayed: Number(playerData.timeplayed),
@@ -118,8 +118,8 @@ export class PlayerService {
       this.newOwnerLogin = null
     }
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits},` +
-        `nickname: ${player.nickName}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
+      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits}, ` +
+        `nickname: ${player.nickname}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
   }
@@ -139,7 +139,7 @@ export class PlayerService {
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
       login: player.login,
-      nickName: player.nickName,
+      nickname: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: totalTimePlayed,
@@ -177,7 +177,7 @@ export class PlayerService {
   /**
    * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    */
-  static addCP(player: TMPlayer, cp: TMCheckpoint): boolean {
+  static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
     let laps
     if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
       laps = 1
@@ -195,7 +195,7 @@ export class PlayerService {
       player.checkpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.checkpoints.length === 0) { return false } // handle people passing some cps before controller start
+    if (player.checkpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
     const endLap: number = player.checkpoints[0].lap + laps
     if (cp.lap < endLap) {
       player.checkpoints.push(cp)
