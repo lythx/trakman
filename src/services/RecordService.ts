@@ -211,7 +211,7 @@ export class RecordService {
       time,
       date,
       checkpoints,
-      nickName: player.nickName,
+      nickName: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: player.timePlayed,

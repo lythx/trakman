@@ -28,5 +28,7 @@
     "currentCps": 80000,
     "donationPanel": 120000,
     "playerList": 130000,
-    "banList": 140000
+    "banList": 140000,
+    "blacklistList": 150000,
+    "guestlistList": 160000
 }

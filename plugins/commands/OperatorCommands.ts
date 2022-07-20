@@ -173,7 +173,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.${reasonString}`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.${reasonString}`
         }]
       },
         {
@@ -209,7 +209,7 @@ const commands: TMCommand[] = [
       const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has muted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
     },
     privilege: 2
   },
@@ -237,7 +237,7 @@ const commands: TMCommand[] = [
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unmuted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -257,7 +257,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into specmode.`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
         }]
       },
         {
@@ -287,7 +287,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into playermode.`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into playermode.`
         }]
       },
         {
@@ -387,7 +387,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['players', 'playerlist'],
-    help: 'Display list of players',
+    help: 'Display list of players.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.playerList, info.login)
     },
@@ -395,12 +395,28 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['banlist'],
-    help: 'Display list of banned players',
+    help: 'Display list of banned players.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.banList, info.login)
     },
     privilege: 1
-  }
+  },
+  {
+    aliases: ['bll, blacklists'],
+    help: 'Display list of blackisted players.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.blacklistList, info.login)
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['gl', 'guestlist'],
+    help: 'Display list of players in the guestlist.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.guestlistList, info.login)
+    },
+    privilege: 1
+  },
 ]
 
 for (const command of commands) { TM.addCommand(command) }

@@ -581,13 +581,15 @@
     ]
   },
   "banList": {
-    "title": "Banned players ",
+    "title": " Banned Players ",
     "icon": "X",
     "entries": 15,
     "columnProportions": [
       2,
       2,
-      3
+      2,
+      3,
+      1
     ],
     "navbar": [
       "blacklistList",
@@ -600,5 +602,37 @@
     "height": 10,
     "iconRed": "chart.dedi",
     "iconGreen": "chart.locals"
+  },
+  "blacklistList": {
+    "title": " Blacklisted Players ",
+    "icon": "X",
+    "entries": 15,
+    "columnProportions": [
+      2,
+      2,
+      2,
+      3,
+      1
+    ],
+    "navbar": [
+      "banList",
+      "guestlistList"
+    ]
+  },
+  "guestlistList": {
+    "title": " Guests ",
+    "icon": "X",
+    "entries": 15,
+    "columnProportions": [
+      2,
+      2,
+      3,
+      2,
+      1
+    ],
+    "navbar": [
+      "banList",
+      "blacklistList"
+    ]
   }
 }
