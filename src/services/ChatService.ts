@@ -164,7 +164,7 @@ export abstract class ChatService {
       id: message.id,
       login,
       text,
-      nickName: player.nickName,
+      nickName: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       wins: player.wins,
