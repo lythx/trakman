@@ -246,7 +246,6 @@ export default class VisitorAmount extends StaticComponent {
     const cfg = this.config
     if (this.resCosts[this.resCostIndex] !== undefined) {
       // If map wasn't resd
-      console.log(this.isRes, this.lastMapRes)
       if (this.isRes === false && this.lastMapRes === false) {
         // Vote to skip
         this.iconData[cfg.voteSkip.index] = {
