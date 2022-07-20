@@ -61,7 +61,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerLeave',
     callback: async (player: LeaveInfo): Promise<void> => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(player.nickName, true)}${TM.palette.servermsg} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(player.nickname, true)}${TM.palette.servermsg} `
         + `has quit after ${TM.palette.highlight + TM.msToTime(player.sessionTime)}${TM.palette.servermsg}.`)
     }
   },
@@ -88,7 +88,7 @@ const events: TMListener[] = [
           }
         }
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.record} has `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.record} has `
         + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.record} `
         + `local record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.time)}`
         + `${rs.calcDiff ? ` ${TM.palette.record}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.record})` : ``}`)
@@ -117,7 +117,7 @@ const events: TMListener[] = [
           }
         }
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.dedirecord} has `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.dedirecord} has `
         + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.dedirecord} `
         + `dedimania record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.time)}`
         + `${rs.calcDiff ? ` ${TM.palette.dedirecord}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.dedirecord})` : ``}`)

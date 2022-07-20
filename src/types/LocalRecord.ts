@@ -4,7 +4,7 @@ interface LocalRecord {
   readonly time: number
   readonly date: Date
   readonly checkpoints: number[]
-  readonly nickName: string
+  readonly nickname: string
   readonly nation: string
   readonly nationCode: string
   readonly timePlayed: number

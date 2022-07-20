@@ -48,7 +48,7 @@ export default class LiveRanking extends StaticComponent {
       <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.live.title, stringToObjectProperty(CONFIG.live.icon, ICONS), true)}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.liveRecords.map(a => ({ name: a.nickName, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, TM.liveRecords.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
         </frame>
       </frame>
     </manialink>`,

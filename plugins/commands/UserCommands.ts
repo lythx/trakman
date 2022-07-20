@@ -20,7 +20,7 @@ const commands: TMCommand[] = [
     help: 'Greet a certain someone.',
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Hey, ${name || 'everyone'}!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Hey, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -28,7 +28,7 @@ const commands: TMCommand[] = [
     aliases: ['bb', 'bye'],
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Goodbye, ${name || 'everyone'}!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Goodbye, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -37,7 +37,7 @@ const commands: TMCommand[] = [
     help: 'Express your gratitude.',
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Thanks, ${name || 'everyone'}!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Thanks, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -46,7 +46,7 @@ const commands: TMCommand[] = [
     help: 'Inform others that you\'ve enjoyed the race.',
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Good game, ${name || 'everyone'}!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Good game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -55,7 +55,7 @@ const commands: TMCommand[] = [
     help: 'Allow others to find out about your disenjoyment of the round.',
     params: [{ name: 'name', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Bad game, ${name || 'everyone'}!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Bad game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -63,7 +63,7 @@ const commands: TMCommand[] = [
     aliases: ['bgm'],
     help: 'Let others know you didn\'t do your best.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Bad game for me! :,(`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Bad game for me! :,(`)
     },
     privilege: 0
   },
@@ -71,7 +71,7 @@ const commands: TMCommand[] = [
     aliases: ['brb'],
     help: 'Notify people of your potential absence.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] Be right back!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Be right back!`)
     },
     privilege: 0
   },
@@ -91,7 +91,7 @@ const commands: TMCommand[] = [
         {
           method: 'ChatSendServerMessage',
           params: [{
-            string: `$g[${info.nickName}$z$s$g] Away from keyboard!`
+            string: `$g[${info.nickname}$z$s$g] Away from keyboard!`
           }]
         })
       await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
@@ -104,7 +104,7 @@ const commands: TMCommand[] = [
     help: 'Express the deep emotions hidden within your sinful soul.',
     params: [{ name: 'thoughts', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, thoughts?: string): void => {
-      TM.sendMessage(`$i${info.nickName}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
+      TM.sendMessage(`$i${info.nickname}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
   },
@@ -112,7 +112,7 @@ const commands: TMCommand[] = [
     aliases: ['lol'],
     help: 'Indicate your amusement.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] LoL!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoL!`)
     },
     privilege: 0
   },
@@ -120,7 +120,7 @@ const commands: TMCommand[] = [
     aliases: ['lool'],
     help: 'Indicate your excess amusement.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoL!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoL!`)
     },
     privilege: 0
   },
@@ -128,7 +128,7 @@ const commands: TMCommand[] = [
     aliases: ['loool'],
     help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickName}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
   },
@@ -237,7 +237,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
+      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickname}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
   },
@@ -285,7 +285,7 @@ TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
-      + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.karma} has voted `
+      + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.karma} has voted `
       + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
     void TM.addVote(TM.map.id, info.login, playerVote as any)
   }

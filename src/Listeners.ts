@@ -261,7 +261,7 @@ export class Listeners {
         const flags: any = params[0].Flags.toString()
         const info: InfoChangedInfo = {
           login: params[0].Login,
-          nickName: params[0].NickName,
+          nickname: params[0].NickName,
           id: params[0].PlayerId,
           teamId: params[0].TeamId,
           ladderRanking: params[0].LadderRanking,

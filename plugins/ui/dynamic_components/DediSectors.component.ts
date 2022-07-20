@@ -47,7 +47,7 @@ export default class DediSectors extends PopupWindow {
     for (const e of records) {
       secRecords.push({
         login: e.login,
-        nickName: e.nickName,
+        nickname: e.nickname,
         time: e.time,
         checkpoints: [...e.checkpoints, e.time].reduce((acc: number[], cur, i, arr) => i === 0 ? [cur] : [...acc, cur - arr[i - 1]], [])
       })
@@ -58,7 +58,7 @@ export default class DediSectors extends PopupWindow {
     const entriesToDisplay = secRecords.length - (playerIndex + 1)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.strip(secRecords[i + playerIndex].nickName, false), w, h)
+      return centeredText(CONFIG.static.format + TM.strip(secRecords[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
