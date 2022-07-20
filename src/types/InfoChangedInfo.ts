@@ -1,6 +1,6 @@
 interface InfoChangedInfo {
   readonly login: string
-  readonly nickName: string
+  readonly nickname: string
   readonly id: number
   readonly teamId: number
   readonly ladderRanking: number

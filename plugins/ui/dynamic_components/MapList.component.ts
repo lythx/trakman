@@ -37,7 +37,7 @@ export default class MapList extends PopupWindow {
           TM.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
           return
         }
-        this.handleMapClick(challengeId, info.login, info.nickName)
+        this.handleMapClick(challengeId, info.login, info.nickname)
         const page = this.paginator.getPageByLogin(info.login)
         let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
         if (pageCount === 0) { pageCount++ }

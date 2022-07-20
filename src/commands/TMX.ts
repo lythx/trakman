@@ -48,7 +48,7 @@ const command: TMCommand = {
       return
     }
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
-      `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued ` +
+      `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued ` +
       `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
   },
   privilege: 1

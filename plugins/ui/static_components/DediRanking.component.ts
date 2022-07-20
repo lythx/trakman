@@ -51,7 +51,7 @@ export default class DediRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.dedis.title, stringToObjectProperty(CONFIG.dedis.icon, ICONS), false)}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.dediRecords.map(a => ({ ...a, name: a.nickName })))}
+          ${this.recordList.constructXml(login, TM.dediRecords.map(a => ({ ...a, name: a.nickname })))}
         </frame>
       </frame>
     </manialink>`,

@@ -139,7 +139,7 @@ export class PlayerService {
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
       login: player.login,
-      nickName: player.nickname,
+      nickname: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: totalTimePlayed,

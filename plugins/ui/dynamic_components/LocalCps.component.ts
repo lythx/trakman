@@ -49,7 +49,7 @@ export default class LocalCps extends PopupWindow {
     const entriesToDisplay = records.length - (playerIndex + 1)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.strip(records[i + playerIndex].nickName, false), w, h)
+      return centeredText(CONFIG.static.format + TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {

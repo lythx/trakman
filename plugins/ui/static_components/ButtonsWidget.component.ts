@@ -103,13 +103,13 @@ export default class VisitorAmount extends StaticComponent {
     })
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
       switch (info.answer - this.id) {
-        case 1: this.onSkipVoteButtonClick(info.login, info.nickName)
+        case 1: this.onSkipVoteButtonClick(info.login, info.nickname)
           break
-        case 2: this.onResVoteButtonClick(info.login, info.nickName)
+        case 2: this.onResVoteButtonClick(info.login, info.nickname)
           break
-        case 3: this.onSkipButtonClick(info.login, info.nickName)
+        case 3: this.onSkipButtonClick(info.login, info.nickname)
           break
-        case 4: this.onResButtonClick(info.login, info.nickName)
+        case 4: this.onResButtonClick(info.login, info.nickname)
       }
     })
     TM.addListener('Controller.MapAdded', () => {

@@ -37,7 +37,7 @@ export default class BestFinishes extends StaticComponent {
       let index = this.bestFinishes.findIndex(a => a.time > info.time)
       if (index === -1) { index = this.bestFinishes.length }
       if (index < this.entries) {
-        this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickName })
+        this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickname })
         this.bestFinishes.length = Math.min(this.entries, this.bestFinishes.length)
         this.newestFinish = index
         this.display()
