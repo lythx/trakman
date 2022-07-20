@@ -12,5 +12,10 @@
         "jumpForwards": 7
     },
     "DropdownMenu": 8,
-    "ClearAlerts": 9
+    "ClearAlerts": 9,
+    "VoteWindow": {
+        "window": 10,
+        "voteNo": 11,
+        "voteYes": 12
+    }
 }

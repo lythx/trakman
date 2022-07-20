@@ -5,10 +5,10 @@ import { CONFIG, IDS, Grid, centeredText, verticallyCenteredText, stringToObject
 export default class BestFinishes extends StaticComponent {
 
   private readonly margin = CONFIG.static.marginSmall
-  private readonly width = CONFIG.bestFinishes.width
+  private readonly width = CONFIG.static.width
   private readonly title = CONFIG.bestFinishes.title
   private readonly height = CONFIG.bestFinishes.height
-  private readonly positionX = CONFIG.static.rightPosition - (CONFIG.static.marginBig + CONFIG.bestFinishes.width)
+  private readonly positionX = CONFIG.static.rightPosition - (CONFIG.static.marginBig + this.width)
   private readonly positionY = CONFIG.static.topBorder
   private readonly entries = CONFIG.bestFinishes.entries
   private readonly bestFinishes: { login: string, time: number, nickname: string }[] = []
@@ -101,7 +101,7 @@ export default class BestFinishes extends StaticComponent {
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (this.bestFinishes[i] === undefined ? '' : verticallyCenteredText(TM.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
+      return this.bestFinishes[i] === undefined ? '' : bg + (verticallyCenteredText(TM.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []

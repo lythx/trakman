@@ -18,6 +18,7 @@ export class ClientSocket extends net.Socket {
   */
   setupListeners(): void {
     this.on('data', (buffer: Buffer): void => {
+      // TODO FIX THE SERVER NOT SPLITTING THE 1ST CHUNK
       // handshake header has no id so it has to be treated differently from normal data
       if (this.handshakeHeaderSize === 0) {
         this.setHandshakeHeaderSize(buffer)
