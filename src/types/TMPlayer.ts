@@ -1,7 +1,7 @@
 interface TMPlayer {
   readonly playerId: number
   readonly login: string
-  readonly nickName: string
+  readonly nickname: string
   readonly nation: string
   readonly nationCode: string
   readonly region: string

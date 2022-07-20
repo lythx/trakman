@@ -8,7 +8,7 @@ export default class LiveCps extends PopupWindow {
   private readonly startCellsOnNextPages: number = 1
   private readonly startCellWidth: number = 2
   private readonly cpsOnFirstPage: number = CONFIG.liveCps.cpsOnFirstPage
-  private readonly cpsOnNextPages: number = CONFIG.liveCps.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
+  private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
   private readonly entries: number = CONFIG.liveCps.entries
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
@@ -49,7 +49,7 @@ export default class LiveCps extends PopupWindow {
     const entriesToDisplay = records.length - (playerIndex + 1)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.strip(records[i + playerIndex].nickName, false), w, h)
+      return centeredText(CONFIG.static.format + TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {

@@ -284,11 +284,15 @@ export const TRAKMAN = {
   /**
    * Adds a map to the server
    * @param filename Path to the map file
-   * @param adminLogin Login of the player who is adding the map
+   * @param callerLogin Login of the player who is adding the map
    * @returns Added map object or error if unsuccessful
    */
-  async addMap(filename: string, adminLogin?: string): Promise<TMMap | Error> {
-    return await MapService.add(filename, adminLogin)
+  async addMap(filename: string, callerLogin?: string): Promise<TMMap | Error> {
+    return await MapService.add(filename, callerLogin)
+  },
+
+  async removeMap(id: string, callerLogin?: string): Promise<boolean | Error> {
+    return await MapService.remove(id, callerLogin)
   },
 
   /**
@@ -356,22 +360,22 @@ export const TRAKMAN = {
    * Adds a map to the queue
    * @param mapId Map UID
    */
-  addToJukebox(mapId: string, callerLogin: string): void {
-    JukeboxService.add(mapId, callerLogin)
+  addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
+    JukeboxService.add(mapId, callerLogin, setAsNextMap)
   },
 
   /**
    * Removes a map from the queue
    * @param mapId Map UID
    */
-  removeFromJukebox(mapId: string, callerLogin: string): void {
+  removeFromJukebox(mapId: string, callerLogin?: string): void {
     JukeboxService.remove(mapId, callerLogin)
   },
 
   /**
    * Removes all maps from jukebox
    */
-  clearJukebox(callerLogin: string): void {
+  clearJukebox(callerLogin?: string): void {
     JukeboxService.clear(callerLogin)
   },
 
@@ -432,7 +436,7 @@ export const TRAKMAN = {
    * Removes a player from the server ban list
    * @param login Player login
    */
-  removeFromBanlist: (login: string, callerLogin: string): boolean => {
+  removeFromBanlist: (login: string, callerLogin?: string): boolean => {
     return AdministrationService.removeFromBanlist(login, callerLogin)
   },
 
@@ -451,7 +455,7 @@ export const TRAKMAN = {
    * Removes a player from the server blacklist
    * @param login Player login
    */
-  removeFromBlacklist: (login: string, callerLogin: string): boolean => {
+  removeFromBlacklist: (login: string, callerLogin?: string): boolean => {
     return AdministrationService.removeFromBlacklist(login, callerLogin)
   },
 
@@ -487,7 +491,7 @@ export const TRAKMAN = {
    * Removes a player from the server guest list
    * @param login Player login
    */
-  removeFromGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
+  removeFromGuestlist: async (login: string, callerLogin?: string): Promise<boolean | Error> => {
     return await AdministrationService.removeFromGuestlist(login, callerLogin)
   },
 
@@ -571,7 +575,7 @@ export const TRAKMAN = {
    * @returns Possibly matching login or undefined if unsuccessful
    */
   nicknameToLogin(nickName: string): string | undefined {
-    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickName).toLowerCase() }))
+    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickname).toLowerCase() }))
     const strippedNicknames: { nickname: string, login: string }[] = []
     for (const e of nicknames) {
       strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })

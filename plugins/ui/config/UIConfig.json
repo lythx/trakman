@@ -1,504 +1,638 @@
 {
-    "customUi": {
-        "notice": false,
-        "challengeInfo": false,
-        "netInfo": true,
-        "chat": true,
-        "checkpointList": true,
-        "roundScores": true,
-        "scoreTable": true,
-        "global": true
-    },
-    "static": {
-        "format": "$s",
-        "width": 14.65,
-        "topBorder": 47.85,
-        "rightPosition": 49.13,
-        "leftPosition": -63.75,
-        "bgColor": "0006",
-        "marginBig": 0.27,
-        "marginSmall": 0.15,
-        "rightSideOrder": [
-            "map",
-            "previousAndBest",
-            "tmx",
-            "timer",
-            "locals",
-            "live",
-            "donationPanel"
-        ],
-        "leftSideOrder": [
-            "buttons",
-            "rank",
-            "karma",
-            "dedis",
-            "admin"
-        ]
-    },
-    "staticHeader": {
-        "format": "$s",
-        "bgColor": "000a",
-        "iconBgColor": "000a",
-        "textScale": 1,
-        "squareWidth": 1.7,
-        "rectangleWidth": 12.8,
-        "height": 2.17,
-        "margin": 0.15,
-        "verticalPadding": 0.3,
-        "horizontalPadding": 0.5,
-        "iconWidth": 1.55,
-        "iconHeight": 2,
-        "iconHorizontalPadding": 0.075,
-        "iconVerticalPadding": 0.1
-    },
-    "popup": {
-        "headerBg": "000C",
-        "bg": "000C",
-        "margin": 0.15,
-        "titleHeight": 5
-    },
-    "grid": {
-        "bg": "9996",
-        "margin": 0.15,
-        "headerBg": "333C"
-    },
-    "closeButton": {
-        "buttonWidth": 3,
-        "buttonHeight": 3,
-        "icon": "X",
-        "iconHover": "X",
-        "padding": 0.2,
-        "background": "000D"
-    },
-    "paginator": {
-        "buttonWidth": 3,
-        "buttonHeight": 3,
-        "margin": 0.4,
-        "padding": 0.2,
-        "background": "000D"
-    },
-    "map": {
-        "height": 9.13,
-        "side": true,
-        "title": "Ongoing",
-        "icons": [
-            "map.white",
-            "nametag.white",
-            "person.white",
-            "timer.author",
-            "tools"
-        ],
-        "textScale": 1,
-        "noDateText": "N/A",
-        "titles": {
-            "lastTrack": "Last Map",
-            "currTrack": "Ongoing",
-            "nextTrack": "Next Map"
-        }
-    },
-    "previousAndBest": {
-        "height": 4.95,
-        "side": true
-    },
-    "karma": {
-        "height": 8.8,
-        "side": false,
-        "title": "Karma",
-        "icon": "karmaStats"
-    },
-    "timer": {
-        "height": 6.45,
-        "side": true,
-        "title": "Timer",
-        "icon": "clock",
-        "hourglassOverlay": "hourglass"
-    },
-    "locals": {
-        "height": 34.12,
-        "side": true,
-        "title": "Local Records",
-        "icon": "chart.locals",
-        "entries": 15,
-        "columnProportions": [
-            1,
-            1,
-            2.8,
-            4
-        ],
-        "topCount": 5,
-        "displayNoRecordEntry": true
-    },
-    "live": {
-        "height": 15.07,
-        "side": true,
-        "title": "Live Records",
-        "icon": "chart.live",
-        "entries": 6,
-        "columnProportions": [
-            1,
-            1,
-            2.8,
-            4
-        ],
-        "topCount": 3,
-        "displayNoRecordEntry": true
-    },
-    "buttons": {
-        "height": 14.5,
-        "side": false,
-        "visitors": {
-            "index": 0,
-            "title": "VISITORS",
-            "icon": "people",
-            "width": 3.2,
-            "height": 3.4,
-            "padding": -0.5
-        },
-        "players": {
-            "index": 1,
-            "title1": "SPECS",
-            "title2": "PLAYERS",
-            "icon": "people",
-            "width": 3.2,
-            "height": 3.4,
-            "padding": -0.5
-        },
-        "version": {
-            "index": 2,
-            "title": "VERSION",
-            "icon": "git",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.3
-        },
-        "time": {
-            "index": 3,
-            "title": "TIME",
-            "icon": "clock",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "maps": {
-            "index": 4,
-            "title": "MAPS",
-            "icon": "numberedList",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "stats": {
-            "index": 5,
-            "title1": "PLAYER",
-            "title2": "STATS",
-            "icon": "stats",
-            "width": 1.9,
-            "height": 1.9,
-            "padding": 0.2
-        },
-        "sectorRecords": {
-            "index": 6,
-            "title1": "SECTOR",
-            "title2": "RECORDS",
-            "icon": "timeList",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "github": {
-            "index": 7,
-            "title1": "GITHUB",
-            "title2": "REPO",
-            "icon": "github",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "voteSkip": {
-            "index": 8,
-            "title1": "VOTE",
-            "title2": "TO $F00SKIP",
-            "icon": "vote.skip",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "voteRes": {
-            "index": 9,
-            "title1": "VOTE",
-            "title2": "TO $0F0RES",
-            "icon": "vote.replay",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2
-        },
-        "paySkip": {
-            "index": 10,
-            "title1": "PAY $F00$COST$",
-            "title2": "TO $F00SKIP",
-            "icon": "pay.skip",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2,
-            "costs": [
-                2,
-                3,
-                4
-            ]
-        },
-        "payRes": {
-            "index": 11,
-            "title1": "PAY $0F0$COST$",
-            "title2": "TO $0F0RES",
-            "title3": "$0F0RES$z$s LIMIT",
-            "title4": "REACHED",
-            "title5": "MAP IS",
-            "title6": "$0F0REPLAYED",
-            "icon": "pay.replay",
-            "width": 1.8,
-            "height": 1.8,
-            "padding": 0.2,
-            "costs": [
-                1,
-                2,
-                3
-            ]
-        }
-    },
-    "rank": {
-        "height": 3.8,
-        "side": false
-    },
-    "dedis": {
-        "height": 34.12,
-        "side": false,
-        "title": "Dedi Records",
-        "icon": "chart.dedi",
-        "entries": 15,
-        "columnProportions": [
-            1,
-            2.8,
-            4,
-            1
-        ],
-        "markers": {
-            "you": "arrowDoubleL",
-            "faster": "person.orange",
-            "slower": "person.green"
-        },
-        "topCount": 5,
-        "displayNoRecordEntry": true
-    },
-    "tmx": {
-        "height": 8.68,
-        "side": true,
-        "title": "TMX Records",
-        "icon": "mxLogo",
-        "entries": 3,
-        "columnProportions": [
-            1,
-            1,
-            2.8,
-            4
-        ],
-        "topCount": 3,
-        "downloadIcon": "timer.download",
-        "displayNoRecordEntry": false
-    },
-    "liveCheckpoint": {
-        "height": 6,
-        "title": "Live Checkpoint",
-        "side": true,
-        "icon": "clock"
-    },
-    "admin": {
-        "height": 5,
-        "side": false,
-        "title": "Admin Panel",
-        "icon": "chart.dedi",
-        "icons": [
-            "person",
-            "",
-            "",
-            "arrowL",
-            "restart",
-            "arrowR"
-        ]
-    },
-    "recordsList": {
-        "columnProportions": [
-            1,
-            2.8,
-            4
-        ],
-        "markerWidth": 1.7,
-        "columnGap": 0.15,
-        "rowGap": 0.15,
-        "downloadIcon": "timer.download",
-        "iconVerticalPadding": 0.15,
-        "iconHorizontalPadding": 0.15,
-        "markersLeft": {
-            "you": "arrowDoubleL",
-            "faster": "person.orange",
-            "slower": "person.green"
-        },
-        "markersRight": {
-            "you": "arrowDoubleR",
-            "faster": "person.orange",
-            "slower": "person.green"
-        },
-        "timeColours": {
-            "slower": "CCCF",
-            "faster": "F00F",
-            "you": "3F5F",
-            "top": "FF0F"
-        },
-        "info": {
-            "iconWidth": 1.7,
-            "columns": 5,
-            "columnWidth": 3,
-            "bgColor": "0009",
-            "icon": "info"
-        }
-    },
-    "dediCps": {
-        "entries": 15,
-        "cpsPerPage": 10,
-        "icon": "chart.dedi",
-        "title": "Dedi Checkpoints",
-        "selfColour": "0F0F",
-        "paginatorOffset": 14.9
-    },
-    "dediSectors": {
-        "entries": 15,
-        "cpsPerPage": 10,
-        "icon": "chart.dedi",
-        "title": "Dedi Sectors",
-        "selfColour": "0F0F",
-        "paginatorOffset": 14.9
-    },
-    "liveCps": {
-        "entries": 15,
-        "cpsOnFirstPage": 10,
-        "icon": "chart.live",
-        "title": "Live Checkpoints",
-        "selfColour": "0F0F",
-        "cpColours": {
-            "best": "0F0F",
-            "worst": "F00F",
-            "equal": "FF0F"
-        },
-        "navbar": [
-            "liveSectors",
-            "dediCps",
-            "dediSectors",
-            "localCps",
-            "localSectors"
-        ],
-        "cpPaginatorMargin": 0.25
-    },
-    "liveSectors": {
-        "entries": 15,
-        "cpsPerPage": 10,
-        "icon": "chart.live",
-        "title": "Live Sectors",
-        "selfColour": "0F0F",
-        "paginatorOffset": 14.9
-    },
-    "localCps": {
-        "entries": 15,
-        "cpsPerPage": 8,
-        "icon": "chart.local",
-        "title": "Local Checkpoints",
-        "selfColour": "0F0F",
-        "paginatorOffset": 14.9
-    },
-    "localSectors": {
-        "entries": 15,
-        "cpsPerPage": 8,
-        "icon": "chart.local",
-        "title": "Local Sectors",
-        "selfColour": "0F0F",
-        "paginatorOffset": 14.9
-    },
-    "recordInfo": {
-        "minColumns": 5,
-        "columnWidth": 3,
-        "bgColor": "0009",
-        "icon": "info"
-    },
-    "currentCps": {
-        "entries": 15,
-        "icon": "clock",
-        "title": "Current Checkpoints",
-        "navbar": [
-            "liveCps",
-            "localCps",
-            "dediCps"
-        ],
-        "columnProportions": [
-            3,
-            3,
-            3,
-            2,
-            2
-        ]
-    },
-    "mapList": {
-        "title": "Map List",
-        "icon": "map.white",
-        "rows": 4,
-        "columns": 5,
-        "navbar": [
-            "dediCps"
-        ]
-    },
-    "donationPanel": {
-        "title": "Donations",
-        "height": 8,
-        "icon": "cash.normal",
-        "side": true,
-        "amounts": [
-            50,
-            100,
-            200,
-            500,
-            1000,
-            5000
-        ]
-    },
-    "playerList": {
-        "title": "Players ",
-        "icon": "person.white",
-        "ban": "X",
-        "mute": "mute",
-        "addGuest": "addGuest",
-        "removeGuest": "removeGuest",
-        "entries": 15,
-        "columnProportions": [
-            3,
-            3,
-            3,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2
-        ]
-    },
-    "banList": {
-        "title": "Banned players ",
-        "icon": "X",
-        "entries": 15,
-        "columnProportions": [
-            2,
-            2,
-            3
-        ],
-        "navbar": [
-            "blacklistList",
-            "guestlistList"
-        ]
+  "customUi": {
+    "notice": false,
+    "challengeInfo": false,
+    "netInfo": true,
+    "chat": true,
+    "checkpointList": false,
+    "roundScores": true,
+    "scoreTable": true,
+    "global": true
+  },
+  "static": {
+    "format": "$s",
+    "width": 14.65,
+    "topBorder": 47.85,
+    "rightPosition": 49.13,
+    "leftPosition": -63.75,
+    "bgColor": "0006",
+    "marginBig": 0.27,
+    "marginSmall": 0.15,
+    "rightSideOrder": [
+      "map",
+      "previousAndBest",
+      "tmx",
+      "timer",
+      "locals",
+      "live",
+      "donationPanel"
+    ],
+    "leftSideOrder": [
+      "buttons",
+      "rank",
+      "karma",
+      "dedis",
+      "admin"
+    ]
+  },
+  "staticHeader": {
+    "format": "$s",
+    "bgColor": "000a",
+    "iconBgColor": "000a",
+    "textScale": 1,
+    "squareWidth": 1.7,
+    "rectangleWidth": 12.8,
+    "height": 2.17,
+    "margin": 0.15,
+    "verticalPadding": 0.3,
+    "horizontalPadding": 0.5,
+    "iconWidth": 1.55,
+    "iconHeight": 2,
+    "iconHorizontalPadding": 0.075,
+    "iconVerticalPadding": 0.1
+  },
+  "popup": {
+    "headerBg": "000C",
+    "bg": "000C",
+    "margin": 0.15,
+    "titleHeight": 5
+  },
+  "grid": {
+    "bg": "9996",
+    "margin": 0.15,
+    "headerBg": "333C"
+  },
+  "closeButton": {
+    "buttonWidth": 3,
+    "buttonHeight": 3,
+    "icon": "X",
+    "iconHover": "X",
+    "padding": 0.2,
+    "background": "000D"
+  },
+  "paginator": {
+    "buttonWidth": 3,
+    "buttonHeight": 3,
+    "margin": 0.4,
+    "padding": 0.2,
+    "background": "000D"
+  },
+  "map": {
+    "height": 9.13,
+    "side": true,
+    "title": "Ongoing",
+    "icons": [
+      "map.white",
+      "nametag.white",
+      "person.white",
+      "timer.author",
+      "tools"
+    ],
+    "textScale": 1,
+    "noDateText": "N/A",
+    "titles": {
+      "lastTrack": "Last Map",
+      "currTrack": "Ongoing",
+      "nextTrack": "Next Map"
     }
+  },
+  "previousAndBest": {
+    "height": 4.95,
+    "side": true
+  },
+  "karma": {
+    "height": 8.8,
+    "side": false,
+    "title": "Karma",
+    "icon": "karmaStats"
+  },
+  "timer": {
+    "height": 6.45,
+    "side": true,
+    "title": "Timer",
+    "icon": "clock",
+    "hourglassOverlay": "hourglass"
+  },
+  "locals": {
+    "height": 34.12,
+    "side": true,
+    "title": "Local Records",
+    "icon": "chart.locals",
+    "entries": 15,
+    "columnProportions": [
+      1,
+      1,
+      2.8,
+      4
+    ],
+    "topCount": 5,
+    "displayNoRecordEntry": true
+  },
+  "live": {
+    "height": 15.07,
+    "side": true,
+    "title": "Live Records",
+    "icon": "chart.live",
+    "entries": 6,
+    "columnProportions": [
+      1,
+      1,
+      2.8,
+      4
+    ],
+    "topCount": 3,
+    "displayNoRecordEntry": true
+  },
+  "buttons": {
+    "height": 14.5,
+    "side": false,
+    "visitors": {
+      "index": 0,
+      "title": "VISITORS",
+      "icon": "people",
+      "width": 3.2,
+      "height": 3.4,
+      "padding": -0.5
+    },
+    "players": {
+      "index": 1,
+      "title1": "SPECS",
+      "title2": "PLAYERS",
+      "icon": "people",
+      "width": 3.2,
+      "height": 3.4,
+      "padding": -0.5
+    },
+    "version": {
+      "index": 2,
+      "title": "VERSION",
+      "icon": "git",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.3
+    },
+    "time": {
+      "index": 3,
+      "title": "TIME",
+      "icon": "clock",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "maps": {
+      "index": 4,
+      "title": "MAPS",
+      "icon": "numberedList",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "stats": {
+      "index": 5,
+      "title1": "PLAYER",
+      "title2": "STATS",
+      "icon": "stats",
+      "width": 1.9,
+      "height": 1.9,
+      "padding": 0.2
+    },
+    "sectorRecords": {
+      "index": 6,
+      "title1": "SECTOR",
+      "title2": "RECORDS",
+      "icon": "timeList",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "github": {
+      "index": 7,
+      "title1": "GITHUB",
+      "title2": "REPO",
+      "icon": "github",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "voteSkip": {
+      "index": 8,
+      "title1": " VOTE ",
+      "title2": "TO $F00SKIP",
+      "title3": "$F00DISABLED",
+      "title4": "DUE TO RES",
+      "icon": "vote.skip",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "voteRes": {
+      "index": 9,
+      "title1": " VOTE ",
+      "title2": "TO $0F0RES",
+      "title3": "MAP IS",
+      "title4": "$0F0REPLAYED",
+      "icon": "vote.replay",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2
+    },
+    "paySkip": {
+      "index": 10,
+      "title1": "PAY $F00$COST$",
+      "title2": "TO $F00SKIP",
+      "title3": "SKIP IN",
+      "title4": "$F00$SECONDS$ $FFFSECS",
+      "title5": "$F00DISABLED",
+      "title6": "DUE TO RES",
+      "icon": "pay.skip",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2,
+      "cost": 3,
+      "timeout": 15
+    },
+    "payRes": {
+      "index": 11,
+      "title1": "PAY $0F0$COST$",
+      "title2": "TO $0F0RES",
+      "title3": "$0F0RES$z$s LIMIT",
+      "title4": "REACHED",
+      "title5": "MAP IS",
+      "title6": "$0F0REPLAYED",
+      "icon": "pay.replay",
+      "width": 1.8,
+      "height": 1.8,
+      "padding": 0.2,
+      "costs": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "rank": {
+    "height": 3.8,
+    "side": false
+  },
+  "dedis": {
+    "height": 34.12,
+    "side": false,
+    "title": "Dedi Records",
+    "icon": "chart.dedi",
+    "entries": 15,
+    "columnProportions": [
+      1,
+      2.8,
+      4,
+      1
+    ],
+    "markers": {
+      "you": "arrowDoubleL",
+      "faster": "person.orange",
+      "slower": "person.green"
+    },
+    "topCount": 5,
+    "displayNoRecordEntry": true
+  },
+  "tmx": {
+    "height": 8.68,
+    "side": true,
+    "title": "TMX Records",
+    "icon": "mxLogo",
+    "entries": 3,
+    "columnProportions": [
+      1,
+      1,
+      2.8,
+      4
+    ],
+    "topCount": 3,
+    "downloadIcon": "timer.download",
+    "displayNoRecordEntry": false
+  },
+  "liveCheckpoint": {
+    "height": 6,
+    "title": "Live Checkpoint",
+    "side": true,
+    "icon": "clock"
+  },
+  "admin": {
+    "height": 5,
+    "side": false,
+    "title": "Admin Panel",
+    "icon": "chart.dedi",
+    "icons": [
+      "person",
+      "",
+      "",
+      "arrowL",
+      "restart",
+      "arrowR"
+    ]
+  },
+  "bestCps": {
+    "title": "Best Checkpoints",
+    "entries": 6,
+    "height": 14.5,
+    "selfColour": "0F0F",
+    "newestColour": "FF0F",
+    "columnProportions": [
+      1,
+      2.8,
+      4
+    ],
+    "textScale": 0.87,
+    "textPadding": 0.2,
+    "icon": "mxLogo",
+    "upIcon": "arrowL",
+    "downIcon": "arrowR"
+  },
+  "bestFinishes": {
+    "title": "Best Finishes",
+    "entries": 6,
+    "height": 14.5,
+    "selfColour": "0F0F",
+    "newestColour": "FF0F",
+    "columnProportions": [
+      1,
+      2.8,
+      4
+    ],
+    "textScale": 0.87,
+    "textPadding": 0.2,
+    "icon": "mxLogo"
+  },
+  "runCps": {
+    "title": "Best Finishes",
+    "entries": 6,
+    "height": 14.5,
+    "width": 17,
+    "colours": {
+      "none": "FFFF",
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "columnProportions": [
+      1,
+      3,
+      6
+    ],
+    "textScale": 0.87,
+    "textPadding": 0.2,
+    "icon": "mxLogo"
+  },
+  "recordsList": {
+    "columnProportions": [
+      1,
+      2.8,
+      4
+    ],
+    "markerWidth": 1.7,
+    "columnGap": 0.15,
+    "rowGap": 0.15,
+    "downloadIcon": "timer.download",
+    "iconVerticalPadding": 0.15,
+    "iconHorizontalPadding": 0.15,
+    "markersLeft": {
+      "you": "arrowDoubleL",
+      "faster": "person.orange",
+      "slower": "person.green"
+    },
+    "markersRight": {
+      "you": "arrowDoubleR",
+      "faster": "person.orange",
+      "slower": "person.green"
+    },
+    "timeColours": {
+      "slower": "CCCF",
+      "faster": "F00F",
+      "you": "3F5F",
+      "top": "FF0F"
+    },
+    "info": {
+      "iconWidth": 1.7,
+      "columns": 5,
+      "columnWidth": 3,
+      "bgColor": "0009",
+      "icon": "info"
+    }
+  },
+  "dediCps": {
+    "entries": 15,
+    "cpsOnFirstPage": 10,
+    "icon": "chart.dedi",
+    "title": "Dedimania Checkpoints",
+    "selfColour": "0F0F",
+    "cpColours": {
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "navbar": [
+      "dediSectors",
+      "localCps",
+      "localSectors",
+      "liveCps",
+      "liveSectors"
+    ],
+    "cpPaginatorMargin": 0.25
+  },
+  "dediSectors": {
+    "entries": 15,
+    "sectorsOnFirstPage": 10,
+    "icon": "chart.dedi",
+    "title": "Dedimania Sectors",
+    "selfColour": "0F0F",
+    "sectorColours": {
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "navbar": [
+      "dediSectors",
+      "localCps",
+      "localSectors",
+      "liveCps",
+      "liveSectors"
+    ],
+    "sectorPaginatorMargin": 0.25
+  },
+  "liveCps": {
+    "entries": 15,
+    "cpsOnFirstPage": 10,
+    "icon": "chart.live",
+    "title": "Live Checkpoints",
+    "selfColour": "0F0F",
+    "cpColours": {
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "navbar": [
+      "liveSectors",
+      "dediCps",
+      "dediSectors",
+      "localCps",
+      "localSectors"
+    ],
+    "cpPaginatorMargin": 0.25
+  },
+  "liveSectors": {
+    "entries": 15,
+    "cpsPerPage": 10,
+    "icon": "chart.live",
+    "title": "Live Sectors",
+    "selfColour": "0F0F",
+    "paginatorOffset": 14.9
+  },
+  "localCps": {
+    "entries": 15,
+    "cpsOnFirstPage": 8,
+    "icon": "chart.local",
+    "title": "Dedimania Checkpoints",
+    "selfColour": "0F0F",
+    "cpColours": {
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "navbar": [
+      "localSectors",
+      "dediCps",
+      "dediSectors",
+      "liveCps",
+      "liveSectors"
+    ],
+    "cpPaginatorMargin": 0.25
+  },
+  "localSectors": {
+    "entries": 15,
+    "cpsPerPage": 8,
+    "icon": "chart.local",
+    "title": "Local Sectors",
+    "selfColour": "0F0F",
+    "paginatorOffset": 14.9
+  },
+  "recordInfo": {
+    "minColumns": 5,
+    "columnWidth": 3,
+    "bgColor": "0009",
+    "icon": "info"
+  },
+  "currentCps": {
+    "entries": 15,
+    "icon": "clock",
+    "title": "Current Checkpoints",
+    "navbar": [
+      "liveCps",
+      "localCps",
+      "dediCps"
+    ],
+    "columnProportions": [
+      3,
+      3,
+      3,
+      2,
+      2
+    ]
+  },
+  "mapList": {
+    "title": "Map List",
+    "icon": "map.white",
+    "rows": 4,
+    "columns": 5,
+    "navbar": [
+      "dediCps"
+    ]
+  },
+  "donationPanel": {
+    "title": "Donations",
+    "height": 8,
+    "icon": "cash.normal",
+    "side": true,
+    "amounts": [
+      50,
+      100,
+      200,
+      500,
+      1000,
+      5000
+    ]
+  },
+  "playerList": {
+    "title": "Players ",
+    "icon": "person.white",
+    "ban": "X",
+    "mute": "mute",
+    "addGuest": "addGuest",
+    "removeGuest": "removeGuest",
+    "entries": 15,
+    "columnProportions": [
+      3,
+      3,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ]
+  },
+  "banList": {
+    "title": " Banned Players ",
+    "icon": "X",
+    "entries": 15,
+    "columnProportions": [
+      2,
+      2,
+      2,
+      3,
+      1
+    ],
+    "navbar": [
+      "blacklistList",
+      "guestlistList"
+    ]
+  },
+  "voteWindow": {
+    "title": " Vote",
+    "width": 25,
+    "height": 10,
+    "iconRed": "chart.dedi",
+    "iconGreen": "chart.locals"
+  },
+  "blacklistList": {
+    "title": " Blacklisted Players ",
+    "icon": "X",
+    "entries": 15,
+    "columnProportions": [
+      2,
+      2,
+      2,
+      3,
+      1
+    ],
+    "navbar": [
+      "banList",
+      "guestlistList"
+    ]
+  },
+  "guestlistList": {
+    "title": " Guests ",
+    "icon": "X",
+    "entries": 15,
+    "columnProportions": [
+      2,
+      2,
+      3,
+      2,
+      1
+    ],
+    "navbar": [
+      "banList",
+      "blacklistList"
+    ]
+  }
 }

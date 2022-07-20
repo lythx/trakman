@@ -37,7 +37,7 @@ const commands: TMCommand[] = [
       }
       const name: string = res[0].Name
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from local files.`)
     },
     privilege: 1
@@ -77,7 +77,7 @@ const commands: TMCommand[] = [
       }
       const name: string = nextInfo[0].Name
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added and queued `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from URL.`)
     },
     privilege: 1
@@ -96,7 +96,7 @@ const commands: TMCommand[] = [
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from the playlist.`)
     },
     privilege: 1
@@ -109,7 +109,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has skipped the ongoing map.`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has skipped the ongoing map.`
         }]
       },
         {
@@ -126,7 +126,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has restarted the ongoing map.`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has restarted the ongoing map.`
         }]
       },
         {
@@ -140,7 +140,7 @@ const commands: TMCommand[] = [
     help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the previous map.`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
@@ -152,7 +152,7 @@ const commands: TMCommand[] = [
     help: 'Requeue the ongoing map.',
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has requeued the ongoing map.`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the ongoing map.`)
       TM.addToJukebox(TM.map.id, info.login)
     },
     privilege: 1
@@ -172,8 +172,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.${reasonString}`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.${reasonString}`
         }]
       },
         {
@@ -208,8 +208,8 @@ const commands: TMCommand[] = [
       const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
       const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has muted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has muted `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
     },
     privilege: 2
   },
@@ -236,8 +236,8 @@ const commands: TMCommand[] = [
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unmuted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unmuted `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -256,8 +256,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into specmode.`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
         }]
       },
         {
@@ -286,8 +286,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into playermode.`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into playermode.`
         }]
       },
         {
@@ -311,7 +311,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has kicked `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
             + `${TM.palette.highlight + TM.strip(login)}${TM.palette.admin}.`
         }]
       },
@@ -339,7 +339,7 @@ const commands: TMCommand[] = [
       }
       TM.removeFromJukebox(map.id, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
       )
     },
@@ -357,7 +357,7 @@ const commands: TMCommand[] = [
         TM.removeFromJukebox(map.id, info.login)
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + 'all mapos'}${TM.palette.admin} from the queue.`
       )
     },
@@ -375,7 +375,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has forced `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
             + `the ongoing round to end.`
         }]
       },
@@ -387,7 +387,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['players', 'playerlist'],
-    help: 'Display list of players',
+    help: 'Display list of players.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.playerList, info.login)
     },
@@ -395,12 +395,28 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['banlist'],
-    help: 'Display list of banned players',
+    help: 'Display list of banned players.',
     callback: (info: MessageInfo): void => {
       TM.openManialink(TM.UIIDS.banList, info.login)
     },
     privilege: 1
-  }
+  },
+  {
+    aliases: ['bll, blacklists'],
+    help: 'Display list of blackisted players.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.blacklistList, info.login)
+    },
+    privilege: 1
+  },
+  {
+    aliases: ['gl', 'guestlist'],
+    help: 'Display list of players in the guestlist.',
+    callback: (info: MessageInfo): void => {
+      TM.openManialink(TM.UIIDS.guestlistList, info.login)
+    },
+    privilege: 1
+  },
 ]
 
 for (const command of commands) { TM.addCommand(command) }

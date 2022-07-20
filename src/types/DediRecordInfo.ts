@@ -3,7 +3,7 @@ interface DediRecordInfo {
     readonly login: string
     readonly time: number
     readonly checkpoints: number[]
-    readonly nickName: string
+    readonly nickname: string
     readonly nation: string
     readonly nationCode: string
     readonly timePlayed: number

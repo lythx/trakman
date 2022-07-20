@@ -1,13 +1,16 @@
 {
     "PopupWindow": 0,
-    "map": 10,
-    "previousAndBest": 20,
-    "buttons": 30,
     "rank": 40,
     "temp1": 60,
     "timer": 70,
+    "map": 80,
+    "previousAndBest": 90,
+    "buttons": 100,
     "karma": 300,
     "admin": 400,
+    "bestCps": 500,
+    "bestFinishes": 600,
+    "runCps": 700,
     "commandList": 1000,
     "TMXWindow": 2000,
     "localCps": 3000,
@@ -25,5 +28,7 @@
     "currentCps": 80000,
     "donationPanel": 120000,
     "playerList": 130000,
-    "banList": 140000
+    "banList": 140000,
+    "blacklistList": 150000,
+    "guestlistList": 160000
 }

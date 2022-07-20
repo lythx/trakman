@@ -48,7 +48,7 @@ export default class PlayerList extends PopupWindow {
             if(status instanceof Error) {
               TM.sendMessage(`${TM.palette.error}An error occured while muting the player.`, info.login)
             } else {
-              TM.sendMessage(`${TM.palette.admin}${info.nickName} $z$shas muted ${targetPlayer.nickName}`, info.login)  
+              TM.sendMessage(`${TM.palette.admin}${info.nickname} $z$shas muted ${targetPlayer.nickname}`, info.login)  
             }
           } // Mute
 
@@ -69,7 +69,7 @@ export default class PlayerList extends PopupWindow {
             if(status instanceof Error) {
               TM.sendMessage(`${TM.palette.error}An error occured while adding player to the guestlist.`, info.login)
             } else {
-              TM.sendMessage(`${info.nickName} ${TM.palette.admin}has added ${targetPlayer.nickName}${TM.palette.admin} to the guestlist.`, info.login)  
+              TM.sendMessage(`${info.nickname} ${TM.palette.admin}has added ${targetPlayer.nickname}${TM.palette.admin} to the guestlist.`, info.login)  
             }
           } // Add to Guestlist
 
@@ -91,7 +91,7 @@ export default class PlayerList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Forcespec ', w, h),
         ]
          const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-            return centeredText(players[i].nickName, w, h)
+            return centeredText(players[i].nickname, w, h)
          }
          const loginCell = (i: number, j: number, w: number, h: number): string => {
              return centeredText(players[i].login, w, h)

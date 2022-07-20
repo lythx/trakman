@@ -87,8 +87,8 @@ export class Listeners {
           return
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
-        const isFinish = PlayerService.addCP(player, checkpoint)
-        if (isFinish === true) {
+        const cpStatus = PlayerService.addCP(player, checkpoint)
+        if (cpStatus === true) {
           const obj = RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
             const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
@@ -104,14 +104,15 @@ export class Listeners {
             }
           }
           return
+        } else if(cpStatus === false) {
+          const info: CheckpointInfo = {
+            time: params[2],
+            lap: params[3],
+            index: params[4],
+            player
+          }
+          Events.emitEvent('Controller.PlayerCheckpoint', info)
         }
-        const info: CheckpointInfo = {
-          time: params[2],
-          lap: params[3],
-          index: params[4],
-          player
-        }
-        Events.emitEvent('Controller.PlayerCheckpoint', info)
       }
     },
     {
@@ -260,7 +261,7 @@ export class Listeners {
         const flags: any = params[0].Flags.toString()
         const info: InfoChangedInfo = {
           login: params[0].Login,
-          nickName: params[0].NickName,
+          nickname: params[0].NickName,
           id: params[0].PlayerId,
           teamId: params[0].TeamId,
           ladderRanking: params[0].LadderRanking,

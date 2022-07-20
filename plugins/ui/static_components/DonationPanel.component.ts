@@ -14,7 +14,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.liveCheckpoint, 'race')
+    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
     this.positionY = calculateStaticPositionY('donationPanel')
     this.constructXML()
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
@@ -25,7 +25,7 @@ export default class DonationPanel extends StaticComponent {
           TM.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
           TM.sendMessage(`${TM.palette.error}Failed to donate coppers`, info.login)
         } else if (status === true) {
-          TM.sendMessage(`${info.nickName}$z$s${TM.palette.donation} donated ${amount} coppers to the server!!!!!!!!!!!!!!!!!`)
+          TM.sendMessage(`${info.nickname}$z$s${TM.palette.donation} donated ${amount} coppers to the server!!!!!!!!!!!!!!!!!`)
         }
       }
     })

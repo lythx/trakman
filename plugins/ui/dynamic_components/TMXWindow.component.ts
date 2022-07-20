@@ -9,7 +9,7 @@
 //   private readonly queueMapsCount = 4
 //   private readonly previousMapsCount = 4
 //   private readonly paginator: Paginator
-
+// 
 //   constructor() {
 //     super(IDS.TMXWindow)
 //     this.paginator = new Paginator(this.openId, this.closeId, Math.ceil(1 + this.queueMapsCount / this.itemsPerPage))

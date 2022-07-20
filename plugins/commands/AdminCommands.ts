@@ -36,7 +36,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
             + `the gamemode to ${TM.palette.highlight + mode.toUpperCase()}${TM.palette.admin}.`
         }]
       },
@@ -65,8 +65,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has banned `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has banned `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
         }]
       },
         {
@@ -95,8 +95,8 @@ const commands: TMCommand[] = [
       }
       TM.removeFromBanlist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unbanned `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -122,8 +122,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has blacklisted `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has blacklisted `
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
         }]
       },
         {
@@ -152,8 +152,8 @@ const commands: TMCommand[] = [
       }
       TM.removeFromBlacklist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unblacklisted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unblacklisted `
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -172,7 +172,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
             + `the referee password to ${TM.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
         }]
       },
@@ -192,7 +192,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set the referee mode to `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set the referee mode to `
             + `${TM.palette.highlight + (mode ? 'ALL' : 'TOP3')}${TM.palette.admin}.`
         }]
       },
@@ -228,8 +228,8 @@ const commands: TMCommand[] = [
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added `
-        + `${TM.palette.highlight + targetInfo.nickName}${TM.palette.admin} to guestlist.`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added `
+        + `${TM.palette.highlight + targetInfo.nickname}${TM.palette.admin} to guestlist.`)
     },
     privilege: 2
   },
@@ -256,8 +256,8 @@ const commands: TMCommand[] = [
         return
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + targetInfo.nickName}${TM.palette.admin} from guestlist.`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
+        + `${TM.palette.highlight + targetInfo.nickname}${TM.palette.admin} from guestlist.`)
     },
     privilege: 2
   },
@@ -296,8 +296,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
-            `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
-            `commands and muted ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`
+            `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has disabled ` +
+            `commands and muted ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`
         }]
       },
         {
@@ -335,8 +335,8 @@ const commands: TMCommand[] = [
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has hardforced `
-              + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into specmode.`
+              + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has hardforced `
+              + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
           }]
         }
       )
@@ -380,8 +380,8 @@ const commands: TMCommand[] = [
           method: 'ChatSendServerMessage',
           params: [{
             string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-              + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has released `
-              + `${TM.palette.highlight + TM.strip(targetInfo?.nickName || info.login)}${TM.palette.admin} out of specmode.`
+              + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has released `
+              + `${TM.palette.highlight + TM.strip(targetInfo?.nickname || info.login)}${TM.palette.admin} out of specmode.`
           }]
         }
       )
@@ -397,7 +397,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
-            `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has set the points limit ` +
+            `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set the points limit ` +
             `to ${TM.palette.highlight + limit}${TM.palette.admin}.`
         }]
       },
@@ -441,8 +441,8 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has put `
-            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickName)} ${TM.palette.admin}to the ${teamColour + team.toUpperCase()}${TM.palette.admin} team.`
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has put `
+            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickname)} ${TM.palette.admin}to the ${teamColour + team.toUpperCase()}${TM.palette.admin} team.`
         }]
       },
         {
@@ -465,7 +465,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} warm-up mode.`
         }]
       },
@@ -495,7 +495,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the laps amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -525,7 +525,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the laps amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -555,7 +555,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -585,7 +585,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -615,7 +615,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the max points per team to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -645,7 +645,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the points limit to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -675,7 +675,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the amount of rounds per map to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -701,7 +701,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the amount of rounds in warm-up to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -731,7 +731,7 @@ const commands: TMCommand[] = [
         method: 'ChatSendServerMessage',
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
+            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
             + `set the amount of cup winners to ${TM.palette.highlight + amount}${TM.palette.admin}.`
         }]
       },
@@ -757,8 +757,8 @@ const commands: TMCommand[] = [
       }
        TM.removeRecord(playerRecord.login, TM.map.id, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-        + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has `
-        + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickName, true))}${TM.palette.admin} on the ongoing map.`)
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
+        + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickname, true))}${TM.palette.admin} on the ongoing map.`)
     },
     privilege: 2
   },
