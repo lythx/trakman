@@ -142,8 +142,8 @@ export abstract class DedimaniaService {
     if (position > this.dedisAmount || time > (pb ?? Infinity)) { return false }
     if (pb === undefined) {
       const dediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
-      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
-      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickname, checkpoints: [...checkpoints] })
+      this._newDedis.push({ login: player.login, time: time, nickName: player.nickname, checkpoints: [...checkpoints] })
       return dediRecordInfo
     }
     if (time === pb) {
@@ -159,9 +159,9 @@ export abstract class DedimaniaService {
       }
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, previousTime, position, this._dedis.findIndex(a => a.login === player.login) + 1)
       this._dedis = this._dedis.filter(a => a.login !== player.login)
-      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickName: player.nickname, checkpoints: [...checkpoints] })
       this._newDedis = this._newDedis.filter(a => a.login !== player.login)
-      this._newDedis.push({ login: player.login, time: time, nickName: player.nickName, checkpoints: [...checkpoints] })
+      this._newDedis.push({ login: player.login, time: time, nickName: player.nickname, checkpoints: [...checkpoints] })
       return dediRecordInfo
     }
     return false
@@ -256,7 +256,7 @@ export abstract class DedimaniaService {
       login: player.login,
       time,
       checkpoints,
-      nickName: player.nickName,
+      nickName: player.nickname,
       nation: player.nation,
       nationCode: player.nationCode,
       timePlayed: player.timePlayed,

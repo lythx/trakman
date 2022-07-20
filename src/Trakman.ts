@@ -575,7 +575,7 @@ export const TRAKMAN = {
    * @returns Possibly matching login or undefined if unsuccessful
    */
   nicknameToLogin(nickName: string): string | undefined {
-    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickName).toLowerCase() }))
+    const nicknames = this.players.map(a => ({ login: a.login, nickname: this.strip(a.nickname).toLowerCase() }))
     const strippedNicknames: { nickname: string, login: string }[] = []
     for (const e of nicknames) {
       strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })

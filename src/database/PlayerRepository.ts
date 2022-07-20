@@ -33,7 +33,7 @@ export class PlayerRepository extends Repository {
    */
   async add(player: TMPlayer): Promise<void> {
     const query = 'INSERT INTO players(login, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
-    await this.db.query(query, [player.login, player.nickName, player.nationCode, player.wins, player.timePlayed, player.privilege])
+    await this.db.query(query, [player.login, player.nickname, player.nationCode, player.wins, player.timePlayed, player.privilege])
   }
 
   /**
@@ -41,7 +41,7 @@ export class PlayerRepository extends Repository {
    */
   async update(player: TMPlayer): Promise<void> {
     const query = `UPDATE players SET nickname=$1, nation=$2, wins=$3, timePlayed=$4, visits=$5 WHERE login=$6;`
-    await this.db.query(query, [player.nickName, player.nationCode, player.wins, player.timePlayed, player.visits, player.login])
+    await this.db.query(query, [player.nickname, player.nationCode, player.wins, player.timePlayed, player.visits, player.login])
   }
 
   /**

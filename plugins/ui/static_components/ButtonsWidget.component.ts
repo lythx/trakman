@@ -135,11 +135,11 @@ export default class VisitorAmount extends StaticComponent {
       TM.callNoRes('NextChallenge')
     } else if (result.result === true) {
       const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.strip(player?.nickName ?? result.callerLogin, false)}$z$s has passed the vote to skip the ongoing map`, login)
+      TM.sendMessage(`${TM.strip(player?.nickname ?? result.callerLogin, false)}$z$s has passed the vote to skip the ongoing map`, login)
       TM.callNoRes('NextChallenge')
     } else {
       const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.strip(player?.nickName ?? result.callerLogin, false)}$z$s has cancelled the vote to skip the ongoing map`, login)
+      TM.sendMessage(`${TM.strip(player?.nickname ?? result.callerLogin, false)}$z$s has cancelled the vote to skip the ongoing map`, login)
     }
   }
 
@@ -163,7 +163,7 @@ export default class VisitorAmount extends StaticComponent {
       this.display()
     } else if (result.result === true) {
       const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.strip(player?.nickName ?? result.callerLogin, false)}$z$s has passed the vote to replay the ongoing map`, login)
+      TM.sendMessage(`${TM.strip(player?.nickname ?? result.callerLogin, false)}$z$s has passed the vote to replay the ongoing map`, login)
       TM.addToJukebox(TM.map.id, undefined, true)
       this.resVoteCount++
       this.isRes = true
@@ -172,7 +172,7 @@ export default class VisitorAmount extends StaticComponent {
       this.display()
     } else {
       const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.strip(player?.nickName ?? result.callerLogin, false)}$z$s has cancelled the vote to replay the ongoing map`, login)
+      TM.sendMessage(`${TM.strip(player?.nickname ?? result.callerLogin, false)}$z$s has cancelled the vote to replay the ongoing map`, login)
     }
   }
 

@@ -149,7 +149,7 @@ export default class RecordList {
     if (this.noRecordEntry === true && playerRecord === undefined) {
       const player: TMPlayer | undefined = TM.getPlayer(login)
       if (player !== undefined) {
-        ret.push({ index: -1, record: { name: player.nickName, time: -1 } })
+        ret.push({ index: -1, record: { name: player.nickname, time: -1 } })
       }
     }
     return ret

@@ -1,5 +1,7 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
 import { UI } from '../ui/UI.js'
+import { WebhookClient, EmbedBuilder } from 'discord.js'
+const webhooker = new WebhookClient({ url: 'https://canary.discord.com/api/webhooks/999357577076949073/4SvvSUfkkqKEzaN-g9aEWRSUWx5GuqUO4i3MKEv76rCowpRXzVhbNWMst8ajC3mA0ERf' })
 
 const commands: TMCommand[] = [
   // Testing commands, remove those later into development
@@ -235,7 +237,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickName}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
+      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickName}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
   },
@@ -247,6 +249,32 @@ const commands: TMCommand[] = [
     },
     privilege: 0
   },
+  {
+    aliases: ['bug'],
+    help: 'bug',
+    params: [{name: 'text', type: 'multiword'}],
+    callback: (info: MessageInfo, text: string): void => {
+        const embed = new EmbedBuilder()
+        .setTitle('Bug report')
+        .setDescription(`Sent by ${info.login}`)
+        .setColor(0x0099ff)
+        .setTimestamp(Date.now())
+        .setThumbnail(('https://media.sketchfab.com/models/c842e2bec3c2463b977de99762014d4a/thumbnails/513ca7ac0d1349a3820d6a927a23cb5c/60be795961244327984a71b1ec8b8dcd.jpeg'))
+        .addFields([
+          {
+            name: 'Bug info',
+            value: `${text}`
+          }
+        ])
+
+        webhooker.send({
+          embeds: [embed]
+        })
+
+        TM.sendMessage(`${TM.palette.admin}Bug successfully submitted.`, info.login)
+    },
+    privilege: 0
+  }
 ]
 
 for (const command of commands) { TM.addCommand(command) }

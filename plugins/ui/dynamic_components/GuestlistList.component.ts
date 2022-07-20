@@ -2,15 +2,16 @@ import PopupWindow from '../PopupWindow.js'
 import {TRAKMAN as TM} from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
-export default class BanList extends PopupWindow {
-    readonly entries = CONFIG.banList.entries
+export default class GuestlistList extends PopupWindow {
+    readonly entries = CONFIG.guestlistList.entries
     readonly grid: Grid
     readonly gridMargin = CONFIG.grid.margin
 
+
     constructor() {
-        const iconurl = stringToObjectProperty(CONFIG.banList.icon, ICONS)
-        super(IDS.banList, iconurl, CONFIG.banList.title, CONFIG.banList.navbar)
-        this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.banList.columnProportions, new Array(this.entries).fill(1),
+        const iconurl = stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)
+        super(IDS.guestlistList, iconurl, CONFIG.guestlistList.title, CONFIG.guestlistList.navbar)
+        this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.guestlistList.columnProportions, new Array(this.entries).fill(1),
         { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
         TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
@@ -21,7 +22,7 @@ export default class BanList extends PopupWindow {
               if(targetInfo === undefined) {
                 return
               } else {
-                TM.removeFromBanlist(targetPlayer.login, info.login)
+                TM.removeFromGuestlist(targetPlayer.login, info.login)
                 TM.sendMessage('do format wizrvn PLZ TX')  
               }
             } // 
@@ -40,37 +41,38 @@ export default class BanList extends PopupWindow {
         const headers = [
             (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Ban Date ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Ban Reason ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Unban ', w, h),
+            (i: number, j: number, w: number, h: number) => centeredText(' Date ', w, h),
+            (i: number, j: number, w: number, h: number) => centeredText(' Admin ', w, h),
+            (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, {padding: 0.2}),
             
         ]
-        const bannedplayers = TM.banlist
+        const guestlisted = TM.guestlist
         const cancer: PlayersDBEntry[] = []
 
-        for(const player of bannedplayers) {
+        for(const player of guestlisted) {
             cancer.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(cancer[i - 1].nickname, w, h)            
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(bannedplayers[i - 1].login, w, h)            
+            return centeredText(guestlisted[i - 1].login, w, h)            
         }
         const dateCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(bannedplayers[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)            
+            return centeredText(guestlisted[i - 1].date.toUTCString(), w, h)            
         }
-        const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(bannedplayers[i - 1]?.reason ?? 'No reason specified', w, h)            
+        const adminCell = (i: number, j: number, w: number, h: number) => {
+            return centeredText(guestlisted[i - 1].callerLogin, w, h)            
         }
-        const unbanButton = (i: number, j: number, w: number, h: number) => {
-            return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.banList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
+        const unglButton = (i: number, j: number, w: number, h: number) => {
+            return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
-        const players = TM.banlist
+
+        const players = TM.guestlist
         const rows = Math.min(this.entries, players.length) 
         const arr = headers
         for(let i = 0; i<rows; i++) {
-            arr.push(nicknameCell, loginCell, reasonCell, dateCell, unbanButton)
+            arr.push(nicknameCell, loginCell, dateCell, adminCell, unglButton)
         }
         return this.grid.constructXml(arr)
     }

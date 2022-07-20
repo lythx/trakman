@@ -66,7 +66,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has banned `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
         }]
       },
         {
@@ -96,7 +96,7 @@ const commands: TMCommand[] = [
       TM.removeFromBanlist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unbanned `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -123,7 +123,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has blacklisted `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
+            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`
         }]
       },
         {
@@ -153,7 +153,7 @@ const commands: TMCommand[] = [
       TM.removeFromBlacklist(targetInfo.login, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has unblacklisted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin}.`
+        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
     },
     privilege: 2
@@ -229,7 +229,7 @@ const commands: TMCommand[] = [
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has added `
-        + `${TM.palette.highlight + targetInfo.nickName}${TM.palette.admin} to guestlist.`)
+        + `${TM.palette.highlight + targetInfo.nickname}${TM.palette.admin} to guestlist.`)
     },
     privilege: 2
   },
@@ -257,7 +257,7 @@ const commands: TMCommand[] = [
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + targetInfo.nickName}${TM.palette.admin} from guestlist.`)
+        + `${TM.palette.highlight + targetInfo.nickname}${TM.palette.admin} from guestlist.`)
     },
     privilege: 2
   },
@@ -297,7 +297,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
             `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has disabled ` +
-            `commands and muted ${TM.palette.highlight + TM.strip(targetInfo.nickName, true)}${TM.palette.admin}.`
+            `commands and muted ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.admin}.`
         }]
       },
         {
@@ -336,7 +336,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
               + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has hardforced `
-              + `${TM.palette.highlight + TM.strip(targetInfo.nickName)}${TM.palette.admin} into specmode.`
+              + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
           }]
         }
       )
@@ -381,7 +381,7 @@ const commands: TMCommand[] = [
           params: [{
             string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
               + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has released `
-              + `${TM.palette.highlight + TM.strip(targetInfo?.nickName || info.login)}${TM.palette.admin} out of specmode.`
+              + `${TM.palette.highlight + TM.strip(targetInfo?.nickname || info.login)}${TM.palette.admin} out of specmode.`
           }]
         }
       )
@@ -442,7 +442,7 @@ const commands: TMCommand[] = [
         params: [{
           string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
             + `${TM.palette.highlight + TM.strip(info.nickName, true)}${TM.palette.admin} has put `
-            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickName)} ${TM.palette.admin}to the ${teamColour + team.toUpperCase()}${TM.palette.admin} team.`
+            + `player ${TM.palette.highlight + TM.strip(playerinfo.nickname)} ${TM.palette.admin}to the ${teamColour + team.toUpperCase()}${TM.palette.admin} team.`
         }]
       },
         {
