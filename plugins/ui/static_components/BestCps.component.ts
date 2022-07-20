@@ -1,11 +1,11 @@
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
-import { CONFIG, IDS, Grid, centeredText, verticallyCenteredText, stringToObjectProperty, ICONS, Paginator } from '../UiUtils.js'
+import { CONFIG, IDS, Grid, centeredText, rightAlignedText, verticallyCenteredText,stringToObjectProperty, ICONS, Paginator } from '../UiUtils.js'
 
 export default class BestCps extends StaticComponent {
 
   private readonly margin = CONFIG.static.marginSmall
-  private readonly width = CONFIG.bestCps.width
+  private readonly width = CONFIG.static.width
   private readonly title = CONFIG.bestCps.title
   private readonly height = CONFIG.bestCps.height
   private readonly positionX = CONFIG.static.leftPosition + CONFIG.static.marginBig + CONFIG.static.width
@@ -112,7 +112,7 @@ export default class BestCps extends StaticComponent {
       </frame>`
     }
     return `<quad posn="0 0 1" sizen="${this.width - (this.squareW + this.margin) * (1 + buttonAmount)} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
-      ${verticallyCenteredText(this.title, this.width - (this.squareW + this.margin) * (1 + buttonAmount), this.headerHeight, { textScale: CONFIG.staticHeader.textScale })}
+      ${rightAlignedText(this.title, this.width - (this.squareW + this.margin) * (1 + buttonAmount), this.headerHeight, { textScale: CONFIG.staticHeader.textScale, yOffset: -0.1 })}
     <frame posn="${this.width - this.squareW} 0 1">
     <quad posn="0 0 1" sizen="${this.squareW} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
     <quad posn="${this.iconHPadding} ${-this.iconVPadding} 4" sizen="${this.iconW} ${this.iconH}" image="${this.icon}"/> 
@@ -146,8 +146,6 @@ export default class BestCps extends StaticComponent {
     }
 
     const cpsToDisplay = this.cpAmount - cpIndex
-
-    console.log(login, page)
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
     for (let i = 0; i < cpsToDisplay; i++) {
       arr.push(indexCell, timeCell, nicknameCell)

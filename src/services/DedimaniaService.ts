@@ -104,19 +104,6 @@ export abstract class DedimaniaService {
     return true
   }
 
-  private static async retryGetRecords(id: string, name: string, environment: string, author: string, isRetry: boolean): Promise<void> {
-    if (isRetry) { return }
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // make it display the warning after controller ready if it doesnt work on start
-    Logger.error(`Failed to fetch dedimania records for map: ${name}`)
-    Client.callNoRes('ChatSendServerMessage', [{ string: `${colours.red}Failed to fetch dedimania records, attempting to fetch again...` }])
-    let status
-    do {
-      await new Promise((resolve) => setTimeout(resolve, 10000))
-      if (MapService.current.id === id) { status = await this.getRecords(id, name, environment, author) }
-      else { return }
-    } while (status instanceof Error)
-  }
-
   static async sendRecords(mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> {
     if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
     const recordsArray: any = []
@@ -161,7 +148,7 @@ export abstract class DedimaniaService {
     }
     if (time === pb) {
       const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login) + 1
-      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, position, previousPosition)
+      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, previousPosition, previousPosition)
       return dediRecordInfo
     }
     if (time < pb) {

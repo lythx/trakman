@@ -360,22 +360,22 @@ export const TRAKMAN = {
    * Adds a map to the queue
    * @param mapId Map UID
    */
-  addToJukebox(mapId: string, callerLogin: string): void {
-    JukeboxService.add(mapId, callerLogin)
+  addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
+    JukeboxService.add(mapId, callerLogin, setAsNextMap)
   },
 
   /**
    * Removes a map from the queue
    * @param mapId Map UID
    */
-  removeFromJukebox(mapId: string, callerLogin: string): void {
+  removeFromJukebox(mapId: string, callerLogin?: string): void {
     JukeboxService.remove(mapId, callerLogin)
   },
 
   /**
    * Removes all maps from jukebox
    */
-  clearJukebox(callerLogin: string): void {
+  clearJukebox(callerLogin?: string): void {
     JukeboxService.clear(callerLogin)
   },
 
@@ -436,7 +436,7 @@ export const TRAKMAN = {
    * Removes a player from the server ban list
    * @param login Player login
    */
-  removeFromBanlist: (login: string, callerLogin: string): boolean => {
+  removeFromBanlist: (login: string, callerLogin?: string): boolean => {
     return AdministrationService.removeFromBanlist(login, callerLogin)
   },
 
@@ -455,7 +455,7 @@ export const TRAKMAN = {
    * Removes a player from the server blacklist
    * @param login Player login
    */
-  removeFromBlacklist: (login: string, callerLogin: string): boolean => {
+  removeFromBlacklist: (login: string, callerLogin?: string): boolean => {
     return AdministrationService.removeFromBlacklist(login, callerLogin)
   },
 
@@ -491,7 +491,7 @@ export const TRAKMAN = {
    * Removes a player from the server guest list
    * @param login Player login
    */
-  removeFromGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
+  removeFromGuestlist: async (login: string, callerLogin?: string): Promise<boolean | Error> => {
     return await AdministrationService.removeFromGuestlist(login, callerLogin)
   },
 
