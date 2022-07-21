@@ -70,9 +70,9 @@ export class MapService {
       const info: TMMap = this.constructMapObjectFromDB(map)
       mapsInDBInfo.push(info)
     }
-    for (const c of [...mapsInDBInfo, ...mapsNotInDBInfo]) {
-      this._maps.push(c)
-    }
+    const arr = [...mapsInDBInfo, ...mapsNotInDBInfo].sort((a, b) => a.name.localeCompare(b.name))
+    arr.sort((a, b) => a.author.localeCompare(b.author))
+    this._maps.push(...arr)
     await this.repo.add(...mapsNotInDBInfo)
   }
 
@@ -84,6 +84,8 @@ export class MapService {
     if (res instanceof Error) { return res }
     const obj: TMMap = this.constructNewMapObject(res[0])
     this._maps.push(obj)
+    this._maps.sort((a, b) => a.name.localeCompare(b.name))
+    this._maps.sort((a, b) => a.author.localeCompare(b.author))
     void this.repo.add(obj)
     if (callerLogin !== undefined) {
       Logger.info(`Player ${callerLogin} added map ${obj.name} by ${obj.author}`)
@@ -98,7 +100,7 @@ export class MapService {
 
   static async remove(id: string, callerLogin?: string): Promise<boolean | Error> {
     const map = this._maps.find(a => id === a.fileName)
-    if(map === undefined) {
+    if (map === undefined) {
       return false
     }
     const insert: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])

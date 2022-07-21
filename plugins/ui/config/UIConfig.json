@@ -540,7 +540,7 @@
   "mapList": {
     "title": "Map List",
     "icon": "map.white",
-    "rows": 4,
+    "rows":5,
     "columns": 5,
     "navbar": [
       "dediCps"

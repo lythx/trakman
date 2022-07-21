@@ -22,7 +22,7 @@ import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
-import dsc from 'dice-similarity-coeff';
+import dsc from 'dice-similarity-coeff'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -308,10 +308,10 @@ export const TRAKMAN = {
    * @param query Query to execute
    * @returns Database response or error on invalid query
    */
-  async queryDB(query: string): Promise<any[] | Error> {
+  async queryDB(query: string, params?: any[]): Promise<any[] | Error> {
     let res
     try {
-      res = await DB.query(query)
+      res = await DB.query(query, params)
     } catch (err: any) {
       return new Error(err)
     } finally {
@@ -568,6 +568,8 @@ export const TRAKMAN = {
     return strippedStr
   },
 
+  matchString: Utils.matchString,
+
 
   /**
    * Attempts to convert the player nickname to their login via charmap
@@ -595,14 +597,6 @@ export const TRAKMAN = {
       return undefined
     }
     return s[0].login
-  },
-
-  matchString(searchString: string, possibleMatches: string[]): string[] {
-    const arr: { str: string, value: number }[] = []
-    for (const e of possibleMatches) {
-      arr.push({ str: e, value: dsc.twoStrings(searchString, e) })
-    }
-    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
   },
 
   /**

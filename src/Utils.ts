@@ -1,4 +1,26 @@
 import { Client } from "./client/Client.js"
+import dsc from 'dice-similarity-coeff';
+
+function matchString(searchString: string, possibleMatches: string[]): string[]
+
+function matchString<T extends { [key: string]: any }>(searchString: string, possibleMatches: T[], key: keyof T): T[]
+
+function matchString<T extends { [key: string]: any }>(searchString: string, possibleMatches: string[] | T[], key?: keyof T): string[] | T[] {
+  if (possibleMatches.length === 0) { return [] }
+  if (key === undefined) {
+    const arr: { str: string, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ str: e as any, value: dsc.twoStrings(searchString, e) })
+    }
+    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
+  } else {
+    const arr: { obj: T, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ obj: e as any, value: dsc.twoStrings(searchString, (e as any)[key]) })
+    }
+    return arr.sort((a, b) => b.value - a.value).map(a => a.obj)
+  }
+}
 
 export const Utils = {
 
@@ -57,5 +79,7 @@ export const Utils = {
     }
     return ret
   },
+
+  matchString,
 
 }
