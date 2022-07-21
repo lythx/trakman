@@ -20,12 +20,12 @@ export default class LiveCps extends PopupWindow {
     const records: FinishInfo[] = TM.liveRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
-    this.paginator.onPageChange((login: string): void => {
+    this.paginator.onPageChange=(login: string): void => {
       this.getPagesAndOpen(login)
-    })
-    this.cpPaginator.onPageChange((login: string): void => {
+    }
+    this.cpPaginator.onPageChange=(login: string): void => {
       this.getPagesAndOpen(login)
-    })
+    }
     TM.addListener('Controller.BeginMap', (): void => {
       this.cpPaginator.updatePageCount(this.calculateCpPages())
       this.paginator.updatePageCount(Math.ceil(TM.liveRecords.length / this.entries))

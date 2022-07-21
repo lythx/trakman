@@ -29,7 +29,7 @@ export default class BlacklistList extends PopupWindow {
     })
     const blacklist = TM.blacklist
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(blacklist.length/this.entries))
-    this.paginator.onPageChange((login: string, page: number) => {
+    this.paginator.onPageChange = (login: string, page: number) => {
         const blacklist = TM.blacklist
         let pageCount =  Math.ceil(blacklist.length/this.entries)
         if(pageCount === 0) {
@@ -38,7 +38,7 @@ export default class BlacklistList extends PopupWindow {
         this.paginator.updatePageCount(pageCount)
 
         this.displayToPlayer(login, {page}, `${page}/${pageCount}`)
-    })
+    }
 }
 
     private reRender(): void {

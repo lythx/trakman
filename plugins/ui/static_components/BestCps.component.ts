@@ -58,9 +58,9 @@ export default class BestCps extends StaticComponent {
       this.bestCps.length = 0
       this.display()
     })
-    this.paginator.onPageChange((login: string) => {
+    this.paginator.onPageChange=(login: string) => {
       this.displayToPlayer(login)
-    })
+    }
   }
 
   display(): void {
