@@ -49,11 +49,11 @@ export default class LocalCps extends PopupWindow {
     const entriesToDisplay = records.length - (playerIndex + 1)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.strip(records[i + playerIndex].nickname, false), w, h)
+      return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      let ret: string = centeredText(CONFIG.static.format + records[i + playerIndex].login, w, h)
+      let ret: string = centeredText(records[i + playerIndex].login, w, h)
       if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -67,11 +67,11 @@ export default class LocalCps extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(cp), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -80,18 +80,18 @@ export default class LocalCps extends PopupWindow {
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + cpIndex - this.startCellsOnNextPages).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - this.startCellsOnNextPages).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })

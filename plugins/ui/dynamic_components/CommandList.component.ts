@@ -26,7 +26,7 @@ export default class CommandList extends PopupWindow {
       })
       this.paginators.push(paginator)
     }
-    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
+    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -46,9 +46,9 @@ export default class CommandList extends PopupWindow {
   protected constructContent(login: string, params: { page: number, commands: TMCommand[], privilege: number }): string {
     const n: number = ((params.page - 1) * this.itemsPerPage) - 1
     const headers = [
-      (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Aliases', w, h),
-      (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Arguments', w, h),
-      (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Comment ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number): string => centeredText('Aliases', w, h),
+      (i: number, j: number, w: number, h: number): string => centeredText('Arguments', w, h),
+      (i: number, j: number, w: number, h: number): string => centeredText(' Comment ', w, h), // Space to prevent translation
     ]
     const nameCell = (i: number, j: number, w: number, h: number): string => {
       const command: TMCommand = params.commands[i + n]

@@ -121,7 +121,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.tag}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${verticallyCenteredText(this.format +TM.safeString(TM.strip(maps[mapIndex].name, false)), width, rowH - this.margin, { textScale: 1 })}
+              ${verticallyCenteredText(TM.safeString(TM.strip(maps[mapIndex].name, false)), width, rowH - this.margin, { textScale: 1 })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
@@ -129,7 +129,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.person.white}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${verticallyCenteredText(this.format + TM.safeString(maps[mapIndex].author), width, rowH - this.margin, { textScale: 1 })}
+              ${verticallyCenteredText(TM.safeString(maps[mapIndex].author), width, rowH - this.margin, { textScale: 1 })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
