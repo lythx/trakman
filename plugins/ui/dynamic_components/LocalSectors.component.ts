@@ -71,11 +71,11 @@ export default class LocalSectors extends PopupWindow {
     const cpTypes = getCpTypes(sectors)
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(CONFIG.static.format + TM.strip(params.records[i + n].nickname, false), w, h)
+      return centeredText(TM.strip(params.records[i + n].nickname, false), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      let ret: string = centeredText(CONFIG.static.format + params.records[i + n].login, w, h)
+      let ret: string = centeredText(params.records[i + n].login, w, h)
       if (login === params.records[i + n].login) {
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -83,7 +83,7 @@ export default class LocalSectors extends PopupWindow {
     }
     const dateCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(CONFIG.static.format + TM.formatDate(params.records[i + n].date, true), w, h)
+      return centeredText(TM.formatDate(params.records[i + n].date, true), w, h)
     }
     const cell = (i: number, j: number, w: number, h: number): string => {
       const record: LocalRecord = params.records?.[i + n]
@@ -98,38 +98,38 @@ export default class LocalSectors extends PopupWindow {
       }
       if (((j - 3 === this.cpsPerPage && params.cpPage === 1) || (j - 4 === this.cpsPerPage && params.cpPage !== 1))
         && playerSectors?.[(j - 3) + sectorIndex] !== undefined) {
-        return centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)
+        return centeredText(TM.Utils.getTimeString(record.time), w, h)
       }
       if (playerSectors?.[(j - 3) + sectorIndex] === undefined) {
         if (playerSectors?.[(j - 4) + sectorIndex] !== undefined) {
           return `<format textcolor="${colour}"/>
-            ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)}`
+            ${centeredText(TM.Utils.getTimeString(record.time), w, h)}`
         }
         return ''
       }
       return `<format textcolor="${colour}"/>
-        ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(playerSectors[(j - 3) + sectorIndex]), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(playerSectors[(j - 3) + sectorIndex]), w, h)}`
     }
     let grid: Grid
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Date', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j - 2).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText('Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Date ', w, h),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 2).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + ((j - 2) + sectorIndex).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 2) + sectorIndex).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array((this.cpsPerPage + 4) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 5).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 5).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
     for (let i: number = 0; i < params.records.length; i++) {
