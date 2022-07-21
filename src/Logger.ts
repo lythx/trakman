@@ -164,12 +164,12 @@ export abstract class Logger {
         )
       const separator = this.isFirstLog === false ? undefined : '---------------------------------------------'
       if (tag === 'fatal') {
-        this.webhook.send({
+        await this.webhook.send({
           content: (separator ?? '') + '\n' + pings.join(' '),
           embeds: [embed]
         })
       } else {
-        this.webhook.send({
+        await this.webhook.send({
           content: separator,
           embeds: [embed]
         })

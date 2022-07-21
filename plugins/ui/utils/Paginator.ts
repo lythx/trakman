@@ -134,7 +134,17 @@ export default class Paginator {
     }
   }
 
-  constructXml(page: number): string {
+  constructXml(page: number): string
+
+  constructXml(login: string): string
+
+  constructXml(arg: number | string): string {
+    let page: number
+    if (typeof arg === 'string') {
+      page = this.loginPages.find(a => a.login === arg)?.page ?? this.defaultPage
+    } else {
+      page = arg
+    }
     if (this.buttonCount === 0) {
       return ``
     }
