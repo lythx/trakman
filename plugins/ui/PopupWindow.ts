@@ -14,7 +14,7 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly headerRight: string
   protected readonly frameMidBottom: string
   protected readonly frameBottom: string
-  protected readonly navbar: Navbar
+  protected readonly navbar: Navbar | undefined
   protected readonly navbarHeight: number
   protected readonly windowWidth: number
   protected readonly windowHeight: number
@@ -28,7 +28,7 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly headerPageWidth: number = 10
   protected static readonly playersWithWindowOpen: { login: string, id: number }[] = []
 
-  constructor(windowId: number, headerIcon: string, title: string, navbar: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
+  constructor(windowId: number, headerIcon: string, title: string, navbar?: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
@@ -36,9 +36,12 @@ export default abstract class PopupWindow extends DynamicComponent {
     this.closeId = windowId + UTILIDS.PopupWindow.close
     this.windowHeight = windowHeight
     this.windowWidth = windowWidth;
-    const buttons = this.getButtons(navbar)
-    this.navbar = new Navbar(buttons, this.windowWidth);
-    this.navbarHeight = this.navbar.height
+    this.navbarHeight = -this.margin
+    if (navbar !== undefined && navbar.length !== 0) {
+      const buttons = this.getButtons(navbar)
+      this.navbar = new Navbar(buttons, this.windowWidth);
+      this.navbarHeight = this.navbar.height
+    }
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.frameMidBottom, this.frameBottom] = this.constructFrame()
@@ -68,9 +71,11 @@ export default abstract class PopupWindow extends DynamicComponent {
 
   private constructFrame(): string[] {
     let navbarBg: string = ''
-    const lgt: number = this.navbar.buttons.length
-    for (let i: number = 0; i < lgt; i++) {
-      navbarBg += `<quad posn="${((this.windowWidth + this.margin) / lgt) * i} 0 2" sizen="${(this.windowWidth + this.margin) / lgt - this.margin} ${this.navbarHeight}" bgcolor="${this.headerBg}"/>`
+    if (this.navbar !== undefined) {
+      const lgt: number = this.navbar.buttons.length
+      for (let i: number = 0; i < lgt; i++) {
+        navbarBg += `<quad posn="${((this.windowWidth + this.margin) / lgt) * i} 0 2" sizen="${(this.windowWidth + this.margin) / lgt - this.margin} ${this.navbarHeight}" bgcolor="${this.headerBg}"/>`
+      }
     }
     return [
       `<manialink id="${this.id}">
@@ -87,7 +92,7 @@ export default abstract class PopupWindow extends DynamicComponent {
           </frame>
           <frame posn="0 ${-(this.headerHeight + this.margin)} 5">
             ${navbarBg}
-            ${this.navbar.constructXml()}
+            ${this.navbar?.constructXml() ?? ''}
           </frame>
           <frame posn="0 ${-(this.headerHeight + this.navbarHeight + this.margin * 2)} 5">
             <quad posn="0 0 2" sizen="${this.windowWidth} ${this.windowHeight - (this.headerHeight * 2 + this.margin * 2 + this.navbarHeight)}" bgcolor="${this.bg}"/>

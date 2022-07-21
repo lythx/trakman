@@ -20,12 +20,12 @@ export default class DediSectors extends PopupWindow {
     const records: TMDedi[] = TM.dediRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.secPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateSecPages(), 1, true)
-    this.paginator.onPageChange((login: string): void => {
+    this.paginator.onPageChange=(login: string): void => {
       this.getPagesAndOpen(login)
-    })
-    this.secPaginator.onPageChange((login: string): void => {
+    }
+    this.secPaginator.onPageChange=(login: string): void => {
       this.getPagesAndOpen(login)
-    })
+    }
     TM.addListener('Controller.BeginMap', (): void => {
       this.secPaginator.updatePageCount(this.calculateSecPages())
       this.paginator.updatePageCount(Math.ceil(TM.dediRecords.length / this.entries))

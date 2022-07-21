@@ -144,6 +144,10 @@ export abstract class Logger {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
+    let str = lines.join('\n')
+    if (str.length > 500) {
+      str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
+    }
     for (const file of this.logTypes[tag].files) {
       await fs.appendFile(file, logStr)
     }
@@ -158,7 +162,7 @@ export abstract class Logger {
         .addFields([
           {
             name: location,
-            value: lines.join('\n')
+            value: str
           }
         ]
         )

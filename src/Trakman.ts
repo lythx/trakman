@@ -17,12 +17,12 @@ import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
 import dsc from 'dice-similarity-coeff'
+import { Logger } from './Logger.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -82,15 +82,7 @@ export const TRAKMAN = {
    * @param removeColours Whether to strip colour tags
    * @returns String without format tags
    */
-  strip(str: string, removeColours: boolean = true): string {
-    let regex: RegExp
-    if (removeColours) {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
-    } else {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
-    }
-    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
-  },
+  strip: Utils.strip,
 
   /**
    * Converts milliseconds to humanly readable time
@@ -263,13 +255,7 @@ export const TRAKMAN = {
    * @returns Escaped string
    */
   safeString(str: string): string {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;'
-    }
-    return str.replace(/[&<>"]/g, (m): string => { return map[m as keyof typeof map] })
+    return str.replace(/"/g, '&quot;')
   },
 
   /**
@@ -547,26 +533,7 @@ export const TRAKMAN = {
     RecordService.removeAll(mapId, callerLogin)
   },
 
-  stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
-      return [a[0], [a[0], ...a[1]]]
-    }))
-    let strippedStr = ''
-    for (const letter of str) {
-      let foundLetter = false
-      for (const key in charmap) {
-        if (charmap[key].includes(letter)) {
-          strippedStr += key
-          foundLetter = true
-          break
-        }
-      }
-      if (!foundLetter) {
-        strippedStr += letter
-      }
-    }
-    return strippedStr
-  },
+  stripSpecialChars: Utils.stripSpecialChars,
 
   matchString: Utils.matchString,
 

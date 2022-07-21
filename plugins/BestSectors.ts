@@ -41,7 +41,6 @@ TM.addListener('Controller.BeginMap', (info: BeginMapInfo): void => void fetchSe
 
 TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
   const sector = secRecs.sectors[info.index]
-  console.log(sector, info.index)
   if (sector === undefined || sector > info.time) {
     secRecs.sectors[info.index] = info.time
     secRecs.logins[info.index] = info.player.login

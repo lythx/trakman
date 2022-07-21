@@ -1,5 +1,5 @@
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { Paginator, Grid, ICONS, centeredText, headerIconTitleText, IDS, CONFIG, closeButton } from "../UiUtils.js";
+import { Paginator, Grid, ICONS, centeredText, IDS, CONFIG, closeButton } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
 
 export default class CommandList extends PopupWindow {
@@ -21,9 +21,9 @@ export default class CommandList extends PopupWindow {
       this.commandLists.push(commands)
       const pageCount: number = Math.ceil(commands.length / this.itemsPerPage)
       const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.headerHeight - this.margin, pageCount)
-      paginator.onPageChange((login: string, page: number): void => {
+      paginator.onPageChange=(login: string, page: number): void => {
         this.displayToPlayer(login, { page, paginator, commands, privilege: this.minPrivilege + i, pageCount })
-      })
+      }
       this.paginators.push(paginator)
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
@@ -37,10 +37,6 @@ export default class CommandList extends PopupWindow {
     const commands: TMCommand[] = this.commandLists[privilegeIndex]
     const pageCount: number = paginator.pageCount
     this.displayToPlayer(info.login, { page: 1, commands, paginator, privilege: player.privilege, pageCount })
-  }
-
-  protected constructHeader(login: string, params: { page: number, pageCount: number }): string {
-    return headerIconTitleText('Command List', this.windowWidth, this.headerHeight, '', 2.5, 2.5, `${params.page}/${params.pageCount}`)
   }
 
   protected constructContent(login: string, params: { page: number, commands: TMCommand[], privilege: number }): string {
