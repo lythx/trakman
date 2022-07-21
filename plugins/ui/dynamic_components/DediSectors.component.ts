@@ -58,11 +58,11 @@ export default class DediSectors extends PopupWindow {
     const entriesToDisplay = secRecords.length - (playerIndex + 1)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.strip(secRecords[i + playerIndex].nickname, false), w, h)
+      return centeredText(TM.strip(secRecords[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      let ret: string = centeredText(CONFIG.static.format + secRecords[i + playerIndex].login, w, h)
+      let ret: string = centeredText(secRecords[i + playerIndex].login, w, h)
       if (login === secRecords[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -76,11 +76,11 @@ export default class DediSectors extends PopupWindow {
       const colour: string = secType === undefined ? 'FFFF' : (this.secColours as any)[secType]
       const sec = record.checkpoints[(j - startCells) + secIndex]
       return sec === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(sec), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(sec), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(CONFIG.static.format + TM.Utils.getTimeString(secRecords[i + playerIndex].time), w, h)
+      return centeredText(TM.Utils.getTimeString(secRecords[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -89,18 +89,18 @@ export default class DediSectors extends PopupWindow {
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
     if (params.secPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
-        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
+        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.secsOnFirstPage - secsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.secsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j + secIndex - this.startCellsOnNextPages).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + secIndex - this.startCellsOnNextPages).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.secsOnNextPages - secsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.secsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
