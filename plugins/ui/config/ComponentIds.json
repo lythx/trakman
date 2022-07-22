@@ -30,5 +30,6 @@
     "playerList": 130000,
     "banList": 140000,
     "blacklistList": 150000,
-    "guestlistList": 160000
+    "guestlistList": 160000,
+    "sectorRecords": 170000
 }

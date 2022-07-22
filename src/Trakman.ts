@@ -1,3 +1,4 @@
+import { Events } from './Events.js'
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
@@ -6,12 +7,10 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
-import { Events } from './Events.js'
 import { Utils } from './Utils.js'
 import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
-import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
@@ -255,17 +254,16 @@ export const TRAKMAN = {
    * @returns Escaped string
    */
   safeString(str: string): string {
-    return str.replace(/"/g, '&quot;')
+    return (str.replace(/"/g, '&quot;')).replace(/&/g, "&amp;")
   },
 
   /**
    * Adds a listener to an event to execute callbacks
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
+   * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
-  addListener(event: TMEvent, callback: ((params: any) => void)): void {
-    Events.addListener(event, callback)
-  },
+  addListener: Events.addListener,
 
   /**
    * Adds a map to the server
@@ -322,7 +320,7 @@ export const TRAKMAN = {
    * @param lines Error messages
    */
   error(...lines: string[]): void {
-    ErrorHandler.error(...lines)
+    Logger.error(...lines)
   },
 
   /**
@@ -330,7 +328,7 @@ export const TRAKMAN = {
    * @param lines Error messages
    */
   fatalError(...lines: string[]): void {
-    ErrorHandler.fatal(...lines)
+    Logger.fatal(...lines)
   },
 
   /**
@@ -400,7 +398,7 @@ export const TRAKMAN = {
       }
     }).catch(err => err)
     if (response instanceof Error) {
-      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
+      Logger.error(`Error while fetching webservices data dor login ${login}`, response.message)
       return response
     }
     return await response.json()
@@ -703,11 +701,11 @@ export const TRAKMAN = {
     return TMXService.current
   },
 
-  get mapQueue(): TMMap[] {
+  get mapQueue() {
     return JukeboxService.queue
   },
 
-  get jukebox(): TMMap[] {
+  get jukebox() {
     return JukeboxService.jukebox
   },
 

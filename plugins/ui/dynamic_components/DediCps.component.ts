@@ -20,19 +20,19 @@ export default class DediCps extends PopupWindow {
     const records: TMDedi[] = TM.dediRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
-    this.paginator.onPageChange=(login: string): void => {
+    this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    this.cpPaginator.onPageChange=(login: string): void => {
+    this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
     TM.addListener('Controller.BeginMap', (): void => {
-      this.cpPaginator.updatePageCount(this.calculateCpPages())
-      this.paginator.updatePageCount(Math.ceil(TM.dediRecords.length / this.entries))
+      this.cpPaginator.setPageCount(this.calculateCpPages())
+      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
       this.reRender()
     })
     TM.addListener('Controller.PlayerFinish', (): void => {
-      this.paginator.updatePageCount(Math.ceil(TM.dediRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
       this.reRender()
     })
   }

@@ -1,5 +1,5 @@
 import Paginator from './utils/Paginator.js'
-import Grid from './utils/Grid.js'
+import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
 import Navbar from './utils/Navbar.js'
 import DropdownMenu from './utils/DropdownMenu.js'
 import RecordList from './utils/RecordList.js'
@@ -115,7 +115,7 @@ const stringToObjectProperty = (str: string, obj: any): any => {
   return obj
 }
 
-const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number, 
+const constuctButton = (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number,
   iconHeight: number, topPadding: number, options?: { equalTexts?: true, actionId?: number, link?: string }): string => {
   const t1: string = options?.equalTexts ?
     horizontallyCenteredText(text1, width, height, { yOffset: 2.4, textScale: 0.36, padding: 0.6 }) :
@@ -178,4 +178,4 @@ const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | unde
   return cpTypes
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, CONFIG, ICONS, BACKGROUNDS, IDS, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText,  calculateStaticPositionY, verticallyCenteredText }
+export { Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject, CONFIG, ICONS, BACKGROUNDS, IDS, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, gridCell, centeredText, calculateStaticPositionY, verticallyCenteredText }
