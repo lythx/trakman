@@ -8,6 +8,7 @@ type TMEvent = StringAutocomplete<
 "Controller.PlayerRecord" |
 "Controller.PlayerFinish" | 
 "Controller.PlayerInfoChanged" | 
+"Controller.LiveRecord" |
 "Controller.ManialinkClick" | 
 "Controller.PlayerCheckpoint" | 
 "Controller.BeginMap" | 
@@ -17,4 +18,5 @@ type TMEvent = StringAutocomplete<
 "Controller.KarmaVote" |
 "Controller.ManiakarmaVotes" | 
 "Controller.MapAdded" |
-"Controller.MapRemoved">
+"Controller.MapRemoved" |
+"Controller.BillUpdated">

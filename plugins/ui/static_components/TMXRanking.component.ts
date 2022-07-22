@@ -23,7 +23,7 @@ export default class TMXRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.LiveRecord', (info: RecordInfo): void => {
+    TM.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
       if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {

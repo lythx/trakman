@@ -22,7 +22,7 @@ export default class LocalSectors extends PopupWindow {
     const records: LocalRecord[] = TM.localRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
-    this.paginator.onPageChange=(login: string, page: number): void => {
+    this.paginator.onPageChange = (login: string, page: number): void => {
       const records: LocalRecord[] = TM.localRecords
       const pageCount: number = this.paginator.pageCount
       const cpPage: number = this.cpPaginator.getPageByLogin(login) ?? 1
@@ -37,7 +37,7 @@ export default class LocalSectors extends PopupWindow {
       }
     }
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
-    this.cpPaginator.onPageChange=(login: string, cpPage: number): void => {
+    this.cpPaginator.onPageChange = (login: string, cpPage: number): void => {
       const records: LocalRecord[] = TM.localRecords
       const pageCount: number = this.paginator.pageCount
       const page: number = this.paginator.getPageByLogin(login) ?? 1
@@ -45,7 +45,7 @@ export default class LocalSectors extends PopupWindow {
     }
     TM.addListener('Controller.BeginMap', (): void => {
       this.cpAmount = TM.map.checkpointsAmount
-      this.paginator.updatePageCount(Math.ceil(TM.localRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.localRecords.length / this.entries))
     })
   }
 

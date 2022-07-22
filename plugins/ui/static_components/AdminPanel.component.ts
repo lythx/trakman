@@ -22,14 +22,15 @@ export default class AdminPanel extends StaticComponent {
   display(): void {
     this._isDisplayed = true
     for (const e of TM.players) {
-      if (e.privilege > 0) {
-        this.displayToPlayer(e.login)
-      }
+      this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    const player = TM.getPlayer(login)
+    if (player !== undefined && player.privilege > 0) {
+      TM.sendManialink(this.xml, login)
+    }
   }
 
   private constructXml(): void {

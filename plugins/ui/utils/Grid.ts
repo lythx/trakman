@@ -1,4 +1,13 @@
-export default class Grid {
+export type GridCellFunction = (i: number, j: number, w: number, h: number) => string
+
+export interface GridCellObject {
+  callback: ((i: number, j: number, w: number, h: number) => string)
+  colspan?: number
+  rowspan?: number
+  background?: string
+}
+
+export class Grid {
 
   readonly width: number
   readonly height: number
@@ -6,7 +15,6 @@ export default class Grid {
   readonly rowHeights: number[]
   readonly columns: number
   readonly rows: number
-  //TODO THIS IN CONFIG FILE
   readonly background: string | undefined
   readonly margin: number
   readonly headerBg: string | undefined
@@ -15,7 +23,7 @@ export default class Grid {
     this.width = width
     this.height = height
     this.margin = options?.margin ?? 0
-    const columnSum: number =  columnProportions.reduce((acc, cur): number => acc + cur, 0)
+    const columnSum: number = columnProportions.reduce((acc, cur): number => acc + cur, 0)
     const rowSum: number = rowProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / columnSum) * (this.width - this.margin))
     this.rowHeights = rowProportions.map(a => (a / rowSum) * (this.height - this.margin))
@@ -25,26 +33,59 @@ export default class Grid {
     this.headerBg = options?.headerBg
   }
 
-  constructXml(cellConstructFunctions: ((i: number, j: number, w: number, h: number) => string)[]): string {
+  constructXml(objectsOrFunctions: (GridCellFunction | GridCellObject)[]): string {
     let xml: string = ``
+    let map: boolean[][] = Array.from(new Array(this.columns), () => new Array(this.rows).fill(false))
+    let indexOffset = 0
     for (let i: number = 0; i < this.rows; i++) {
       for (let j: number = 0; j < this.columns; j++) {
-        if (cellConstructFunctions[(i * this.columns) + j] === undefined) { break }
-        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc += cur, 0) -this.margin
+        if (map[j][i] === true) {
+          indexOffset++
+          continue
+        }
+        const obj = objectsOrFunctions[(i * this.columns) + j - indexOffset]
+        if (obj === undefined) { break }
+        let callback: (i: number, j: number, w: number, h: number) => string
+        let rowspan = 1
+        let colspan = 1
+        let background: string | undefined
+        if (this.checkConstructFunctionType(obj)) {
+          callback = obj.callback
+          rowspan = obj.rowspan ?? 1
+          colspan = obj.colspan ?? 1
+          background = obj.background
+        } else {
+          callback = obj
+        }
+        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc += cur, 0) - this.margin
         const posX: number = this.columnWidths.filter((val, index): boolean => index < j).reduce((acc, cur): number => acc += cur, 0) + this.margin
-        const h: number = this.rowHeights[i] - this.margin
-        const w: number = this.columnWidths[j] - this.margin
+        let h: number = -this.margin
+        for (let k = i; k < i + rowspan; k++) {
+          h += this.rowHeights[k]
+          map[j][k] = true
+        }
+        let w: number = -this.margin
+        for (let k = j; k < j + colspan; k++) {
+          w += this.columnWidths[k]
+          map[k][i] = true
+        }
         xml += `<frame posn="${posX} ${posY} 1">`
-        if (this.headerBg !== undefined && i === 0) {
+        if (background !== undefined) {
+          xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${background}"/>`
+        } else if (this.headerBg !== undefined && i === 0) {
           xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
         } else if ((this.background !== undefined && i !== 0) || (this.headerBg === undefined && this.background !== undefined)) {
           xml += `<quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${this.background}"/>`
         }
-        xml += cellConstructFunctions[(i * this.columns) + j](i, j, w, h)
+        xml += callback(i, j, w, h)
         xml += `</frame>`
       }
     }
     return xml
+  }
+
+  private checkConstructFunctionType(obj: any): obj is GridCellObject {
+    return obj?.callback !== undefined
   }
 
 }

@@ -21,7 +21,7 @@ export default class Paginator {
   readonly height: number
   readonly margin: number = CONFIG.paginator.margin
   readonly emptyBg: string = CONFIG.paginator.background
-  _onPageChange: (login: string, page: number) => void = ()=>undefined
+  private _onPageChange: (login: string, page: number) => void = () => undefined
   pageCount: number
   yPos: number
   xPos: number[]
@@ -98,7 +98,7 @@ export default class Paginator {
     return page
   }
 
-  updatePageCount(pageCount: number): void {
+  setPageCount(pageCount: number): void {
     this.pageCount = pageCount
     this.buttonCount = 0
     if (pageCount > 1) { this.buttonCount = 1 }

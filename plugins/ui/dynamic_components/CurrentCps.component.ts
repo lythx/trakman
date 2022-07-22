@@ -49,13 +49,13 @@ export default class CurrentCps extends PopupWindow {
       }
     })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, 1)
-    this.paginator.onPageChange=(login: string, page: number) => {
+    this.paginator.onPageChange = (login: string, page: number) => {
       // Calculate and update page count
       let pageCount = Math.ceil(this.currentCheckpoints.length / this.entries)
       if (pageCount === 0) { // Fix 0 pages display if theres no entries
         pageCount = 1
       }
-      this.paginator.updatePageCount(pageCount)
+      this.paginator.setPageCount(pageCount)
       // Display using page received in params
       this.displayToPlayer(login, { page }, `${page}/${pageCount}`)
     }
@@ -77,7 +77,7 @@ export default class CurrentCps extends PopupWindow {
     if (pageCount === 0) { // Fix 0 pages display if theres no entries
       pageCount = 1
     }
-    this.paginator.updatePageCount(pageCount)
+    this.paginator.setPageCount(pageCount)
     this.displayToPlayer(info.login, { page: 1 }, `1/${pageCount}`)
   }
 

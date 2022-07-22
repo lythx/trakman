@@ -414,7 +414,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = (parentWidth / 2) + xOffset
     const posY: number = (parentHeight / 2) + yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center" halign="center"/>`
   }
 
   private verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number): string => {
@@ -422,7 +422,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = xOffset + padding
     const posY: number = parentHeight / 2
-    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center"/>`
   }
 
   private stringToIcon = (str: string) => {
