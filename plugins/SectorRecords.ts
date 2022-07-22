@@ -1,7 +1,7 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
 interface MapSectors {
-  readonly mapId: string
+  readonly mapid: string
   readonly logins: string[]
   readonly nicknames: string[]
   readonly sectors: number[]
@@ -9,7 +9,7 @@ interface MapSectors {
 }
 
 interface PlayerSectors {
-  readonly mapId: string
+  readonly mapid: string
   readonly login: string
   readonly sectors: number[]
 }
@@ -41,7 +41,7 @@ const playerSectorListeners: ((login: string, nickname: string, index: number) =
 
 const addMapSectors = async (): Promise<void> => {
   const query = `INSERT INTO mapsecrecs(mapId, logins, nicknames, sectors, dates) VALUES($1, $2, $3, $4, $5);`
-  await TM.queryDB(query, [mapSectors.mapId, mapSectors.logins, mapSectors.nicknames, mapSectors.sectors, mapSectors.dates])
+  await TM.queryDB(query, [mapSectors.mapid, mapSectors.logins, mapSectors.nicknames, mapSectors.sectors, mapSectors.dates])
 }
 
 const addPlayerSector = async (mapId: string, login: string, sectors: number[]): Promise<void> => {
@@ -56,10 +56,12 @@ const getMapSectors = async (mapId: string): Promise<void> => {
     return
   }
   if (res[0] === undefined) {
-    mapSectors = { mapId, logins: [], nicknames: [], sectors: [], dates: [] }
+    mapSectors = { mapid: mapId, logins: [], nicknames: [], sectors: [], dates: [] }
     void addMapSectors()
   } else {
+    console.log(res[0])
     mapSectors = res[0]
+    console.log(mapSectors)
   }
 }
 
@@ -74,7 +76,7 @@ const getPlayerSectors = async (mapId: string, login: string): Promise<PlayerSec
 
 const updateMapSectors = async (): Promise<void> => {
   const query = `UPDATE mapsecrecs SET logins=$1, nicknames=$2, sectors=$3, dates=$4 WHERE mapId=$5;`
-  const res: MapSectors[] | Error = await TM.queryDB(query, [mapSectors.logins, mapSectors.nicknames, mapSectors.sectors, mapSectors.dates, mapSectors.mapId])
+  const res: MapSectors[] | Error = await TM.queryDB(query, [mapSectors.logins, mapSectors.nicknames, mapSectors.sectors, mapSectors.dates, mapSectors.mapid])
   if (res instanceof Error) {
     TM.error(`Error when updating sector records`, res.message)
   }
@@ -92,7 +94,7 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
   for (const query of createQueries) {
     await TM.queryDB(query)
   }
-  void getMapSectors(TM.map.id)
+  await getMapSectors(TM.map.id)
   for (const e of TM.players) {
     const sec = await getPlayerSectors(TM.map.id, e.login)
     if (sec !== undefined) { sectors.push(sec) }
@@ -117,18 +119,19 @@ TM.addListener('Controller.BeginMap', (info: BeginMapInfo): void => {
 TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
   const date = new Date()
   const playerSectors = sectors.find(a => a.login === info.player.login)
+  const time = info.time - (info.player.checkpoints[info.index - 1]?.time ?? 0)
   if (playerSectors === undefined) {
-    sectors.push({ mapId: mapSectors.mapId, login: info.player.login, sectors: [info.time] })
-    void addPlayerSector(mapSectors.mapId, info.player.login, [info.time])
-  } else if (playerSectors.sectors[info.index] === undefined || playerSectors.sectors[info.index] > info.time) {
-    playerSectors.sectors[info.index] = info.time - (info.player.checkpoints[info.index - 1]?.time ?? 0)
-    void updatePlayerSectors(mapSectors.mapId, info.player.login, playerSectors.sectors)
+    sectors.push({ mapid: mapSectors.mapid, login: info.player.login, sectors: [info.time] })
+    void addPlayerSector(mapSectors.mapid, info.player.login, [info.time])
+  } else if (playerSectors.sectors[info.index] === undefined || playerSectors.sectors[info.index] > time) {
+    playerSectors.sectors[info.index] = time
+    void updatePlayerSectors(mapSectors.mapid, info.player.login, playerSectors.sectors)
   }
   const sector = mapSectors.sectors[info.index]
-  if (sector === undefined || sector > info.time) {
+  if (sector === undefined || sector > time) {
     mapSectors.logins[info.index] = info.player.login
     mapSectors.nicknames[info.index] = info.player.nickname
-    mapSectors.sectors[info.index] = info.time - (info.player.checkpoints[info.index - 1]?.time ?? 0)
+    mapSectors.sectors[info.index] = time
     mapSectors.dates[info.index] = date
     void updateMapSectors()
     for (const e of bestSectorListeners) {
@@ -141,18 +144,19 @@ TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
   const date = new Date()
   const index = info.checkpoints.length
   const playerSectors = sectors.find(a => a.login === info.login)
+  const time = info.time - (info.checkpoints[index - 1] ?? 0)
   if (playerSectors === undefined) {
-    sectors.push({ mapId: mapSectors.mapId, login: info.login, sectors: [info.time] })
-    void addPlayerSector(mapSectors.mapId, info.login, [info.time])
-  } else if (playerSectors.sectors[index] === undefined || playerSectors.sectors[index] > info.time) {
+    sectors.push({ mapid: mapSectors.mapid, login: info.login, sectors: [info.time] })
+    void addPlayerSector(mapSectors.mapid, info.login, [info.time])
+  } else if (playerSectors.sectors[index] === undefined || playerSectors.sectors[index] > time) {
     playerSectors.sectors[index] = info.time - (info.checkpoints[index - 1] ?? 0)
-    void updatePlayerSectors(mapSectors.mapId, info.login, playerSectors.sectors)
+    void updatePlayerSectors(mapSectors.mapid, info.login, playerSectors.sectors)
   }
   const sector = mapSectors.sectors[index]
-  if (sector === undefined || sector > info.time) {
+  if (sector === undefined || sector > time) {
     mapSectors.logins[index] = info.login
     mapSectors.nicknames[index] = info.nickname
-    mapSectors.sectors[index] = info.time - (info.checkpoints[index - 1] ?? 0)
+    mapSectors.sectors[index] = time
     mapSectors.dates[index] = date
     void updateMapSectors()
     for (const e of bestSectorListeners) {
@@ -223,7 +227,7 @@ const sectorRecords = {
     for (const [i, e] of TM.players.entries()) {
       arr[i] = {
         login: e.login,
-        sectors: sectors.find(a => a.login === e.login)?.sectors ?? new Array(TM.map.checkpointsAmount).fill(null)
+        sectors: new Array(TM.map.checkpointsAmount).fill(null).map((a, i) => sectors.find(a => a.login === e.login)?.sectors[i] ?? null)
       }
     }
     return arr
