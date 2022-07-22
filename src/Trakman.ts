@@ -300,6 +300,7 @@ export const TRAKMAN = {
       return new Error(err)
     } finally {
       if (res === undefined) {
+        console.log(query, params)
         return new Error('Database response undefined')
       }
       return res.rows
