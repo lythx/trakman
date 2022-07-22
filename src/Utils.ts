@@ -1,4 +1,6 @@
 import { Client } from "./client/Client.js"
+import dsc from 'dice-similarity-coeff';
+import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 
 export const Utils = {
 
@@ -58,4 +60,63 @@ export const Utils = {
     return ret
   },
 
+  strip(str: string, removeColours: boolean = true): string {
+    let regex: RegExp
+    if (removeColours) {
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
+    } else {
+      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
+    }
+    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
+  },
+
+  stripSpecialChars(str: string): string {
+    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
+      return [a[0], [a[0], ...a[1]]]
+    }))
+    let strippedStr = ''
+    for (const letter of str) {
+      let foundLetter = false
+      for (const key in charmap) {
+        if (charmap[key].includes(letter)) {
+          strippedStr += key
+          foundLetter = true
+          break
+        }
+      }
+      if (!foundLetter) {
+        strippedStr += letter
+      }
+    }
+    return strippedStr
+  },
+
+  matchString,
+
 }
+
+function matchString(searchString: string, possibleMatches: string[]): { str: string, value: number }[]
+
+function matchString<T extends { [key: string]: any }>
+  (searchString: string, possibleMatches: T[], key: keyof T, stripSpecialChars?: true): { obj: T, value: number }[]
+
+function matchString<T extends { [key: string]: any }>
+  (searchString: string, possibleMatches: string[] | T[], key?: keyof T, stripSpecialChars?: true)
+  : { str: string, value: number }[] | { obj: T, value: number }[] {
+  if (possibleMatches.length === 0) { return [] }
+  if (key === undefined) {
+    const arr: { str: string, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ str: e as any, value: dsc.twoStrings(searchString, e) })
+    }
+    return arr.sort((a, b) => b.value - a.value)
+  } else {
+    const arr: { obj: T, value: number }[] = []
+    for (const e of possibleMatches) {
+      arr.push({ obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ? Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key]) })
+    }
+    return arr.sort((a, b) => b.value - a.value)
+  }
+}
+
+

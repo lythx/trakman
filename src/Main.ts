@@ -4,7 +4,6 @@ import { MapService } from './services/MapService.js'
 import 'dotenv/config'
 import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
-import { ErrorHandler } from './ErrorHandler.js'
 import { ChatService } from './services/ChatService.js'
 import './commands/InternalCommands.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
@@ -74,7 +73,7 @@ async function main(): Promise<void> {
   if (process.env.USE_MANIAKARMA === 'YES') {
     Logger.trace('Connecting to Maniakarma...')
     const status: void | Error = await ManiakarmaService.initialize()
-    if (status instanceof Error) { ErrorHandler.error('Failed to initialize Maniakarma service') }
+    if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
     else { Logger.trace('Connected to Maniakarma') }
   }
   Logger.trace('Enabling callbacks...')

@@ -194,7 +194,7 @@ export default class VoteWindow {
     const padding: number = options?.padding ?? 1
     const posX: number = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
     const posY: number = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${TM.safeString(text)}" valign="center" halign="right"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center" halign="right"/>`
   }
 
   private centeredText = (text: string, parentWidth: number, parentHeight: number, params?: { xOffset?: number, yOffset?: number, specialFont?: true, textScale?: number }): string => {
@@ -203,7 +203,7 @@ export default class VoteWindow {
     const posX: number = (parentWidth / 2) + (params?.xOffset ?? 0)
     const posY: number = (parentHeight / 2) + (params?.yOffset ?? -0.15)
     const styleStr = params?.specialFont ? `style="TextRaceChrono"` : ''
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format + TM.safeString(text)}" ${styleStr} valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${CONFIG.static.format + TM.safeString(text)}" ${styleStr} valign="center" halign="center"/>`
   }
 
   private stringToIcon = (str: string): any => {

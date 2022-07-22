@@ -22,12 +22,12 @@ export default class LiveSectors extends PopupWindow {
     const records: FinishInfo[] = TM.liveRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
-    this.paginator.onPageChange((login: string, page: number): void => {
+    this.paginator.onPageChange = (login: string, page: number): void => {
       const records: FinishInfo[] = TM.liveRecords
       const pageCount: number = this.paginator.pageCount
       const cpPage: number = this.cpPaginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
-    })
+    }
     let cpPages: number = 1
     for (let i: number = 0; i < this.cpAmount; i++) {
       if (cpPages == 1 && i > this.cpsPerPage * cpPages) {
@@ -37,15 +37,15 @@ export default class LiveSectors extends PopupWindow {
       }
     }
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
-    this.cpPaginator.onPageChange((login: string, cpPage: number): void => {
+    this.cpPaginator.onPageChange = (login: string, cpPage: number): void => {
       const records: FinishInfo[] = TM.liveRecords
       const pageCount: number = this.paginator.pageCount
       const page: number = this.paginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
-    })
+    }
     TM.addListener('Controller.BeginMap', (): void => {
       this.cpAmount = TM.map.checkpointsAmount
-      this.paginator.updatePageCount(Math.ceil(TM.liveRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
     })
   }
 
@@ -71,11 +71,11 @@ export default class LiveSectors extends PopupWindow {
     const cpTypes = getCpTypes(sectors)
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(CONFIG.static.format + TM.strip(params.records[i + n].nickname, false), w, h)
+      return centeredText(TM.strip(params.records[i + n].nickname, false), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       if (params.records?.[i + n] === undefined) { return '' }
-      let ret: string = centeredText(CONFIG.static.format + params.records[i + n].login, w, h)
+      let ret: string = centeredText(params.records[i + n].login, w, h)
       if (login === params.records[i + n].login) {
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -94,37 +94,37 @@ export default class LiveSectors extends PopupWindow {
       }
       if (((j - 2 === this.cpsPerPage && params.cpPage === 1) || (j - 3 === this.cpsPerPage && params.cpPage !== 1))
         && playerSectors?.[(j - 2) + sectorIndex] !== undefined) {
-        return centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)
+        return centeredText(TM.Utils.getTimeString(record.time), w, h)
       }
       if (playerSectors?.[(j - 2) + sectorIndex] === undefined) {
         if (playerSectors?.[(j - 3) + sectorIndex] !== undefined) {
           return `<format textcolor="${colour}"/>
-            ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(record.time), w, h)}`
+            ${centeredText(TM.Utils.getTimeString(record.time), w, h)}`
         }
         return ''
       }
       return `<format textcolor="${colour}"/>
-        ${centeredText(CONFIG.static.format + TM.Utils.getTimeString(playerSectors[(j - 2) + sectorIndex]), w, h)}`
+        ${centeredText(TM.Utils.getTimeString(playerSectors[(j - 2) + sectorIndex]), w, h)}`
     }
     let grid: Grid
     let headers: ((i: number, j: number, w: number, h: number) => string)[]
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Login', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + (j - 1).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 1).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Nickname ', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + ((j - 1) + sectorIndex).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(CONFIG.static.format + 'Finish', w, h),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 1) + sectorIndex).toString(), w, h)),
+        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array((this.cpsPerPage + 2) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg,  margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
     for (let i: number = 0; i < params.records.length; i++) {

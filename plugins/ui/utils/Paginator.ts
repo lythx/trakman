@@ -21,6 +21,7 @@ export default class Paginator {
   readonly height: number
   readonly margin: number = CONFIG.paginator.margin
   readonly emptyBg: string = CONFIG.paginator.background
+  private _onPageChange: (login: string, page: number) => void = () => undefined
   pageCount: number
   yPos: number
   xPos: number[]
@@ -57,23 +58,24 @@ export default class Paginator {
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }
-  }
-
-  onPageChange(callback: (login: string, page: number) => void): void {
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (this.ids.includes(info.answer)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)
         if (playerPage === undefined) { // Should never happen
           const page: number = this.getPageFromClick(info.answer, this.defaultPage)
           this.loginPages.push({ login: info.login, page: page })
-          callback(info.login, page)
+          this._onPageChange(info.login, page)
           return
         }
         const page: number = this.getPageFromClick(info.answer, playerPage.page)
         playerPage.page = page
-        callback(info.login, page)
+        this._onPageChange(info.login, page)
       }
     })
+  }
+
+  set onPageChange(callback: (login: string, page: number) => void) {
+    this._onPageChange = callback
   }
 
   resetPlayerPages(): void {
@@ -96,7 +98,7 @@ export default class Paginator {
     return page
   }
 
-  updatePageCount(pageCount: number): void {
+  setPageCount(pageCount: number): void {
     this.pageCount = pageCount
     this.buttonCount = 0
     if (pageCount > 1) { this.buttonCount = 1 }
@@ -134,7 +136,17 @@ export default class Paginator {
     }
   }
 
-  constructXml(page: number): string {
+  constructXml(page: number): string
+
+  constructXml(login: string): string
+
+  constructXml(arg: number | string): string {
+    let page: number
+    if (typeof arg === 'string') {
+      page = this.loginPages.find(a => a.login === arg)?.page ?? this.defaultPage
+    } else {
+      page = arg
+    }
     if (this.buttonCount === 0) {
       return ``
     }

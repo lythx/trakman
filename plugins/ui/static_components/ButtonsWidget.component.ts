@@ -426,7 +426,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: cfg.sectorRecords.width,
       iconHeight: cfg.sectorRecords.height,
       padding: cfg.sectorRecords.padding,
-      actionId: IDS.dediCps,
+      actionId: IDS.sectorRecords,
       equalTexts: true
     }
     // Github repo

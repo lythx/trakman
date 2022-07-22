@@ -7,6 +7,7 @@ import { Events } from "../Events.js"
 interface JukeboxMap {
   readonly map: TMMap
   readonly isForced: boolean
+  readonly callerLogin?: string
 }
 
 /**
@@ -30,7 +31,7 @@ export abstract class JukeboxService {
     MapService.setNextMap(this._queue[0].map.id)
     Events.addListener('Controller.MapAdded', (info: MapAddedInfo) => {
       const status = this.add(info.id, info.callerLogin, true)
-      if(status instanceof Error) {
+      if (status instanceof Error) {
         Logger.error(`Failed to insert newly added map ${info.name} into the jukebox, clearing the jukebox to prevent further errors...`)
         this.clear()
       }
@@ -67,7 +68,7 @@ export abstract class JukeboxService {
     const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
-    this._queue.splice(index, 0, { map: map, isForced: true })
+    this._queue.splice(index, 0, { map: map, isForced: true, callerLogin })
     MapService.setNextMap(this._queue[0].map.id)
     TMXService.addMap(mapId, index)
     if (callerLogin !== undefined) {
@@ -114,12 +115,12 @@ export abstract class JukeboxService {
     this.fillQueue()
   }
 
-  static get jukebox(): TMMap[] {
-    return [...this._queue.filter(a => a.isForced === true).map(a => a.map)]
+  static get jukebox(): ({ map: TMMap, callerLogin?: string })[] {
+    return [...this._queue.filter(a => a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))]
   }
 
   static get queue(): TMMap[] {
-    return [...this._queue.map(a => a.map)]
+    return [...this._queue.map(a =>  a.map )]
   }
 
   static get previous(): TMMap[] {
