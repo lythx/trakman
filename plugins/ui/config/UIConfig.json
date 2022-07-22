@@ -331,7 +331,7 @@
     ]
   },
   "bestCps": {
-    "title": "Best Checkpoints",
+    "title": "Best Cps",
     "entries": 6,
     "height": 14.5,
     "selfColour": "0F0F",
@@ -540,10 +540,10 @@
   "mapList": {
     "title": "Map List",
     "icon": "map.white",
-    "rows": 4,
+    "rows": 5,
     "columns": 5,
     "navbar": [
-      "dediCps"
+      "commandList"
     ]
   },
   "donationPanel": {
@@ -633,6 +633,38 @@
     "navbar": [
       "banList",
       "blacklistList"
+    ]
+  },
+  "sectorRecords": {
+    "title": " Sector Records ",
+    "icon": "clock",
+    "entries": 14,
+    "columnProportions": [
+      0.7,
+      2,
+      2,
+      2,
+      1,
+      1.5
+    ],
+    "navbar": [
+      "checkpointRecords"
+    ]
+  },
+  "checkpointRecords": {
+    "title": " Checkpoint Records ",
+    "icon": "clock",
+    "entries": 14,
+    "columnProportions": [
+      0.7,
+      2,
+      2,
+      2,
+      1,
+      1.5
+    ],
+    "navbar": [
+      "sectorRecords"
     ]
   }
 }

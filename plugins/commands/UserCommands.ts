@@ -213,21 +213,6 @@ const commands: TMCommand[] = [
     privilege: 0
   },
   {
-    // TODO IMPLEMENT MAP SEARCH
-    aliases: ['l', 'ml', 'list'],
-    help: 'Display list of maps.',
-    params: [{ name: 'query', optional: true }],
-    callback: (info: MessageInfo, query?: string): void => {
-      if (query === undefined) {
-        TM.openManialink(TM.UIIDS.mapList, info.login)
-        return
-      }
-      const mapList = UI.dynamicComponents.mapList
-      mapList.openWithQuery(info.login, query)
-    },
-    privilege: 0
-  },
-  {
     aliases: ['pm', 'dm'],
     params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
     help: 'Message a player.',

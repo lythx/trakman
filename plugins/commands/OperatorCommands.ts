@@ -332,7 +332,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No such index in the queue.`, info.login)
         return
       }
-      const map: TMMap | undefined = TM.jukebox.find(a => a === TM.jukebox[index])
+      const map: TMMap | undefined = TM.jukebox.map(a => a.map).find(a => a === TM.jukebox.map(a => a.map)[index])
       if (map === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't find this index in the queue.`, info.login)
         return
@@ -354,7 +354,7 @@ const commands: TMCommand[] = [
         return
       }
       for (const map of TM.jukebox) {
-        TM.removeFromJukebox(map.id, info.login)
+        TM.removeFromJukebox(map.map.id, info.login)
       }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `

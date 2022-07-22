@@ -129,16 +129,16 @@ export default class KarmaWidget extends StaticComponent {
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
       <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${ICONS.heart}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(CONFIG.static.format + Math.round(karma).toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      ${centeredText(Math.round(karma).toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(CONFIG.static.format + mkKarma, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      ${centeredText(mkKarma, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
 
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
       <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="https://cdn.discordapp.com/attachments/502122268936110100/990585196288024576/Vote.png"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(CONFIG.static.format + totalVotes.toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      ${centeredText(totalVotes.toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(CONFIG.static.format + mkAmount, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      ${centeredText(mkAmount, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
     ]
     return grid.constructXml(arr)
   }
@@ -152,7 +152,7 @@ export default class KarmaWidget extends StaticComponent {
       const offsetFix: number = i > 2 ? -0.3 : 0
       const textScale: number = i > 2 ? 1 : 0.6
       ret += `<quad posn="${this.margin} -${this.margin + h * i} 2" sizen="${this.buttonW - (this.margin * 2)} ${h - this.margin}" bgcolor="${colours[i]}" action="${this.id + i + 1}"/>
-      ${centeredText(CONFIG.static.format + e, this.buttonW - (this.margin * 2), h - this.margin, { xOffset: this.margin, yOffset: this.margin + h * i + offsetFix, padding: 0, textScale })}`
+      ${centeredText(e, this.buttonW - (this.margin * 2), h - this.margin, { xOffset: this.margin, yOffset: this.margin + h * i + offsetFix, padding: 0, textScale })}`
     }
     return ret
   }

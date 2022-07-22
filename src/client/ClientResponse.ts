@@ -1,5 +1,5 @@
+import { Logger } from '../Logger.js'
 import xml2js from 'xml2js'
-import { ErrorHandler } from '../ErrorHandler.js'
 
 export class ClientResponse {
 
@@ -96,7 +96,7 @@ export class ClientResponse {
   extractOverload(): Buffer {
     this._status = 'completed'
     if (this._overload === null) {
-      ErrorHandler.error('Error in ClientResponse.extractOverload()', `Overload is null for response ${this._eventName}`)
+      Logger.error('Error in ClientResponse.extractOverload()', `Overload is null for response ${this._eventName}`)
       return Buffer.from('')
     }
     const overload: Buffer = this._overload

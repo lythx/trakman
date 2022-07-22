@@ -10,10 +10,10 @@ type EventParams =
   BeginMapInfo |
   EndMapInfo |
   DediRecordInfo |
-  BillUpdatedInfo |
   MapDedisInfo |
   KarmaVoteInfo |
   MKVotesInfo |
   MapAddedInfo |
   MapRemovedInfo |
+  BillUpdatedInfo |
   any[]

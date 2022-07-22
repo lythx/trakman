@@ -1,3 +1,4 @@
+import { Events } from './Events.js'
 import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
@@ -6,23 +7,21 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
-import { Events } from './Events.js'
 import { Utils } from './Utils.js'
 import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
-import { ErrorHandler } from './ErrorHandler.js'
 import { JukeboxService } from './services/JukeboxService.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
-import dsc from 'dice-similarity-coeff';
+import dsc from 'dice-similarity-coeff'
+import { Logger } from './Logger.js'
 
 if (process.env.USE_WEBSERVICES === 'YES') {
   tls.DEFAULT_MIN_VERSION = 'TLSv1'
@@ -82,15 +81,7 @@ export const TRAKMAN = {
    * @param removeColours Whether to strip colour tags
    * @returns String without format tags
    */
-  strip(str: string, removeColours: boolean = true): string {
-    let regex: RegExp
-    if (removeColours) {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
-    } else {
-      regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
-    }
-    return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
-  },
+  strip: Utils.strip,
 
   /**
    * Converts milliseconds to humanly readable time
@@ -263,23 +254,16 @@ export const TRAKMAN = {
    * @returns Escaped string
    */
   safeString(str: string): string {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;'
-    }
-    return str.replace(/[&<>"]/g, (m): string => { return map[m as keyof typeof map] })
+    return (str.replace(/"/g, '&quot;')).replace(/&/g, "&amp;")
   },
 
   /**
    * Adds a listener to an event to execute callbacks
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
+   * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
-  addListener(event: TMEvent, callback: ((params: any) => void)): void {
-    Events.addListener(event, callback)
-  },
+  addListener: Events.addListener,
 
   /**
    * Adds a map to the server
@@ -308,14 +292,15 @@ export const TRAKMAN = {
    * @param query Query to execute
    * @returns Database response or error on invalid query
    */
-  async queryDB(query: string): Promise<any[] | Error> {
+  async queryDB(query: string, params?: any[]): Promise<any[] | Error> {
     let res
     try {
-      res = await DB.query(query)
+      res = await DB.query(query, params)
     } catch (err: any) {
       return new Error(err)
     } finally {
       if (res === undefined) {
+        console.log(query, params)
         return new Error('Database response undefined')
       }
       return res.rows
@@ -336,7 +321,7 @@ export const TRAKMAN = {
    * @param lines Error messages
    */
   error(...lines: string[]): void {
-    ErrorHandler.error(...lines)
+    Logger.error(...lines)
   },
 
   /**
@@ -344,7 +329,7 @@ export const TRAKMAN = {
    * @param lines Error messages
    */
   fatalError(...lines: string[]): void {
-    ErrorHandler.fatal(...lines)
+    Logger.fatal(...lines)
   },
 
   /**
@@ -414,7 +399,7 @@ export const TRAKMAN = {
       }
     }).catch(err => err)
     if (response instanceof Error) {
-      ErrorHandler.error(`Error while fetching webservices data dor login ${login}`, response.message)
+      Logger.error(`Error while fetching webservices data dor login ${login}`, response.message)
       return response
     }
     return await response.json()
@@ -547,26 +532,9 @@ export const TRAKMAN = {
     RecordService.removeAll(mapId, callerLogin)
   },
 
-  stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
-      return [a[0], [a[0], ...a[1]]]
-    }))
-    let strippedStr = ''
-    for (const letter of str) {
-      let foundLetter = false
-      for (const key in charmap) {
-        if (charmap[key].includes(letter)) {
-          strippedStr += key
-          foundLetter = true
-          break
-        }
-      }
-      if (!foundLetter) {
-        strippedStr += letter
-      }
-    }
-    return strippedStr
-  },
+  stripSpecialChars: Utils.stripSpecialChars,
+
+  matchString: Utils.matchString,
 
 
   /**
@@ -595,14 +563,6 @@ export const TRAKMAN = {
       return undefined
     }
     return s[0].login
-  },
-
-  matchString(searchString: string, possibleMatches: string[]): string[] {
-    const arr: { str: string, value: number }[] = []
-    for (const e of possibleMatches) {
-      arr.push({ str: e, value: dsc.twoStrings(searchString, e) })
-    }
-    return arr.sort((a, b) => b.value - a.value).map(a => a.str)
   },
 
   /**
@@ -742,11 +702,11 @@ export const TRAKMAN = {
     return TMXService.current
   },
 
-  get mapQueue(): TMMap[] {
+  get mapQueue() {
     return JukeboxService.queue
   },
 
-  get jukebox(): TMMap[] {
+  get jukebox() {
     return JukeboxService.jukebox
   },
 
