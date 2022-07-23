@@ -237,9 +237,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['bug'],
     help: 'bug',
-    params: [{name: 'text', type: 'multiword'}],
+    params: [{ name: 'text', type: 'multiword' }],
     callback: (info: MessageInfo, text: string): void => {
-        const embed = new EmbedBuilder()
+      const embed = new EmbedBuilder()
         .setTitle('Bug report')
         .setDescription(`Sent by ${info.login}`)
         .setColor(0x0099ff)
@@ -252,11 +252,11 @@ const commands: TMCommand[] = [
           }
         ])
 
-        webhooker.send({
-          embeds: [embed]
-        })
+      webhooker.send({
+        embeds: [embed]
+      })
 
-        TM.sendMessage(`${TM.palette.admin}Bug successfully submitted.`, info.login)
+      TM.sendMessage(`${TM.palette.admin}Bug successfully submitted.`, info.login)
     },
     privilege: 0
   }

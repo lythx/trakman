@@ -1,4 +1,4 @@
-interface MapRemovedInfo {
+interface CurrentMap {
   readonly id: string
   readonly name: string
   readonly fileName: string
@@ -11,8 +11,7 @@ interface MapRemovedInfo {
   readonly authorTime: number
   readonly copperPrice: number
   readonly isLapRace: boolean
-  readonly lapsAmount?: number
-  readonly checkpointsAmount?: number
+  readonly lapsAmount: number
+  readonly checkpointsAmount: number
   readonly addDate: Date
-  readonly callerLogin?: string
 }

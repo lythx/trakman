@@ -103,7 +103,7 @@ export class Listeners {
             }
           }
           return
-        } else if(cpStatus === false) {
+        } else if (cpStatus === false) {
           const info: CheckpointInfo = {
             time: params[2],
             lap: params[3],

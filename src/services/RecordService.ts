@@ -79,7 +79,7 @@ export class RecordService {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
-    if (GameService.game.gameMode === 1 || !MapService.current.lapRace) {
+    if (GameService.game.gameMode === 1 || !MapService.current.isLapRace) {
       laps = 1
     } else if (GameService.game.gameMode === 3) {
       laps = GameService.game.lapsNo

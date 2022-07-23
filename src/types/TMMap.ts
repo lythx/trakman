@@ -10,8 +10,8 @@ interface TMMap {
   readonly goldTime: number
   readonly authorTime: number
   readonly copperPrice: number
-  readonly lapRace: boolean
-  readonly lapsAmount: number
-  readonly checkpointsAmount: number
+  readonly isLapRace: boolean
+  lapsAmount?: number
+  checkpointsAmount?: number
   readonly addDate: Date
 }

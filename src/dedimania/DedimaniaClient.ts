@@ -113,7 +113,8 @@ export abstract class DedimaniaClient {
             resolve(new Error(this.response.errorString?.toString()))
           } else {
             Logger.debug('dedi')
-            resolve(this.response.json) }
+            resolve(this.response.json)
+          }
           this.receivingResponse = false
           return
         }
