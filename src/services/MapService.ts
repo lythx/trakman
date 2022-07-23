@@ -38,7 +38,7 @@ export class MapService {
       Logger.error('Failed to fetch map info from database')
       return
     }
-    this._current = this.constructMapObjectFromDB(dbinfo, res[0])
+    this._current = dbinfo
   }
 
   /**
@@ -50,13 +50,15 @@ export class MapService {
       Logger.fatal('Error while getting the map list', mapList.message)
       return
     }
-    const DBMapList: MapsDBEntry[] = await this.repo.getAll()
+    const DBMapList: TMMap[] = await this.repo.getAll()
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
     if (mapsNotInDB.length > 100) { // TODO implement progress bar here perhaps (?)
       Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
     }
     const mapsNotInDBInfo: TMMap[] = []
+    let i = 0
     for (const c of mapsNotInDB) {
+      if(i++ === 50) { break }
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
       if (res instanceof Error) {
         Logger.fatal(`Unable to retrieve map info for map id: ${c.id}, filename: ${c.fileName}`, res.message)
@@ -67,8 +69,7 @@ export class MapService {
     }
     const mapsInDBInfo: TMMap[] = []
     for (const map of DBMapList) {
-      const info: TMMap = this.constructMapObjectFromDB(map)
-      mapsInDBInfo.push(info)
+      mapsInDBInfo.push(map)
     }
     const arr = [...mapsInDBInfo, ...mapsNotInDBInfo].sort((a, b) => a.name.localeCompare(b.name))
     arr.sort((a, b) => a.author.localeCompare(b.author))

@@ -6,19 +6,16 @@ const { Pool } = postgres
 
 export class Database {
 
-  private static readonly pool: postgres.Pool = new Pool({
+  private readonly client: postgres.Pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     host: process.env.DB_SERVER,
     port: Number(process.env.DB_PORT)
   })
-  private client: postgres.PoolClient | undefined
 
   async initialize(): Promise<void> {
-    const client = await Database.pool.connect().catch(err => Logger.fatal('Cannot connect to database', err))
-    if (!client) { throw new Error() }
-    this.client = client
+    await this.client.connect().catch(err => Logger.fatal('Cannot connect to database', err))
   }
 
   /**
@@ -29,8 +26,7 @@ export class Database {
    * @param params
    * @throws a database error if something goes wrong with the query
    */
-  async query(q: string, ...params: any[]): Promise<postgres.QueryResult> {
-    if (this.client === undefined) { throw Error('Database client is not initialized') }
+  async query(q: string, params: any[] = []): Promise<postgres.QueryResult> {
     return await this.client.query(q, params).catch(err => {
       throw Error(`Database error on query ${q}: ${err.message}`)
     })

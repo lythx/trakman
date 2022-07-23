@@ -1,7 +1,6 @@
 import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import countries from '../data/Countries.json' assert { type: 'json' }
-import { Events } from '../Events.js'
 import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
@@ -16,17 +15,17 @@ export class PlayerService {
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const oldOwnerLogin: string | undefined = (await this.repo.getOwner())?.login
-    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
-    if (newOwnerLogin === undefined) {
-      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
-      return
-    }
-    if (oldOwnerLogin !== newOwnerLogin) {
-      this.newOwnerLogin = newOwnerLogin
-      if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
-    }
-    await this.addAllFromList()
+    // const oldOwnerLogin: string | undefined = (await this.repo.getOwner())?.login
+    // const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
+    // if (newOwnerLogin === undefined) {
+    //   await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
+    //   return
+    // }
+    // if (oldOwnerLogin !== newOwnerLogin) {
+    //   this.newOwnerLogin = newOwnerLogin
+    //   if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
+    // }
+     await this.addAllFromList()
   }
 
   static getPlayer(login: string): TMPlayer | undefined {

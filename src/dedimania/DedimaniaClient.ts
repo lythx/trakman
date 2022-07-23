@@ -111,7 +111,9 @@ export abstract class DedimaniaClient {
             Logger.error('Dedimania server responded with an error',
               `${this.response.errorString} Code: ${this.response.errorCode}`)
             resolve(new Error(this.response.errorString?.toString()))
-          } else { resolve(this.response.json) }
+          } else {
+            Logger.debug('dedi')
+            resolve(this.response.json) }
           this.receivingResponse = false
           return
         }
