@@ -80,7 +80,7 @@ export abstract class ManiakarmaService {
       (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
     const vote = Number(json?.result?.players[0]?.player[0]?.$?.vote)
-    const v = [-3, -2, -1, 1, 2, 3].find(a=>a === vote)
+    const v = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
     if (v === undefined) {
       return
     }

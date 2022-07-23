@@ -12,16 +12,11 @@ export class MapIdsRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async add(mapUid: string): Promise<void>
-
-  async add(mapUids: string[]): Promise<void>
-
-  async add(mapUids: string[] | string): Promise<void> {
-    if (typeof mapUids === 'string') { mapUids = [mapUids] }
+  async add(...mapUids: string[]): Promise<void> {
     this.query(`INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, mapUids.length)}`, ...mapUids)
   }
 
-  async getId(mapUids: string): Promise<string>
+  async getId(mapUid: string): Promise<string>
 
   async getId(mapUids: string[]): Promise<string[]>
 
@@ -36,7 +31,7 @@ export class MapIdsRepository extends Repository {
     return isArr ? res.map(a => a.id) : res.map(a => a.id)[0]
   }
 
-  async addAndGetId(mapUids: string): Promise<string>
+  async addAndGetId(mapUid: string): Promise<string>
 
   async addAndGetId(mapUids: string[]): Promise<string[]>
 

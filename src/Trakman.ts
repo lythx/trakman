@@ -300,7 +300,6 @@ export const TRAKMAN = {
       return new Error(err)
     } finally {
       if (res === undefined) {
-        console.log(query, params)
         return new Error('Database response undefined')
       }
       return res.rows
@@ -647,8 +646,8 @@ export const TRAKMAN = {
     return RecordService.liveRecords
   },
 
-  get map(): TMMap {
-    return Object.assign(MapService.current)
+  get map(): CurrentMap {
+    return MapService.current
   },
 
   get messages(): TMMessage[] {

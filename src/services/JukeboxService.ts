@@ -120,7 +120,7 @@ export abstract class JukeboxService {
   }
 
   static get queue(): TMMap[] {
-    return [...this._queue.map(a =>  a.map )]
+    return [...this._queue.map(a => a.map)]
   }
 
   static get previous(): TMMap[] {

@@ -755,7 +755,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} has no record on this map.`, info.login)
         return
       }
-       TM.removeRecord(playerRecord.login, TM.map.id, info.login)
+      TM.removeRecord(playerRecord.login, TM.map.id, info.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
         + `removed the record of ${TM.palette.highlight + (TM.strip(playerRecord.nickname, true))}${TM.palette.admin} on the ongoing map.`)

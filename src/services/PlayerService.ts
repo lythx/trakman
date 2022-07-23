@@ -25,7 +25,7 @@ export class PlayerService {
     //   this.newOwnerLogin = newOwnerLogin
     //   if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
     // }
-     await this.addAllFromList()
+    await this.addAllFromList()
   }
 
   static getPlayer(login: string): TMPlayer | undefined {
@@ -178,7 +178,7 @@ export class PlayerService {
    */
   static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
     let laps
-    if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
+    if (GameService.game.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
     } else if (GameService.game.gameMode === 3) { // laps gamemode
       laps = GameService.game.lapsNo
