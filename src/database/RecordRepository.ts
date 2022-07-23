@@ -1,4 +1,4 @@
-import { Repository } from './Repository.js'
+import { Repository } from './OldRepository.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS records(

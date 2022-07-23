@@ -59,9 +59,7 @@ const getMapSectors = async (mapId: string): Promise<void> => {
     mapSectors = { mapid: mapId, logins: [], nicknames: [], sectors: [], dates: [] }
     void addMapSectors()
   } else {
-    console.log(res[0])
     mapSectors = res[0]
-    console.log(mapSectors)
   }
 }
 
