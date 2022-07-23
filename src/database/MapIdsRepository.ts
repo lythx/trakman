@@ -12,25 +12,45 @@ export class MapIdsRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async add(...mapUids: string[]) {
+  async add(mapUid: string): Promise<void>
+
+  async add(mapUids: string[]): Promise<void>
+
+  async add(mapUids: string[] | string): Promise<void> {
+    if (typeof mapUids === 'string') { mapUids = [mapUids] }
     this.query(`INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, mapUids.length)}`, ...mapUids)
   }
 
-  async getUids(...mapIds: string[]) {
-    return await this.query(`SELECT uid FROM map_ids WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).slice(0, -3)}`, ...mapIds)
+  async getId(mapUids: string): Promise<string>
+
+  async getId(mapUids: string[]): Promise<string[]>
+
+  async getId(mapUids: string[] | string): Promise<string[] | string> {
+    let isArr = true
+    if (typeof mapUids === 'string') {
+      mapUids = [mapUids]
+      isArr = false
+    }
+    const query = `SELECT id FROM map_ids WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR`).join('').slice(0, -3)}`
+    const res = await this.query(query, ...mapUids)
+    return isArr ? res.map(a => a.id) : res.map(a => a.id)[0]
   }
 
-  async getIds(...mapUids: string[]) {
-    return await this.query(`SELECT id FROM map_ids WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR`).slice(0, -3)}`, ...mapUids)
-  }
+  async addAndGetId(mapUids: string): Promise<string>
 
-  async addAndGetId(...mapUids: string[]): Promise<string[]> {
+  async addAndGetId(mapUids: string[]): Promise<string[]>
+
+  async addAndGetId(mapUids: string[] | string): Promise<string[] | string> {
+    let isArr = true
+    if (typeof mapUids === 'string') {
+      mapUids = [mapUids]
+      isArr = false
+    }
     const query = `INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, mapUids.length)} 
     ON CONFLICT (uid) DO UPDATE SET uid=EXCLUDED.uid
     RETURNING id`
-    const a= (await this.query(query, ...mapUids)).map(a => a.id)
-    console.log(a)
-    return a
+    const res = (await this.query(query, ...mapUids)).map(a => a.id)
+    return isArr === true ? res : res[0]
   }
 
 }
