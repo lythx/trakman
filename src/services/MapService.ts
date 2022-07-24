@@ -5,7 +5,7 @@ import { Events } from '../Events.js'
 
 export class MapService {
 
-  private static _current: CurrentMap
+  private static _current: TMCurrentMap
   private static _maps: TMMap[] = []
   private static repo: MapRepository
 
@@ -21,7 +21,7 @@ export class MapService {
     })
   }
 
-  static get current(): CurrentMap {
+  static get current(): TMCurrentMap {
     return this._current
   }
 

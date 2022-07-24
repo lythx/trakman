@@ -117,7 +117,7 @@ TM.addListener('Controller.BeginMap', (info: BeginMapInfo): void => {
 TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
   const date = new Date()
   const playerSectors = sectors.find(a => a.login === info.player.login)
-  const time = info.time - (info.player.checkpoints[info.index - 1]?.time ?? 0)
+  const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
   if (playerSectors === undefined) {
     sectors.push({ mapid: mapSectors.mapid, login: info.player.login, sectors: [info.time] })
     void addPlayerSector(mapSectors.mapid, info.player.login, [info.time])

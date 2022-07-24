@@ -21,7 +21,7 @@ export default class CommandList extends PopupWindow {
       this.commandLists.push(commands)
       const pageCount: number = Math.ceil(commands.length / this.itemsPerPage)
       const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.headerHeight - this.margin, pageCount)
-      paginator.onPageChange=(login: string, page: number): void => {
+      paginator.onPageChange = (login: string, page: number): void => {
         this.displayToPlayer(login, { page, paginator, commands, privilege: this.minPrivilege + i, pageCount })
       }
       this.paginators.push(paginator)

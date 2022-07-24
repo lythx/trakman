@@ -3,8 +3,6 @@ import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
 import { MapService } from './MapService.js'
-import { Client } from '../client/Client.js'
-import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from './JukeboxService.js'
 import { Events } from '../Events.js'
@@ -267,7 +265,7 @@ export abstract class DedimaniaService {
       position,
       previousTime,
       previousPosition,
-      playerId: player.playerId,
+      playerId: player.id,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited

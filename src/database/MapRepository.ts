@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS maps(
 	    REFERENCES map_ids(id)
 );`
 
-interface ITableEntry {
+interface TableEntry {
   readonly uid: string
   readonly name: string
   readonly filename: string
@@ -73,37 +73,37 @@ export class MapRepository extends Repository {
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
       laps_amount, checkpoints_amount, add_date) ${this.getInsertValuesString(15, maps.length)}`
-    const ids = await mapIdsRepo.addAndGetId(maps.map(a => a.id))
+    const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     const values: any[] = []
     for (const [i, map] of maps.entries()) {
-      values.push(ids[i], map.name,
-        map.fileName, map.author, (environments as any)[map.environment], (moods as any)[map.mood], map.bronzeTime, map.silverTime,
+      values.push(ids[i].id, map.name,
+        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
         map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate)
     }
     await this.query(query, ...values)
   }
 
   async getAll(): Promise<TMMap[]> {
-    const query = 'SELECT * FROM maps INNER JOIN map_ids ON maps.id=map_ids.id;'
+    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps 
+    JOIN map_ids ON maps.id=map_ids.id;`
     return ((await this.db.query(query)).rows).map(a => this.constructMapObject(a))
   }
 
   async get(mapId: string): Promise<TMMap | undefined>
-
   async get(mapIds: string[]): Promise<TMMap[]>
-
   async get(mapIds: string | string[]): Promise<TMMap | TMMap[] | undefined> {
     let isArr = true
     if (typeof mapIds === 'string') {
       isArr = false
       mapIds = [mapIds]
-    }
+    } else if (mapIds.length === 0) { return [] }
     const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
-    const ids = await mapIdsRepo.getId(mapIds)
-    const res = (await this.db.query(query, ...ids)).rows
+    const ids = await mapIdsRepo.get(mapIds)
+    const res = (await this.db.query(query, ...ids.map(a => a.id))).rows
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
     }
@@ -111,15 +111,13 @@ export class MapRepository extends Repository {
   }
 
   async getByFilename(fileName: string): Promise<TMMap | undefined>
-
   async getByFilename(fileNames: string[]): Promise<TMMap[]>
-
   async getByFilename(fileNames: string | string[]): Promise<TMMap | TMMap[] | undefined> {
     let isArr = true
     if (typeof fileNames === 'string') {
       isArr = false
       fileNames = [fileNames]
-    }
+    } else if (fileNames.length === 0) { return [] }
     const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
@@ -132,37 +130,34 @@ export class MapRepository extends Repository {
   }
 
   async remove(...mapIds: string[]): Promise<void> {
-    if (typeof mapIds === 'string') {
-      mapIds = [mapIds]
-    }
+    if (mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
-    const ids = await mapIdsRepo.getId(mapIds)
-    await this.db.query(query, ...ids)
+    const ids = await mapIdsRepo.get(mapIds)
+    await this.db.query(query, ...ids.map(a => a.id))
   }
 
   async setCpsAndLapsAmount(uid: string, lapsAmount: number, cpsAmount: number): Promise<void> {
-    const id = await mapIdsRepo.getId(uid)
-    console.log(id)
+    const id = await mapIdsRepo.get(uid)
     const query = `UPDATE maps SET laps_amount=$1, checkpoints_amount=$2 WHERE id=$3`
     await this.db.query(query, lapsAmount, cpsAmount, id)
   }
 
-  private constructMapObject(entry: ITableEntry): TMMap {
+  private constructMapObject(entry: TableEntry): TMMap {
     return {
       id: entry.uid,
       name: entry.name,
       fileName: entry.filename,
       author: entry.author,
-      environment: Object.entries(environments).find(a => a[1] === entry.environment)?.[0] ?? '',
-      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] ?? '',
+      environment: Object.entries(environments).find(a => a[1] === entry.environment)?.[0] as any,
+      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] as any,
       bronzeTime: entry.bronze_time,
       silverTime: entry.silver_time,
       goldTime: entry.gold_time,
       authorTime: entry.author_time,
       copperPrice: entry.copper_price,
       isLapRace: entry.is_lap_race,
-      lapsAmount: entry.laps_amount ?? -1,
-      checkpointsAmount: entry.checkpoints_amount ?? -1,
+      lapsAmount: entry.laps_amount,
+      checkpointsAmount: entry.checkpoints_amount,
       addDate: entry.add_date
     }
   }

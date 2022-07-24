@@ -89,7 +89,7 @@ export class RecordService {
       laps = MapService.current.lapsAmount
     }
     const cpAmount: number = cpsPerLap * laps
-    const checkpoints: number[] = [...player.checkpoints.map(a => a.time)]
+    const checkpoints: number[] = [...player.currentCheckpoints.map(a => a.time)]
     const temp: any = player
     temp.checkpoints = [...checkpoints] // break the reference
     temp.map = map
@@ -222,7 +222,7 @@ export class RecordService {
       position,
       previousTime,
       previousPosition,
-      playerId: player.playerId,
+      playerId: player.id,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited

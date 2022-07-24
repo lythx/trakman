@@ -1,78 +1,103 @@
 import { Repository } from './Repository.js'
-import { MapIdsRepository } from './MapIdsRepository.js'
 import { PlayerIdsRepository } from './PlayerIdsRepository.js'
+import { Utils } from '../Utils.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
-    id INT4 GENERATED ALWAYS AS IDENTITY,
-    player_id INT4,
-    nickname VARCHAR(45) not null,
-    nation VARCHAR(3) not null,
-    wins INT4 NOT NULL DEFAULT 0,
-    time_played INT4 NOT NULL DEFAULT 0,
-    visits INT4 NOT NULL DEFAULT 1,
+    id INT4 NOT NULL,
+    nickname VARCHAR(45) NOT NULL,
+    region VARCHAR(100) NOT NULL,
+    wins INT4 NOT NULL,
+    time_played INT4 NOT NULL,
+    visits INT4 NOT NULL,
+    is_united BOOLEAN NOT NULL,
+    last_online TIMESTAMP,
     PRIMARY KEY(id),
     CONSTRAINT fk_player_id
-      FOREIGN KEY(player_id) 
+      FOREIGN KEY(id) 
 	      REFERENCES player_ids(id)
-  );
-`
+  );`
+
+interface TableEntry {
+  readonly login: string
+  readonly nickname: string
+  readonly region: string
+  readonly wins: number
+  readonly time_played: number
+  readonly visits: number
+  readonly is_united: boolean
+  readonly privilege: number
+  readonly last_online?: Date
+}
+
+const playerIdsRepo = new PlayerIdsRepository()
 
 export class PlayerRepository extends Repository {
 
   async initialize(): Promise<void> {
+    await playerIdsRepo.initialize()
     await super.initialize(createQuery)
   }
 
-  /**
-   * Searches for a player by login in the database
-   */
-  async get(login: string): Promise<PlayersDBEntry | undefined> {
-    const query = `SELECT * FROM players WHERE login=$1 
-    INNER JOIN player_ids ON players.player_id=player_ids.id;`
-    const res = await this.db.query(query, [login])
-    return res.rows[0]
+  async get(login: string): Promise<TMOfflinePlayer | undefined>
+  async get(logins: string[]): Promise<TMOfflinePlayer[]>
+  async get(logins: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
+    let isArr = true
+    if (typeof logins === 'string') {
+      isArr = false
+      logins = [logins]
+    } else if (logins.length === 0) { return [] }
+    const ids = await playerIdsRepo.get(logins)
+    const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
+    JOIN player_ids ON players.id=player_ids.id
+    JOIN privileges ON players.id=privileges.player_id
+    WHERE ${logins.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)}`
+    const res = await this.db.query(query, ...ids.map(a => a.id))
+    if (isArr === false) {
+      return res.rows[0] === undefined ? undefined : this.constructPlayerObject(res.rows[0])
+    }
+    return res.rows.map(a => this.constructPlayerObject(a))
   }
 
-  /**
-   * Adds a player to the database
-   */
-  async add(player: TMPlayer): Promise<void> {
-    const query = 'INSERT INTO players(player_id, nickname, nation, wins, timePlayed, privilege) VALUES($1, $2, $3, $4, $5, $6);'
-    await this.db.query(query, [`(SELECT id FROM player_ids WHERE player_ids.login=${player.login})`
-      , player.nickname, player.nationCode, player.wins, player.timePlayed, player.privilege])
+  async add(...players: TMOfflinePlayer[]): Promise<void> {
+    if (players.length === 0) { return }
+    const query = `INSERT INTO players(id, nickname, region, wins, time_played, visits, is_united, last_online) 
+    ${this.getInsertValuesString(8, players.length)};`
+    const ids = await playerIdsRepo.addAndGet(players.map(a => a.login))
+    const values: any[] = []
+    for (const [i, player] of players.entries()) {
+      values.push(ids[i].id, player.nickname, player.region, player.wins, player.timePlayed, player.visits, player.isUnited, player.lastOnline)
+    }
+    await this.db.query(query, ...values)
   }
 
-  /**
-   * Updates the player information in the database
-   */
-  async update(player: TMPlayer): Promise<void> {
-    const query = `UPDATE players SET nickname=$1, nation=$2, wins=$3, timePlayed=$4, visits=$5 WHERE login=$6;`
-    await this.db.query(query, [player.nickname, player.nationCode, player.wins, player.timePlayed, player.visits, player.login])
+  async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean, lastOnline?: Date): Promise<void> {
+    const query = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4, last_online=$5 WHERE id=$6;`
+    const id = await playerIdsRepo.get(login)
+    await this.db.query(query, nickname, region, visits, isUnited, lastOnline, id)
   }
 
-  /**
-   * Set a player's timePlayed after they leave.
-   */
   async setTimePlayed(login: string, timePlayed: number): Promise<void> {
-    const query = `UPDATE players SET timePlayed=$1 WHERE login=$2;`
-    await this.db.query(query, [timePlayed, login])
+    const query = `UPDATE players SET time_played=$1 WHERE id=$2;`
+    const id = await playerIdsRepo.get(login)
+    await this.db.query(query, timePlayed, id)
   }
 
-  async setPrivilege(login: string, privilege: number): Promise<void> {
-    const query = 'UPDATE players SET privilege = $1 WHERE login = $2'
-    await this.db.query(query, [privilege, login])
-  }
-
-  async getOwner(): Promise<PlayersDBEntry | undefined> {
-    const query = 'SELECT * FROM players WHERE privilege = 4'
-    const res = await this.db.query(query)
-    return res.rows[0]
-  }
-
-  async removeOwner(): Promise<void> {
-    const query = 'UPDATE players SET privilege = 0 WHERE privilege = 4'
-    await this.db.query(query)
+  private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
+    const nation = entry.region.split('|')[1]
+    return {
+      login: entry.login,
+      nickname: entry.nickname,
+      nation: nation,
+      nationCode: Utils.nationToNationCode(nation) as any,
+      region: entry.region,
+      timePlayed: entry.time_played,
+      lastOnline: entry.last_online,
+      visits: entry.visits,
+      isUnited: entry.is_united,
+      wins: entry.wins,
+      privilege: entry.privilege
+    }
   }
 
 }
