@@ -646,7 +646,7 @@ export const TRAKMAN = {
     return RecordService.liveRecords
   },
 
-  get map(): CurrentMap {
+  get map(): TMCurrentMap {
     return MapService.current
   },
 

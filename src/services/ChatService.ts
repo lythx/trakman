@@ -172,7 +172,7 @@ export abstract class ChatService {
       joinTimestamp: player.joinTimestamp,
       privilege: player.privilege,
       isSpectator: player.isSpectator,
-      playerId: player.playerId,
+      playerId: player.id,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited
