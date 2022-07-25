@@ -1,4 +1,4 @@
-interface LocalRecord {
+interface TMLocalRecord {
   readonly map: string
   readonly login: string
   readonly time: number
@@ -11,5 +11,4 @@ interface LocalRecord {
   readonly wins: number
   readonly privilege: number
   readonly visits: number
-  readonly position: number
 }

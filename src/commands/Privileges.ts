@@ -14,7 +14,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: PlayersDBEntry  | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer  | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -49,7 +49,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -129,7 +129,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -168,7 +168,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return

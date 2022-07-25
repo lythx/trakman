@@ -27,7 +27,7 @@ interface TableEntry {
   readonly visits: number
   readonly is_united: boolean
   readonly privilege: number
-  readonly last_online?: Date
+  readonly last_online: Date | null
 }
 
 const playerIdsRepo = new PlayerIdsRepository()
@@ -42,20 +42,23 @@ export class PlayerRepository extends Repository {
   async get(login: string): Promise<TMOfflinePlayer | undefined>
   async get(logins: string[]): Promise<TMOfflinePlayer[]>
   async get(logins: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
-    let isArr = true
     if (typeof logins === 'string') {
-      isArr = false
-      logins = [logins]
-    } else if (logins.length === 0) { return [] }
+      const id = await playerIdsRepo.get(logins)
+      if (id === undefined) { return }
+      const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
+      JOIN player_ids ON players.id=player_ids.id
+      JOIN privileges ON player_ids.login=privileges.login
+      WHERE players.id=$1`
+      const res = await this.query(query, id)
+      return res[0] === undefined ? undefined : this.constructPlayerObject(res[0])
+    }
     const ids = await playerIdsRepo.get(logins)
+    if (ids.length === 0) { return [] }
     const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
     JOIN player_ids ON players.id=player_ids.id
-    JOIN privileges ON players.id=privileges.player_id
-    WHERE ${logins.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)}`
-    const res = await this.db.query(query, ...ids.map(a => a.id))
-    if (isArr === false) {
-      return res.rows[0] === undefined ? undefined : this.constructPlayerObject(res.rows[0])
-    }
+    JOIN privileges ON player_ids.login=privileges.login
+    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
+    const res = await this.db.query(query, ...(ids.map(a => a.id)))
     return res.rows.map(a => this.constructPlayerObject(a))
   }
 
@@ -77,10 +80,10 @@ export class PlayerRepository extends Repository {
     await this.db.query(query, nickname, region, visits, isUnited, lastOnline, id)
   }
 
-  async setTimePlayed(login: string, timePlayed: number): Promise<void> {
-    const query = `UPDATE players SET time_played=$1 WHERE id=$2;`
+  async updateOnLeave(login: string, timePlayed: number, date: Date): Promise<void> {
+    const query = `UPDATE players SET time_played=$1, last_online=$2 WHERE id=$3;`
     const id = await playerIdsRepo.get(login)
-    await this.db.query(query, timePlayed, id)
+    await this.db.query(query, timePlayed, date, id)
   }
 
   private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
@@ -92,7 +95,7 @@ export class PlayerRepository extends Repository {
       nationCode: Utils.nationToNationCode(nation) as any,
       region: entry.region,
       timePlayed: entry.time_played,
-      lastOnline: entry.last_online,
+      lastOnline: entry.last_online ?? undefined,
       visits: entry.visits,
       isUnited: entry.is_united,
       wins: entry.wins,

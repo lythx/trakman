@@ -85,7 +85,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not banned.`, info.login)
         return
       }
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -107,7 +107,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -142,7 +142,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not blacklisted.`, info.login)
         return
       }
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -210,7 +210,7 @@ const commands: TMCommand[] = [
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -238,7 +238,7 @@ const commands: TMCommand[] = [
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
@@ -750,7 +750,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }],
     callback: (info: MessageInfo, login: string): void => {
       // Can also be done with TM.getPlayerRecord, however we need the player nickname
-      const playerRecord: LocalRecord | undefined = TM.localRecords.find(a => a.login === login)
+      const playerRecord: TMLocalRecord | undefined = TM.localRecords.find(a => a.login === login)
       if (playerRecord === undefined) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player ${login} has no record on this map.`, info.login)
         return

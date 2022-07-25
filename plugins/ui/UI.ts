@@ -64,7 +64,7 @@ let staticComponents: {
   readonly timerWidget: TimerWidget
   readonly localRanking: LocalRanking
   readonly liveRanking: LiveRanking
-  readonly buttonsWidget: ButtonsWidget
+ // readonly buttonsWidget: ButtonsWidget
   readonly tmxRanking: TMXRanking
   readonly adminPanel: AdminPanel
   readonly donationPanel: DonationPanel
@@ -86,8 +86,8 @@ let dynamicComponents: {
   readonly banList: BanList
   readonly blacklistList: BlackListList
   readonly guestlistList: GuestListList
-  readonly sectorRecords: SectorRecords
-  readonly checkpointRecords: CheckpointRecords
+ // readonly sectorRecords: SectorRecords
+ // readonly checkpointRecords: CheckpointRecords
 }
 
 const events: TMListener[] = [
@@ -107,7 +107,7 @@ const events: TMListener[] = [
         timerWidget: new TimerWidget(),
         localRanking: new LocalRanking(),
         liveRanking: new LiveRanking(),
-        buttonsWidget: new ButtonsWidget(),
+      //  buttonsWidget: new ButtonsWidget(),
         tmxRanking: new TMXRanking(),
         adminPanel: new AdminPanel(),
         donationPanel: new DonationPanel(),
@@ -129,8 +129,8 @@ const events: TMListener[] = [
         banList: new BanList(),
         blacklistList: new BlackListList(),
         guestlistList: new GuestListList(),
-        sectorRecords: new SectorRecords(),
-        checkpointRecords: new CheckpointRecords()
+      //  sectorRecords: new SectorRecords(),
+       // checkpointRecords: new CheckpointRecords()
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {

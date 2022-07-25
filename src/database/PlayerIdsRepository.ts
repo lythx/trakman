@@ -2,7 +2,7 @@ import { Repository } from "./Repository.js";
 
 const createQuery = `CREATE TABLE IF NOT EXISTS player_ids(
   id INT4 GENERATED ALWAYS AS IDENTITY,
-  login VARCHAR(25) NOT NULL,
+  login VARCHAR(25) NOT NULL UNIQUE,
   PRIMARY KEY(id)
 );`
 
