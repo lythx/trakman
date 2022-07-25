@@ -16,9 +16,7 @@ export class Database {
   private client: any | undefined
 
   async initialize(): Promise<void> {
-    // console.log('a1')
     // const client = await Database.pool.connect().catch(err => Logger.fatal('Cannot connect to database', err))
-    // console.log('a2')
     // if (!client) { throw new Error() }
     this.client = Database.pool
   }

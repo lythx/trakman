@@ -15,7 +15,6 @@ export abstract class VoteService {
   static async initialize(): Promise<void> {
     await this.repo.initialize()
     const res: TMVote[] = await this.repo.getAll()
-    console.log(res)
     const maps: { readonly mapId: string, votes: number[] }[] = []
     for (const e of res) {
       const map = maps.find(a => a.mapId === e.mapId)
