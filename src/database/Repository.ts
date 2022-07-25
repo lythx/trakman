@@ -2,7 +2,7 @@ import { Database } from './DB.js'
 
 export abstract class Repository {
 
-  protected db: Database = new Database()
+  private db: Database = new Database()
 
   async initialize(createQuery: string): Promise<void> {
     await this.db.initialize()
