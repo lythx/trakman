@@ -58,8 +58,8 @@ export class PlayerRepository extends Repository {
     JOIN player_ids ON players.id=player_ids.id
     JOIN privileges ON player_ids.login=privileges.login
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
-    const res = await this.db.query(query, ...(ids.map(a => a.id)))
-    return res.rows.map(a => this.constructPlayerObject(a))
+    const res = await this.query(query, ...(ids.map(a => a.id)))
+    return res.map(a => this.constructPlayerObject(a))
   }
 
   async add(...players: TMOfflinePlayer[]): Promise<void> {
@@ -71,19 +71,19 @@ export class PlayerRepository extends Repository {
     for (const [i, player] of players.entries()) {
       values.push(ids[i].id, player.nickname, player.region, player.wins, player.timePlayed, player.visits, player.isUnited, player.lastOnline)
     }
-    await this.db.query(query, ...values)
+    await this.query(query, ...values)
   }
 
   async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean, lastOnline?: Date): Promise<void> {
     const query = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4, last_online=$5 WHERE id=$6;`
     const id = await playerIdsRepo.get(login)
-    await this.db.query(query, nickname, region, visits, isUnited, lastOnline, id)
+    await this.query(query, nickname, region, visits, isUnited, lastOnline, id)
   }
 
   async updateOnLeave(login: string, timePlayed: number, date: Date): Promise<void> {
     const query = `UPDATE players SET time_played=$1, last_online=$2 WHERE id=$3;`
     const id = await playerIdsRepo.get(login)
-    await this.db.query(query, timePlayed, date, id)
+    await this.query(query, timePlayed, date, id)
   }
 
   private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {

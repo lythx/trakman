@@ -14,12 +14,13 @@ export abstract class VoteService {
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const res: VotesDBEntry[] = await this.repo.getAll()
+    const res: TMVote[] = await this.repo.getAll()
+    console.log(res)
     const maps: { readonly mapId: string, votes: number[] }[] = []
     for (const e of res) {
-      const map = maps.find(a => a.mapId === e.map)
+      const map = maps.find(a => a.mapId === e.mapId)
       if (map === undefined) {
-        maps.push({ mapId: e.map, votes: [e.vote] })
+        maps.push({ mapId: e.mapId, votes: [e.vote] })
       } else {
         map.votes.push(e.vote)
       }
@@ -37,11 +38,8 @@ export abstract class VoteService {
     }
     for (let i: number = 0; i < 4; i++) {
       const id = [JukeboxService.current, ...JukeboxService.queue][i].id
-      const arr: VotesDBEntry[] = res.filter(a => a.map === id)
       this.mapsWithVotesStored.push(id)
-      for (const e of arr) {
-        this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
-      }
+      this._votes.push(...res.filter(a => a.mapId === id))
     }
   }
 
@@ -55,12 +53,10 @@ export abstract class VoteService {
 
   static async nextMap(): Promise<void> {
     const id = JukeboxService.queue[2].id
-    const res: VotesDBEntry[] = await this.repo.get(id)
+    const res: TMVote[] = await this.repo.get(id)
     this.mapsWithVotesStored.push(id)
     this.mapsWithVotesStored.shift()
-    for (const e of res) {
-      this._votes.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
-    }
+    this._votes.push(...res)
     this._votes = this._votes.filter(a => this.mapsWithVotesStored.includes(a.mapId))
   }
 
@@ -68,12 +64,7 @@ export abstract class VoteService {
     if (this._votes.some(a => a.mapId === mapId)) {
       return this._votes.filter(a => a.mapId === mapId)
     }
-    const res: VotesDBEntry[] = await this.repo.get(mapId)
-    const ret: TMVote[] = []
-    for (const e of res) {
-      ret.push({ mapId: e.map, login: e.login, vote: e.vote, date: e.date })
-    }
-    return ret
+    return await this.repo.get(mapId)
   }
 
   static async add(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
@@ -90,9 +81,9 @@ export abstract class VoteService {
       void this.repo.update(mapId, login, vote, date)
       Events.emitEvent('Controller.KarmaVote', v as KarmaVoteInfo)
     } else {
-      const res: VotesDBEntry | undefined = await this.repo.getOne(mapId, login)
+      const res: TMVote | undefined = await this.repo.getByLogin(mapId, login)
       if (res === undefined) { // If previous vote doesn't exist
-        void this.repo.add(mapId, login, vote, date)
+        void this.repo.add({ mapId, login, vote, date })
         if (this.mapsWithVotesStored.includes(mapId)) {
           void this._votes.push({ login, mapId, vote, date })
         }

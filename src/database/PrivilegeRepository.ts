@@ -38,13 +38,13 @@ export class PrivilegeRepository extends Repository {
 
   async getOwner(): Promise<string | undefined> {
     const query = `SELECT login FROM privileges WHERE privilege=4`
-    const res = await this.db.query(query)
-    return res.rows[0]?.login
+    const res = await this.query(query)
+    return res[0]?.login
   }
 
   async removeOwner(): Promise<void> {
     const query = 'DELETE FROM privileges WHERE privilege=4'
-    await this.db.query(query)
+    await this.query(query)
   }
 
 }

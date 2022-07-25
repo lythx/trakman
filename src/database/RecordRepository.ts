@@ -41,8 +41,8 @@ export class RecordRepository extends Repository {
     if (records.length === 0) { return }
     const query = `INSERT INTO records(map_id, player_id, time, checkpoints, date) 
     ${this.getInsertValuesString(5, records.length)}`
-    const mapIds = await mapIdsRepo.addAndGet(records.map(a => a.map))
-    const playerIds = await playerIdsRepo.addAndGet(records.map(a => a.login))
+    const mapIds = await mapIdsRepo.get(records.map(a => a.map))
+    const playerIds = await playerIdsRepo.get(records.map(a => a.login))
     const values: any[] = []
     for (const [i, record] of records.entries()) {
       values.push(mapIds[i].id, playerIds[i].id, record.time, record.checkpoints, record.date)
@@ -58,7 +58,7 @@ export class RecordRepository extends Repository {
     WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR`).join('').slice(0, -3)}
     ORDER BY time ASC;`
     const mapIds = await mapIdsRepo.get(mapUids)
-    const res = (await this.db.query(query, ...mapIds.map(a => a.id))).rows
+    const res = (await this.query(query, ...mapIds.map(a => a.id)))
     return res.map(a => this.constructRecordObject(a))
   }
 
@@ -67,7 +67,7 @@ export class RecordRepository extends Repository {
     const playerId = await playerIdsRepo.get(login)
     const query: string = `SELECT uid, login, time, checkpoints, date FROM records 
     WHERE map_id=$1 AND player_id=$2`
-    const res = (await this.db.query(query, mapId, playerId)).rows
+    const res = (await this.query(query, mapId, playerId))
     return this.constructRecordObject(res[0])
   }
 
@@ -75,20 +75,20 @@ export class RecordRepository extends Repository {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerIdsRepo.get(login)
     const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`
-    await this.db.query(query, mapId, playerId)
+    await this.query(query, mapId, playerId)
   }
 
   async removeAll(mapUid: string): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     const query: string = `DELETE FROM records WHERE map_id=$1;`
-    await this.db.query(query, mapId)
+    await this.query(query, mapId)
   }
 
   async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerIdsRepo.get(login)
     const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'
-    await this.db.query(query, [time, checkpoints, date, mapId, playerId])
+    await this.query(query, [time, checkpoints, date, mapId, playerId])
   }
 
   constructRecordObject(entry: TableEntry): TMRecord {

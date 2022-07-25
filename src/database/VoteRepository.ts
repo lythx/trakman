@@ -1,48 +1,96 @@
-import { Repository } from './OldRepository.js'
+import { Repository } from './Repository.js'
+import { PlayerIdsRepository } from './PlayerIdsRepository.js'
+import { MapIdsRepository } from './MapIdsRepository.js'
 
 const createQuery: string = `
 CREATE TABLE IF NOT EXISTS votes(
-    map varchar(27) NOT NULL,
-    login varchar(25) NOT NULL,
-    vote int2 NOT NULL,
-    date timestamp NOT NULL,
-    PRIMARY KEY(login, map)
-);
-`
+    map_id INT4 NOT NULL,
+    player_id INT4 NOT NULL,
+    vote INT2 NOT NULL,
+    date TIMESTAMP NOT NULL,
+    PRIMARY KEY(map_id, player_id),
+    CONSTRAINT fk_player_id
+      FOREIGN KEY(player_id) 
+        REFERENCES player_ids(id),
+    CONSTRAINT fk_map_id
+      FOREIGN KEY(map_id)
+        REFERENCES map_ids(id)
+);`
+
+interface TableEntry {
+  readonly uid: string
+  readonly login: string
+  readonly vote: -3 | -2 | -1 | 1 | 2 | 3
+  readonly date: Date
+}
+
+const mapIdsRepo = new MapIdsRepository()
+const playerIdsRepo = new PlayerIdsRepository()
 
 export class VoteRepository extends Repository {
 
   async initialize(): Promise<void> {
-    await super.initialize()
-    await this.db.query(createQuery)
+    await mapIdsRepo.initialize()
+    await playerIdsRepo.initialize()
+    await super.initialize(createQuery)
   }
 
-  async add(mapId: string, login: string, vote: number, date: Date): Promise<void> {
-    const query: string = 'INSERT INTO votes(map, login, vote, date) VALUES($1, $2, $3, $4);'
-    await this.db.query(query, [mapId, login, vote, date])
+  async add(...votes: TMVote[]): Promise<void> {
+    if (votes.length === 0) { return }
+    const query = `INSERT INTO votes(map_id, player_id, vote, date) 
+    ${this.getInsertValuesString(4, votes.length)}`
+    const mapIds = await mapIdsRepo.get(votes.map(a => a.mapId))
+    const playerIds = await playerIdsRepo.get(votes.map(a => a.login))
+    const values: any[] = []
+    for (const [i, vote] of votes.entries()) {
+      values.push(mapIds[i].id, playerIds[i].id, vote.vote, vote.date)
+    }
+    await this.query(query, ...values)
   }
 
-  async update(mapId: string, login: string, vote: number, date: Date): Promise<void> {
-    const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map=$3 AND login=$4;'
-    await this.db.query(query, [vote, date, mapId, login])
+  async update(mapUid: string, login: string, vote: number, date: Date): Promise<void> {
+    const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
+    const mapId = await mapIdsRepo.get(mapUid)
+    const playerId = await playerIdsRepo.addAndGet(login)
+    await this.query(query, vote, date, mapId, playerId)
   }
 
-  async getAll(): Promise<VotesDBEntry[]> {
-    const query: string = 'SELECT * FROM votes;'
-    const res = await this.db.query(query)
-    return res.rows
+  async getByLogin(mapUid: string, login: string): Promise<TMVote | undefined> {
+    const query: string = `SELECT login, vote, date FROM votes 
+    JOIN map_ids ON map_ids.id=votes.map_id
+    JOIN player_ids ON player_ids.id=votes.player_id
+    WHERE map_id=$1 AND player_id=$2;`
+    const mapId = await mapIdsRepo.get(mapUid)
+    const playerId =await playerIdsRepo.get(login)
+    const res = await this.query(query, mapId, playerId)
+    return res[0] === undefined ? undefined : this.constructVoteObject({ ...res[0], uid: mapUid })
   }
 
-  async getOne(mapId: string, login: string): Promise<VotesDBEntry | undefined> {
-    const query: string = 'SELECT * FROM votes WHERE map=$1 AND login=$2;'
-    const res = await this.db.query(query, [mapId, login])
-    return res.rows[0]
+  async get(mapUid: string): Promise<TMVote[]> {
+    const query: string = `SELECT login, vote, date FROM votes 
+    JOIN map_ids ON map_ids.id=votes.map_id
+    JOIN player_ids ON player_ids.id=votes.player_id
+    WHERE map_id=$1;`
+    const mapId =await mapIdsRepo.get(mapUid)
+    const res = await this.query(query, mapId)
+    return res.map(a => this.constructVoteObject(a))
   }
 
-  async get(mapId: string): Promise<VotesDBEntry[]> {
-    const query: string = 'SELECT * FROM votes WHERE map=$1;'
-    const res = await this.db.query(query, [mapId])
-    return res.rows
+  async getAll(): Promise<TMVote[]> {
+    const query: string = `SELECT login, vote, date FROM votes 
+    JOIN map_ids ON map_ids.id=votes.map_id
+    JOIN player_ids ON player_ids.id=votes.player_id;`
+    const res = await this.query(query)
+    return res.map(a => this.constructVoteObject(a))
+  }
+
+  constructVoteObject(entry: TableEntry): TMVote {
+    return {
+      login: entry.login,
+      mapId: entry.uid,
+      vote: entry.vote,
+      date: entry.date
+    }
   }
 
 }

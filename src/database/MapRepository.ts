@@ -87,7 +87,7 @@ export class MapRepository extends Repository {
     const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps 
     JOIN map_ids ON maps.id=map_ids.id;`
-    return ((await this.db.query(query)).rows).map(a => this.constructMapObject(a))
+    return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
   async get(mapId: string): Promise<TMMap | undefined>
@@ -103,7 +103,7 @@ export class MapRepository extends Repository {
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
-    const res = (await this.db.query(query, ...ids.map(a => a.id))).rows
+    const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
     }
@@ -122,7 +122,7 @@ export class MapRepository extends Repository {
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR`).join('').slice(0, -3)};`
-    const res = (await this.db.query(query, ...fileNames)).rows
+    const res = (await this.query(query, ...fileNames))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
     }
@@ -133,13 +133,13 @@ export class MapRepository extends Repository {
     if (mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
-    await this.db.query(query, ...ids.map(a => a.id))
+    await this.query(query, ...ids.map(a => a.id))
   }
 
   async setCpsAndLapsAmount(uid: string, lapsAmount: number, cpsAmount: number): Promise<void> {
     const id = await mapIdsRepo.get(uid)
     const query = `UPDATE maps SET laps_amount=$1, checkpoints_amount=$2 WHERE id=$3`
-    await this.db.query(query, lapsAmount, cpsAmount, id)
+    await this.query(query, lapsAmount, cpsAmount, id)
   }
 
   private constructMapObject(entry: TableEntry): TMMap {
