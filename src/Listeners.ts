@@ -88,7 +88,6 @@ export class Listeners {
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         const cpStatus = PlayerService.addCP(player, checkpoint)
-        console.log(cpStatus)
         if (cpStatus === true) {
           const obj = RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {

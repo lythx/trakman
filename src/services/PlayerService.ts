@@ -173,7 +173,6 @@ export class PlayerService {
     } else { // rounds, cup, teams and lap map
       laps = MapService.current.lapsAmount
     }
-    console.log(laps, MapService.current)
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
         player.currentCheckpoints.length = 0

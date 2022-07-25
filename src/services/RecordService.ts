@@ -54,7 +54,6 @@ export class RecordService {
   }
 
   static add(map: string, player: TMPlayer, time: number): false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo } {
-    console.log(map, player,time)
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
