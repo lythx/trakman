@@ -10,64 +10,42 @@ import { Utils } from '../Utils.js'
 export class RecordService {
 
   private static repo: RecordRepository = new RecordRepository()
-  private static readonly _records: TMRecord[] = [] // TODO: dont hold all records in memory this is probably a bad idea since there is a lot of them
-  private static readonly _localRecords: LocalRecord[] = []
+  private static readonly _localRecords: TMLocalRecord[] = []
   private static readonly _liveRecords: FinishInfo[] = []
+  private static readonly localsAmount = Number(process.env.LOCALS_AMOUNT)
 
   static async initialize(): Promise<void> {
-    if (process.env.LOCALS_AMOUNT === undefined || Number(process.env.LOCALS_AMOUNT) === NaN) {
-      Logger.fatal('LOCALS_AMOUNT is undefined or not a number. Check your .env file')
+    if (this.localsAmount === NaN) {
+      await Logger.fatal('LOCALS_AMOUNT is undefined or not a number. Check your .env file')
     }
     await this.repo.initialize()
-    const res: RecordsDBEntry[] = await this.repo.getAll()
-    for (const record of res) { this._records.push({ map: record.map, time: record.score, login: record.login, date: record.date, checkpoints: record.checkpoints }) }
     await this.fetchRecords(MapService.current.id)
   }
 
-  static async fetchRecords(mapId: string): Promise<LocalRecord[]> {
+  static async fetchRecords(mapId: string): Promise<TMLocalRecord[]> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
-    const records: RecordsDBEntry[] = await this.repo.get(mapId)
-    records.sort((a, b): number => a.score - b.score)
-    const n: number = Math.min(Number(process.env.LOCALS_AMOUNT), records.length)
-    for (let i: number = 0; i < n; i++) {
-      const player: PlayersDBEntry | undefined = await PlayerService.fetchPlayer(records[i].login)
+    const records: TMRecord[] = await this.repo.get(mapId)
+    for (const e of records) {
+      const player: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(e.login)
       if (player === undefined) {
         Logger.fatal('Cant find login in players table even though it has record in records table.')
         return []
       }
-      const localRecord: LocalRecord = {
-        map: mapId,
-        login: records[i].login,
-        time: records[i].score,
-        date: records[i].date,
-        checkpoints: records[i].checkpoints,
-        position: i + 1,
-        nickname: player.nickname,
-        nation: player.nation,
-        nationCode: player.nation, // TODO: fix nation code or just dont store it idk (its not in db)
-        privilege: player.privilege,
-        timePlayed: player.timePlayed,
-        wins: player.wins,
-        visits: player.visits,
-      }
-      this._localRecords.push(localRecord)
+      this._localRecords.push({
+        ...e,
+        ...player
+      })
     }
     Events.emitEvent('Controller.LocalRecords', records)
     return this._localRecords
   }
 
   static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {
-    const res = await this.repo.getByLogin(mapId, login)
-    if (res === undefined) { return undefined }
-    return { map: mapId, time: res.score, login, date: res.date, checkpoints: res.checkpoints }
+    return await this.repo.getByLogin(mapId, login)
   }
 
-  static get records(): TMRecord[] {
-    return [...this._records]
-  }
-
-  static get localRecords(): LocalRecord[] {
+  static get localRecords(): TMLocalRecord[] {
     return [...this._localRecords]
   }
 
@@ -76,6 +54,7 @@ export class RecordService {
   }
 
   static add(map: string, player: TMPlayer, time: number): false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo } {
+    console.log(map, player,time)
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
@@ -104,13 +83,11 @@ export class RecordService {
     return { localRecord, finishInfo, liveRecord }
   }
 
-  // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
   private static handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TMPlayer): RecordInfo | undefined {
     const pb: number | undefined = this._localRecords.find(a => a.login === player.login)?.time
     const position: number = this._localRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
-      this._records.splice(position - 1, 0, recordInfo)
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
@@ -119,7 +96,8 @@ export class RecordService {
       return recordInfo
     }
     if (time === pb) {
-      const previousPosition: number = this.records.findIndex(a => a.login === this.records.find(a => a.login === player.login)?.login) + 1
+      const previousPosition: number = this._localRecords
+        .findIndex(a => a.login === this._localRecords.find(a => a.login === player.login)?.login) + 1
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
       Logger.info(...this.getLogString(previousPosition, previousPosition, time, time, player.login, 'local'))
       return recordInfo
@@ -132,14 +110,12 @@ export class RecordService {
       }
       const previousTime: number | undefined = this._localRecords[previousIndex].time
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
-      this._records.splice(this._records.findIndex(a => !(a.login == player.login && a.map === mapId)), 1)
-      this._records.splice(position - 1, 0, { map: mapId, login: player.login, time: time, date, checkpoints })
       if (position <= Number(process.env.LOCALS_AMOUNT)) {
         this._localRecords.splice(previousIndex, 1)
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'local'))
-      void this.repo.update(recordInfo)
+      void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
       return recordInfo
     }
   }
@@ -181,7 +157,6 @@ export class RecordService {
     } else {
       Logger.info(`${login} record on map ${mapId} has been removed`)
     }
-    this._records.splice(this._records.findIndex(a => a.login === login && a.map === mapId), 1)
     this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.map === mapId), 1)
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
     void this.repo.remove(login, mapId)
@@ -192,9 +167,6 @@ export class RecordService {
       Logger.info(`${callerLogin} has removed records on map ${mapId}`)
     } else {
       Logger.info(`Records on map ${mapId} have been removed`)
-    }
-    while (this._records.some(a => a.map === mapId)) {
-      this._records.splice(this._records.findIndex(a => a.map === mapId), 1)
     }
     while (this._localRecords.some(a => a.map === mapId)) {
       this._localRecords.splice(this._localRecords.findIndex(a => a.map === mapId), 1)

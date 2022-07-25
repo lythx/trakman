@@ -43,11 +43,13 @@ export class MapService {
       Logger.error('Failed to get map info from memory')
       return
     }
+    console.log(res[0])
     if (dbinfo.checkpointsAmount === undefined) {
       dbinfo.checkpointsAmount = res[0].NbCheckpoints
       dbinfo.lapsAmount = res[0].NbLaps
     }
     this._current = dbinfo as any
+    console.log(this._current)
     this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
   }
 

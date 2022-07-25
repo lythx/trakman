@@ -19,6 +19,7 @@ interface EventWithCallbackInterface {
   "Controller.MapRemoved": MapRemovedInfo
   "Controller.BillUpdated": BillUpdatedInfo
   "Controller.MatchSettingsUpdated": TMMap[]
+  "Controller.LocalRecords": TMRecord[]
 }
 
 

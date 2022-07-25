@@ -2,7 +2,7 @@ import { Repository } from "./Repository.js";
 
 const createQuery = `CREATE TABLE IF NOT EXISTS map_ids(
   id INT4 GENERATED ALWAYS AS IDENTITY,
-  uid VARCHAR(27) UNIQUE,
+  uid VARCHAR(27) NOT NULL UNIQUE,
   PRIMARY KEY(id)
 );`
 

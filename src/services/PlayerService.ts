@@ -12,7 +12,6 @@ export class PlayerService {
   private static readonly _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
   private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
-  private static newOwnerLogin: string | null
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
@@ -24,8 +23,8 @@ export class PlayerService {
       return
     }
     if (oldOwnerLogin !== newOwnerLogin) {
-      this.newOwnerLogin = newOwnerLogin
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
+      await this.setPrivilege(newOwnerLogin, 4)
     }
     await this.addAllFromList()
   }
@@ -115,10 +114,6 @@ export class PlayerService {
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited, player.lastOnline) // need to await so owner privilege gets set after player is added
     }
     this._players.push(player)
-    if (player.login === this.newOwnerLogin) {
-      void this.setPrivilege(player.login, 4)
-      this.newOwnerLogin = null
-    }
     if (serverStart === undefined) {
       Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits}, ` +
         `nickname: ${player.nickname}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
@@ -130,6 +125,7 @@ export class PlayerService {
    * Remove the player from local memory, save timePlayed in database
    */
   static leave(login: string): LeaveInfo | Error {
+    const date =new Date()
     const playerIndex = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
       const errStr = `Error removing player ${login} from memory, player is not in the memory`
@@ -140,11 +136,11 @@ export class PlayerService {
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
-      ...player, 
+      ...player,
       timePlayed: totalTimePlayed,
-      sessionTime,
+      sessionTime
     }
-    void this.repo.setTimePlayed(player.login, totalTimePlayed)
+    void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
     this._players.splice(playerIndex, 1)
     Logger.info(`Player ${player.login} left after playing for ${Utils.getTimeString(sessionTime)}`)
     return leaveInfo
@@ -156,7 +152,7 @@ export class PlayerService {
 
   static async setPrivilege(login: string, privilege: number, adminLogin?: string): Promise<void> {
     await this.privilegeRepo.set(login, privilege)
-    const player: TMPlayer | undefined = this.players.find(a => a.login === login)
+    const player: TMPlayer | undefined = this._players.find(a => a.login === login)
     if (player !== undefined) { player.privilege = privilege }
     if (adminLogin !== undefined) {
       Logger.info(`Player ${adminLogin} changed ${login} privilege to ${privilege}`)
@@ -177,6 +173,7 @@ export class PlayerService {
     } else { // rounds, cup, teams and lap map
       laps = MapService.current.lapsAmount
     }
+    console.log(laps, MapService.current)
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
         player.currentCheckpoints.length = 0

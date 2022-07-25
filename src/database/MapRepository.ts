@@ -37,8 +37,8 @@ interface TableEntry {
   readonly author_time: number
   readonly copper_price: number
   readonly is_lap_race: boolean
-  readonly laps_amount?: number
-  readonly checkpoints_amount?: number
+  readonly laps_amount: number | null
+  readonly checkpoints_amount: number | null
   readonly add_date: Date
 }
 
@@ -84,7 +84,7 @@ export class MapRepository extends Repository {
   }
 
   async getAll(): Promise<TMMap[]> {
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
+    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps 
     JOIN map_ids ON maps.id=map_ids.id;`
     return ((await this.db.query(query)).rows).map(a => this.constructMapObject(a))
@@ -98,7 +98,7 @@ export class MapRepository extends Repository {
       isArr = false
       mapIds = [mapIds]
     } else if (mapIds.length === 0) { return [] }
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
+    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
@@ -118,7 +118,7 @@ export class MapRepository extends Repository {
       isArr = false
       fileNames = [fileNames]
     } else if (fileNames.length === 0) { return [] }
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time
+    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR`).join('').slice(0, -3)};`
@@ -156,8 +156,8 @@ export class MapRepository extends Repository {
       authorTime: entry.author_time,
       copperPrice: entry.copper_price,
       isLapRace: entry.is_lap_race,
-      lapsAmount: entry.laps_amount,
-      checkpointsAmount: entry.checkpoints_amount,
+      lapsAmount: entry.laps_amount ?? undefined,
+      checkpointsAmount: entry.checkpoints_amount?? undefined,
       addDate: entry.add_date
     }
   }

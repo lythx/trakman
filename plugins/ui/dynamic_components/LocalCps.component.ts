@@ -17,7 +17,7 @@ export default class LocalCps extends PopupWindow {
 
   constructor() {
     super(IDS.localCps, stringToObjectProperty(CONFIG.localCps.icon, ICONS), CONFIG.localCps.title, CONFIG.localCps.navbar)
-    const records: LocalRecord[] = TM.localRecords
+    const records: TMLocalRecord[] = TM.localRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {

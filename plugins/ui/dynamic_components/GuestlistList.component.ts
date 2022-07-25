@@ -47,13 +47,13 @@ export default class GuestlistList extends PopupWindow {
             
         ]
         const guestlisted = TM.guestlist
-        const cancer: PlayersDBEntry[] = []
+        const cancer: (TMOfflinePlayer | undefined)[] = []
 
         for(const player of guestlisted) {
             cancer.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(cancer[i - 1].nickname, w, h)            
+            return centeredText(cancer[i - 1]?.nickname ?? '', w, h)            
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(guestlisted[i - 1].login, w, h)            

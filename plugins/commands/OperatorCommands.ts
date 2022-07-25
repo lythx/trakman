@@ -192,7 +192,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo === undefined) {
@@ -222,7 +222,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not muted.`, info.login)
         return
       }
-      let targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
