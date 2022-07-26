@@ -1,6 +1,5 @@
-import config from './Freezone.json' assert { type: "json" }
-import { Logger } from '../../src/Logger.js'
-import { ServerConfig } from '../../src/ServerConfig.js'
+import { Logger } from '../src/Logger.js'
+import { ServerConfig } from '../src/ServerConfig.js'
 import fetch from 'node-fetch'
 import tls from 'node:tls'
 import 'dotenv/config'
@@ -14,15 +13,20 @@ if (process.env.USE_FREEZONE === 'YES') {
 export class Freezone {
 
     // Manialive hash, static value that never changes
-    private static manialiveHash: string = '6f116833b419fe7cb9c912fdaefb774845f60e79'
+    private static readonly manialiveHash: string = '6f116833b419fe7cb9c912fdaefb774845f60e79'
     // Last Manialive version release
-    private static manialiveVersion: number = 239
+    private static readonly manialiveVersion: number = 239
     // Freezone WS password, received on 'freezone:servers' manialink in-game
-    private static freezonePassword: string = config.password
+    private static freezonePassword: string
     // Freezone ManiaLive URL
     private static manialiveUrl: string = 'http://ws.trackmania.com'
 
     static async initialize(): Promise<void | Error> {
+        if (process.env.FREEZONE_PASSWORD === undefined) {
+            Logger.fatal('Freezone password is not defined')
+            return
+        }
+        this.freezonePassword = process.env.FREEZONE_PASSWORD
         const status: void | Error = await this.sendLive()
         if (status instanceof Error) {
             Logger.fatal(`Couldn't connect to ManiaLive`)
@@ -47,14 +51,14 @@ export class Freezone {
             classHash: this.manialiveHash
         }
         // Append freezone to the server name if it isn't there already
-        if (!cfg.name.includes('freezone')) {
+        if (!cfg.name.toLowerCase().includes('freezone')) {
             data.serverName = 'Freezone|' + data.serverName
         }
         // Get authentication string
         const auth: string = 'Basic ' + Buffer.from(`${cfg.login}:${this.freezonePassword}`).toString('base64')
         // Do the performance
         const res = await fetch(url, {
-            method: 'post',
+            method: 'POST',
             headers: {
                 'Authorization': auth
             },
@@ -63,6 +67,7 @@ export class Freezone {
         // 😨😨😨😨
         if (res instanceof Error) {
             Logger.error(`Couldn't send Freezone ManiaLive request`)
+            return res
         }
     }
 }

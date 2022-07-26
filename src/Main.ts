@@ -17,7 +17,7 @@ import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
-import { Freezone } from '../plugins/freezone/Freezone.js'
+import { Freezone } from '../plugins/Freezone.js'
 
 async function main(): Promise<void> {
   await Logger.initialize()
