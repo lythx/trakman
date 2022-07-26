@@ -77,7 +77,6 @@ export class PlayerService {
     const privilege: number = await this.privilegeRepo.get(login)
     let player: TMPlayer
     if (playerData === undefined) {
-      console.log(login)
       player = {
         id,
         login,

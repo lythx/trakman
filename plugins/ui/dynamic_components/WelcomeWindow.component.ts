@@ -23,7 +23,6 @@ export default class WelcomeWindow extends PopupWindow {
   async initializeDb() {
     await TM.queryDB(`CREATE TABLE IF NOT EXISTS welcomed_players
     login VARCHAR(25) NOT NULL PRIMARY KEY`)
-    console.log('penispsenahf')
     const res = await TM.queryDB('SELECT login FROM welcomed_players')
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))

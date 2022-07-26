@@ -57,7 +57,6 @@ export class VoteRepository extends Repository {
 
   async getByLogin(mapUid: string, login: string): Promise<TMVote | undefined> {
     const query: string = `SELECT login, vote, date FROM votes 
-    JOIN map_ids ON map_ids.id=votes.map_id
     JOIN player_ids ON player_ids.id=votes.player_id
     WHERE map_id=$1 AND player_id=$2;`
     const mapId = await mapIdsRepo.get(mapUid)
@@ -68,16 +67,15 @@ export class VoteRepository extends Repository {
 
   async get(mapUid: string): Promise<TMVote[]> {
     const query: string = `SELECT login, vote, date FROM votes 
-    JOIN map_ids ON map_ids.id=votes.map_id
     JOIN player_ids ON player_ids.id=votes.player_id
     WHERE map_id=$1;`
     const mapId =await mapIdsRepo.get(mapUid)
     const res = await this.query(query, mapId)
-    return res.map(a => this.constructVoteObject(a))
+    return res.map(a => this.constructVoteObject({...a, uid: mapUid}))
   }
 
   async getAll(): Promise<TMVote[]> {
-    const query: string = `SELECT login, vote, date FROM votes 
+    const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN map_ids ON map_ids.id=votes.map_id
     JOIN player_ids ON player_ids.id=votes.player_id;`
     const res = await this.query(query)
