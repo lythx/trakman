@@ -12,6 +12,8 @@ export default class MapWidget extends StaticComponent {
   private readonly positionY: number
   private xml: string = ''
   private readonly grid: Grid
+  private authorNickname: string | undefined
+  private authorNation: string | undefined
 
   constructor() {
     super(IDS.map, { displayOnRace: true, hideOnResult: true })
@@ -22,11 +24,37 @@ export default class MapWidget extends StaticComponent {
     this.positionX = CFG.static.rightPosition
     this.positionY = calculateStaticPositionY('map')
     this.grid = new Grid(this.width, this.height - CONFIG.static.marginSmall, [1], new Array(4).fill(1))
-    void this.updateXML()
+    if (process.env.USE_WEBSERVICES === "YES") {
+      void this.fetchWebservices(TM.map.author)
+      TM.addListener('Controller.BeginMap', async (info) => {
+        void this.fetchWebservices(info.author)
+      })
+    }
+  }
+
+  private async fetchWebservices(author: string) {
+    const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
+    if (regex.test(author) === true) { return }
+    const json: any = await TM.fetchWebServices(author)
+    if (json instanceof Error) {
+      TM.error(`Failed to fetch nickname for author login ${author}`, json.message)
+      this.authorNickname = undefined
+    } else {
+      if (json?.message === 'Unkown player') { // THANKS NADEO
+        TM.error(`Failed to fetch nickname for author login ${author} (no such login registered)`, json.message)
+        this.authorNickname = author
+      } else {
+        this.authorNickname = json?.nickname
+        this.authorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
+      }
+    }
+    if(this._isDisplayed === true) {
+      this.display()
+    }
   }
 
   async display(): Promise<void> {
-    await this.updateXML()
+    this.updateXML()
     this._isDisplayed = true
     TM.sendManialink(this.xml)
   }
@@ -35,32 +63,13 @@ export default class MapWidget extends StaticComponent {
     TM.sendManialink(this.xml, login)
   }
 
-  private async updateXML(): Promise<void> {
-    let author: string, nation: string | undefined
-    const authorLogin: string = TM.map.author
-    const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
-    if (process.env.USE_WEBSERVICES === "YES" && !regex.test(authorLogin)) {
-      const json: any = await TM.fetchWebServices(authorLogin)
-      if (json instanceof Error) {
-        TM.error(`Failed to fetch nickname for author login ${authorLogin}`, json.message)
-        author = authorLogin
-      } else {
-        if (json?.message === 'Unkown player') { // THANKS NADEO
-          TM.error(`Failed to fetch nickname for author login ${authorLogin} (no such login registered)`, json.message)
-          author = authorLogin
-        } else {
-          author = json?.nickname
-          nation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
-        }
-      }
-    } else {
-      author = authorLogin
-    }
+  private updateXML(): void {
+    const author: string = this.authorNickname ?? TM.map.author
     const date: Date | undefined = TM.TMXCurrent?.lastUpdateDate
     const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
     const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
-    if (nation !== undefined) {
-      icons[2] = (flags as any)[nation] // cope typescript
+    if (this.authorNation !== undefined) {
+      icons[2] = (flags as any)[this.authorNation] // cope typescript
     }
     const headerCFG = CONFIG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {
