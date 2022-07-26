@@ -12,8 +12,6 @@ import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
 import { JukeboxService } from './services/JukeboxService.js'
-import fetch from 'node-fetch'
-import tls from 'node:tls'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
@@ -22,11 +20,7 @@ import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
 import dsc from 'dice-similarity-coeff'
 import { Logger } from './Logger.js'
-
-if (process.env.USE_WEBSERVICES === 'YES') {
-  tls.DEFAULT_MIN_VERSION = 'TLSv1'
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-}
+import http from 'http'
 
 const DB: Database = new Database()
 await DB.initialize()
@@ -387,21 +381,38 @@ export const TRAKMAN = {
    * @param login Player login
    * @returns Player information in JSON or error if unsuccessful
    */
-  async fetchWebServices(login: string): Promise<any | Error> {
+  async fetchWebServices(login: string): Promise<{
+    id: number
+    login: string
+    nickname: string
+    united: boolean
+    path: string
+    idZone: number
+  } | Error> {
     if (process.env.USE_WEBSERVICES !== "YES") {
       return new Error('Use webservices set to false')
     }
     const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
-    const response = await fetch(`https://ws.trackmania.com/tmf/players/${login}/`, {
+    const options = {
+      host: `ws.trackmania.com`,
+      path: `/tmf/players/${login}/`,
       headers: {
-        "Authorization": au
+        'Authorization': au,
       }
-    }).catch(err => err)
-    if (response instanceof Error) {
-      Logger.error(`Error while fetching webservices data dor login ${login}`, response.message)
-      return response
     }
-    return await response.json()
+    return new Promise((resolve) => {
+      http.request(options, function (res) {
+        let data = ''
+        res.on('data', function (chunk) {
+          data += chunk
+        })
+        if (res.statusCode === 200) {
+          res.on('end', () => resolve(JSON.parse(data)))
+          return
+        }
+        res.on('end', () => resolve(new Error(data)))
+      }).end()
+    })
   },
 
   /**

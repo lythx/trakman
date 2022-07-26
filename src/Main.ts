@@ -79,7 +79,7 @@ async function main(): Promise<void> {
   }
   if (process.env.USE_FREEZONE === 'YES') {
     Logger.trace('Connecting to ManiaLive...')
-    const status: void | Error = await Freezone.initialize()
+    const status: true | Error = await Freezone.initialize()
     if (status instanceof Error) { Logger.error('Failed to authenticate on ManiaLive') }
     else { Logger.trace('Connected to ManiaLive') }
   }
