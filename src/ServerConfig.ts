@@ -21,7 +21,7 @@ export class ServerConfig {
   ]
 
   static async initialize(): Promise<void> {
-    this.update()
+    await this.update()
     Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
       Logger.info(`Server config changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()

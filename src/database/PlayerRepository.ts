@@ -44,14 +44,12 @@ export class PlayerRepository extends Repository {
   async get(logins: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
     if (typeof logins === 'string') {
       const id = await playerIdsRepo.get(logins)
-      console.log(id, 'id')
       if (id === undefined) { return }
       const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
       JOIN player_ids ON players.id=player_ids.id
       LEFT JOIN privileges ON player_ids.login=privileges.login
       WHERE players.id=$1`
       const res = await this.query(query, id)
-      console.log(res, 'res')
       return res[0] === undefined ? undefined : this.constructPlayerObject(res[0])
     }
     const ids = await playerIdsRepo.get(logins)

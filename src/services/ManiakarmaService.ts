@@ -32,6 +32,7 @@ export abstract class ManiakarmaService {
       for (const player of PlayerService.players) {
         await this.receiveVotes(player.login)
       }
+      console.log({ votes: this._mapKarma, karma: this._mapKarmaValue })
       Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     })
     Events.addListener('Controller.EndMap', async (): Promise<void> => {
@@ -85,7 +86,7 @@ export abstract class ManiakarmaService {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
-    this.fixCoherence()
+    await this.fixCoherence()
   }
 
   private static async sendVotes(): Promise<void | Error> {
@@ -160,12 +161,12 @@ export abstract class ManiakarmaService {
     this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
   }
 
-  private static fixCoherence() {
+  private static async fixCoherence() {
     const localVotes = VoteService.votes.filter(a => a.mapId === MapService.current.id)
     const mkVotes = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-        VoteService.add(e.mapId, e.login, e.vote)
+        await VoteService.add(e.mapId, e.login, e.vote)
       }
     }
     for (const e of localVotes) {
