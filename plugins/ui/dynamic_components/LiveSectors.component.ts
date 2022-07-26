@@ -18,7 +18,7 @@ export default class LiveSectors extends PopupWindow {
 
   constructor() {
     super(IDS.liveSectors, stringToObjectProperty(CONFIG.liveSectors.icon, ICONS), CONFIG.liveSectors.title, CONFIG.liveSectors.navbar)
-    const records: FinishInfo[] = TM.liveRecords
+    const records = TM.liveRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -32,7 +32,7 @@ export default class LiveSectors extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
       this.reRender()
     })
-    TM.addListener('Controller.PlayerFinish', (): void => {
+    TM.addListener('Controller.LiveRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
       this.reRender()
     })
@@ -67,8 +67,8 @@ export default class LiveSectors extends PopupWindow {
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const startCells = (params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
-      const record: FinishInfo = records[i + playerIndex]
+      const startCells = (params.cpPage === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
+      const record = records[i + playerIndex]
       const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
@@ -98,7 +98,7 @@ export default class LiveSectors extends PopupWindow {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages + 1)).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
@@ -125,15 +125,15 @@ export default class LiveSectors extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = TM.map.checkpointsAmount - 1
+    const cpAmount = TM.map.checkpointsAmount 
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
-      cpIndex = this.cpsOnFirstPage + 1
+      cpIndex = this.cpsOnFirstPage
       for (let i: number = 2; i < cpPage; i++) {
         cpIndex += this.cpsOnNextPages
       }
-      cpsToDisplay = Math.min(cpAmount - (cpIndex - 1), this.cpsOnNextPages)
+      cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
     }
     return [cpIndex, cpsToDisplay]
   }
@@ -154,7 +154,7 @@ export default class LiveSectors extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages: number = 1
-    const cpAmount = TM.map.checkpointsAmount
+    const cpAmount = TM.map.checkpointsAmount 
     for (let i: number = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++

@@ -18,7 +18,7 @@ export default class LiveCps extends PopupWindow {
 
   constructor() {
     super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, CONFIG.liveCps.navbar)
-    const records: FinishInfo[] = TM.liveRecords
+    const records= TM.liveRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -32,7 +32,7 @@ export default class LiveCps extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
       this.reRender()
     })
-    TM.addListener('Controller.PlayerFinish', (): void => {
+    TM.addListener('Controller.LiveRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
       this.reRender()
     })
@@ -64,8 +64,8 @@ export default class LiveCps extends PopupWindow {
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const startCells = (params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
-      const record: FinishInfo = records[i + playerIndex]
+      const startCells = (params.cpPage === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
+      const record = records[i + playerIndex]
       const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
@@ -86,20 +86,20 @@ export default class LiveCps extends PopupWindow {
         (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i, j, w, h) => centeredText(' Nickname ', w, h),
         (i, j, w, h) => centeredText(' Login ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j  - this.startCellsOnFirstPage).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - this.startCellsOnFirstPage).toString(), w, h)),
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages + 1)).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
@@ -126,11 +126,11 @@ export default class LiveCps extends PopupWindow {
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
-      cpIndex = this.cpsOnFirstPage + 1
+      cpIndex = this.cpsOnFirstPage 
       for (let i: number = 2; i < cpPage; i++) {
         cpIndex += this.cpsOnNextPages
       }
-      cpsToDisplay = Math.min(cpAmount - (cpIndex - 1), this.cpsOnNextPages)
+      cpsToDisplay = Math.min(cpAmount - cpIndex , this.cpsOnNextPages)
     }
     return [cpIndex, cpsToDisplay]
   }
