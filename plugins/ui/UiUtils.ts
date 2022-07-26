@@ -16,7 +16,7 @@ const gridCell = (width: number, height: number, margin: number, color: string =
 
 const centeredText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
   const textScale: number = options?.textScale ?? 0.7
-  const padding: number = options?.padding ?? 1
+  const padding: number = options?.padding ?? 0.5
   const posX: number = options?.xOffset === undefined ? parentWidth / 2 : (parentWidth / 2) + options?.xOffset
   const posY: number = options?.yOffset === undefined ? parentHeight / 2 - 0.1 : (parentHeight / 2) + options?.yOffset
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${text}" valign="center" halign="center"/>`

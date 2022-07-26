@@ -1,12 +1,13 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
+import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 
 export default class LiveCps extends PopupWindow {
 
   private readonly startCellsOnFirstPage: number = 2
   private readonly startCellsOnNextPages: number = 1
-  private readonly startCellWidth: number = 2
+  private readonly startCellWidth: number = CONFIG.liveCps.startCellWidth
+  private readonly indexCellWidth: number = CONFIG.liveCps.indexCellWidth
   private readonly cpsOnFirstPage: number = CONFIG.liveCps.cpsOnFirstPage
   private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
   private readonly entries: number = CONFIG.liveCps.entries
@@ -48,6 +49,8 @@ export default class LiveCps extends PopupWindow {
     const cpTypes = getCpTypes(records.map(a => a.checkpoints))
     const entriesToDisplay = records.length - (playerIndex + 1)
 
+    const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
+
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
@@ -61,7 +64,7 @@ export default class LiveCps extends PopupWindow {
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const startCells = params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages
+      const startCells = (params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
       const record: FinishInfo = records[i + playerIndex]
       const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
@@ -77,31 +80,33 @@ export default class LiveCps extends PopupWindow {
     const emptyCell = (): string => ''
 
     let grid: Grid
-    let headers: ((i: number, j: number, w: number, h: number) => string)[]
+    let headers: GridCellFunction[] = []
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
+        (i, j, w, h) => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Login ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j  - this.startCellsOnFirstPage).toString(), w, h)),
+        (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - this.startCellsOnNextPages).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages + 1)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
-        arr.push(nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }
     }
     return grid.constructXml(arr)
