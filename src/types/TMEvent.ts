@@ -20,4 +20,5 @@ type TMEvent = StringAutocomplete<
 "Controller.MapAdded" |
 "Controller.MapRemoved" |
 "Controller.BillUpdated" |
+"Controller.PrivilegeChanged" |
 "Controller.MatchSettingsUpdated">

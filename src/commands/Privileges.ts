@@ -14,7 +14,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No login specified.`, callerLogin)
         return
       }
-      const targetInfo: TMOfflinePlayer  | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
       if (targetInfo == null) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Cannot find the specified login in the database.`, callerLogin)
         return
@@ -151,6 +151,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
           `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has enabled ` +
           `${TM.palette.highlight + TM.strip(targetInfo.nickname, true)} ${TM.palette.admin}commands.`)
+        await PlayerService.setPrivilege(targetLogin, 0, info.login)
       } else if (targetInfo.privilege === 0) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(targetInfo.nickname, true)}${TM.palette.error} has no priveleges.`, callerLogin)
       }

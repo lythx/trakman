@@ -31,7 +31,6 @@ export default class KarmaWidget extends StaticComponent {
       this.display()
     })
     TM.addListener('Controller.ManiakarmaVotes', () => {
-      console.log('mkvotes')
       this.display()
     })
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
