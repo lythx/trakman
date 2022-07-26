@@ -59,10 +59,7 @@ const getMapCps = async (mapId: string): Promise<void> => {
     mapCheckpoints = { mapid: mapId, logins: [], nicknames: [], checkpoints: [], dates: [] }
     void addMapCps()
   } else {
-    console.log('a')
-    console.log(res[0])
     mapCheckpoints = res[0]
-    console.log(mapCheckpoints)
   }
 }
 

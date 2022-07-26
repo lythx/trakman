@@ -16,4 +16,5 @@ type EventParams =
   MapAddedInfo |
   MapRemovedInfo |
   BillUpdatedInfo |
+  TMMap[] |
   any[]

@@ -3,8 +3,6 @@ import 'dotenv/config'
 import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
 import { MapService } from './MapService.js'
-import { Client } from '../client/Client.js'
-import colours from '../data/Colours.json' assert {type: 'json'}
 import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from './JukeboxService.js'
 import { Events } from '../Events.js'
@@ -54,7 +52,7 @@ export abstract class DedimaniaService {
   }
 
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
-    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
+    if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
     this._dedis.length = 0
     this._newDedis.length = 0
     const cfg: ServerInfo = ServerConfig.config
@@ -105,7 +103,7 @@ export abstract class DedimaniaService {
   }
 
   static async sendRecords(mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> {
-    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
+    if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
     const recordsArray: any = []
     for (const d of this._newDedis) {
       recordsArray.push(
@@ -136,7 +134,7 @@ export abstract class DedimaniaService {
   }
 
   static addRecord(mapId: string, player: TMPlayer, time: number, checkpoints: number[]): false | Error | DediRecordInfo {
-    if(this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it')}
+    if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
     const pb: number | undefined = this._dedis.find(a => a.login === player.login)?.time
     const position: number = this._dedis.filter(a => a.time <= time).length + 1
     if (position > this.dedisAmount || time > (pb ?? Infinity)) { return false }
@@ -200,7 +198,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerJoin(login: string, nickname: string, region: string, isSpectator: boolean): Promise<void> {
-    if(this.isActive === false) { return }
+    if (this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
       [
         { string: 'TMF' },
@@ -217,7 +215,7 @@ export abstract class DedimaniaService {
   }
 
   static async playerLeave(login: string): Promise<void> {
-    if(this.isActive === false) { return }
+    if (this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
       [
         { string: 'TMF' },
@@ -249,7 +247,7 @@ export abstract class DedimaniaService {
     return arr
   }
 
-  private static constructRecordObject(player: TMPlayer, mapId: string, 
+  private static constructRecordObject(player: TMPlayer, mapId: string,
     checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): DediRecordInfo {
     return {
       map: mapId,
@@ -267,7 +265,7 @@ export abstract class DedimaniaService {
       position,
       previousTime,
       previousPosition,
-      playerId: player.playerId,
+      playerId: player.id,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited

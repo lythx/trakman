@@ -72,13 +72,13 @@ export default class BlacklistList extends PopupWindow {
         // for(let i = 0; i<100; i++) {
         //     blacklisted.push({login: Math.random().toString(), expires: new Date(Math.random()), caller: Math.random().toString(), reason: Math.random().toString(), date: new Date(Math.random())})
         // }
-        const fetchedPlayers: PlayersDBEntry[] = []
+        const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of blacklisted) {
             fetchedPlayers.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(fetchedPlayers[i - 1].nickname, w, h)
+            return centeredText(fetchedPlayers[i - 1]?.nickname ?? '', w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(blacklisted[i - 1].login, w, h)

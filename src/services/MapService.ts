@@ -5,7 +5,7 @@ import { Events } from '../Events.js'
 
 export class MapService {
 
-  private static _current: TMMap
+  private static _current: TMCurrentMap
   private static _maps: TMMap[] = []
   private static repo: MapRepository
 
@@ -14,14 +14,19 @@ export class MapService {
     await this.repo.initialize()
     await this.initializeList()
     await this.setCurrent()
+    Client.addProxy(['LoadMatchSettings'], async () => {
+      this.maps.length = 0
+      await this.initializeList()
+      Events.emitEvent('Controller.MatchSettingsUpdated', this.maps)
+    })
   }
 
-  static get current(): TMMap {
+  static get current(): TMCurrentMap {
     return this._current
   }
 
   static get maps(): TMMap[] {
-    return this._maps
+    return [...this._maps]
   }
 
   /**
@@ -33,12 +38,17 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const dbinfo = await this.repo.get(res[0].UId)
+    const dbinfo = this.maps.find(a => a.id === res[0].UId)
     if (dbinfo === undefined) {
-      Logger.error('Failed to fetch map info from database')
+      Logger.error('Failed to get map info from memory')
       return
     }
-    this._current = this.constructMapObjectFromDB(dbinfo, res[0])
+    if (dbinfo.checkpointsAmount === undefined) {
+      dbinfo.checkpointsAmount = res[0].NbCheckpoints
+      dbinfo.lapsAmount = res[0].NbLaps
+    }
+    this._current = dbinfo as any
+    this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
   }
 
   /**
@@ -50,12 +60,12 @@ export class MapService {
       Logger.fatal('Error while getting the map list', mapList.message)
       return
     }
-    const DBMapList: MapsDBEntry[] = await this.repo.getAll()
+    const DBMapList: TMMap[] = await this.repo.getAll()
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
     if (mapsNotInDB.length > 100) { // TODO implement progress bar here perhaps (?)
       Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
     }
-    const mapsNotInDBInfo: TMMap[] = []
+    const mapsNotInDBObjects: TMMap[] = []
     for (const c of mapsNotInDB) {
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
       if (res instanceof Error) {
@@ -63,59 +73,62 @@ export class MapService {
         return
       }
       const obj: TMMap = this.constructNewMapObject(res[0])
-      mapsNotInDBInfo.push(obj)
+      mapsNotInDBObjects.push(obj)
     }
-    const mapsInDBInfo: TMMap[] = []
+    const mapsInMapList: TMMap[] = []
     for (const map of DBMapList) {
-      const info: TMMap = this.constructMapObjectFromDB(map)
-      mapsInDBInfo.push(info)
+      if (mapList.some(a => a.UId === map.id)) {
+        mapsInMapList.push(map)
+      }
     }
-    const arr = [...mapsInDBInfo, ...mapsNotInDBInfo].sort((a, b) => a.name.localeCompare(b.name))
+    const arr = [...mapsInMapList, ...mapsNotInDBObjects].sort((a, b) => a.name.localeCompare(b.name))
     arr.sort((a, b) => a.author.localeCompare(b.author))
     this._maps.push(...arr)
-    await this.repo.add(...mapsNotInDBInfo)
+    await this.repo.add(...mapsNotInDBObjects)
   }
 
   static async add(fileName: string, callerLogin?: string): Promise<TMMap | Error> {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }
     if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
-    const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: fileName }])
-    if (res instanceof Error) { return res }
-    const obj: TMMap = this.constructNewMapObject(res[0])
+    const dbRes = await this.repo.getByFilename(fileName)
+    let obj: TMMap
+    if (dbRes !== undefined) {
+      obj = dbRes
+    } else {
+      const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: fileName }])
+      if (res instanceof Error) { return res }
+      obj = this.constructNewMapObject(res[0])
+      void this.repo.add(obj)
+    }
     this._maps.push(obj)
     this._maps.sort((a, b) => a.name.localeCompare(b.name))
     this._maps.sort((a, b) => a.author.localeCompare(b.author))
-    void this.repo.add(obj)
     if (callerLogin !== undefined) {
       Logger.info(`Player ${callerLogin} added map ${obj.name} by ${obj.author}`)
     } else {
       Logger.info(`Map ${obj.name} by ${obj.author} added`)
     }
-    const temp: any = obj
-    temp.callerLogin = callerLogin
-    Events.emitEvent('Controller.MapAdded', temp as MapAddedInfo)
+    Events.emitEvent('Controller.MapAdded', { ...obj, callerLogin })
     return obj
   }
 
   static async remove(id: string, callerLogin?: string): Promise<boolean | Error> {
-    const map = this._maps.find(a => id === a.fileName)
+    const map = this._maps.find(a => id === a.id)
     if (map === undefined) {
       return false
     }
-    const insert: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
-    if (insert instanceof Error) { return insert }
-    if (insert[0] === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
+    const remove: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
+    if (remove instanceof Error) { return remove }
+    if (remove[0] === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
     this._maps.splice(this._maps.findIndex(a => a.id === id), 1)
-    // void this.repo.remove(fileName) TODO IMPLEMENT REMOVAL AFTER REWRITING DB
+    void this.repo.remove(id)
     if (callerLogin !== undefined) {
       Logger.info(`Player ${callerLogin} removed map ${map.name} by ${map.author}`)
     } else {
       Logger.info(`Map ${map.name} by ${map.author} removed`)
     }
-    const temp: any = map
-    temp.callerLogin = callerLogin
-    Events.emitEvent('Controller.MapRemoved', temp as MapRemovedInfo)
+    Events.emitEvent('Controller.MapRemoved', { ...map, callerLogin })
     return true
   }
 
@@ -154,31 +167,10 @@ export class MapService {
       goldTime: info.GoldTime,
       authorTime: info.AuthorTime,
       copperPrice: info.CopperPrice,
-      lapRace: info.LapRace,
-      lapsAmount: info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints,
+      isLapRace: info.LapRace,
+      lapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
+      checkpointsAmount: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date()
-    }
-  }
-
-  // Fix later cuz nadeo are apes and send -1 for laps and checkpoints on GetChallengeInfo
-  private static constructMapObjectFromDB(info: MapsDBEntry, callRes?: any) {
-    return {
-      id: info.id,
-      name: info.name,
-      fileName: info.filename,
-      author: info.author,
-      environment: info.environment,
-      mood: info.mood,
-      bronzeTime: info.bronzetime,
-      silverTime: info.silvertime,
-      goldTime: info.goldtime,
-      authorTime: info.authortime,
-      copperPrice: info.copperprice,
-      lapRace: info.laprace,
-      lapsAmount: callRes === undefined ? info.lapsamount : callRes.NbLaps,
-      checkpointsAmount: callRes === undefined ? info.checkpointsamount : callRes.NbCheckpoints,
-      addDate: info.adddate
     }
   }
 

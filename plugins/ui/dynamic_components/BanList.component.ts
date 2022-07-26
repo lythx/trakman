@@ -46,16 +46,16 @@ export default class BanList extends PopupWindow {
             
         ]
         const bannedplayers = TM.banlist
-        const cancer: PlayersDBEntry[] = []
+        const fetchedPlayers: (TMOfflinePlayer | undefined )[] = []
 
         for(const player of bannedplayers) {
-            cancer.push(await TM.fetchPlayer(player.login))
+            fetchedPlayers.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(cancer[i - 1].nickname, w, h)            
+            return centeredText(fetchedPlayers[i - 1]?.nickname ?? '', w, h)            
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(bannedplayers[i - 1].login, w, h)            
+            return centeredText(bannedplayers[i - 1]?.login ?? '', w, h)            
         }
         const dateCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(bannedplayers[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)            

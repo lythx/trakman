@@ -1,15 +1,13 @@
-interface LocalRecord {
-  readonly map: string
+interface TMOfflinePlayer {
   readonly login: string
-  readonly time: number
-  readonly date: Date
-  readonly checkpoints: number[]
   readonly nickname: string
   readonly nation: string
   readonly nationCode: string
+  readonly region: string
   readonly timePlayed: number
+  readonly visits: number
+  readonly isUnited: boolean
   readonly wins: number
   readonly privilege: number
-  readonly visits: number
-  readonly position: number
+  readonly lastOnline?: Date
 }

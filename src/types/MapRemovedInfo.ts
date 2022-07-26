@@ -10,9 +10,9 @@ interface MapRemovedInfo {
   readonly goldTime: number
   readonly authorTime: number
   readonly copperPrice: number
-  readonly lapRace: boolean
-  readonly lapsAmount: number
-  readonly checkpointsAmount: number
+  readonly isLapRace: boolean
+  readonly lapsAmount?: number
+  readonly checkpointsAmount?: number
   readonly addDate: Date
   readonly callerLogin?: string
 }

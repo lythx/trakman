@@ -19,11 +19,11 @@ export default class LocalSectors extends PopupWindow {
 
   constructor() {
     super(IDS.localSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, ['localCps', 'dediCps', 'dediSectors', 'liveCps', 'liveSectors'])
-    const records: LocalRecord[] = TM.localRecords
+    const records: TMLocalRecord[] = TM.localRecords
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
     this.paginator.onPageChange = (login: string, page: number): void => {
-      const records: LocalRecord[] = TM.localRecords
+      const records: TMLocalRecord[] = TM.localRecords
       const pageCount: number = this.paginator.pageCount
       const cpPage: number = this.cpPaginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
@@ -38,7 +38,7 @@ export default class LocalSectors extends PopupWindow {
     }
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
     this.cpPaginator.onPageChange = (login: string, cpPage: number): void => {
-      const records: LocalRecord[] = TM.localRecords
+      const records: TMLocalRecord[] = TM.localRecords
       const pageCount: number = this.paginator.pageCount
       const page: number = this.paginator.getPageByLogin(login) ?? 1
       this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
@@ -50,12 +50,12 @@ export default class LocalSectors extends PopupWindow {
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
-    const records: LocalRecord[] = TM.localRecords
+    const records: TMLocalRecord[] = TM.localRecords
     const pageCount: number = this.paginator.pageCount
     this.displayToPlayer(info.login, { page: 1, cpPage: 1, records }, `1/${Math.max(1, pageCount)}`)
   }
 
-  protected constructContent(login: string, params: { page: number, cpPage: number, records: LocalRecord[] }): string {
+  protected constructContent(login: string, params: { page: number, cpPage: number, records: TMLocalRecord[] }): string {
     const sectors: number[][] = params.records.map(a => [...a.checkpoints, a.time]).map(a => a
       .reduce((acc: number[], cur, i, arr): number[] => i === 0 ? [cur] : [...acc, cur - arr[i - 1]], []))
     let sectorsDisplay: number = Math.min(this.cpAmount, this.cpsPerPage)
@@ -86,7 +86,7 @@ export default class LocalSectors extends PopupWindow {
       return centeredText(TM.formatDate(params.records[i + n].date, true), w, h)
     }
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const record: LocalRecord = params.records?.[i + n]
+      const record: TMLocalRecord = params.records?.[i + n]
       const playerSectors: number[] = sectors?.[i + n]
       if (record === undefined) {
         return ''
