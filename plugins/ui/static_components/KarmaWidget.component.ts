@@ -12,6 +12,7 @@ export default class KarmaWidget extends StaticComponent {
   private readonly margin: number = CONFIG.static.marginSmall
   private readonly buttonW: number = 1.7
   private readonly options: number[] = [-3, -2, -1, 1, 2, 3]
+  private readonly icons = CONFIG.karma.icons
 
   constructor() {
     super(IDS.karma, { displayOnRace: true, hideOnResult: true })
@@ -120,19 +121,19 @@ export default class KarmaWidget extends StaticComponent {
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = [
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="https://cdn.discordapp.com/attachments/793464821030322196/990589378457911327/LocalPin.png"/>`,
+      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${stringToObjectProperty(this.icons[0], ICONS)}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${ICONS.globe}"/>`,
+      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${stringToObjectProperty(this.icons[1], ICONS)}"/>`,
 
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${ICONS.heart}"/>`,
+      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${stringToObjectProperty(this.icons[2], ICONS)}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
       ${centeredText(Math.round(karma).toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
       ${centeredText(mkKarma, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
 
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="https://cdn.discordapp.com/attachments/502122268936110100/990585196288024576/Vote.png"/>`,
+      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${stringToObjectProperty(this.icons[3], ICONS)}"/>`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
       ${centeredText(totalVotes.toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
