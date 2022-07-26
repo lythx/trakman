@@ -104,7 +104,6 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     })
     TM.addListener("Controller.PrivilegeChanged", (info) => {
       const p: { login: string, params: DisplayParams } | undefined = this.getPlayersWithWindowOpen(true).find(a => a.login === info.login)
-      console.log(p)
       if (p !== undefined) {
         if (info.newPrivilege < p.params.privilege || p.params.singleType === undefined) {
           const paginator: Paginator = this.paginators[info.newPrivilege]

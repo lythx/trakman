@@ -55,6 +55,7 @@ export abstract class ManiakarmaService {
     const json: any = this.getJson(await res.text())
     this.authCode = json?.result?.authcode[0]
     this.apiUrl = json?.result?.api_url[0]
+    Logger.debug(this.apiUrl)
   }
 
   private static async receiveVotes(playerLogin: string): Promise<void | Error> {
