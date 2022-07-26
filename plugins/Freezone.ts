@@ -19,11 +19,11 @@ export class Freezone {
     // Freezone WS password, received on 'freezone:servers' manialink in-game
     private static freezonePassword: string
     // Freezone ManiaLive URL
-    private static manialiveUrl: string = 'http://ws.trackmania.com'
+    private static readonly manialiveUrl: string = 'http://ws.trackmania.com'
 
     static async initialize(): Promise<void | Error> {
         if (process.env.FREEZONE_PASSWORD === undefined) {
-            Logger.fatal('Freezone password is not defined')
+            Logger.fatal('FREEZONE_PASSWORD is not defined')
             return
         }
         this.freezonePassword = process.env.FREEZONE_PASSWORD
