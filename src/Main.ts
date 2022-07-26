@@ -17,6 +17,7 @@ import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
+import { Freezone } from '../plugins/Freezone.js'
 
 async function main(): Promise<void> {
   await Logger.initialize()
@@ -75,6 +76,12 @@ async function main(): Promise<void> {
     const status: void | Error = await ManiakarmaService.initialize()
     if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
     else { Logger.trace('Connected to Maniakarma') }
+  }
+  if (process.env.USE_FREEZONE === 'YES') {
+    Logger.trace('Connecting to ManiaLive...')
+    const status: true | Error = await Freezone.initialize()
+    if (status instanceof Error) { Logger.error('Failed to authenticate on ManiaLive') }
+    else { Logger.trace('Connected to ManiaLive') }
   }
   Logger.trace('Enabling callbacks...')
   const cb = await Listeners.initialize()
