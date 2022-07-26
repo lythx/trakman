@@ -6,6 +6,7 @@ import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
+import { Events } from '../Events.js'
 
 export class PlayerService {
 
@@ -153,15 +154,23 @@ export class PlayerService {
     return await this.repo.get(login)
   }
 
-  static async setPrivilege(login: string, privilege: number, adminLogin?: string): Promise<void> {
-    await this.privilegeRepo.set(login, privilege)
+  static async setPrivilege(login: string, privilege: number, callerLogin?: string): Promise<void> {
     const player: TMPlayer | undefined = this._players.find(a => a.login === login)
     if (player !== undefined) { player.privilege = privilege }
-    if (adminLogin !== undefined) {
-      Logger.info(`Player ${adminLogin} changed ${login} privilege to ${privilege}`)
+    if (callerLogin !== undefined) {
+      Logger.info(`Player ${callerLogin} changed ${login} privilege to ${privilege}`)
     } else {
       Logger.info(`${login} privilege set to ${privilege}`)
     }
+    const offlinePlayer = await this.repo.get(login)
+    Events.emitEvent('Controller.PrivilegeChanged', {
+      player: offlinePlayer === undefined ? undefined : { ...offlinePlayer, privilege },
+      login,
+      previousPrivilege: offlinePlayer?.privilege ?? 0,
+      newPrivilege: privilege,
+      callerLogin
+    })
+    void this.privilegeRepo.set(login, privilege)
   }
 
   /**

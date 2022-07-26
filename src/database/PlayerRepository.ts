@@ -45,7 +45,7 @@ export class PlayerRepository extends Repository {
     if (typeof logins === 'string') {
       const id = await playerIdsRepo.get(logins)
       if (id === undefined) { return }
-      const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
+      const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, privilege FROM players 
       JOIN player_ids ON players.id=player_ids.id
       LEFT JOIN privileges ON player_ids.login=privileges.login
       WHERE players.id=$1`
@@ -54,7 +54,7 @@ export class PlayerRepository extends Repository {
     }
     const ids = await playerIdsRepo.get(logins)
     if (ids.length === 0) { return [] }
-    const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
+    const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, privilege FROM players 
     JOIN player_ids ON players.id=player_ids.id
     LEFT JOIN privileges ON player_ids.login=privileges.login
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
@@ -87,7 +87,7 @@ export class PlayerRepository extends Repository {
   }
 
   private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
-    const nation = entry.region.split('|')[1]
+    const nation = entry.region.split('|')[0]
     return {
       login: entry.login,
       nickname: entry.nickname,

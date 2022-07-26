@@ -32,7 +32,6 @@ export abstract class ManiakarmaService {
       for (const player of PlayerService.players) {
         await this.receiveVotes(player.login)
       }
-      console.log({ votes: this._mapKarma, karma: this._mapKarmaValue })
       Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     })
     Events.addListener('Controller.EndMap', async (): Promise<void> => {
