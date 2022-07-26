@@ -1,37 +1,38 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
+import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 
 export default class DediSectors extends PopupWindow {
 
   private readonly startCellsOnFirstPage: number = 2
   private readonly startCellsOnNextPages: number = 1
-  private readonly startCellWidth: number = 2
-  private readonly secsOnFirstPage: number = CONFIG.dediSectors.sectorsOnFirstPage
-  private readonly secsOnNextPages: number = this.secsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
+  private readonly startCellWidth: number = CONFIG.dediSectors.startCellWidth
+  private readonly indexCellWidth: number = CONFIG.dediSectors.indexCellWidth
+  private readonly cpsOnFirstPage: number = CONFIG.dediSectors.cpsOnFirstPage
+  private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
   private readonly entries: number = CONFIG.dediSectors.entries
   private readonly paginator: Paginator
-  private readonly secPaginator: Paginator
+  private readonly cpPaginator: Paginator
   private readonly selfColour: string = CONFIG.dediSectors.selfColour
-  private readonly secColours = CONFIG.dediSectors.sectorColours
+  private readonly cpColours = CONFIG.dediSectors.cpColours
 
   constructor() {
     super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, CONFIG.dediSectors.navbar)
-    const records: TMDedi[] = TM.dediRecords
+    const records = TM.dediRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
-    this.secPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateSecPages(), 1, true)
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    this.secPaginator.onPageChange = (login: string): void => {
+    this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    TM.addListener('Controller.BeginMap', (): void => {
-      this.secPaginator.setPageCount(this.calculateSecPages())
+    TM.addListener('Controller.DedimaniaRecords', (): void => {
+      this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
       this.reRender()
     })
-    TM.addListener('Controller.PlayerFinish', (): void => {
+    TM.addListener('Controller.DedimaniaRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
       this.reRender()
     })
@@ -41,109 +42,107 @@ export default class DediSectors extends PopupWindow {
     this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: { page: number, secPage: number }): string {
-    const records = TM.dediRecords
-    const secRecords: TMDedi[] = []
-    for (const e of records) {
-      secRecords.push({
-        login: e.login,
-        nickname: e.nickname,
-        time: e.time,
-        checkpoints: [...e.checkpoints, e.time].reduce((acc: number[], cur, i, arr) => i === 0 ? [cur] : [...acc, cur - arr[i - 1]], [])
-      })
+  protected constructContent(login: string, params: { page: number, cpPage: number }): string {
+    const records: TMDedi[] = []
+    for (const e of TM.dediRecords) {
+      records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }
-    const [secIndex, secsToDisplay] = this.getSecIndexAndAmount(params.secPage)
+    const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
-    const secTypes = getCpTypes(secRecords.map(a => a.checkpoints))
-    const entriesToDisplay = secRecords.length - (playerIndex + 1)
+    const cpTypes = getCpTypes(records.map(a => a.checkpoints))
+    const entriesToDisplay = records.length - (playerIndex + 1)
+
+    const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.strip(secRecords[i + playerIndex].nickname, false), w, h)
+      return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      let ret: string = centeredText(secRecords[i + playerIndex].login, w, h)
-      if (login === secRecords[i + playerIndex].login) { // Add colour for yourself
+      let ret: string = centeredText(records[i + playerIndex].login, w, h)
+      if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
       return ret
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const startCells = params.page === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages
-      const record: TMDedi = secRecords[i + playerIndex]
-      const secType = secTypes[i + playerIndex][j + secIndex - startCells]
-      const colour: string = secType === undefined ? 'FFFF' : (this.secColours as any)[secType]
-      const sec = record.checkpoints[(j - startCells) + secIndex]
-      return sec === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(sec), w, h)}`
+      const startCells = (params.cpPage === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
+      const record = records[i + playerIndex]
+      const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
+      const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
+      const cp = record.checkpoints[(j - startCells) + cpIndex]
+      return cp === undefined ? '' : `<format textcolor="${colour}"/>
+        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.Utils.getTimeString(secRecords[i + playerIndex].time), w, h)
+      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
 
     let grid: Grid
-    let headers: ((i: number, j: number, w: number, h: number) => string)[]
-    if (params.secPage === 1) {
+    let headers: GridCellFunction[] = []
+    if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
-        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + 1 - this.startCellsOnFirstPage).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
-        ...new Array(this.secsOnFirstPage - secsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
+        (i, j, w, h) => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Login ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - this.startCellsOnFirstPage).toString(), w, h)),
+        (i, j, w, h) => centeredText(' Finish ', w, h),
+        ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.secsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(secsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + secIndex - this.startCellsOnNextPages).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
-        ...new Array(this.secsOnNextPages - secsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.secsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
-      if (params.secPage === 1) {
-        arr.push(nickNameCell, loginCell, ...new Array(secsToDisplay).fill(cell), finishCell, ...new Array(this.secsOnFirstPage - secsToDisplay).fill(emptyCell))
+      if (params.cpPage === 1) {
+        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
-        arr.push(nickNameCell, ...new Array(secsToDisplay).fill(cell), finishCell, ...new Array(this.secsOnNextPages - secsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }
     }
     return grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: { page: number, secPage: number }): string {
-    const w = (this.secPaginator.buttonW + this.secPaginator.margin) * this.secPaginator.buttonCount + CONFIG.dediSectors.sectorPaginatorMargin
+  protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
+    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + CONFIG.dediSectors.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth / 2 - w} 0 3">
-      ${this.secPaginator.constructXml(params.secPage)}
+      ${this.cpPaginator.constructXml(params.cpPage)}
     </frame>`
   }
 
-  private getSecIndexAndAmount(secPage: number): [number, number] {
-    const secAmount = TM.map.checkpointsAmount
-    let secsToDisplay: number = Math.min(secAmount, this.secsOnFirstPage)
-    let secIndex: number = 0
-    if (secPage > 1) {
-      secIndex = this.secsOnFirstPage + 1
-      for (let i: number = 2; i < secPage; i++) {
-        secIndex += this.secsOnNextPages
+  private getCpIndexAndAmount(cpPage: number): [number, number] {
+    const cpAmount = TM.map.checkpointsAmount 
+    let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
+    let cpIndex: number = 0
+    if (cpPage > 1) {
+      cpIndex = this.cpsOnFirstPage
+      for (let i: number = 2; i < cpPage; i++) {
+        cpIndex += this.cpsOnNextPages
       }
-      secsToDisplay = Math.min(secAmount - (secIndex - 1), this.secsOnNextPages)
+      cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
     }
-    return [secIndex, secsToDisplay]
+    return [cpIndex, cpsToDisplay]
   }
 
   private getPagesAndOpen(login: string): void {
     const page = this.paginator.getPageByLogin(login)
-    const secPage = this.secPaginator.getPageByLogin(login)
+    const cpPage = this.cpPaginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
-    this.displayToPlayer(login, { page, secPage }, `${page}/${Math.max(1, pageCount)}`)
+    this.displayToPlayer(login, { page, cpPage }, `${page}/${Math.max(1, pageCount)}`)
   }
 
   private reRender(): void {
@@ -153,17 +152,17 @@ export default class DediSectors extends PopupWindow {
     }
   }
 
-  private calculateSecPages(): number {
-    let secPages: number = 1
-    const secAmount = TM.map.checkpointsAmount
-    for (let i: number = 1; i < secAmount; i++) {
-      if (secPages === 1 && i >= this.secsOnFirstPage) {
-        secPages++
-      } else if (i >= this.secsOnFirstPage + this.secsOnNextPages * (secPages - 1)) {
-        secPages++
+  private calculateCpPages(): number {
+    let cpPages: number = 1
+    const cpAmount = TM.map.checkpointsAmount 
+    for (let i: number = 1; i < cpAmount; i++) {
+      if (cpPages === 1 && i >= this.cpsOnFirstPage) {
+        cpPages++
+      } else if (i >= this.cpsOnFirstPage + this.cpsOnNextPages * (cpPages - 1)) {
+        cpPages++
       }
     }
-    return secPages
+    return cpPages
   }
 
 } 
