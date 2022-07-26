@@ -434,29 +434,33 @@
       "localCps",
       "localSectors",
       "liveCps",
-      "liveSectors"
+      "localCps"
     ],
-    "cpPaginatorMargin": 0.25
+    "cpPaginatorMargin": 0.25,
+    "startCellWidth": 2,
+    "indexCellWidth": 1
   },
   "dediSectors": {
     "entries": 15,
-    "sectorsOnFirstPage": 10,
+    "cpsOnFirstPage": 10,
     "icon": "chart.dedi",
     "title": "Dedimania Sectors",
     "selfColour": "0F0F",
-    "sectorColours": {
+    "cpColours": {
       "best": "0F0F",
       "worst": "F00F",
       "equal": "FF0F"
     },
     "navbar": [
-      "dediSectors",
+      "dediCps",
       "localCps",
       "localSectors",
       "liveCps",
       "liveSectors"
     ],
-    "sectorPaginatorMargin": 0.25
+    "cpPaginatorMargin": 0.25,
+    "startCellWidth": 2,
+    "indexCellWidth": 1
   },
   "liveCps": {
     "entries": 15,
@@ -484,7 +488,7 @@
     "entries": 15,
     "cpsOnFirstPage": 10,
     "icon": "chart.live",
-    "title": "Live Checkpoints",
+    "title": "Live Sectors",
     "selfColour": "0F0F",
     "cpColours": {
       "best": "0F0F",
@@ -506,7 +510,7 @@
     "entries": 15,
     "cpsOnFirstPage": 8,
     "icon": "chart.local",
-    "title": "Dedimania Checkpoints",
+    "title": "Local Checkpoints",
     "selfColour": "0F0F",
     "cpColours": {
       "best": "0F0F",
@@ -520,15 +524,31 @@
       "liveCps",
       "liveSectors"
     ],
-    "cpPaginatorMargin": 0.25
+    "cpPaginatorMargin": 0.25,
+    "startCellWidth": 2,
+    "indexCellWidth": 1
   },
   "localSectors": {
     "entries": 15,
-    "cpsPerPage": 8,
+    "cpsOnFirstPage": 8,
     "icon": "chart.local",
     "title": "Local Sectors",
     "selfColour": "0F0F",
-    "paginatorOffset": 14.9
+    "cpColours": {
+      "best": "0F0F",
+      "worst": "F00F",
+      "equal": "FF0F"
+    },
+    "navbar": [
+      "localCps",
+      "dediCps",
+      "dediSectors",
+      "liveCps",
+      "liveSectors"
+    ],
+    "cpPaginatorMargin": 0.25,
+    "startCellWidth": 2,
+    "indexCellWidth": 1
   },
   "recordInfo": {
     "minColumns": 5,
