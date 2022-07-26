@@ -1,30 +1,31 @@
 import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
-import countries from '../data/Countries.json' assert { type: 'json' }
-import { Events } from '../Events.js'
+import { PrivilegeRepository } from '../database/PrivilegeRepository.js'
 import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
+import { Events } from '../Events.js'
 
 export class PlayerService {
 
   private static readonly _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
-  private static newOwnerLogin: string | null
+  private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const oldOwnerLogin: string | undefined = (await this.repo.getOwner())?.login
+    await this.privilegeRepo.initialize()
+    const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
     const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
     if (newOwnerLogin === undefined) {
       await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
       return
     }
     if (oldOwnerLogin !== newOwnerLogin) {
-      this.newOwnerLogin = newOwnerLogin
-      if (oldOwnerLogin !== undefined) { await this.repo.removeOwner() }
+      if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
+      await this.setPrivilege(newOwnerLogin, 4)
     }
     await this.addAllFromList()
   }
@@ -62,61 +63,61 @@ export class PlayerService {
   /**
    * Adds a player into the list and database
    */
-  static async join(login: string, nickName: string, path: string, isSpectator: boolean, playerId: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
-    const nation: string = path.split('|')[1]
-    let nationCode: string | undefined = countries.find(a => a.name === path.split('|')[1])?.code
+  static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
+    let s = fullRegion.split('|')
+    s.shift()
+    const region = s.join('|')
+    const nation: string = fullRegion.split('|')[1]
+    let nationCode: string | undefined = Utils.nationToNationCode(nation)
     if (nationCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
       await Logger.fatal(`Error adding player ${login} to memory, nation ${nation} is not in the country list`)
-      let temp: any
-      return temp as JoinInfo // Shut up IDE
+      return {} as any // Shut up IDE
     }
-    const playerData: any = await this.repo.get(login)
+    const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
+    const privilege: number = await this.privilegeRepo.get(login)
     let player: TMPlayer
     if (playerData === undefined) {
       player = {
+        id,
         login,
-        nickname: nickName,
+        nickname,
         nation,
         nationCode,
         timePlayed: 0,
         joinTimestamp: Date.now(),
         visits: 1,
-        checkpoints: [],
+        currentCheckpoints: [],
         wins: 0,
         privilege: 0,
         isSpectator,
-        playerId,
         ip,
-        region: path,
+        region,
         isUnited
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
       player = {
         login,
-        nickname: nickName,
+        nickname,
         nation,
         nationCode,
-        timePlayed: Number(playerData.timeplayed),
+        timePlayed: playerData.timePlayed,
         joinTimestamp: Date.now(),
-        visits: serverStart === true ? Number(playerData.visits) : Number(playerData.visits) + 1, // Prevent adding visits on server start
-        checkpoints: [],
-        wins: Number(playerData.wins),
-        privilege: Number(playerData.privilege),
+        visits: serverStart === true ? playerData.visits : playerData.visits + 1, // Prevent adding visits on server start
+        currentCheckpoints: [],
+        wins: playerData.wins,
+        privilege,
         isSpectator,
-        playerId,
+        id,
         ip,
-        region: path,
-        isUnited
+        region,
+        isUnited,
+        lastOnline: playerData.lastOnline
       }
-      await this.repo.update(player) // need to await so owner privilege gets set after player is added
+      await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited, player.lastOnline) // need to await so owner privilege gets set after player is added
     }
     this._players.push(player)
-    if (player.login === this.newOwnerLogin) {
-      void this.setPrivilege(player.login, 4)
-      this.newOwnerLogin = null
-    }
     if (serverStart === undefined) {
       Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits}, ` +
         `nickname: ${player.nickname}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
@@ -128,6 +129,7 @@ export class PlayerService {
    * Remove the player from local memory, save timePlayed in database
    */
   static leave(login: string): LeaveInfo | Error {
+    const date = new Date()
     const playerIndex = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
       const errStr = `Error removing player ${login} from memory, player is not in the memory`
@@ -138,40 +140,37 @@ export class PlayerService {
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
-      login: player.login,
-      nickname: player.nickname,
-      nation: player.nation,
-      nationCode: player.nationCode,
+      ...player,
       timePlayed: totalTimePlayed,
-      joinTimestamp: player.joinTimestamp,
-      sessionTime,
-      wins: player.wins,
-      privilege: player.privilege,
-      visits: player.visits,
-      playerId: player.playerId,
-      ip: player.ip,
-      region: player.region,
-      isUnited: player.isUnited
+      sessionTime
     }
-    void this.repo.setTimePlayed(player.login, totalTimePlayed)
+    void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
     this._players.splice(playerIndex, 1)
     Logger.info(`Player ${player.login} left after playing for ${Utils.getTimeString(sessionTime)}`)
     return leaveInfo
   }
 
-  static async fetchPlayer(login: string): Promise<PlayersDBEntry | undefined> {
+  static async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined> {
     return await this.repo.get(login)
   }
 
-  static async setPrivilege(login: string, privilege: number, adminLogin?: string): Promise<void> {
-    await this.repo.setPrivilege(login, privilege)
-    const player: TMPlayer | undefined = this.players.find(a => a.login === login)
+  static async setPrivilege(login: string, privilege: number, callerLogin?: string): Promise<void> {
+    const player: TMPlayer | undefined = this._players.find(a => a.login === login)
     if (player !== undefined) { player.privilege = privilege }
-    if (adminLogin !== undefined) {
-      Logger.info(`Player ${adminLogin} changed ${login} privilege to ${privilege}`)
+    if (callerLogin !== undefined) {
+      Logger.info(`Player ${callerLogin} changed ${login} privilege to ${privilege}`)
     } else {
       Logger.info(`${login} privilege set to ${privilege}`)
     }
+    const offlinePlayer = await this.repo.get(login)
+    Events.emitEvent('Controller.PrivilegeChanged', {
+      player: offlinePlayer === undefined ? undefined : { ...offlinePlayer, privilege },
+      login,
+      previousPrivilege: offlinePlayer?.privilege ?? 0,
+      newPrivilege: privilege,
+      callerLogin
+    })
+    void this.privilegeRepo.set(login, privilege)
   }
 
   /**
@@ -179,7 +178,7 @@ export class PlayerService {
    */
   static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
     let laps
-    if (GameService.game.gameMode === 1 || MapService.current.lapRace === false) { // ta gamemode or not a lap map
+    if (GameService.game.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
     } else if (GameService.game.gameMode === 3) { // laps gamemode
       laps = GameService.game.lapsNo
@@ -188,17 +187,17 @@ export class PlayerService {
     }
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
-        player.checkpoints.length = 0
+        player.currentCheckpoints.length = 0
         return true
       }
-      player.checkpoints.unshift(cp)
-      player.checkpoints.length = 1 // reset checkpoints array on cp1
+      player.currentCheckpoints.unshift(cp)
+      player.currentCheckpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.checkpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
-    const endLap: number = player.checkpoints[0].lap + laps
+    if (player.currentCheckpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
+    const endLap: number = player.currentCheckpoints[0].lap + laps
     if (cp.lap < endLap) {
-      player.checkpoints.push(cp)
+      player.currentCheckpoints.push(cp)
       return false
     } else {
       return true

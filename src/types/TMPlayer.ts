@@ -1,5 +1,5 @@
 interface TMPlayer {
-  readonly playerId: number
+  readonly id: number
   readonly login: string
   readonly nickname: string
   readonly nation: string
@@ -7,10 +7,11 @@ interface TMPlayer {
   readonly region: string
   readonly timePlayed: number
   readonly joinTimestamp: number
-  readonly checkpoints: TMCheckpoint[]
+  readonly currentCheckpoints: TMCheckpoint[]
   readonly visits: number
   readonly ip: string
   readonly isUnited: boolean
+  readonly lastOnline?: Date
   wins: number
   privilege: number
   isSpectator: boolean

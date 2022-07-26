@@ -10,9 +10,7 @@ interface MapAddedInfo {
   readonly goldTime: number
   readonly authorTime: number
   readonly copperPrice: number
-  readonly lapRace: boolean
-  readonly lapsAmount: number
-  readonly checkpointsAmount: number
+  readonly isLapRace: boolean
   readonly addDate: Date
   readonly callerLogin?: string
 }

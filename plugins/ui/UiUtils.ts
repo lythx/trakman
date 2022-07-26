@@ -60,12 +60,12 @@ const staticHeader = (text: string, icon: string, side: boolean,
   if (side) {
     let label: string = ''
     if (options?.centerText) {
-      label = centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
+      label = centeredText(text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
     } else if (options?.centerVertically) {
-      label = verticallyCenteredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
+      label = verticallyCenteredText(text, rectWidth, CFG.height, { textScale, padding: horizontalPadding, xOffset: CFG.squareWidth + CONFIG.static.marginSmall })
     } else {
       label = `<label posn="${CFG.squareWidth + horizontalPadding} -${options?.verticalPadding ?? CFG.verticalPadding} 2" 
-        sizen="${(CFG.rectangleWidth * (1 / textScale)) - (horizontalPadding * 2)} 2" scale="${textScale}" text="${CFG.format}${text}"/>`
+        sizen="${(CFG.rectangleWidth * (1 / textScale)) - (horizontalPadding * 2)} 2" scale="${textScale}" text="${text}"/>`
     }
     return `
       <quad posn="0 0 1" sizen="${CFG.squareWidth} ${CFG.height}" bgcolor="${options?.iconBackground ?? CFG.iconBgColor}"/>
@@ -77,11 +77,11 @@ const staticHeader = (text: string, icon: string, side: boolean,
   } else {
     let label: string = ''
     if (options?.centerText) {
-      label = centeredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding })
+      label = centeredText(text, rectWidth, CFG.height, { textScale, padding: horizontalPadding })
     } else if (options?.centerVertically) {
-      label = verticallyCenteredText(CFG.format + text, rectWidth, CFG.height, { textScale, padding: horizontalPadding })
+      label = verticallyCenteredText(text, rectWidth, CFG.height, { textScale, padding: horizontalPadding })
     } else {
-      label = rightAlignedText(CFG.format + text, CFG.rectangleWidth, CFG.height, { textScale, yOffset: -0.1 })
+      label = rightAlignedText(text, CFG.rectangleWidth, CFG.height, { textScale, yOffset: -0.1 })
     }
     return `<quad posn="0 0 1" sizen="${rectWidth} ${CFG.height}" bgcolor="${options?.textBackgrund ?? CFG.bgColor}"/>
       ${label}

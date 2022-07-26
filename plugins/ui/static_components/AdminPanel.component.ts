@@ -17,6 +17,11 @@ export default class AdminPanel extends StaticComponent {
     this.positionX = CONFIG.static.leftPosition
     this.positionY = calculateStaticPositionY('admin')
     this.constructXml()
+    TM.addListener('Controller.PrivilegeChanged', (info) => {
+      if (this._isDisplayed === true) {
+        this.displayToPlayer(info.login)
+      }
+    })
   }
 
   display(): void {
@@ -30,6 +35,8 @@ export default class AdminPanel extends StaticComponent {
     const player = TM.getPlayer(login)
     if (player !== undefined && player.privilege > 0) {
       TM.sendManialink(this.xml, login)
+    } else {
+      TM.sendManialink(`<manialink id=${this.id}></manialink>`)
     }
   }
 

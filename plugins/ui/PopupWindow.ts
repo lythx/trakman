@@ -4,16 +4,17 @@ import { CONFIG, IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.json' assert { type: 'json' }
 import Navbar from './utils/Navbar.js'
 
-export default abstract class PopupWindow extends DynamicComponent {
+export default abstract class PopupWindow<DisplayParams = any> extends DynamicComponent {
 
   readonly openId: number
   readonly closeId: number
   protected readonly headerIcon: string
   protected readonly title: string
-  protected readonly headerLeft: string
-  protected readonly headerRight: string
-  protected readonly frameMidBottom: string
-  protected readonly frameBottom: string
+  private readonly headerLeft: string
+  private readonly headerRight: string
+  private readonly navbarBottom: string
+  private readonly frameMidBottom: string
+  private readonly frameBottom: string
   protected readonly navbar: Navbar | undefined
   protected readonly navbarHeight: number
   protected readonly windowWidth: number
@@ -26,7 +27,7 @@ export default abstract class PopupWindow extends DynamicComponent {
   protected readonly margin: number = CONFIG.popup.margin
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
-  protected static readonly playersWithWindowOpen: { login: string, id: number }[] = []
+  protected static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
 
   constructor(windowId: number, headerIcon: string, title: string, navbar?: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
@@ -44,7 +45,7 @@ export default abstract class PopupWindow extends DynamicComponent {
     }
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
-    [this.headerLeft, this.headerRight, this.frameMidBottom, this.frameBottom] = this.constructFrame()
+    [this.headerLeft, this.headerRight, this.navbarBottom, this.frameMidBottom, this.frameBottom] = this.constructFrame()
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === this.openId) { this.onOpen(info) }
       else if (info.answer === this.closeId) { this.onClose(info) }
@@ -70,13 +71,6 @@ export default abstract class PopupWindow extends DynamicComponent {
   }
 
   private constructFrame(): string[] {
-    let navbarBg: string = ''
-    if (this.navbar !== undefined) {
-      const lgt: number = this.navbar.buttons.length
-      for (let i: number = 0; i < lgt; i++) {
-        navbarBg += `<quad posn="${((this.windowWidth + this.margin) / lgt) * i} 0 2" sizen="${(this.windowWidth + this.margin) / lgt - this.margin} ${this.navbarHeight}" bgcolor="${this.headerBg}"/>`
-      }
-    }
     return [
       `<manialink id="${this.id}">
         <frame posn="-${this.windowWidth / 2} ${this.windowHeight / 2} 5">
@@ -90,10 +84,8 @@ export default abstract class PopupWindow extends DynamicComponent {
       `
             </frame>
           </frame>
-          <frame posn="0 ${-(this.headerHeight + this.margin)} 5">
-            ${navbarBg}
-            ${this.navbar?.constructXml() ?? ''}
-          </frame>
+          <frame posn="0 ${-(this.headerHeight + this.margin)} 5">`,
+      `</frame>
           <frame posn="0 ${-(this.headerHeight + this.navbarHeight + this.margin * 2)} 5">
             <quad posn="0 0 2" sizen="${this.windowWidth} ${this.windowHeight - (this.headerHeight * 2 + this.margin * 2 + this.navbarHeight)}" bgcolor="${this.bg}"/>
             <frame posn="0 0 1">`,
@@ -123,28 +115,39 @@ export default abstract class PopupWindow extends DynamicComponent {
     return ret
   }
 
-  protected abstract constructContent(login: string, params: any): string | Promise<string>
+  protected constructNavbar(login: string, params?: DisplayParams): string {
+    return this.navbar?.constructXml() ?? ''
+  }
 
-  protected abstract constructFooter(login: string, params: any): string
+  protected abstract constructContent(login: string, params?: DisplayParams): string | Promise<string>
 
-  async displayToPlayer(login: string, params?: any, topRightText?: string): Promise<void> {
+  protected abstract constructFooter(login: string, params?: DisplayParams): string
+
+  async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string): Promise<void> {
     const content: string = await this.constructContent(login, params)
     const footer: string = this.constructFooter(login, params)
     const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
     if (index !== -1) {
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
-    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId })
+    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
     TM.sendManialink(`${this.headerLeft}
     <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" valign="center" halign="center"/>
     ${this.headerRight}
+    ${this.constructNavbar(login, params)}
+    ${this.navbarBottom}
     ${content}
     ${this.frameMidBottom}
     ${footer}
     ${this.frameBottom}`, login)
   }
 
-  protected getPlayersWithWindowOpen() {
+  protected getPlayersWithWindowOpen(): string[]
+  protected getPlayersWithWindowOpen(getParams: true): { login: string, params: any }[]
+  protected getPlayersWithWindowOpen(getParams?: true): string[] | { login: string, params: any }[] {
+    if (getParams === true) {
+      return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId).map(a => ({ login: a.login, params: a.params }))
+    }
     return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId).map(a => a.login)
   }
 

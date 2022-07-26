@@ -13,6 +13,7 @@ import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
+import { join } from 'path'
 
 export class Listeners {
   private static readonly listeners: TMListener[] = [
@@ -38,7 +39,7 @@ export class Listeners {
           { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
           return
         }
-        const joinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, playerInfo[1],
+        const joinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
@@ -103,7 +104,7 @@ export class Listeners {
             }
           }
           return
-        } else if(cpStatus === false) {
+        } else if (cpStatus === false) {
           const info: CheckpointInfo = {
             time: params[2],
             lap: params[3],
@@ -184,7 +185,7 @@ export class Listeners {
           lapRace: c.LapRace,
           lapsAmount: c.NbLaps,
           checkpointsAmount: c.NbCheckpoints,
-          records: RecordService.records
+          records: RecordService.localRecords
         }
         const lastId: string = JukeboxService.current.id
         JukeboxService.nextMap()
@@ -203,7 +204,7 @@ export class Listeners {
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         const temp: any = MapService.current
-        temp.records = RecordService.records
+        temp.records = RecordService.localRecords
         temp.isRestarted = params[4]
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]

@@ -1,6 +1,7 @@
 import { Client } from "./client/Client.js"
 import dsc from 'dice-similarity-coeff';
 import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
+import countries from './data/Countries.json' assert { type: 'json' }
 
 export const Utils = {
 
@@ -92,6 +93,10 @@ export const Utils = {
   },
 
   matchString,
+
+  nationToNationCode(nation: string) {
+    return countries.find(a => a.name === nation)?.code
+  }
 
 }
 

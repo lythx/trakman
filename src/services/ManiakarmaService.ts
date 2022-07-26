@@ -55,6 +55,7 @@ export abstract class ManiakarmaService {
     const json: any = this.getJson(await res.text())
     this.authCode = json?.result?.authcode[0]
     this.apiUrl = json?.result?.api_url[0]
+    Logger.debug(this.apiUrl)
   }
 
   private static async receiveVotes(playerLogin: string): Promise<void | Error> {
@@ -80,12 +81,12 @@ export abstract class ManiakarmaService {
       (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
     const vote = Number(json?.result?.players[0]?.player[0]?.$?.vote)
-    const v = [-3, -2, -1, 1, 2, 3].find(a=>a === vote)
+    const v = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
     if (v === undefined) {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
-    this.fixCoherence()
+    await this.fixCoherence()
   }
 
   private static async sendVotes(): Promise<void | Error> {
@@ -160,12 +161,12 @@ export abstract class ManiakarmaService {
     this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
   }
 
-  private static fixCoherence() {
+  private static async fixCoherence() {
     const localVotes = VoteService.votes.filter(a => a.mapId === MapService.current.id)
     const mkVotes = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-        VoteService.add(e.mapId, e.login, e.vote)
+        await VoteService.add(e.mapId, e.login, e.vote)
       }
     }
     for (const e of localVotes) {

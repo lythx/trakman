@@ -29,7 +29,7 @@ if (process.env.USE_WEBSERVICES === 'YES') {
 }
 
 const DB: Database = new Database()
-DB.initialize()
+await DB.initialize()
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
@@ -133,7 +133,7 @@ export const TRAKMAN = {
    * @param login Player login
    * @returns Player object or undefined if the player isn't in the database
    */
-  async fetchPlayer(login: string): Promise<any | undefined> {
+  async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined> {
     return (await PlayerService.fetchPlayer(login))
   },
 
@@ -144,7 +144,7 @@ export const TRAKMAN = {
    * @returns Record object or undefined if the player doesn't have a local record
    */
   getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.records.find(a => a.login === login && a.map === MapService.current.id)
+    return RecordService.localRecords.find(a => a.login === login && a.map === MapService.current.id)
   },
 
   /**
@@ -292,15 +292,14 @@ export const TRAKMAN = {
    * @param query Query to execute
    * @returns Database response or error on invalid query
    */
-  async queryDB(query: string, params?: any[]): Promise<any[] | Error> {
+  async queryDB(query: string, ...params: any[]): Promise<any[] | Error> {
     let res
     try {
-      res = await DB.query(query, params)
+      res = await DB.query(query, ...params)
     } catch (err: any) {
       return new Error(err)
     } finally {
       if (res === undefined) {
-        console.log(query, params)
         return new Error('Database response undefined')
       }
       return res.rows
@@ -632,10 +631,10 @@ export const TRAKMAN = {
   },
 
   get records(): TMRecord[] {
-    return RecordService.records
+    return RecordService.localRecords
   },
 
-  get localRecords(): LocalRecord[] {
+  get localRecords(): TMLocalRecord[] {
     return RecordService.localRecords
   },
 
@@ -647,8 +646,8 @@ export const TRAKMAN = {
     return RecordService.liveRecords
   },
 
-  get map(): TMMap {
-    return Object.assign(MapService.current)
+  get map(): TMCurrentMap {
+    return MapService.current
   },
 
   get messages(): TMMessage[] {
