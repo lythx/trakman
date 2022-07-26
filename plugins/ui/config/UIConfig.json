@@ -666,5 +666,9 @@
     "navbar": [
       "sectorRecords"
     ]
+  },
+  "welcomeWindow": {
+    "title": "Welcome to Trakman!",
+    "icon": "info"
   }
 }

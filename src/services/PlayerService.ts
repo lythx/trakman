@@ -62,8 +62,11 @@ export class PlayerService {
   /**
    * Adds a player into the list and database
    */
-  static async join(login: string, nickname: string, region: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
-    const nation: string = region.split('|')[1]
+  static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
+    let s = fullRegion.split('|')
+    s.shift()
+    const region = s.join('|')
+    const nation: string = fullRegion.split('|')[1]
     let nationCode: string | undefined = Utils.nationToNationCode(nation)
     if (nationCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
@@ -74,6 +77,7 @@ export class PlayerService {
     const privilege: number = await this.privilegeRepo.get(login)
     let player: TMPlayer
     if (playerData === undefined) {
+      console.log(login)
       player = {
         id,
         login,
@@ -125,7 +129,7 @@ export class PlayerService {
    * Remove the player from local memory, save timePlayed in database
    */
   static leave(login: string): LeaveInfo | Error {
-    const date =new Date()
+    const date = new Date()
     const playerIndex = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
       const errStr = `Error removing player ${login} from memory, player is not in the memory`
