@@ -29,7 +29,7 @@ if (process.env.USE_WEBSERVICES === 'YES') {
 }
 
 const DB: Database = new Database()
-DB.initialize()
+await DB.initialize()
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
@@ -292,10 +292,10 @@ export const TRAKMAN = {
    * @param query Query to execute
    * @returns Database response or error on invalid query
    */
-  async queryDB(query: string, params?: any[]): Promise<any[] | Error> {
+  async queryDB(query: string, ...params: any[]): Promise<any[] | Error> {
     let res
     try {
-      res = await DB.query(query, params)
+      res = await DB.query(query, ...params)
     } catch (err: any) {
       return new Error(err)
     } finally {

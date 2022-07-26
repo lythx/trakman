@@ -26,7 +26,7 @@ interface TableEntry {
   readonly time_played: number
   readonly visits: number
   readonly is_united: boolean
-  readonly privilege: number
+  readonly privilege?: number
   readonly last_online: Date | null
 }
 
@@ -44,19 +44,21 @@ export class PlayerRepository extends Repository {
   async get(logins: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
     if (typeof logins === 'string') {
       const id = await playerIdsRepo.get(logins)
+      console.log(id, 'id')
       if (id === undefined) { return }
       const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
       JOIN player_ids ON players.id=player_ids.id
-      JOIN privileges ON player_ids.login=privileges.login
+      LEFT JOIN privileges ON player_ids.login=privileges.login
       WHERE players.id=$1`
       const res = await this.query(query, id)
+      console.log(res, 'res')
       return res[0] === undefined ? undefined : this.constructPlayerObject(res[0])
     }
     const ids = await playerIdsRepo.get(logins)
     if (ids.length === 0) { return [] }
     const query = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online FROM players 
     JOIN player_ids ON players.id=player_ids.id
-    JOIN privileges ON player_ids.login=privileges.login
+    LEFT JOIN privileges ON player_ids.login=privileges.login
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
     const res = await this.query(query, ...(ids.map(a => a.id)))
     return res.map(a => this.constructPlayerObject(a))
@@ -99,7 +101,7 @@ export class PlayerRepository extends Repository {
       visits: entry.visits,
       isUnited: entry.is_united,
       wins: entry.wins,
-      privilege: entry.privilege
+      privilege: entry.privilege ?? 0
     }
   }
 

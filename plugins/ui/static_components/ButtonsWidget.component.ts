@@ -353,14 +353,19 @@ export default class VisitorAmount extends StaticComponent {
 
   private initialize = async (): Promise<void> => {
     // Visit counter
-    const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
+    //const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
+    const res = [
+      {
+        count: 45243
+      }
+    ]
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
     const cfg = this.config
     this.iconData[cfg.visitors.index] = {
       icon: stringToObjectProperty(cfg.visitors.icon, ICONS),
-      text1: res[0].count,
+      text1: res[0].count.toString(),
       text2: cfg.visitors.title,
       iconWidth: cfg.visitors.width,
       iconHeight: cfg.visitors.height,

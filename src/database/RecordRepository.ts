@@ -55,7 +55,7 @@ export class RecordRepository extends Repository {
     const query = `SELECT uid, login, time, checkpoints, date FROM records
     JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
-    WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR`).join('').slice(0, -3)}
+    WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR`).join(' ').slice(0, -3)}
     ORDER BY time ASC;`
     const mapIds = await mapIdsRepo.get(mapUids)
     const res = (await this.query(query, ...mapIds.map(a => a.id)))
@@ -88,7 +88,7 @@ export class RecordRepository extends Repository {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerIdsRepo.get(login)
     const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'
-    await this.query(query, [time, checkpoints, date, mapId, playerId])
+    await this.query(query, time, checkpoints, date, mapId, playerId)
   }
 
   constructRecordObject(entry: TableEntry): TMRecord {
