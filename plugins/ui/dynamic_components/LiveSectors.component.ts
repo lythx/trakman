@@ -1,149 +1,168 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty } from '../UiUtils.js'
+import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 
 export default class LiveSectors extends PopupWindow {
 
-  readonly cpsPerPage: number = CONFIG.liveSectors.cpsPerPage
-  readonly entries: number = CONFIG.liveSectors.entries
-  readonly paginator: Paginator
-  readonly cpPaginator: Paginator
-  readonly selfColour: string = CONFIG.liveSectors.selfColour
-  readonly colours = {
-    best: '0F0F',
-    worst: 'F00F',
-    equal: 'FF0F'
-  }
-  readonly paginatorOffset: number = CONFIG.liveSectors.paginatorOffset
-  cpAmount: number
+  private readonly startCellsOnFirstPage: number = 2
+  private readonly startCellsOnNextPages: number = 1
+  private readonly startCellWidth: number = CONFIG.liveSectors.startCellWidth
+  private readonly indexCellWidth: number = CONFIG.liveSectors.indexCellWidth
+  private readonly cpsOnFirstPage: number = CONFIG.liveSectors.cpsOnFirstPage
+  private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
+  private readonly entries: number = CONFIG.liveSectors.entries
+  private readonly paginator: Paginator
+  private readonly cpPaginator: Paginator
+  private readonly selfColour: string = CONFIG.liveSectors.selfColour
+  private readonly cpColours = CONFIG.liveSectors.cpColours
 
   constructor() {
-    super(IDS.liveSectors, stringToObjectProperty(CONFIG.liveSectors.icon, ICONS), CONFIG.liveSectors.title, ['liveCps', 'dediCps', 'dediSectors', 'localCps', 'localSectors'])
-    const records: FinishInfo[] = TM.liveRecords
-    this.cpAmount = TM.map.checkpointsAmount - 1
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.headerHeight - this.margin, Math.ceil(records.length / this.entries))
-    this.paginator.onPageChange = (login: string, page: number): void => {
-      const records: FinishInfo[] = TM.liveRecords
-      const pageCount: number = this.paginator.pageCount
-      const cpPage: number = this.cpPaginator.getPageByLogin(login) ?? 1
-      this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
+    super(IDS.liveSectors, stringToObjectProperty(CONFIG.liveSectors.icon, ICONS), CONFIG.liveSectors.title, CONFIG.liveSectors.navbar)
+    const records = TM.liveRecords
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
+    this.paginator.onPageChange = (login: string): void => {
+      this.getPagesAndOpen(login)
     }
-    let cpPages: number = 1
-    for (let i: number = 0; i < this.cpAmount; i++) {
-      if (cpPages == 1 && i > this.cpsPerPage * cpPages) {
-        cpPages++
-      } else if (i > (this.cpsPerPage + 2) * cpPages) {
-        cpPages++
-      }
-    }
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth / 10, this.headerHeight - this.margin, cpPages, 1, true)
-    this.cpPaginator.onPageChange = (login: string, cpPage: number): void => {
-      const records: FinishInfo[] = TM.liveRecords
-      const pageCount: number = this.paginator.pageCount
-      const page: number = this.paginator.getPageByLogin(login) ?? 1
-      this.displayToPlayer(login, { page, cpPage, records }, `${page}/${Math.max(1, pageCount)}`)
+    this.cpPaginator.onPageChange = (login: string): void => {
+      this.getPagesAndOpen(login)
     }
     TM.addListener('Controller.BeginMap', (): void => {
-      this.cpAmount = TM.map.checkpointsAmount
+      this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
+      this.reRender()
+    })
+    TM.addListener('Controller.LiveRecord', (): void => {
+      this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
+      this.reRender()
     })
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
-    const records: FinishInfo[] = TM.liveRecords
-    const pageCount: number = this.paginator.pageCount
-    this.displayToPlayer(info.login, { page: 1, cpPage: 1, records }, `1/${Math.max(1, pageCount)}`)
+    this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: { page: number, cpPage: number, records: FinishInfo[] }): string {
-    const sectors: number[][] = params.records.map(a => [...a.checkpoints, a.time]).map(a => a
-      .reduce((acc: number[], cur, i, arr): number[] => i === 0 ? [cur] : [...acc, cur - arr[i - 1]], []))
-    let sectorsDisplay: number = Math.min(this.cpAmount, this.cpsPerPage)
-    let sectorIndex: number = 0
-    if (params.cpPage > 1) {
-      sectorIndex = this.cpsPerPage + 1
-      for (let i: number = 2; i < params.cpPage; i++) {
-        sectorIndex += this.cpsPerPage + 2
-      }
-      sectorsDisplay = Math.min(this.cpAmount - (sectorIndex - 2), this.cpsPerPage + 2)
+  protected constructContent(login: string, params: { page: number, cpPage: number }): string {
+    const records: FinishInfo[] = []
+    for (const e of TM.liveRecords) {
+      records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }
-    const n: number = (params.page - 1) * this.entries - 1
-    const cpTypes = getCpTypes(sectors)
+    const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
+    const playerIndex: number = (params.page - 1) * this.entries - 1
+    const cpTypes = getCpTypes(records.map(a => a.checkpoints))
+    const entriesToDisplay = records.length - (playerIndex + 1)
+
+    const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
+
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      if (params.records?.[i + n] === undefined) { return '' }
-      return centeredText(TM.strip(params.records[i + n].nickname, false), w, h)
+      return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
     }
+
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      if (params.records?.[i + n] === undefined) { return '' }
-      let ret: string = centeredText(params.records[i + n].login, w, h)
-      if (login === params.records[i + n].login) {
+      let ret: string = centeredText(records[i + playerIndex].login, w, h)
+      if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
       return ret
     }
+
     const cell = (i: number, j: number, w: number, h: number): string => {
-      const record: FinishInfo = params.records?.[i + n]
-      const playerSectors: number[] = sectors?.[i + n]
-      if (record === undefined) {
-        return ''
-      }
-      const type = cpTypes?.[i + n]?.[j + sectorIndex - 2]
-      let colour: string = 'FFFF'
-      if (type !== undefined) {
-        colour = (this.colours as any)[type]
-      }
-      if (((j - 2 === this.cpsPerPage && params.cpPage === 1) || (j - 3 === this.cpsPerPage && params.cpPage !== 1))
-        && playerSectors?.[(j - 2) + sectorIndex] !== undefined) {
-        return centeredText(TM.Utils.getTimeString(record.time), w, h)
-      }
-      if (playerSectors?.[(j - 2) + sectorIndex] === undefined) {
-        if (playerSectors?.[(j - 3) + sectorIndex] !== undefined) {
-          return `<format textcolor="${colour}"/>
-            ${centeredText(TM.Utils.getTimeString(record.time), w, h)}`
-        }
-        return ''
-      }
-      return `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(playerSectors[(j - 2) + sectorIndex]), w, h)}`
+      const startCells = (params.cpPage === 1 ? this.startCellsOnFirstPage : this.startCellsOnNextPages) + 1
+      const record = records[i + playerIndex]
+      const cpType = cpTypes[i + playerIndex][j + cpIndex - startCells]
+      const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
+      const cp = record.checkpoints[(j - startCells) + cpIndex]
+      return cp === undefined ? '' : `<format textcolor="${colour}"/>
+        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
     }
+
+    const finishCell = (i: number, j: number, w: number, h: number): string => {
+      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+    }
+
+    const emptyCell = (): string => ''
+
     let grid: Grid
-    let headers: ((i: number, j: number, w: number, h: number) => string)[]
+    let headers: GridCellFunction[] = []
     if (params.cpPage === 1) {
       headers = [
-        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Login ', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - 1).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
-        ...new Array(this.cpsPerPage - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
+        (i, j, w, h) => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Login ', w, h),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - this.startCellsOnFirstPage).toString(), w, h)),
+        (i, j, w, h) => centeredText(' Finish ', w, h),
+        ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, 2, ...new Array(this.cpsPerPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     } else {
       headers = [
+        (i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(((j - 1) + sectorIndex).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
-        ...new Array((this.cpsPerPage + 2) - sectorsDisplay).fill((i: number, j: number, w: number, h: number): string => '')
+        ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [2, ...new Array(this.cpsPerPage + 3).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
     }
     const arr = [...headers]
-    for (let i: number = 0; i < params.records.length; i++) {
+    for (let i: number = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(nickNameCell, loginCell, ...new Array(this.cpsPerPage + 1).fill(cell))
+        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
-        arr.push(nickNameCell, ...new Array(this.cpsPerPage + 3).fill(cell))
+        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }
     }
-    return `<frame posn="0 ${-this.margin} 3">
-    ${grid.constructXml(arr)}
-    </frame>`
+    return grid.constructXml(arr)
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
+    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + CONFIG.liveSectors.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
-    <frame posn="${this.windowWidth - this.paginatorOffset} 0 3">
+    <frame posn="${this.windowWidth / 2 - w} 0 3">
       ${this.cpPaginator.constructXml(params.cpPage)}
     </frame>`
   }
+
+  private getCpIndexAndAmount(cpPage: number): [number, number] {
+    const cpAmount = TM.map.checkpointsAmount 
+    let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
+    let cpIndex: number = 0
+    if (cpPage > 1) {
+      cpIndex = this.cpsOnFirstPage
+      for (let i: number = 2; i < cpPage; i++) {
+        cpIndex += this.cpsOnNextPages
+      }
+      cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
+    }
+    return [cpIndex, cpsToDisplay]
+  }
+
+  private getPagesAndOpen(login: string): void {
+    const page = this.paginator.getPageByLogin(login)
+    const cpPage = this.cpPaginator.getPageByLogin(login)
+    const pageCount: number = this.paginator.pageCount
+    this.displayToPlayer(login, { page, cpPage }, `${page}/${Math.max(1, pageCount)}`)
+  }
+
+  private reRender(): void {
+    const players = this.getPlayersWithWindowOpen()
+    for (const login of players) {
+      this.getPagesAndOpen(login)
+    }
+  }
+
+  private calculateCpPages(): number {
+    let cpPages: number = 1
+    const cpAmount = TM.map.checkpointsAmount 
+    for (let i: number = 1; i < cpAmount; i++) {
+      if (cpPages === 1 && i >= this.cpsOnFirstPage) {
+        cpPages++
+      } else if (i >= this.cpsOnFirstPage + this.cpsOnNextPages * (cpPages - 1)) {
+        cpPages++
+      }
+    }
+    return cpPages
+  }
+
 } 
