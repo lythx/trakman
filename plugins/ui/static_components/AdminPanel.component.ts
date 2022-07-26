@@ -33,7 +33,6 @@ export default class AdminPanel extends StaticComponent {
 
   displayToPlayer(login: string): void {
     const player = TM.getPlayer(login)
-    console.log(player?.privilege)
     if (player !== undefined && player.privilege > 0) {
       TM.sendManialink(this.xml, login)
     } else {
