@@ -1,25 +1,24 @@
-import { calculateStaticPositionY, centeredText, Grid, CONFIG, horizontallyCenteredText, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
+import { getStaticPosition, centeredText, Grid, CONFIG, horizontallyCenteredText, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class KarmaWidget extends StaticComponent {
 
-  private readonly width: number
-  private readonly height: number
+  private readonly width = CONFIG.static.width
+  private readonly height = CONFIG.karma.height
   private readonly positionX: number
   private readonly positionY: number
   private readonly headerH: number = CONFIG.staticHeader.height
-  private readonly margin: number = CONFIG.static.marginSmall
+  private readonly margin: number = CONFIG.marginSmall
   private readonly buttonW: number = 1.7
   private readonly options: number[] = [-3, -2, -1, 1, 2, 3]
   private readonly icons = CONFIG.karma.icons
 
   constructor() {
     super(IDS.karma, { displayOnRace: true, hideOnResult: true })
-    this.width = CONFIG.static.width
-    this.height = CONFIG.karma.height
-    this.positionX = CONFIG.static.leftPosition
-    this.positionY = calculateStaticPositionY('karma')
+    const pos =  getStaticPosition('karma')
+    this.positionX = pos.x
+    this.positionY = pos.y
     this.display()
     // setInterval(() => {
     //   this.updateXML()
@@ -67,7 +66,7 @@ export default class KarmaWidget extends StaticComponent {
     const mkKarmaValue = TM.mkMapKarmaValue
     const totalMkVotes = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const maxMkAmount = Math.max(...Object.values(mkVotes))
-    const personalVote = votes.find(a => a.login)?.vote
+    const personalVote = votes.find(a => a.login === login)?.vote
     return `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
+import {  IDS, Paginator, Grid, centeredText, CONFIG,getIcon, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 
 export default class DediCps extends PopupWindow {
 
@@ -17,7 +17,7 @@ export default class DediCps extends PopupWindow {
   private readonly cpColours = CONFIG.dediCps.cpColours
 
   constructor() {
-    super(IDS.dediCps, stringToObjectProperty(CONFIG.dediCps.icon, ICONS), CONFIG.dediCps.title, CONFIG.dediCps.navbar)
+    super(IDS.dediCps, getIcon(CONFIG.dediCps.icon), CONFIG.dediCps.title, CONFIG.dediCps.navbar)
     const records: TMDedi[] = TM.dediRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
@@ -52,7 +52,7 @@ export default class DediCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
+      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -60,7 +60,7 @@ export default class DediCps extends PopupWindow {
       if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
-      return ret
+      return  ret
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
