@@ -442,7 +442,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: cfg.github.width,
       iconHeight: cfg.github.height,
       padding: cfg.github.padding,
-      link: `github.com/felacek/trakman/`,
+      actionId: IDS.commandList,
       equalTexts: true
     }
     this.updateVoteAndPayButtons()
