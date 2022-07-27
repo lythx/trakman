@@ -65,8 +65,8 @@ export default class BlacklistList extends PopupWindow {
         const headers = [
             (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Expire Date ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Blacklist Reason ', w, h),
+            (i: number, j: number, w: number, h: number) => centeredText(' Expire Date ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Unblacklist ', w, h, { padding: 0.2 }),
 
         ]
@@ -81,7 +81,7 @@ export default class BlacklistList extends PopupWindow {
             fetchedPlayers.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(fetchedPlayers[i - 1]?.nickname ?? '', w, h)
+            return centeredText(TM.safeString((TM.strip(fetchedPlayers[i - 1]?.nickname ?? '', false))), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(blacklisted[i - 1].login, w, h)
@@ -90,7 +90,7 @@ export default class BlacklistList extends PopupWindow {
             return centeredText(blacklisted[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)
         }
         const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(blacklisted[i - 1]?.reason ?? 'No reason specified', w, h)
+            return centeredText(TM.safeString(blacklisted[i - 1]?.reason ?? 'No reason specified'), w, h)
         }
         const unblButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.blacklistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
