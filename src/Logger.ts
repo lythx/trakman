@@ -205,7 +205,8 @@ export abstract class Logger {
     if (stack === undefined) {
       return ''
     }
-    const s = stack.split('\n')[3].split(' ').filter(a => a !== '')[2].split('/')
+    let s = stack.split('\n')[3].split(' ').filter(a => a !== '')
+    s = s[s.length-1].split('/')
     const str = s[s.length - 1]
     return str.split(':').slice(0, 2).join(':')
   }
