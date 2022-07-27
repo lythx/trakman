@@ -4,11 +4,11 @@ import { CONFIG, IDS, Grid, centeredText, verticallyCenteredText, stringToObject
 
 export default class BestFinishes extends StaticComponent {
 
-  private readonly margin = CONFIG.static.marginSmall
+  private readonly margin = CONFIG.marginSmall
   private readonly width = CONFIG.static.width
   private readonly title = CONFIG.bestFinishes.title
   private readonly height = CONFIG.bestFinishes.height
-  private readonly positionX = CONFIG.static.rightPosition - (CONFIG.static.marginBig + this.width)
+  private readonly positionX = CONFIG.static.rightPosition - (CONFIG.marginBig + this.width)
   private readonly positionY = CONFIG.static.topBorder
   private readonly entries = CONFIG.bestFinishes.entries
   private readonly bestFinishes: { login: string, time: number, nickname: string }[] = []

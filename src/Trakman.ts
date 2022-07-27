@@ -287,17 +287,11 @@ export const TRAKMAN = {
    * @returns Database response or error on invalid query
    */
   async queryDB(query: string, ...params: any[]): Promise<any[] | Error> {
-    let res
-    try {
-      res = await DB.query(query, ...params)
-    } catch (err: any) {
-      return new Error(err)
-    } finally {
-      if (res === undefined) {
-        return new Error('Database response undefined')
-      }
-      return res.rows
+    const res = await DB.query(query, ...params).catch((err: Error) => err)
+    if (res instanceof Error) {
+      return res
     }
+    return res.rows
   },
 
   /**

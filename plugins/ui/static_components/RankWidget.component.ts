@@ -1,21 +1,20 @@
-import { calculateStaticPositionY, CONFIG, IDS } from '../UiUtils.js'
+import { getStaticPosition, CONFIG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class RankWidget extends StaticComponent {
 
-  private readonly width: number
-  private readonly height: number
+  private readonly width =  CONFIG.static.width
+  private readonly height = CONFIG.rank.height
   private readonly positionY: number
   private readonly positionX: number
   private xml: string = ''
 
   constructor() {
     super(IDS.rank, { displayOnRace: true, hideOnResult: true })
-    this.width = CONFIG.static.width
-    this.height = CONFIG.rank.height
-    this.positionX = CONFIG.static.leftPosition
-    this.positionY = calculateStaticPositionY('rank')
+    const pos = getStaticPosition('rank')
+    this.positionX = pos.x
+    this.positionY = pos.y
     this.constructXml()
   }
 

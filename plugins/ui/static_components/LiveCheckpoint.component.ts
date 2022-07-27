@@ -1,19 +1,19 @@
 import StaticComponent from '../StaticComponent.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import { IDS, CONFIG, calculateStaticPositionY, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
+import { IDS, CONFIG, getStaticPosition, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 
 export default class LiveCheckpoint extends StaticComponent {
 
   private readonly bg: string = CONFIG.static.bgColor
   private readonly width: number = CONFIG.static.width
   private readonly height: number = CONFIG.liveCheckpoint.height
-  private readonly positionX: number = CONFIG.static.rightPosition
+  private readonly positionX: number 
   private readonly positionY: number
   private readonly side: boolean = CONFIG.liveCheckpoint.side
   private readonly title: string = CONFIG.liveCheckpoint.title
   private readonly icon: string = CONFIG.liveCheckpoint.icon
   private readonly headerHeight: number = CONFIG.staticHeader.height
-  private readonly margin: number = CONFIG.static.marginSmall
+  private readonly margin: number = CONFIG.marginSmall
   private readonly colours = {
     worse: "$F00",
     better: "$00F",
@@ -22,7 +22,9 @@ export default class LiveCheckpoint extends StaticComponent {
 
   constructor() {
     super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
-    this.positionY = calculateStaticPositionY('liveCheckpoint')
+    const pos  = getStaticPosition('liveCheckpoint')
+    this.positionX = pos.x
+    this.positionY = pos.y
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
       const pb: TMRecord | undefined = TM.getPlayerRecord(info.player.login)
       if (pb !== undefined) {
