@@ -23,13 +23,15 @@ export default class LocalRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.PlayerRecord', (): void => {
-      this.display()
+      if (this._isDisplayed) {
+        this.display()
+      }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.LocalRecords', (): void => {
       if (this._isDisplayed) { this.display() }

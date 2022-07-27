@@ -15,7 +15,7 @@ export default class DediRanking extends StaticComponent {
   constructor() {
     super(IDS.dedis, { displayOnRace: true, hideOnResult: true })
     const side: boolean = CONFIG.dedis.side
-    const pos =  getStaticPosition('dedis')
+    const pos = getStaticPosition('dedis')
     this.positionX = pos.x
     this.positionY = pos.y
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.dedis.entries, side, CONFIG.dedis.topCount, this.maxDedis, CONFIG.dedis.displayNoRecordEntry)
@@ -23,16 +23,20 @@ export default class DediRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.DedimaniaRecords', (): void => {
-      this.display()
+      if (this._isDisplayed) {
+        this.display()
+      }
     })
     TM.addListener('Controller.DedimaniaRecord', (): void => {
-      this.display()
+      if (this._isDisplayed) {
+        this.display()
+      }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -48,7 +52,7 @@ export default class DediRanking extends StaticComponent {
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.dedis.title, stringToObjectProperty(CONFIG.dedis.icon, ICONS), false, { actionId: IDS.dediCps})}
+        ${staticHeader(CONFIG.dedis.title, stringToObjectProperty(CONFIG.dedis.icon, ICONS), false, { actionId: IDS.dediCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
           ${this.recordList.constructXml(login, TM.dediRecords.map(a => ({ ...a, name: a.nickname })))}
         </frame>
