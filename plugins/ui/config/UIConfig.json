@@ -284,29 +284,10 @@
       "padding": 0.2,
       "costs": [
         100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100
+        200,
+        400,
+        800,
+        1600
       ]
     }
   },
@@ -327,9 +308,9 @@
       1
     ],
     "markers": {
-      "you": "arrowDoubleL",
-      "faster": "person",
-      "slower": "person"
+      "you": "pageDoubleLeftHover",
+      "faster": "personBetter",
+      "slower": "personWorse"
     },
     "topCount": 5,
     "displayNoRecordEntry": true
@@ -436,13 +417,13 @@
     "iconHorizontalPadding": 0.15,
     "markersLeft": {
       "you": "pageDoubleLeftHover",
-      "faster": "person",
-      "slower": "person"
+      "faster": "personBetter",
+      "slower": "personWorse"
     },
     "markersRight": {
       "you": "pageDoubleRightHover",
-      "faster": "person",
-      "slower": "person"
+      "faster": "personBetter",
+      "slower": "personWorse"
     },
     "timeColours": {
       "slower": "CCCF",
