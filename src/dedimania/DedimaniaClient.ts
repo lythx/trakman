@@ -14,7 +14,7 @@ export abstract class DedimaniaClient {
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
   private static sessionId: string
-  private static connected: boolean
+  static connected: boolean
   private static host: string
   private static port: number
 
