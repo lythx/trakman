@@ -3,7 +3,7 @@ interface TMMap {
   readonly name: string
   readonly fileName: string
   readonly author: string
-  readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+  readonly environment: 'Stadium' | 'Island' | 'Speed' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
   readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
   readonly bronzeTime: number
   readonly silverTime: number
