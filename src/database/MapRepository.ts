@@ -157,7 +157,7 @@ export class MapRepository extends Repository {
       copperPrice: entry.copper_price,
       isLapRace: entry.is_lap_race,
       lapsAmount: entry.laps_amount ?? undefined,
-      checkpointsAmount: entry.checkpoints_amount?? undefined,
+      checkpointsAmount: entry.checkpoints_amount ?? undefined,
       addDate: entry.add_date
     }
   }

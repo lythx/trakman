@@ -1,21 +1,20 @@
-import { calculateStaticPositionY, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
+import { getStaticPosition, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class TimerWidget extends StaticComponent {
 
-  private readonly width: number
-  private readonly height: number
+  private readonly width = CONFIG.static.width
+  private readonly height = CONFIG.timer.height
   private readonly positionX: number
   private readonly positionY: number
   private xml: string = ''
 
   constructor() {
     super(IDS.timer, { displayOnRace: true, hideOnResult: true })
-    this.width = CONFIG.static.width
-    this.height = CONFIG.timer.height
-    this.positionX = CONFIG.static.rightPosition
-    this.positionY = calculateStaticPositionY('timer')
+    const pos = getStaticPosition('timer')
+    this.positionX = pos.x
+    this.positionY = pos.y
     this.constructXml()
   }
 
@@ -30,7 +29,7 @@ export default class TimerWidget extends StaticComponent {
 
   private constructXml(): void {
     const headerHeight: number = CONFIG.staticHeader.height
-    const marginSmall: number = CONFIG.static.marginSmall
+    const marginSmall: number = CONFIG.marginSmall
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">

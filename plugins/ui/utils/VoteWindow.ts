@@ -16,10 +16,10 @@ export default class VoteWindow {
   readonly noId = IDS.VoteWindow.voteNo
   private readonly width = CONFIG.voteWindow.width
   private readonly height = CONFIG.voteWindow.height
-  private readonly positionX = CONFIG.static.leftPosition + CONFIG.static.marginBig + CONFIG.static.width
-  private readonly positionY = CONFIG.static.topBorder - (CONFIG.bestCps.height + CONFIG.static.marginBig)
+  private readonly positionX = CONFIG.static.leftPosition + CONFIG.marginBig + CONFIG.static.width
+  private readonly positionY = CONFIG.static.topBorder - (CONFIG.bestCps.height + CONFIG.marginBig)
   private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.static.marginSmall
+  private readonly margin = CONFIG.marginSmall
   private readonly bg = CONFIG.static.bgColor
   private readonly buttonW = 2.5
   private readonly buttonH = 2.5

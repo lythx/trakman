@@ -1,4 +1,4 @@
-import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, calculateStaticPositionY, stringToObjectProperty } from '../UiUtils.js'
+import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObjectProperty } from '../UiUtils.js'
 import countries from '../../../src/data/Countries.json' assert {type: 'json'}
 import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
@@ -6,7 +6,7 @@ import StaticComponent from '../StaticComponent.js'
 
 export default class MapWidget extends StaticComponent {
 
-  private readonly width: number
+  private readonly width =  CFG.static.width
   private readonly height: number
   private readonly positionX: number
   private readonly positionY: number
@@ -17,13 +17,13 @@ export default class MapWidget extends StaticComponent {
 
   constructor() {
     super(IDS.map, { displayOnRace: true, hideOnResult: true })
-    this.width = CFG.static.width
     // Here height is 4 headers instead of config height
     // To set correct height in config after changing header height copy this.height from debbuger / console.log()
-    this.height = (CFG.staticHeader.height + CFG.static.marginSmall) * 4 + CFG.static.marginSmall
-    this.positionX = CFG.static.rightPosition
-    this.positionY = calculateStaticPositionY('map')
-    this.grid = new Grid(this.width, this.height - CONFIG.static.marginSmall, [1], new Array(4).fill(1))
+    this.height = (CFG.staticHeader.height + CFG.marginSmall) * 4 + CFG.marginSmall
+    const pos =  getStaticPosition('map')
+    this.positionX = pos.x
+    this.positionY = pos.y
+    this.grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(4).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") {
       void this.fetchWebservices(TM.map.author)
       TM.addListener('Controller.BeginMap', async (info) => {
@@ -48,7 +48,7 @@ export default class MapWidget extends StaticComponent {
         this.authorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
       }
     }
-    if(this._isDisplayed === true) {
+    if (this._isDisplayed === true) {
       this.display()
     }
   }
