@@ -52,7 +52,7 @@ const moods = {
 const environments = {
   Stadium: 1,
   Island: 2,
-  Desert: 3,
+  Speed: 3,
   Rally: 4,
   Bay: 5,
   Coast: 6,

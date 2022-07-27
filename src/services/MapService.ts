@@ -161,7 +161,7 @@ export class MapService {
       fileName: info.FileName,
       author: info.Author,
       environment: info.Environnement,
-      mood: info.Mood,
+      mood: info.Mood.trim(),
       bronzeTime: info.BronzeTime,
       silverTime: info.SilverTime,
       goldTime: info.GoldTime,
