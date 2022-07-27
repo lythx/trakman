@@ -6,7 +6,7 @@ import StaticComponent from '../StaticComponent.js'
 
 export default class MapWidget extends StaticComponent {
 
-  private readonly width =  CFG.static.width
+  private readonly width = CFG.static.width
   private readonly height: number
   private readonly positionX: number
   private readonly positionY: number
@@ -16,18 +16,21 @@ export default class MapWidget extends StaticComponent {
   private authorNation: string | undefined
 
   constructor() {
-    super(IDS.map, { displayOnRace: true, hideOnResult: true })
+    super(IDS.map, { hideOnResult: true })
     // Here height is 4 headers instead of config height
     // To set correct height in config after changing header height copy this.height from debbuger / console.log()
     this.height = (CFG.staticHeader.height + CFG.marginSmall) * 4 + CFG.marginSmall
-    const pos =  getStaticPosition('map')
+    const pos = getStaticPosition('map')
     this.positionX = pos.x
     this.positionY = pos.y
     this.grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(4).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") {
       void this.fetchWebservices(TM.map.author)
       TM.addListener('Controller.BeginMap', async (info) => {
+        this.authorNickname = undefined
+        this.authorNation = undefined
         void this.fetchWebservices(info.author)
+        this.display()
       })
     }
   }

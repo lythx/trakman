@@ -83,11 +83,11 @@ export default class CurrentCps extends PopupWindow {
 
   protected constructContent(login: string, params: { page: number }): string {
     const headers = [
-      (i: number, j: number, w: number, h: number) => centeredText('Nickname ', w, h), // Space to prevent translation
-      (i: number, j: number, w: number, h: number) => centeredText('Login', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText('Checkpoint', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText('PB Checkpoint', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText('PB Time', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h), // Space to prevent translation
+      (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText(' Checkpoint ', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText(' PB Checkpoint ', w, h),
+      (i: number, j: number, w: number, h: number) => centeredText(' PB Time ', w, h),
     ]
     // Make entries relative to pages (subtract 1 from page because its 1-based)
     const index = (params.page - 1) * this.entries
@@ -95,7 +95,7 @@ export default class CurrentCps extends PopupWindow {
     const entriesToDisplay = this.currentCheckpoints.length - index
     // Add n to index everywhere to make display relative to page
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(this.currentCheckpoints[i - 1 + index].nickname, w, h)
+      return centeredText(TM.safeString(TM.strip(this.currentCheckpoints[i - 1 + index].nickname, false)), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(this.currentCheckpoints[i - 1 + index].login, w, h)

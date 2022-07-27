@@ -23,13 +23,18 @@ export default class LocalRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.PlayerRecord', (): void => {
-      this.display()
+      if (this._isDisplayed) {
+        this.display()
+      }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.localRecords.some(a => a.login === info.login)) { this.display() }
+    })
+    TM.addListener('Controller.LocalRecords', (): void => {
+      if (this._isDisplayed) { this.display() }
     })
   }
 
@@ -47,7 +52,7 @@ export default class LocalRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS), true, { actionId: IDS.localCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })).slice(0, this.maxRecords))}
         </frame>
       </frame>
     </manialink>`,

@@ -3,6 +3,7 @@ import { VoteRepository } from "../database/VoteRepository.js";
 import { JukeboxService } from "./JukeboxService.js";
 import { MapService } from "./MapService.js";
 import { Logger } from "../Logger.js";
+import { Client } from "../client/Client.js";
 
 export abstract class VoteService {
 
@@ -13,6 +14,7 @@ export abstract class VoteService {
   private static readonly voteValues = [0, 20, 40, -1, 60, 80, 100]
 
   static async initialize(): Promise<void> {
+    Client.callNoRes('SetCallVoteTimeout', [{ int: 0 }])
     await this.repo.initialize()
     const res: TMVote[] = await this.repo.getAll()
     const maps: { readonly mapId: string, votes: number[] }[] = []

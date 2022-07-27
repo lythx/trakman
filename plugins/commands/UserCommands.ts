@@ -283,13 +283,13 @@ for (const command of commands) { TM.addCommand(command) }
 
 // Vote handler
 
-TM.addListener('Controller.PlayerChat', (info: MessageInfo): void => {
+TM.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
     TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
       + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.karma} has voted `
       + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
-    void TM.addVote(TM.map.id, info.login, playerVote as any)
+    await TM.addVote(TM.map.id, info.login, playerVote as any)
   }
 })
 
