@@ -5,7 +5,6 @@ import { Logger } from '../Logger.js'
 
 export class ClientSocket extends net.Socket {
 
-  private handshakeHeaderSize: number = 0
   private handshakeHeader: string = ''
   private handshakeStatus: null | true | Error = null
   private response: ClientResponse | null = null
@@ -20,9 +19,7 @@ export class ClientSocket extends net.Socket {
     this.on('data', (buffer: Buffer): void => {
       // TODO FIX THE SERVER NOT SPLITTING THE 1ST CHUNK
       // handshake header has no id so it has to be treated differently from normal data
-      if (this.handshakeHeaderSize === 0) {
-        this.setHandshakeHeaderSize(buffer)
-      } else if (this.handshakeHeader === '') {
+      if (this.handshakeStatus === null) {
         this.handleHandshake(buffer)
       } else if (!this.receivingResponse) { // all data except for the handshake
         this.handleResponseStart(buffer)
@@ -70,7 +67,7 @@ export class ClientSocket extends net.Socket {
           }
           resolve(response.json)
           return
-        } 
+        }
         if (Date.now() - startTimestamp > 15000) {
           resolve(new Error(`No server response for call ${method}`))
           return
@@ -81,20 +78,13 @@ export class ClientSocket extends net.Socket {
     })
   }
 
-  private setHandshakeHeaderSize(buffer: Buffer): void {
-    if (buffer.length < 4) { this.handshakeStatus = new Error(`Failed to read handshake header. Received header: ${buffer.toString()}. Buffer length too small`) }
-    this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
-  }
-
   private handleHandshake(buffer: Buffer): void {
-    this.handshakeHeader = buffer.toString()
-    if (this.handshakeHeaderSize !== this.handshakeHeader.length || // check if protocol and header length is right
-      this.handshakeHeader !== 'GBXRemote 2') {
-      this.destroy()
-      this.handshakeStatus = new Error('Server uses wrong GBX protocol')
-      return
+    this.handshakeHeader += buffer.toString()
+    if (this.handshakeHeader.slice(-11) === 'GBXRemote 2') {
+      this.handshakeStatus = true
+    } else if(this.handshakeHeader.length > 15) {
+      this.handshakeStatus = new Error('Server uses wrong protocol')
     }
-    this.handshakeStatus = true
   }
 
   /** 
