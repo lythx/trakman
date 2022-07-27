@@ -1,5 +1,6 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import config from '../config.json' assert { type: 'json' }
+import { Logger } from '../src/Logger.js'
 
 const events: TMListener[] = [
   {
@@ -10,12 +11,12 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.BeginMap',
+    event: ['Controller.BeginMap', 'Controller.Ready'],
     callback: (): void => {
       for (const player of TM.players) {
         let msg: string
         const index: number | undefined = TM.localRecords.findIndex(a => a.login === player.login)
-        if (index === undefined) {
+        if (index === -1) {
           msg = `${TM.palette.error}You don't have a PB on this map.`
         } else {
           const rec: TMLocalRecord = TM.localRecords[index]
