@@ -144,8 +144,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   protected constructContent(login: string, params: DisplayParams): string {
     const n = ((params.page - 1) * this.itemsPerPage) - 1
     const headers: GridCellFunction[] = [
-      (i, j, w, h) => centeredText('Aliases', w, h),
-      (i, j, w, h) => centeredText('Arguments', w, h),
+      (i, j, w, h) => centeredText(' Aliases ', w, h),
+      (i, j, w, h) => centeredText(' Arguments ', w, h),
       (i, j, w, h) => centeredText(' Comment ', w, h), // Space to prevent translation
     ]
     const nameCell: GridCellFunction = (i, j, w, h) => {

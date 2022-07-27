@@ -86,6 +86,7 @@ export abstract class ManiakarmaService {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
+    Logger.debug(this.apiUrl, this.authCode, this._mapKarmaValue.toString(), JSON.stringify(this._mapKarma))
     await this.fixCoherence()
   }
 
