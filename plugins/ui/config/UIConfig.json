@@ -220,9 +220,9 @@
     },
     "github": {
       "index": 7,
-      "title1": "GITHUB",
-      "title2": "REPO",
-      "icon": "github",
+      "title1": "COMMAND",
+      "title2": "LIST",
+      "icon": "infoCircle",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2

@@ -155,7 +155,7 @@ export abstract class Logger {
       const users = process.env.USERS_TO_PING_ON_CRASH
       const pings = users === undefined ? [] : users.split(',')
       const embed = new EmbedBuilder()
-        .setTitle(tag.toUpperCase())
+        .setTitle(`${tag.toUpperCase()} on server ${process.env.SERVER_LOGIN}`)
         .setColor(this.logTypes[tag].discordColour)
         .setTimestamp(new Date())
         .setThumbnail(('https://cdn.discordapp.com/attachments/800663457779023872/999374713312776372/unknown.png'))
