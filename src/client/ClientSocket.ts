@@ -70,7 +70,7 @@ export class ClientSocket extends net.Socket {
           }
           resolve(response.json)
           return
-        } 
+        }
         if (Date.now() - startTimestamp > 15000) {
           resolve(new Error(`No server response for call ${method}`))
           return
@@ -82,8 +82,10 @@ export class ClientSocket extends net.Socket {
   }
 
   private setHandshakeHeaderSize(buffer: Buffer): void {
+    this.handshakeHeader = 'asd'
     if (buffer.length < 4) { this.handshakeStatus = new Error(`Failed to read handshake header. Received header: ${buffer.toString()}. Buffer length too small`) }
     this.handshakeHeaderSize = buffer.readUIntLE(0, 4)
+    this.handshakeStatus = true
   }
 
   private handleHandshake(buffer: Buffer): void {
