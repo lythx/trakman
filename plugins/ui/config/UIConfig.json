@@ -9,6 +9,14 @@
     "scoreTable": true,
     "global": true
   },
+  "marginSmall": 0.15,
+  "marginBig": 0.27,
+  "text": {
+    "format": "$s",
+    "textScale": 0.7,
+    "padding": 0.2,
+    "yOffset": -0.1
+  },
   "static": {
     "format": "$s",
     "width": 14.65,
@@ -16,8 +24,6 @@
     "rightPosition": 49.13,
     "leftPosition": -63.75,
     "bgColor": "0006",
-    "marginBig": 0.27,
-    "marginSmall": 0.15,
     "rightSideOrder": [
       "map",
       "previousAndBest",
@@ -65,8 +71,8 @@
   "closeButton": {
     "buttonWidth": 3,
     "buttonHeight": 3,
-    "icon": "X",
-    "iconHover": "X",
+    "icon": "close",
+    "iconHover": "close",
     "padding": 0.2,
     "background": "000D"
   },
@@ -75,17 +81,24 @@
     "buttonHeight": 3,
     "margin": 0.4,
     "padding": 0.2,
-    "background": "000D"
+    "background": "000D",
+    "icons": [
+      "pageFirst",
+      "pageDoubleLeft",
+      "pageLeft",
+      "pageRight",
+      "pageDoubleRight"
+    ]
   },
   "map": {
     "height": 9.13,
     "side": true,
     "title": "Ongoing",
     "icons": [
-      "map.white",
-      "nametag.white",
-      "person.white",
-      "timer.author",
+      "ongoingMap",
+      "tag",
+      "personBuilder",
+      "clockAuthor",
       "tools"
     ],
     "textScale": 1,
@@ -104,7 +117,13 @@
     "height": 8.8,
     "side": false,
     "title": "Karma",
-    "icon": "karmaStats"
+    "icon": "karmaStats",
+    "icons": [
+      "karmaLocal",
+      "karmaGlobal",
+      "karmaPulse",
+      "peopleKarma"
+    ]
   },
   "timer": {
     "height": 6.45,
@@ -117,7 +136,7 @@
     "height": 34.12,
     "side": true,
     "title": "Local Records",
-    "icon": "chart.locals",
+    "icon": "chartLocal",
     "entries": 15,
     "columnProportions": [
       1,
@@ -132,7 +151,7 @@
     "height": 15.07,
     "side": true,
     "title": "Live Records",
-    "icon": "chart.live",
+    "icon": "chartLive",
     "entries": 6,
     "columnProportions": [
       1,
@@ -150,23 +169,23 @@
       "index": 0,
       "title": "VISITORS",
       "icon": "people",
-      "width": 3.2,
-      "height": 3.4,
-      "padding": -0.5
+      "width": 2,
+      "height": 2,
+      "padding": 0.3
     },
     "players": {
       "index": 1,
       "title1": "SPECS",
       "title2": "PLAYERS",
-      "icon": "people",
-      "width": 3.2,
-      "height": 3.4,
-      "padding": -0.5
+      "icon": "peopleGaming",
+      "width": 2,
+      "height": 2,
+      "padding": 0.3
     },
     "version": {
       "index": 2,
       "title": "VERSION",
-      "icon": "git",
+      "icon": "codeBranch",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.3
@@ -200,16 +219,16 @@
       "index": 6,
       "title1": "SECTOR",
       "title2": "RECORDS",
-      "icon": "timeList",
+      "icon": "clockList",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2
     },
     "github": {
       "index": 7,
-      "title1": "GITHUB",
-      "title2": "REPO",
-      "icon": "github",
+      "title1": "COMMAND",
+      "title2": "LIST",
+      "icon": "infoCircle",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2
@@ -220,7 +239,7 @@
       "title2": "TO $F00SKIP",
       "title3": "$F00DISABLED",
       "title4": "DUE TO RES",
-      "icon": "vote.skip",
+      "icon": "voteSkip",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2
@@ -231,7 +250,7 @@
       "title2": "TO $0F0RES",
       "title3": "MAP IS",
       "title4": "$0F0REPLAYED",
-      "icon": "vote.replay",
+      "icon": "voteReplay",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2
@@ -244,7 +263,7 @@
       "title4": "$F00$SECONDS$ $FFFSECS",
       "title5": "$F00DISABLED",
       "title6": "DUE TO RES",
-      "icon": "pay.skip",
+      "icon": "paySkip",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2,
@@ -259,7 +278,7 @@
       "title4": "REACHED",
       "title5": "MAP IS",
       "title6": "$0F0REPLAYED",
-      "icon": "pay.replay",
+      "icon": "payReplay",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2,
@@ -278,7 +297,7 @@
     "height": 34.12,
     "side": false,
     "title": "Dedi Records",
-    "icon": "chart.dedi",
+    "icon": "chartDedi",
     "entries": 15,
     "columnProportions": [
       1,
@@ -288,8 +307,8 @@
     ],
     "markers": {
       "you": "arrowDoubleL",
-      "faster": "person.orange",
-      "slower": "person.green"
+      "faster": "person",
+      "slower": "person"
     },
     "topCount": 5,
     "displayNoRecordEntry": true
@@ -298,7 +317,7 @@
     "height": 8.68,
     "side": true,
     "title": "TMX Records",
-    "icon": "mxLogo",
+    "icon": "maniaExchange",
     "entries": 3,
     "columnProportions": [
       1,
@@ -320,14 +339,14 @@
     "height": 5,
     "side": false,
     "title": "Admin Panel",
-    "icon": "chart.dedi",
+    "icon": "gears",
     "icons": [
-      "person",
       "",
       "",
-      "arrowL",
-      "restart",
-      "arrowR"
+      "",
+      "",
+      "",
+      ""
     ]
   },
   "bestCps": {
@@ -343,9 +362,9 @@
     ],
     "textScale": 0.87,
     "textPadding": 0.2,
-    "icon": "mxLogo",
-    "upIcon": "arrowL",
-    "downIcon": "arrowR"
+    "icon": "bestClock",
+    "upIcon": "pageLeft",
+    "downIcon": "pageRight"
   },
   "bestFinishes": {
     "title": "Best Finishes",
@@ -360,7 +379,7 @@
     ],
     "textScale": 0.87,
     "textPadding": 0.2,
-    "icon": "mxLogo"
+    "icon": "bestFinishes"
   },
   "runCps": {
     "title": "Best Finishes",
@@ -391,18 +410,18 @@
     "markerWidth": 1.7,
     "columnGap": 0.15,
     "rowGap": 0.15,
-    "downloadIcon": "timer.download",
+    "downloadIcon": "download",
     "iconVerticalPadding": 0.15,
     "iconHorizontalPadding": 0.15,
     "markersLeft": {
-      "you": "arrowDoubleL",
-      "faster": "person.orange",
-      "slower": "person.green"
+      "you": "pageDoubleLeftHover",
+      "faster": "person",
+      "slower": "person"
     },
     "markersRight": {
-      "you": "arrowDoubleR",
-      "faster": "person.orange",
-      "slower": "person.green"
+      "you": "pageDoubleRightHover",
+      "faster": "person",
+      "slower": "person"
     },
     "timeColours": {
       "slower": "CCCF",
@@ -415,13 +434,13 @@
       "columns": 5,
       "columnWidth": 3,
       "bgColor": "0009",
-      "icon": "info"
+      "icon": "infoCircle"
     }
   },
   "dediCps": {
     "entries": 15,
     "cpsOnFirstPage": 10,
-    "icon": "chart.dedi",
+    "icon": "chartDedi",
     "title": "Dedimania Checkpoints",
     "selfColour": "0F0F",
     "cpColours": {
@@ -443,7 +462,7 @@
   "dediSectors": {
     "entries": 15,
     "cpsOnFirstPage": 10,
-    "icon": "chart.dedi",
+    "icon": "chartDedi",
     "title": "Dedimania Sectors",
     "selfColour": "0F0F",
     "cpColours": {
@@ -465,7 +484,7 @@
   "liveCps": {
     "entries": 15,
     "cpsOnFirstPage": 10,
-    "icon": "chart.live",
+    "icon": "chartLive",
     "title": "Live Checkpoints",
     "selfColour": "0F0F",
     "cpColours": {
@@ -487,7 +506,7 @@
   "liveSectors": {
     "entries": 15,
     "cpsOnFirstPage": 10,
-    "icon": "chart.live",
+    "icon": "chartLive",
     "title": "Live Sectors",
     "selfColour": "0F0F",
     "cpColours": {
@@ -509,7 +528,7 @@
   "localCps": {
     "entries": 15,
     "cpsOnFirstPage": 8,
-    "icon": "chart.local",
+    "icon": "chartLocal",
     "title": "Local Checkpoints",
     "selfColour": "0F0F",
     "cpColours": {
@@ -531,7 +550,7 @@
   "localSectors": {
     "entries": 15,
     "cpsOnFirstPage": 8,
-    "icon": "chart.local",
+    "icon": "chartLocal",
     "title": "Local Sectors",
     "selfColour": "0F0F",
     "cpColours": {
@@ -575,17 +594,33 @@
   },
   "mapList": {
     "title": "Map List",
-    "icon": "map.white",
+    "icon": "map",
     "rows": 5,
     "columns": 5,
     "navbar": [
       "commandList"
-    ]
+    ],
+    "icons": [
+      "ongoingMap",
+      "tag",
+      "personBuilder",
+      "clockAuthor",
+      "tools"
+    ],
+    "iconWidth": 2,
+    "queueWidth": 5.2,
+    "queueNumberWidth": 2.9,
+    "timeWidth": 5,
+    "positionWidth": 3.1,
+    "iconBackground": "222C",
+    "contentBackground": "555C",
+    "plusImage": "",
+    "minusImage": ""
   },
   "donationPanel": {
     "title": "Donations",
     "height": 8,
-    "icon": "cash.normal",
+    "icon": "cash",
     "side": true,
     "amounts": [
       50,
@@ -598,7 +633,7 @@
   },
   "playerList": {
     "title": "Players ",
-    "icon": "person.white",
+    "icon": "personwhite",
     "ban": "X",
     "mute": "mute",
     "addGuest": "addGuest",
@@ -618,7 +653,7 @@
   },
   "banList": {
     "title": " Banned Players ",
-    "icon": "X",
+    "icon": "banList",
     "entries": 15,
     "columnProportions": [
       2,
@@ -636,12 +671,12 @@
     "title": " Vote",
     "width": 25,
     "height": 10,
-    "iconRed": "chart.dedi",
-    "iconGreen": "chart.locals"
+    "iconRed": "",
+    "iconGreen": ""
   },
   "blacklistList": {
     "title": " Blacklisted Players ",
-    "icon": "X",
+    "icon": "blacklistList",
     "entries": 15,
     "columnProportions": [
       2,
@@ -657,7 +692,7 @@
   },
   "guestlistList": {
     "title": " Guests ",
-    "icon": "X",
+    "icon": "guestlistList",
     "entries": 15,
     "columnProportions": [
       2,
@@ -705,12 +740,12 @@
   },
   "welcomeWindow": {
     "title": "Welcome to Trakman!",
-    "icon": "info"
+    "icon": "infoCircle"
   },
   "commandList": {
     "title": "Command List",
     "entries": 15,
-    "icon": "info",
+    "icon": "infoCircle",
     "userNavbar": [
       {
         "name": "Info",

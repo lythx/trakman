@@ -4,11 +4,11 @@ import { CONFIG, IDS, Grid, centeredText, rightAlignedText, verticallyCenteredTe
 
 export default class BestCps extends StaticComponent {
 
-  private readonly margin = CONFIG.static.marginSmall
+  private readonly margin = CONFIG.marginSmall
   private readonly width = CONFIG.static.width
   private readonly title = CONFIG.bestCps.title
   private readonly height = CONFIG.bestCps.height
-  private readonly positionX = CONFIG.static.leftPosition + CONFIG.static.marginBig + CONFIG.static.width
+  private readonly positionX = CONFIG.static.leftPosition + CONFIG.marginBig + CONFIG.static.width
   private readonly positionY = CONFIG.static.topBorder
   private readonly entries = CONFIG.bestCps.entries
   private readonly bestCps: { login: string, time: number, nickname: string }[] = []

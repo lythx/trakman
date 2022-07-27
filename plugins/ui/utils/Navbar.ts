@@ -1,6 +1,5 @@
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import BGS from '../config/Backgrounds.json' assert { type: 'json' }
-import ICN from '../config/Icons.json' assert { type: 'json' }
 import { CONFIG } from '../UiUtils.js'
 
 //TODO THIS IN CONFIG FILE
@@ -39,7 +38,7 @@ export default class Navbar {
     const w = (this.width + this.margin) / this.buttons.length
     for (const [i, e] of this.buttons.entries()) {
       xml += `<frame posn="${w * i} 0 1">
-            <quad posn="0 0 3" sizen="${w - this.margin} ${this.height}" image="${ICN.blank}" imagefocus="${this.hoverImage}" action="${e.action}"/>
+            <quad posn="0 0 3" sizen="${w - this.margin} ${this.height}" image="f" imagefocus="${this.hoverImage}" action="${e.action}"/>
             <quad posn="0 0 2" sizen="${w - this.margin} ${this.height}" bgcolor="${this.bg}"/>
             <label posn="${w / 2} -${(this.height / 2)} 9" sizen="${(w * (1 / this.textScale)) - (this.padding * 2)} ${this.height}" scale="${this.textScale}" text="${TM.safeString(e.name)}" valign="center" halign="center"/>
             </frame>`

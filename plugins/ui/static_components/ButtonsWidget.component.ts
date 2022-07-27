@@ -1,17 +1,17 @@
-import { calculateStaticPositionY, CONFIG, IDS, Grid, constuctButton, ICONS, stringToObjectProperty, VoteWindow } from '../UiUtils.js'
+import { getStaticPosition, CONFIG, IDS, Grid, constuctButton, ICONS, stringToObjectProperty, VoteWindow } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
-export default class VisitorAmount extends StaticComponent {
+export default class ButtonsWidget extends StaticComponent {
 
-  private readonly width: number
-  private readonly height: number
+  private readonly config = CONFIG.buttons
+  private readonly width = CONFIG.static.width
+  private readonly height =  this.config.height
   private readonly positionX: number
   private readonly positionY: number
   private readonly iconData: { icon: string, text1: string, text2: string, iconWidth: number, iconHeight: number, padding: number, equalTexts?: true, actionId?: number, link?: string }[] = []
   private xml: string = ''
   private readonly grid: Grid
-  private readonly config = CONFIG.buttons
   private readonly skipCost = this.config.paySkip.cost
   private readonly resCosts = this.config.payRes.costs
   private resCostIndex = 0
@@ -21,11 +21,10 @@ export default class VisitorAmount extends StaticComponent {
 
   constructor() {
     super(IDS.buttons, { displayOnRace: true, hideOnResult: true })
-    this.width = CONFIG.static.width
-    this.height = this.config.height
-    this.positionX = CONFIG.static.leftPosition
-    this.positionY = calculateStaticPositionY('buttons')
-    this.grid = new Grid(this.width + CONFIG.static.marginSmall, this.height + CONFIG.static.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+    const pos = getStaticPosition('buttons')
+    this.positionX = pos.x
+    this.positionY = pos.y
+    this.grid = new Grid(this.width + CONFIG.marginSmall, this.height + CONFIG.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
   }
 
   async display(): Promise<void> {
@@ -42,7 +41,7 @@ export default class VisitorAmount extends StaticComponent {
 
   private constructXml(): void {
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
-    const marginSmall: number = CONFIG.static.marginSmall
+    const marginSmall: number = CONFIG.marginSmall
     for (const e of this.iconData) {
       arr.push((i: number, j: number, w: number, h: number): string =>
         constuctButton(e.icon, CONFIG.static.format + e.text1, CONFIG.static.format + e.text2, w - marginSmall,
@@ -442,7 +441,7 @@ export default class VisitorAmount extends StaticComponent {
       iconWidth: cfg.github.width,
       iconHeight: cfg.github.height,
       padding: cfg.github.padding,
-      link: `github.com/felacek/trakman/`,
+      actionId: IDS.commandList,
       equalTexts: true
     }
     this.updateVoteAndPayButtons()

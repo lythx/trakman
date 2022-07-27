@@ -1,11 +1,11 @@
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
-import { IDS, CONFIG, calculateStaticPositionY, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
+import { IDS, CONFIG, getStaticPosition, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
 
 export default class DonationPanel extends StaticComponent {
 
   private readonly width = CONFIG.static.width
-  private readonly positionX = CONFIG.static.rightPosition
+  private readonly positionX: number
   private readonly positionY: number
   private readonly side = CONFIG.donationPanel.side
   private readonly title = CONFIG.donationPanel.title
@@ -15,7 +15,9 @@ export default class DonationPanel extends StaticComponent {
 
   constructor() {
     super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
-    this.positionY = calculateStaticPositionY('donationPanel')
+    const pos = getStaticPosition('donationPanel')
+    this.positionX = pos.x
+    this.positionY = pos.y
     this.constructXML()
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + this.amounts.length) {
@@ -44,7 +46,7 @@ export default class DonationPanel extends StaticComponent {
 
   private constructXML(): void {
     const headerHeight: number = CONFIG.staticHeader.height
-    const marginSmall: number = CONFIG.static.marginSmall
+    const marginSmall: number = CONFIG.marginSmall
     const iconWidth: number = (this.width + marginSmall) / this.amounts.length
     const iconUrl = stringToObjectProperty(this.icon, ICONS)
     let boxXML: string = ''

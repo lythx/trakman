@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { centeredText, closeButton, CONFIG, Grid, ICONS, IDS, stringToObjectProperty, verticallyCenteredText } from '../UiUtils.js'
+import { centeredText, closeButton, CONFIG, Grid, IDS,  verticallyCenteredText, getIcon } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 
 export default class MapList extends PopupWindow {
@@ -10,21 +10,21 @@ export default class MapList extends PopupWindow {
   private readonly paginator: Paginator
   private readonly mapAddId = 1000
   private readonly grid: Grid
-  private readonly format = CONFIG.static.format
   private readonly challengeActionIds: string[] = []
-  private readonly contentBg = '555C'
-  private readonly iconBg = '222C'
+  private readonly contentBg = CONFIG.mapList.contentBackground
+  private readonly iconBg = CONFIG.mapList.iconBackground
+  private readonly icons = CONFIG.mapList.icons
   private readonly playerQueries: { paginator: Paginator, list: TMMap[], login: string }[] = []
-  private readonly iconW = 2
-  private readonly queuePositionW = 5.2
-  private readonly queueNumberW = 2.9
-  private readonly timeW = 5
-  private readonly positionW = 3.1
+  private readonly iconW = CONFIG.mapList.iconWidth
+  private readonly queueW = CONFIG.mapList.queueWidth
+  private readonly queueNumberW = CONFIG.mapList.queueNumberWidth
+  private readonly timeW = CONFIG.mapList.timeWidth
+  private readonly positionW = CONFIG.mapList.positionWidth
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
 
   constructor() {
-    super(IDS.mapList, stringToObjectProperty(CONFIG.mapList.icon, ICONS), CONFIG.mapList.title, CONFIG.mapList.navbar)
+    super(IDS.mapList, getIcon(CONFIG.mapList.icon), CONFIG.mapList.title, CONFIG.mapList.navbar)
     const pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
     this.paginator.onPageChange = (login: string, page: number) => {
@@ -57,7 +57,11 @@ export default class MapList extends PopupWindow {
           TM.openManialink(this.openId, info.login)
           return
         }
-        this.openWithQuery(info.login, query, query.startsWith('$a') === true ? true : undefined)
+        if (query.startsWith('$a')) {
+          this.openWithQuery(info.login, query.slice(2), true)
+        } else {
+          this.openWithQuery(info.login, query)
+        }
       },
       privilege: 0
     })
@@ -160,7 +164,7 @@ export default class MapList extends PopupWindow {
           ${header}
           <frame posn="0 ${-rowH} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.tag}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[0])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(TM.strip(maps[index].name, false)), width, rowH - this.margin, { textScale: 1 })}
@@ -168,7 +172,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.person.white}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
@@ -176,7 +180,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.timer.author}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[2])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.timeW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(TM.Utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin, { textScale: 1, padding: 0.2 })}
@@ -184,7 +188,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="${this.timeW + this.iconW + this.margin * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.stats}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[3])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.positionW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(` ${recordIndexString} `, this.positionW, rowH - this.margin, { textScale: 1, padding: 0 })}
@@ -192,7 +196,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="${this.timeW + this.positionW + this.margin * 4 + this.iconW * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${ICONS.heart}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(karmaRatio === undefined ? '-' : Math.round(karmaRatio).toString(), karmaW, rowH - this.margin, { textScale: 1, padding: 0.1 })}
@@ -260,28 +264,28 @@ export default class MapList extends PopupWindow {
     }
     if (index !== -1) {
       return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
-            imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/plusek8.png"/>`}
+            image="${getIcon(CONFIG.mapList.minusImage)}" 
+            imagefocus="${getIcon(CONFIG.mapList.minusImage + 'Hover')}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${ICONS.map.white}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
-            <quad posn="0 0 3" sizen="${width - (this.margin * 2 + this.queuePositionW + this.queueNumberW)} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${verticallyCenteredText(`Map #${mapIndex + 1}`, width - (this.margin * 2 + this.queuePositionW) + this.queueNumberW, height / 4 - this.margin, { textScale: 1 })}
+            <quad posn="0 0 3" sizen="${width - (this.margin * 2 + this.queueW + this.queueNumberW)} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
+            ${verticallyCenteredText(`Map #${mapIndex + 1}`, width - (this.margin * 2 + this.queueW) + this.queueNumberW, height / 4 - this.margin, { textScale: 1 })}
           </frame>
-          <frame posn="${this.iconW + width - (this.queuePositionW + this.queueNumberW)} 0 1">
-            <quad posn="0 0 3" sizen="${this.queuePositionW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`$0F0Queued`, this.queuePositionW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
-          <frame posn="${this.queuePositionW + this.margin} 0 1">
+          <frame posn="${this.iconW + width - (this.queueW + this.queueNumberW)} 0 1">
+            <quad posn="0 0 3" sizen="${this.queueW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
+            ${centeredText(`$0F0Queued`, this.queueW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
+          <frame posn="${this.queueW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${this.queueNumberW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
             ${centeredText(`$0F0${TM.Utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
           </frame>
           </frame>`
     }
     return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-           image="http://maniacdn.net/undef.de/uaseco/blank.png" 
-           imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/986391260325638154/minusek8.png"/>`}
+            image="${getIcon(CONFIG.mapList.plusImage)}" 
+            imagefocus="${getIcon(CONFIG.mapList.plusImage + 'Hover')}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${ICONS.map.white}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
             ${verticallyCenteredText(`Map #${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: 1 })}
