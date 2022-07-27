@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import { centeredText, closeButton, CONFIG, Grid, IDS,  verticallyCenteredText, getIcon } from '../UiUtils.js'
+import { centeredText, closeButton, CONFIG, Grid, IDS, verticallyCenteredText, getIcon } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 
 export default class MapList extends PopupWindow {
@@ -39,7 +39,7 @@ export default class MapList extends PopupWindow {
       if (info.answer >= this.openId + this.mapAddId && info.answer <= this.openId + this.mapAddId + 5000) {
         const mapId = this.challengeActionIds[info.answer - (this.openId + this.mapAddId)]
         if (mapId === undefined) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding the map to queue.`, info.login)
           TM.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
           return
         }
@@ -172,7 +172,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
@@ -214,7 +214,7 @@ export default class MapList extends PopupWindow {
   private handleMapClick(mapId: string, login: string, nickName: string, privilege: number): boolean {
     const challenge = TM.maps.find(a => a.id === mapId)
     if (challenge === undefined) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding challenge to queue.`, login)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding the map to queue.`, login)
       TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
       return false
     }
@@ -225,7 +225,7 @@ export default class MapList extends PopupWindow {
     }
     else {
       if (privilege <= 0 && TM.jukebox.find(a => a.callerLogin === login)) {
-        TM.sendMessage(`You can't add more than one map to the jukebox.`)
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.vote}You can't add more than one map to the queue.`)
         return false
       }
       TM.addToJukebox(mapId, login)
@@ -263,9 +263,9 @@ export default class MapList extends PopupWindow {
         <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>`
     }
     if (index !== -1) {
-      return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-            image="${getIcon(CONFIG.mapList.minusImage)}" 
-            imagefocus="${getIcon(CONFIG.mapList.minusImage + 'Hover')}"/>`}
+      return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
+            image="${getIcon('blank')}" 
+            imagefocus="${getIcon(CONFIG.mapList.minusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
           <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
@@ -281,9 +281,9 @@ export default class MapList extends PopupWindow {
           </frame>
           </frame>`
     }
-    return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-            image="${getIcon(CONFIG.mapList.plusImage)}" 
-            imagefocus="${getIcon(CONFIG.mapList.plusImage + 'Hover')}"/>`}
+    return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
+            image="${getIcon('blank')}" 
+            imagefocus="${getIcon(CONFIG.mapList.plusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
           <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">

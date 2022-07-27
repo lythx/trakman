@@ -167,7 +167,7 @@
     "side": false,
     "visitors": {
       "index": 0,
-      "title": "VISITORS",
+      "title": "$AF4VISITORS",
       "icon": "people",
       "width": 2,
       "height": 2,
@@ -175,8 +175,8 @@
     },
     "players": {
       "index": 1,
-      "title1": "SPECS",
-      "title2": "PLAYERS",
+      "title1": "$AF4SPECS",
+      "title2": "$AF4PLAYERS",
       "icon": "peopleGaming",
       "width": 2,
       "height": 2,
@@ -184,7 +184,7 @@
     },
     "version": {
       "index": 2,
-      "title": "VERSION",
+      "title": "$AF4VERSION",
       "icon": "codeBranch",
       "width": 1.8,
       "height": 1.8,
@@ -192,7 +192,7 @@
     },
     "time": {
       "index": 3,
-      "title": "TIME",
+      "title": "$AF4TIME",
       "icon": "clock",
       "width": 1.8,
       "height": 1.8,
@@ -200,7 +200,7 @@
     },
     "maps": {
       "index": 4,
-      "title": "MAPS",
+      "title": "$AF4MAPS",
       "icon": "numberedList",
       "width": 1.8,
       "height": 1.8,
@@ -209,7 +209,7 @@
     "stats": {
       "index": 5,
       "title1": "PLAYER",
-      "title2": "STATS",
+      "title2": "$AF4STATS",
       "icon": "stats",
       "width": 1.9,
       "height": 1.9,
@@ -218,7 +218,7 @@
     "sectorRecords": {
       "index": 6,
       "title1": "SECTOR",
-      "title2": "RECORDS",
+      "title2": "$AF4RECORDS",
       "icon": "clockList",
       "width": 1.8,
       "height": 1.8,
@@ -227,7 +227,7 @@
     "github": {
       "index": 7,
       "title1": "COMMAND",
-      "title2": "LIST",
+      "title2": "$AF4LIST",
       "icon": "infoCircle",
       "width": 1.8,
       "height": 1.8,
@@ -236,8 +236,8 @@
     "voteSkip": {
       "index": 8,
       "title1": " VOTE ",
-      "title2": "TO $F00SKIP",
-      "title3": "$F00DISABLED",
+      "title2": "TO $E22SKIP",
+      "title3": "$E22DISABLED",
       "title4": "DUE TO RES",
       "icon": "voteSkip",
       "width": 1.8,
@@ -247,9 +247,9 @@
     "voteRes": {
       "index": 9,
       "title1": " VOTE ",
-      "title2": "TO $0F0RES",
+      "title2": "TO $AF4RES",
       "title3": "MAP IS",
-      "title4": "$0F0REPLAYED",
+      "title4": "$AF4REPLAYED",
       "icon": "voteReplay",
       "width": 1.8,
       "height": 1.8,
@@ -257,35 +257,56 @@
     },
     "paySkip": {
       "index": 10,
-      "title1": "PAY $F00$COST$",
-      "title2": "TO $F00SKIP",
+      "title1": "PAY $E22$COST$",
+      "title2": "TO $E22SKIP",
       "title3": "SKIP IN",
-      "title4": "$F00$SECONDS$ $FFFSECS",
-      "title5": "$F00DISABLED",
+      "title4": "$E22$SECONDS$ $FFFSECS",
+      "title5": "$E22DISABLED",
       "title6": "DUE TO RES",
       "icon": "paySkip",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2,
-      "cost": 3,
+      "cost": 500,
       "timeout": 15
     },
     "payRes": {
       "index": 11,
-      "title1": "PAY $0F0$COST$",
-      "title2": "TO $0F0RES",
-      "title3": "$0F0RES$z$s LIMIT",
+      "title1": "PAY $AF4$COST$",
+      "title2": "TO $AF4RES",
+      "title3": "$AF4RES$z$s LIMIT",
       "title4": "REACHED",
       "title5": "MAP IS",
-      "title6": "$0F0REPLAYED",
+      "title6": "$AF4REPLAYED",
       "icon": "payReplay",
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2,
       "costs": [
-        1,
-        2,
-        3
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
       ]
     }
   },
@@ -594,17 +615,17 @@
   },
   "mapList": {
     "title": "Map List",
-    "icon": "map",
+    "icon": "mapList",
     "rows": 5,
     "columns": 5,
     "navbar": [
       "commandList"
     ],
     "icons": [
-      "ongoingMap",
       "tag",
+      "ongoingMap",
       "personBuilder",
-      "clockAuthor",
+      "chartLocal",
       "tools"
     ],
     "iconWidth": 2,
@@ -614,8 +635,8 @@
     "positionWidth": 3.1,
     "iconBackground": "222C",
     "contentBackground": "555C",
-    "plusImage": "",
-    "minusImage": ""
+    "plusImage": "addMap",
+    "minusImage": "removeMap"
   },
   "donationPanel": {
     "title": "Donations",
@@ -633,7 +654,7 @@
   },
   "playerList": {
     "title": "Players ",
-    "icon": "personwhite",
+    "icon": "playerList",
     "ban": "X",
     "mute": "mute",
     "addGuest": "addGuest",
@@ -668,11 +689,11 @@
     ]
   },
   "voteWindow": {
-    "title": " Vote",
+    "title": " Vote ",
     "width": 25,
     "height": 10,
-    "iconRed": "",
-    "iconGreen": ""
+    "iconRed": "placeholder",
+    "iconGreen": "placeholder"
   },
   "blacklistList": {
     "title": " Blacklisted Players ",
@@ -745,7 +766,7 @@
   "commandList": {
     "title": "Command List",
     "entries": 15,
-    "icon": "infoCircle",
+    "icon": "infoList",
     "userNavbar": [
       {
         "name": "Info",

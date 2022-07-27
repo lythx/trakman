@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import {TRAKMAN as TM} from '../../../src/Trakman.js'
+import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
 export default class GuestlistList extends PopupWindow {
@@ -12,30 +12,32 @@ export default class GuestlistList extends PopupWindow {
         const iconurl = stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)
         super(IDS.guestlistList, iconurl, CONFIG.guestlistList.title, CONFIG.guestlistList.navbar)
         this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.guestlistList.columnProportions, new Array(this.entries).fill(1),
-        { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+            { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
         TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
-            if(info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-  
-              const targetPlayer = TM.players[info.answer - this.openId - 1000]
-              const targetInfo = TM.getPlayer(targetPlayer.login)
-              if(targetInfo === undefined) {
-                return
-              } else {
-                TM.removeFromGuestlist(targetPlayer.login, info.login)
-                TM.sendMessage('do format wizrvn PLZ TX')  
-              }
+            if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
+
+                const targetPlayer = TM.players[info.answer - this.openId - 1000]
+                const targetInfo = TM.getPlayer(targetPlayer.login)
+                if (targetInfo === undefined) {
+                    return
+                } else {
+                    TM.removeFromGuestlist(targetPlayer.login, info.login)
+                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+                        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
+                        + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} from guestlist.`)
+                }
             } // 
 
-    })
-}
+        })
+    }
 
     private reRender(): void {
         const players = this.getPlayersWithWindowOpen()
         for (const login of players) {
-          this.displayToPlayer(login)
+            this.displayToPlayer(login)
         }
-      }
+    }
 
     protected async constructContent(login: string, params: any): Promise<string> {
         const headers = [
@@ -43,41 +45,41 @@ export default class GuestlistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Date ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Admin ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, {padding: 0.2}),
-            
+            (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, { padding: 0.2 }),
+
         ]
         const guestlisted = TM.guestlist
         const cancer: (TMOfflinePlayer | undefined)[] = []
 
-        for(const player of guestlisted) {
+        for (const player of guestlisted) {
             cancer.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(cancer[i - 1]?.nickname ?? '', w, h)            
+            return centeredText(cancer[i - 1]?.nickname ?? '', w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(guestlisted[i - 1].login, w, h)            
+            return centeredText(guestlisted[i - 1].login, w, h)
         }
         const dateCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(guestlisted[i - 1].date.toUTCString(), w, h)            
+            return centeredText(guestlisted[i - 1].date.toUTCString(), w, h)
         }
         const adminCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(guestlisted[i - 1].callerLogin, w, h)            
+            return centeredText(guestlisted[i - 1].callerLogin, w, h)
         }
         const unglButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
 
         const players = TM.guestlist
-        const rows = Math.min(this.entries, players.length) 
+        const rows = Math.min(this.entries, players.length)
         const arr = headers
-        for(let i = 0; i<rows; i++) {
+        for (let i = 0; i < rows; i++) {
             arr.push(nicknameCell, loginCell, dateCell, adminCell, unglButton)
         }
         return this.grid.constructXml(arr)
     }
-    
+
     protected constructFooter(login: string, params: any): string {
-        return closeButton(this.closeId, this.windowWidth, this.footerHeight)        
+        return closeButton(this.closeId, this.windowWidth, this.footerHeight)
     }
 }
