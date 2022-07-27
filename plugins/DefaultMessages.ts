@@ -1,10 +1,12 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
+import config from '../config.json' assert { type: 'json' }
 
 const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (): Promise<void> => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman v1Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, Ω ω. start g`)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman ${TM.palette.highlight}`
+        + `v${config.version}${TM.palette.servermsg} startup sequence successful.`)
     }
   },
   {
