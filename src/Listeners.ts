@@ -76,7 +76,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerCheckpoint',
-      callback: (params: any[]): void => {
+      callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         if (params[0] === 0) { // Ignore inexistent people //please elaborate
           return
@@ -89,7 +89,7 @@ export class Listeners {
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         const cpStatus = PlayerService.addCP(player, checkpoint)
         if (cpStatus === true) {
-          const obj = RecordService.add(MapService.current.id, player, checkpoint.time)
+          const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
             const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
             Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)

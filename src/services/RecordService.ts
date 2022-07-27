@@ -53,7 +53,7 @@ export class RecordService {
     return [...this._liveRecords]
   }
 
-  static add(map: string, player: TMPlayer, time: number): false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo } {
+  static async add(map: string, player: TMPlayer, time: number): Promise<false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo }> {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
@@ -77,12 +77,12 @@ export class RecordService {
       return false
     }
     const finishInfo: FinishInfo = temp
-    const localRecord = this.handleLocalRecord(map, time, date, [...checkpoints], player)
+    const localRecord =await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
   }
 
-  private static handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TMPlayer): RecordInfo | undefined {
+  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TMPlayer): Promise<RecordInfo | undefined> {
     const pb: number | undefined = this._localRecords.find(a => a.login === player.login)?.time
     const position: number = this._localRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
@@ -91,7 +91,7 @@ export class RecordService {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Logger.info(...this.getLogString(-1, position, -1, time, player.login, 'local'))
-      void this.repo.add(recordInfo)
+      await this.repo.add(recordInfo)
       return recordInfo
     }
     if (time === pb) {
@@ -114,7 +114,7 @@ export class RecordService {
         this._localRecords.splice(position - 1, 0, recordInfo)
       }
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'local'))
-      void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
+      await this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
       return recordInfo
     }
   }
