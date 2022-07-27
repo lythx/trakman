@@ -53,6 +53,9 @@ export abstract class DedimaniaService {
 
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
+    if(DedimaniaClient.connected === false) {
+      await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+    }
     this._dedis.length = 0
     this._newDedis.length = 0
     const cfg: ServerInfo = ServerConfig.config
