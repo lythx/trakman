@@ -1,4 +1,4 @@
-import { calculateStaticPositionY, RecordList, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
+import { getStaticPosition, RecordList, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
@@ -17,9 +17,10 @@ export default class TMXRanking extends StaticComponent {
     this.height = CONFIG.tmx.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.tmx.side
-    this.positionX = side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition
-    this.positionY = calculateStaticPositionY('tmx')
-    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.static.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, true)
+    const pos =  getStaticPosition('tmx')
+    this.positionX = pos.x
+    this.positionY = pos.y
+    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, true)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -52,7 +53,7 @@ export default class TMXRanking extends StaticComponent {
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.tmx.title, stringToObjectProperty(CONFIG.tmx.icon, ICONS), true)}
-        <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.static.marginSmall} 1">
+        <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
           ${this.recordList.constructXml(login, replays)}
         </frame>
       </frame>

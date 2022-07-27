@@ -52,7 +52,7 @@ export default class LiveCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.strip(records[i + playerIndex].nickname, false), w, h)
+      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {

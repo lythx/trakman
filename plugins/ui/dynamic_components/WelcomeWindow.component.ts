@@ -11,7 +11,7 @@ export default class WelcomeWindow extends PopupWindow {
     super(IDS.welcomeWindow, stringToObjectProperty(CONFIG.welcomeWindow.icon, ICONS), CONFIG.welcomeWindow.title, ['commandList'])
     this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], { background: CONFIG.grid.bg, margin: 1 })
     TM.addListener('Controller.PlayerJoin', (info) => {
-      if (!this.welcomedPlayers.includes(info.login)) {
+      if (this.welcomedPlayers.includes(info.login) === false) {
         this.welcomedPlayers.push(info.login)
         TM.openManialink(this.openId, info.login)
         void TM.queryDB('INSERT INTO welcomed_players(login) VALUES($1)', info.login)
@@ -21,8 +21,8 @@ export default class WelcomeWindow extends PopupWindow {
   }
 
   async initializeDb() {
-    await TM.queryDB(`CREATE TABLE IF NOT EXISTS welcomed_players
-    login VARCHAR(25) NOT NULL PRIMARY KEY`)
+    await TM.queryDB(`CREATE TABLE IF NOT EXISTS welcomed_players(
+    login VARCHAR(25) NOT NULL PRIMARY KEY)`)
     const res = await TM.queryDB('SELECT login FROM welcomed_players')
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))
