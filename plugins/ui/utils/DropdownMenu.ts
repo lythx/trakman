@@ -6,7 +6,7 @@ import BG from '../config/Backgrounds.json' assert { type: 'json' }
 const DEFAULT_OPTION_HEIGHT: number = 2
 const DEFAULT_PADDING: number = 1
 const DEFAULT_TEXT_SCALE: number = 1
-const DEFAULT_BACKGROUND_IMAGE: string = ICN.blank
+const DEFAULT_BACKGROUND_IMAGE: string = ICN.clock
 const DEFAULT_HOVER_IMAGE: string = BG.darkblue
 
 export default class DropdownMenu {

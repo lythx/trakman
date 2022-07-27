@@ -1,21 +1,20 @@
-import { calculateStaticPositionY, CONFIG as CFG, CONFIG, IDS } from '../UiUtils.js'
+import { getStaticPosition, CONFIG as CFG, CONFIG, IDS } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class PreviousAndBest extends StaticComponent {
 
-  private readonly width: number
-  private readonly height: number
+  private readonly width = CONFIG.static.width
+  private readonly height = CONFIG.previousAndBest.height
   private readonly positionY: number
   private readonly positionX: number
   private xml: string = ''
 
   constructor() {
-    super(IDS.previousAndBest,{ displayOnRace: true, hideOnResult: true })
-    this.width = CONFIG.static.width
-    this.height = CONFIG.previousAndBest.height
-    this.positionX = CONFIG.static.rightPosition
-    this.positionY = calculateStaticPositionY('previousAndBest')
+    super(IDS.previousAndBest, { displayOnRace: true, hideOnResult: true })
+    const pos = getStaticPosition('previousAndBest')
+    this.positionX = pos.x
+    this.positionY = pos.y
     this.constructXml()
   }
 

@@ -1,7 +1,8 @@
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import ICN from '../config/Icons.json' assert { type: 'json'}
+import ICONS from '../config/Icons.json' assert { type: 'json'}
 import IDS from '../config/UtilIds.json' assert { type: 'json'}
 import { CONFIG } from '../UiUtils.js'
+
 
 const ID = IDS.Paginator
 
@@ -21,6 +22,8 @@ export default class Paginator {
   readonly height: number
   readonly margin: number = CONFIG.paginator.margin
   readonly emptyBg: string = CONFIG.paginator.background
+  readonly icons: string[]
+  readonly iconsHover: string[]
   private _onPageChange: (login: string, page: number) => void = () => undefined
   pageCount: number
   yPos: number
@@ -30,6 +33,8 @@ export default class Paginator {
   constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
     this.parentId = parentId
     this.width = parentWidth
+    this.icons = CONFIG.paginator.icons.map(a => this.stringToIcon(a))
+    this.iconsHover = CONFIG.paginator.icons.map(a => this.stringToIcon(a + 'Hover'))
     this.height = parentHeight
     this.pageCount = pageCount
     this.defaultPage = defaultPage
@@ -153,20 +158,20 @@ export default class Paginator {
     let xml: string = ''
     if (page !== 1) {
       xml += `<quad posn="${this.xPos[2]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.previous}" 
-        imagefocus="${ICN.arrowL}"
-        image="${ICN.arrowL}"/>`
+        imagefocus="${this.iconsHover[2]}"
+        image="${this.icons[2]}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="${this.xPos[0]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
-            imagefocus="${ICN.arrowFirst}"
-            image="${ICN.arrowFirst}"/>
+            imagefocus="${this.iconsHover[0]}"
+            image="${this.icons[0]}"/>
             <quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpBackwards}" 
-            imagefocus="${ICN.arrowDoubleL}"
-            image="${ICN.arrowDoubleL}"/>`
+            imagefocus="${this.iconsHover[1]}"
+            image="${this.icons[1]}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
-        imagefocus="${ICN.arrowFirst}"
-        image="${ICN.arrowFirst}"/>`
+        imagefocus="${this.iconsHover[0]}"
+        image="${this.icons[0]}"/>`
       }
     }
     xml += `<quad posn="${this.xPos[2]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
@@ -178,20 +183,20 @@ export default class Paginator {
     }
     if (page !== this.pageCount) {
       xml += `<quad posn="${this.xPos[3]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.next}" 
-      imagefocus="${ICN.arrowR}"
-      image="${ICN.arrowR}"/>`
+      imagefocus="${this.iconsHover[3]}"
+      image="${this.icons[3]}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpForwards}" 
-          imagefocus="${ICN.arrowDoubleR}"
-          image="${ICN.arrowDoubleR}"/>
+          imagefocus="${this.iconsHover[4]}"
+          image="${this.icons[4]}"/>
           <quad posn="${this.xPos[5]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${ICN.arrowLast}"
-          image="${ICN.arrowLast}"/>`
+          imagefocus="${this.iconsHover[5]}"
+          image="${this.icons[5]}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${ICN.arrowLast}"
-          image="${ICN.arrowLast}"/>`
+          imagefocus="${this.iconsHover[5]}"
+          image="${this.icons[5]}"/>`
       }
     }
     xml += `<quad posn="${this.xPos[3]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
@@ -203,4 +208,14 @@ export default class Paginator {
     }
     return xml
   }
+
+  private stringToIcon = (str: string): any => {
+    const split: string[] = str.split('.')
+    let obj = ICONS
+    for (const e of split) {
+      obj = (obj as any)[e]
+    }
+    return obj
+  }
+
 }
