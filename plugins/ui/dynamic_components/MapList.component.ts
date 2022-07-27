@@ -172,7 +172,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
@@ -263,7 +263,7 @@ export default class MapList extends PopupWindow {
         <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>`
     }
     if (index !== -1) {
-      return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
+      return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${getIcon('blank')}" 
             imagefocus="${getIcon(CONFIG.mapList.minusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
@@ -281,7 +281,7 @@ export default class MapList extends PopupWindow {
           </frame>
           </frame>`
     }
-    return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
+    return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${getIcon('blank')}" 
             imagefocus="${getIcon(CONFIG.mapList.plusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
