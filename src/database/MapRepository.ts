@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS maps(
   id INT4 NOT NULL,
   name VARCHAR(60) NOT NULL,
   filename VARCHAR(254) NOT NULL UNIQUE,
-  author VARCHAR(25) NOT NULL,
+  author VARCHAR(40) NOT NULL,
   environment INT2 NOT NULL,
   mood INT2 NOT NULL,
   bronze_time INT4 NOT NULL,
@@ -77,7 +77,7 @@ export class MapRepository extends Repository {
     const values: any[] = []
     for (const [i, map] of maps.entries()) {
       values.push(ids[i].id, map.name,
-        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
+        map.fileName, map.author, environments[map.environment], 1, map.bronzeTime, map.silverTime,
         map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate)
     }
     await this.query(query, ...values)
