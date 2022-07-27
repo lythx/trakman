@@ -31,6 +31,9 @@ export default class LocalRanking extends StaticComponent {
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
+    TM.addListener('Controller.LocalRecords', (): void => {
+      if (this._isDisplayed) { this.display() }
+    })
   }
 
   display(): void {
