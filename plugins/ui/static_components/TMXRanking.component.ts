@@ -17,7 +17,7 @@ export default class TMXRanking extends StaticComponent {
     this.height = CONFIG.tmx.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.tmx.side
-    const pos =  getStaticPosition('tmx')
+    const pos = getStaticPosition('tmx')
     this.positionX = pos.x
     this.positionY = pos.y
     this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, true)
@@ -25,13 +25,13 @@ export default class TMXRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 

@@ -23,13 +23,15 @@ export default class LiveRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.LiveRecord', (): void => {
-      this.display()
+      if (this._isDisplayed) {
+        this.display()
+      }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.liveRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
+      if (this._isDisplayed && TM.liveRecords.some(a => a.login === info.login)) { this.display() }
     })
   }
 

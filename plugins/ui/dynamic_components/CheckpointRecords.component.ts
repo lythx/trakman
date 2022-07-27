@@ -69,7 +69,7 @@ export default class CheckpointRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(cps[i + cpIndex - 1]?.nickname ?? '-', w, h)
+      return centeredText(TM.safeString(TM.strip(cps[i + cpIndex - 1]?.nickname ?? '-')), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {

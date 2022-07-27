@@ -99,7 +99,7 @@ export default class PlayerList extends PopupWindow {
       (i: number, j: number, w: number, h: number) => centeredText(' Forcespec ', w, h),
     ]
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(players[i].nickname, w, h)
+      return centeredText(TM.safeString(TM.strip(players[i].nickname, false)), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(players[i].login, w, h)
