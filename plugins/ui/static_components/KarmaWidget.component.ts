@@ -16,7 +16,7 @@ export default class KarmaWidget extends StaticComponent {
 
   constructor() {
     super(IDS.karma, { displayOnRace: true, hideOnResult: true })
-    const pos =  getStaticPosition('karma')
+    const pos = getStaticPosition('karma')
     this.positionX = pos.x
     this.positionY = pos.y
     this.display()

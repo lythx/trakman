@@ -763,10 +763,13 @@ const commands: TMCommand[] = [
     privilege: 2
   },
   {
-    aliases: ['shf', 'shuffle'],
+    aliases: ['shuf', 'shuffle'],
     help: 'Shuffle the map queue.',
     callback: async (info: MessageInfo): Promise<void> => {
       TM.shuffleJukebox(info.login)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
+        + `shuffled the queue.`)
     },
     privilege: 2
   }
