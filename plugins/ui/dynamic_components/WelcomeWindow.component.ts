@@ -77,8 +77,16 @@ which was a painstakingly long process, but it sure paid off."/>
     return this.grid.constructXml([left, right])
   }
 
+  closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
+    const width: number = options?.width ?? CONFIG.closeButton.buttonWidth
+    const height: number = options?.height ?? CONFIG.closeButton.buttonHeight
+    const padding: number = options?.padding ?? CONFIG.closeButton.padding
+    return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" valign="center" bgcolor="${CONFIG.closeButton.background}" action="${actionId}"/>
+    <label posn="${parentWidth / 2} -0.5 3" sizen="${width - padding * 2} ${height - padding * 2}" text="X" textsize="4" halign="center"/>`
+  }
+
   protected constructFooter(): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+    return this.closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 
 }
