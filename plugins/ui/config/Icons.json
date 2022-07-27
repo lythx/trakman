@@ -73,5 +73,18 @@
     "maniaExchange": "https://cdn.discordapp.com/attachments/793464821030322196/1001610713804050482/ManiaExchange.png",
     "cash": "https://cdn.discordapp.com/attachments/793464821030322196/1001610714160574535/Cash.png",
     "info": "https://cdn.discordapp.com/attachments/793464821030322196/1001610714680656002/Info.png",
-    "gears": "https://cdn.discordapp.com/attachments/793464821030322196/1001610716584874178/Gears.png"
+    "gears": "https://cdn.discordapp.com/attachments/793464821030322196/1001610716584874178/Gears.png",
+    "playerList": "https://cdn.discordapp.com/attachments/793464821030322196/1001863463372587008/PlayerList.png",
+    "mapList": "https://cdn.discordapp.com/attachments/793464821030322196/1001863463687168030/MapList.png",
+    "infoList": "https://cdn.discordapp.com/attachments/793464821030322196/1001863464031109120/InfoList.png",
+    "placeholder": "https://cdn.discordapp.com/attachments/793464821030322196/1001863464324694056/Placeholder.png",
+    "checkmark": "https://cdn.discordapp.com/attachments/793464821030322196/1001863464609915010/Checkmark.png",
+    "cross": "https://cdn.discordapp.com/attachments/793464821030322196/1001863464899334214/Cross.png",
+    "addMap": "https://cdn.discordapp.com/attachments/793464821030322196/1001863465176150157/AddMap.png",
+    "removeMap": "https://cdn.discordapp.com/attachments/793464821030322196/1001863465541046354/RemoveMap.png",
+    "thumbsUpF5": "https://cdn.discordapp.com/attachments/793464821030322196/1001867709237166120/ThumbsUpF5.png",
+    "thumbsDownF6": "https://cdn.discordapp.com/attachments/793464821030322196/1001867709585305610/ThumbsDownF6.png",
+    "F5": "https://cdn.discordapp.com/attachments/793464821030322196/1001869645319512074/F5.png",
+    "F6": "https://cdn.discordapp.com/attachments/793464821030322196/1001869645617303642/F6.png",
+    "blank": "http://maniacdn.net/undef.de/uaseco/blank.png"
 }

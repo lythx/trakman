@@ -1,6 +1,7 @@
 import { getStaticPosition, CONFIG, IDS, Grid, constuctButton, ICONS, stringToObjectProperty, VoteWindow } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
+import Config from '../../../config.json' assert { type: 'json' }
 
 export default class ButtonsWidget extends StaticComponent {
 
@@ -352,12 +353,7 @@ export default class ButtonsWidget extends StaticComponent {
 
   private initialize = async (): Promise<void> => {
     // Visit counter
-    //const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
-    const res = [
-      {
-        count: 45243
-      }
-    ]
+    const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
@@ -385,7 +381,7 @@ export default class ButtonsWidget extends StaticComponent {
     // Version
     this.iconData[cfg.version.index] = {
       icon: stringToObjectProperty(cfg.version.icon, ICONS),
-      text1: '0.0.1',
+      text1: Config.version,
       text2: cfg.version.title,
       iconWidth: cfg.version.width,
       iconHeight: cfg.version.height,
@@ -419,7 +415,7 @@ export default class ButtonsWidget extends StaticComponent {
       iconWidth: cfg.stats.width,
       iconHeight: cfg.stats.height,
       padding: cfg.stats.padding,
-      actionId: IDS.localCps,
+      //actionId: IDS.localCps,
       equalTexts: true
     }
     // Sector records
@@ -430,7 +426,7 @@ export default class ButtonsWidget extends StaticComponent {
       iconWidth: cfg.sectorRecords.width,
       iconHeight: cfg.sectorRecords.height,
       padding: cfg.sectorRecords.padding,
-      actionId: IDS.sectorRecords,
+      //actionId: IDS.sectorRecords,
       equalTexts: true
     }
     // Github repo
