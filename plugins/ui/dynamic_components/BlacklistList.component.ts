@@ -23,7 +23,10 @@ export default class BlacklistList extends PopupWindow {
                     return
                 } else {
                     TM.removeFromBlacklist(targetPlayer.login, info.login)
-                    TM.sendMessage('do format wizrvn PLZ TX')
+                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+                        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unblacklisted `
+                        + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`
+                    )
                 }
             } //
         })

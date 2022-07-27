@@ -39,6 +39,7 @@ import GuestListList from './dynamic_components/GuestlistList.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
+import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -87,9 +88,9 @@ let dynamicComponents: {
   readonly banList: BanList
   readonly blacklistList: BlackListList
   readonly guestlistList: GuestListList
- // readonly sectorRecords: SectorRecords
- // readonly checkpointRecords: CheckpointRecords
- readonly welcomeWindow: WelcomeWindow
+  // readonly sectorRecords: SectorRecords
+  // readonly checkpointRecords: CheckpointRecords
+  readonly welcomeWindow: WelcomeWindow
 }
 
 const events: TMListener[] = [
@@ -98,6 +99,7 @@ const events: TMListener[] = [
     callback: async (): Promise<void> => {
       await TM.call('SendHideManialinkPage')
       loadMod()
+      initalizeKeyListeners()
       customUi = new CustomUi()
       customUi.display()
       staticComponents = {
@@ -132,8 +134,8 @@ const events: TMListener[] = [
         blacklistList: new BlackListList(),
         guestlistList: new GuestListList(),
         //sectorRecords: new SectorRecords(),
-       // checkpointRecords: new CheckpointRecords()
-       welcomeWindow: new WelcomeWindow()
+        //checkpointRecords: new CheckpointRecords()
+        welcomeWindow: new WelcomeWindow()
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {
