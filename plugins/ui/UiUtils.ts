@@ -13,6 +13,8 @@ import { staticHeader } from './utils/StaticHeader.js'
 import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { getIcon } from './utils/GetIcon.js'
+import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
+
 
 const getStaticPosition = (widgetName: string): { x: number, y: number } => {
   const side = (CONFIG as any)[widgetName].side === true
@@ -50,4 +52,10 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
   ${horizontallyCenteredText(text2, width, height, { yOffset: 3.65, textScale: 0.36, padding: 0.6 })}`
 }
 
-export { Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject, CONFIG, ICONS, BACKGROUNDS, IDS, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText, constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition, verticallyCenteredText, getIcon }
+export {
+  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject,
+  CONFIG, ICONS, BACKGROUNDS, IDS,
+  addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
+  constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition,
+  verticallyCenteredText, getIcon
+}

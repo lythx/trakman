@@ -6,6 +6,7 @@ import { JukeboxService } from '../services/JukeboxService.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { TRAKMAN as TM } from '../Trakman.js'
+import Config from '../../config.json' assert { type: 'json' }
 
 export abstract class DedimaniaClient {
 
@@ -36,7 +37,7 @@ export abstract class DedimaniaClient {
         Login: { string: process.env.SERVER_LOGIN },
         Password: { string: process.env.SERVER_PASSWORD },
         Tool: { string: 'Trakman' },
-        Version: { string: '0.0.1' },
+        Version: { string: Config.version },
         Nation: { string: process.env.SERVER_NATION },
         Packmask: { string: process.env.SERVER_PACKMASK }
       }

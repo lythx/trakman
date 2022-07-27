@@ -264,8 +264,8 @@ export default class MapList extends PopupWindow {
     }
     if (index !== -1) {
       return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-            image="${getIcon(CONFIG.mapList.minusImage)}" 
-            imagefocus="${getIcon(CONFIG.mapList.minusImage + 'Hover')}"/>`}
+            image="${getIcon('blank')}" 
+            imagefocus="${getIcon(CONFIG.mapList.minusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
           <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
@@ -282,8 +282,8 @@ export default class MapList extends PopupWindow {
           </frame>`
     }
     return `${overlay ?? `<quad posn="0 0 8" sizen="${w} ${h}" action="${actionId}"
-            image="${getIcon(CONFIG.mapList.plusImage)}" 
-            imagefocus="${getIcon(CONFIG.mapList.plusImage + 'Hover')}"/>`}
+            image="${getIcon('blank')}" 
+            imagefocus="${getIcon(CONFIG.mapList.plusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
           <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">

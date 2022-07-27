@@ -2,6 +2,7 @@ import { TRAKMAN as TM } from "../../../src/Trakman.js"
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.json' assert { type: 'json' }
+import { addKeyListener } from "./KeyListener.js"
 
 export default class VoteWindow {
 
@@ -47,6 +48,8 @@ export default class VoteWindow {
     if (VoteWindow.isListenerAdded === false) {
       VoteWindow.isListenerAdded = true
       TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => VoteWindow.listener(info))
+      addKeyListener('F5', (info) => VoteWindow.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
+      addKeyListener('F6', (info) => VoteWindow.listener({ ...info, answer: this.noId }), 1, 'voteNo')
     }
   }
 
@@ -183,9 +186,9 @@ export default class VoteWindow {
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.noId}"/>
-      <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" bgcolor="F00F"/>
+      <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F6')}"/>
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.yesId}"/>
-      <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" bgcolor="0F0F"/>
+      <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F5')}"/>
     </frame>`
   }
 

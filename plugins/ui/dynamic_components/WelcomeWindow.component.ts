@@ -27,25 +27,32 @@ export default class WelcomeWindow extends PopupWindow {
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))
     }
+    for (const e of TM.players) {
+      if (this.welcomedPlayers.includes(e.login) === false) {
+        this.welcomedPlayers.push(e.login)
+        TM.openManialink(this.openId, e.login)
+        void TM.queryDB('INSERT INTO welcomed_players(login) VALUES($1)', e.login)
+      }
+    }
   }
 
   protected constructContent(): string {
     const left: GridCellFunction = (i, j, w, h) => {
       return `<format textsize="1"/>
       ${centeredText("About the controller", w, 3, { textScale: 2, yOffset: 0.8 })}
-      <label posn="1 -6 5" sizen="150 3.5" scale="1.2" text="TRAKMAN is a new TypeScript based controller. 
+      <label posn="1 -6 5" sizen="150 3.5" scale="1.2" text="$sTRAKMAN is a new TypeScript based controller. 
 It was made in just about 3 months, by 4 main developers:
 - Ciekma
 - Wiseraven
 - Snake
 - Borec"/>
-      <label posn="1 -21 5" sizen="150 3.5" scale="1.2" text="The controller features a variety of new things such as:
+      <label posn="1 -21 5" sizen="150 3.5" scale="1.2" text="$sThe controller features a variety of new things such as:
 - faster loading times
 - easier usability
 - responsable interface
 - better language
 And much more!"/>
-      <label posn="1 -36 5" sizen="150 3.5" scale="1.2" text="Keep in mind, the controller is still in its early stages,
+      <label posn="1 -36 5" sizen="150 3.5" scale="1.2" text="$sKeep in mind, the controller is still in its early stages,
 and bugs will occur.
 If you do happen to notice any bugs,
 you can report them using the /bug [report] command."/>`
@@ -53,18 +60,19 @@ you can report them using the /bug [report] command."/>`
     const right: GridCellFunction = (i, j, w, h) => {
       return `<format textsize="1"/>
       ${centeredText("A bit of history", w, 3, { textScale: 2, yOffset: 0.8 })}
-      <label posn="1 -6 5" sizen="150 3.5" scale="1.2" text="The project initally started as somewhat of a joke,
+      <label posn="1 -6 5" sizen="150 3.5" scale="1.2" text="$sThe project initally started as somewhat of a joke,
 but as we went on, we realised how much we can actually do.
 So we decided to make it a real thing,
 and dedicate our time to it."/>
-      <label posn="1 -17 5" sizen="150 3.5" scale="1.2" text="We initally thought that we were going to rewrite XASECO
+      <label posn="1 -17 5" sizen="150 3.5" scale="1.2" text="$sWe initally thought that we were going to rewrite XASECO
 in its entirety, but that turned out not to be the case,
 since XASECO uses a lot of old and deprecated methods,
 and its overall look and code is unmaintanable."/>
-      <label posn="1 -28 5" sizen="150 3.5" scale="1.2" text="That necessarily doesn't mean its a bad controller,
+      <label posn="1 -28 5" sizen="150 3.5" scale="1.2" text="$sThat necessarily doesn't mean its a bad controller,
 just that its not 'up to date'.
 We tried to make everything as best as possible,
-which was a painstakingly long process, but it sure paid off."/>`
+which was a painstakingly long process, but it sure paid off."/>
+      <label posn="1 -39 5" sizen="150 3.5" scale="1.5" text="$s[Some icons might not load at first, be patient]"/>`
     }
     return this.grid.constructXml([left, right])
   }

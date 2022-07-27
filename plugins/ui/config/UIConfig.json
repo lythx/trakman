@@ -267,7 +267,7 @@
       "width": 1.8,
       "height": 1.8,
       "padding": 0.2,
-      "cost": 3,
+      "cost": 500,
       "timeout": 15
     },
     "payRes": {
@@ -283,9 +283,30 @@
       "height": 1.8,
       "padding": 0.2,
       "costs": [
-        1,
-        2,
-        3
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
       ]
     }
   },
@@ -594,7 +615,7 @@
   },
   "mapList": {
     "title": "Map List",
-    "icon": "map",
+    "icon": "mapList",
     "rows": 5,
     "columns": 5,
     "navbar": [
@@ -614,8 +635,8 @@
     "positionWidth": 3.1,
     "iconBackground": "222C",
     "contentBackground": "555C",
-    "plusImage": "",
-    "minusImage": ""
+    "plusImage": "addMap",
+    "minusImage": "removeMap"
   },
   "donationPanel": {
     "title": "Donations",
@@ -633,7 +654,7 @@
   },
   "playerList": {
     "title": "Players ",
-    "icon": "personwhite",
+    "icon": "playerList",
     "ban": "X",
     "mute": "mute",
     "addGuest": "addGuest",
@@ -668,11 +689,11 @@
     ]
   },
   "voteWindow": {
-    "title": " Vote",
+    "title": " Vote ",
     "width": 25,
     "height": 10,
-    "iconRed": "",
-    "iconGreen": ""
+    "iconRed": "placeholder",
+    "iconGreen": "placeholder"
   },
   "blacklistList": {
     "title": " Blacklisted Players ",
@@ -745,7 +766,7 @@
   "commandList": {
     "title": "Command List",
     "entries": 15,
-    "icon": "infoCircle",
+    "icon": "infoList",
     "userNavbar": [
       {
         "name": "Info",
