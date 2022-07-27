@@ -1,15 +1,34 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
+import config from '../config.json' assert { type: 'json' }
 
 const events: TMListener[] = [
   {
     event: 'Controller.Ready',
-    callback: async (): Promise<void> => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman v1Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, Ω ω. start g`)
+    callback: (): void => {
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman ${TM.palette.highlight}`
+        + `v${config.version}${TM.palette.servermsg} startup sequence successful.`)
+    }
+  },
+  {
+    event: 'Controller.BeginMap',
+    callback: (): void => {
+      for (const player of TM.players) {
+        let msg: string
+        const index: number | undefined = TM.localRecords.findIndex(a => a.login === player.login)
+        if (index === undefined) {
+          msg = `${TM.palette.error}You don't have a PB on this map.`
+        } else {
+          const rec: TMLocalRecord = TM.localRecords[index]
+          msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
+            + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+        }
+        TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
+      }
     }
   },
   {
     event: 'Controller.PlayerJoin',
-    callback: async (player: JoinInfo): Promise<void> => {
+    callback: (player: JoinInfo): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
@@ -17,14 +36,14 @@ const events: TMListener[] = [
   },
   {
     event: 'Controller.PlayerLeave',
-    callback: async (player: LeaveInfo): Promise<void> => {
+    callback: (player: LeaveInfo): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(player.nickname, true)}${TM.palette.servermsg} `
         + `has quit after ${TM.palette.highlight + TM.msToTime(player.sessionTime)}${TM.palette.servermsg}.`)
     }
   },
   {
     event: 'Controller.PlayerRecord',
-    callback: async (info: RecordInfo): Promise<void> => {
+    callback: (info: RecordInfo): void => {
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
@@ -53,7 +72,7 @@ const events: TMListener[] = [
   },
   {
     event: 'Controller.DedimaniaRecord',
-    callback: async (info: DediRecordInfo): Promise<void> => {
+    callback: (info: DediRecordInfo): void => {
       let rs = { str: '', calcDiff: false } // Rec status
       let diff // Difference
       if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }

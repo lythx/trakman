@@ -69,7 +69,7 @@ export default class SectorRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(sectors[i + sectorIndex - 1]?.nickname ?? '-', w, h)
+      return centeredText(TM.safeString(TM.strip(sectors[i + sectorIndex - 1]?.nickname ?? '-', false)), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {

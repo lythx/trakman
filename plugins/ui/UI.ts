@@ -51,7 +51,7 @@ const loadMod = (): void => {
       array: [{
         struct: {
           Env: { string: 'Stadium' },
-          Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip' }
+          Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/1001923942249934990/TrakmanDefaultNoGanyu.zip' }
         }
       }]
     }])

@@ -43,8 +43,8 @@ export default class BanList extends PopupWindow {
         const headers = [
             (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
-            (i: number, j: number, w: number, h: number) => centeredText(' Ban Date ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Ban Reason ', w, h),
+            (i: number, j: number, w: number, h: number) => centeredText(' Ban Date ', w, h),
             (i: number, j: number, w: number, h: number) => centeredText(' Unban ', w, h),
 
         ]
@@ -55,7 +55,7 @@ export default class BanList extends PopupWindow {
             fetchedPlayers.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(fetchedPlayers[i - 1]?.nickname ?? '', w, h)
+            return centeredText(TM.safeString(TM.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(bannedplayers[i - 1]?.login ?? '', w, h)
@@ -64,7 +64,7 @@ export default class BanList extends PopupWindow {
             return centeredText(bannedplayers[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)
         }
         const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(bannedplayers[i - 1]?.reason ?? 'No reason specified', w, h)
+            return centeredText(TM.safeString(bannedplayers[i - 1]?.reason ?? 'No reason specified'), w, h)
         }
         const unbanButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.banList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`

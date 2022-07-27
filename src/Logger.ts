@@ -144,7 +144,7 @@ export abstract class Logger {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
-    let str = lines.join('\n')
+    let str = lines.join('\n').replace(/[_*~|>`]/g, '\$&')
     if (str.length > 500) {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
     }
@@ -206,7 +206,7 @@ export abstract class Logger {
       return ''
     }
     let s = stack.split('\n')[3].split(' ').filter(a => a !== '')
-    s = s[s.length-1].split('/')
+    s = s[s.length - 1].split('/')
     const str = s[s.length - 1]
     return str.split(':').slice(0, 2).join(':')
   }
