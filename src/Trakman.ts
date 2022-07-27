@@ -248,7 +248,11 @@ export const TRAKMAN = {
    * @returns Escaped string
    */
   safeString(str: string): string {
-    return (str.replace(/"/g, '&quot;')).replace(/&/g, "&amp;")
+    const map = {
+      '&': '&amp;',
+      '"': '&quot;',
+    }
+    return str.replace(/[&"]/g, (m): string => { return map[m as keyof typeof map] })
   },
 
   /**

@@ -52,7 +52,7 @@ export default class LocalRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS), true, { actionId: IDS.localCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, TM.localRecords.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })).slice(0, this.maxRecords))}
         </frame>
       </frame>
     </manialink>`,
