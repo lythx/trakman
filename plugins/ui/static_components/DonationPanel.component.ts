@@ -25,9 +25,10 @@ export default class DonationPanel extends StaticComponent {
         const status = await TM.sendCoppers(info.login, amount, 'Please give me coper')
         if (status instanceof Error) {
           TM.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
-          TM.sendMessage(`${TM.palette.error}Failed to donate coppers`, info.login)
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`, info.login)
         } else if (status === true) {
-          TM.sendMessage(`${info.nickname}$z$s${TM.palette.donation} donated ${amount} coppers to the server!!!!!!!!!!!!!!!!!`)
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}${TM.palette.donation} `
+            + `donated ${TM.palette.highlight}${amount}C${TM.palette.donation} to the server.`)
         }
       }
     })

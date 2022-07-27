@@ -256,7 +256,7 @@ const commands: TMCommand[] = [
         embeds: [embed]
       })
 
-      TM.sendMessage(`${TM.palette.admin}Bug successfully submitted.`, info.login)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Bug successfully submitted.`, info.login)
     },
     privilege: 0
   },
@@ -271,13 +271,12 @@ const commands: TMCommand[] = [
   {
     aliases: ['admin', 'a'],
     callback: (info: MessageInfo): void => {
-      if(info.privilege > 0) {
-        TM.sendMessage(`${TM.palette.admin}Command prefix ${TM.colours.white}/a ${TM.palette.admin}or ${TM.colours.white}/admin ${TM.palette.admin}is not used. Use ${TM.colours.white}//[command] ${TM.palette.admin}for admin commands instead.`, info.login)
+      if (info.privilege > 0) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Command prefix ${TM.colours.white}/a ${TM.palette.admin}or ${TM.colours.white}/admin ${TM.palette.admin}is not used. Use ${TM.colours.white}//[command] ${TM.palette.admin}for admin commands instead.`, info.login)
       }
     },
     privilege: 0
   },
-  
 ]
 
 for (const command of commands) { TM.addCommand(command) }
