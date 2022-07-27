@@ -39,6 +39,7 @@ import GuestListList from './dynamic_components/GuestlistList.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
+import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -98,6 +99,7 @@ const events: TMListener[] = [
     callback: async (): Promise<void> => {
       await TM.call('SendHideManialinkPage')
       loadMod()
+      initalizeKeyListeners()
       customUi = new CustomUi()
       customUi.display()
       staticComponents = {

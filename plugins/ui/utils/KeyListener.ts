@@ -11,7 +11,21 @@ export const removeKeyListener = (id: string) => {
   keyListeners = keyListeners.filter(a => a.id === id)
 }
 
-TM.addListener(['Controller.Ready', 'Controller.PlayerJoin'], (info) => {
+export const initialize = () => {
+  TM.sendManialink(`<manialinks>
+<manialink id="${UTILIDS.F5}">
+  <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${UTILIDS.F5}"/>
+</manialink>
+<manialink id="${UTILIDS.F6}">
+  <quad posn="0 0 0" sizen="0 0" actionkey="2" action="${UTILIDS.F6}"/>
+</manialink>
+<manialink id="${UTILIDS.F7}">
+  <quad posn="0 0 0" sizen="0 0" actionkey="3" action="${UTILIDS.F7}"/>
+</manialink>
+</manialinks>`)
+}
+
+TM.addListener('Controller.PlayerJoin', (info) => {
   TM.sendManialink(`<manialinks>
   <manialink id="${UTILIDS.F5}">
     <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${UTILIDS.F5}"/>
@@ -22,8 +36,10 @@ TM.addListener(['Controller.Ready', 'Controller.PlayerJoin'], (info) => {
   <manialink id="${UTILIDS.F7}">
     <quad posn="0 0 0" sizen="0 0" actionkey="3" action="${UTILIDS.F7}"/>
   </manialink>
-  </manialinks>`, info?.login)
+  </manialinks>`, info.login)
 })
+
+
 
 TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
   switch (info.answer) {
