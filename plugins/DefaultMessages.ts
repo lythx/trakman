@@ -4,50 +4,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (): Promise<void> => {
-      // Generate numba
-      const flagSeed: number = Math.floor(Math.random() * 10) + 1
-      // Make colours obj
-      let co = { c1: '', c2: '', c3: '', c4: '', c5: '' }
-      switch (flagSeed) {
-        case 1: // Agender (fkd up)
-          co.c1 = '$000'; co.c2 = '$bcc'; co.c3 = '$bf8'; co.c4 = '$bcc'; co.c5 = '$000'
-          break
-        case 2: // Aromantic
-          co.c1 = '$3a4'; co.c2 = '$ad7'; co.c3 = '$fff'; co.c4 = '$aaa'; co.c5 = '$000'
-          break
-        case 3: // Transgender
-          co.c1 = '$5cf'; co.c2 = '$fab'; co.c3 = '$fff'; co.c4 = '$fab'; co.c5 = '$5cf'
-          break
-        case 4: // Genderfluid
-          co.c1 = '$f7a'; co.c2 = '$fff'; co.c3 = '$c1d'; co.c4 = '$000'; co.c5 = '$23b'
-          break
-        case 5: // Bisexual
-          co.c1 = '$d07'; co.c2 = '$d07'; co.c3 = '$949'; co.c4 = '$03a'; co.c5 = '$03a'
-          break
-        case 6: // Lesbian (fkd up)
-          co.c1 = '$d20'; co.c2 = '$f95'; co.c3 = '$fff'; co.c4 = '$d6a'; co.c5 = '$a06'
-          break
-        case 7: // Gay (fkd up)
-          co.c1 = '$087'; co.c2 = '$9ec'; co.c3 = '$fff'; co.c4 = '$7ae'; co.c5 = '$317'
-          break
-        case 8: // Asexual (shifted)
-          co.c1 = '$000'; co.c2 = '$aaa'; co.c3 = '$fff'; co.c4 = '$808'; co.c5 = '$505'
-          break
-        case 9: // Pansexual (shifted)
-          co.c1 = '$f28'; co.c2 = '$f28'; co.c3 = '$fd0'; co.c4 = '$1bf'; co.c5 = '$1bf'
-          break
-        case 10: // Prideflag (shifted)
-          co.c1 = '$d22'; co.c2 = '$f81'; co.c3 = '$fe1'; co.c4 = '$074'; co.c5 = '$248'
-          break
-        default:
-          return
-      }
-      TM.sendMessage(
-        `${co.c1}||||||||||||||||||TRAKMAN\n`
-        + `${co.c2}||||||||||||||||||0.0.1a\n`
-        + `${co.c3}||||||||||||||||||STARTUP\n`
-        + `${co.c4}||||||||||||||||||SEQUENCE\n`
-        + `${co.c5}||||||||||||||||||SUCCESSFUL`)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman v1Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, Ω ω. start g`)
     }
   },
   {
