@@ -50,8 +50,8 @@ export const TRAKMAN = {
 
   // TODO THIS IN A CONFIG FILE
   specialTitles: [
-    { login: 'redgreendevil', title: 'Venti the Anemo Archon' },
-    { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
+    { login: 'd', title: 'Venti the Anemo Archon' },
+    // { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
   ],
   titles: ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner'],
 
