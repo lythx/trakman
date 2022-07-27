@@ -90,14 +90,14 @@ export class RecordService {
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(-1, position, -1, time, player.login, 'local'))
       await this.repo.add(recordInfo)
-      return recordInfo
+      return position > this.localsAmount ? undefined : recordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._localRecords
         .findIndex(a => a.login === this._localRecords.find(a => a.login === player.login)?.login) + 1
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
       Logger.info(...this.getLogString(previousPosition, previousPosition, time, time, player.login, 'local'))
-      return recordInfo
+      return position > this.localsAmount ? undefined : recordInfo
     }
     if (time < pb) {
       const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
@@ -111,7 +111,7 @@ export class RecordService {
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'local'))
       await this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
-      return recordInfo
+      return position > this.localsAmount ? undefined : recordInfo
     }
   }
 
