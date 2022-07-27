@@ -112,7 +112,6 @@ export abstract class DedimaniaClient {
               `${this.response.errorString} Code: ${this.response.errorCode}`)
             resolve(new Error(this.response.errorString?.toString()))
           } else {
-            Logger.debug('dedi')
             resolve(this.response.json)
           }
           this.receivingResponse = false
