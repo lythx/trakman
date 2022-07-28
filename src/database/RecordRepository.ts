@@ -22,7 +22,7 @@ const mapIdsRepo = new MapIdsRepository()
 const playerIdsRepo = new PlayerIdsRepository()
 
 interface TableEntry {
-  readonly map: string
+  readonly uid: string
   readonly login: string
   readonly time: number
   readonly checkpoints: number[]
@@ -99,7 +99,7 @@ export class RecordRepository extends Repository {
 
   private constructRecordObject(entry: TableEntry): TMRecord {
     return {
-      map: entry.map,
+      map: entry.uid,
       login: entry.login,
       time: entry.time,
       date: entry.date,
