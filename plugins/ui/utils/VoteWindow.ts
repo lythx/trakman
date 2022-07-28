@@ -2,19 +2,16 @@ import { TRAKMAN as TM } from "../../../src/Trakman.js"
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.json' assert { type: 'json' }
-import { addKeyListener } from "./KeyListener.js"
+import { centeredText, rightAlignedText } from './TextUtils.js'
+import { Vote } from '../../Vote.js'
 
 export default class VoteWindow {
 
-  private static isListenerAdded = false
-  private static isDisplayed = false
-  private readonly goal: number
+  private vote: Vote
   private readonly title = CONFIG.voteWindow.title
   private readonly message: string
   private readonly icon: string
   private readonly id = IDS.VoteWindow.window
-  readonly yesId = IDS.VoteWindow.voteYes
-  readonly noId = IDS.VoteWindow.voteNo
   private readonly width = CONFIG.voteWindow.width
   private readonly height = CONFIG.voteWindow.height
   private readonly positionX = CONFIG.static.leftPosition + CONFIG.marginBig + CONFIG.static.width
@@ -26,17 +23,10 @@ export default class VoteWindow {
   private readonly buttonH = 2.5
   private readonly rightW = this.buttonW * 2 + 3 * this.margin
   private readonly leftW = this.width - this.rightW
-  private readonly votes: { login: string, vote: boolean }[] = []
-  private static listener: ((info: ManialinkClickInfo) => void) = () => undefined
-  private loginList: string[] = []
-  private isActive = false
-  private seconds: number
-  private interrupted: { callerLogin: string, result: boolean } | undefined
 
   constructor(callerLogin: string, goal: number, message: string, seconds: number, iconPresetOrUrl: "voteGreen" | "voteRed" | Omit<string, "voteGreen" | "voteRed">) {
-    this.goal = goal
+    this.vote = new Vote(callerLogin, goal, seconds)
     this.message = message
-    this.votes.push({ login: callerLogin, vote: true })
     if (iconPresetOrUrl === "voteGreen") {
       this.icon = this.stringToIcon(CONFIG.voteWindow.iconGreen)
     } else if (iconPresetOrUrl === "voteRed") {
@@ -44,90 +34,52 @@ export default class VoteWindow {
     } else {
       this.icon = iconPresetOrUrl as string
     }
-    this.seconds = seconds
-    if (VoteWindow.isListenerAdded === false) {
-      VoteWindow.isListenerAdded = true
-      TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => VoteWindow.listener(info))
-      addKeyListener('F5', (info) => VoteWindow.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
-      addKeyListener('F6', (info) => VoteWindow.listener({ ...info, answer: this.noId }), 1, 'voteNo')
-    }
   }
 
   /**
    * @param eligibleLogins list of logins of players that can vote
    * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, callerLogin: string }> | undefined {
-    if (VoteWindow.isDisplayed === true) { return }
-    VoteWindow.isDisplayed = true
-    VoteWindow.listener = (info: ManialinkClickInfo) => {
-      if (this.isActive === true && this.loginList.includes(info.login)) {
-        const vote = this.votes.find(a => a.login === info.login)
-        if (vote === undefined) {
-          if (info.answer === this.yesId) { this.votes.push({ login: info.login, vote: true }) }
-          else if (info.answer === this.noId) { this.votes.push({ login: info.login, vote: false }) }
-        } else {
-          if (info.answer === this.yesId) { vote.vote = true }
-          else if (info.answer === this.noId) { vote.vote = false }
-        }
-        this.display()
-      }
-    }
-    const startTime = Date.now()
-    this.isActive = true
-    this.loginList = eligibleLogins
-    this.display()
-    const maxSeconds = this.seconds + 1
+  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, callerLogin?: string }> | undefined {
     return new Promise((resolve) => {
-      const interval = setInterval(() => {
-        if (Date.now() > startTime + (maxSeconds - this.seconds) * 1000) {
-          if (this.interrupted !== undefined) {
-            resolve(this.interrupted)
-            return
-          }
-          this.seconds--
-          if (this.seconds === -1) {
-            resolve(this.conclude())
-            this.hide()
-            clearInterval(interval)
-            VoteWindow.isDisplayed = false
-            return
-          }
-          this.display()
-        }
-      }, 200)
+      this.vote.onUpdate = (votes, seconds) => {
+        this.display(votes, seconds)
+      }
+      this.vote.onInterrupt = (info) => {
+        this.hide()
+        resolve(info)
+      }
+      this.vote.onEnd = (info) => {
+        this.hide()
+        resolve(info)
+      }
+      this.vote.onSecondsChanged = (seconds, votes) => {
+        this.display(votes, seconds)
+      }
+      if (this.vote.start(eligibleLogins) === false) { return }
     })
   }
 
-  private conclude(): boolean {
-    const allVotes = this.votes.length
-    const yesVotes = this.votes.filter(a => a.vote === true).length
-    this.isActive = false
-    return (yesVotes / allVotes) > this.goal
+  pass(callerLogin?: string): void {
+    this.vote.pass(callerLogin)
   }
 
-  pass(callerLogin: string): void {
-    if (this.isActive === false) { return }
-    this.interrupted = { callerLogin, result: true }
+  cancel(callerLogin?: string): void {
+    this.vote.cancel(callerLogin)
   }
 
-  cancel(callerLogin: string): void {
-    if (this.isActive === false) { return }
-    this.interrupted = { callerLogin, result: false }
-  }
-
-  private display() {
-    for (const e of this.loginList) {
+  private display(votes: { login: string; vote: boolean; }[], seconds: number) {
+    for (const e of this.vote.loginList) {
       TM.sendManialink(`<manialink id="${this.id}">
         <format textsize="1"/>
         <frame posn="${this.positionX} ${this.positionY} 1">
           ${this.constructHeader()}
         </frame>
         <frame posn="${this.positionX} ${this.positionY - (this.headerHeight + this.margin)}">
-          ${this.constructLeft()}
+          ${this.constructLeft(votes)}
         </frame>
         <frame posn="${this.positionX + this.leftW + this.margin} ${this.positionY - (this.headerHeight + this.margin)}">
-          ${this.constructRight()}
+          ${this.constructRight(votes, seconds)}
         </frame>
       </manialink>`, e)
     }
@@ -141,72 +93,55 @@ export default class VoteWindow {
     const cfg = CONFIG.staticHeader
     return `
     <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
-    ${this.rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale })}
+    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, yOffset: -0.1, xOffset: 0.2 })}
     <frame posn="${this.width - (cfg.squareWidth + cfg.margin) + cfg.margin} 0 1">
       <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
       <quad posn="${cfg.iconHorizontalPadding} ${-cfg.iconVerticalPadding} 4" sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${this.icon}"/> 
     </frame>`
   }
 
-  private constructLeft() {
+  private constructLeft(votes: { login: string; vote: boolean; }[]) {
     const w = this.leftW
     const h = this.height - (this.headerHeight + this.margin)
     const rowH = (h - this.buttonH) / 2 - this.margin
-    const allVotes = this.votes.length
-    const noVotes = this.votes.filter(a => a.vote === false).length
-    const noVotesW = (noVotes / this.votes.length) * w
-    const neededAmount = Math.ceil(allVotes * this.goal)
+    const allVotes = votes.length
+    const noVotes = votes.filter(a => a.vote === false).length
+    const noVotesW = (noVotes / votes.length) * w
+    const neededAmount = Math.ceil(allVotes * this.vote.goal)
     const colour = (neededAmount - (allVotes - noVotes)) <= 0 ? '$0F0' : '$F00'
     return `
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${this.centeredText(this.message, w, rowH, { textScale: 1 })}
+    ${centeredText(this.message, w, rowH, { textScale: 1 })}
     <frame posn="0 ${-rowH - this.margin} 1">
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${this.centeredText(`Votes needed to pass: ${colour}${neededAmount}`, w, rowH, { textScale: 1 })}
+    ${centeredText(`Votes needed to pass: ${colour}${neededAmount}`, w, rowH, { textScale: 1 })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
-      <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.noId}"/>
+      <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
       <quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="0D0F"/>
       <quad posn="${this.margin} ${-this.margin} 4" sizen="${noVotesW - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="F00F"/>
     </frame>`
   }
 
-  private constructRight() {
+  private constructRight(votes: { login: string; vote: boolean; }[], seconds: number) {
     const w = this.rightW
     const h = this.height - (this.headerHeight + this.margin)
     const rowH = (h - this.buttonH) / 2 - this.margin
-    const timeColour = ['$FFF', '$FF0', '$F00'][[20, 5, -1].findIndex(a => a < this.seconds)]
+    const timeColour = ['$FFF', '$FF0', '$F00'][[20, 5, -1].findIndex(a => a < seconds)]
     return `<quad posn="0 0 1" sizen="${w - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-    ${this.centeredText(`${timeColour}${this.seconds}`, w - this.margin, rowH, { textScale: 0.4, specialFont: true })}
+    ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: 0.4, specialFont: true })}
     <frame posn="0 ${-rowH - this.margin} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${this.centeredText(`$F00` + this.votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH)}
+      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, {textScale: 1})}
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${this.centeredText(`$0F0` + this.votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2 })}
+      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2,textScale: 1 })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
-      <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.noId}"/>
+      <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
       <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F6')}"/>
-      <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.yesId}"/>
+      <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.yesId}"/>
       <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F5')}"/>
     </frame>`
-  }
-
-  private rightAlignedText = (text: string, parentWidth: number, parentHeight: number, options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
-    const textScale: number = options?.textScale ?? 0.7
-    const padding: number = options?.padding ?? 1
-    const posX: number = options?.xOffset === undefined ? parentWidth - 0.5 : (parentWidth) + options?.xOffset - 0.5
-    const posY: number = options?.yOffset === undefined ? parentHeight / 2 : (parentHeight / 2) + options?.yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center" halign="right"/>`
-  }
-
-  private centeredText = (text: string, parentWidth: number, parentHeight: number, params?: { xOffset?: number, yOffset?: number, specialFont?: true, textScale?: number }): string => {
-    const textScale: number = params?.textScale ?? 1.2
-    const padding: number = 0.2
-    const posX: number = (parentWidth / 2) + (params?.xOffset ?? 0)
-    const posY: number = (parentHeight / 2) + (params?.yOffset ?? -0.15)
-    const styleStr = params?.specialFont ? `style="TextRaceChrono"` : ''
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${CONFIG.static.format + TM.safeString(text)}" ${styleStr} valign="center" halign="center"/>`
   }
 
   private stringToIcon = (str: string): any => {

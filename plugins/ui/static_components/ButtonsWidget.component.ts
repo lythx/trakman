@@ -26,6 +26,22 @@ export default class ButtonsWidget extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.grid = new Grid(this.width + CONFIG.marginSmall, this.height + CONFIG.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
+    TM.addCommand({
+      aliases: ['s', 'skip'],
+      help: 'Start a vote to skip the ongoing map',
+      callback: info => {
+        this.onSkipVoteButtonClick(info.login, info.nickname)
+      },
+      privilege: 0
+    })
+    TM.addCommand({
+      aliases: ['r', 'res', 'replay'],
+      help: 'Start a vote to replay the ongoing map',
+      callback: info => {
+        this.onResVoteButtonClick(info.login, info.nickname)
+      },
+      privilege: 0
+    })
   }
 
   async display(): Promise<void> {
@@ -121,6 +137,7 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onSkipVoteButtonClick(login: string, nickname: string) {
+    if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}SKIP${TM.palette.highlight} the ongoing map`, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
@@ -137,18 +154,27 @@ export default class ButtonsWidget extends StaticComponent {
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}has passed${TM.palette.vote}.`)
       TM.callNoRes('NextChallenge')
     } else if (result.result === true) {
-      const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
-        + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to skip the ongoing map`)
+      if (result.callerLogin === undefined) {
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to skip the ongoing map passed`)
+      } else {
+        const player = TM.getPlayer(result.callerLogin)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+          + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to skip the ongoing map`)
+      }
       TM.callNoRes('NextChallenge')
     } else {
-      const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
-        + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to skip the ongoing map`)
+      if (result.callerLogin === undefined) {
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to skip the ongoing was cancelled`)
+      } else {
+        const player = TM.getPlayer(result.callerLogin)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+          + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to skip the ongoing map`)
+      }
     }
   }
 
   private async onResVoteButtonClick(login: string, nickname: string) {
+    if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
@@ -170,19 +196,27 @@ export default class ButtonsWidget extends StaticComponent {
       this.constructXml()
       this.display()
     } else if (result.result === true) {
-      const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
-        + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to replay the ongoing map`)
-      TM.addToJukebox(TM.map.id, undefined, true)
+      if (result.callerLogin === undefined) {
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to replay the ongoing map passed`)
+      } else {
+        const player = TM.getPlayer(result.callerLogin)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+          + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to replay the ongoing map`)
+        TM.addToJukebox(TM.map.id, undefined, true)
+      }
       this.resVoteCount++
       this.isRes = true
       this.onMapReplay()
       this.constructXml()
       this.display()
     } else {
-      const player = TM.getPlayer(result.callerLogin)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
-        + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to replay the ongoing map`)
+      if (result.callerLogin === undefined) {
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to replay the ongoing map was cancelled`)
+      } else {
+        const player = TM.getPlayer(result.callerLogin)
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+          + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to replay the ongoing map`)
+      }
     }
   }
 
