@@ -21,6 +21,7 @@ export class RecordService {
     }
     await this.repo.initialize()
     await this.fetchRecords(MapService.current.id)
+    this.initialLocals.push(...this._localRecords)
     Events.addListener('Controller.BeginMap', (): void => {
       this.initialLocals.length = 0
       this.initialLocals.push(...this._localRecords)

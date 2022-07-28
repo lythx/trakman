@@ -20,7 +20,7 @@ export class PlayerIdsRepository extends Repository {
       logins = [logins]
       isArr = false
     } else if(logins.length === 0) { return [] }
-    const query = `SELECT id, login FROM player_ids WHERE ${logins.map((a, i) => `login=$${i + 1} OR`).join('').slice(0, -3)}`
+    const query = `SELECT id, login FROM player_ids WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...logins)
     return isArr ? res : res[0]?.id
   }

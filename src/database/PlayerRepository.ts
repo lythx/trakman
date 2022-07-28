@@ -61,7 +61,7 @@ export class PlayerRepository extends Repository {
     const query: string = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, rank, average, privilege FROM players 
     JOIN player_ids ON players.id=player_ids.id
     LEFT JOIN privileges ON player_ids.login=privileges.login
-    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
+    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...(ids.map(a => a.id)))
     return res.map(a => this.constructPlayerObject(a))
   }
@@ -118,7 +118,7 @@ export class PlayerRepository extends Repository {
     if (ids.length === 0) { return [] }
     const query: string = `SELECT player_ids.login, rank, average FROM players 
     JOIN player_ids ON players.id=player_ids.id
-    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR`).join('').slice(0, -3)}`
+    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...(ids.map(a => a.id)))
     return res
   }
