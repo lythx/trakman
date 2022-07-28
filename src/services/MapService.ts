@@ -81,9 +81,7 @@ export class MapService {
         mapsInMapList.push(map)
       }
     }
-    const arr = [...mapsInMapList, ...mapsNotInDBObjects].sort((a, b) => a.name.localeCompare(b.name))
-    arr.sort((a, b) => a.author.localeCompare(b.author))
-    this._maps.push(...arr)
+    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b) => a.rand - b.rand).map(a => a.map)
     await this.repo.add(...mapsNotInDBObjects)
   }
 
@@ -102,8 +100,6 @@ export class MapService {
       void this.repo.add(obj)
     }
     this._maps.push(obj)
-    this._maps.sort((a, b) => a.name.localeCompare(b.name))
-    this._maps.sort((a, b) => a.author.localeCompare(b.author))
     if (callerLogin !== undefined) {
       Logger.info(`Player ${callerLogin} added map ${obj.name} by ${obj.author}`)
     } else {
