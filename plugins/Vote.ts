@@ -135,10 +135,10 @@ export class Vote {
   }
 
   clearListeners() {
-    this.onUpdate = () => undefined
-    this.onEnd = () => undefined
-    this.onInterrupt = () => undefined
-    this.onSecondsChanged = () => undefined
+    Vote.onUpdate = () => undefined
+    Vote.onEnd = () => undefined
+    Vote.onInterrupt = () => undefined
+    Vote.onSecondsChanged = () => undefined
   }
 
 }
