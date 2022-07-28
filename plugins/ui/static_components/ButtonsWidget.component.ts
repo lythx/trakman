@@ -230,7 +230,6 @@ export default class ButtonsWidget extends StaticComponent {
       const startTime = Date.now()
       TM.sendMessage(`${TM.palette.server}» ${TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}${TM.palette.donation}.`)
-      TM.addToJukebox(TM.map.id, login)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
       if (this._isDisplayed === true) { await this.display() }
