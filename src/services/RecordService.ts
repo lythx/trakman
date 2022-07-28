@@ -12,7 +12,8 @@ export class RecordService {
   private static repo: RecordRepository = new RecordRepository()
   private static readonly _localRecords: TMLocalRecord[] = []
   private static readonly _liveRecords: FinishInfo[] = []
-  private static readonly localsAmount = Number(process.env.LOCALS_AMOUNT)
+  static readonly localsAmount = Number(process.env.LOCALS_AMOUNT)
+  static readonly initialLocals: TMLocalRecord[] = []
 
   static async initialize(): Promise<void> {
     if (this.localsAmount === NaN) {
@@ -20,6 +21,10 @@ export class RecordService {
     }
     await this.repo.initialize()
     await this.fetchRecords(MapService.current.id)
+    Events.addListener('Controller.BeginMap', (): void => {
+      this.initialLocals.length = 0
+      this.initialLocals.push(...this._localRecords)
+    })
   }
 
   static async fetchRecords(mapId: string): Promise<TMLocalRecord[]> {
@@ -39,6 +44,10 @@ export class RecordService {
     }
     Events.emitEvent('Controller.LocalRecords', records)
     return this._localRecords
+  }
+
+  static async getRecordsAmount(login: string): Promise<number> {
+    return await this.repo.countRecords(login)
   }
 
   static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {

@@ -10,4 +10,6 @@ interface TMOfflinePlayer {
   readonly wins: number
   readonly privilege: number
   readonly lastOnline?: Date
+  readonly rank?: number
+  readonly average: number
 }
