@@ -603,9 +603,10 @@
       "commandList"
     ],
     "icons": [
-      "tag",
       "ongoingMap",
+      "tag",
       "personBuilder",
+      "clockAuthor",
       "chartLocal",
       "karmaPulse"
     ],
