@@ -149,7 +149,7 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onResVoteButtonClick(login: string, nickname: string) {
-    const voteWindow = new VoteWindow(login, 0.5, '${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map', 30, 'voteGreen')
+    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
