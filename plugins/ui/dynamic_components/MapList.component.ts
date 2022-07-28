@@ -22,16 +22,19 @@ export default class MapList extends PopupWindow {
   private readonly positionW = CONFIG.mapList.positionWidth
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
+  private sortedList: TMMap[]
 
   constructor() {
     super(IDS.mapList, getIcon(CONFIG.mapList.icon), CONFIG.mapList.title, CONFIG.mapList.navbar)
-    const pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+    this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
+    const pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
     this.paginator.onPageChange = (login: string, page: number) => {
-      let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+      let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
-      this.displayToPlayer(login, { page, paginator: this.paginator, list: TM.maps }, `${page}/${pageCount}`)
+      this.displayToPlayer(login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(this.columns).fill(1), new Array(this.rows).fill(1),
       { background: 'FFFA', margin: CONFIG.grid.margin })
@@ -66,7 +69,9 @@ export default class MapList extends PopupWindow {
       privilege: 0
     })
     TM.addListener(['Controller.MapAdded', 'Controller.MapRemoved'], () => {
-      let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+      const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+      this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
+      let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
       this.reRender()
@@ -74,8 +79,8 @@ export default class MapList extends PopupWindow {
   }
 
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
-    const matches = (searchByAuthor === true ? TM.matchString(query, TM.maps, 'author') :
-      TM.matchString(query, TM.maps, 'name', true)).filter(a => a.value > 0.1)
+    const matches = (searchByAuthor === true ? TM.matchString(query, this.sortedList, 'author') :
+      TM.matchString(query, this.sortedList, 'name', true)).filter(a => a.value > 0.1)
     const playerQuery = this.playerQueries.find(a => a.login === login)
     const pageCount = Math.ceil(matches.length / (this.rows * this.columns))
     const list = matches.map(a => a.obj)
@@ -104,7 +109,7 @@ export default class MapList extends PopupWindow {
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list = TM.maps
+      let list = this.sortedList
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
@@ -123,16 +128,16 @@ export default class MapList extends PopupWindow {
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     if (pageCount === 0) { pageCount++ }
     if (page === undefined) {
-      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator, list: TM.maps }, `1/${pageCount}`)
+      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator, list: this.sortedList }, `1/${pageCount}`)
       return
     }
     this.paginator.setPageCount(pageCount)
     const index = this.playerQueries.findIndex(a => a.login === info.login)
     this.playerQueries.splice(index, 1)
-    this.displayToPlayer(info.login, { page, paginator: this.paginator, list: TM.maps }, `${page}/${pageCount}`)
+    this.displayToPlayer(info.login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
   }
 
   protected onClose(info: ManialinkClickInfo): void {
@@ -164,7 +169,7 @@ export default class MapList extends PopupWindow {
           ${header}
           <frame posn="0 ${-rowH} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[0])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(TM.strip(maps[index].name, false)), width, rowH - this.margin, { textScale: 1 })}
@@ -172,7 +177,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[2])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${verticallyCenteredText(TM.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
@@ -180,7 +185,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[2])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[3])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.timeW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(TM.Utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin, { textScale: 1, padding: 0.2 })}
@@ -188,7 +193,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="${this.timeW + this.iconW + this.margin * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[3])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.positionW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(` ${recordIndexString} `, this.positionW, rowH - this.margin, { textScale: 1, padding: 0 })}
@@ -196,7 +201,7 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="${this.timeW + this.positionW + this.margin * 4 + this.iconW * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[4])}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[5])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(karmaRatio === undefined ? '-' : Math.round(karmaRatio).toString(), karmaW, rowH - this.margin, { textScale: 1, padding: 0.1 })}
@@ -212,7 +217,7 @@ export default class MapList extends PopupWindow {
   }
 
   private handleMapClick(mapId: string, login: string, nickName: string, privilege: number): boolean {
-    const challenge = TM.maps.find(a => a.id === mapId)
+    const challenge = this.sortedList.find(a => a.id === mapId)
     if (challenge === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding the map to queue.`, login)
       TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
@@ -254,7 +259,7 @@ export default class MapList extends PopupWindow {
     const width = (w - this.margin * 3) - this.iconW
     const height = h - this.margin
     const index = TM.jukebox.findIndex(a => a.map.id === mapId)
-    const prevIndex = TM.previousMaps.findIndex(a => a.id === mapId)
+    const prevIndex = [TM.map, ...TM.previousMaps].findIndex(a => a.id === mapId)
     const player = TM.getPlayer(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
@@ -267,7 +272,7 @@ export default class MapList extends PopupWindow {
             image="${getIcon('blank')}" 
             imagefocus="${getIcon(CONFIG.mapList.minusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[0])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width - (this.margin * 2 + this.queueW + this.queueNumberW)} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
             ${verticallyCenteredText(`Map #${mapIndex + 1}`, width - (this.margin * 2 + this.queueW) + this.queueNumberW, height / 4 - this.margin, { textScale: 1 })}
@@ -285,7 +290,7 @@ export default class MapList extends PopupWindow {
             image="${getIcon('blank')}" 
             imagefocus="${getIcon(CONFIG.mapList.plusImage)}"/>`}
           <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${getIcon(this.icons[0])}"/>
           <frame posn="${this.iconW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
             ${verticallyCenteredText(`Map #${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: 1 })}

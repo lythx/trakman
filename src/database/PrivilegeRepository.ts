@@ -20,7 +20,7 @@ export class PrivilegeRepository extends Repository {
       logins = [logins]
       isArr = false
     } else if (logins.length === 0) { return [] }
-    const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR`).join('').slice(0, -3)}`
+    const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...logins)
     return isArr === false ? res[0]?.privilege ?? 0 : res
   }

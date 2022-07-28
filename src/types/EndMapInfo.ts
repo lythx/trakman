@@ -17,4 +17,6 @@ interface EndMapInfo {
     readonly isRestarted: boolean
     readonly wasWarmUp: boolean
     readonly continuesOnNextMap: boolean
+    readonly winnerLogin?: string
+    readonly winnerWins?: number
 }

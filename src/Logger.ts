@@ -90,7 +90,7 @@ export abstract class Logger {
     }
   }
 
-  static async fatal(...lines: string[]): Promise<void> {
+  static async fatal(...lines: any[]): Promise<void> {
     if (this.crashed === true) { return }
     this.crashed = true
     const date = new Date().toUTCString()
@@ -100,7 +100,7 @@ export abstract class Logger {
     process.exit(1)
   }
 
-  static error(...lines: string[]): void {
+  static error(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -108,7 +108,7 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
-  static warn(...lines: string[]): void {
+  static warn(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -116,7 +116,7 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
-  static info(...lines: string[]): void {
+  static info(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -124,7 +124,7 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
-  static debug(...lines: string[]): void {
+  static debug(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -132,7 +132,7 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
-  static trace(...lines: string[]): void {
+  static trace(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date = new Date().toUTCString()
     const location = this.getLocation()
@@ -140,7 +140,7 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
-  private static async writeLog(tag: Tag, location: string, date: string, lines: string[]): Promise<void> {
+  private static async writeLog(tag: Tag, location: string, date: string, lines: any[]): Promise<void> {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
