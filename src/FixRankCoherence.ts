@@ -32,7 +32,7 @@ export const fixCoherence = async () => {
         const arr = [...indexes, ...Array.from({ length: maps.length - recs.length }).fill(Number(process.env.LOCALS_AMOUNT))]
         const sum: any = arr.reduce((acc: any, cur: any) => acc + cur, 0)
         //console.log(e.login, indexes, sum, sum / maps.length)
-        await playerRepo.updateRank(e.login, 1, sum / maps.length)
+        await playerRepo.updateAverage(e.login, sum / maps.length)
     }
 }
 
