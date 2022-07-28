@@ -78,10 +78,16 @@ export class PlayerRepository extends Repository {
     await this.query(query, ...values)
   }
 
-  async updateRank(login: string, rank: number, average: number): Promise<void> {
-    const query: string = `UPDATE players SET rank=$1, average=$2 WHERE id=$3;`
+  async updateAverage(login: string, average: number): Promise<void> {
+    const query: string = `UPDATE players SET average=$1 WHERE id=$2;`
     const id: number | undefined = await playerIdsRepo.get(login)
-    await this.query(query, rank, average, id)
+    await this.query(query, average, id)
+  }
+
+  async updateRank(login: string, rank?: number): Promise<void> {
+    const query: string = `UPDATE players SET rank=$1 WHERE id=$2;`
+    const id: number | undefined = await playerIdsRepo.get(login)
+    await this.query(query, rank, id)
   }
 
   async updateOnWin(login: string, wins: number): Promise<void> {
@@ -102,9 +108,9 @@ export class PlayerRepository extends Repository {
     await this.query(query, timePlayed, date, id)
   }
 
-  async getRank(login: string): Promise<number | undefined>
-  async getRank(logins: string[]): Promise<{ login: string, rank: number | undefined, average: number | undefined }[]>
-  async getRank(logins: string | string[]): Promise<number | { login: string, rank: number | undefined, average: number | undefined }[] | undefined> {
+  async getAverage(login: string): Promise<number | undefined>
+  async getAverage(logins: string[]): Promise<{ login: string, rank: number | undefined, average: number | undefined }[]>
+  async getAverage(logins: string | string[]): Promise<number | { login: string, rank: number | undefined, average: number | undefined }[] | undefined> {
     if (typeof logins === 'string') {
       const id: number | undefined = await playerIdsRepo.get(logins)
       if (id === undefined) { return }
@@ -120,6 +126,13 @@ export class PlayerRepository extends Repository {
     JOIN player_ids ON players.id=player_ids.id
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...(ids.map(a => a.id)))
+    return res
+  }
+
+  async getAllAverages(): Promise<{ login: string, average: number | undefined }[]> {
+    const query: string = `SELECT player_ids.login, average FROM players
+    JOIN player_ids ON players.id=player_ids.id`
+    const res = await this.query(query)
     return res
   }
 

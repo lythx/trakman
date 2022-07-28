@@ -235,10 +235,10 @@ export class PlayerService {
     return player.wins
   }
 
-  static async calculateRanks(): Promise<void> {
+  static async calculateAverages(): Promise<void> {
     const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocals).map((a, i) => ({ login: a.login, position: i + 1 }))
     const amount = MapService.maps.length
-    const ranks = await this.repo.getRank(logins.map(a => a.login))
+    const ranks = await this.repo.getAverage(logins.map(a => a.login))
     for (const rank of ranks) {
       console.log(rank)
       let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
@@ -250,8 +250,19 @@ export class PlayerService {
       if (onlinePlayer !== undefined) {
         onlinePlayer.average = sum / amount
       }
-      console.log(sum/amount)
-      await this.repo.updateRank(rank.login, 1, sum / amount)
+      console.log(sum / amount)
+      await this.repo.updateAverage(rank.login, sum / amount)
+    }
+  }
+
+  static async calculateRanks(): Promise<void> {
+    const ranks = (await this.repo.getAllAverages()).sort((a, b) => (a.average ?? Infinity) - (b.average ?? Infinity))
+    for (let i = 0; i < ranks.length; i++) {
+      const onlinePlayer = this.getPlayer(ranks[i].login)
+      if (onlinePlayer !== undefined) {
+        onlinePlayer.rank = i + 1
+      }
+      await this.repo.updateRank(ranks[i].login, i + 1)
     }
   }
 
