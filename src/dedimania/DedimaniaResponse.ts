@@ -1,3 +1,4 @@
+import { Logger } from '../Logger.js'
 import xml2js from 'xml2js'
 
 export class DedimaniaResponse {
@@ -6,7 +7,7 @@ export class DedimaniaResponse {
   private _xml: string = ''
   private _isError: boolean | null = null
   private _errorCode: number | null = null
-  private _errorString: number | null = null
+  private _errorString: string | null = null
   private _json: any = null
   private _sessionId: string | null = null
 
@@ -43,7 +44,7 @@ export class DedimaniaResponse {
     return this._errorCode
   }
 
-  get errorString(): number | null {
+  get errorString(): string | null {
     return this._errorString
   }
 
@@ -56,7 +57,10 @@ export class DedimaniaResponse {
     // parse xml to json
     xml2js.parseString(this._xml.toString(), (err, result): void => {
       if (err != null) {
-        throw err
+        this._isError = true
+        this._errorCode = 1
+        this._errorString = 'Received invalid XML'
+        Logger.error('Received invalid XML from dedimania server', err.message)
       }
       json = result
     })
