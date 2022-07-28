@@ -137,15 +137,15 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onSkipVoteButtonClick(login: string, nickname: string) {
+    const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
+    + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}SKIP${TM.palette.highlight} the ongoing map`, 30, 'voteRed')
+    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
       return
     }
-    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
-      + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`)
     if (result === false) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}skip `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}did not pass${TM.palette.vote}.`)
@@ -174,15 +174,15 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onResVoteButtonClick(login: string, nickname: string) {
+    const startMsg =`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
+    + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, 30, 'voteGreen')
+    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
       return
     }
-    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
-      + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`)
     if (result === false) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}replay `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}did not pass${TM.palette.vote}.`)

@@ -23,9 +23,11 @@ export default class VoteWindow {
   private readonly buttonH = 2.5
   private readonly rightW = this.buttonW * 2 + 3 * this.margin
   private readonly leftW = this.width - this.rightW
+  private readonly chatMessage: string
 
-  constructor(callerLogin: string, goal: number, message: string, seconds: number, iconPresetOrUrl: "voteGreen" | "voteRed" | Omit<string, "voteGreen" | "voteRed">) {
+  constructor(callerLogin: string, goal: number, message: string, chatMessage: string, seconds: number, iconPresetOrUrl: "voteGreen" | "voteRed" | Omit<string, "voteGreen" | "voteRed">) {
     this.vote = new Vote(callerLogin, goal, seconds)
+    this.chatMessage = chatMessage
     this.message = message
     if (iconPresetOrUrl === "voteGreen") {
       this.icon = this.stringToIcon(CONFIG.voteWindow.iconGreen)
@@ -57,6 +59,9 @@ export default class VoteWindow {
         this.display(votes, seconds)
       }
       if (this.vote.start(eligibleLogins) === false) { return }
+      for (const e of this.vote.loginList) {
+        TM.sendMessage(this.chatMessage, e)
+      }
     })
   }
 
@@ -132,9 +137,9 @@ export default class VoteWindow {
     ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: 0.4, specialFont: true })}
     <frame posn="0 ${-rowH - this.margin} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, {textScale: 1})}
+      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: 1 })}
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2,textScale: 1 })}
+      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: 1 })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
