@@ -209,8 +209,11 @@ export class Listeners {
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]
         const endMapInfo: EndMapInfo = temp
+        const login: string | undefined = params[0][0].Login
+        const wins: number | undefined = login === undefined ? undefined : await PlayerService.addWin(login)
         await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
-        Events.emitEvent('Controller.EndMap', endMapInfo)
+        await PlayerService.calculateRanks()
+        Events.emitEvent('Controller.EndMap', { ...endMapInfo, winnerLogin: login, winnerWins: wins })
       }
     },
     {

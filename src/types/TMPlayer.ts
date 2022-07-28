@@ -15,4 +15,6 @@ interface TMPlayer {
   wins: number
   privilege: number
   isSpectator: boolean
+  rank?: number
+  average: number
 }

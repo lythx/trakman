@@ -7,12 +7,14 @@ import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
+import { RecordService } from './RecordService.js'
 
 export class PlayerService {
 
   private static readonly _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
   private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
+  private static newLocals: number
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
@@ -28,6 +30,14 @@ export class PlayerService {
       await this.setPrivilege(newOwnerLogin, 4)
     }
     await this.addAllFromList()
+    Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
+      if (info.previousPosition > RecordService.localsAmount && info.position <= RecordService.localsAmount) {
+        this.newLocals++
+      }
+    })
+    Events.addListener('Controller.BeginMap', (): void => {
+      this.newLocals = 0
+    })
   }
 
   static getPlayer(login: string): TMPlayer | undefined {
@@ -93,7 +103,8 @@ export class PlayerService {
         isSpectator,
         ip,
         region,
-        isUnited
+        isUnited,
+        average: RecordService.localsAmount
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -113,7 +124,9 @@ export class PlayerService {
         ip,
         region,
         isUnited,
-        lastOnline: playerData.lastOnline
+        lastOnline: playerData.lastOnline,
+        rank: playerData.rank,
+        average: playerData.average
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited, player.lastOnline) // need to await so owner privilege gets set after player is added
     }
@@ -150,8 +163,10 @@ export class PlayerService {
     return leaveInfo
   }
 
-  static async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined> {
-    return await this.repo.get(login)
+  static async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined>
+  static async fetchPlayer(login: string[]): Promise<TMOfflinePlayer[]>
+  static async fetchPlayer(login: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
+    return await this.repo.get(login as any)
   }
 
   static async setPrivilege(login: string, privilege: number, callerLogin?: string): Promise<void> {
@@ -209,6 +224,32 @@ export class PlayerService {
     if (player === undefined) { return false }
     player.isSpectator = status
     return true
+  }
+
+  static async addWin(login: string): Promise<number> {
+    let player: any = this.getPlayer(login)
+    if (player === undefined) {
+      player = await PlayerService.fetchPlayer(login)
+    }
+    await this.repo.updateOnWin(login, player.wins++)
+    return player.wins
+  }
+
+  static async calculateRanks(): Promise<void> {
+    const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocals).map((a, i) => ({ login: a.login, position: i + 1 }))
+    const amount = MapService.maps.length
+    const ranks = await this.repo.getRank(logins.map(a => a.login))
+    for (const rank of ranks) {
+      let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login)
+      if (previousRank === -1) { previousRank = RecordService.localsAmount }
+      let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login)
+      const sum = amount * (rank.rank ?? RecordService.localsAmount) + newRank - previousRank
+      const onlinePlayer = this.getPlayer(rank.login)
+      if (onlinePlayer !== undefined) {
+        onlinePlayer.average = sum / amount
+      }
+      await this.repo.updateRank(rank.login, 1, sum / amount)
+    }
   }
 
 }
