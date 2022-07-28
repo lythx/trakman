@@ -240,14 +240,17 @@ export class PlayerService {
     const amount = MapService.maps.length
     const ranks = await this.repo.getRank(logins.map(a => a.login))
     for (const rank of ranks) {
-      let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login)
-      if (previousRank === -1) { previousRank = RecordService.localsAmount }
-      let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login)
-      const sum = amount * (rank.rank ?? RecordService.localsAmount) + newRank - previousRank
+      console.log(rank)
+      let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
+      if (previousRank === 0) { previousRank = RecordService.localsAmount }
+      let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login) + 1
+      const sum = amount * (rank.average ?? RecordService.localsAmount) + newRank - previousRank
+      console.log(sum)
       const onlinePlayer = this.getPlayer(rank.login)
       if (onlinePlayer !== undefined) {
         onlinePlayer.average = sum / amount
       }
+      console.log(sum/amount)
       await this.repo.updateRank(rank.login, 1, sum / amount)
     }
   }

@@ -20,7 +20,7 @@ export class MapIdsRepository extends Repository {
       mapUids = [mapUids]
       isArr = false
     } else if (mapUids.length === 0) { return [] }
-    const query = `SELECT uid, id FROM map_ids WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR`).join('').slice(0, -3)}`
+    const query = `SELECT uid, id FROM map_ids WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...mapUids)
     return isArr ? res : res[0]?.id
   }

@@ -202,14 +202,14 @@ export class Listeners {
     {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
-        // [0] = Rankings[arr], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
+        // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         const temp: any = MapService.current
         temp.records = RecordService.localRecords
         temp.isRestarted = params[4]
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]
         const endMapInfo: EndMapInfo = temp
-        const login: string | undefined = params[0][0].Login
+        const login: string | undefined = params[0].Login
         const wins: number | undefined = login === undefined ? undefined : await PlayerService.addWin(login)
         await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         await PlayerService.calculateRanks()
