@@ -80,8 +80,8 @@ export abstract class ManiakarmaService {
     for (const key of Object.keys(this._mapKarma)) {
       (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
-    const vote = Number(json?.result?.players[0]?.player[0]?.$?.vote)
-    const v = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
+    const vote: number = Number(json?.result?.players[0]?.player[0]?.$?.vote)
+    const v: number | undefined = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
     if (v === undefined) {
       return
     }
@@ -145,11 +145,11 @@ export abstract class ManiakarmaService {
     return json
   }
 
-  static addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3) {
+  static addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
     const v: MKVote = { mapId: mapId, login: login, vote: vote }
     this._newVotes.push(v)
-    const prevVote = this._playerVotes.find(a => a.login === login && a.mapId === mapId)
-    const voteNames = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
+    const prevVote: MKVote | undefined = this._playerVotes.find(a => a.login === login && a.mapId === mapId)
+    const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
     (this._mapKarma as any)[voteNames[vote > 0 ? vote + 2 : vote + 3]]++
     if (prevVote === undefined) {
       this._playerVotes.push(v)
@@ -162,9 +162,9 @@ export abstract class ManiakarmaService {
     this._mapKarmaValue = Object.entries(this._mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
   }
 
-  private static async fixCoherence() {
-    const localVotes = VoteService.votes.filter(a => a.mapId === MapService.current.id)
-    const mkVotes = this._playerVotes
+  private static async fixCoherence(): Promise<void> {
+    const localVotes: TMVote[] = VoteService.votes.filter(a => a.mapId === MapService.current.id)
+    const mkVotes: MKVote[] = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
         await VoteService.add(e.mapId, e.login, e.vote)
@@ -175,6 +175,7 @@ export abstract class ManiakarmaService {
         this.addVote(e.mapId, e.login, e.vote)
       }
     }
+    Logger.debug(JSON.stringify(VoteService.votes), JSON.stringify(this._mapKarma), this._mapKarmaValue)
   }
 
   static get playerVotes(): MKVote[] {
