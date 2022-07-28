@@ -41,7 +41,7 @@ export class ClientSocket extends net.Socket {
           resolve(this.handshakeStatus)
           return
         }
-        if (Date.now() - startTimestamp > 5000) {
+        if (Date.now() - startTimestamp > 10000) {
           resolve(new Error('No response from the server'))
           return
         }
@@ -68,7 +68,7 @@ export class ClientSocket extends net.Socket {
           resolve(response.json)
           return
         }
-        if (Date.now() - startTimestamp > 15000) {
+        if (Date.now() - startTimestamp > 30000) {
           resolve(new Error(`No server response for call ${method}`))
           return
         }

@@ -32,6 +32,8 @@ export default class MapWidget extends StaticComponent {
         void this.fetchWebservices(info.author)
         this.display()
       })
+    } else {
+      TM.addListener('Controller.BeginMap', async (info) => this.display())
     }
   }
 

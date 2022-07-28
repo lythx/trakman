@@ -35,22 +35,22 @@ export class ServerConfig {
       { method: 'GetVersion' }
     )
     if (res instanceof Error) {
-      Logger.fatal('Failed to fetch server info', res.message)
+      Logger.error('Failed to fetch server info', res.message)
       return
     }
     const options = res[0] instanceof Error ? res[0] : res[0].params
     const loginInfo = res[1] instanceof Error ? res[1] : res[1].params
     const version = res[2] instanceof Error ? res[2] : res[2].params
     if (options instanceof Error) {
-      Logger.fatal(`Failed to fetch server options.`, options.message)
+      Logger.error(`Failed to fetch server options.`, options.message)
       return
     }
     if (loginInfo instanceof Error) {
-      Logger.fatal(`Failed to fetch server login info.`, loginInfo.message)
+      Logger.error(`Failed to fetch server login info.`, loginInfo.message)
       return
     }
     if (version instanceof Error) {
-      Logger.fatal(`Failed to fetch server version.`, version.message)
+      Logger.error(`Failed to fetch server version.`, version.message)
       return
     }
     this._config = {

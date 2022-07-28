@@ -1,5 +1,6 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import config from '../config.json' assert { type: 'json' }
+import { Logger } from '../src/Logger.js'
 
 const events: TMListener[] = [
   {
@@ -10,12 +11,12 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.BeginMap',
+    event: ['Controller.BeginMap', 'Controller.Ready'],
     callback: (): void => {
       for (const player of TM.players) {
         let msg: string
-        const index: number | undefined = TM.localRecords.findIndex(a => a.login === player.login)
-        if (index === undefined) {
+        const index: number = TM.localRecords.findIndex(a => a.login === player.login)
+        if (index === -1) {
           msg = `${TM.palette.error}You don't have a PB on this map.`
         } else {
           const rec: TMLocalRecord = TM.localRecords[index]
@@ -29,6 +30,16 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: (player: JoinInfo): void => {
+      let msg: string
+      const index: number = TM.localRecords.findIndex(a => a.login === player.login)
+      if (index === -1) {
+        msg = `${TM.palette.error}You don't have a PB on this map.`
+      } else {
+        const rec: TMLocalRecord = TM.localRecords[index]
+        msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
+          + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+      }
+      TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)

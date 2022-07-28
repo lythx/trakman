@@ -46,6 +46,25 @@ export abstract class Client {
   }
 
   private static callProxies(method: string, params: CallParams[], response: any[]): void {
+    if (method === 'system.multicall') {
+      const calls: ({ method: string, params: CallParams[], response: any[] } | Error)[] = []
+      for (const [i, r] of response.entries()) {
+        if (r.faultCode === undefined) {
+          calls.push({
+            method: params[0]?.array?.[i]?.struct?.methodName?.string ?? '',
+            params: params[0]?.array?.[i]?.struct?.params?.array ?? [], response: r
+          })
+        }
+      }
+      for (const call of calls) {
+        if (!(call instanceof Error)) {
+          for (const e of this.proxies.filter(a => a.methods.some(b => b === call.method))) {
+            e.callback(call.method, call.params, call.response)
+          }
+        }
+      }
+      return
+    }
     for (const e of this.proxies.filter(a => a.methods.some(b => b === method))) {
       e.callback(method, params, response)
     }

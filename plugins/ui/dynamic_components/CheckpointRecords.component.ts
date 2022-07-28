@@ -26,7 +26,7 @@ export default class CheckpointRecords extends PopupWindow {
     TM.addCommand({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
-      callback: (info: ManialinkClickInfo) => {
+      callback: (info: MessageInfo) => {
         TM.openManialink(this.openId, info.login)
       },
       privilege: 0

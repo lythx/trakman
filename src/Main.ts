@@ -18,6 +18,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { Freezone } from '../plugins/Freezone.js'
+import { fixCoherence } from './FixRankCoherence.js'
 
 async function main(): Promise<void> {
   await Logger.initialize()
@@ -34,6 +35,9 @@ async function main(): Promise<void> {
   ])
   if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
+  if(process.env.FIX_RANK_COHERENCE === "YES") {
+      await fixCoherence()
+  }
   Logger.trace('Retrieving game info...')
   await GameService.initialize()
   Logger.trace('Game info fetched')

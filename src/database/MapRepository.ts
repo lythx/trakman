@@ -101,7 +101,7 @@ export class MapRepository extends Repository {
     const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
-    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
+    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
@@ -121,7 +121,7 @@ export class MapRepository extends Repository {
     const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
     JOIN map_ids ON maps.id=map_ids.id
-    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR`).join('').slice(0, -3)};`
+    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)};`
     const res = (await this.query(query, ...fileNames))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
@@ -131,7 +131,7 @@ export class MapRepository extends Repository {
 
   async remove(...mapIds: string[]): Promise<void> {
     if (mapIds.length === 0) { return }
-    const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR`).join('').slice(0, -3)};`
+    const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     await this.query(query, ...ids.map(a => a.id))
   }

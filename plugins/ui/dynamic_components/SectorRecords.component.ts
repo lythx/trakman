@@ -26,7 +26,7 @@ export default class SectorRecords extends PopupWindow {
     TM.addCommand({
       aliases: ['scr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
-      callback: (info: ManialinkClickInfo) => {
+      callback: (info: MessageInfo) => {
         TM.openManialink(this.openId, info.login)
       },
       privilege: 0
