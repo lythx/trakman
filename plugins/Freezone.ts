@@ -60,16 +60,23 @@ export class Freezone {
     }
     return new Promise((resolve) => {
       const req = http.request(options, function (res) {
-        if (res.statusCode === 200) {
-          resolve(true)
-          return
-        }
+        // if (res.statusCode === 200) {
+        //   resolve(true)
+        //   return
+        // }
         let data = ''
         res.on('data', function (chunk) {
           data += chunk
         })
-        Logger.error(`Couldn't send Freezone ManiaLive request`, data)
-        res.on('end', () => resolve(new Error(data)))
+        res.on('end', () => {
+          Logger.debug(data)
+          if (res.statusCode === 200) {
+            resolve(true)
+            return
+          }
+          Logger.error(`Couldn't send Freezone ManiaLive request`, data)
+          resolve(new Error(data))
+        })
       })
       req.write(JSON.stringify(data))
       req.end()
