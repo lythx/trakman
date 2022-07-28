@@ -22,16 +22,19 @@ export default class MapList extends PopupWindow {
   private readonly positionW = CONFIG.mapList.positionWidth
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
+  private sortedList: TMMap[]
 
   constructor() {
     super(IDS.mapList, getIcon(CONFIG.mapList.icon), CONFIG.mapList.title, CONFIG.mapList.navbar)
-    const pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+    this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
+    const pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
     this.paginator.onPageChange = (login: string, page: number) => {
-      let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+      let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
-      this.displayToPlayer(login, { page, paginator: this.paginator, list: TM.maps }, `${page}/${pageCount}`)
+      this.displayToPlayer(login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(this.columns).fill(1), new Array(this.rows).fill(1),
       { background: 'FFFA', margin: CONFIG.grid.margin })
@@ -66,7 +69,9 @@ export default class MapList extends PopupWindow {
       privilege: 0
     })
     TM.addListener(['Controller.MapAdded', 'Controller.MapRemoved'], () => {
-      let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+      const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+      this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
+      let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
       this.reRender()
@@ -74,8 +79,8 @@ export default class MapList extends PopupWindow {
   }
 
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
-    const matches = (searchByAuthor === true ? TM.matchString(query, TM.maps, 'author') :
-      TM.matchString(query, TM.maps, 'name', true)).filter(a => a.value > 0.1)
+    const matches = (searchByAuthor === true ? TM.matchString(query, this.sortedList, 'author') :
+      TM.matchString(query, this.sortedList, 'name', true)).filter(a => a.value > 0.1)
     const playerQuery = this.playerQueries.find(a => a.login === login)
     const pageCount = Math.ceil(matches.length / (this.rows * this.columns))
     const list = matches.map(a => a.obj)
@@ -104,7 +109,7 @@ export default class MapList extends PopupWindow {
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list = TM.maps
+      let list = this.sortedList
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
@@ -123,16 +128,16 @@ export default class MapList extends PopupWindow {
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    let pageCount = Math.ceil(TM.maps.length / (this.rows * this.columns))
+    let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     if (pageCount === 0) { pageCount++ }
     if (page === undefined) {
-      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator, list: TM.maps }, `1/${pageCount}`)
+      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator, list: this.sortedList }, `1/${pageCount}`)
       return
     }
     this.paginator.setPageCount(pageCount)
     const index = this.playerQueries.findIndex(a => a.login === info.login)
     this.playerQueries.splice(index, 1)
-    this.displayToPlayer(info.login, { page, paginator: this.paginator, list: TM.maps }, `${page}/${pageCount}`)
+    this.displayToPlayer(info.login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
   }
 
   protected onClose(info: ManialinkClickInfo): void {
@@ -212,7 +217,7 @@ export default class MapList extends PopupWindow {
   }
 
   private handleMapClick(mapId: string, login: string, nickName: string, privilege: number): boolean {
-    const challenge = TM.maps.find(a => a.id === mapId)
+    const challenge = this.sortedList.find(a => a.id === mapId)
     if (challenge === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Error while adding the map to queue.`, login)
       TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
