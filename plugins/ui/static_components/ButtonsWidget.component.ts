@@ -17,6 +17,7 @@ export default class ButtonsWidget extends StaticComponent {
   private readonly resCosts = this.config.payRes.costs
   private resCostIndex = 0
   private resVoteCount = 0
+  private skipVoteCount = 0
   private isRes = false
   private lastMapRes = false
 
@@ -109,6 +110,8 @@ export default class ButtonsWidget extends StaticComponent {
       if (this._isDisplayed === true) { void this.display() }
     })
     TM.addListener('Controller.BeginMap', () => {
+      this.resVoteCount = 0
+      this.skipVoteCount = 0
       this.lastMapRes = false
       if (this.isRes === true) {
         this.isRes = false
@@ -137,8 +140,12 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onSkipVoteButtonClick(login: string, nickname: string) {
+    if (this.skipVoteCount === 2) {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Too many votes failed.`, login)
+      return
+    }
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
-    + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
+      + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
@@ -146,6 +153,7 @@ export default class ButtonsWidget extends StaticComponent {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
       return
     }
+    this.skipVoteCount++
     if (result === false) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}skip `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}did not pass${TM.palette.vote}.`)
@@ -174,8 +182,12 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onResVoteButtonClick(login: string, nickname: string) {
-    const startMsg =`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
-    + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
+    if (this.resVoteCount === 2) {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Too many votes failed.`, login)
+      return
+    }
+    const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
+      + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
@@ -183,6 +195,7 @@ export default class ButtonsWidget extends StaticComponent {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
       return
     }
+    this.resVoteCount++
     if (result === false) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}replay `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}did not pass${TM.palette.vote}.`)
