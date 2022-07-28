@@ -2,8 +2,26 @@ import { Client } from "./client/Client.js"
 import dsc from 'dice-similarity-coeff';
 import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import countries from './data/Countries.json' assert { type: 'json' }
+import { Events } from "./Events.js";
+import { GameService } from "./services/GameService.js";
+
+let timerStartTimestamp: number
+
+Events.addListener('TrackMania.StatusChanged', (params: [number, string]) => {
+  if (params[0] === 4) {
+    timerStartTimestamp = Date.now()
+  }
+}, true)
 
 export const Utils = {
+
+  /**
+   * @returns remaining map time in seconds
+   */
+  getRemainingMapTime(): number | undefined {
+    if (timerStartTimestamp === undefined) { return undefined }
+    return Math.round((GameService.game.timeAttackLimit - (Date.now() - timerStartTimestamp)) / 1000)
+  },
 
   /**
    * Formats time for prettier display
