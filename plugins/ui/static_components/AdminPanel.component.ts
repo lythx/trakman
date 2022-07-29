@@ -35,7 +35,7 @@ export default class AdminPanel extends StaticComponent {
     if (player !== undefined && player.privilege > 0) {
       TM.sendManialink(this.xml, login)
     } else {
-      TM.sendManialink(`<manialink id=${this.id}></manialink>`)
+      TM.sendManialink(`<manialink id="${this.id}"></manialink>`)
     }
   }
 

@@ -37,7 +37,9 @@ export default class DonationPanel extends StaticComponent {
   display(): void {
     this._isDisplayed = true
     for (const player of TM.players) {
-      this.displayToPlayer(player.login)
+      if (player.isUnited) {
+        this.displayToPlayer(player.login)
+      }
     }
   }
 
