@@ -87,7 +87,8 @@
       "pageDoubleLeft",
       "pageLeft",
       "pageRight",
-      "pageDoubleRight"
+      "pageDoubleRight",
+      "pageLast"
     ]
   },
   "map": {

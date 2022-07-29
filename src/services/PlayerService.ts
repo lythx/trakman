@@ -240,17 +240,14 @@ export class PlayerService {
     const amount = MapService.maps.length
     const ranks = await this.repo.getAverage(logins.map(a => a.login))
     for (const rank of ranks) {
-      console.log(rank)
       let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
       if (previousRank === 0) { previousRank = RecordService.localsAmount }
       let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login) + 1
       const sum = amount * (rank.average ?? RecordService.localsAmount) + newRank - previousRank
-      console.log(sum)
       const onlinePlayer = this.getPlayer(rank.login)
       if (onlinePlayer !== undefined) {
         onlinePlayer.average = sum / amount
       }
-      console.log(sum / amount)
       await this.repo.updateAverage(rank.login, sum / amount)
     }
   }

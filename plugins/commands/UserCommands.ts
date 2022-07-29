@@ -241,7 +241,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, text: string): void => {
       const embed = new EmbedBuilder()
         .setTitle('Bug report')
-        .setDescription(`Sent by ${info.login}`)
+        .setDescription(`Sent by ${TM.strip(info.nickname)}`)
         .setColor(0x0099ff)
         .setTimestamp(Date.now())
         .setThumbnail(('https://media.sketchfab.com/models/c842e2bec3c2463b977de99762014d4a/thumbnails/513ca7ac0d1349a3820d6a927a23cb5c/60be795961244327984a71b1ec8b8dcd.jpeg'))
