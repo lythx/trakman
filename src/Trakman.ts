@@ -700,6 +700,14 @@ export const TRAKMAN = {
       server: this.colours.yellow,
       // Voting messages
       vote: this.colours.chartreuse,
+      // Green
+      tmGreen: '$af4',
+      // Red
+      tmRed: '$e22',
+      // Yellow
+      tmYellow: '$fc1',
+      // Purple
+      tmPurple: '$73f'
     }
   },
 
