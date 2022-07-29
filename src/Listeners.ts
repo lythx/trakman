@@ -213,7 +213,7 @@ export class Listeners {
         const wins: number | undefined = login === undefined ? undefined : await PlayerService.addWin(login)
         await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         await PlayerService.calculateAverages()
-        await PlayerService.calculateRanks()
+        //await PlayerService.calculateRanks()
         Events.emitEvent('Controller.EndMap', { ...endMapInfo, winnerLogin: login, winnerWins: wins })
       }
     },
