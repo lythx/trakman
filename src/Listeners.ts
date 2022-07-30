@@ -13,7 +13,6 @@ import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
-import { join } from 'path'
 
 export class Listeners {
   private static readonly listeners: TMListener[] = [
@@ -203,21 +202,23 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
-        const temp: any = MapService.current
-        temp.records = RecordService.localRecords
-        temp.isRestarted = params[4]
-        temp.wasWarmUp = params[2]
-        temp.continuesOnNextMap = params[3]
-        const endMapInfo: EndMapInfo = temp
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists
         const wins: number | undefined = (login === undefined || PlayerService.players.length === 1) ? undefined : await PlayerService.addWin(login)
+        const endMapInfo: EndMapInfo = {
+          ...MapService.current,
+          isRestarted: params[4],
+          wasWarmUp: params[2],
+          continuesOnNextMap: params[3],
+          localRecords: RecordService.localRecords,
+          liveRecords: RecordService.liveRecords,
+          winnerLogin: login,
+          winnerWins: wins
+        }
         await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
-        await PlayerService.calculateAverages()
-        // TODO: Use a less resource intensive algorithm? Or emit event prior?
-        //await PlayerService.calculateRanks()
-        Events.emitEvent('Controller.EndMap', { ...endMapInfo, winnerLogin: login, winnerWins: wins })
+        await PlayerService.calculateAveragesAndRanks()
+        Events.emitEvent('Controller.EndMap', endMapInfo)
       }
     },
     {
