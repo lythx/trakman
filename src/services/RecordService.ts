@@ -125,7 +125,6 @@ export class RecordService {
     }
   }
 
-  // TODO MOVE FUNCTION TO FORMAT RECORD CHAT MESSAGE TO UTILS OR HERE AND USE IT TO LOG
   private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TMPlayer): RecordInfo | undefined {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
     const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
