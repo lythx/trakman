@@ -1,17 +1,17 @@
 import { Logger } from '../src/Logger.js'
 import { ServerConfig } from '../src/ServerConfig.js'
 import 'dotenv/config'
-import http from 'http'
+import http, { ClientRequest } from 'http'
 
 export class Freezone {
 
   // Manialive hash, static value that never changes
   private static readonly manialiveHash: string = '6f116833b419fe7cb9c912fdaefb774845f60e79'
-  // Last Manialive version release
+  // Last Manialive (for TMF at least) version release
   private static readonly manialiveVersion: number = 239
   // Freezone WS password, received on 'freezone:servers' manialink in-game
   private static freezonePassword: string
-  // Freezone ManiaLive URL
+  // Freezone Manialive URL (aka Trackmania Webservices)
   private static readonly manialiveUrl: string = 'ws.trackmania.com'
 
   static async initialize(): Promise<true | Error> {
@@ -37,16 +37,19 @@ export class Freezone {
     // Data object in any because TS coping language
     const data = {
       serverLogin: cfg.login,
+      // Remove the if below for shorthand here?
       serverName: cfg.name,
       serverVersion: [cfg.game, cfg.version, cfg.build].join(),
       manialiveVersion: this.manialiveVersion,
+      // Check if > 40 and set to 40 in that case
       maxPlayers: cfg.currentMaxPlayers,
       visibility: cfg.password.length === 0 ? 1 : 0, // Maybe reversed statement
       classHash: this.manialiveHash
     }
     // Append freezone to the server name if it isn't there already
     if (!cfg.name.toLowerCase().includes('freezone')) {
-      data.serverName = 'Freezone|' + data.serverName
+      // If the resulting name is too long, trim it to (presumably) max value
+      data.serverName = ('Freezone|' + data.serverName).substring(0, 80)
     }
     // Get authentication string
     const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${this.freezonePassword}`).toString('base64')
@@ -58,18 +61,18 @@ export class Freezone {
         'Authorization': auth,
       }
     }
-    return new Promise((resolve) => {
-      const req = http.request(options, function (res) {
+    return new Promise((resolve): void => {
+      const req: ClientRequest = http.request(options, function (res): void {
         if (res.statusCode === 200) {
           resolve(true)
           return
         }
-        let data = ''
-        res.on('data', function (chunk) {
+        let data: string = ''
+        res.on('data', function (chunk): void {
           data += chunk
         })
-        Logger.error(`Couldn't send Freezone ManiaLive request`, data)
-        res.on('end', () => resolve(new Error(data)))
+        Logger.error(`Couldn't send Freezone Manialive request`, data)
+        res.on('end', (): void => resolve(new Error(data)))
       })
       req.write(JSON.stringify(data))
       req.end()

@@ -209,10 +209,13 @@ export class Listeners {
         temp.wasWarmUp = params[2]
         temp.continuesOnNextMap = params[3]
         const endMapInfo: EndMapInfo = temp
+        // Get winner login from the callback
         const login: string | undefined = params[0].Login
-        const wins: number | undefined = login === undefined ? undefined : await PlayerService.addWin(login)
+        // Only update wins if the player is not alone on the server and exists
+        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1) ? undefined : await PlayerService.addWin(login)
         await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         await PlayerService.calculateAverages()
+        // TODO: Use a less resource intensive algorithm? Or emit event prior?
         //await PlayerService.calculateRanks()
         Events.emitEvent('Controller.EndMap', { ...endMapInfo, winnerLogin: login, winnerWins: wins })
       }

@@ -243,7 +243,7 @@ export default class ButtonsWidget extends StaticComponent {
       const cfg = this.config.paySkip
       let countDown = cfg.timeout
       const startTime = Date.now()
-      TM.sendMessage(`${TM.palette.server}» ${TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}s${TM.palette.donation}.`)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
@@ -270,7 +270,7 @@ export default class ButtonsWidget extends StaticComponent {
     if (res instanceof Error) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`)
     } else if (res === true) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${cost}C ${TM.palette.donation}to replay the ongoing map.`)
       TM.addToJukebox(TM.map.id, login)
       this.resCostIndex++

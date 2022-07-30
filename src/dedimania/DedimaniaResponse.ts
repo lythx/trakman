@@ -61,6 +61,7 @@ export class DedimaniaResponse {
         this._errorCode = 1
         this._errorString = 'Received invalid XML'
         Logger.error('Received invalid XML from dedimania server', err.message)
+        return
       }
       json = result
     })

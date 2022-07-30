@@ -12,13 +12,30 @@ const commands: TMCommand[] = [
       const col: string[] = Object.values(TM.colours)
       TM.sendMessage(col.map((v): string => `${v}>`).join(' '))
     },
+    privilege: 1
+  },
+  // Placeholders for the actual future commands
+  {
+    aliases: [
+      'laston', 'wins', 'stats', 'song', 'mod',
+      'server', 'nations', 'visitors', 'track', 'map',
+      'playtime', 'players', 'best', 'worst', 'summary',
+      'topsums', 'toprecs', 'chatlog', 'topdons', 'autojuke',
+      'xlist', 'history', 'jukebox', 'top100', 'rank',
+      'topwins', 'active', 'nextmap', 'nextrank', 'pb',
+      'tmxinfo', 'tmxrecs'
+    ],
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
+        + `use the /bug command with the command name (or talk to one of the devs).`, info.login)
+    },
     privilege: 0
   },
   // Basic commands, such as hi, bye, etc
   {
     aliases: ['hi', 'hey', 'hello'],
     help: 'Greet a certain someone.',
-    params: [{ name: 'name', optional: true }],
+    params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickname}$z$s$g] Hey, ${name || 'everyone'}!`)
     },
@@ -26,7 +43,7 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['bb', 'bye'],
-    params: [{ name: 'name', optional: true }],
+    params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickname}$z$s$g] Goodbye, ${name || 'everyone'}!`)
     },
@@ -35,7 +52,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['ty', 'tx', 'thx', 'thanks'], // Can add like every single one of them idk
     help: 'Express your gratitude.',
-    params: [{ name: 'name', optional: true }],
+    params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickname}$z$s$g] Thanks, ${name || 'everyone'}!`)
     },
@@ -44,7 +61,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['gg', 'goodgame'],
     help: 'Inform others that you\'ve enjoyed the race.',
-    params: [{ name: 'name', optional: true }],
+    params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickname}$z$s$g] Good game, ${name || 'everyone'}!`)
     },
@@ -53,9 +70,27 @@ const commands: TMCommand[] = [
   {
     aliases: ['bg', 'badgame'],
     help: 'Allow others to find out about your disenjoyment of the round.',
-    params: [{ name: 'name', optional: true }],
+    params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
       TM.sendMessage(`$g[${info.nickname}$z$s$g] Bad game, ${name || 'everyone'}!`)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['n1', 'nice1', 'niceone'],
+    help: 'Rain your blessings upon the few selected by thy divine ritual.',
+    params: [{ name: 'name', type: 'multiword' }],
+    callback: (info: MessageInfo, name: string): void => {
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Nice one, ${name}!`)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['gr', 'goodrace'],
+    help: 'Mention that you\'ve had a great time racing just now.',
+    params: [{ name: 'name', type: 'multiword', optional: true }],
+    callback: (info: MessageInfo, name: string): void => {
+      TM.sendMessage(`$g[${info.nickname}$z$s$g] Good race, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -144,7 +179,27 @@ const commands: TMCommand[] = [
     aliases: ['time'],
     help: 'Find out about the current server time.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server time is ${TM.palette.highlight + (new Date().toString())}${TM.palette.admin}.`, info.login)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Current server time is ${TM.palette.highlight + (new Date().toString())}${TM.palette.servermsg}.`, info.login)
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['bm', 'bootme', 'dienow'],
+    help: 'Part your ways with life.',
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}`
+        + `${TM.palette.servermsg} has passed away for good. May their soul ${TM.palette.highlight}rest in peace${TM.palette.servermsg}.`)
+      TM.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['rq', 'ragequit'],
+    help: 'Signal your dissatisfaction with whatever is happening right now.',
+    callback: (info: MessageInfo): void => {
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}`
+        + `${TM.palette.error} has ragequit.`)
+      TM.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
     },
     privilege: 0
   },
