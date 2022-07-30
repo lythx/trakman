@@ -513,6 +513,55 @@ export const TRAKMAN = {
   },
 
   /**
+   * Gets the appropriate verb and calculates record differences
+   * @param prevPos Previous record index
+   * @param currPos Current record index
+   * @param prevTime Previous record time
+   * @param currTime Current record time
+   * @returns Object containing the string to use, whether calculation is needed, and the difference
+   */
+  getRankingString(prevPos: number, currPos: number, prevTime: number, currTime: number): { str: string, calc: boolean, diff: string } {
+    const obj = {
+      str: ``,
+      calc: false,
+      diff: ``
+    }
+    // TODO: Limit this according to the RecordService.localsAmount
+    if (prevPos === -1) {
+      obj.str = 'acquired'
+      obj.calc = false
+    } else if (prevPos > currPos) {
+      obj.str = 'obtained'
+      obj.calc = true
+    } else if (prevPos === currPos && prevTime === currTime) {
+      obj.str = 'equaled'
+      obj.calc = false
+    } else if (prevPos === currPos) {
+      obj.str = 'improved'
+      obj.calc = true
+    }
+    if (obj.calc) {
+      obj.diff = this.Utils.getTimeString(prevTime - currTime)
+      let i: number = -1
+      while (true) {
+        i++
+        if (obj.diff[i] === undefined || (!isNaN(Number(obj.diff[i])) && Number(obj.diff[i]) !== 0) || obj.diff.length === 4) {
+          break
+        }
+        if (Number(obj.diff[i]) !== 0) {
+          continue
+        }
+        obj.diff = obj.diff.substring(1)
+        i--
+        if (obj.diff[i + 1] === ':') {
+          obj.diff = obj.diff.substring(1)
+        }
+      }
+    }
+    return obj
+  },
+
+  /**
    * @returns remaining map time in seconds
    */
   getRemainingMapTime: Utils.getRemainingMapTime,
