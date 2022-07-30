@@ -12,7 +12,6 @@ const createQuery: string = `
     visits INT4 NOT NULL,
     is_united BOOLEAN NOT NULL,
     last_online TIMESTAMP,
-    rank INT4,
     average REAL,
     PRIMARY KEY(id),
     CONSTRAINT fk_player_id
@@ -30,7 +29,6 @@ interface TableEntry {
   readonly is_united: boolean
   readonly privilege?: number
   readonly last_online: Date | null
-  readonly rank: number | null
   readonly average: number
 }
 
@@ -49,7 +47,7 @@ export class PlayerRepository extends Repository {
     if (typeof logins === 'string') {
       const id: number | undefined = await playerIdsRepo.get(logins)
       if (id === undefined) { return }
-      const query: string = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, rank, average, privilege FROM players 
+      const query: string = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online,  average, privilege FROM players 
       JOIN player_ids ON players.id=player_ids.id
       LEFT JOIN privileges ON player_ids.login=privileges.login
       WHERE players.id=$1`
@@ -58,7 +56,7 @@ export class PlayerRepository extends Repository {
     }
     const ids = await playerIdsRepo.get(logins)
     if (ids.length === 0) { return [] }
-    const query: string = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, rank, average, privilege FROM players 
+    const query: string = `SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online,  average, privilege FROM players 
     JOIN player_ids ON players.id=player_ids.id
     LEFT JOIN privileges ON player_ids.login=privileges.login
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join('').slice(0, -3)}`
@@ -84,22 +82,16 @@ export class PlayerRepository extends Repository {
     await this.query(query, average, id)
   }
 
-  async updateRank(login: string, rank?: number): Promise<void> {
-    const query: string = `UPDATE players SET rank=$1 WHERE id=$2;`
-    const id: number | undefined = await playerIdsRepo.get(login)
-    await this.query(query, rank, id)
-  }
-
   async updateOnWin(login: string, wins: number): Promise<void> {
     const query: string = `UPDATE players SET wins=$1 WHERE id=$2;`
     const id: number | undefined = await playerIdsRepo.get(login)
     await this.query(query, wins, id)
   }
 
-  async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean, lastOnline?: Date): Promise<void> {
-    const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4, last_online=$5 WHERE id=$6;`
+  async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean): Promise<void> {
+    const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4, WHERE id=$6;`
     const id: number | undefined = await playerIdsRepo.get(login)
-    await this.query(query, nickname, region, visits, isUnited, lastOnline, id)
+    await this.query(query, nickname, region, visits, isUnited, id)
   }
 
   async updateOnLeave(login: string, timePlayed: number, date: Date): Promise<void> {
@@ -109,31 +101,32 @@ export class PlayerRepository extends Repository {
   }
 
   async getAverage(login: string): Promise<number | undefined>
-  async getAverage(logins: string[]): Promise<{ login: string, rank: number | undefined, average: number | undefined }[]>
-  async getAverage(logins: string | string[]): Promise<number | { login: string, rank: number | undefined, average: number | undefined }[] | undefined> {
+  async getAverage(logins: string[]): Promise<{ login: string, average: number | undefined }[]>
+  async getAverage(logins: string | string[]): Promise<number | { login: string, average: number | undefined }[] | undefined> {
     if (typeof logins === 'string') {
       const id: number | undefined = await playerIdsRepo.get(logins)
       if (id === undefined) { return }
-      const query: string = `SELECT rank, average FROM players 
+      const query: string = `SELECT average FROM players 
       JOIN player_ids ON players.id=player_ids.id
       WHERE players.id=$1`
       const res = await this.query(query, id)
-      return res[0] === undefined ? undefined : res[0].rank
+      return res[0] === undefined ? undefined : res[0].average
     }
     const ids = await playerIdsRepo.get(logins)
     if (ids.length === 0) { return [] }
-    const query: string = `SELECT player_ids.login, rank, average FROM players 
+    const query: string = `SELECT player_ids.login, average FROM players 
     JOIN player_ids ON players.id=player_ids.id
     WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...(ids.map(a => a.id)))
     return res
   }
 
-  async getAllAverages(): Promise<{ login: string, average: number | undefined }[]> {
-    const query: string = `SELECT player_ids.login, average FROM players
-    JOIN player_ids ON players.id=player_ids.id`
+  async getRanks(): Promise<string[]> {
+    const query: string = `SELECT player_ids.login FROM players
+    JOIN player_ids ON players.id=player_ids.id
+    ORDER BY average ASC`
     const res = await this.query(query)
-    return res
+    return res.map(a => a.login)
   }
 
   private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
@@ -150,7 +143,6 @@ export class PlayerRepository extends Repository {
       isUnited: entry.is_united,
       wins: entry.wins,
       privilege: entry.privilege ?? 0,
-      rank: entry.rank ?? undefined,
       average: entry.average
     }
   }
