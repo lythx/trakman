@@ -54,8 +54,12 @@ export abstract class DedimaniaService {
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to YES in .env file to enable it') }
     if (DedimaniaClient.connected === false) {
-      const status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
-      if (status instanceof Error) { return status }
+      let status: boolean | Error = false
+      do {
+        await new Promise((resolve) => setTimeout(resolve, 60000))
+        status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+        if (id !== MapService.current.id) { return new Error(`Failed to connect to dedimania`) }
+      } while (status !== true)
     }
     this._dedis.length = 0
     this._newDedis.length = 0
