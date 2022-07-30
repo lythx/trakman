@@ -59,7 +59,7 @@ export abstract class VoteService {
     this.mapsWithVotesStored.shift()
     this._votes.push(...res)
     this._votes = this._votes.filter(a => this.mapsWithVotesStored.includes(a.mapId))
-    Logger.debug(JSON.stringify(this._voteRatios.find(a => a.mapId === id)), JSON.stringify(this._votes, null, 2))
+    Logger.debug(JSON.stringify(this._voteRatios.find(a => a.mapId === id)), this._votes.filter(a => a.mapId === MapService.current.id).length)
   }
 
   static async fetch(mapId: string): Promise<TMVote[]> {

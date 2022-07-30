@@ -175,7 +175,6 @@ export abstract class ManiakarmaService {
         this.addVote(e.mapId, e.login, e.vote)
       }
     }
-    Logger.debug(JSON.stringify(VoteService.votes), JSON.stringify(this._mapKarma), this._mapKarmaValue)
   }
 
   static get playerVotes(): MKVote[] {
