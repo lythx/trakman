@@ -89,7 +89,7 @@ export class PlayerRepository extends Repository {
   }
 
   async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean): Promise<void> {
-    const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4, WHERE id=$6;`
+    const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4 WHERE id=$5;`
     const id: number | undefined = await playerIdsRepo.get(login)
     await this.query(query, nickname, region, visits, isUnited, id)
   }
