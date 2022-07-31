@@ -37,14 +37,14 @@ export default class DonationPanel extends StaticComponent {
   display(): void {
     this._isDisplayed = true
     for (const player of TM.players) {
-      if (player.isUnited) {
-        this.displayToPlayer(player.login)
-      }
+      this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
-    TM.sendManialink(this.xml, login)
+    if (TM.getPlayer(login)?.isUnited) {
+      TM.sendManialink(this.xml, login)
+    }
   }
 
   private constructXML(): void {
