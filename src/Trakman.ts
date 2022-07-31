@@ -21,6 +21,14 @@ import { ServerConfig } from './ServerConfig.js'
 import dsc from 'dice-similarity-coeff'
 import { Logger } from './Logger.js'
 import http from 'http'
+import { PlayerIdsRepository } from './database/PlayerIdsRepository.js'
+import { MapIdsRepository } from './database/MapIdsRepository.js'
+
+const playerIdsRepo = new PlayerIdsRepository()
+playerIdsRepo.initialize()
+
+const mapIdsRepo = new MapIdsRepository()
+mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 await DB.initialize()
@@ -68,6 +76,12 @@ export const TRAKMAN = {
     }
     return title
   },
+
+  getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
+
+  getMapDBId: mapIdsRepo.get.bind(mapIdsRepo),
+
+  DatabaseClient: Database,
 
   /**
    * Removes all TM formatting from a string
@@ -319,8 +333,8 @@ export const TRAKMAN = {
    * Outputs an error message into the console and exits the process
    * @param lines Error messages
    */
-  fatalError(...lines: string[]): void {
-    Logger.fatal(...lines)
+  async fatalError(...lines: string[]): Promise<void> {
+    await Logger.fatal(...lines)
   },
 
   /**
