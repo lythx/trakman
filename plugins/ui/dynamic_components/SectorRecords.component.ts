@@ -1,7 +1,7 @@
 import PopupWindow from '../PopupWindow.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
-import { sectorRecords } from '../../SectorRecords.js'
+import { sectorRecords } from '../../sector_records/SectorRecords.js'
 
 export default class SectorRecords extends PopupWindow {
 
@@ -158,8 +158,8 @@ export default class SectorRecords extends PopupWindow {
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(login)
+  protected constructFooter(login: string, params: { page: number }): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(params.page)
   }
 
 }
