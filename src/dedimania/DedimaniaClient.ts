@@ -78,7 +78,10 @@ export abstract class DedimaniaClient {
   }
 
   static setupListeners(): void {
-    this.socket.on('data', buffer => {
+    this.socket.on('data', async buffer => {
+      do {
+        await new Promise(resolve => setTimeout(resolve, 10))
+      } while (this.response.status === 'completed')
       this.response.addData(buffer.toString())
     })
     this.socket.on('error', async err => {
