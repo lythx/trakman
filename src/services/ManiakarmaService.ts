@@ -55,7 +55,6 @@ export abstract class ManiakarmaService {
     const json: any = this.getJson(await res.text())
     this.authCode = json?.result?.authcode[0]
     this.apiUrl = json?.result?.api_url[0]
-    Logger.debug(this.apiUrl)
   }
 
   private static async receiveVotes(playerLogin: string): Promise<void | Error> {
@@ -86,7 +85,13 @@ export abstract class ManiakarmaService {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
-    Logger.debug(this.apiUrl, this.authCode, this._mapKarmaValue.toString(), JSON.stringify(this._mapKarma))
+    Logger.debug(
+      `curr. map maniakarma stats`,
+      `mk api url: ` + this.apiUrl,
+      `mk api authcode: ` + this.authCode,
+      `mk karma value: ` + this._mapKarmaValue.toString(),
+      `mk vote stats: ` + JSON.stringify(this._mapKarma)
+    )
     await this.fixCoherence()
   }
 
