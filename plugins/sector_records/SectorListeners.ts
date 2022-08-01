@@ -4,9 +4,7 @@ import { bestSecsDB, allSecsDB } from './SectorDB.js'
 import { emitEvent } from './SectorEvents.js'
 
 let currentBestSecs: BestSectors
-
 let currentMapDBId: number
-
 const currentPlayerSecs: PlayerSectors[] = []
 
 const onMapStart = async (): Promise<void> => {
@@ -48,7 +46,7 @@ TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
     currentPlayerSecs.push({ login: info.player.login, sectors: [time] })
     void allSecsDB.add(currentMapDBId, info.player.login, [time])
     emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
-  } else if (playerSectors.sectors[info.index] === undefined || playerSectors.sectors[info.index] as any > time) {
+  } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
     playerSectors.sectors[info.index] = time
     void allSecsDB.update(currentMapDBId, info.player.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
     emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
@@ -76,7 +74,7 @@ TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
     currentPlayerSecs.push({ login: info.login, sectors: [time] })
     void allSecsDB.add(currentMapDBId, info.login, [time])
     emitEvent('PlayerSector', info.login, info.nickname, index)
-  } else if (playerSectors.sectors[index] === undefined || playerSectors.sectors[index] as any > time) {
+  } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
     playerSectors.sectors[index] = time
     void allSecsDB.update(currentMapDBId, info.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
     emitEvent('PlayerSector', info.login, info.nickname, index)
@@ -95,6 +93,14 @@ TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
   }
 })
 
+TM.addListener('Controller.PlayerJoin', async (info) => {
+  const playerSecs = await allSecsDB.get(currentMapDBId, info.login)
+  if (playerSecs instanceof Error) {
+    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.map.id}`, playerSecs.message)
+    return
+  }
+  currentPlayerSecs.push(...playerSecs)
+})
 
 TM.addCommand({
   aliases: ['delmysec', 'deletemysector'],

@@ -25,10 +25,10 @@ import { PlayerIdsRepository } from './database/PlayerIdsRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 
 const playerIdsRepo = new PlayerIdsRepository()
-playerIdsRepo.initialize()
+await playerIdsRepo.initialize()
 
 const mapIdsRepo = new MapIdsRepository()
-mapIdsRepo.initialize()
+await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 await DB.initialize()
