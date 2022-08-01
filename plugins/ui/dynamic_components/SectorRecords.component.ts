@@ -1,7 +1,7 @@
 import PopupWindow from '../PopupWindow.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
-import { sectorRecords } from '../../sector_records/SectorRecords.js'
+import { sectorRecords } from '../../SectorRecords.js'
 
 export default class SectorRecords extends PopupWindow {
 
@@ -24,7 +24,7 @@ export default class SectorRecords extends PopupWindow {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     TM.addCommand({
-      aliases: ['secs', 'secrecs'],
+      aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
       callback: (info: MessageInfo) => {
         TM.openManialink(this.openId, info.login)
@@ -36,9 +36,9 @@ export default class SectorRecords extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries))
       this.reRender()
     })
-    sectorRecords.addListener('PlayerSector', () => this.reRender())
+    sectorRecords.addListener('PlayerSector', (login) => this.reRenderToPlayer(login))
     sectorRecords.addListener('DeleteBestSector', () => this.reRender())
-    sectorRecords.addListener('DeletePlayerSector', () => this.reRender())
+    sectorRecords.addListener('DeletePlayerSector', (login) => this.reRenderToPlayer(login))
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -51,6 +51,12 @@ export default class SectorRecords extends PopupWindow {
       const page = this.paginator.getPageByLogin(login)
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
+  }
+
+  private reRenderToPlayer(login: string): void {
+    if(!this.getPlayersWithWindowOpen().includes(login)) { return }
+    const page = this.paginator.getPageByLogin(login)
+    this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
   protected async constructContent(login: string, params: { page: number }): Promise<string> {

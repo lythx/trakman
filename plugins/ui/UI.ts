@@ -89,7 +89,7 @@ let dynamicComponents: {
   readonly blacklistList: BlackListList
   readonly guestlistList: GuestListList
   readonly sectorRecords: SectorRecords
-  // readonly checkpointRecords: CheckpointRecords
+  readonly checkpointRecords: CheckpointRecords
   readonly welcomeWindow: WelcomeWindow
 }
 
@@ -134,7 +134,7 @@ const events: TMListener[] = [
         blacklistList: new BlackListList(),
         guestlistList: new GuestListList(),
         sectorRecords: new SectorRecords(),
-        //checkpointRecords: new CheckpointRecords()
+        checkpointRecords: new CheckpointRecords(),
         welcomeWindow: new WelcomeWindow()
       }
       // const testWindow = new TestWindow()

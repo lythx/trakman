@@ -30,9 +30,9 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
 
 const DB = new TM.DatabaseClient()
 
-DB.initialize()
+await DB.initialize()
 for (const e of createQueries) {
-  DB.query(e)
+  await DB.query(e)
 }
 
 export const allSecsDB = {

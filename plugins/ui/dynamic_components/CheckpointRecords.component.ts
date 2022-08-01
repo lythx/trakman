@@ -19,7 +19,7 @@ export default class CheckpointRecords extends PopupWindow {
     super(IDS.checkpointRecords, iconurl, CONFIG.checkpointRecords.title, CONFIG.checkpointRecords.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.checkpointRecords.columnProportions, new Array(this.entries + 1).fill(1),
       { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.contentHeight, Math.ceil(TM.map.checkpointsAmount / (this.entries + 1)))
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(TM.map.checkpointsAmount / this.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -33,10 +33,12 @@ export default class CheckpointRecords extends PopupWindow {
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries + 1))
+      this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries))
       this.reRender()
     })
-    checkpointRecords.addListener('PlayerCheckpoint', () => this.reRender())
+    checkpointRecords.addListener('PlayerCheckpoint', (login) => this.reRenderToPlayer(login))
+    checkpointRecords.addListener('DeleteBestCheckpoint', () => this.reRender())
+    checkpointRecords.addListener('DeletePlayerCheckpoint', (login) => this.reRenderToPlayer(login))
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -49,6 +51,12 @@ export default class CheckpointRecords extends PopupWindow {
       const page = this.paginator.getPageByLogin(login)
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
+  }
+
+  private reRenderToPlayer(login: string): void {
+    if(!this.getPlayersWithWindowOpen().includes(login)) { return }
+    const page = this.paginator.getPageByLogin(login)
+    this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
   protected async constructContent(login: string, params: { page: number }): Promise<string> {
@@ -69,7 +77,7 @@ export default class CheckpointRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(TM.safeString(TM.strip(cps[i + cpIndex - 1]?.nickname ?? '-')), w, h)
+      return centeredText(TM.safeString(TM.strip(cps[i + cpIndex - 1]?.nickname ?? '-', false)), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
@@ -90,64 +98,28 @@ export default class CheckpointRecords extends PopupWindow {
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
       const cp = personalCps.find(a => a.login === login)?.checkpoints[i + cpIndex - 1]
       if (cp === undefined || cp === null) { return centeredText('--:--.-', w, h) }
-      let differenceString: string
-      const difference = (cps?.[i + cpIndex - 1]?.checkpoint ?? 0) - cp
-      if (cps?.[i + cpIndex - 1]?.login === login) {
-        differenceString = ''
-      } else if (difference > 0) {
-        differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
-      } else if (difference === 0) {
-        differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
-      } else {
-        differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+      let differenceString = ''
+      const bestSec = cps?.[i + cpIndex - 1]?.checkpoint
+      if (bestSec !== undefined) {
+        const difference = bestSec - cp
+        if (cps?.[i + cpIndex - 1]?.login === login) {
+          differenceString = ''
+        } else if (difference > 0) {
+          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+        } else if (difference === 0) {
+          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+        } else {
+          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+        }
       }
       return centeredText(differenceString + ' ' + TM.Utils.getTimeString(cp), w, h)
     }
 
-    const emptyCell: GridCellObject = {
-      background: '',
-      colspan: 3,
-      callback: () => '',
-    }
-
-    const totalTimeHeaderCell: GridCellObject = {
-      callback: (i, j, w, h) => centeredText(' Total Time ', w, h),
-      background: CONFIG.grid.headerBg
-    }
-
-    const totalTime: GridCellFunction = (i, j, w, h) => {
-      if (cps.some(a => a === null)) {
-        return centeredText('--:--.-', w, h)
-      }
-      const sum = cps.map(a => a?.checkpoint ?? 0).reduce((acc, cur) => acc += cur)
-      return centeredText(TM.Utils.getTimeString(sum), w, h)
-    }
-
-    const pesonalTotalTime: GridCellFunction = (i, j, w, h) => {
-      const checkpoints = personalCps.find(a => a.login === login)?.checkpoints
-      if (checkpoints === undefined || checkpoints.some(a => a === null)) {
-        return centeredText('--:--.-', w, h)
-      }
-      const bestSum = cps.map(a => a?.checkpoint ?? 0).reduce((acc, cur) => acc += cur)
-      const sum = checkpoints.map(a => a === null ? 0 : a).reduce((acc, cur) => acc += cur)
-      let differenceString: string
-      const difference = sum - bestSum
-      if (difference > 0) {
-        differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
-      } else if (difference === 0) {
-        differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
-      } else {
-        differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
-      }
-      return centeredText(differenceString + ' ' + TM.Utils.getTimeString(sum), w, h)
-    }
-
-    const rows = Math.min(this.entries, cps.length)
+    const rows = Math.min(this.entries, cps.length - cpIndex)
     const arr: (GridCellObject | GridCellFunction)[] = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, bestSectorCell, personalSectorCell)
     }
-    arr.push(emptyCell, totalTimeHeaderCell, totalTime, pesonalTotalTime)
     return this.grid.constructXml(arr)
   }
 
