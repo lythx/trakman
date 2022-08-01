@@ -206,27 +206,8 @@ export class RecordService {
   }
 
   private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string, recordType: 'live' | 'local'): string[] {
-    let rs = { str: '', calcDiff: false } // Rec status
-    let diff // Difference
-    if (previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-    else if (previousPosition > position) { rs.str = 'obtained', rs.calcDiff = true }
-    else if (previousPosition === position && previousTime === time) { rs.str = 'equaled', rs.calcDiff = false }
-    else if (previousPosition === position) { rs.str = 'improved', rs.calcDiff = true }
-    if (rs.calcDiff) {
-      diff = Utils.getTimeString(previousTime - time)
-      let i: number = -1
-      while (true) {
-        i++
-        if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
-        if (Number(diff[i]) !== 0) { continue }
-        diff = diff.substring(1)
-        i--
-        if (diff[i + 1] === ':') {
-          diff = diff.substring(1)
-        }
-      }
-    }
-    return [`${login} has ${rs.str} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.calcDiff ? ` (${previousPosition} -${diff})` : ``}`]
+    const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
+    return [`${login} has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
 }
