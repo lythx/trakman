@@ -20,6 +20,8 @@ export class DedimaniaResponse {
       }
       this._status = 'completed'
       this._xml = this._data.split('\r\n\r\n')[1]
+      Logger.debug(this._data)
+      Logger.debug(split)
       this.generateJson()
     }
   }
@@ -62,7 +64,7 @@ export class DedimaniaResponse {
         this._errorCode = 1
         this._errorString = 'Received invalid XML'
         isError = true
-        Logger.error('Received invalid XML from dedimania server', err.message)
+        Logger.error('Received invalid XML from dedimania server', err.message, err.stack)
         return
       }
       json = result

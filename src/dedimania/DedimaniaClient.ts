@@ -8,7 +8,7 @@ import Config from '../../config.json' assert { type: 'json' }
 
 export abstract class DedimaniaClient {
 
-  private static readonly socket: Socket = new Socket()
+  private static socket: Socket = new Socket()
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
   private static sessionId: string
@@ -23,6 +23,7 @@ export abstract class DedimaniaClient {
     this.connected = false
     this.response = new DedimaniaResponse()
     this.socket?.destroy()
+    this.socket = new Socket()
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
@@ -79,6 +80,9 @@ export abstract class DedimaniaClient {
 
   static setupListeners(): void {
     this.socket.on('data', async buffer => {
+      if(this.connected === false) {
+        Logger.debug(buffer.toString())
+      }
       do {
         await new Promise(resolve => setTimeout(resolve, 10))
       } while (this.response.status === 'completed')
