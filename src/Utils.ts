@@ -114,7 +114,56 @@ export const Utils = {
 
   nationToNationCode(nation: string) {
     return countries.find(a => a.name === nation)?.code
-  }
+  },
+
+  /**
+ * Gets the appropriate verb and calculates record differences
+ * @param prevPos Previous record index
+ * @param currPos Current record index
+ * @param prevTime Previous record time
+ * @param currTime Current record time
+ * @returns Object containing the string to use, whether calculation is needed, and the difference
+ */
+  getRankingString(prevPos: number, currPos: number, prevTime: number, currTime: number): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
+    let calc = false
+    const obj: any = {
+      status: ``,
+      difference: undefined
+    }
+    // TODO: Limit this according to the RecordService.localsAmount
+    if (prevPos === -1) {
+      obj.status = 'acquired'
+      calc = false
+    } else if (prevPos > currPos) {
+      obj.status = 'obtained'
+      calc = true
+    } else if (prevPos === currPos && prevTime === currTime) {
+      obj.status = 'equaled'
+      calc = false
+    } else if (prevPos === currPos) {
+      obj.status = 'improved'
+      calc = true
+    }
+    if (calc) {
+      obj.difference = this.getTimeString(prevTime - currTime)
+      let i: number = -1
+      while (true) {
+        i++
+        if (obj.difference[i] === undefined || (!isNaN(Number(obj.difference[i])) && Number(obj.difference[i]) !== 0) || obj.difference.length === 4) {
+          break
+        }
+        if (Number(obj.difference[i]) !== 0) {
+          continue
+        }
+        obj.difference = obj.difference.substring(1)
+        i--
+        if (obj.difference[i + 1] === ':') {
+          obj.difference = obj.difference.substring(1)
+        }
+      }
+    }
+    return obj
+  },
 
 }
 
