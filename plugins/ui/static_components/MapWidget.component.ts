@@ -3,6 +3,7 @@ import countries from '../../../src/data/Countries.json' assert {type: 'json'}
 import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
+import { Logger } from '../../../src/Logger.js'
 
 export default class MapWidget extends StaticComponent {
 
@@ -41,17 +42,12 @@ export default class MapWidget extends StaticComponent {
     const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
     if (regex.test(author) === true) { return }
     const json: any = await TM.fetchWebServices(author)
-    if (json instanceof Error) {
-      TM.error(`Failed to fetch nickname for author login ${author}`, json.message)
-      this.authorNickname = undefined
+    if (json instanceof Error) { // UNKOWN PLAYER MOMENT
+      Logger.warn(`Failed to fetch nickname for login ${author}`, json.message)
+      this.authorNickname = author
     } else {
-      if (json?.message === 'Unkown player') { // THANKS NADEO
-        TM.error(`Failed to fetch nickname for author login ${author} (no such login registered)`, json.message)
-        this.authorNickname = author
-      } else {
-        this.authorNickname = json?.nickname
-        this.authorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
-      }
+      this.authorNickname = json?.nickname
+      this.authorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
     }
     if (this._isDisplayed === true) {
       this.display()

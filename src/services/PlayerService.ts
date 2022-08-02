@@ -15,6 +15,7 @@ export class PlayerService {
   private static readonly repo: PlayerRepository = new PlayerRepository()
   private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
   private static newLocals: number
+  private static ranks: string[]
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
@@ -29,6 +30,7 @@ export class PlayerService {
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
       await this.setPrivilege(newOwnerLogin, 4)
     }
+    this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
       if (info.previousPosition > RecordService.localsAmount && info.position <= RecordService.localsAmount) {
@@ -87,6 +89,7 @@ export class PlayerService {
     const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
     let player: TMPlayer
+    const index = this.ranks.indexOf(login)
     if (playerData === undefined) {
       player = {
         id,
@@ -104,7 +107,8 @@ export class PlayerService {
         ip,
         region,
         isUnited,
-        average: RecordService.localsAmount
+        average: RecordService.localsAmount,
+        rank: index === -1 ? undefined : index
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -125,10 +129,10 @@ export class PlayerService {
         region,
         isUnited,
         lastOnline: playerData.lastOnline,
-        rank: playerData.rank,
+        rank: index === -1 ? undefined : index,
         average: playerData.average
       }
-      await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited, player.lastOnline) // need to await so owner privilege gets set after player is added
+      await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
     this._players.push(player)
     if (serverStart === undefined) {
@@ -231,39 +235,26 @@ export class PlayerService {
     if (player === undefined) {
       player = await PlayerService.fetchPlayer(login)
     }
-    await this.repo.updateOnWin(login, player.wins++)
+    await this.repo.updateOnWin(login, ++player.wins)
     return player.wins
   }
 
-  static async calculateAverages(): Promise<void> {
+  static async calculateAveragesAndRanks(): Promise<void> {
     const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocals).map((a, i) => ({ login: a.login, position: i + 1 }))
     const amount = MapService.maps.length
     const ranks = await this.repo.getAverage(logins.map(a => a.login))
     for (const rank of ranks) {
-      console.log(rank)
       let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
       if (previousRank === 0) { previousRank = RecordService.localsAmount }
       let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login) + 1
       const sum = amount * (rank.average ?? RecordService.localsAmount) + newRank - previousRank
-      console.log(sum)
       const onlinePlayer = this.getPlayer(rank.login)
       if (onlinePlayer !== undefined) {
         onlinePlayer.average = sum / amount
       }
-      console.log(sum / amount)
       await this.repo.updateAverage(rank.login, sum / amount)
     }
-  }
-
-  static async calculateRanks(): Promise<void> {
-    const ranks = (await this.repo.getAllAverages()).sort((a, b) => (a.average ?? Infinity) - (b.average ?? Infinity))
-    for (let i = 0; i < ranks.length; i++) {
-      const onlinePlayer = this.getPlayer(ranks[i].login)
-      if (onlinePlayer !== undefined) {
-        onlinePlayer.rank = i + 1
-      }
-      await this.repo.updateRank(ranks[i].login, i + 1)
-    }
+    this.ranks = await this.repo.getRanks()
   }
 
 }

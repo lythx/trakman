@@ -11,7 +11,7 @@ export abstract class VoteService {
   private static readonly _voteRatios: { readonly mapId: string, ratio: number, amount: number }[] = []
   private static _votes: TMVote[] = []
   private static readonly mapsWithVotesStored: string[] = []
-  private static readonly voteValues = [0, 20, 40, -1, 60, 80, 100]
+  private static readonly voteValues: number[] = [0, 20, 40, -1, 60, 80, 100]
 
   static async initialize(): Promise<void> {
     Client.callNoRes('SetCallVoteTimeout', [{ int: 0 }])
@@ -38,7 +38,7 @@ export abstract class VoteService {
       }
     }
     for (let i: number = 0; i < 4; i++) {
-      const id = [JukeboxService.current, ...JukeboxService.queue][i].id
+      const id: string = [JukeboxService.current, ...JukeboxService.queue][i].id
       this.mapsWithVotesStored.push(id)
       this._votes.push(...res.filter(a => a.mapId === id))
     }
@@ -53,13 +53,17 @@ export abstract class VoteService {
   }
 
   static async nextMap(): Promise<void> {
-    const id = JukeboxService.queue[2].id
+    const id: string = JukeboxService.queue[2].id
     const res: TMVote[] = await this.repo.get(id)
     this.mapsWithVotesStored.push(id)
     this.mapsWithVotesStored.shift()
     this._votes.push(...res)
     this._votes = this._votes.filter(a => this.mapsWithVotesStored.includes(a.mapId))
-    Logger.debug(JSON.stringify(this._voteRatios.find(a => a.mapId === id)), JSON.stringify(this._votes, null, 2))
+    Logger.debug(
+      `curr. map karma stats:`,
+      `ratios obj: ` + JSON.stringify(this._voteRatios.find(a => a.mapId === id)),
+      `amt of votes: ` + (this._votes.filter(a => a.mapId === id).length.toString())
+    )
   }
 
   static async fetch(mapId: string): Promise<TMVote[]> {
@@ -102,18 +106,18 @@ export abstract class VoteService {
     }
   }
 
-  private static async updateVoteRatio(mapId: string) {
+  private static async updateVoteRatio(mapId: string): Promise<void> {
     const ratio = this._voteRatios.find(a => a.mapId === mapId)
     if (ratio === undefined) {
       return
     }
-    const mapVotes = this._votes.filter(a => a.mapId === mapId)
+    const mapVotes: TMVote[] = this._votes.filter(a => a.mapId === mapId)
     if (this.mapsWithVotesStored.includes(mapId)) {
       const amount: number = mapVotes.length
       const sum: number = mapVotes.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
       ratio.ratio = sum / amount
     } else {
-      const res = await this.repo.get(mapId)
+      const res: TMVote[] = await this.repo.get(mapId)
       const amount: number = res.length
       const sum: number = res.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
       ratio.ratio = sum / amount

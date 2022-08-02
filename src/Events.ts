@@ -24,7 +24,7 @@ interface EventWithCallbackInterface {
 }
 
 
-const eventListeners: { event: TMEvent, callback: ((params: any) => void) }[] = []
+const eventListeners: { event: TMEvent, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
 const initialize = (): void => {
@@ -39,7 +39,7 @@ const initialize = (): void => {
  * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
 const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event: T | TMEvent[],
-  callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : any) => void), prepend?: true): void => {
+  callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : any) => void | Promise<void>), prepend?: true): void => {
   const arr: { event: TMEvent, callback: ((params: any) => void) }[] = []
   if (Array.isArray(event)) {
     arr.push(...event.map(a => ({ event: a, callback })))
@@ -54,15 +54,15 @@ const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event
  * @param event callback event name
  * @param params callback params
  */
-const emitEvent = <T extends keyof EventWithCallbackInterface | TMEvent>(event: T,
-  params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams): void => {
+const emitEvent = async <T extends keyof EventWithCallbackInterface | TMEvent>(event: T,
+  params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams): Promise<void> => {
   if (controllerReady === false) { return }
   const matchingEvents: {
     event: TMEvent,
-    callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams) => void)
+    callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams) => void | Promise<void>)
   }[] = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
-    listener.callback(params)
+    await listener.callback(params)
   }
 }
 

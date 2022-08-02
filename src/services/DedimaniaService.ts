@@ -7,6 +7,7 @@ import { ServerConfig } from '../ServerConfig.js'
 import { JukeboxService } from './JukeboxService.js'
 import { Events } from '../Events.js'
 import { Logger } from '../Logger.js'
+import { Utils } from '../Utils.js'
 
 export abstract class DedimaniaService {
 
@@ -53,12 +54,16 @@ export abstract class DedimaniaService {
 
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to YES in .env file to enable it') }
-    if (DedimaniaClient.connected === false) {
-      const status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
-      if (status instanceof Error) { return status }
-    }
     this._dedis.length = 0
     this._newDedis.length = 0
+    if (DedimaniaClient.connected === false) {
+      let status: boolean | Error = false
+      do {
+        await new Promise((resolve) => setTimeout(resolve, 60000))
+        status = await DedimaniaClient.connect('dedimania.net', Number(process.env.DEDIMANIA_PORT))
+        if (id !== MapService.current.id) { return new Error(`Failed to connect to dedimania`) }
+      } while (status !== true)
+    }
     const cfg: ServerInfo = ServerConfig.config
     const nextIds: string[] = []
     for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
@@ -146,15 +151,18 @@ export abstract class DedimaniaService {
       const dediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+      Logger.info(this.getLogString(-1, position, -1, time, player.login))
       return dediRecordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, previousPosition, previousPosition)
+      Logger.info(this.getLogString(previousPosition, previousPosition, time, time, player.login))
       return dediRecordInfo
     }
     if (time < pb) {
-      const previousTime: number | undefined = this._dedis.find(a => a.login === player.login)?.time
+      const previousIndex: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login)
+      const previousTime: number = this._dedis[previousIndex].time
       if (previousTime === undefined) {
         Logger.error(`Can't find player ${player.login} in memory`)
         return new Error(`Can't find player ${player.login} in memory`)
@@ -164,6 +172,7 @@ export abstract class DedimaniaService {
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this._newDedis = this._newDedis.filter(a => a.login !== player.login)
       this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+      Logger.info(this.getLogString(previousIndex + 1, position, previousTime, time, player.login))
       return dediRecordInfo
     }
     return false
@@ -274,6 +283,11 @@ export abstract class DedimaniaService {
       region: player.region,
       isUnited: player.isUnited
     }
+  }
+
+  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string): string[] {
+    const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
+    return [`${login} has ${rs.status} the ${Utils.getPositionString(position)} dedimania record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
 }
