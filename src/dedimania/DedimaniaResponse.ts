@@ -20,8 +20,6 @@ export class DedimaniaResponse {
       }
       this._status = 'completed'
       this._xml = this._data.split('\r\n\r\n')[1]
-      Logger.debug(this._data)
-      Logger.debug(split)
       this.generateJson()
     }
   }

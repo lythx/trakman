@@ -235,7 +235,7 @@ export class PlayerService {
     if (player === undefined) {
       player = await PlayerService.fetchPlayer(login)
     }
-    await this.repo.updateOnWin(login, player.wins++)
+    await this.repo.updateOnWin(login, ++player.wins)
     return player.wins
   }
 
