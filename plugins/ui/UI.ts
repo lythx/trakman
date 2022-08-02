@@ -1,5 +1,10 @@
 import { TRAKMAN as TM } from '../../src/Trakman.js'
 
+/*
+-----------------
+STATIC COMPONENTS
+-----------------
+*/
 import CustomUi from './CustomUi.js'
 //import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
@@ -17,7 +22,13 @@ import AdminPanel from './static_components/AdminPanel.component.js'
 import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/BestCps.component.js'
 import BestFinishes from './static_components/BestFinishes.component.js'
+import CpCounter from './static_components/CpCounter.compnent.js'
 
+/*
+------------------
+DYNAMIC COMPONENTS
+------------------
+*/
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
 //import TMXWindow from './dynamic_components/TMXWindow.component.js'
@@ -73,6 +84,7 @@ let staticComponents: {
   readonly donationPanel: DonationPanel
   readonly bestCps: BestCps
   readonly bestFinishes: BestFinishes
+  readonly cpCounter: CpCounter
 }
 
 let dynamicComponents: {
@@ -118,7 +130,8 @@ const events: TMListener[] = [
         adminPanel: new AdminPanel(),
         donationPanel: new DonationPanel(),
         bestCps: new BestCps(),
-        bestFinishes: new BestFinishes()
+        bestFinishes: new BestFinishes(),
+        cpCounter: new CpCounter()
       }
       for (const c of Object.values(staticComponents)) { await c.display() }
       dynamicComponents = {
