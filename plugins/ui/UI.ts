@@ -39,6 +39,7 @@ import GuestListList from './dynamic_components/GuestlistList.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
+import Changelog from './dynamic_components/Changelog.component.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 
 let customUi: CustomUi
@@ -91,6 +92,7 @@ let dynamicComponents: {
   readonly sectorRecords: SectorRecords
   readonly checkpointRecords: CheckpointRecords
   readonly welcomeWindow: WelcomeWindow
+  readonly changelog: Changelog
 }
 
 const events: TMListener[] = [
@@ -135,7 +137,8 @@ const events: TMListener[] = [
         guestlistList: new GuestListList(),
         sectorRecords: new SectorRecords(),
         checkpointRecords: new CheckpointRecords(),
-        welcomeWindow: new WelcomeWindow()
+        welcomeWindow: new WelcomeWindow(),
+        changelog: new Changelog()
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {

@@ -216,7 +216,7 @@ export class Listeners {
           winnerLogin: login,
           winnerWins: wins
         }
-        await DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
+        void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         await PlayerService.calculateAveragesAndRanks()
         Events.emitEvent('Controller.EndMap', endMapInfo)
       }

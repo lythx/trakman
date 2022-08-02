@@ -8,7 +8,7 @@ export default class WelcomeWindow extends PopupWindow {
   readonly welcomedPlayers: string[] = []
 
   constructor() {
-    super(IDS.welcomeWindow, stringToObjectProperty(CONFIG.welcomeWindow.icon, ICONS), CONFIG.welcomeWindow.title, ['commandList'])
+    super(IDS.welcomeWindow, stringToObjectProperty(CONFIG.welcomeWindow.icon, ICONS), CONFIG.welcomeWindow.title, CONFIG.welcomeWindow.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], { background: CONFIG.grid.bg, margin: 1 })
     TM.addListener('Controller.PlayerJoin', (info) => {
       if (this.welcomedPlayers.includes(info.login) === false) {

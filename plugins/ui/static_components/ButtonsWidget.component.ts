@@ -446,6 +446,7 @@ export default class ButtonsWidget extends StaticComponent {
       iconWidth: cfg.version.width,
       iconHeight: cfg.version.height,
       padding: cfg.version.padding,
+      actionId: IDS.changelog
     }
     // Time
     const timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
