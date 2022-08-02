@@ -108,7 +108,7 @@ export class PlayerService {
         region,
         isUnited,
         average: RecordService.localsAmount,
-        rank: index === -1 ? undefined : index
+        rank: index === -1 ? undefined : (index + 1)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -129,7 +129,7 @@ export class PlayerService {
         region,
         isUnited,
         lastOnline: playerData.lastOnline,
-        rank: index === -1 ? undefined : index,
+        rank: index === -1 ? undefined : (index + 1),
         average: playerData.average
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
