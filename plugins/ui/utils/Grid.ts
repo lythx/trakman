@@ -1,7 +1,7 @@
 export type GridCellFunction = (i: number, j: number, w: number, h: number) => string
 
 export interface GridCellObject {
-  callback: ((i: number, j: number, w: number, h: number) => string)
+  callback: GridCellFunction
   colspan?: number
   rowspan?: number
   background?: string
