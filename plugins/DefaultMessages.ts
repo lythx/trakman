@@ -13,37 +13,66 @@ const events: TMListener[] = [
   },
   {
     event: ['Controller.BeginMap', 'Controller.Ready'],
-    callback: (): void => {
+    callback: async (): Promise<void> => {
+      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
       for (const player of TM.players) {
-        let msg: string
         const index: number = TM.localRecords.findIndex(a => a.login === player.login)
         if (index === -1) {
-          msg = `${TM.palette.error}You don't have a PB on this map.`
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
         } else {
           const rec: TMLocalRecord = TM.localRecords[index]
-          msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
-            + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}Personal best${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, the `
+            + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`, player.login)
         }
-        TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
+        const playerRank: number | undefined = player.rank
+        if (allRanks instanceof Error) {
+          Logger.error('how')
+          return
+        }
+        if (playerRank === undefined) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a rank on the server yet.`, player.login)
+        } else {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You are currently ranked ${TM.palette.rank + TM.Utils.getPositionString(playerRank)} ${TM.palette.record}out `
+            + `of ${TM.palette.highlight + allRanks[0].count}${TM.palette.record} people total.`, player.login)
+        }
       }
     }
   },
   {
     event: 'Controller.PlayerJoin',
-    callback: (player: JoinInfo): void => {
-      let msg: string
+    callback: async (player: JoinInfo): Promise<void> => {
       const index: number = TM.localRecords.findIndex(a => a.login === player.login)
       if (index === -1) {
-        msg = `${TM.palette.error}You don't have a PB on this map.`
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
       } else {
         const rec: TMLocalRecord = TM.localRecords[index]
-        msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
-          + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}Personal best${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, the `
+          + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`, player.login)
       }
-      TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
+      const playerRank: number | undefined = player.rank
+      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
+      if (allRanks instanceof Error) {
+        Logger.error('how')
+        return
+      }
+      if (playerRank === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a rank on the server yet.`, player.login)
+      } else {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You are currently ranked ${TM.palette.rank + TM.Utils.getPositionString(playerRank)} ${TM.palette.record}out `
+          + `of ${TM.palette.highlight + allRanks[0].count}${TM.palette.record} people total.`, player.login)
+      }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
+    }
+  },
+  {
+    event: 'Controller.EndMap',
+    callback: (endMapInfo: EndMapInfo): void => {
+      if (endMapInfo.winnerLogin === undefined || endMapInfo.winnerWins === undefined) {
+        return
+      }
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You have won your ${TM.palette.rank + TM.Utils.getPositionString(endMapInfo.winnerWins)}${TM.palette.record} race.`, endMapInfo.winnerLogin)
     }
   },
   {
