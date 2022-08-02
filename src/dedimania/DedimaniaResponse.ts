@@ -54,16 +54,20 @@ export class DedimaniaResponse {
 
   private generateJson(): void {
     let json: any
+    let isError = false
     // parse xml to json
     xml2js.parseString(this._xml.toString(), (err, result): void => {
       if (err != null) {
         this._isError = true
         this._errorCode = 1
         this._errorString = 'Received invalid XML'
-        Logger.error('Received invalid XML from dedimania server', err.message)
+        isError = true
+        Logger.error('Received invalid XML from dedimania server', err.message, err.stack)
+        return
       }
       json = result
     })
+    if (isError !== false) { return }
     if (json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array?.[0]?.data?.[0]?.value) { // system.multicall errors
       for (const e of json?.methodResponse?.params?.[0]?.param?.[0]?.value?.[0]?.array[0]?.data?.[0]?.value) {
         if (e?.struct?.[0]?.member?.[0]?.name?.[0] === 'faultCode') {

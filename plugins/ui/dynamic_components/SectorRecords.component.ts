@@ -17,14 +17,14 @@ export default class SectorRecords extends PopupWindow {
   constructor() {
     const iconurl = stringToObjectProperty(CONFIG.sectorRecords.icon, ICONS)
     super(IDS.sectorRecords, iconurl, CONFIG.sectorRecords.title, CONFIG.sectorRecords.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.sectorRecords.columnProportions, new Array(this.entries + 1).fill(1),
+    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.sectorRecords.columnProportions, new Array(this.entries + 2).fill(1),
       { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.contentHeight, Math.ceil(TM.map.checkpointsAmount / (this.entries + 1)))
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(TM.map.checkpointsAmount / this.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     TM.addCommand({
-      aliases: ['scr', 'secrecs'],
+      aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
       callback: (info: MessageInfo) => {
         TM.openManialink(this.openId, info.login)
@@ -33,10 +33,12 @@ export default class SectorRecords extends PopupWindow {
     })
     sectorRecords.addListener('BestSector', () => this.reRender())
     sectorRecords.addListener('SectorsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries + 1))
+      this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries))
       this.reRender()
     })
-    sectorRecords.addListener('PlayerSector', () => this.reRender())
+    sectorRecords.addListener('PlayerSector', (login) => this.reRenderToPlayer(login))
+    sectorRecords.addListener('DeleteBestSector', () => this.reRender())
+    sectorRecords.addListener('DeletePlayerSector', (login) => this.reRenderToPlayer(login))
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -49,6 +51,12 @@ export default class SectorRecords extends PopupWindow {
       const page = this.paginator.getPageByLogin(login)
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
+  }
+
+  private reRenderToPlayer(login: string): void {
+    if(!this.getPlayersWithWindowOpen().includes(login)) { return }
+    const page = this.paginator.getPageByLogin(login)
+    this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
   protected async constructContent(login: string, params: { page: number }): Promise<string> {
@@ -90,16 +98,19 @@ export default class SectorRecords extends PopupWindow {
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
       const sector = personalSectors.find(a => a.login === login)?.sectors[i + sectorIndex - 1]
       if (sector === undefined || sector === null) { return centeredText('--:--.-', w, h) }
-      let differenceString: string
-      const difference = (sectors?.[i + sectorIndex - 1]?.sector ?? 0) - sector
-      if (sectors?.[i + sectorIndex - 1]?.login === login) {
-        differenceString = ''
-      } else if (difference > 0) {
-        differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
-      } else if (difference === 0) {
-        differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
-      } else {
-        differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+      let differenceString = ''
+      const bestSec = sectors?.[i + sectorIndex - 1]?.sector
+      if (bestSec !== undefined) {
+        const difference = bestSec - sector
+        if (sectors?.[i + sectorIndex - 1]?.login === login) {
+          differenceString = ''
+        } else if (difference > 0) {
+          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+        } else if (difference === 0) {
+          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+        } else {
+          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+        }
       }
       return centeredText(differenceString + ' ' + TM.Utils.getTimeString(sector), w, h)
     }
@@ -128,21 +139,23 @@ export default class SectorRecords extends PopupWindow {
       if (secs === undefined || secs.some(a => a === null)) {
         return centeredText('--:--.-', w, h)
       }
-      const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
+      let differenceString = ''
       const sum = secs.map(a => a === null ? 0 : a).reduce((acc, cur) => acc += cur)
-      let differenceString: string
-      const difference = sum - bestSum
-      if (difference > 0) {
-        differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
-      } else if (difference === 0) {
-        differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
-      } else {
-        differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+      if (!sectors.some(a => a === null)) {
+        const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
+        const difference = bestSum - sum
+        if (difference > 0) {
+          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+        } else if (difference === 0) {
+          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+        } else {
+          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+        }
       }
       return centeredText(differenceString + ' ' + TM.Utils.getTimeString(sum), w, h)
     }
 
-    const rows = Math.min(this.entries, sectors.length)
+    const rows = Math.min(this.entries, sectors.length - sectorIndex)
     const arr: (GridCellObject | GridCellFunction)[] = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, bestSectorCell, personalSectorCell)
@@ -151,8 +164,8 @@ export default class SectorRecords extends PopupWindow {
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(login)
+  protected constructFooter(login: string, params: { page: number }): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(params.page)
   }
 
 }

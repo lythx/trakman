@@ -140,6 +140,7 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private async onSkipVoteButtonClick(login: string, nickname: string) {
+    if (this.lastMapRes) { return }
     if (this.skipVoteCount === 2) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Too many votes failed.`, login)
       return
@@ -147,7 +148,7 @@ export default class ButtonsWidget extends StaticComponent {
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
+    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmRed}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
@@ -189,7 +190,7 @@ export default class ButtonsWidget extends StaticComponent {
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
     if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.vote}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
+    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmGreen}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
@@ -234,6 +235,7 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private onSkipButtonClick = async (login: string, nickname: string): Promise<void> => {
+    if (this.lastMapRes) { return }
     const res = await TM.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
     if (res instanceof Error) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`)
@@ -241,8 +243,8 @@ export default class ButtonsWidget extends StaticComponent {
       const cfg = this.config.paySkip
       let countDown = cfg.timeout
       const startTime = Date.now()
-      TM.sendMessage(`${TM.palette.server}» ${TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
-        + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}${TM.palette.donation}.`)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
+        + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}s${TM.palette.donation}.`)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
       if (this._isDisplayed === true) { await this.display() }
@@ -268,7 +270,7 @@ export default class ButtonsWidget extends StaticComponent {
     if (res instanceof Error) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`)
     } else if (res === true) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${cost}C ${TM.palette.donation}to replay the ongoing map.`)
       TM.addToJukebox(TM.map.id, login)
       this.resCostIndex++
@@ -444,6 +446,7 @@ export default class ButtonsWidget extends StaticComponent {
       iconWidth: cfg.version.width,
       iconHeight: cfg.version.height,
       padding: cfg.version.padding,
+      actionId: IDS.changelog
     }
     // Time
     const timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
@@ -484,7 +487,7 @@ export default class ButtonsWidget extends StaticComponent {
       iconWidth: cfg.sectorRecords.width,
       iconHeight: cfg.sectorRecords.height,
       padding: cfg.sectorRecords.padding,
-      //actionId: IDS.sectorRecords,
+      actionId: IDS.sectorRecords,
       equalTexts: true
     }
     // Github repo

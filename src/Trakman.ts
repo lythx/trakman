@@ -21,6 +21,14 @@ import { ServerConfig } from './ServerConfig.js'
 import dsc from 'dice-similarity-coeff'
 import { Logger } from './Logger.js'
 import http from 'http'
+import { PlayerIdsRepository } from './database/PlayerIdsRepository.js'
+import { MapIdsRepository } from './database/MapIdsRepository.js'
+
+const playerIdsRepo = new PlayerIdsRepository()
+await playerIdsRepo.initialize()
+
+const mapIdsRepo = new MapIdsRepository()
+await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 await DB.initialize()
@@ -68,6 +76,12 @@ export const TRAKMAN = {
     }
     return title
   },
+
+  getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
+
+  getMapDBId: mapIdsRepo.get.bind(mapIdsRepo),
+
+  DatabaseClient: Database,
 
   /**
    * Removes all TM formatting from a string
@@ -319,8 +333,8 @@ export const TRAKMAN = {
    * Outputs an error message into the console and exits the process
    * @param lines Error messages
    */
-  fatalError(...lines: string[]): void {
-    Logger.fatal(...lines)
+  async fatalError(...lines: string[]): Promise<void> {
+    await Logger.fatal(...lines)
   },
 
   /**
@@ -371,6 +385,7 @@ export const TRAKMAN = {
     const temp: any = PlayerService.getPlayer(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
+    if(info.privilege < 0) { return }
     Events.emitEvent('Controller.ManialinkClick', info)
   },
 
@@ -511,6 +526,16 @@ export const TRAKMAN = {
         return undefined
     }
   },
+
+  /**
+   * Gets the appropriate verb and calculates record differences
+   * @param prevPos Previous record index
+   * @param currPos Current record index
+   * @param prevTime Previous record time
+   * @param currTime Current record time
+   * @returns Object containing the string to use, whether calculation is needed, and the difference
+   */
+  getRankingString: Utils.getRankingString.bind(Utils),
 
   /**
    * @returns remaining map time in seconds
@@ -700,6 +725,14 @@ export const TRAKMAN = {
       server: this.colours.yellow,
       // Voting messages
       vote: this.colours.chartreuse,
+      // Green
+      tmGreen: '$af4',
+      // Red
+      tmRed: '$e22',
+      // Yellow
+      tmYellow: '$fc1',
+      // Purple
+      tmPurple: '$73f'
     }
   },
 

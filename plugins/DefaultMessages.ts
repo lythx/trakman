@@ -1,6 +1,7 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 import config from '../config.json' assert { type: 'json' }
 import { Logger } from '../src/Logger.js'
+import 'dotenv/config'
 
 const events: TMListener[] = [
   {
@@ -12,37 +13,66 @@ const events: TMListener[] = [
   },
   {
     event: ['Controller.BeginMap', 'Controller.Ready'],
-    callback: (): void => {
+    callback: async (): Promise<void> => {
+      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
       for (const player of TM.players) {
-        let msg: string
         const index: number = TM.localRecords.findIndex(a => a.login === player.login)
         if (index === -1) {
-          msg = `${TM.palette.error}You don't have a PB on this map.`
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
         } else {
           const rec: TMLocalRecord = TM.localRecords[index]
-          msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
-            + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}Personal best${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, the `
+            + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`, player.login)
         }
-        TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
+        const playerRank: number | undefined = player.rank
+        if (allRanks instanceof Error) {
+          Logger.error('how')
+          return
+        }
+        if (playerRank === undefined) {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a rank on the server yet.`, player.login)
+        } else {
+          TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You are currently ranked ${TM.palette.rank + TM.Utils.getPositionString(playerRank)} ${TM.palette.record}out `
+            + `of ${TM.palette.highlight + allRanks[0].count}${TM.palette.record} people total.`, player.login)
+        }
       }
     }
   },
   {
     event: 'Controller.PlayerJoin',
-    callback: (player: JoinInfo): void => {
-      let msg: string
+    callback: async (player: JoinInfo): Promise<void> => {
       const index: number = TM.localRecords.findIndex(a => a.login === player.login)
       if (index === -1) {
-        msg = `${TM.palette.error}You don't have a PB on this map.`
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
       } else {
         const rec: TMLocalRecord = TM.localRecords[index]
-        msg = `${TM.palette.record}PB${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, `
-          + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}Personal best${TM.palette.highlight}: ${TM.Utils.getTimeString(rec.time)}${TM.palette.record}, the `
+          + `${TM.palette.rank + TM.Utils.getPositionString(index + 1)} ${TM.palette.record}record.`, player.login)
       }
-      TM.sendMessage(`${TM.palette.server}» ${msg}`, player.login)
+      const playerRank: number | undefined = player.rank
+      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
+      if (allRanks instanceof Error) {
+        Logger.error('how')
+        return
+      }
+      if (playerRank === undefined) {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a rank on the server yet.`, player.login)
+      } else {
+        TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You are currently ranked ${TM.palette.rank + TM.Utils.getPositionString(playerRank)} ${TM.palette.record}out `
+          + `of ${TM.palette.highlight + allRanks[0].count}${TM.palette.record} people total.`, player.login)
+      }
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
+    }
+  },
+  {
+    event: 'Controller.EndMap',
+    callback: (endMapInfo: EndMapInfo): void => {
+      if (endMapInfo.winnerLogin === undefined || endMapInfo.winnerWins === undefined) {
+        return
+      }
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You have won your ${TM.palette.rank + TM.Utils.getPositionString(endMapInfo.winnerWins)}${TM.palette.record} race.`, endMapInfo.winnerLogin)
     }
   },
   {
@@ -55,59 +85,28 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: (info: RecordInfo): void => {
-      let rs = { str: '', calcDiff: false } // Rec status
-      let diff // Difference
-      if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-      else if (info.previousPosition > info.position) { rs.str = 'obtained', rs.calcDiff = true }
-      else if (info.previousPosition === info.position && info.previousTime === info.time) { rs.str = 'equaled', rs.calcDiff = false }
-      else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      if (rs.calcDiff) {
-        diff = TM.Utils.getTimeString(info.previousTime - info.time)
-        let i: number = -1
-        while (true) {
-          i++
-          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
-          if (Number(diff[i]) !== 0) { continue }
-          diff = diff.substring(1)
-          i--
-          if (diff[i + 1] === ':') {
-            diff = diff.substring(1)
-          }
-        }
+      let prevPos = info.previousPosition
+      let prevTime = info.previousTime
+      if (info.previousPosition > Number(process.env.LOCALS_AMOUNT)) {
+        prevPos = -1
+        prevTime = -1
       }
+      const rs = TM.getRankingString(prevPos, info.position, prevTime, info.time)
+      Logger.debug(JSON.stringify(TM.getRankingString(info.previousPosition, info.position, info.previousTime, info.time)))
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.record} has `
-        + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.record} `
+        + `${rs.status} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.record} `
         + `local record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.time)}`
-        + `${rs.calcDiff ? ` ${TM.palette.record}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.record})` : ``}`)
+        + `${rs.difference !== undefined ? ` ${TM.palette.record}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${rs.difference + TM.palette.record})` : ``}`)
     }
   },
   {
     event: 'Controller.DedimaniaRecord',
     callback: (info: DediRecordInfo): void => {
-      let rs = { str: '', calcDiff: false } // Rec status
-      let diff // Difference
-      if (info.previousPosition === -1) { rs.str = 'acquired', rs.calcDiff = false }
-      else if (info.previousPosition > info.position) { rs.str = 'obtained', rs.calcDiff = true }
-      else if (info.previousPosition === info.position && info.previousTime === info.time) { rs.str = 'equaled', rs.calcDiff = false }
-      else if (info.previousPosition === info.position) { rs.str = 'improved', rs.calcDiff = true }
-      if (rs.calcDiff) {
-        diff = TM.Utils.getTimeString(info.previousTime - info.time)
-        let i: number = -1
-        while (true) {
-          i++
-          if (diff[i] === undefined || (!isNaN(Number(diff[i])) && Number(diff[i]) !== 0) || diff.length === 4) { break }
-          if (Number(diff[i]) !== 0) { continue }
-          diff = diff.substring(1)
-          i--
-          if (diff[i + 1] === ':') {
-            diff = diff.substring(1)
-          }
-        }
-      }
+      const rs = TM.getRankingString(info.previousPosition, info.position, info.previousTime, info.time)
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.dedirecord} has `
-        + `${rs.str} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.dedirecord} `
+        + `${rs.status} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.dedirecord} `
         + `dedimania record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.time)}`
-        + `${rs.calcDiff ? ` ${TM.palette.dedirecord}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${diff + TM.palette.dedirecord})` : ``}`)
+        + `${rs.difference !== undefined ? ` ${TM.palette.dedirecord}$n(${TM.palette.rank + info.previousPosition} ${TM.palette.highlight}-${rs.difference + TM.palette.dedirecord})` : ``}`)
     }
   },
 ]

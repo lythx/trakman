@@ -87,7 +87,8 @@
       "pageDoubleLeft",
       "pageLeft",
       "pageRight",
-      "pageDoubleRight"
+      "pageDoubleRight",
+      "pageLast"
     ]
   },
   "map": {
@@ -712,7 +713,7 @@
   "sectorRecords": {
     "title": " Sector Records ",
     "icon": "clock",
-    "entries": 14,
+    "entries": 13,
     "columnProportions": [
       0.7,
       2,
@@ -743,7 +744,11 @@
   },
   "welcomeWindow": {
     "title": "Welcome to Trakman!",
-    "icon": "infoCircle"
+    "icon": "infoCircle",
+    "navbar": [
+      "commandList",
+      "changelog"
+    ]
   },
   "commandList": {
     "title": "Command List",
@@ -780,6 +785,17 @@
         "name": "Server Owner Commands",
         "action": 1500
       }
+    ]
+  },
+  "changelog": {
+    "title": "Changelog",
+    "icon": "codeBranch",
+    "navbar": [
+      {
+        "name": "Info",
+        "action": 190000
+      },
+      "commandList"
     ]
   }
 }

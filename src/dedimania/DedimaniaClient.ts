@@ -8,21 +8,18 @@ import Config from '../../config.json' assert { type: 'json' }
 
 export abstract class DedimaniaClient {
 
-  private static readonly socket: Socket = new Socket()
+  private static socket: Socket = new Socket()
   private static response: DedimaniaResponse
   private static receivingResponse: boolean
   private static sessionId: string
   static connected: boolean
-  private static host: string
-  private static port: number
 
   static async connect(host: string, port: number): Promise<true | Error> {
-    this.host = host
-    this.port = port
     this.receivingResponse = false
     this.connected = false
     this.response = new DedimaniaResponse()
     this.socket?.destroy()
+    this.socket = new Socket()
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
@@ -78,21 +75,12 @@ export abstract class DedimaniaClient {
   }
 
   static setupListeners(): void {
-    this.socket.on('data', buffer => {
+    this.socket.on('data', async buffer => {
       this.response.addData(buffer.toString())
     })
     this.socket.on('error', async err => {
       Logger.error('Dedimania socket error:', err.message)
-      // if (this.connected === false) { return }
       this.connected = false
-      // Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.error}Failed to connect to Dedimania. Retrying...` }])
-      // let status: true | Error
-      // do {
-      //   await new Promise((resolve) => setTimeout(resolve, 10000))
-      //   status = await this.connect(this.host, this.port)
-      // } while (status !== true)
-      // Logger.info(`Reconnected to dedimania after socket error`)
-      // Client.call('ChatSendServerMessage', [{ string: `${TM.palette.server}»» ${TM.palette.admin}Successfully re-established connection with Dedimania.` }])
     })
   }
 
