@@ -799,8 +799,8 @@
     ]
   },
   "cpCounter": {
-    "height": 10,
-    "width": 10,
+    "height": 4.8,
+    "width": 4,
     "title": "Cp Count",
     "side": "false",
     "icon": "mxLogo"
