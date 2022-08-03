@@ -19,7 +19,7 @@ const commands: TMCommand[] = [
     aliases: [
       'laston', 'wins', 'stats', 'song', 'mod',
       'server', 'nations', 'visitors', 'track', 'map',
-      'playtime', 'players', 'best', 'worst', 'summary',
+      'playtime', 'players',  'summary',
       'topsums', 'toprecs', 'chatlog', 'topdons', 'autojuke',
       'xlist', 'history', 'jukebox', 'top100', 'rank',
       'topwins', 'active', 'nextmap', 'nextrank', 'pb',

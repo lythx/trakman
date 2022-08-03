@@ -2,6 +2,7 @@ import PopupWindow from "../PopupWindow.js";
 import { TRAKMAN as TM } from "../../../src/Trakman.js";
 import { centeredText, closeButton, CONFIG, Grid, IDS, verticallyCenteredText, getIcon } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
+import { MAPLIST as ML } from '../../Maplist.js'
 
 export default class MapList extends PopupWindow {
 
@@ -53,11 +54,18 @@ export default class MapList extends PopupWindow {
     })
     TM.addCommand({
       aliases: ['l', 'ml', 'list'],
-      help: 'Display list of maps.',
+      help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: (info: MessageInfo, query?: string): void => {
+      callback: async (info: MessageInfo, query?: string): Promise<void> => {
         if (query === undefined) {
           TM.openManialink(this.openId, info.login)
+          return
+        }
+        const option = query.split(' ').filter(a => a !== '')[0]
+        const arr: ['name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'bestkarma'] = ['name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'bestkarma']
+        const o = arr.find(a => a === option)
+        if (o !== undefined) {
+          await this.openWithOption(info.login, o)
           return
         }
         if (query.startsWith('$a')) {
@@ -65,6 +73,22 @@ export default class MapList extends PopupWindow {
         } else {
           this.openWithQuery(info.login, query)
         }
+      },
+      privilege: 0
+    })
+    TM.addCommand({
+      aliases: ['best'],
+      help: 'Display list of maps sorted by rank ascending.',
+      callback: async (info: MessageInfo): Promise<void> => {
+        await this.openWithOption(info.login, 'best')
+      },
+      privilege: 0
+    })
+    TM.addCommand({
+      aliases: ['worst'],
+      help: 'Display list of maps sorted by rank descending.',
+      callback: async (info: MessageInfo): Promise<void> => {
+        await this.openWithOption(info.login, 'worst')
       },
       privilege: 0
     })
@@ -78,12 +102,35 @@ export default class MapList extends PopupWindow {
     })
   }
 
+  async openWithOption(login: string, option: 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'bestkarma') {
+    let list: TMMap[] = []
+    if (option === 'best' || option === 'worst') {
+      list = await ML.getByPosition(login, option)
+    } else {
+      list = ML.get(option)
+    }
+    const pageCount = Math.ceil(list.length / (this.rows * this.columns))
+    const index = this.playerQueries.findIndex(a => a.login === login)
+    if (index !== -1) {
+      this.playerQueries.splice(index, 1)
+    }
+    const paginator = this.getPaginator(login, list, pageCount)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+  }
+
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
-    const matches = (searchByAuthor === true ? TM.matchString(query, this.sortedList, 'author') :
-      TM.matchString(query, this.sortedList, 'name', true)).filter(a => a.value > 0.1)
+    const list = searchByAuthor === true ? ML.searchByAuthor(query) : ML.searchByName(query)
+    const pageCount = Math.ceil(list.length / (this.rows * this.columns))
+    const index = this.playerQueries.findIndex(a => a.login === login)
+    if (index !== -1) {
+      this.playerQueries.splice(index, 1)
+    }
+    const paginator = this.getPaginator(login, list, pageCount)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+  }
+
+  private getPaginator(login: string, list: TMMap[], pageCount: number) {
     const playerQuery = this.playerQueries.find(a => a.login === login)
-    const pageCount = Math.ceil(matches.length / (this.rows * this.columns))
-    const list = matches.map(a => a.obj)
     let paginator: Paginator
     if (playerQuery !== undefined) {
       const prevLgt = playerQuery.list.length
@@ -101,7 +148,7 @@ export default class MapList extends PopupWindow {
       this.playerQueries.push({ paginator, login, list })
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login, { page, paginator, list }, `${page}/${pageCount}`)
     }
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+    return paginator
   }
 
   private reRender(): void {
