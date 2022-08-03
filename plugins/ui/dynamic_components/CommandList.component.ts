@@ -152,7 +152,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const command: TMCommand = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(TM.strip(text,true))}" valign="center" halign="center"/>`
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: TMCommand = params.commands[i + n]
@@ -171,12 +171,12 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(text)}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(TM.strip(text,true))}" valign="center" halign="center"/>`
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: TMCommand = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(command.help ?? '')}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.safeString(TM.strip(command.help ?? '',true))}" valign="center" halign="center"/>`
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)
