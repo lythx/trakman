@@ -43,9 +43,9 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Welcome to ${TM.palette.highlight + TM.strip(TM.serverConfig.name)}${TM.palette.servermsg}. `
-        + `This server is running Trakman ${TM.palette.highlight}v${config.version}${TM.palette.servermsg}. `
-        + `You can see the recent changes with the ${TM.palette.highlight}/changes ${TM.palette.servermsg}command.`)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Welcome to ${TM.palette.highlight + TM.strip(TM.serverConfig.name)}${TM.palette.error}. `
+        + `This server is running Trakman ${TM.palette.highlight}v${config.version}${TM.palette.error}.\n`
+        + `${TM.palette.server}» ${TM.palette.error}You can see the recent changes with the ${TM.palette.highlight}/changes ${TM.palette.error}command.`, player.login)
       const index: number = TM.localRecords.findIndex(a => a.login === player.login)
       if (index === -1) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
