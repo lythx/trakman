@@ -87,11 +87,15 @@ export class RecordService {
       }
       let currentMap = records[0].map
       let i = 0
+      let pos = 0
       while (true) {
         if (records[i] === undefined) { break }
-        if (records[i].map === currentMap && records[i].login === login) {
-          r[index].rank = i + 1
-          break
+        if (records[i].map === currentMap) {
+          if (records[i].login === login) {
+            r[index].rank = pos + 1
+            break
+          }
+          pos++
         }
         i++
       }
