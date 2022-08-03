@@ -98,7 +98,6 @@ const events: TMListener[] = [
         prevTime = -1
       }
       const rs = TM.getRankingString(prevPos, info.position, prevTime, info.time)
-      Logger.debug(JSON.stringify(TM.getRankingString(info.previousPosition, info.position, info.previousTime, info.time)))
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.record} has `
         + `${rs.status} the ${TM.palette.rank + TM.Utils.getPositionString(info.position)}${TM.palette.record} `
         + `local record. Time${TM.palette.highlight}: ${TM.Utils.getTimeString(info.time)}`
