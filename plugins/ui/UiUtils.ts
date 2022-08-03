@@ -5,6 +5,7 @@ import DropdownMenu from './utils/DropdownMenu.js'
 import RecordList from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
 import CONFIG from './config/UIConfig.json' assert { type: 'json' }
+import RESULTCONFIG from './config/ResultUIConfig.json' assert { type: 'json' }
 import ICONS from './config/Icons.json' assert { type: 'json' }
 import BACKGROUNDS from './config/Backgrounds.json' assert { type: 'json' }
 import IDS from './config/ComponentIds.json' assert { type: 'json' }
@@ -54,7 +55,7 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
 
 export {
   Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject,
-  CONFIG, ICONS, BACKGROUNDS, IDS,
+  CONFIG, ICONS, BACKGROUNDS, IDS,RESULTCONFIG,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition,
   verticallyCenteredText, getIcon

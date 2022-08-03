@@ -1,0 +1,23 @@
+{
+  "map": {
+    "height": 9.13,
+    "side": true,
+    "title": "Next Map",
+    "icons": [
+      "ongoingMap",
+      "tag",
+      "personBuilder",
+      "clockAuthor",
+      "tools",
+      "placeholder",
+      "placeholder"
+    ],
+    "textScale": 1,
+    "noDateText": "N/A",
+    "titles": {
+      "lastTrack": "Last Map",
+      "currTrack": "Ongoing",
+      "nextTrack": "Next Map"
+    }
+  }
+}

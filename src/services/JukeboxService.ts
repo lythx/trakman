@@ -70,7 +70,8 @@ export abstract class JukeboxService {
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin })
     MapService.setNextMap(this._queue[0].map.id)
-    TMXService.addMap(mapId, index)
+    void TMXService.addMap(mapId, index)
+    Events.emitEvent('Controller.JukeboxChanged', this.queue)
     if (callerLogin !== undefined) {
       Logger.trace(`${callerLogin} has added map ${map.name} by ${map.author} to the jukebox`)
     } else {
@@ -89,7 +90,8 @@ export abstract class JukeboxService {
     this._queue.splice(index, 1)
     this.fillQueue()
     MapService.setNextMap(this._queue[0].map.id)
-    TMXService.removeMap(index)
+    void TMXService.removeMap(index)
+    Events.emitEvent('Controller.JukeboxChanged', this.queue)
     return true
   }
 
@@ -102,6 +104,7 @@ export abstract class JukeboxService {
       }
     }
     this.fillQueue()
+    Events.emitEvent('Controller.JukeboxChanged', this.queue)
     if (callerLogin !== undefined) {
       Logger.trace(`${callerLogin} has cleared the jukebox`)
     } else {
@@ -113,6 +116,7 @@ export abstract class JukeboxService {
     MapService.shuffle(callerLogin)
     this._queue.length = 0
     this.fillQueue()
+    Events.emitEvent('Controller.JukeboxChanged', this.queue)
   }
 
   static get jukebox(): ({ map: TMMap, callerLogin?: string })[] {

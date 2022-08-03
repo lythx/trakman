@@ -165,6 +165,7 @@ export class Listeners {
     {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]): Promise<void> => {
+        GameService.state = 'race'
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         await GameService.update()
         await RecordService.fetchAndSaveRecords(params[0].UId)
@@ -203,6 +204,7 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
+        GameService.state = 'result'
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists
@@ -227,6 +229,9 @@ export class Listeners {
       callback: (params: any[]): void => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
+        if (params[0] === 4 || params[0]===5) {
+          GameService.startTimer()
+        }
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play
         // if (params[1][0] == 4)
