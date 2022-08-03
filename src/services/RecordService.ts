@@ -34,7 +34,6 @@ export class RecordService {
     if (typeof mapIds === 'string') {
       return undefined //TODO
     } else {
-      console.log(mapIds[0])
       const records = await this.repo.get(...mapIds)
       const positions: number[] = []
       let i = -1
