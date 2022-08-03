@@ -22,7 +22,7 @@ import AdminPanel from './static_components/AdminPanel.component.js'
 import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/BestCps.component.js'
 import BestFinishes from './static_components/BestFinishes.component.js'
-import CpCounter from './static_components/CpCounter.compnent.js'
+import CpCounter from './static_components/CpCounter.component.js'
 
 /*
 ------------------
