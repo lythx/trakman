@@ -15,7 +15,7 @@ On Windows, the installation instructions might be a little goofy and I'm not wi
 ### Install & Run
 1. Get a hold of the current main branch via `git clone` or by downloading the source
 2. `$ npm i` to install all the dependencies
-3. Copy `.env.example` to `.env` and configure [settings](https://github.com/felacek/trakman/README.md#settings)
+3. Copy `.env.example` to `.env` and configure [settings](#settings)
 4. `$ npx tsc` to [transpile](https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html#compiling-your-code) the code
 5. `$ node ./built/src/Main.js` to run the controller
 
@@ -53,14 +53,14 @@ Before configuring this, please see the [wiki page](https://github.com/felacek/t
 ##### Trackmania Exchange
 - `USE_TMX`: Enable or disable track info fetching from TMExchange (`YES` or `NO`)
 - `TMX_PREFETCH_AMOUNT`: Amount of tracks to be pre-fetched from TMExchange (`4` by default)
-#### ManiaKarma
+##### ManiaKarma
 - `USE_MANIAKARMA`: Enable or disable the use of Maniakarma global votes (`YES` or `NO`)
 - `MANIAKARMA_PREFETCH_AMOUNT`: Amount of tracks to have Maniakarma fetched for (`4` by default)
-#### Freezone
+##### Freezone
 Note that enabling the plugin will not magically make your server Freezone-active, [gaze upon the wiki page](https://github.com/felacek/trakman/wiki/Freezone-Configuration) for a proper tutorial
 - `USE_FREEZONE`: Enable or disable the Freezone plugin (`YES` or `NO`)
 - `FREEZONE_PASSWORD`: Your freezone TMWS password
-#### Logging
+##### Logging
 If you want to use the Discord logging feature, please [take a look at the Discord webhook docs](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) first
 - `LOG_LEVEL`: The level of logging (`1` - error, `2` - warn, `3` - info, `4` - debug, `5` - trace)
 - `USE_DISCORD_LOG`: Enable or disable sending logs to Discord (`YES` or `NO`)
@@ -72,3 +72,4 @@ If you want to use the Discord logging feature, please [take a look at the Disco
 1. Stunts mode is not supported (yet?)
 2. Rounds mode is not supported by the UI (yet)
 3. Some methods/callbacks were never tested, thus may disfunction (very unlikely)
+4. Stability is questionable as of now
