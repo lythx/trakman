@@ -68,11 +68,12 @@ export class RecordRepository extends Repository {
     const query = `SELECT uid, login, time, checkpoints, date FROM records
     JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
-    WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join(' ').slice(0, -3)}
+    WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
     date DESC;`
     const playerIds = await playerIdsRepo.get(logins)
     const res = (await this.query(query, ...playerIds.map(a => a.id)))
+    console.log(res, 'res')
     return res.map(a => this.constructRecordObject(a))
   }
 
