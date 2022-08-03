@@ -20,7 +20,7 @@ export class RecordService {
       await Logger.fatal('LOCALS_AMOUNT is undefined or not a number. Check your .env file')
     }
     await this.repo.initialize()
-    await this.fetchRecords(MapService.current.id)
+    await this.fetchAndAddRecords(MapService.current.id)
     this.initialLocals.push(...this._localRecords)
     Events.addListener('Controller.BeginMap', (): void => {
       this.initialLocals.length = 0
@@ -28,7 +28,49 @@ export class RecordService {
     })
   }
 
-  static async fetchRecords(mapId: string): Promise<TMLocalRecord[]> {
+  static async fetchMapRank(login: string, mapId: string): Promise<number | undefined>
+  static async fetchMapRank(login: string, mapIds: string[]): Promise<{ mapId: string, rank: number }[]>
+  static async fetchMapRank(login: string, mapIds: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
+    if (typeof mapIds === 'string') {
+      return undefined //TODO
+    } else {
+      console.log(mapIds[0])
+      const records = await this.repo.get(...mapIds)
+      const positions: number[] = []
+      let i = -1
+      while (true) {
+        i++
+        if (records[i] === undefined) { break }
+        const id = records[i].map
+        if (positions[mapIds.indexOf(id)] !== undefined) {  continue}
+        let index = 0
+        let j = 0
+        while (true) {
+          if (records[j] === undefined) {
+            positions[mapIds.indexOf(id)] = -1
+            break
+          }
+          if (records[j].map === id) {
+            if (records[j].login === login) {
+              positions[mapIds.indexOf(id)] = index + 1
+              break
+            }
+            index++
+          }
+          j++
+        }
+      }
+      const ret: { mapId: string, rank: number }[] = []
+      for (let i = 0; i < mapIds.length; i++) {
+        if (positions[i] !== -1 && positions[i] !== undefined) {
+          ret.push({ mapId: mapIds[i], rank: positions[i] })
+        }
+      }
+      return ret
+    }
+  }
+
+  static async fetchAndAddRecords(mapId: string): Promise<TMLocalRecord[]> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
     const records: TMRecord[] = await this.repo.get(mapId)
@@ -47,12 +89,20 @@ export class RecordService {
     return this._localRecords
   }
 
+  static async fetchRecords(...mapId: string[]): Promise<TMRecord[]> {
+    return await this.repo.get(...mapId)
+  }
+
+  static async fetchRecordsByLogin(...logins: string[]): Promise<TMRecord[]> {
+    return await this.repo.getByLogin(...logins)
+  }
+
   static async getRecordsAmount(login: string): Promise<number> {
     return await this.repo.countRecords(login)
   }
 
   static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {
-    return await this.repo.getByLogin(mapId, login)
+    return await this.repo.getOne(mapId, login)
   }
 
   static get localRecords(): TMLocalRecord[] {

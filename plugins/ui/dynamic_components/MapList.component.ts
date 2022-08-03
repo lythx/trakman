@@ -150,13 +150,15 @@ export default class MapList extends PopupWindow {
     this.hideToPlayer(info.login)
   }
 
-  protected constructContent(login: string, params: { page: number, list: TMMap[] }): string {
+  protected async constructContent(login: string, params: { page: number, list: TMMap[] }): Promise<string> {
     const maps = params.list
     const startIndex = (this.rows * this.columns) * (params.page - 1)
     const mapsToDisplay = Math.min(maps.length - startIndex, this.rows * this.columns)
+    const recordIndexStrings = await this.getRecordIndexStrings(login, ...maps.slice(startIndex, (this.rows * this.columns) + startIndex).map(a => a.id))
     const cell = (i: number, j: number, w: number, h: number) => {
-      const index = startIndex + (i * this.columns) + j
-      const recordIndexString = this.getRecordIndexString(login, maps[index].id)
+      const gridIndex = (i * this.columns) + j
+      const recordIndexString = recordIndexStrings[gridIndex]
+      const index = startIndex + gridIndex
       const actionId = this.getActionId(maps[index].id)
       const header = this.getHeader(login, index, maps[index].id, actionId, w, h)
       const rowH = (h - this.margin) / 4
@@ -229,7 +231,7 @@ export default class MapList extends PopupWindow {
         + `${TM.palette.vote}removed ${TM.palette.highlight + TM.strip(challenge.name, true)}${TM.palette.vote} from the queue.`)
     }
     else {
-      if (privilege <= 0 && TM.jukebox.find(a => a.callerLogin === login)) {
+      if (privilege <= 0 && TM.jukebox.some(a => a.callerLogin === login)) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.vote}You can't add more than one map to the queue.`)
         return false
       }
@@ -240,10 +242,38 @@ export default class MapList extends PopupWindow {
     return true
   }
 
-  private getRecordIndexString(login: string, mapId: string): string {
-    const recordIndex = TM.records.filter(a => a.map === mapId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
-    if (recordIndex === 0) { return "--." }
-    else { return TM.Utils.getPositionString(recordIndex) }
+  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
+    const records = await TM.fetchRecords(...mapIds)
+    const positions: number[] = []
+    let i = -1
+    while (true) {
+      i++
+      if (records[i] === undefined) { break }
+      const id = records[i].map
+      if (positions[mapIds.indexOf(id)] !== undefined) { continue }
+      let index = 0
+      let j = 0
+      while (true) {
+        if (records[j] === undefined) {
+          positions[mapIds.indexOf(id)] = -1
+          break
+        }
+        if (records[j].map === id) {
+          if (records[j].login === login) {
+            positions[mapIds.indexOf(id)] = index + 1
+            break
+          }
+          index++
+        }
+        j++
+      }
+    }
+    const ret: string[] = []
+    for (let i = 0; i < mapIds.length; i++) {
+      if (positions[i] === -1 || positions[i] === undefined) { ret.push("--.") }
+      else { ret.push(TM.Utils.getPositionString(positions[i])) }
+    }
+    return ret
   }
 
   private getActionId(mapId: string): number {
