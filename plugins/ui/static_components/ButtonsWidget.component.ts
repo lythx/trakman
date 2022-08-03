@@ -147,7 +147,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
-    if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
+    if (TM.remainingMapTime  <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmRed}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
@@ -189,7 +189,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
-    if ((TM.getRemainingMapTime() ?? Infinity) <= 30) { return }
+    if (TM.remainingMapTime <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmGreen}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
@@ -203,7 +203,7 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (result === true) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}replay `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}has passed${TM.palette.vote}.`)
-      TM.addToJukebox(TM.map.id, undefined, true)
+         TM.addToJukebox(TM.map.id, undefined, true)
       this.resVoteCount++
       this.isRes = true
       this.onMapReplay()
@@ -216,7 +216,7 @@ export default class ButtonsWidget extends StaticComponent {
         const player = TM.getPlayer(result.callerLogin)
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to replay the ongoing map`)
-        TM.addToJukebox(TM.map.id, undefined, true)
+           TM.addToJukebox(TM.map.id, undefined, true)
       }
       this.resVoteCount++
       this.isRes = true
@@ -272,7 +272,7 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (res === true) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${cost}C ${TM.palette.donation}to replay the ongoing map.`)
-      TM.addToJukebox(TM.map.id, login)
+         TM.addToJukebox(TM.map.id, login)
       this.resCostIndex++
       this.isRes = true
       this.onMapReplay()

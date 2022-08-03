@@ -350,8 +350,8 @@ export const TRAKMAN = {
    * Adds a map to the queue
    * @param mapId Map UID
    */
-  addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
-    JukeboxService.add(mapId, callerLogin, setAsNextMap)
+   addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
+     JukeboxService.add(mapId, callerLogin, setAsNextMap)
   },
 
   /**
@@ -539,7 +539,13 @@ export const TRAKMAN = {
   /**
    * @returns remaining map time in seconds
    */
-  getRemainingMapTime: Utils.getRemainingMapTime,
+  get remainingMapTime(): number {
+    return GameService.remainingMapTime
+  },
+
+  get remainingResultTime(): number {
+    return GameService.remainingResultTime
+  },
 
   /**
    * Adds a callback listener which will be executed when one of the specified dedicated methods gets called
@@ -573,6 +579,9 @@ export const TRAKMAN = {
 
   matchString: Utils.matchString,
 
+  get serverState(): "race" | "result" {
+    return GameService.state
+  },
 
   /**
    * Attempts to convert the player nickname to their login via charmap

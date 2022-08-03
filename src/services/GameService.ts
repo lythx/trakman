@@ -1,5 +1,4 @@
 import { Client } from '../client/Client.js'
-import { Events } from '../Events.js'
 import { Logger } from '../Logger.js'
 
 export class GameService {
@@ -28,6 +27,8 @@ export class GameService {
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
   ]
+  private static _state: 'race' | 'result' = 'race'
+  private static _timerStartTimestamp = Date.now()
 
   static async initialize(): Promise<void> {
     const status = this.update()
@@ -38,6 +39,29 @@ export class GameService {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
+    this.startTimer()
+  }
+
+  static set state(state: 'race' | 'result') {
+    this._state = state
+  }
+
+  static startTimer() {
+    this._timerStartTimestamp = Date.now()
+  }
+
+  static get remainingMapTime(): number {
+    if (this._state === 'result') { return 0 }
+    return Math.round((this.game.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
+  }
+
+  static get remainingResultTime(): number {
+    if (this._state === 'race') { return 0 }
+    return Math.round((this.game.chatTime - (Date.now() - this._timerStartTimestamp)) / 1000)
+  }
+
+  static get state(): 'race' | 'result' {
+    return this._state
   }
 
   static async update(): Promise<void> {

@@ -1,4 +1,4 @@
-import { CONFIG as CFG, IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObjectProperty } from '../UiUtils.js'
+import { RESULTCONFIG as RCFG, IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 import countries from '../../../src/data/Countries.json' assert {type: 'json'}
 import flags from '../config/FlagIcons.json' assert {type: 'json'}
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
@@ -7,35 +7,66 @@ import { Logger } from '../../../src/Logger.js'
 
 export default class MapWidget extends StaticComponent {
 
-  private readonly width = CFG.static.width
-  private readonly height: number
-  private readonly positionX: number
-  private readonly positionY: number
+  private width = CONFIG.static.width
+  private height: number
+  private positionX: number
+  private positionY: number
   private xml: string = ''
-  private readonly grid: Grid
   private authorNickname: string | undefined
   private authorNation: string | undefined
+  private nextAuthorNickname: string | undefined
+  private nextAuthorNation: string | undefined
 
   constructor() {
-    super(IDS.map, { hideOnResult: true })
-    // Here height is 4 headers instead of config height
+    super(IDS.map)
+    // Here height is 4 (or 5 if result screen) headers instead of config height
     // To set correct height in config after changing header height copy this.height from debbuger / console.log()
-    this.height = (CFG.staticHeader.height + CFG.marginSmall) * 4 + CFG.marginSmall
+    this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * 4 + CONFIG.marginSmall
     const pos = getStaticPosition('map')
     this.positionX = pos.x
     this.positionY = pos.y
-    this.grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(4).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") {
       void this.fetchWebservices(TM.map.author)
-      TM.addListener('Controller.BeginMap', async (info) => {
-        this.authorNickname = undefined
-        this.authorNation = undefined
-        void this.fetchWebservices(info.author)
+      this.authorNickname = this.nextAuthorNickname
+      this.authorNation = this.nextAuthorNation
+      void this.fetchWebservices(TM.mapQueue[0].id)
+      TM.addListener('Controller.BeginMap', async () => {
+        this.setClassVars('race')
+        this.authorNickname = this.nextAuthorNickname
+        this.authorNation = this.nextAuthorNation
+        this.nextAuthorNickname = undefined
+        this.nextAuthorNation = undefined
+        void this.fetchWebservices(TM.mapQueue[0].id)
         this.display()
       })
+      TM.addListener('Controller.JukeboxChanged', (queue) => {
+        console.log(queue[0].name)
+        void this.fetchWebservices(queue[0].id)
+      })
     } else {
-      TM.addListener('Controller.BeginMap', async (info) => this.display())
+      TM.addListener('Controller.BeginMap', async () => {
+        this.setClassVars('race')
+        this.display()
+      })
+      TM.addListener('Controller.JukeboxChanged', () => {
+        void this.display()
+      })
     }
+    TM.addListener('Controller.EndMap', async () => {
+      this.setClassVars('result')
+      this.display()
+    })
+    TM.addListener('Controller.TMXQueueChanged', () => {
+      this.display()
+    })
+  }
+
+  setClassVars(state: 'race' | 'result') {
+    const rows = state === 'race' ? 4 : 5
+    this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
+    const pos = getStaticPosition('map')
+    this.positionX = pos.x
+    this.positionY = pos.y
   }
 
   private async fetchWebservices(author: string) {
@@ -44,10 +75,9 @@ export default class MapWidget extends StaticComponent {
     const json: any = await TM.fetchWebServices(author)
     if (json instanceof Error) { // UNKOWN PLAYER MOMENT
       Logger.warn(`Failed to fetch nickname for login ${author}`, json.message)
-      this.authorNickname = author
     } else {
-      this.authorNickname = json?.nickname
-      this.authorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
+      this.nextAuthorNickname = json?.nickname
+      this.nextAuthorNation = countries.find(a => a.name === json?.path?.split('|')[1])?.code
     }
     if (this._isDisplayed === true) {
       this.display()
@@ -65,10 +95,27 @@ export default class MapWidget extends StaticComponent {
   }
 
   private updateXML(): void {
-    const author: string = this.authorNickname ?? TM.map.author
-    const date: Date | undefined = TM.TMXCurrent?.lastUpdateDate
-    const texts: (string | undefined)[] = [CFG.map.title, TM.safeString(TM.map.name), TM.safeString(author), TM.Utils.getTimeString(TM.map.authorTime), date === undefined ? undefined : TM.formatDate(date)]
-    const icons: string[] = CFG.map.icons.map(a => stringToObjectProperty(a, ICONS))
+    console.log(TM.serverState)
+    const isRace = TM.serverState === 'race'
+    const rows = isRace ? 4 : 5
+    this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
+    const map = isRace ? TM.map : TM.mapQueue[0]
+    const author: string = this.authorNickname ?? map.author
+    const cfg = isRace ? CONFIG.map : RCFG.map
+    const tmxmap = isRace ? TM.TMXCurrent : TM.TMXNext[0]
+    const date: Date | undefined = tmxmap?.lastUpdateDate
+    const tmxwr = tmxmap?.replays?.[0]?.time
+    const grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(rows).fill(1))
+    const texts: (string | undefined)[] = [
+      cfg.title,
+      TM.safeString(map.name),
+      TM.safeString(author),
+      TM.Utils.getTimeString(map.authorTime),
+      date === undefined ? undefined : TM.formatDate(date),
+      tmxmap?.awards === undefined ? undefined : tmxmap?.awards.toString(),
+      tmxwr === undefined ? undefined : TM.Utils.getTimeString(tmxwr)
+    ]
+    const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
     if (this.authorNation !== undefined) {
       icons[2] = (flags as any)[this.authorNation] // cope typescript
     }
@@ -79,16 +126,16 @@ export default class MapWidget extends StaticComponent {
         <frame posn="0 0 1">
           ${staticHeader(texts[i] ?? '', icons[i] ?? '', true, {
           rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-          textScale: CONFIG.map.textScale,
+          textScale: cfg.textScale,
           centerText: true,
           textBackgrund: CONFIG.static.bgColor
         })}
         </frame>
         <frame posn="${(headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)) +
           headerCFG.squareWidth + (headerCFG.margin * 2)} 0 1">
-          ${staticHeader(texts[i + 1] ?? CONFIG.map.noDateText, icons[i + 1] ?? '', true, {
+          ${staticHeader(texts[i + 1] ?? cfg.noDateText, icons[i + 1] ?? '', true, {
             rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-            textScale: CONFIG.map.textScale,
+            textScale: cfg.textScale,
             centerText: true,
             textBackgrund: CONFIG.static.bgColor
           })}
@@ -98,18 +145,40 @@ export default class MapWidget extends StaticComponent {
       <frame posn="0 0 1">
         ${i === 0 ? staticHeader(texts[i] ?? '', icons[i] ?? '', true) :
           staticHeader(TM.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
-            textScale: CONFIG.map.textScale,
+            textScale: cfg.textScale,
             textBackgrund: CONFIG.static.bgColor,
             centerVertically: true,
             horizontalPadding: 0.3
           })}
       </frame>`
     }
+    const resultCell: GridCellFunction = (i, j, w, h) => {
+      return `<frame posn="0 0 1">
+      ${staticHeader(texts[i + 1] ?? cfg.noDateText, icons[i + 1] ?? '', true, {
+        rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
+        textScale: cfg.textScale,
+        centerText: true,
+        textBackgrund: CONFIG.static.bgColor
+      })}
+    </frame>
+    <frame posn="${(headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)) +
+        headerCFG.squareWidth + (headerCFG.margin * 2)} 0 1">
+      ${staticHeader(texts[i + 2] ?? cfg.noDateText, icons[i + 2] ?? '', true, {
+          rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
+          textScale: cfg.textScale,
+          centerText: true,
+          textBackgrund: CONFIG.static.bgColor
+        })}
+    </frame>`
+    }
     const arr: any[] = new Array(4).fill(cell)
+    if (!isRace) {
+      arr.push(resultCell)
+    }
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.grid.constructXml(arr)}
+        ${grid.constructXml(arr)}
       </frame>
       </manialink>`
   }

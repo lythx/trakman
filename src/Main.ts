@@ -35,8 +35,8 @@ async function main(): Promise<void> {
   ])
   if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
-  if(process.env.FIX_RANK_COHERENCE === "YES") {
-      await fixCoherence()
+  if (process.env.FIX_RANK_COHERENCE === "YES") {
+    await fixCoherence()
   }
   Logger.trace('Retrieving game info...')
   await GameService.initialize()

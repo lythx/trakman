@@ -3,6 +3,7 @@ import { JukeboxService } from './JukeboxService.js'
 import 'dotenv/config'
 import CONFIG from '../../config.json' assert { type: 'json' }
 import { Logger } from '../Logger.js'
+import { Events } from '../Events.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
@@ -43,12 +44,14 @@ export abstract class TMXService {
     this._current = next
     const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static restartMap(): void {
     if (this.isActive === false) { return }
     this._previous.unshift(this._current === null ? null : { ...this._current })
     this._previous.length = Math.min(this._previous.length, this.previousSize)
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static async addMap(id: string, index: number): Promise<void> {
@@ -56,6 +59,7 @@ export abstract class TMXService {
     const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
     this._next.splice(index, 0, map instanceof Error ? null : map)
     this._next.length = this.nextSize
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static async removeMap(index: number): Promise<void> {
@@ -63,6 +67,7 @@ export abstract class TMXService {
     this._next.splice(index, 1)
     const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static get current(): TMXMapInfo | null {
