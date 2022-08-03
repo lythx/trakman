@@ -619,6 +619,15 @@ export const TRAKMAN = {
     return RecordService.localsAmount
   },
 
+  get playerRanks(): {
+    [login: string]: {
+      mapId: string;
+      rank: number;
+    }[];
+  } {
+    return RecordService.playerRanks
+  },
+
   fetchRecords: RecordService.fetchRecords.bind(RecordService),
 
   fetchRecord: RecordService.fetchRecord.bind(RecordService),

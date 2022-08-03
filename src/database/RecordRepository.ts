@@ -50,6 +50,16 @@ export class RecordRepository extends Repository {
     await this.query(query, ...values)
   }
 
+  async getAll(): Promise<TMRecord[]> {
+    const query = `SELECT uid, login, time, checkpoints, date FROM records
+    JOIN player_ids ON player_ids.id=records.player_id
+    JOIN map_ids ON map_ids.id=records.map_id
+    ORDER BY time ASC,
+    date DESC;`
+    const res = (await this.query(query))
+    return res.map(a => this.constructRecordObject(a))
+  }
+
   async get(...mapUids: string[]): Promise<TMRecord[]> {
     if (mapUids.length === 0) { return [] }
     const query = `SELECT uid, login, time, checkpoints, date FROM records
