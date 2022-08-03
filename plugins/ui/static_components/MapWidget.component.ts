@@ -63,7 +63,7 @@ export default class MapWidget extends StaticComponent {
 
   setClassVars(state: 'race' | 'result') {
     const rows = state === 'race' ? 4 : 5
-    this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
+    this.height = (RCFG.staticHeader.height + RCFG.marginSmall) * rows + RCFG.marginSmall
     const pos = getStaticPosition('map')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -95,7 +95,6 @@ export default class MapWidget extends StaticComponent {
   }
 
   private updateXML(): void {
-    console.log(TM.serverState)
     const isRace = TM.serverState === 'race'
     const rows = isRace ? 4 : 5
     this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
