@@ -385,7 +385,7 @@ export const TRAKMAN = {
     const temp: any = PlayerService.getPlayer(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
-    if(info.privilege < 0) { return }
+    if (info.privilege < 0) { return }
     Events.emitEvent('Controller.ManialinkClick', info)
   },
 
@@ -663,6 +663,10 @@ export const TRAKMAN = {
 
   get gameInfo(): TMGame {
     return Object.assign(GameService.game)
+  },
+
+  get serverConfig(): ServerInfo {
+    return ServerConfig.config
   },
 
   get players(): TMPlayer[] {
