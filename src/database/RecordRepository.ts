@@ -63,7 +63,21 @@ export class RecordRepository extends Repository {
     return res.map(a => this.constructRecordObject(a))
   }
 
-  async getByLogin(mapUid: string, login: string): Promise<TMRecord | undefined> {
+  async getByLogin(...logins: string[]): Promise<TMRecord[]> {
+    if (logins.length === 0) { return [] }
+    const query = `SELECT uid, login, time, checkpoints, date FROM records
+    JOIN player_ids ON player_ids.id=records.player_id
+    JOIN map_ids ON map_ids.id=records.map_id
+    WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join(' ').slice(0, -3)}
+    ORDER BY time ASC,
+    date DESC;`
+    const playerIds = await playerIdsRepo.get(logins)
+    const res = (await this.query(query, ...playerIds.map(a => a.id)))
+    return res.map(a => this.constructRecordObject(a))
+  }
+
+
+  async getOne(mapUid: string, login: string): Promise<TMRecord | undefined> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerIdsRepo.get(login)
     const query: string = `SELECT uid, login, time, checkpoints, date FROM records 

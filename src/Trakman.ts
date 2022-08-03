@@ -385,7 +385,6 @@ export const TRAKMAN = {
     const temp: any = PlayerService.getPlayer(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
-    if(info.privilege < 0) { return }
     Events.emitEvent('Controller.ManialinkClick', info)
   },
 
@@ -616,6 +615,18 @@ export const TRAKMAN = {
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
 
+  get localRecordsAmount() {
+    return RecordService.localsAmount
+  },
+
+  fetchRecords: RecordService.fetchRecords.bind(RecordService),
+
+  fetchRecord: RecordService.fetchRecord.bind(RecordService),
+
+  fetchRecordsByLogin: RecordService.fetchRecordsByLogin.bind(RecordService),
+
+  fetchMapRank: RecordService.fetchMapRank.bind(RecordService),
+
   /**
    * Adds a player vote to the database and to Maniakarma service if its running
    * @param mapId Map UID
@@ -667,10 +678,6 @@ export const TRAKMAN = {
 
   get players(): TMPlayer[] {
     return PlayerService.players
-  },
-
-  get records(): TMRecord[] {
-    return RecordService.localRecords
   },
 
   get localRecords(): TMLocalRecord[] {
