@@ -12,11 +12,14 @@ TM.addCommand({
     switch (option) {
       case 'nofinish': case 'nofin': {
         const mapsWithRec = (await TM.fetchRecordsByLogin(info.login)).map(a => a.map)
+        console.log(mapsWithRec.length, 'rec')
+        console.log(TM.maps.length, 'all')
         const eligibleMaps = TM.maps.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
           TM.map.id !== a.id &&
           !mapsWithRec.includes(a.id))
+          console.log(eligibleMaps.length, 'eligible')
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No unfinished maps available', info.login)
           return
