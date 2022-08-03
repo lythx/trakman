@@ -34,5 +34,6 @@
     "sectorRecords": 170000,
     "checkpointRecords": 180000,
     "welcomeWindow": 190000,
-    "changelog": 200000
+    "changelog": 200000,
+    "cpCounter": 210000
 }

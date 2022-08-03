@@ -9,6 +9,8 @@ const events: TMListener[] = [
     callback: (): void => {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}Trakman ${TM.palette.highlight}`
         + `v${config.version}${TM.palette.servermsg} startup sequence successful.`)
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}You can see the changelog with `
+        + `${TM.palette.highlight}/changes${TM.palette.servermsg}.`)
     }
   },
   {
@@ -41,6 +43,9 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Welcome to ${TM.palette.highlight + TM.strip(TM.serverConfig.name)}${TM.palette.servermsg}. `
+        + `This server is running Trakman ${TM.palette.highlight}v${config.version}${TM.palette.servermsg}. `
+        + `You can see the recent changes with the ${TM.palette.highlight}/changes ${TM.palette.servermsg}command.`)
       const index: number = TM.localRecords.findIndex(a => a.login === player.login)
       if (index === -1) {
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You don't have a personal best on this map.`, player.login)
@@ -72,7 +77,8 @@ const events: TMListener[] = [
       if (endMapInfo.winnerLogin === undefined || endMapInfo.winnerWins === undefined) {
         return
       }
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You have won your ${TM.palette.rank + TM.Utils.getPositionString(endMapInfo.winnerWins)}${TM.palette.record} race.`, endMapInfo.winnerLogin)
+      TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You have won your `
+        + `${TM.palette.rank + TM.Utils.getPositionString(endMapInfo.winnerWins)}${TM.palette.record} race.`, endMapInfo.winnerLogin)
     }
   },
   {
@@ -85,8 +91,8 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: (info: RecordInfo): void => {
-      let prevPos = info.previousPosition
-      let prevTime = info.previousTime
+      let prevPos: number = info.previousPosition
+      let prevTime: number = info.previousTime
       if (info.previousPosition > Number(process.env.LOCALS_AMOUNT)) {
         prevPos = -1
         prevTime = -1

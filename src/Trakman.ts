@@ -676,6 +676,10 @@ export const TRAKMAN = {
     return Object.assign(GameService.game)
   },
 
+  get serverConfig(): ServerInfo {
+    return ServerConfig.config
+  },
+
   get players(): TMPlayer[] {
     return PlayerService.players
   },
