@@ -24,6 +24,8 @@ import BestCps from './static_components/BestCps.component.js'
 import BestFinishes from './static_components/BestFinishes.component.js'
 import CpCounter from './static_components/CpCounter.component.js'
 
+import NextMapRecords from './static_components/result/NextMapRecords.component.js'
+
 /*
 ------------------
 DYNAMIC COMPONENTS
@@ -87,6 +89,10 @@ let staticComponents: {
   readonly cpCounter: CpCounter
 }
 
+let staticResultComponents: {
+  readonly nextMapRecords: NextMapRecords
+}
+
 let dynamicComponents: {
   readonly mapList: MapList
   readonly commandList: CommandList
@@ -134,6 +140,9 @@ const events: TMListener[] = [
         cpCounter: new CpCounter()
       }
       for (const c of Object.values(staticComponents)) { await c.display() }
+      staticResultComponents = {
+        nextMapRecords: new NextMapRecords()
+      }
       dynamicComponents = {
         mapList: new MapList(),
         commandList: new CommandList(),

@@ -27,6 +27,7 @@ interface TableEntry {
   readonly time: number
   readonly checkpoints: number[]
   readonly date: Date
+  readonly nickname: string
 }
 
 export class RecordRepository extends Repository {
@@ -51,9 +52,10 @@ export class RecordRepository extends Repository {
   }
 
   async getAll(): Promise<TMRecord[]> {
-    const query = `SELECT uid, login, time, checkpoints, date FROM records
+    const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
     JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
+    JOIN players ON players.id=records.player_id
     ORDER BY time ASC,
     date DESC;`
     const res = (await this.query(query))
@@ -62,9 +64,10 @@ export class RecordRepository extends Repository {
 
   async get(...mapUids: string[]): Promise<TMRecord[]> {
     if (mapUids.length === 0) { return [] }
-    const query = `SELECT uid, login, time, checkpoints, date FROM records
+    const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
     JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
+    JOIN players ON players.id=records.player_id
     WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
     date DESC;`
@@ -75,9 +78,10 @@ export class RecordRepository extends Repository {
 
   async getByLogin(...logins: string[]): Promise<TMRecord[]> {
     if (logins.length === 0) { return [] }
-    const query = `SELECT uid, login, time, checkpoints, date FROM records
+    const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
     JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
+    JOIN players ON players.id=records.player_id
     WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
     date DESC;`
@@ -90,10 +94,11 @@ export class RecordRepository extends Repository {
   async getOne(mapUid: string, login: string): Promise<TMRecord | undefined> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerIdsRepo.get(login)
-    const query: string = `SELECT uid, login, time, checkpoints, date FROM records 
+    const query: string = `SELECT time, checkpoints, date FROM records 
+    JOIN players ON players.id=records.player_id
     WHERE map_id=$1 AND player_id=$2`
     const res = (await this.query(query, mapId, playerId))
-    return this.constructRecordObject(res[0])
+    return this.constructRecordObject({ uid: mapUid, login, ...res[0] })
   }
 
   async remove(mapUid: string, login: string): Promise<void> {
@@ -128,7 +133,8 @@ export class RecordRepository extends Repository {
       login: entry.login,
       time: entry.time,
       date: entry.date,
-      checkpoints: entry.checkpoints
+      checkpoints: entry.checkpoints,
+      nickname: entry.nickname
     }
   }
 

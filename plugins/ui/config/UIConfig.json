@@ -804,5 +804,8 @@
     "title": "Cp Count",
     "side": "false",
     "icon": "mxLogo"
+  },
+  "list": {
+    "margin": 0.15
   }
 }

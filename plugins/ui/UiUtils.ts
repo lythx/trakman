@@ -10,11 +10,12 @@ import ICONS from './config/Icons.json' assert { type: 'json' }
 import BACKGROUNDS from './config/Backgrounds.json' assert { type: 'json' }
 import IDS from './config/ComponentIds.json' assert { type: 'json' }
 import { centeredText, horizontallyCenteredText, verticallyCenteredText, rightAlignedText } from './utils/TextUtils.js'
-import { staticHeader } from './utils/StaticHeader.js'
+import { staticHeader, resultStaticHeader } from './utils/StaticHeader.js'
 import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { getIcon } from './utils/GetIcon.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
+import {List } from './utils/List.js'
 
 
 const getStaticPosition = (widgetName: string): { x: number, y: number } => {
@@ -26,6 +27,17 @@ const getStaticPosition = (widgetName: string): { x: number, y: number } => {
     positionSum += (CONFIG as any)?.[v]?.height + CONFIG.marginBig
   }
   return { y: CONFIG.static.topBorder - positionSum, x: side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition }
+}
+
+const getResultPosition = (widgetName: string): { x: number, y: number } => {
+  const side = (RESULTCONFIG as any)[widgetName].side === true
+  const order: string[] = side ? RESULTCONFIG.static.rightSideOrder : RESULTCONFIG.static.leftSideOrder
+  let positionSum: number = 0
+  for (const [k, v] of order.entries()) {
+    if (v === widgetName) { break }
+    positionSum += (RESULTCONFIG as any)?.[v]?.height + RESULTCONFIG.marginBig
+  }
+  return { y: RESULTCONFIG.static.topBorder - positionSum, x: side ? RESULTCONFIG.static.rightPosition : RESULTCONFIG.static.leftPosition }
 }
 
 const fullScreenListener = (actionId: number, zIndex: number = -100): string => {
@@ -54,9 +66,9 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
 }
 
 export {
-  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject,
+  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject,List,
   CONFIG, ICONS, BACKGROUNDS, IDS,RESULTCONFIG,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition,
-  verticallyCenteredText, getIcon
+  verticallyCenteredText, getIcon, getResultPosition, resultStaticHeader
 }
