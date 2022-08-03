@@ -797,5 +797,12 @@
       },
       "commandList"
     ]
+  },
+  "cpCounter": {
+    "height": 4.8,
+    "width": 4,
+    "title": "Cp Count",
+    "side": "false",
+    "icon": "mxLogo"
   }
 }
