@@ -12,14 +12,11 @@ TM.addCommand({
     switch (option) {
       case 'nofinish': case 'nofin': {
         const mapsWithRec = (await TM.fetchRecordsByLogin(info.login)).map(a => a.map)
-        console.log(mapsWithRec.length, 'rec')
-        console.log(TM.maps.length, 'all')
         const eligibleMaps = TM.maps.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
           TM.map.id !== a.id &&
           !mapsWithRec.includes(a.id))
-          console.log(eligibleMaps.length, 'eligible')
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No unfinished maps available', info.login)
           return
@@ -50,25 +47,27 @@ TM.addCommand({
       }
       case 'norank': {
         const ranks: { mapId: string; rank: number; }[] = []
-        for (let i = 0; ; i++) {
-          console.log(i)
+        let i = -1
+        const fetchSize = 300
+        do {
+          i++
           if (i * 500 > TM.maps.length) { break }
-          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.slice(i * 300, (i + 1) * 300).map(a => a.id))).filter(a => a.rank <= TM.localRecordsAmount))
-          if (ranks.length > 300) { break }
-        }
-        const eligibleMaps = ranks.filter(a =>
-          !TM.jukebox.some(b => b.map.id === a.mapId) &&
-          !TM.previousMaps.some(b => b.id === a.mapId) &&
-          TM.map.id !== a.mapId)
+          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.localRecordsAmount))
+        } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
+        const list = TM.maps.slice(0, (i + 1) * fetchSize)
+        const eligibleMaps = list.filter(a =>
+          !TM.jukebox.some(b => b.map.id === a.id) &&
+          !TM.previousMaps.some(b => b.id === a.id) &&
+          TM.map.id !== a.id &&
+          !ranks.some(b => a.id === b.mapId))
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No maps with no rank available', info.login)
           return
         }
-        const id = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)].mapId
-        TM.addToJukebox(id, info.login)
-        const map = TM.maps.find(a => a.id === id)
+        const map = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
+        TM.addToJukebox(map.id, info.login)
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map?.name ?? '', true)}${TM.palette.vote} to the queue.`)
+          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.vote} to the queue.`)
         break
       }
       default: {

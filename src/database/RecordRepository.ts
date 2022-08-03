@@ -73,7 +73,6 @@ export class RecordRepository extends Repository {
     date DESC;`
     const playerIds = await playerIdsRepo.get(logins)
     const res = (await this.query(query, ...playerIds.map(a => a.id)))
-    console.log(res, 'res')
     return res.map(a => this.constructRecordObject(a))
   }
 
