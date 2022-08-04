@@ -7,26 +7,14 @@ const updateListeners: (() => void)[] = []
 const topUpdateListeners: (() => void)[] = []
 
 TM.addListener('Controller.Ready', async () => {
-  const allPlayers = await TM.queryDB(`SELECT players.id, login FROM players
-  JOIN player_ids ON player_ids.id=players.id`)
-  if (allPlayers instanceof Error) {
-    return
-  }
-  const allVoteCounts: { login: string, count: number }[] = []
-  for (const e of allPlayers) {
-    const res = await TM.queryDB(`SELECT count(*) FROM VOTES
-    WHERE player_id=$1`, e.id)
-    if (res instanceof Error) {
-      TM.error(`Failed to fetch vote count for player ${e.login}`, res.message, res.stack)
-      return
-    }
-    allVoteCounts.push({ login: e.login, count: Number(res[0].count) })
-  }
-  allVoteCounts.sort((a, b) => b.count - a.count)
-  topVoteCounts.push(...allVoteCounts.slice(0, 10))
-  for (const e of TM.players) {
-    voteCounts.push({ login: e.login, count: allVoteCounts.find(a => a.login === e.login)?.count ?? 0 })
-  }
+  const res = await TM.queryDB(`select p.login, count(p.id)::int
+  from votes v
+  join player_ids p on v.player_id = p.id
+  group by p.login
+  order by count desc
+  limit 10;`)
+  if (res instanceof Error) { return }
+  topVoteCounts.push(...res)
 })
 
 TM.addListener('Controller.EndMap', () => {
@@ -52,14 +40,11 @@ TM.addListener('Controller.KarmaVote', (info) => {
       if (newIndex < topIndex) {
         topVoteCounts.splice(topIndex, 1)
         topVoteCounts.splice(newIndex, 0, count)
-        for (const e of topUpdateListeners) {
-          e()
-        }
       } else {
         topVoteCounts[topIndex].count++
-        for (const e of topUpdateListeners) {
-          e()
-        }
+      }
+      for (const e of topUpdateListeners) {
+        e()
       }
     }
     for (const e of updateListeners) {

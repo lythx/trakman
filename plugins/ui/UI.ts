@@ -29,6 +29,8 @@ import NextMapRecords from './static_components/result/NextMapRecords.component.
 import TimerWidgetResult from './static_components/result/TimerWidgetResult.component.js'
 import KarmaRanking from './static_components/result/KarmaRanking.component.js'
 import VotersRanking from './static_components/result/VotersRanking.component.js'
+import VisitorsRanking from './static_components/result/VisitorsRanking.component.js'
+import PlaytimeRanking from './static_components/result/PlaytimeRanking.component.js'
 
 /*
 ------------------
@@ -96,6 +98,8 @@ let staticComponents: {
   readonly timerWidgetResult: TimerWidgetResult
   readonly karmaRanking: KarmaRanking
   readonly votersRanking: VotersRanking
+  readonly visitorsRanking: VisitorsRanking
+  readonly playtimeRanking: PlaytimeRanking
 }
 
 let dynamicComponents: {
@@ -147,7 +151,9 @@ const events: TMListener[] = [
         mapWidgetResult: new MapWidgetResult(),
         timerWidgetResult: new TimerWidgetResult(),
         karmaRanking: new KarmaRanking(),
-        votersRanking: new VotersRanking()
+        votersRanking: new VotersRanking(),
+        visitorsRanking: new VisitorsRanking(),
+        playtimeRanking: new PlaytimeRanking()
       }
       for (const c of Object.values(staticComponents)) {
         if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }

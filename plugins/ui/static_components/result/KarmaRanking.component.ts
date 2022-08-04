@@ -2,6 +2,8 @@ import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, 
 import StaticComponent from '../../StaticComponent.js'
 import { TRAKMAN as TM } from '../../../../src/Trakman.js'
 
+const MIN_AMOUNT = 5 // TODO: this in config file
+
 export default class KarmaRanking extends StaticComponent {
 
   private readonly width = CFG.static.width
@@ -21,11 +23,11 @@ export default class KarmaRanking extends StaticComponent {
     this.posY = pos.y
     this.entries = CFG.karmaRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.karmaRanking.columnProportions as any, { background: CFG.static.bgColor })
-    const topMaps = TM.voteRatios.sort((a, b) => b.ratio - a.ratio).slice(0, this.entries)
+    const topMaps = TM.voteRatios.sort((a, b) => b.ratio - a.ratio).filter(a => a.amount > MIN_AMOUNT).slice(0, this.entries)
     this.ranking = topMaps.map(a => ({ name: TM.maps.find(b => b.id === a.mapId)?.name ?? '', karma: a.ratio }))
     this.constructXml()
     TM.addListener('Controller.EndMap', () => {
-      const topMaps = TM.voteRatios.sort((a, b) => b.ratio - a.ratio).slice(0, this.entries)
+      const topMaps = TM.voteRatios.sort((a, b) => b.ratio - a.ratio).filter(a => a.amount > MIN_AMOUNT).slice(0, this.entries)
       this.ranking = topMaps.map(a => ({ name: TM.maps.find(b => b.id === a.mapId)?.name ?? '', karma: a.ratio }))
       this.constructXml()
     }, true)
@@ -53,7 +55,7 @@ export default class KarmaRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.karmaRanking.title, CFG.karmaRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(this.ranking.map(a => a.karma.toString()), this.ranking.map(a => TM.safeString(TM.strip(a.name, false))))}
+        ${this.list.constructXml(this.ranking.map(a => Math.round(a.karma).toString()), this.ranking.map(a => TM.safeString(TM.strip(a.name, false))))}
       </frame>
       </frame>
     </manialink>`
