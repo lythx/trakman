@@ -676,9 +676,6 @@ export const TRAKMAN = {
         switch (status) {
           case 'accepted':
             resolve(true)
-            if (targetLogin === '' /* || targetLogin === TODO check if server*/) {
-              // TODO push to donors table
-            }
             break
           case 'refused':
             resolve(false)

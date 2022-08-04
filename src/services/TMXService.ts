@@ -150,7 +150,6 @@ export abstract class TMXService {
       }
     }
     if (prefix === undefined) {
-      this._current = null
       return new Error('Cannot fetch map data from TMX')
     }
     const s: string[] = data.split('\t')

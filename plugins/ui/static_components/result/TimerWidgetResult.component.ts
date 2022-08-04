@@ -18,11 +18,13 @@ export default class TimerWidgetResult extends StaticComponent {
     this.constructXml()
   }
 
-  display(): void {
+  display(): void {  
+      if(!this.isDisplayed) { return }
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
+    if(!this.isDisplayed) { return }
     TM.sendManialink(this.xml, login)
   }
 

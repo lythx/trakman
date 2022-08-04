@@ -34,7 +34,8 @@
       "nextMapRecords",
       "timer",
       "karmaRanking",
-      "votersRanking"
+      "votersRanking",
+      "visitorsRanking"
     ],
     "leftSideOrder": [
       "buttons",
@@ -131,6 +132,30 @@
     "title": "Most Votes",
     "icon": "peopleKarma",
     "entries": 5,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
+  },
+  "visitorsRanking": {
+    "height": 12.92,
+    "side": true,
+    "title": "Most Visits",
+    "icon": "people",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
+  },
+  "playtimeRanking": {
+    "height": 12.92,
+    "title": "Top Hours Played",
+    "icon": "people",
+    "entries": 5,
+    "side": true,
     "columnProportions": [
       1,
       1.9,

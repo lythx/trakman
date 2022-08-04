@@ -32,11 +32,13 @@ export default class MapWidgetResult extends StaticComponent {
   }
 
   async display(): Promise<void> {
+    if(!this.isDisplayed) { return }
     this.updateXML()
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
+    if(!this.isDisplayed) { return }
     TM.sendManialink(this.xml, login)
   }
 
