@@ -13,7 +13,6 @@ export default class TimerWidgetResult extends StaticComponent {
   constructor() {
     super(IDS.timerResult, 'result')
     const pos = getResultPosition('timer')
-    console.log(pos)
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()

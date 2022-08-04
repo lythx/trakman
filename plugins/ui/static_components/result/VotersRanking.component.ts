@@ -35,6 +35,7 @@ export default class VotersRanking extends StaticComponent {
 
   display(): void {
     if (this.isDisplayed === false) { return }
+    this.constructXml()
     TM.sendManialink(this.xml)
   }
 
