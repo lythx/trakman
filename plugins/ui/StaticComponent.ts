@@ -2,25 +2,37 @@ import { TRAKMAN as TM } from "../../src/Trakman.js"
 
 export default abstract class StaticComponent {
 
-  protected _isDisplayed: boolean = false
+  displayMode: 'race' | 'result' | 'always' | 'none'
+  private _isDisplayed: boolean = true
   readonly id: number
 
-  constructor(id: number, display?: { displayOnRace?: true, displayOnResult?: true, hideOnRace?: true, hideOnResult?: true }) {
+  constructor(id: number, displayMode: 'race' | 'result' | 'always' | 'none') {
     this.id = id
-    if (display?.displayOnRace === true) {
-      TM.addListener('Controller.BeginMap', async () => { await this.display() })
-    }
-    if (display?.displayOnResult === true) {
-      TM.addListener('Controller.EndMap', async () => { await this.display() })
-    }
-    if (display?.hideOnRace === true) {
-      TM.addListener('Controller.BeginMap', () => { this.hide() })
-    }
-    if (display?.hideOnResult === true) {
-      TM.addListener('Controller.EndMap', () => { this.hide() })
+    this.displayMode = displayMode
+    switch (displayMode) {
+      case 'race':
+        TM.addListener('Controller.BeginMap', async () => {
+          this._isDisplayed = true
+          await this.display()
+        })
+        TM.addListener('Controller.EndMap', () => {
+          this._isDisplayed = false
+          this.hide()
+        })
+        break
+      case 'result':
+        this._isDisplayed = false
+        TM.addListener('Controller.EndMap', async () => {
+          this._isDisplayed = true
+          await this.display()
+        })
+        TM.addListener('Controller.BeginMap', () => {
+          this._isDisplayed = false
+          this.hide()
+        })
     }
     TM.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
-      if (this._isDisplayed) { await this.displayToPlayer(info.login) }
+      if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
   }
 

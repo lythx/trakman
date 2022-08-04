@@ -55,12 +55,12 @@ export class VoteRepository extends Repository {
     await this.query(query, vote, date, mapId, playerId)
   }
 
-  async getByLogin(mapUid: string, login: string): Promise<TMVote | undefined> {
+  async getOne(mapUid: string, login: string): Promise<TMVote | undefined> {
     const query: string = `SELECT login, vote, date FROM votes 
     JOIN player_ids ON player_ids.id=votes.player_id
     WHERE map_id=$1 AND player_id=$2;`
     const mapId = await mapIdsRepo.get(mapUid)
-    const playerId =await playerIdsRepo.get(login)
+    const playerId = await playerIdsRepo.get(login)
     const res = await this.query(query, mapId, playerId)
     return res[0] === undefined ? undefined : this.constructVoteObject({ ...res[0], uid: mapUid })
   }
@@ -69,9 +69,9 @@ export class VoteRepository extends Repository {
     const query: string = `SELECT login, vote, date FROM votes 
     JOIN player_ids ON player_ids.id=votes.player_id
     WHERE map_id=$1;`
-    const mapId =await mapIdsRepo.get(mapUid)
+    const mapId = await mapIdsRepo.get(mapUid)
     const res = await this.query(query, mapId)
-    return res.map(a => this.constructVoteObject({...a, uid: mapUid}))
+    return res.map(a => this.constructVoteObject({ ...a, uid: mapUid }))
   }
 
   async getAll(): Promise<TMVote[]> {

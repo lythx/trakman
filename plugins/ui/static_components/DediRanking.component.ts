@@ -13,7 +13,7 @@ export default class DediRanking extends StaticComponent {
   private readonly maxDedis: number = Number(process.env.DEDIS_AMOUNT)
 
   constructor() {
-    super(IDS.dedis, { displayOnRace: true, hideOnResult: true })
+    super(IDS.dedis, 'race')
     const side: boolean = CONFIG.dedis.side
     const pos = getStaticPosition('dedis')
     this.positionX = pos.x
@@ -23,25 +23,21 @@ export default class DediRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.DedimaniaRecords', (): void => {
-      if (this._isDisplayed) {
         this.display()
-      }
     })
     TM.addListener('Controller.DedimaniaRecord', (): void => {
-      if (this._isDisplayed) {
         this.display()
-      }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (this._isDisplayed && TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (this._isDisplayed && TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
     })
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
@@ -49,6 +45,7 @@ export default class DediRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
+    if(this.isDisplayed === false) { return }
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

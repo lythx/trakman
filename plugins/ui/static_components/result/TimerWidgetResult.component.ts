@@ -1,8 +1,8 @@
-import { getStaticPosition, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import StaticComponent from '../StaticComponent.js'
+import { RESULTCONFIG as CONFIG, getResultPosition, IDS } from '../../UiUtils.js'
+import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import StaticComponent from '../../StaticComponent.js'
 
-export default class TimerWidget extends StaticComponent {
+export default class TimerWidgetResult extends StaticComponent {
 
   private readonly width = CONFIG.static.width
   private readonly height = CONFIG.timer.height
@@ -11,8 +11,9 @@ export default class TimerWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.timer, 'race')
-    const pos = getStaticPosition('timer')
+    super(IDS.timerResult, 'result')
+    const pos = getResultPosition('timer')
+    console.log(pos)
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
@@ -32,9 +33,8 @@ export default class TimerWidget extends StaticComponent {
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
-        <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.timer.title, stringToObjectProperty(CONFIG.timer.icon, ICONS), true)}
-        <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
+        <format textsize="1" textcolor="FFFF"/>
+        <quad posn="0 0 1" sizen="${this.width} ${this.height}" bgcolor="${CONFIG.static.bgColor}"/>
       </frame>
     </manialink>`
   }

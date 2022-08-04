@@ -1,14 +1,52 @@
-<manialink id="30">
-      <frame posn="-63.85 47.85 1">
-        <frame posn="0 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
-  <quad posn="0.15625 --1 5" sizen="3.2 3.4" image="https://cdn.discordapp.com/attachments/502122268936110100/989520212191764480/People.png"/>
-  <label posn="1.75625 -2.2 3" sizen="5.1863636363636365 4.85" scale="0.55" text="20" halign="center"/>
-  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="VISITORS" halign="center"/></frame><frame posn="3.6625 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
-  <quad posn="0.15625 --1 5" sizen="3.2 3.4" image="https://cdn.discordapp.com/attachments/502122268936110100/989520212191764480/People.png"/>
-  <label posn="1.75625 -2.4 3" sizen="6.968604651162791 4.85" scale="0.43" text="0 SPECS" halign="center"/>
-  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="3 PLAYERS" halign="center"/></frame><frame posn="7.325 0 1"><quad posn="0 0 1" sizen="3.5125 4.85" bgcolor="000a"/>
-  <quad posn="0.7562500000000001 --1 5" sizen="2 2" image="https://cdn.discordapp.com/attachments/502122268936110100/989520209545162792/Git.png"/>
-  <label posn="1.75625 -2.2 3" sizen="5.1863636363636365 4.85" scale="0.55" text="0.0.1" halign="center"/>
-  <label posn="1.75625 -3.65 3" sizen="6.968604651162791 4.85" scale="0.43" text="VERSION" halign="center"/></frame>
+<manialink id="80">
+      <frame posn="49.13 47.85 1">
+        <format textsize="1" textcolor="FFFF"/>
+        <frame posn="0 0 1">
+      <frame posn="0 0 1">
+        <quad posn="0 0 5" sizen="14.65 2.17" action="undefined"/>
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0.075 -0.1 2"
+         sizen="1.55 2" image="https://cdn.discordapp.com/attachments/793464821030322196/1001610670384623636/OngoingMap.png"/>       
+        <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="000a"/>
+        <label posn="2.2 -0.3 2"
+          sizen="11.8 2" scale="1" text="Ongoing"/>
+
+      </frame></frame><frame posn="0 -2.32 1">
+      <frame posn="0 0 1">
+        <quad posn="0 0 5" sizen="14.65 2.17" action="undefined"/>
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0.075 -0.1 2"
+         sizen="1.55 2" image="https://cdn.discordapp.com/attachments/793464821030322196/1001566240181063780/Tag.png"/>
+        <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="0006"/>
+        <label posn="2.15 -0.985 3" sizen="12.200000000000001 2.17" scale="1" text="$sHalligalli im Stadion short" valign="center"/> 
+
+      </frame></frame><frame posn="0 -4.64 1">
+      <frame posn="0 0 1">
+        <quad posn="0 0 5" sizen="14.65 2.17" action="undefined"/>
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0.075 -0.1 2"
+         sizen="1.55 2" image="https://cdn.discordapp.com/attachments/502122268936110100/994280974340870225/GER.png"/>
+        <quad posn="1.8499999999999999 0 1" sizen="12.8 2.17" bgcolor="0006"/>
+        <label posn="2.15 -0.985 3" sizen="12.200000000000001 2.17" scale="1" text="$shalogucker" valign="center"/>
+
+      </frame></frame><frame posn="0 -6.959999999999999 1">
+        <frame posn="0 0 1">
+          <quad posn="0 0 5" sizen="7.250000000000001 2.17" action="undefined"/>
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0.075 -0.1 2"
+         sizen="1.55 2" image="https://cdn.discordapp.com/attachments/793464821030322196/1001610713481101362/ClockAuthor.png"/>      
+        <quad posn="1.8499999999999999 0 1" sizen="5.4 2.17" bgcolor="0006"/>
+        <label posn="4.55 -0.985 3" sizen="4.4 2.17" scale="1" text="$s1:03.63"  valign="center" halign="center"/>
+
+        </frame>
+        <frame posn="7.4 0 1">
+          <quad posn="0 0 5" sizen="7.250000000000001 2.17" action="undefined"/>
+        <quad posn="0 0 1" sizen="1.7 2.17" bgcolor="000a"/>
+        <quad posn="0.075 -0.1 2"
+         sizen="1.55 2" image="https://cdn.discordapp.com/attachments/793464821030322196/1001611092964950056/Tools.png"/>
+        <quad posn="1.8499999999999999 0 1" sizen="5.4 2.17" bgcolor="0006"/>
+        <label posn="4.55 -0.985 3" sizen="4.4 2.17" scale="1" text="$s02/2009"  valign="center" halign="center"/>
+
+        </frame></frame>
       </frame>
-    </manialink>
+      </manialink>

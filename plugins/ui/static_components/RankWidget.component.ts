@@ -11,7 +11,7 @@ export default class RankWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.rank, { displayOnRace: true, hideOnResult: true })
+    super(IDS.rank,'race')
     const pos = getStaticPosition('rank')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -19,11 +19,12 @@ export default class RankWidget extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
+    if(this.isDisplayed === false) { return }
     TM.sendManialink(this.xml, login)
   }
 

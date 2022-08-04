@@ -14,7 +14,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
+    super(IDS.liveCheckpoint, 'race')
     const pos = getStaticPosition('donationPanel')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -35,13 +35,14 @@ export default class DonationPanel extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
+    if(this.isDisplayed === false) { return }
     if (TM.getPlayer(login)?.isUnited) {
       TM.sendManialink(this.xml, login)
     }

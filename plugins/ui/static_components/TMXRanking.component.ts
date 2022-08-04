@@ -13,30 +13,30 @@ export default class TMXRanking extends StaticComponent {
   private readonly maxRecords: number = 20
 
   constructor() {
-    super(IDS.tmx, { displayOnRace: true, hideOnResult: true })
+    super(IDS.tmx, 'race')
     this.height = CONFIG.tmx.height
     this.width = CONFIG.static.width
     const side: boolean = CONFIG.tmx.side
     const pos = getStaticPosition('tmx')
     this.positionX = pos.x
     this.positionY = pos.y
-    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, true)
+    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
-      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (this._isDisplayed && TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 
   display(): void {
-    this._isDisplayed = true
+    if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
@@ -44,6 +44,7 @@ export default class TMXRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
+    if (this.isDisplayed === false) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: TMXMapInfo | null = TM.TMXCurrent
     if (tmxInfo !== null) {

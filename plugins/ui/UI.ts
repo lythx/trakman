@@ -24,7 +24,11 @@ import BestCps from './static_components/BestCps.component.js'
 import BestFinishes from './static_components/BestFinishes.component.js'
 import CpCounter from './static_components/CpCounter.component.js'
 
+import MapWidgetResult from './static_components/result/MapWidgetResult.component.js'
 import NextMapRecords from './static_components/result/NextMapRecords.component.js'
+import TimerWidgetResult from './static_components/result/TimerWidgetResult.component.js'
+import KarmaRanking from './static_components/result/KarmaRanking.component.js'
+import VotersRanking from './static_components/result/VotersRanking.component.js'
 
 /*
 ------------------
@@ -87,10 +91,11 @@ let staticComponents: {
   readonly bestCps: BestCps
   readonly bestFinishes: BestFinishes
   readonly cpCounter: CpCounter
-}
-
-let staticResultComponents: {
   readonly nextMapRecords: NextMapRecords
+  readonly mapWidgetResult: MapWidgetResult
+  readonly timerWidgetResult: TimerWidgetResult
+  readonly karmaRanking: KarmaRanking
+  readonly votersRanking: VotersRanking
 }
 
 let dynamicComponents: {
@@ -137,11 +142,15 @@ const events: TMListener[] = [
         donationPanel: new DonationPanel(),
         bestCps: new BestCps(),
         bestFinishes: new BestFinishes(),
-        cpCounter: new CpCounter()
+        cpCounter: new CpCounter(),
+        nextMapRecords: new NextMapRecords(),
+        mapWidgetResult: new MapWidgetResult(),
+        timerWidgetResult: new TimerWidgetResult(),
+        karmaRanking: new KarmaRanking(),
+        votersRanking: new VotersRanking()
       }
-      for (const c of Object.values(staticComponents)) { await c.display() }
-      staticResultComponents = {
-        nextMapRecords: new NextMapRecords()
+      for (const c of Object.values(staticComponents)) {
+        if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }
       }
       dynamicComponents = {
         mapList: new MapList(),

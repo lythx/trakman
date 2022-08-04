@@ -1,4 +1,4 @@
-import { getStaticPosition, CONFIG, ICONS, IDS, staticHeader, getIcon } from '../UiUtils.js'
+import { getStaticPosition, CONFIG,  IDS, staticHeader, getIcon } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -11,20 +11,17 @@ export default class AdminPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.admin, { displayOnRace: true, hideOnResult: true })
+    super(IDS.admin,'always')
     const pos = getStaticPosition('admin')
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
     TM.addListener('Controller.PrivilegeChanged', (info) => {
-      if (this._isDisplayed === true) {
         this.displayToPlayer(info.login)
-      }
     })
   }
 
   display(): void {
-    this._isDisplayed = true
     for (const e of TM.players) {
       this.displayToPlayer(e.login)
     }

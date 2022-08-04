@@ -35,7 +35,7 @@ export default class BestCps extends StaticComponent {
   private grid: Grid
 
   constructor() {
-    super(IDS.bestCps, { displayOnRace: true, hideOnResult: true })
+    super(IDS.bestCps,'race')
     this.cpAmount = TM.map.checkpointsAmount - 1
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
@@ -64,13 +64,14 @@ export default class BestCps extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     for (const e of TM.players) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string, params?: { page?: number }): void {
+    if(this.isDisplayed === false) { return }
     const page = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
 
     const pageCount = this.paginator.pageCount

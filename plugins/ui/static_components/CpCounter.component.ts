@@ -13,7 +13,7 @@ export default class CpCounter extends StaticComponent {
     private readonly posY: number
 
     constructor() {
-        super(IDS.cpCounter, { displayOnRace: true, hideOnResult: true })
+        super(IDS.cpCounter,'race')
         const pos = getStaticPosition('rank')
         this.posY = pos.y
         TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
@@ -27,7 +27,7 @@ export default class CpCounter extends StaticComponent {
     }
 
     display(): void {
-        this._isDisplayed = true
+        if(this.isDisplayed === false) { return }
         const cps = TM.map.checkpointsAmount - 1
         let xml: string = ''
 
@@ -48,6 +48,7 @@ export default class CpCounter extends StaticComponent {
     }
 
     displayToPlayer(login: string, params?: any): void | Promise<void> {
+        if(this.isDisplayed === false) { return }
 
         const cps = TM.map.checkpointsAmount - 1
         let xml: string = ''

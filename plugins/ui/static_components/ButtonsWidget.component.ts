@@ -22,7 +22,7 @@ export default class ButtonsWidget extends StaticComponent {
   private lastMapRes = false
 
   constructor() {
-    super(IDS.buttons, { displayOnRace: true, hideOnResult: true })
+    super(IDS.buttons, 'race')
     const pos = getStaticPosition('buttons')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -46,14 +46,15 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   async display(): Promise<void> {
+    if (this.isDisplayed === false) { return }
     if (this.xml === '') { await this.initialize() }
     this.constructXml()
-    this._isDisplayed = true
     TM.sendManialink(this.xml)
   }
 
 
   displayToPlayer(login: string): void {
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.xml, login)
   }
 
@@ -77,11 +78,9 @@ export default class ButtonsWidget extends StaticComponent {
       const newTimeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
       if (timeString !== newTimeString) {
         timeString = newTimeString
-        if (this._isDisplayed === true) {
-          const cfg = this.config.time
-          this.iconData[cfg.index].text1 = timeString
-          void this.display()
-        }
+        const cfg = this.config.time
+        this.iconData[cfg.index].text1 = timeString
+        void this.display()
       }
     }, 1000)
   }
@@ -99,15 +98,15 @@ export default class ButtonsWidget extends StaticComponent {
         const prevAmount = Number(this.iconData[this.config.visitors.index].text1)
         this.iconData[this.config.visitors.index].text1 = (prevAmount + 1).toString()
       }
-      if (this._isDisplayed === true) { void this.display() }
+      void this.display()
     })
     TM.addListener('Controller.PlayerLeave', () => {
       this.updatePlayerCount()
-      if (this._isDisplayed === true) { void this.display() }
+      void this.display()
     })
     TM.addListener('Controller.PlayerInfoChanged', () => {
       this.updatePlayerCount()
-      if (this._isDisplayed === true) { void this.display() }
+      void this.display()
     })
     TM.addListener('Controller.BeginMap', () => {
       this.resVoteCount = 0
@@ -118,7 +117,7 @@ export default class ButtonsWidget extends StaticComponent {
         this.lastMapRes = true
       }
       this.updateVoteAndPayButtons()
-      if (this._isDisplayed === true) { void this.display() }
+      void this.display()
     })
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
       switch (info.answer - this.id) {
@@ -147,7 +146,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
     const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
-    if (TM.remainingMapTime  <= 30) { return }
+    if (TM.remainingMapTime <= 30) { return }
     const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmRed}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
@@ -203,7 +202,7 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (result === true) {
       TM.sendMessage(`${TM.palette.server}»» ${TM.palette.vote}Vote to ${TM.palette.highlight}replay `
         + `${TM.palette.vote}the ongoing map ${TM.palette.highlight}has passed${TM.palette.vote}.`)
-         TM.addToJukebox(TM.map.id, undefined, true)
+      TM.addToJukebox(TM.map.id, undefined, true)
       this.resVoteCount++
       this.isRes = true
       this.onMapReplay()
@@ -216,7 +215,7 @@ export default class ButtonsWidget extends StaticComponent {
         const player = TM.getPlayer(result.callerLogin)
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to replay the ongoing map`)
-           TM.addToJukebox(TM.map.id, undefined, true)
+        TM.addToJukebox(TM.map.id, undefined, true)
       }
       this.resVoteCount++
       this.isRes = true
@@ -247,13 +246,13 @@ export default class ButtonsWidget extends StaticComponent {
         + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}s${TM.palette.donation}.`)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
-      if (this._isDisplayed === true) { await this.display() }
+      await this.display()
       const interval = setInterval(async () => {
         if (Date.now() > startTime + 1000 * (cfg.timeout - countDown)) { // TODO HANDLE CHALLENGE ENDING BEFORE COUNTDOWN
           countDown--
           this.iconData[cfg.index].text1 = cfg.title3
           this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
-          if (this._isDisplayed === true) { await this.display() }
+          await this.display()
           if (countDown === 0) {
             TM.callNoRes('NextChallenge')
             clearInterval(interval)
@@ -272,11 +271,11 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (res === true) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${cost}C ${TM.palette.donation}to replay the ongoing map.`)
-         TM.addToJukebox(TM.map.id, login)
+      TM.addToJukebox(TM.map.id, login)
       this.resCostIndex++
       this.isRes = true
       this.onMapReplay()
-      if (this._isDisplayed === true) { void this.display() }
+      void this.display()
     }
   }
 
