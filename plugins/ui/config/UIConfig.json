@@ -130,8 +130,7 @@
     "height": 6.45,
     "side": true,
     "title": "Timer",
-    "icon": "clock",
-    "hourglassOverlay": "hourglass"
+    "icon": "clock"
   },
   "locals": {
     "height": 34.12,

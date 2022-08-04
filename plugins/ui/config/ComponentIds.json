@@ -1,18 +1,20 @@
 {
     "PopupWindow": 0,
     "rank": 40,
-    "temp1": 60,
+    "timerResult": 60,
     "timer": 70,
     "map": 80,
     "previousAndBest": 90,
     "buttons": 100,
+    "mapResult": 200,
     "karma": 300,
     "admin": 400,
     "bestCps": 500,
     "bestFinishes": 600,
     "runCps": 700,
     "nextMapRecords": 800,
-    "commandList": 1000,
+    "karmaRanking": 900,
+    "votersRanking": 1000,
     "TMXWindow": 2000,
     "localCps": 3000,
     "dediCps": 4000,
@@ -36,5 +38,6 @@
     "checkpointRecords": 180000,
     "welcomeWindow": 190000,
     "changelog": 200000,
-    "cpCounter": 210000
+    "cpCounter": 210000,
+    "commandList": 220000
 }

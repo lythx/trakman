@@ -87,7 +87,7 @@ export abstract class VoteService {
       void this.repo.update(mapId, login, vote, date)
       Events.emitEvent('Controller.KarmaVote', v as KarmaVoteInfo)
     } else {
-      const res: TMVote | undefined = await this.repo.getByLogin(mapId, login)
+      const res: TMVote | undefined = await this.repo.getOne(mapId, login)
       if (res === undefined) { // If previous vote doesn't exist
         void this.repo.add({ mapId, login, vote, date })
         if (this.mapsWithVotesStored.includes(mapId)) {

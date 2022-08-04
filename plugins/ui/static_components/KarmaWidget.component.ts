@@ -15,7 +15,7 @@ export default class KarmaWidget extends StaticComponent {
   private readonly icons: string[] = CONFIG.karma.icons
 
   constructor() {
-    super(IDS.karma, { displayOnRace: true, hideOnResult: true })
+    super(IDS.karma, 'race')
     const pos = getStaticPosition('karma')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -25,17 +25,13 @@ export default class KarmaWidget extends StaticComponent {
     //   this.display()
     // }, 100)
     TM.addListener('Controller.KarmaVote', (): void => {
-      if (this._isDisplayed) {
         this.display()
-      }
     })
     TM.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
     TM.addListener('Controller.ManiakarmaVotes', (): void => {
-      if (this._isDisplayed) {
         this.display()
-      }
     })
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
@@ -47,13 +43,14 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     for (const e of TM.players) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
+    if(this.isDisplayed === false) { return }
     TM.sendManialink(this.constructXml(login), login)
   }
 

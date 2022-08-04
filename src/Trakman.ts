@@ -7,6 +7,7 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import colours from './data/Colours.json' assert {type: 'json'}
+import countries from './data/Countries.json' assert {type: 'json'}
 import { Utils } from './Utils.js'
 import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
@@ -325,7 +326,7 @@ export const TRAKMAN = {
    * Outputs an error message into the console
    * @param lines Error messages
    */
-  error(...lines: string[]): void {
+  error(...lines: any[]): void {
     Logger.error(...lines)
   },
 
@@ -350,8 +351,8 @@ export const TRAKMAN = {
    * Adds a map to the queue
    * @param mapId Map UID
    */
-   addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
-     JukeboxService.add(mapId, callerLogin, setAsNextMap)
+  addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
+    JukeboxService.add(mapId, callerLogin, setAsNextMap)
   },
 
   /**
@@ -848,4 +849,9 @@ export const TRAKMAN = {
   get mkMapKarma() {
     return ManiakarmaService.mapKarma
   },
+
+  get countries() {
+    return countries
+  }
+
 }

@@ -21,7 +21,7 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   constructor() {
-    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
+    super(IDS.liveCheckpoint, 'race')
     const pos  = getStaticPosition('liveCheckpoint')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -38,7 +38,7 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
     TM.sendManialink(`
     <manialink id="${this.id}">
@@ -54,6 +54,7 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   displayToPlayer(login: string, checkpointTime?: number, difference?: number): void {
+    if(this.isDisplayed === false) { return }
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
     let timeString: string = ''
     if (checkpointTime !== undefined) {

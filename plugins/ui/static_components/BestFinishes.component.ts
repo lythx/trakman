@@ -31,7 +31,7 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(IDS.bestFinishes, { displayOnRace: true, hideOnResult: true })
+    super(IDS.bestFinishes, 'race')
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
     TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
       let index = this.bestFinishes.findIndex(a => a.time > info.time)
@@ -51,13 +51,14 @@ export default class BestFinishes extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
+    if(this.isDisplayed === false) { return }
     for (const e of TM.players) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
+    if(this.isDisplayed === false) { return }
     TM.sendManialink(`
     <manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
