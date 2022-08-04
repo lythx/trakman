@@ -144,7 +144,7 @@ export abstract class Logger {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
-    let str = lines.join('\n').replace(/[_*~|>`]/g, '\$&')
+    let str = lines.join('\n').replace(/[_*~|>`]/g, '\\$&')
     if (str.length > 500) {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
     }

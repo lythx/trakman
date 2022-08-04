@@ -419,7 +419,7 @@ export default class ButtonsWidget extends StaticComponent {
     const cfg = this.config
     this.iconData[cfg.visitors.index] = {
       icon: stringToObjectProperty(cfg.visitors.icon, ICONS),
-      text1: res[0].count.toString(),
+      text1: res[0].count,
       text2: cfg.visitors.title,
       iconWidth: cfg.visitors.width,
       iconHeight: cfg.visitors.height,

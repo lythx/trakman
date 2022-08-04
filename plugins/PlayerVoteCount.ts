@@ -9,7 +9,6 @@ const topUpdateListeners: (() => void)[] = []
 TM.addListener('Controller.Ready', async () => {
   const allPlayers = await TM.queryDB(`SELECT players.id, login FROM players
   JOIN player_ids ON player_ids.id=players.id`)
-  console.log(allPlayers)
   if (allPlayers instanceof Error) {
     return
   }
@@ -21,10 +20,9 @@ TM.addListener('Controller.Ready', async () => {
       TM.error(`Failed to fetch vote count for player ${e.login}`, res.message, res.stack)
       return
     }
-    allVoteCounts.push({ login: e.login, count: res[0].count })
+    allVoteCounts.push({ login: e.login, count: Number(res[0].count) })
   }
   allVoteCounts.sort((a, b) => b.count - a.count)
-  console.log(allVoteCounts)
   topVoteCounts.push(...allVoteCounts.slice(0, 10))
   for (const e of TM.players) {
     voteCounts.push({ login: e.login, count: allVoteCounts.find(a => a.login === e.login)?.count ?? 0 })
@@ -57,6 +55,11 @@ TM.addListener('Controller.KarmaVote', (info) => {
         for (const e of topUpdateListeners) {
           e()
         }
+      } else {
+        topVoteCounts[topIndex].count++
+        for (const e of topUpdateListeners) {
+          e()
+        }
       }
     }
     for (const e of updateListeners) {
@@ -73,7 +76,7 @@ TM.addListener('Controller.PlayerJoin', async (info) => {
     TM.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
     return
   }
-  voteCounts.push({ login: info.login, count: res[0].count })
+  voteCounts.push({ login: info.login, count: Number(res[0].count) })
 })
 
 TM.addListener('Controller.PlayerLeave', async (info) => {

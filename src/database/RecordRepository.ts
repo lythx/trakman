@@ -124,7 +124,7 @@ export class RecordRepository extends Repository {
   async countRecords(login: string): Promise<number> {
     const playerId = await playerIdsRepo.get(login)
     const query = `select count(*) from records where login=$1;`
-    return (await this.query(query, playerId))[0].count
+    return Number((await this.query(query, playerId))[0].count)
   }
 
   private constructRecordObject(entry: TableEntry): TMRecord {
