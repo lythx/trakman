@@ -97,9 +97,9 @@ export class Vote {
     const interval = setInterval(() => {
       if (Date.now() > startTime + (maxSeconds - this.seconds) * 1000) {
         if (this.interrupted !== undefined) {
-          this.clearListeners()
           clearInterval(interval)
           Vote.onInterrupt(this.interrupted, this.votes)
+          this.clearListeners()
           Vote.isDisplayed = false
           return
         }
