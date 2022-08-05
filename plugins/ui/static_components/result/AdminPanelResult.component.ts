@@ -1,8 +1,8 @@
-import { getStaticPosition, CONFIG,  IDS, staticHeader, getIcon } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
-import StaticComponent from '../StaticComponent.js'
+import { getResultPosition, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon } from '../../UiUtils.js'
+import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import StaticComponent from '../../StaticComponent.js'
 
-export default class AdminPanel extends StaticComponent {
+export default class AdminPanelResult extends StaticComponent {
 
   private readonly width = CONFIG.static.width
   private readonly height = CONFIG.admin.height
@@ -11,13 +11,13 @@ export default class AdminPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.admin,'race')
-    const pos = getStaticPosition('admin')
+    super(IDS.adminResult, 'result')
+    const pos = getResultPosition('admin')
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
     TM.addListener('Controller.PrivilegeChanged', (info) => {
-        this.displayToPlayer(info.login)
+      this.displayToPlayer(info.login)
     })
   }
 
@@ -49,7 +49,7 @@ export default class AdminPanel extends StaticComponent {
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.admin.title, getIcon(CONFIG.admin.icon), false)}
+        ${resultStaticHeader(CONFIG.admin.title, getIcon(CONFIG.admin.icon), false)}
         ${iconsXml}
       </frame>
     </manialink>`

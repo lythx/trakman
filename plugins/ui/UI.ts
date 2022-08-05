@@ -35,6 +35,10 @@ import DonatorsRanking from './static_components/result/DonatorsRanking.componen
 import AveragesRanking from './static_components/result/AveragesRanking.component.js'
 import RankWidgetResult from './static_components/result/RankWidgetResult.component.js'
 import KarmaWidgetResult from './static_components/result/KarmaWidgetResult.component.js'
+import LocalRankingResult from './static_components/result/LocalRankingResult.component.js'
+import DediRankingResult from './static_components/result/DediRankingResult.component.js'
+import RoundAveragesRanking from './static_components/result/RoundAveragesRanking.component.js'
+import AdminPanelResult from './static_components/result/AdminPanelResult.component.js'
 
 /*
 ------------------
@@ -108,6 +112,10 @@ let staticComponents: {
   readonly averagesRanking: AveragesRanking
   readonly rankWidgetResult: RankWidgetResult
   readonly karmaWidgetResult: KarmaWidgetResult
+  readonly localRankingResult: LocalRankingResult
+  readonly dediRankingResult: DediRankingResult
+  readonly roundAveragesRanking: RoundAveragesRanking
+  readonly adminPanelResult: AdminPanelResult
 }
 
 let dynamicComponents: {
@@ -165,7 +173,11 @@ const events: TMListener[] = [
         donatorsRanking: new DonatorsRanking(),
         averagesRanking: new AveragesRanking(),
         rankWidgetResult: new RankWidgetResult(),
-        karmaWidgetResult: new KarmaWidgetResult()
+        karmaWidgetResult: new KarmaWidgetResult(),
+        localRankingResult: new LocalRankingResult(),
+        dediRankingResult: new DediRankingResult(),
+        roundAveragesRanking: new RoundAveragesRanking(),
+        adminPanelResult: new AdminPanelResult()
       }
       for (const c of Object.values(staticComponents)) {
         if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }

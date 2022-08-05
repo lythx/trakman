@@ -41,7 +41,9 @@
       "averagesRanking",
       "rank",
       "karma",
+      "locals",
       "dedis",
+      "roundAveragesRanking",
       "admin"
     ]
   },
@@ -200,6 +202,67 @@
       "karmaGlobal",
       "karmaPulse",
       "peopleKarma"
+    ]
+  },
+  "locals": {
+    "height": 12.92,
+    "side": false,
+    "title": "Local Records",
+    "icon": "chartLocal",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      1,
+      2.8,
+      4
+    ],
+    "topCount": 5,
+    "displayNoRecordEntry": true
+  },
+  "dedis": {
+    "height": 12.92,
+    "side": false,
+    "title": "Dedi Records",
+    "icon": "chartDedi",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      2.8,
+      4,
+      1
+    ],
+    "markers": {
+      "you": "pageDoubleLeftHover",
+      "faster": "personBetter",
+      "slower": "personWorse"
+    },
+    "topCount": 5,
+    "displayNoRecordEntry": true
+  },
+  "roundAveragesRanking": {
+    "height": 12.92,
+    "side": false,
+    "title": "Round Averages",
+    "icon": "placeholder",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      2.9,
+      4.1
+    ]
+  },
+  "admin": {
+    "height": 5,
+    "side": false,
+    "title": "Admin Panel",
+    "icon": "gears",
+    "icons": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
     ]
   }
 }
