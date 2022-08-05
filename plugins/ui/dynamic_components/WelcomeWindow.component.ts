@@ -14,16 +14,16 @@ export default class WelcomeWindow extends PopupWindow {
       if (this.welcomedPlayers.includes(info.login) === false) {
         this.welcomedPlayers.push(info.login)
         TM.openManialink(this.openId, info.login)
-        void TM.queryDB('INSERT INTO welcomed_players(login) VALUES($1)', info.login)
+        void TM.db.query('INSERT INTO welcomed_players(login) VALUES($1)', info.login)
       }
     })
     void this.initializeDb()
   }
 
   async initializeDb() {
-    await TM.queryDB(`CREATE TABLE IF NOT EXISTS welcomed_players(
+    await TM.db.query(`CREATE TABLE IF NOT EXISTS welcomed_players(
     login VARCHAR(25) NOT NULL PRIMARY KEY)`)
-    const res = await TM.queryDB('SELECT login FROM welcomed_players')
+    const res = await TM.db.query('SELECT login FROM welcomed_players')
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))
     }
@@ -31,7 +31,7 @@ export default class WelcomeWindow extends PopupWindow {
       if (this.welcomedPlayers.includes(e.login) === false) {
         this.welcomedPlayers.push(e.login)
         TM.openManialink(this.openId, e.login)
-        void TM.queryDB('INSERT INTO welcomed_players(login) VALUES($1)', e.login)
+        void TM.db.query('INSERT INTO welcomed_players(login) VALUES($1)', e.login)
       }
     }
   }

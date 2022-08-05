@@ -1,6 +1,6 @@
 import { TRAKMAN as TM } from '../src/Trakman.js'
 
-await TM.queryDB(`CREATE TABLE IF NOT EXISTS donations(
+await TM.db.query(`CREATE TABLE IF NOT EXISTS donations(
   player_id INT4 GENERATED ALWAYS AS IDENTITY,
   amount INT4 NOT NULL,
   date TIMESTAMP NOT NULL
@@ -12,7 +12,7 @@ const topDonators: { login: string, nickname: string, amount: number }[] = []
 // const onlineDonators: { login: string, amount: number }[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await TM.queryDB(`SELECT SUM(amount) AS amount, login, nickname FROM donations
+  const res: any[] | Error = await TM.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
   JOIN players ON players.id=donations.player_id
   JOIN player_ids ON player_ids.id=donations.player_id
   GROUP BY (login, nickname)
@@ -36,7 +36,7 @@ const addToDB = async (login: string, amount: number): Promise<void> => {
     TM.error(`Failed to save donation from player ${login} (amount ${amount})`, 'Failed to fetch player DB ID')
     return
   }
-  await TM.queryDB('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
+  await TM.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
 }
 
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<void> => {

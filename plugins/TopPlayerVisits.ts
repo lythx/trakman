@@ -4,7 +4,7 @@ const topPlayerVisits: { login: string, visits: number }[] = []
 const updateListeners: (() => void)[] = []
 
 const initialize = async () => {
-  const allPlayers: any[] | Error = await TM.queryDB(`SELECT login, visits FROM players
+  const allPlayers: any[] | Error = await TM.db.query(`SELECT login, visits FROM players
   JOIN player_ids ON player_ids.id=players.id
   ORDER BY visits DESC,
   last_online DESC
@@ -16,7 +16,7 @@ const initialize = async () => {
 }
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
-    void initialize()
+  void initialize()
 })
 
 TM.addListener('Controller.PlayerJoin', (info): void => {

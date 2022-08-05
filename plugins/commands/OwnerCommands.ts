@@ -5,7 +5,7 @@ const commands: TMCommand[] = [
     aliases: ['ffdb', 'fetchallfromdb'],
     help: 'Adds all the maps present in database if they are on TMX based on id',
     callback: async (info: MessageInfo): Promise<void> => {
-      const res: any[] | Error = await TM.queryDB('SELECT * FROM maps;')
+      const res: any[] | Error = await TM.db.query('SELECT * FROM maps;')
       if (res instanceof Error) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to get maps from the database.`, info.login)
         return
@@ -41,7 +41,7 @@ const commands: TMCommand[] = [
     aliases: ['aadb', 'addallfromdb'],
     help: 'Adds all the maps present in database if they are on the server based on filename.',
     callback: async (info: MessageInfo): Promise<void> => {
-      const res: any[] | Error = await TM.queryDB('SELECT * FROM maps;')
+      const res: any[] | Error = await TM.db.query('SELECT * FROM maps;')
       if (res instanceof Error) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to get maps from the database.`, info.login)
         return

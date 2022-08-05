@@ -416,7 +416,7 @@ export default class ButtonsWidget extends StaticComponent {
 
   private initialize = async (): Promise<void> => {
     // Visit counter
-    const res: any[] | Error = await TM.queryDB('SELECT count(*) FROM players;')
+    const res: any[] | Error = await TM.db.query('SELECT count(*) FROM players;')
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }

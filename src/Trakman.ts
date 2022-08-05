@@ -34,10 +34,29 @@ export const TRAKMAN = {
 
   utils: Utils,
 
+  db: {
+
+    getMapId: mapIdsRepo.get.bind(mapIdsRepo),
+
+    /**
+    * Executes a query on the database
+    * @param query Query to execute
+    * @returns Database response or error on invalid query
+    */
+    async query(query: string, ...params: any[]): Promise<any[] | Error> {
+      const res = await DB.query(query, ...params).catch((err: Error) => err)
+      if (res instanceof Error) {
+        return res
+      }
+      return res.rows
+    }
+
+  },
+
+  // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
 
-  getMapDBId: mapIdsRepo.get.bind(mapIdsRepo),
-
+  // Implement client idk
   DatabaseClient: Database,
 
 
@@ -201,18 +220,7 @@ export const TRAKMAN = {
     return await MapService.remove(id, callerLogin)
   },
 
-  /**
-   * Executes a query on the database
-   * @param query Query to execute
-   * @returns Database response or error on invalid query
-   */
-  async queryDB(query: string, ...params: any[]): Promise<any[] | Error> {
-    const res = await DB.query(query, ...params).catch((err: Error) => err)
-    if (res instanceof Error) {
-      return res
-    }
-    return res.rows
-  },
+
 
   /**
    * Fetches the map from TMX via its UID

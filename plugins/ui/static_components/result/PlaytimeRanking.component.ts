@@ -20,7 +20,7 @@ export default class PlaytimeRanking extends StaticComponent {
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.playtimeRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     this.constructXml()
     TM.addListener('Controller.EndMap', async () => {
-      const res = await TM.queryDB(`SELECT nickname, time_played FROM players
+      const res = await TM.db.query(`SELECT nickname, time_played FROM players
       JOIN player_ids ON player_ids.id=players.id
       ORDER BY time_played DESC
       LIMIT ${this.entries + 1}`)

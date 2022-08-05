@@ -70,7 +70,7 @@ export const allCpsDB = {
 export const bestSecsDB = {
 
   async get(mapId: string | number): Promise<{ checkpoint: number, date: Date, login: string, nickname: string }[] | Error> {
-    const mapDBId = typeof mapId === 'number' ? mapId : await TM.getMapDBId(mapId)
+    const mapDBId = typeof mapId === 'number' ? mapId : await TM.db.getMapId(mapId)
     if (mapDBId === undefined) { return [] }
     const res: { checkpoint: number, date: Date, index: number, login: string, nickname: string }[] | Error =
       (await DB.query(`SELECT checkpoint, index, date, login, nickname FROM best_checkpoint_records 
@@ -88,7 +88,7 @@ export const bestSecsDB = {
   },
 
   async add(mapId: string | number, playerId: string | number, index: number, checkpoint: number, date: Date): Promise<void> {
-    const mapDBId = typeof mapId === 'number' ? mapId : await TM.getMapDBId(mapId)
+    const mapDBId = typeof mapId === 'number' ? mapId : await TM.db.getMapId(mapId)
     const playerDBId = typeof playerId === 'number' ? playerId : await TM.getPlayerDBId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `INSERT INTO best_checkpoint_records(map_id, player_id, index, checkpoint, date) VALUES($1, $2, $3, $4, $5);`
@@ -96,7 +96,7 @@ export const bestSecsDB = {
   },
 
   async update(mapId: string | number, playerId: string | number, index: number, checkpoint: number, date: Date): Promise<void> {
-    const mapDBId = typeof mapId === 'number' ? mapId : await TM.getMapDBId(mapId)
+    const mapDBId = typeof mapId === 'number' ? mapId : await TM.db.getMapId(mapId)
     const playerDBId = typeof playerId === 'number' ? playerId : await TM.getPlayerDBId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `UPDATE best_checkpoint_records SET checkpoint=$1, date=$2 WHERE map_id=$3 AND player_id=$4 AND index=$5;`
@@ -104,7 +104,7 @@ export const bestSecsDB = {
   },
 
   async delete(mapId: string | number, index?: number): Promise<void> {
-    const mapDBId = typeof mapId === 'number' ? mapId : await TM.getMapDBId(mapId)
+    const mapDBId = typeof mapId === 'number' ? mapId : await TM.db.getMapId(mapId)
     if (mapDBId === undefined) { return }
     const indexStr = index === undefined ? '' : ` AND index=$2`
     const query = `DELETE FROM best_checkpoint_records WHERE map_id=$1${indexStr};`
@@ -118,7 +118,7 @@ async function fetchMapCheckpoints(...mapId: string[]): Promise<BestCheckpoints[
 async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheckpoints | void | BestCheckpoints[]> {
   if (Array.isArray(mapIds)) {
     const str = mapIds.map((a, i) => `mapId=$${i} OR `).join('')
-    const res: BestCheckpoints[] | Error = await TM.queryDB(`SELECT * FROM secrecs WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
+    const res: BestCheckpoints[] | Error = await TM.db.query(`SELECT * FROM secrecs WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
     if (res instanceof Error) {
       TM.error(`Error when fetching checkpoint records for maps ${mapIds.join(',')}`, res.message)
       return
@@ -127,7 +127,7 @@ async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheck
     }
     return
   }
-  const res: BestCheckpoints[] | Error = await TM.queryDB('SELECT * FROM secrecs WHERE mapId=$1;', [mapIds])
+  const res: BestCheckpoints[] | Error = await TM.db.query('SELECT * FROM secrecs WHERE mapId=$1;', [mapIds])
   if (res instanceof Error) {
     TM.error(`Error when fetching checkpoint records for map ${mapIds}`, res.message)
     return
@@ -136,4 +136,4 @@ async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheck
   }
 }
 
-export { fetchMapCheckpoints  }
+export { fetchMapCheckpoints }

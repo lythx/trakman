@@ -3,8 +3,8 @@ import { TRAKMAN as TM } from "../src/Trakman.js";
 const topPlayerWins: { login: string, nickname: string, wins: number }[] = []
 const updateListeners: (() => void)[] = []
 
-const initialize = async()=> {
-  const res: any[] | Error = await TM.queryDB(`SELECT login, nickname, wins FROM players
+const initialize = async () => {
+  const res: any[] | Error = await TM.db.query(`SELECT login, nickname, wins FROM players
   JOIN player_ids ON player_ids.id=players.id
   ORDER BY wins DESC,
   last_online DESC
