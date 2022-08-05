@@ -21,9 +21,10 @@ export default class DonatorsRanking extends StaticComponent {
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.donatorsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     this.constructXml()
     this.ranking = Donations.topDonators
-    
     TM.addListener('Controller.EndMap', async () => {
       this.ranking = Donations.topDonators
+      this.constructXml()
+      this.display()
     })
     TM.addListener('Controller.BeginMap', () => {
       this.ranking.length = 0

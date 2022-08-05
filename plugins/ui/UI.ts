@@ -32,6 +32,9 @@ import VotersRanking from './static_components/result/VotersRanking.component.js
 import VisitorsRanking from './static_components/result/VisitorsRanking.component.js'
 import PlaytimeRanking from './static_components/result/PlaytimeRanking.component.js'
 import DonatorsRanking from './static_components/result/DonatorsRanking.component.js'
+import AveragesRanking from './static_components/result/AveragesRanking.component.js'
+import RankWidgetResult from './static_components/result/RankWidgetResult.component.js'
+import KarmaWidgetResult from './static_components/result/KarmaWidgetResult.component.js'
 
 /*
 ------------------
@@ -102,6 +105,9 @@ let staticComponents: {
   readonly visitorsRanking: VisitorsRanking
   readonly playtimeRanking: PlaytimeRanking
   readonly donatorsRanking: DonatorsRanking
+  readonly averagesRanking: AveragesRanking
+  readonly rankWidgetResult: RankWidgetResult
+  readonly karmaWidgetResult: KarmaWidgetResult
 }
 
 let dynamicComponents: {
@@ -156,7 +162,10 @@ const events: TMListener[] = [
         votersRanking: new VotersRanking(),
         visitorsRanking: new VisitorsRanking(),
         playtimeRanking: new PlaytimeRanking(),
-        donatorsRanking: new DonatorsRanking()
+        donatorsRanking: new DonatorsRanking(),
+        averagesRanking: new AveragesRanking(),
+        rankWidgetResult: new RankWidgetResult(),
+        karmaWidgetResult: new KarmaWidgetResult()
       }
       for (const c of Object.values(staticComponents)) {
         if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }

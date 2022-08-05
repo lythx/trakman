@@ -38,7 +38,7 @@
       "visitorsRanking"
     ],
     "leftSideOrder": [
-      "buttons",
+      "averagesRanking",
       "rank",
       "karma",
       "dedis",
@@ -142,7 +142,7 @@
     "height": 12.92,
     "side": true,
     "title": "Most Visits",
-    "icon": "people",
+    "icon": "placeholder",
     "entries": 5,
     "columnProportions": [
       1,
@@ -153,7 +153,7 @@
   "playtimeRanking": {
     "height": 12.92,
     "title": "Top Hours Played",
-    "icon": "people",
+    "icon": "placeholder",
     "entries": 5,
     "side": true,
     "columnProportions": [
@@ -165,13 +165,41 @@
   "donatorsRanking": {
     "height": 12.92,
     "title": "Top Donators",
-    "icon": "people",
+    "icon": "placeholder",
     "entries": 5,
     "side": true,
     "columnProportions": [
       1,
       1.9,
       5.1
+    ]
+  },
+  "averagesRanking": {
+    "height": 12.92,
+    "title": "Top Ranks",
+    "icon": "placeholder",
+    "entries": 5,
+    "side": false,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
+  },
+  "rank": {
+    "height": 6.5,
+    "side": false
+  },
+  "karma": {
+    "height": 8.8,
+    "side": false,
+    "title": "Karma",
+    "icon": "karmaStats",
+    "icons": [
+      "karmaLocal",
+      "karmaGlobal",
+      "karmaPulse",
+      "peopleKarma"
     ]
   }
 }
