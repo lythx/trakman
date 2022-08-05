@@ -27,7 +27,7 @@ export class GameService {
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
   ]
-  private static _state: 'race' | 'result' = 'race'
+  private static _state: 'race' | 'result'
   private static _timerStartTimestamp: number = Date.now()
 
   static async initialize(): Promise<void> {

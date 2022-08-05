@@ -267,7 +267,7 @@
   },
   "winnersRanking": {
     "height": 12.92,
-    "side": true,
+    "side": false,
     "title": "Most Wins",
     "icon": "placeholder",
     "entries": 5,
@@ -279,7 +279,7 @@
   },
   "mostRecordsRanking": {
     "height": 12.92,
-    "side": true,
+    "side": false,
     "title": "Most Records",
     "icon": "placeholder",
     "entries": 5,

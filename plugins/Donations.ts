@@ -11,7 +11,7 @@ const updateListeners: (() => void)[] = []
 const topDonators: { login: string, nickname: string, amount: number }[] = []
 // const onlineDonators: { login: string, amount: number }[] = []
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+const initialize = async () => {
   const res: any[] | Error = await TM.queryDB(`SELECT SUM(amount) AS amount, login, nickname FROM donations
   JOIN players ON players.id=donations.player_id
   JOIN player_ids ON player_ids.id=donations.player_id
@@ -23,6 +23,10 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
     return
   }
   topDonators.push(...res)
+}
+
+TM.addListener('Controller.Ready', async (): Promise<void> => {
+  void initialize()
 }, true)
 
 const addToDB = async (login: string, amount: number): Promise<void> => {

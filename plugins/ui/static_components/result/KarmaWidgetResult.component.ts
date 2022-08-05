@@ -19,7 +19,6 @@ export default class KarmaWidgetResult extends StaticComponent {
     const pos = getResultPosition('karma')
     this.positionX = pos.x
     this.positionY = pos.y
-    this.display()
     // setInterval(() => {
     //   this.updateXML()
     //   this.display()

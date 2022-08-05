@@ -21,7 +21,6 @@ export default abstract class StaticComponent {
         })
         break
       case 'result':
-        this._isDisplayed = false
         TM.addListener('Controller.EndMap', async () => {
           this._isDisplayed = true
           await this.display()
@@ -34,6 +33,9 @@ export default abstract class StaticComponent {
     TM.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
       if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
+    if (TM.serverState !== this.displayMode && this.displayMode !== 'always') {
+      this._isDisplayed = false
+    }
   }
 
   get isDisplayed(): boolean {

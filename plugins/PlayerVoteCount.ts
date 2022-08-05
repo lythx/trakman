@@ -6,7 +6,7 @@ const topVoteCounts: { login: string, count: number }[] = []
 const updateListeners: (() => void)[] = []
 const topUpdateListeners: (() => void)[] = []
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+const initialize = async () => {
   const res: any[] | Error = await TM.queryDB(`select p.login, count(p.id)::int
   from votes v
   join player_ids p on v.player_id = p.id
@@ -15,6 +15,10 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
   limit 10;`)
   if (res instanceof Error) { return }
   topVoteCounts.push(...res)
+}
+
+TM.addListener('Controller.Ready', async (): Promise<void> => {
+  void initialize()
 })
 
 TM.addListener('Controller.EndMap', (): void => {
