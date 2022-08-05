@@ -750,12 +750,12 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }],
     callback: (info: MessageInfo, login: string): void => {
       // Can also be done with TM.getPlayerRecord, however we need the player nickname
-      const playerRecord: TMLocalRecord | undefined = TM.localRecords.find(a => a.login === login)
+      const playerRecord: TMLocalRecord | undefined = TM.records.local.find(a => a.login === login)
       if (playerRecord === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player ${login} has no record on this map.`, info.login)
         return
       }
-      TM.removeRecord(playerRecord.login, TM.map.id, info.login)
+      TM.records.remove(playerRecord.login, TM.map.id, info.login)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
         + `removed the record of ${TM.utils.palette.highlight + (TM.utils.strip(playerRecord.nickname, true))}${TM.utils.palette.admin} on the ongoing map.`)

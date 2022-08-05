@@ -18,11 +18,11 @@ const events: TMListener[] = [
     callback: async (): Promise<void> => {
       const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
       for (const player of TM.players.list) {
-        const index: number = TM.localRecords.findIndex(a => a.login === player.login)
+        const index: number = TM.records.local.findIndex(a => a.login === player.login)
         if (index === -1) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a personal best on this map.`, player.login)
         } else {
-          const rec: TMLocalRecord = TM.localRecords[index]
+          const rec: TMLocalRecord = TM.records.local[index]
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}Personal best${TM.utils.palette.highlight}: ${TM.utils.getTimeString(rec.time)}${TM.utils.palette.record}, the `
             + `${TM.utils.palette.rank + TM.utils.getPositionString(index + 1)} ${TM.utils.palette.record}record.`, player.login)
         }
@@ -46,11 +46,11 @@ const events: TMListener[] = [
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Welcome to ${TM.utils.palette.highlight + TM.utils.strip(TM.serverConfig.name)}${TM.utils.palette.error}. `
         + `This server is running Trakman ${TM.utils.palette.highlight}v${config.version}${TM.utils.palette.error}.\n`
         + `${TM.utils.palette.server}» ${TM.utils.palette.error}You can see the recent changes with the ${TM.utils.palette.highlight}/changes ${TM.utils.palette.error}command.`, player.login)
-      const index: number = TM.localRecords.findIndex(a => a.login === player.login)
+      const index: number = TM.records.local.findIndex(a => a.login === player.login)
       if (index === -1) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a personal best on this map.`, player.login)
       } else {
-        const rec: TMLocalRecord = TM.localRecords[index]
+        const rec: TMLocalRecord = TM.records.local[index]
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}Personal best${TM.utils.palette.highlight}: ${TM.utils.getTimeString(rec.time)}${TM.utils.palette.record}, the `
           + `${TM.utils.palette.rank + TM.utils.getPositionString(index + 1)} ${TM.utils.palette.record}record.`, player.login)
       }

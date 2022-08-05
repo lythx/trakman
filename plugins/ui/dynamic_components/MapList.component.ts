@@ -290,7 +290,7 @@ export default class MapList extends PopupWindow {
   }
 
   private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
-    const records = await TM.fetchRecords(...mapIds)
+    const records = await TM.records.fetchByMap(...mapIds)
     const positions: number[] = []
     let i = -1
     while (true) {
@@ -318,7 +318,7 @@ export default class MapList extends PopupWindow {
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
       if (positions[i] === -1 || positions[i] === undefined) { ret.push("--.") }
-      else { ret.push(TM.utils.getPositionString(positions[i] > TM.localRecordsAmount ? TM.localRecordsAmount : positions[i])) }
+      else { ret.push(TM.utils.getPositionString(positions[i] > TM.records.localsAmount ? TM.records.localsAmount : positions[i])) }
     }
     return ret
   }

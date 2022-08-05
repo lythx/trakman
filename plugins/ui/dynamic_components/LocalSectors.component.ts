@@ -18,7 +18,7 @@ export default class LocalSectors extends PopupWindow {
 
   constructor() {
     super(IDS.localSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, CONFIG.localSectors.navbar)
-    const records = TM.localRecords
+    const records = TM.records.local
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -29,11 +29,11 @@ export default class LocalSectors extends PopupWindow {
     }
     TM.addListener('Controller.BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(TM.localRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.records.local.length / this.entries))
       this.reRender()
     })
     TM.addListener('Controller.PlayerRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(TM.localRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.records.local.length / this.entries))
       this.reRender()
     })
   }
@@ -44,7 +44,7 @@ export default class LocalSectors extends PopupWindow {
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
     const records: TMLocalRecord[] = []
-    for (const e of TM.localRecords) {
+    for (const e of TM.records.local) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)

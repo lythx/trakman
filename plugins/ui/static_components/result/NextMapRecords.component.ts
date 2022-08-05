@@ -26,7 +26,7 @@ export default class NextMapRecords extends StaticComponent {
     })
     TM.addListener('Controller.EndMap', async () => {
       const mapId = TM.mapQueue[0].id
-      this.records = await TM.fetchRecords(mapId)
+      this.records = await TM.records.fetchByMap(mapId)
       this.display()
     })
     TM.addListener('Controller.BeginMap', () => {

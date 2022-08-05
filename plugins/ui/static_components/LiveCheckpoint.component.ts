@@ -26,7 +26,7 @@ export default class LiveCheckpoint extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
-      const pb: TMRecord | undefined = TM.getPlayerRecord(info.player.login)
+      const pb: TMRecord | undefined = TM.records.getLocal(info.player.login)
       if (pb !== undefined) {
         const cpIndex: number = info.index
         const diff: number = pb.checkpoints[cpIndex] - info.time

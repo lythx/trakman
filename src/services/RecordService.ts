@@ -32,6 +32,24 @@ export class RecordService {
     }
   }
 
+  /**
+   * Gets the players local record on the ongoing map
+   * @param login Player login
+   * @returns Record object or undefined if the player doesn't have a local record
+   */
+  static getLocal(login: string): TMLocalRecord | undefined {
+    return this._localRecords.find(a => a.login === login)
+  }
+
+  /**
+   * Gets the players live record on the ongoing map
+   * @param login Player login
+   * @returns Record object or undefined if the player doesn't have a local record
+   */
+  static getLive(login: string): FinishInfo | undefined {
+    return this._liveRecords.find(a => a.login === login)
+  }
+
   static async fetchMapRank(login: string, mapId: string): Promise<number | undefined>
   static async fetchMapRank(login: string, mapIds: string[]): Promise<{ mapId: string, rank: number }[]>
   static async fetchMapRank(login: string, mapIds: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
@@ -133,7 +151,7 @@ export class RecordService {
     return this._playerRanks
   }
 
-  static async fetchRecords(...mapId: string[]): Promise<TMRecord[]> {
+  static async fetch(...mapId: string[]): Promise<TMRecord[]> {
     return await this.repo.get(...mapId)
   }
 
@@ -145,7 +163,7 @@ export class RecordService {
     return await this.repo.countRecords(login)
   }
 
-  static async fetchRecord(mapId: string, login: string): Promise<TMRecord | undefined> {
+  static async fetchOne(mapId: string, login: string): Promise<TMRecord | undefined> {
     return await this.repo.getOne(mapId, login)
   }
 
@@ -249,6 +267,12 @@ export class RecordService {
     }
   }
 
+  /**
+   * Removes a player record
+   * @param login Player login
+   * @param mapId Map UID
+   * @returns Database response
+   */
   static remove(login: string, mapId: string, callerLogin?: string): void {
     if (callerLogin !== undefined) {
       Logger.info(`${callerLogin} has removed ${login} record on map ${mapId}`)
@@ -260,6 +284,11 @@ export class RecordService {
     void this.repo.remove(login, mapId)
   }
 
+  /**
+   * Removes all player records on given map
+   * @param mapId Map UID
+   * @returns Database response
+   */
   static removeAll(mapId: string, callerLogin?: string): void {
     if (callerLogin !== undefined) {
       Logger.info(`${callerLogin} has removed records on map ${mapId}`)

@@ -11,7 +11,7 @@ TM.addCommand({
     }
     switch (option) {
       case 'nofinish': case 'nofin': {
-        const mapsWithRec: string[] = (await TM.fetchRecordsByLogin(info.login)).map(a => a.map)
+        const mapsWithRec: string[] = (await TM.records.fetchByLogin(info.login)).map(a => a.map)
         const eligibleMaps: TMMap[] = TM.maps.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
@@ -28,7 +28,7 @@ TM.addCommand({
         break
       }
       case 'noauthor': {
-        const mapsWithAuthor: string[] = (await TM.fetchRecordsByLogin(info.login))
+        const mapsWithAuthor: string[] = (await TM.records.fetchByLogin(info.login))
           .filter(a => TM.maps.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
         const eligibleMaps: TMMap[] = TM.maps.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
@@ -52,7 +52,7 @@ TM.addCommand({
         do {
           i++
           if (i * 500 > TM.maps.length) { break }
-          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.localRecordsAmount))
+          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.localsAmount))
         } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
         const list: TMMap[] = TM.maps.slice(0, (i + 1) * fetchSize)
         const eligibleMaps: TMMap[] = list.filter(a =>

@@ -32,7 +32,7 @@ export default class CurrentCps extends PopupWindow {
       { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
-      const pb = TM.getPlayerRecord(info.player.login)
+      const pb = TM.records.getLocal(info.player.login)
       if (currentCp === undefined) { // Add a player to array if he wasn't there
         this.currentCheckpoints.push({
           nickname: info.player.nickname,
