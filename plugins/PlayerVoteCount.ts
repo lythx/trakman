@@ -6,8 +6,8 @@ const topVoteCounts: { login: string, count: number }[] = []
 const updateListeners: (() => void)[] = []
 const topUpdateListeners: (() => void)[] = []
 
-TM.addListener('Controller.Ready', async () => {
-  const res = await TM.queryDB(`select p.login, count(p.id)::int
+TM.addListener('Controller.Ready', async (): Promise<void> => {
+  const res: any[] | Error = await TM.queryDB(`select p.login, count(p.id)::int
   from votes v
   join player_ids p on v.player_id = p.id
   group by p.login
@@ -17,18 +17,18 @@ TM.addListener('Controller.Ready', async () => {
   topVoteCounts.push(...res)
 })
 
-TM.addListener('Controller.EndMap', () => {
+TM.addListener('Controller.EndMap', (): void => {
   initialVotes.length = 0
   initialVotes.push(...TM.votes.filter(a => a.mapId === TM.mapQueue[0].id))
 })
 
-TM.addListener('Controller.KarmaVote', (info) => {
+TM.addListener('Controller.KarmaVote', (info): void => {
   if (!initialVotes.some(a => a.login === info.login)) {
     initialVotes.push(info)
     const count = voteCounts.find(a => a.login === info.login)
     if (count === undefined) { return }
     count.count++
-    const topIndex = topVoteCounts.findIndex(a => a.login === info.login)
+    const topIndex: number = topVoteCounts.findIndex(a => a.login === info.login)
     if (topIndex === -1 && count.count > topVoteCounts[topVoteCounts.length - 1].count) {
       topVoteCounts.splice(topVoteCounts.findIndex(a => a.count < count.count), 0, count)
       topVoteCounts.length = 10
@@ -36,7 +36,7 @@ TM.addListener('Controller.KarmaVote', (info) => {
         e()
       }
     } else if (topIndex !== -1) {
-      const newIndex = topVoteCounts.findIndex(a => a.count < count.count)
+      const newIndex: number = topVoteCounts.findIndex(a => a.count < count.count)
       if (newIndex < topIndex) {
         topVoteCounts.splice(topIndex, 1)
         topVoteCounts.splice(newIndex, 0, count)
@@ -53,9 +53,9 @@ TM.addListener('Controller.KarmaVote', (info) => {
   }
 })
 
-TM.addListener('Controller.PlayerJoin', async (info) => {
-  const id = await TM.getPlayerDBId(info.login)
-  const res = await TM.queryDB(`SELECT count(*) FROM VOTES
+TM.addListener('Controller.PlayerJoin', async (info): Promise<void> => {
+  const id: number | undefined = await TM.getPlayerDBId(info.login)
+  const res: any[] | Error = await TM.queryDB(`SELECT count(*) FROM VOTES
       WHERE player_id=$1`, id)
   if (res instanceof Error) {
     TM.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
@@ -64,7 +64,7 @@ TM.addListener('Controller.PlayerJoin', async (info) => {
   voteCounts.push({ login: info.login, count: Number(res[0].count) })
 })
 
-TM.addListener('Controller.PlayerLeave', async (info) => {
+TM.addListener('Controller.PlayerLeave', async (info): Promise<void> => {
   voteCounts.splice(voteCounts.findIndex(a => a.login === info.login), 1)
 })
 

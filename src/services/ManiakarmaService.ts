@@ -77,7 +77,7 @@ export abstract class ManiakarmaService {
     const json: any = this.getJson(await res.text())
     this._mapKarmaValue = json?.result?.votes?.[0]?.karma?.[0]
     for (const key of Object.keys(this._mapKarma)) {
-      (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
+      this._mapKarma[key as keyof typeof this._mapKarma] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
     const vote: number = Number(json?.result?.players[0]?.player[0]?.$?.vote)
     const v: number | undefined = [-3, -2, -1, 1, 2, 3].find(a => a === vote)

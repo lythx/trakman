@@ -18,8 +18,8 @@ export abstract class JukeboxService {
   private static readonly _queue: JukeboxMap[] = []
   private static _current: TMMap
   private static readonly _previous: TMMap[] = []
-  static readonly queueLength = CONFIG.jukeboxQueueSize
-  static readonly previousLength = CONFIG.jukeboxPreviousMapsInRuntime
+  static readonly queueLength: number = CONFIG.jukeboxQueueSize
+  static readonly previousLength: number = CONFIG.jukeboxPreviousMapsInRuntime
 
   static initialize(): void {
     this._current = { ...MapService.current }
@@ -29,8 +29,8 @@ export abstract class JukeboxService {
       this._queue.push({ map: MapService.maps[(i + currentIndex) % lgt], isForced: false })
     }
     MapService.setNextMap(this._queue[0].map.id)
-    Events.addListener('Controller.MapAdded', (info: MapAddedInfo) => {
-      const status = this.add(info.id, info.callerLogin, true)
+    Events.addListener('Controller.MapAdded', (info: MapAddedInfo): void => {
+      const status: void | Error = this.add(info.id, info.callerLogin, true)
       if (status instanceof Error) {
         Logger.error(`Failed to insert newly added map ${info.name} into the jukebox, clearing the jukebox to prevent further errors...`)
         this.clear()
@@ -96,8 +96,8 @@ export abstract class JukeboxService {
   }
 
   static clear(callerLogin?: string): void {
-    let n = this._queue.length
-    for (let i = 0; i < n; i++) {
+    let n: number = this._queue.length
+    for (let i: number = 0; i < n; i++) {
       if (this._queue[i].isForced) {
         this._queue.splice(i--, 1)
         n--

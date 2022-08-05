@@ -54,7 +54,7 @@ export class DedimaniaResponse {
 
   private generateJson(): void {
     let json: any
-    let isError = false
+    let isError: boolean = false
     // parse xml to json
     xml2js.parseString(this._xml.toString(), (err, result): void => {
       if (err != null) {

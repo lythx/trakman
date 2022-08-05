@@ -6,8 +6,9 @@ import { MapService } from './services/MapService.js'
 import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
-import colours from './data/Colours.json' assert {type: 'json'}
-import countries from './data/Countries.json' assert {type: 'json'}
+import colours from './data/Colours.json' assert { type: 'json' }
+import countries from './data/Countries.json' assert { type: 'json' }
+import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { Utils } from './Utils.js'
 import { randomUUID } from 'crypto'
 import { Database } from './database/DB.js'
@@ -25,18 +26,18 @@ import http from 'http'
 import { PlayerIdsRepository } from './database/PlayerIdsRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 
-const playerIdsRepo = new PlayerIdsRepository()
+const playerIdsRepo: PlayerIdsRepository = new PlayerIdsRepository()
 await playerIdsRepo.initialize()
 
-const mapIdsRepo = new MapIdsRepository()
+const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
 await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 await DB.initialize()
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
-Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
-  const billIndex = bills.findIndex(a => a.id === info.id)
+Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo): void => {
+  const billIndex: number = bills.findIndex(a => a.id === info.id)
   if (billIndex !== -1) {
     switch (info.state) {
       case 4:
@@ -57,23 +58,25 @@ Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo) => {
 
 export const TRAKMAN = {
 
-  // TODO THIS IN A CONFIG FILE
-  specialTitles: [
-    { login: 'd', title: 'Venti the Anemo Archon' },
-    // { login: 'petr_kharpe', title: 'SUSPICIOUS PETER 丹丹丹丹丹丹丹' }
-  ],
   titles: ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner'],
 
   /**
    * Determines the player title on join/actions
-   * @param player Player to get the title for
+   * @param login Login of the player to get the title for
    * @returns The title string
    */
-  getTitle(player: any): string {
-    const title: string = TRAKMAN.titles[player.privilege]
-    const specialTitle = TRAKMAN.specialTitles.find(a => a.login === player.login)
+  getTitle(login: string): string {
+    let player: TMPlayer | undefined = this.getPlayer(login)
+    // I'd say this is almost impossible to trigger, as titles only get used when admin stuff is executed.
+    // Admin must be on the server, thus making this unlikely to fail, however as a failsafe just return undefined.
+    if (player === undefined) {
+      return this.titles[-1]
+    }
+    const title: string = this.titles[player?.privilege]
+    // Apparently this is a thing
+    const specialTitle: string | undefined = specialTitles[player?.login as keyof typeof specialTitles]
     if (specialTitle !== undefined) {
-      return specialTitle.title
+      return specialTitle
     }
     return title
   },
@@ -413,17 +416,17 @@ export const TRAKMAN = {
         'Authorization': au,
       }
     }
-    return new Promise((resolve) => {
-      http.request(options, function (res) {
-        let data = ''
-        res.on('data', function (chunk) {
+    return new Promise((resolve): void => {
+      http.request(options, function (res): void {
+        let data: string = ''
+        res.on('data', function (chunk): void {
           data += chunk
         })
         if (res.statusCode === 200) {
-          res.on('end', () => resolve(JSON.parse(data)))
+          res.on('end', (): void => resolve(JSON.parse(data)))
           return
         }
-        res.on('end', () => resolve(new Error(data)))
+        res.on('end', (): void => resolve(new Error(data)))
       }).end()
     })
   },
@@ -605,7 +608,7 @@ export const TRAKMAN = {
     if (matches.length === 0) {
       return undefined
     }
-    const s = matches.sort((a, b) => b.value - a.value)
+    const s = matches.sort((a, b): number => b.value - a.value)
     if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
       return undefined
     }
@@ -625,7 +628,7 @@ export const TRAKMAN = {
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
 
-  get localRecordsAmount() {
+  get localRecordsAmount(): number {
     return RecordService.localsAmount
   },
 
@@ -669,7 +672,7 @@ export const TRAKMAN = {
   },
 
   async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
-    const billId = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
+    const billId: any[] | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
@@ -775,7 +778,7 @@ export const TRAKMAN = {
     return TMXService.current
   },
 
-  get mapQueue() {
+  get mapQueue(): TMMap[] {
     return JukeboxService.queue
   },
 
