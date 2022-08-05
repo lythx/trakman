@@ -86,11 +86,26 @@ export abstract class TMXService {
   }
 
   /**
+   * Fetches the map from TMX via its UID
+   * @param mapId Map UID
+   * @returns TMX map data or error if unsuccessful
+   */
+  static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
+  /**
    * Fetches map gbx file from tmx by TMX id, returns name and file in base64 string
    */
-  static async fetchMapFile(tmxId: number, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
-    const prefix: TMXPrefix = this.siteToPrefix(site)
-    const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${tmxId}`
+  static async fetchMapFile(tmxId: number, site?: TMXSite): Promise<{ name: string, content: Buffer } | Error>
+  static async fetchMapFile(id: number | string, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+    let prefix: TMXPrefix = this.siteToPrefix(site)
+    if (typeof id === 'string') {
+      const res = await this.getTMXId(id)
+      if (res instanceof Error) {
+        return res
+      }
+      id = res.id
+      prefix = res.prefix
+    }
+    const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.error(`Error while fetching map file from TMX (url: ${url})`, res.message)
@@ -106,9 +121,11 @@ export abstract class TMXService {
   }
 
   /**
-   * Fetches map gbx file from tmx map id, returns name and file in base64 string
+   * Fetches the map from TMX via its UID
+   * @param mapId Map UID
+   * @returns TMX map data or error if unsuccessful
    */
-  static async fetchMapFileByUid(mapId: string): Promise<{ name: string, content: Buffer } | Error> {
+  private static async getTMXId(mapId: string): Promise<{ id: number, prefix: TMXPrefix } | Error> {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) {
@@ -127,11 +144,13 @@ export abstract class TMXService {
     if (prefix === undefined) { return new Error('Cannot fetch map data from TMX') }
     const s: string[] = data.split('\t')
     const id: number = Number(s[0])
-    return await this.fetchMapFile(id, this.prefixToSite(prefix))
+    return { id, prefix }
   }
 
   /**
-   * Fetches TMX info for map with given id
+   * Fetches TMX for map information
+   * @param mapId Map UID
+   * @returns Map info from TMX or error if unsuccessful
    */
   static async fetchMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
     let data: string = ''

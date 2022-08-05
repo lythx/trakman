@@ -53,21 +53,19 @@ export const TRAKMAN = {
 
   },
 
+  tmx: {
+
+    fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
+
+    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
+
+  },
+
   // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
 
   // Implement client idk
   DatabaseClient: Database,
-
-
-  /**
-   * Fetches TMX for map information
-   * @param mapId Map UID
-   * @returns Map info from TMX or error if unsuccessful
-   */
-  async fetchTMXMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
-    return await TMXService.fetchMapInfo(mapId)
-  },
 
   /**
    * Gets the player information
@@ -218,17 +216,6 @@ export const TRAKMAN = {
 
   async removeMap(id: string, callerLogin?: string): Promise<boolean | Error> {
     return await MapService.remove(id, callerLogin)
-  },
-
-
-
-  /**
-   * Fetches the map from TMX via its UID
-   * @param mapId Map UID
-   * @returns TMX map data or error if unsuccessful
-   */
-  async fetchMapFileByUid(mapId: string): Promise<{ name: string, content: Buffer } | Error> {
-    return await TMXService.fetchMapFileByUid(mapId)
   },
 
   /**
