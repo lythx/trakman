@@ -66,7 +66,7 @@ const events: TMListener[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.record}You are currently ranked ${TM.palette.rank + TM.Utils.getPositionString(playerRank)} ${TM.palette.record}out `
           + `of ${TM.palette.highlight + allRanks[0].count}${TM.palette.record} people total.`, player.login)
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player)}${TM.palette.highlight}: `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.servermsg}${TM.getTitle(player.login)}${TM.palette.highlight}: `
         + `${TM.strip(player.nickname, true)}${TM.palette.servermsg} Country${TM.palette.highlight}: `
         + `${player.nation} ${TM.palette.servermsg}Visits${TM.palette.highlight}: ${player.visits}${TM.palette.servermsg}.`)
     }

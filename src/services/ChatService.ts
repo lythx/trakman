@@ -9,7 +9,7 @@ import CONFIG from '../../config.json' assert { type: 'json' }
 
 export abstract class ChatService {
 
-  private static readonly messagesArraySize = CONFIG.messagesInRuntimeMemory
+  private static readonly messagesArraySize: number = CONFIG.messagesInRuntimeMemory
   static readonly messages: TMMessage[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
@@ -25,7 +25,7 @@ export abstract class ChatService {
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
       const input: string = info.text?.trim()
-      const usedAlias = input.split(' ').shift()?.toLowerCase()
+      const usedAlias: string | undefined = input.split(' ').shift()?.toLowerCase()
       if (!command.aliases.some((alias: string): boolean => usedAlias === (prefix + alias))) {
         return
       }
@@ -156,7 +156,7 @@ export abstract class ChatService {
     }
     const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
     if (player === undefined) {
-      const errStr = `Error while adding message. Cannot find player ${login} in the memory`
+      const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }

@@ -14,7 +14,7 @@ export class MapService {
     await this.repo.initialize()
     await this.initializeList()
     await this.setCurrent()
-    Client.addProxy(['LoadMatchSettings'], async () => {
+    Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
       this.maps.length = 0
       await this.initializeList()
       Events.emitEvent('Controller.MatchSettingsUpdated', this.maps)
@@ -38,7 +38,7 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const dbinfo = this.maps.find(a => a.id === res[0].UId)
+    const dbinfo: TMMap | undefined = this.maps.find(a => a.id === res[0].UId)
     if (dbinfo === undefined) {
       Logger.error('Failed to get map info from memory')
       return
@@ -81,7 +81,7 @@ export class MapService {
         mapsInMapList.push(map)
       }
     }
-    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b) => a.rand - b.rand).map(a => a.map)
+    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     await this.repo.add(...mapsNotInDBObjects)
   }
 
@@ -89,7 +89,7 @@ export class MapService {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }
     if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
-    const dbRes = await this.repo.getByFilename(fileName)
+    const dbRes: TMMap | undefined = await this.repo.getByFilename(fileName)
     let obj: TMMap
     if (dbRes !== undefined) {
       obj = dbRes
@@ -110,7 +110,7 @@ export class MapService {
   }
 
   static async remove(id: string, callerLogin?: string): Promise<boolean | Error> {
-    const map = this._maps.find(a => id === a.id)
+    const map: TMMap | undefined = this._maps.find(a => id === a.id)
     if (map === undefined) {
       return false
     }
@@ -138,7 +138,7 @@ export class MapService {
   }
 
   static shuffle(adminLogin?: string): void {
-    this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b) => a.rand - b.rand).map(a => a.map)
+    this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     if (adminLogin !== undefined) {
       Logger.info(`Player ${adminLogin} shuffled the maplist`)
     } else {

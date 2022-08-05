@@ -22,7 +22,7 @@ export default class BanList extends PopupWindow {
                     return
                 } else {
                     TM.removeFromBanlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
                         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unbanned `
                         + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`
                     )

@@ -13,8 +13,8 @@ export abstract class DedimaniaService {
 
   static _dedis: TMDedi[] = []
   static _newDedis: TMDedi[] = []
-  private static readonly dedisAmount = Number(process.env.DEDIS_AMOUNT)
-  private static readonly isActive = process.env.USE_DEDIMANIA === 'YES'
+  private static readonly dedisAmount: number = Number(process.env.DEDIS_AMOUNT)
+  private static readonly isActive: boolean = process.env.USE_DEDIMANIA === 'YES'
 
   static async initialize(): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
@@ -73,14 +73,14 @@ export abstract class DedimaniaService {
         { string: name },
         { string: environment },
         { string: author },
-        { string: 'TMF' },
+        { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
         { int: GameService.game.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
             Private: { boolean: cfg.password === '' },
-            SrvIP: { string: '127.0.0.1' },
+            SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
             SrvPort: { string: '5000' },
             XmlRpcPort: { string: '5000' },
             NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
@@ -148,7 +148,7 @@ export abstract class DedimaniaService {
     const position: number = this._dedis.filter(a => a.time <= time).length + 1
     if (position > this.dedisAmount || time > (pb ?? Infinity)) { return false }
     if (pb === undefined) {
-      const dediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
+      const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       Logger.info(this.getLogString(-1, position, -1, time, player.login))
