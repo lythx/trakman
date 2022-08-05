@@ -48,7 +48,7 @@ export default class MapWidgetResult extends StaticComponent {
     const map = TM.mapQueue[0]
     const author: string = MapAuthorData?.nextAuthorData?.nickname ?? map.author
     const cfg = RCFG.map
-    const tmxmap = TM.TMXNext[0]
+    const tmxmap = TM.tmx.next[0]
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - RCFG.marginSmall, [1], new Array(rows).fill(1))

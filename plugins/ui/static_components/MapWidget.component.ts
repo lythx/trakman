@@ -42,7 +42,7 @@ export default class MapWidget extends StaticComponent {
     const map = TM.map
     const author: string = MapAuthorData.currentAuthor?.nickname ?? map.author
     const cfg = CONFIG.map
-    const tmxmap = TM.TMXCurrent
+    const tmxmap = TM.tmx.current
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(rows).fill(1))

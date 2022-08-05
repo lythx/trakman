@@ -57,7 +57,13 @@ export const TRAKMAN = {
 
     fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
 
-    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
+    fetchMapFile: TMXService.fetchMapFile.bind(TMXService),
+
+    get current() { return TMXService.current },
+
+    get next() { return TMXService.next },
+
+    get previous() { return TMXService.previous }
 
   },
 
@@ -523,10 +529,6 @@ export const TRAKMAN = {
     return MapService.maps
   },
 
-  get TMXInfo(): TMXMapInfo | null {
-    return TMXService.current
-  },
-
   get mapQueue(): TMMap[] {
     return JukeboxService.queue
   },
@@ -537,18 +539,6 @@ export const TRAKMAN = {
 
   get previousMaps(): TMMap[] {
     return JukeboxService.previous
-  },
-
-  get TMXPrevious(): (TMXMapInfo | null)[] {
-    return TMXService.previous
-  },
-
-  get TMXCurrent(): TMXMapInfo | null {
-    return TMXService.current
-  },
-
-  get TMXNext(): (TMXMapInfo | null)[] {
-    return TMXService.next
   },
 
   get votes(): TMVote[] {
