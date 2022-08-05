@@ -18,7 +18,6 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
   GROUP BY (login, nickname)
   ORDER BY amount DESC
   LIMIT 10`)
-  console.log(res)
   if (res instanceof Error) {
     TM.error(res)
     return
