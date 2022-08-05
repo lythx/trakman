@@ -145,7 +145,7 @@ let dynamicComponents: {
 const events: TMListener[] = [
   {
     event: 'Controller.Ready',
-    callback: async (): Promise<void> => {
+    callback: async (status: 'race' | 'result'): Promise<void> => {
       await TM.call('SendHideManialinkPage')
       loadMod()
       initalizeKeyListeners()
@@ -186,7 +186,7 @@ const events: TMListener[] = [
         mostRecordsRanking: new MostRecordsRanking()
       }
       for (const c of Object.values(staticComponents)) {
-        if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }
+        if (c.displayMode === status || c.displayMode === 'always') { await c.display() }
       }
       dynamicComponents = {
         mapList: new MapList(),

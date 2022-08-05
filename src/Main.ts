@@ -93,7 +93,7 @@ async function main(): Promise<void> {
     Logger.fatal('Failed to enable callbacks', cb.message)
   }
   Logger.trace('Callbacks enabled')
-  Events.initialize()
+  await Events.initialize()
   Logger.trace('Controller events enabled')
   Logger.info('Controller started successfully')
 }

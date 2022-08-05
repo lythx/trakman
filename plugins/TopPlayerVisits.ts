@@ -3,7 +3,7 @@ import { TRAKMAN as TM } from "../src/Trakman.js";
 const topPlayerVisits: { login: string, visits: number }[] = []
 const updateListeners: (() => void)[] = []
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+const initialize = async () => {
   const allPlayers: any[] | Error = await TM.queryDB(`SELECT login, visits FROM players
   JOIN player_ids ON player_ids.id=players.id
   ORDER BY visits DESC,
@@ -13,6 +13,10 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
     return
   }
   topPlayerVisits.push(...allPlayers.slice(0, 10))
+}
+
+TM.addListener('Controller.Ready', async (): Promise<void> => {
+    void initialize()
 })
 
 TM.addListener('Controller.PlayerJoin', (info): void => {

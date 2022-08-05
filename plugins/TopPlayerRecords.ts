@@ -2,8 +2,7 @@ import { TRAKMAN as TM } from "../src/Trakman.js";
 
 const topPlayerRecords: { login: string, nickname: string, amount: number }[] = []
 const updateListeners: (() => void)[] = []
-
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+const initialize =async () => {
   const res: any[] | Error = await TM.queryDB(`SELECT count(*)::int as amount, nickname, login FROM records
   JOIN player_ids ON player_ids.id=records.player_id
   JOIN players ON players.id=records.player_id
@@ -16,6 +15,10 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
     return
   }
   topPlayerRecords.push(...res.slice(0, 10))
+}
+
+TM.addListener('Controller.Ready', async (): Promise<void> => {
+void initialize()
 })
 
 // TM.addListener('Controller.PlayerJoin', (info): void => {
