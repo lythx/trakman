@@ -12,8 +12,8 @@ import { Utils } from '../Utils.js'
 export abstract class DedimaniaService {
 
   static _dedis: TMDedi[] = []
-  static _newDedis: TMDedi[] = []
-  private static readonly dedisAmount: number = Number(process.env.DEDIS_AMOUNT)
+  static newDedis: TMDedi[] = []
+  static readonly dedisAmount: number = Number(process.env.DEDIS_AMOUNT)
   private static readonly isActive: boolean = process.env.USE_DEDIMANIA === 'YES'
 
   static async initialize(): Promise<true | Error> {
@@ -48,14 +48,14 @@ export abstract class DedimaniaService {
     return [...this._dedis]
   }
 
-  static get newDedis(): TMDedi[] {
-    return [...this._newDedis]
+  static getDedi(login: string): TMDedi | undefined {
+    return this._dedis.find(a=>a.login === login)
   }
 
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to YES in .env file to enable it') }
     this._dedis.length = 0
-    this._newDedis.length = 0
+    this.newDedis.length = 0
     if (DedimaniaClient.connected === false) {
       let status: boolean | Error = false
       do {
@@ -114,7 +114,7 @@ export abstract class DedimaniaService {
   static async sendRecords(mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> {
     if (this.isActive === false) { return new Error('Dedimania service is not enabled. Set USE_DEDIMANIA to yes in .env file to enable it') }
     const recordsArray: any = []
-    for (const d of this._newDedis) {
+    for (const d of this.newDedis) {
       recordsArray.push(
         {
           struct: {
@@ -150,7 +150,7 @@ export abstract class DedimaniaService {
     if (pb === undefined) {
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-      this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+      this.newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       Logger.info(this.getLogString(-1, position, -1, time, player.login))
       return dediRecordInfo
     }
@@ -170,8 +170,8 @@ export abstract class DedimaniaService {
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, previousTime, position, this._dedis.findIndex(a => a.login === player.login) + 1)
       this._dedis = this._dedis.filter(a => a.login !== player.login)
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-      this._newDedis = this._newDedis.filter(a => a.login !== player.login)
-      this._newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+      this.newDedis = this.newDedis.filter(a => a.login !== player.login)
+      this.newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       Logger.info(this.getLogString(previousIndex + 1, position, previousTime, time, player.login))
       return dediRecordInfo
     }

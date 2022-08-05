@@ -29,10 +29,10 @@ export default class DediRanking extends StaticComponent {
       this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (TM.dedis.list.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.dediRecords.some(a => a.login === info.login)) { this.display() }
+      if (TM.dedis.list.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -51,7 +51,7 @@ export default class DediRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.dedis.title, stringToObjectProperty(CONFIG.dedis.icon, ICONS), false, { actionId: IDS.dediCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.dediRecords.map(a => ({ ...a, name: a.nickname })))}
+          ${this.recordList.constructXml(login, TM.dedis.list.map(a => ({ ...a, name: a.nickname })))}
         </frame>
       </frame>
     </manialink>`,

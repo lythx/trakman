@@ -141,20 +141,19 @@ export const TRAKMAN = {
 
   },
 
+  dedis: {
+
+    get: DedimaniaService.getDedi.bind(DedimaniaService),
+
+    get list() { return DedimaniaService.dedis }
+
+  },
+
   // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
 
   // Implement client idk
   DatabaseClient: Database,
-
-  /**
-   * Gets the player dedimania record on the ongoing map
-   * @param login Player login
-   * @returns Dedi record object or undefined if the player doesn't have a dedi record
-   */
-  getPlayerDedi(login: string): TMDedi | undefined {
-    return DedimaniaService.dedis.find(a => a.login === login)
-  },
 
   /**
    * Gets the recent player messages
@@ -479,10 +478,6 @@ export const TRAKMAN = {
 
   get serverConfig(): ServerInfo {
     return ServerConfig.config
-  },
-
-  get dediRecords(): TMDedi[] {
-    return [...DedimaniaService.dedis]
   },
 
   get map(): TMCurrentMap {
