@@ -8,21 +8,21 @@ let currentMapDBId: number
 const currentPlayerSecs: PlayerSectors[] = []
 
 const onMapStart = async (): Promise<void> => {
-  const DBId = await TM.db.getMapId(TM.map.id)
+  const DBId = await TM.db.getMapId(TM.maps.current.id)
   if (DBId === undefined) {
-    await TM.fatalError(`Failed to fetch current map (${TM.map.id}) id from database`)
+    await TM.fatalError(`Failed to fetch current map (${TM.maps.current.id}) id from database`)
     return
   }
   currentMapDBId = DBId
   const res = await bestSecsDB.get(currentMapDBId)
   if (res instanceof Error) {
-    await TM.fatalError(`Failed to fetch best sectors for map ${TM.map.id}`, res.message)
+    await TM.fatalError(`Failed to fetch best sectors for map ${TM.maps.current.id}`, res.message)
     return
   }
   currentBestSecs = res
   const playerSecs = await allSecsDB.get(currentMapDBId, ...TM.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player sectors for map ${TM.map.id}`, playerSecs.message)
+    await TM.fatalError(`Failed to fetch player sectors for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.length = 0
@@ -96,7 +96,7 @@ TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
 TM.addListener('Controller.PlayerJoin', async (info) => {
   const playerSecs = await allSecsDB.get(currentMapDBId, info.login)
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.map.id}`, playerSecs.message)
+    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.push(...playerSecs)
@@ -117,7 +117,7 @@ TM.commands.add({
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your sectors on the ongoing map were removed.`, info.login)
       void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
     } else {
-      if (sectorIndex < 1 || sectorIndex > TM.map.checkpointsAmount) {
+      if (sectorIndex < 1 || sectorIndex > TM.maps.current.checkpointsAmount) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
         return
       }
@@ -143,7 +143,7 @@ TM.commands.add({
         + `${TM.utils.palette.highlight + 'all sector records'}${TM.utils.palette.admin} on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId)
     } else {
-      if (sectorIndex < 1 || sectorIndex > TM.map.checkpointsAmount + 1) {
+      if (sectorIndex < 1 || sectorIndex > TM.maps.current.checkpointsAmount + 1) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
         return
       }
@@ -159,7 +159,7 @@ TM.commands.add({
 })
 
 const getMapSectors = (): ({ login: string, nickname: string, sector: number, date: Date } | null)[] => {
-  const arr: ({ login: string, nickname: string, sector: number, date: Date } | null)[] = new Array(TM.map.checkpointsAmount).fill(null)
+  const arr: ({ login: string, nickname: string, sector: number, date: Date } | null)[] = new Array(TM.maps.current.checkpointsAmount).fill(null)
   for (const [i, e] of currentBestSecs.entries()) {
     arr[i] = e ?? null
   }
@@ -171,7 +171,7 @@ const getPlayerSectors = (): ({ login: string, sectors: (number | null)[] })[] =
   for (const [i, e] of TM.players.list.entries()) {
     arr[i] = {
       login: e.login,
-      sectors: new Array(TM.map.checkpointsAmount).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.sectors[i] ?? null)
+      sectors: new Array(TM.maps.current.checkpointsAmount).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.sectors[i] ?? null)
     }
   }
   return arr

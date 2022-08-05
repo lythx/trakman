@@ -19,7 +19,7 @@ export default class CheckpointRecords extends PopupWindow {
     super(IDS.checkpointRecords, iconurl, CONFIG.checkpointRecords.title, CONFIG.checkpointRecords.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.checkpointRecords.columnProportions, new Array(this.entries + 1).fill(1),
       { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(TM.map.checkpointsAmount / this.entries))
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(TM.maps.current.checkpointsAmount / this.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -33,7 +33,7 @@ export default class CheckpointRecords extends PopupWindow {
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(TM.map.checkpointsAmount / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.maps.current.checkpointsAmount / this.entries))
       this.reRender()
     })
     checkpointRecords.addListener('PlayerCheckpoint', (login) => this.reRenderToPlayer(login))

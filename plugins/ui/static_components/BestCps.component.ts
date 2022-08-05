@@ -36,7 +36,7 @@ export default class BestCps extends StaticComponent {
 
   constructor() {
     super(IDS.bestCps, 'race')
-    this.cpAmount = TM.map.checkpointsAmount - 1
+    this.cpAmount = TM.maps.current.checkpointsAmount - 1
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
@@ -51,7 +51,7 @@ export default class BestCps extends StaticComponent {
     })
     TM.addListener('Controller.BeginMap', () => {
       this.newestCp = -1
-      this.cpAmount = TM.map.checkpointsAmount - 1
+      this.cpAmount = TM.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
       this.paginator.resetPlayerPages()
       this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })

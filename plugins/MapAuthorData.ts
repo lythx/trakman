@@ -20,7 +20,7 @@ let currentAuthorData: { nickname: string, nation: string } | undefined
 let nextAuthorData: { nickname: string, nation: string } | undefined
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
-  const res = await fetchPlayerData(TM.map.author)
+  const res = await fetchPlayerData(TM.maps.current.author)
   if (res instanceof Error || res === false) {
     currentAuthorData = undefined
   } else {

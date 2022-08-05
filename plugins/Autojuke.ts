@@ -12,10 +12,10 @@ TM.commands.add({
     switch (option) {
       case 'nofinish': case 'nofin': {
         const mapsWithRec: string[] = (await TM.records.fetchByLogin(info.login)).map(a => a.map)
-        const eligibleMaps: TMMap[] = TM.maps.filter(a =>
+        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
-          TM.map.id !== a.id &&
+          TM.maps.current.id !== a.id &&
           !mapsWithRec.includes(a.id))
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No unfinished maps available', info.login)
@@ -29,11 +29,11 @@ TM.commands.add({
       }
       case 'noauthor': {
         const mapsWithAuthor: string[] = (await TM.records.fetchByLogin(info.login))
-          .filter(a => TM.maps.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
-        const eligibleMaps: TMMap[] = TM.maps.filter(a =>
+          .filter(a => TM.maps.list.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
+        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
-          TM.map.id !== a.id &&
+          TM.maps.current.id !== a.id &&
           !mapsWithAuthor.includes(a.id))
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No maps with no author time available', info.login)
@@ -51,14 +51,14 @@ TM.commands.add({
         const fetchSize: number = 300
         do {
           i++
-          if (i * 500 > TM.maps.length) { break }
-          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.localsAmount))
+          if (i * 500 > TM.maps.list.length) { break }
+          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.localsAmount))
         } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
-        const list: TMMap[] = TM.maps.slice(0, (i + 1) * fetchSize)
+        const list: TMMap[] = TM.maps.list.slice(0, (i + 1) * fetchSize)
         const eligibleMaps: TMMap[] = list.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
-          TM.map.id !== a.id &&
+          TM.maps.current.id !== a.id &&
           !ranks.some(b => a.id === b.mapId))
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No maps with no rank available', info.login)
@@ -71,10 +71,10 @@ TM.commands.add({
         break
       }
       default: {
-        const eligibleMaps: TMMap[] = TM.maps.filter(a =>
+        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.some(b => b.map.id === a.id) &&
           !TM.previousMaps.some(b => b.id === a.id) &&
-          TM.map.id !== a.id)
+          TM.maps.current.id !== a.id)
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No maps available', info.login)
           return

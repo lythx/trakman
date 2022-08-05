@@ -39,7 +39,7 @@ export default class MapWidget extends StaticComponent {
   private updateXML(): void {
     const rows = 4
     this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
-    const map = TM.map
+    const map = TM.maps.current
     const author: string = MapAuthorData.currentAuthor?.nickname ?? map.author
     const cfg = CONFIG.map
     const tmxmap = TM.tmx.current

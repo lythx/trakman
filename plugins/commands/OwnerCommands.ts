@@ -12,7 +12,7 @@ const commands: TMCommand[] = [
         return
       }
       for (const map of res) {
-        if (TM.maps.some(a => a.id === map.uid))
+        if (TM.maps.list.some(a => a.id === map.uid))
           continue
         const file: { name: string, content: Buffer } | Error = await TM.tmx.fetchMapFile(map.uid)
         if (file instanceof Error) {
@@ -50,7 +50,7 @@ const commands: TMCommand[] = [
         return
       }
       for (const map of res) {
-        if (TM.maps.some(a => a.id === map.id))
+        if (TM.maps.list.some(a => a.id === map.id))
           continue
         const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: map.filename }])
         if (insert instanceof Error) {

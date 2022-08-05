@@ -27,7 +27,7 @@ export default class MapList extends PopupWindow {
 
   constructor() {
     super(IDS.mapList, getIcon(CONFIG.mapList.icon), CONFIG.mapList.title, CONFIG.mapList.navbar)
-    const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+    const arr = TM.maps.list.sort((a, b) => a.name.localeCompare(b.name))
     this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
     const pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
@@ -93,7 +93,7 @@ export default class MapList extends PopupWindow {
       privilege: 0
     })
     TM.addListener(['Controller.MapAdded', 'Controller.MapRemoved'], () => {
-      const arr = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
+      const arr = TM.maps.list.sort((a, b) => a.name.localeCompare(b.name))
       this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
       let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
@@ -336,7 +336,7 @@ export default class MapList extends PopupWindow {
     const width = (w - this.margin * 3) - this.iconW
     const height = h - this.margin
     const index = TM.jukebox.findIndex(a => a.map.id === mapId)
-    const prevIndex = [TM.map, ...TM.previousMaps].findIndex(a => a.id === mapId)
+    const prevIndex = [TM.maps.current, ...TM.previousMaps].findIndex(a => a.id === mapId)
     const player = TM.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
