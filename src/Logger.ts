@@ -89,7 +89,11 @@ export abstract class Logger {
       this.webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL })
     }
   }
-
+  
+  /**
+   * Outputs an error message into the console and exits the process
+   * @param lines Error messages
+   */
   static async fatal(...lines: any[]): Promise<void> {
     if (this.crashed === true) { return }
     this.crashed = true
@@ -100,6 +104,10 @@ export abstract class Logger {
     process.exit(1)
   }
 
+  /**
+   * Outputs an error message into the console
+   * @param lines Error messages
+   */
   static error(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date: string = new Date().toUTCString()

@@ -45,7 +45,7 @@ export const allSecsDB = {
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
     const res: { sectors: number[], login: string }[] | Error = (await DB.query(query, mapDBId, ...playerDBIds.map(a => a.id))).rows
     if (res instanceof Error) {
-      TM.error(`Error when fetching sector records of players ${playerDBIds} on map ${mapDBId}`, res.message)
+      TM.log.error(`Error when fetching sector records of players ${playerDBIds} on map ${mapDBId}`, res.message)
       return []
     }
     return res.map(a => ({ login: a.login, sectors: a.sectors.map(b => b === -1 ? undefined : b) }))
@@ -78,7 +78,7 @@ export const bestSecsDB = {
     JOIN player_ids ON player_ids.id=best_sector_records.player_id
     WHERE map_id=$1;`, mapId)).rows
     if (res instanceof Error) {
-      TM.error(`Error when fetching sector records on map ${mapDBId}`, res.message)
+      TM.log.error(`Error when fetching sector records on map ${mapDBId}`, res.message)
     }
     const ret: Omit<typeof res[0], 'index'>[] = []
     for (const e of res) {
@@ -120,7 +120,7 @@ async function fetchMapSectors(mapIds: string | string[]): Promise<BestSectors |
     const str = mapIds.map((a, i) => `mapId=$${i} OR `).join('')
     const res: BestSectors[] | Error = await TM.db.query(`SELECT * FROM secrecs WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
     if (res instanceof Error) {
-      TM.error(`Error when fetching sector records for maps ${mapIds.join(',')}`, res.message)
+      TM.log.error(`Error when fetching sector records for maps ${mapIds.join(',')}`, res.message)
       return
     } else if (res.length === 1) {
       return res
@@ -129,7 +129,7 @@ async function fetchMapSectors(mapIds: string | string[]): Promise<BestSectors |
   }
   const res: BestSectors[] | Error = await TM.db.query('SELECT * FROM secrecs WHERE mapId=$1;', [mapIds])
   if (res instanceof Error) {
-    TM.error(`Error when fetching sector records for map ${mapIds}`, res.message)
+    TM.log.error(`Error when fetching sector records for map ${mapIds}`, res.message)
     return
   } else if (res.length === 1) {
     return res[0]

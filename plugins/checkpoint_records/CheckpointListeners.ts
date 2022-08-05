@@ -12,19 +12,19 @@ const currentPlayerSecs: PlayerCheckpoints[] = []
 const onMapStart = async (): Promise<void> => {
   const DBId = await TM.db.getMapId(TM.maps.current.id)
   if (DBId === undefined) {
-    await TM.fatalError(`Failed to fetch current map (${TM.maps.current.id}) id from database`)
+    await TM.log.fatal(`Failed to fetch current map (${TM.maps.current.id}) id from database`)
     return
   }
   currentMapDBId = DBId
   const res = await bestSecsDB.get(currentMapDBId)
   if (res instanceof Error) {
-    await TM.fatalError(`Failed to fetch best checkpoints for map ${TM.maps.current.id}`, res.message)
+    await TM.log.fatal(`Failed to fetch best checkpoints for map ${TM.maps.current.id}`, res.message)
     return
   }
   currentBestSecs = res
   const playerSecs = await allCpsDB.get(currentMapDBId, ...TM.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player checkpoints for map ${TM.maps.current.id}`, playerSecs.message)
+    await TM.log.fatal(`Failed to fetch player checkpoints for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.length = 0
@@ -69,7 +69,7 @@ TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
 TM.addListener('Controller.PlayerJoin', async (info) => {
   const playerSecs = await allCpsDB.get(currentMapDBId, info.login)
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.maps.current.id}`, playerSecs.message)
+    await TM.log.fatal(`Failed to fetch player ${info.login} sectors for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.push(...playerSecs)

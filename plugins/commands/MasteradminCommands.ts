@@ -281,7 +281,7 @@ const commands: TMCommand[] = [
       // TODO: Return immediately if the server isn't united. How to check tho..?
       const coppers: any[] | Error = await TM.client.call('GetServerCoppers')
       if (coppers instanceof Error) {
-        TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
+        TM.log.error(`Couldn't retrieve the coppers amount.`, coppers.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't retrieve the coppers amount.`, info.login)
         return
       }

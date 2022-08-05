@@ -13,25 +13,25 @@ const commands: TMCommand[] = [
       const path: string = split.join(' ')
       const file: any = await fs.readFile(path, 'base64').catch(err => err)
       if (file instanceof Error) {
-        TM.error('Error when reading file on addlocal', file.message)
+        TM.log.error('Error when reading file on addlocal', file.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}File ${TM.utils.palette.highlight + path} is not accessible.`, info.login)
         return
       }
       const write: any[] | Error = await TM.client.call('WriteFile', [{ string: fileName }, { base64: file }])
       if (write instanceof Error) {
-        TM.error('Failed to write file', write.message)
+        TM.log.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        TM.error('Failed to insert map to jukebox', insert.message)
+        TM.log.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const res: any[] | Error = await TM.client.call('GetNextChallengeInfo')
       if (res instanceof Error) {
-        TM.error('Failed to get next map info', res.message)
+        TM.log.error('Failed to get next map info', res.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
@@ -59,19 +59,19 @@ const commands: TMCommand[] = [
       const buffer: Buffer = Buffer.from(data)
       const write: any[] | Error = await TM.client.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
       if (write instanceof Error) {
-        TM.error('Failed to write file', write.message)
+        TM.log.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
-        TM.error('Failed to insert map to jukebox', insert.message)
+        TM.log.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const nextInfo: any[] | Error = await TM.client.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
-        TM.error('Failed to get next map info', nextInfo.message)
+        TM.log.error('Failed to get next map info', nextInfo.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
@@ -91,7 +91,7 @@ const commands: TMCommand[] = [
       const map: TMMap = TM.maps.current
       const res: any[] | Error = await TM.client.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
-        TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
+        TM.log.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't remove the current map.`, info.login)
         return
       }

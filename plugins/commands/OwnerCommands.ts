@@ -23,13 +23,13 @@ const commands: TMCommand[] = [
         }
         const write: any[] | Error = await TM.client.call('WriteFile', [{ string: file.name }, { base64: file.content.toString('base64') }])
         if (write instanceof Error) {
-          TM.error('Failed to write file', write.message)
+          TM.log.error('Failed to write file', write.message)
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}file to the server.`, info.login)
           continue
         }
         const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
-          TM.error('Failed to insert map to jukebox', insert.message)
+          TM.log.error('Failed to insert map to jukebox', insert.message)
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
           continue
         }
@@ -54,7 +54,7 @@ const commands: TMCommand[] = [
           continue
         const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: map.filename }])
         if (insert instanceof Error) {
-          TM.error('Failed to insert map to jukebox', insert.message)
+          TM.log.error('Failed to insert map to jukebox', insert.message)
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
           continue
         }

@@ -280,22 +280,6 @@ export const TRAKMAN = {
   addListener: Events.addListener,
 
   /**
-   * Outputs an error message into the console
-   * @param lines Error messages
-   */
-  error(...lines: any[]): void {
-    Logger.error(...lines)
-  },
-
-  /**
-   * Outputs an error message into the console and exits the process
-   * @param lines Error messages
-   */
-  async fatalError(...lines: string[]): Promise<void> {
-    await Logger.fatal(...lines)
-  },
-
-  /**
    * Sets a player privilege level
    * @param login Player login
    * @param privilege Privilege level

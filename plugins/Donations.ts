@@ -19,7 +19,7 @@ const initialize = async () => {
   ORDER BY amount DESC
   LIMIT 10`)
   if (res instanceof Error) {
-    TM.error(res)
+    TM.log.error(res)
     return
   }
   topDonators.push(...res)
@@ -33,7 +33,7 @@ const addToDB = async (login: string, amount: number): Promise<void> => {
   const date: number = Date.now()
   const id: number | undefined = await TM.getPlayerDBId(login)
   if (id === undefined) {
-    TM.error(`Failed to save donation from player ${login} (amount ${amount})`, 'Failed to fetch player DB ID')
+    TM.log.error(`Failed to save donation from player ${login} (amount ${amount})`, 'Failed to fetch player DB ID')
     return
   }
   await TM.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
@@ -42,7 +42,7 @@ const addToDB = async (login: string, amount: number): Promise<void> => {
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<void> => {
   const status: boolean | Error = await TM.utils.sendCoppers(payerLogin, amount, 'Donation')
   if (status instanceof Error) {
-    TM.error(`Failed to receive ${amount} coppers donation from player ${payerLogin}`, status.message)
+    TM.log.error(`Failed to receive ${amount} coppers donation from player ${payerLogin}`, status.message)
     TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, payerLogin)
   } else if (status === true) {
     void addToDB(payerLogin, amount)
