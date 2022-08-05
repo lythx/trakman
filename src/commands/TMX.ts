@@ -47,7 +47,7 @@ const command: TMCommand = {
       TM.sendMessage(`${TM.palette.server}»${TM.palette.error} Server failed to queue the map.`, info.login)
       return
     }
-    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} ` +
+    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} ` +
       `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued ` +
       `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
   },

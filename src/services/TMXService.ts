@@ -90,7 +90,7 @@ export abstract class TMXService {
    */
   static async fetchMapFile(tmxId: number, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
     const prefix: TMXPrefix = this.siteToPrefix(site)
-    const url = `https://${prefix}.tm-exchange.com/trackgbx/${tmxId}`
+    const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${tmxId}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.error(`Error while fetching map file from TMX (url: ${url})`, res.message)
@@ -112,7 +112,7 @@ export abstract class TMXService {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) {
-      const url = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info by uuid from TMX (url: ${url})`, res.message)
@@ -137,7 +137,7 @@ export abstract class TMXService {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) { // Search for right prefix
-      const url = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
@@ -154,7 +154,7 @@ export abstract class TMXService {
     }
     const s: string[] = data.split('\t')
     const TMXId: number = Number(s[0])
-    const url = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
+    const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
     if (replaysRes instanceof Error) {
       Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
@@ -211,7 +211,7 @@ export abstract class TMXService {
     return mapInfo
   }
 
-  private static siteToPrefix(game: TMXSite) {
+  private static siteToPrefix(game: TMXSite): TMXPrefix {
     return this.prefixes[this.sites.indexOf(game)]
   }
 

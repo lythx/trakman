@@ -22,7 +22,7 @@ export class ServerConfig {
 
   static async initialize(): Promise<void> {
     await this.update()
-    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
+    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]): Promise<void> => {
       Logger.info(`Server config changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
@@ -38,9 +38,9 @@ export class ServerConfig {
       Logger.error('Failed to fetch server info', res.message)
       return
     }
-    const options = res[0] instanceof Error ? res[0] : res[0].params
-    const loginInfo = res[1] instanceof Error ? res[1] : res[1].params
-    const version = res[2] instanceof Error ? res[2] : res[2].params
+    const options: any[] | Error = res[0] instanceof Error ? res[0] : res[0].params
+    const loginInfo: any[] | Error = res[1] instanceof Error ? res[1] : res[1].params
+    const version: any[] | Error = res[2] instanceof Error ? res[2] : res[2].params
     if (options instanceof Error) {
       Logger.error(`Failed to fetch server options.`, options.message)
       return

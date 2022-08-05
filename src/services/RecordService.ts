@@ -12,7 +12,7 @@ export class RecordService {
   private static repo: RecordRepository = new RecordRepository()
   private static readonly _localRecords: TMLocalRecord[] = []
   private static readonly _liveRecords: FinishInfo[] = []
-  static readonly localsAmount = Number(process.env.LOCALS_AMOUNT)
+  static readonly localsAmount: number = Number(process.env.LOCALS_AMOUNT)
   static readonly initialLocals: TMLocalRecord[] = []
   private static readonly _playerRanks: { [login: string]: { mapId: string, rank: number }[] } = {}
 
@@ -41,16 +41,16 @@ export class RecordService {
       if (this._playerRanks[login] !== undefined) {
         return this._playerRanks[login].filter(a => mapIds.includes(a.mapId) && a.rank !== -1)
       }
-      const records = await this.repo.get(...mapIds)
+      const records: TMRecord[] = await this.repo.get(...mapIds)
       const positions: number[] = []
-      let i = -1
+      let i: number = -1
       while (true) {
         i++
         if (records[i] === undefined) { break }
-        const id = records[i].map
+        const id: string = records[i].map
         if (positions[mapIds.indexOf(id)] !== undefined) { continue }
-        let index = 0
-        let j = 0
+        let index: number = 0
+        let j: number = 0
         while (true) {
           if (records[j] === undefined) {
             positions[mapIds.indexOf(id)] = -1
@@ -67,7 +67,7 @@ export class RecordService {
         }
       }
       const ret: { mapId: string, rank: number }[] = []
-      for (let i = 0; i < mapIds.length; i++) {
+      for (let i: number = 0; i < mapIds.length; i++) {
         if (positions[i] !== -1 && positions[i] !== undefined) {
           ret.push({ mapId: mapIds[i], rank: positions[i] })
         }
@@ -77,17 +77,17 @@ export class RecordService {
   }
 
   static async fetchAndSaveRanks(login: string): Promise<void> {
-    let records = await this.repo.getAll()
+    let records: TMRecord[] = await this.repo.getAll()
     const r: { mapId: string, rank: number }[] = []
-    let index = 0
+    let index: number = 0
     while (records.length > 0) {
       r[index] = {
         mapId: records[0].map,
         rank: -1
       }
-      let currentMap = records[0].map
-      let i = 0
-      let pos = 0
+      let currentMap: string = records[0].map
+      let i: number = 0
+      let pos: number = 0
       while (true) {
         if (records[i] === undefined) { break }
         if (records[i].map === currentMap) {
@@ -181,8 +181,8 @@ export class RecordService {
       return false
     }
     const finishInfo: FinishInfo = temp
-    const localRecord = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
-    const liveRecord = this.handleLiveRecord(map, time, date, [...checkpoints], player)
+    const localRecord: RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
+    const liveRecord: RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
   }
 
@@ -204,7 +204,7 @@ export class RecordService {
       return position > this.localsAmount ? undefined : recordInfo
     }
     if (time < pb) {
-      const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
+      const previousIndex: number = this._localRecords.findIndex(a => a.login === player.login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${player.login} in memory`)
         return
@@ -235,7 +235,7 @@ export class RecordService {
       return recordInfo
     }
     if (time < pb) {
-      const previousIndex = this._liveRecords.findIndex(a => a.login === player.login)
+      const previousIndex: number = this._liveRecords.findIndex(a => a.login === player.login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${player.login} in memory`)
         return

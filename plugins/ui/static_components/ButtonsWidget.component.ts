@@ -6,20 +6,20 @@ import Config from '../../../config.json' assert { type: 'json' }
 export default class ButtonsWidget extends StaticComponent {
 
   private readonly config = CONFIG.buttons
-  private readonly width = CONFIG.static.width
-  private readonly height = this.config.height
+  private readonly width: number = CONFIG.static.width
+  private readonly height: number = this.config.height
   private readonly positionX: number
   private readonly positionY: number
   private readonly iconData: { icon: string, text1: string, text2: string, iconWidth: number, iconHeight: number, padding: number, equalTexts?: true, actionId?: number, link?: string }[] = []
   private xml: string = ''
   private readonly grid: Grid
-  private readonly skipCost = this.config.paySkip.cost
-  private readonly resCosts = this.config.payRes.costs
-  private resCostIndex = 0
-  private resVoteCount = 0
-  private skipVoteCount = 0
-  private isRes = false
-  private lastMapRes = false
+  private readonly skipCost: number = this.config.paySkip.cost
+  private readonly resCosts: number[] = this.config.payRes.costs
+  private resCostIndex: number = 0
+  private resVoteCount: number = 0
+  private skipVoteCount: number = 0
+  private isRes: boolean = false
+  private lastMapRes: boolean = false
 
   constructor() {
     super(IDS.buttons, 'race')
@@ -73,9 +73,9 @@ export default class ButtonsWidget extends StaticComponent {
     </manialink>`
   }
 
-  private pollTimeUpdate(timeString: string) {
-    setInterval(() => {
-      const newTimeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
+  private pollTimeUpdate(timeString: string): void {
+    setInterval((): void => {
+      const newTimeString: string = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
       if (timeString !== newTimeString) {
         timeString = newTimeString
         const cfg = this.config.time
@@ -85,30 +85,30 @@ export default class ButtonsWidget extends StaticComponent {
     }, 1000)
   }
 
-  private updatePlayerCount() {
-    const players = TM.players
+  private updatePlayerCount(): void {
+    const players: TMPlayer[] = TM.players
     this.iconData[this.config.players.index].text1 = `${players.filter(a => a.isSpectator === true).length} SPECS`
     this.iconData[this.config.players.index].text2 = `${players.filter(a => a.isSpectator === false).length} PLAYERS`
   }
 
-  private setupListeners() {
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo) => {
+  private setupListeners(): void {
+    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       this.updatePlayerCount()
       if (info.visits === 0) {
-        const prevAmount = Number(this.iconData[this.config.visitors.index].text1)
+        const prevAmount: number = Number(this.iconData[this.config.visitors.index].text1)
         this.iconData[this.config.visitors.index].text1 = (prevAmount + 1).toString()
       }
       void this.display()
     })
-    TM.addListener('Controller.PlayerLeave', () => {
+    TM.addListener('Controller.PlayerLeave', (): void => {
       this.updatePlayerCount()
       void this.display()
     })
-    TM.addListener('Controller.PlayerInfoChanged', () => {
+    TM.addListener('Controller.PlayerInfoChanged', (): void => {
       this.updatePlayerCount()
       void this.display()
     })
-    TM.addListener('Controller.BeginMap', () => {
+    TM.addListener('Controller.BeginMap', (): void => {
       this.resVoteCount = 0
       this.skipVoteCount = 0
       this.lastMapRes = false
@@ -130,24 +130,24 @@ export default class ButtonsWidget extends StaticComponent {
         case 4: this.onResButtonClick(info.login, info.nickname)
       }
     })
-    TM.addListener('Controller.MapAdded', () => {
+    TM.addListener('Controller.MapAdded', (): void => {
       this.iconData[this.config.maps.index].text1 = (TM.maps.length).toString()
     })
-    TM.addListener('Controller.MapRemoved', () => {
+    TM.addListener('Controller.MapRemoved', (): void => {
       this.iconData[this.config.maps.index].text1 = (TM.maps.length).toString()
     })
   }
 
-  private async onSkipVoteButtonClick(login: string, nickname: string) {
+  private async onSkipVoteButtonClick(login: string, nickname: string): Promise<void> {
     if (this.lastMapRes) { return }
     if (this.skipVoteCount === 2) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Too many votes failed.`, login)
       return
     }
-    const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
+    const startMsg: string = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}skip ${TM.palette.vote}the ongoing map.`
     if (TM.remainingMapTime <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmRed}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
+    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmRed}SKIP${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
@@ -165,8 +165,9 @@ export default class ButtonsWidget extends StaticComponent {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to skip the ongoing map passed`)
       } else {
-        const player = TM.getPlayer(result.callerLogin)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+        const player: TMPlayer | undefined = TM.getPlayer(result.callerLogin)
+        if (player === undefined) { return }
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player.login)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to skip the ongoing map`)
       }
       TM.callNoRes('NextChallenge')
@@ -174,22 +175,23 @@ export default class ButtonsWidget extends StaticComponent {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to skip the ongoing was cancelled`)
       } else {
-        const player = TM.getPlayer(result.callerLogin)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+        const player: TMPlayer | undefined = TM.getPlayer(result.callerLogin)
+        if (player === undefined) { return }
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player.login)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to skip the ongoing map`)
       }
     }
   }
 
-  private async onResVoteButtonClick(login: string, nickname: string) {
+  private async onResVoteButtonClick(login: string, nickname: string): Promise<void> {
     if (this.resVoteCount === 2) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Too many votes failed.`, login)
       return
     }
-    const startMsg = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
+    const startMsg: string = `${TM.palette.server}»» ${TM.palette.highlight + TM.strip(nickname)} `
       + `${TM.palette.vote}started a vote to ${TM.palette.highlight}replay ${TM.palette.vote}the ongoing map.`
     if (TM.remainingMapTime <= 30) { return }
-    const voteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmGreen}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
+    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.palette.highlight}Vote to ${TM.palette.tmGreen}REPLAY${TM.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.map(a => a.login))
     if (result === undefined) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}A vote is already running.`, login)
@@ -212,8 +214,9 @@ export default class ButtonsWidget extends StaticComponent {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to replay the ongoing map passed`)
       } else {
-        const player = TM.getPlayer(result.callerLogin)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+        const player: TMPlayer | undefined = TM.getPlayer(result.callerLogin)
+        if (player === undefined) { return }
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player.login)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has passed the vote to replay the ongoing map`)
         TM.addToJukebox(TM.map.id, undefined, true)
       }
@@ -226,8 +229,9 @@ export default class ButtonsWidget extends StaticComponent {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin} Vote to replay the ongoing map was cancelled`)
       } else {
-        const player = TM.getPlayer(result.callerLogin)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player)} `
+        const player: TMPlayer | undefined = TM.getPlayer(result.callerLogin)
+        if (player === undefined) { return }
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(player.login)} `
           + `${TM.palette.highlight + TM.strip(player?.nickname ?? result.callerLogin, true)}${TM.palette.admin} has cancelled the vote to replay the ongoing map`)
       }
     }
@@ -235,19 +239,19 @@ export default class ButtonsWidget extends StaticComponent {
 
   private onSkipButtonClick = async (login: string, nickname: string): Promise<void> => {
     if (this.lastMapRes) { return }
-    const res = await TM.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
+    const res: boolean | Error = await TM.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
     if (res instanceof Error) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`)
     } else if (res === true) {
       const cfg = this.config.paySkip
-      let countDown = cfg.timeout
-      const startTime = Date.now()
+      let countDown: number = cfg.timeout
+      const startTime: number = Date.now()
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(nickname)}${TM.palette.donation} has paid ${TM.palette.highlight}`
         + `${this.skipCost}C ${TM.palette.donation}to skip the ongoing map. Skipping in ${TM.palette.highlight}${countDown}s${TM.palette.donation}.`)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
       await this.display()
-      const interval = setInterval(async () => {
+      const interval = setInterval(async (): Promise<void> => {
         if (Date.now() > startTime + 1000 * (cfg.timeout - countDown)) { // TODO HANDLE CHALLENGE ENDING BEFORE COUNTDOWN
           countDown--
           this.iconData[cfg.index].text1 = cfg.title3
@@ -263,9 +267,9 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private onResButtonClick = async (login: string, nickname: string): Promise<void> => {
-    const cost = this.resCosts[this.resCostIndex]
+    const cost: number = this.resCosts[this.resCostIndex]
     if (cost === undefined) { return }
-    const res = await TM.sendCoppers(login, cost, 'Pay to restart the ongoing map')
+    const res: boolean | Error = await TM.sendCoppers(login, cost, 'Pay to restart the ongoing map')
     if (res instanceof Error) {
       TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`)
     } else if (res === true) {
@@ -279,7 +283,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
   }
 
-  private onMapReplay() {
+  private onMapReplay(): void {
     this.iconData[this.config.payRes.index].text1 = this.config.payRes.title5
     this.iconData[this.config.payRes.index].text2 = this.config.payRes.title6
     this.iconData[this.config.payRes.index].equalTexts = true
@@ -301,7 +305,7 @@ export default class ButtonsWidget extends StaticComponent {
     this.iconData[this.config.voteSkip.index].actionId = undefined
   }
 
-  private updateVoteAndPayButtons() {
+  private updateVoteAndPayButtons(): void {
     const cfg = this.config
     if (this.resCosts[this.resCostIndex] !== undefined) {
       // If map wasn't resd
@@ -448,7 +452,7 @@ export default class ButtonsWidget extends StaticComponent {
       actionId: IDS.changelog
     }
     // Time
-    const timeString = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
+    const timeString: string = `${new Date().getUTCHours().toString().padStart(2, '0')}:${new Date().getUTCMinutes().toString().padStart(2, '0')}`
     this.iconData[cfg.time.index] = {
       icon: stringToObjectProperty(cfg.time.icon, ICONS),
       text1: timeString,

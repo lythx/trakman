@@ -11,23 +11,23 @@ export class AdministrationService {
   private static readonly _blacklist: { readonly login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date }[] = []
   private static readonly _mutelist: { readonly login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date }[] = []
   private static readonly _guestlist: { readonly login: string, date: Date, callerLogin: string }[] = []
-  private static readonly guestListFile = CONFIG.guestlistFilePath
+  private static readonly guestListFile: string = CONFIG.guestlistFilePath
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const banlist = await this.repo.getBanlist()
+    const banlist: BanlistDBEntry[] = await this.repo.getBanlist()
     for (const e of banlist) {
       this._banlist.push({ ip: e.ip, login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
     }
-    const blacklist = await this.repo.getBlacklist()
+    const blacklist: BlacklistDBEntry[] = await this.repo.getBlacklist()
     for (const e of blacklist) {
       this._blacklist.push({ login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
     }
-    const mutelist = await this.repo.getMutelist()
+    const mutelist: MutelistDBEntry[] = await this.repo.getMutelist()
     for (const e of mutelist) {
       this._mutelist.push({ login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
     }
-    const guestlist = await this.repo.getGuestlist()
+    const guestlist: GuestlistDBEntry[] = await this.repo.getGuestlist()
     for (const e of guestlist) {
       this._guestlist.push({ login: e.login, date: e.date, callerLogin: e.caller })
     }
@@ -73,7 +73,7 @@ export class AdministrationService {
   }
 
   static removeFromBanlist(login: string, callerLogin?: string): boolean { // TODO HANDLE MULTIPLE IPS REMOVAL
-    const index = this._banlist.findIndex(a => a.login === login)
+    const index: number = this._banlist.findIndex(a => a.login === login)
     if (index === -1) { return false }
     this._banlist.splice(index, 1)
     void this.repo.removeFromBanlist(login)
@@ -108,7 +108,7 @@ export class AdministrationService {
   }
 
   static removeFromBlacklist(login: string, callerLogin?: string): boolean {
-    const index = this._blacklist.findIndex(a => a.login === login)
+    const index: number = this._blacklist.findIndex(a => a.login === login)
     if (index === -1) { return false }
     this._blacklist.splice(index, 1)
     void this.repo.removeFromBlacklist(login)
@@ -146,7 +146,7 @@ export class AdministrationService {
   }
 
   static async removeFromMutelist(login: string, callerLogin?: string): Promise<boolean | Error> {
-    const index = this._mutelist.findIndex(a => a.login === login)
+    const index: number = this._mutelist.findIndex(a => a.login === login)
     if (index === -1) { return false }
     this._mutelist.splice(index, 1)
     const mute: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
@@ -177,7 +177,7 @@ export class AdministrationService {
   }
 
   static async removeFromGuestlist(login: string, callerLogin?: string): Promise<boolean | Error> {
-    const index = this._guestlist.findIndex(a => a.login === login)
+    const index: number = this._guestlist.findIndex(a => a.login === login)
     if (index === -1) { return false }
     const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
     if (res instanceof Error) { return res }

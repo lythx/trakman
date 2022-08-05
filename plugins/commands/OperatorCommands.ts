@@ -36,7 +36,7 @@ const commands: TMCommand[] = [
         return
       }
       const name: string = res[0].Name
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from local files.`)
     },
@@ -76,7 +76,7 @@ const commands: TMCommand[] = [
         return
       }
       const name: string = nextInfo[0].Name
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
         + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from URL.`)
     },
@@ -95,7 +95,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current map.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from the playlist.`)
     },
@@ -108,7 +108,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has skipped the ongoing map.`
         }]
       },
@@ -125,7 +125,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has restarted the ongoing map.`
         }]
       },
@@ -143,7 +143,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't queue previous map because map history is empty. This happens if server was restarted.`)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
@@ -155,7 +155,7 @@ const commands: TMCommand[] = [
     aliases: ['rq', 'requeue', 'replay'],
     help: 'Requeue the ongoing map.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the ongoing map.`)
       TM.addToJukebox(TM.map.id, info.login)
     },
@@ -175,7 +175,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
             + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.${reasonString}`
         }]
@@ -211,7 +211,7 @@ const commands: TMCommand[] = [
       }
       const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
       const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has muted `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
     },
@@ -239,7 +239,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from mute list.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unmuted `
         + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
       )
@@ -259,7 +259,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
             + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
         }]
@@ -289,7 +289,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
             + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into playermode.`
         }]
@@ -314,7 +314,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
             + `${TM.palette.highlight + TM.strip(login)}${TM.palette.admin}.`
         }]
@@ -342,7 +342,7 @@ const commands: TMCommand[] = [
         return
       }
       TM.removeFromJukebox(map.id, info.login)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
       )
@@ -360,7 +360,7 @@ const commands: TMCommand[] = [
       for (const map of TM.jukebox) {
         TM.removeFromJukebox(map.map.id, info.login)
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + 'all mapos'}${TM.palette.admin} from the queue.`
       )
@@ -378,7 +378,7 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
             + `the ongoing round to end.`
         }]

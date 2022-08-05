@@ -76,9 +76,9 @@ export class PlayerService {
    * Adds a player into the list and database
    */
   static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
-    let s = fullRegion.split('|')
+    let s: string[] = fullRegion.split('|')
     s.shift()
-    const region = s.join('|')
+    const region: string = s.join('|')
     const nation: string = fullRegion.split('|')[1]
     let nationCode: string | undefined = Utils.nationToNationCode(nation)
     if (nationCode === undefined) {
@@ -89,7 +89,7 @@ export class PlayerService {
     const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
     let player: TMPlayer
-    const index = this.ranks.indexOf(login)
+    const index: number = this.ranks.indexOf(login)
     if (playerData === undefined) {
       player = {
         id,
@@ -146,10 +146,10 @@ export class PlayerService {
    * Remove the player from local memory, save timePlayed in database
    */
   static leave(login: string): LeaveInfo | Error {
-    const date = new Date()
-    const playerIndex = this._players.findIndex(a => a.login === login)
+    const date: Date = new Date()
+    const playerIndex: number = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
-      const errStr = `Error removing player ${login} from memory, player is not in the memory`
+      const errStr: string = `Error removing player ${login} from memory, player is not in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }
@@ -181,7 +181,7 @@ export class PlayerService {
     } else {
       Logger.info(`${login} privilege set to ${privilege}`)
     }
-    const offlinePlayer = await this.repo.get(login)
+    const offlinePlayer: TMOfflinePlayer | undefined = await this.repo.get(login)
     Events.emitEvent('Controller.PrivilegeChanged', {
       player: offlinePlayer === undefined ? undefined : { ...offlinePlayer, privilege },
       login,
@@ -241,14 +241,14 @@ export class PlayerService {
 
   static async calculateAveragesAndRanks(): Promise<void> {
     const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocals).map((a, i) => ({ login: a.login, position: i + 1 }))
-    const amount = MapService.maps.length
+    const amount: number = MapService.maps.length
     const ranks = await this.repo.getAverage(logins.map(a => a.login))
     for (const rank of ranks) {
-      let previousRank = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
+      let previousRank: number = RecordService.initialLocals.findIndex(a => a.login === rank.login) + 1
       if (previousRank === 0) { previousRank = RecordService.localsAmount }
-      let newRank = RecordService.localRecords.findIndex(a => a.login === rank.login) + 1
-      const sum = amount * (rank.average ?? RecordService.localsAmount) + newRank - previousRank
-      const onlinePlayer = this.getPlayer(rank.login)
+      let newRank: number = RecordService.localRecords.findIndex(a => a.login === rank.login) + 1
+      const sum: number = amount * (rank.average ?? RecordService.localsAmount) + newRank - previousRank
+      const onlinePlayer: TMPlayer | undefined = this.getPlayer(rank.login)
       if (onlinePlayer !== undefined) {
         onlinePlayer.average = sum / amount
       }
