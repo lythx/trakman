@@ -42,7 +42,6 @@ export default class LocalRankingResult extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    console.log(this.isDisplayed)
     if (this.isDisplayed === false) { return }
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
