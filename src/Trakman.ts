@@ -66,13 +66,15 @@ export const TRAKMAN = {
    * @returns The title string
    */
   getTitle(login: string): string {
-    const player: TMPlayer | undefined = this.getPlayer(login)
+    let player: TMPlayer | undefined = this.getPlayer(login)
+    // I'd say this is almost impossible to trigger, as titles only get used when admin stuff is executed.
+    // Admin must be on the server, thus making this unlikely to fail, however as a failsafe just return undefined.
     if (player === undefined) {
       return this.titles[-1]
     }
     const title: string = this.titles[player?.privilege]
     // Apparently this is a thing
-    const specialTitle: string | undefined = specialTitles[player.login as keyof typeof specialTitles]
+    const specialTitle: string | undefined = specialTitles[player?.login as keyof typeof specialTitles]
     if (specialTitle !== undefined) {
       return specialTitle
     }
