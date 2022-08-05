@@ -57,7 +57,7 @@ export class RecordRepository extends Repository {
     JOIN map_ids ON map_ids.id=records.map_id
     JOIN players ON players.id=records.player_id
     ORDER BY time ASC,
-    date DESC;`
+    date ASC;`
     const res = (await this.query(query))
     return res.map(a => this.constructRecordObject(a))
   }
@@ -70,7 +70,7 @@ export class RecordRepository extends Repository {
     JOIN players ON players.id=records.player_id
     WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
-    date DESC;`
+    date ASC;`
     const mapIds = await mapIdsRepo.get(mapUids)
     const res = (await this.query(query, ...mapIds.map(a => a.id)))
     return res.map(a => this.constructRecordObject(a))
@@ -84,7 +84,7 @@ export class RecordRepository extends Repository {
     JOIN players ON players.id=records.player_id
     WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
-    date DESC;`
+    date ASC;`
     const playerIds = await playerIdsRepo.get(logins)
     const res = (await this.query(query, ...playerIds.map(a => a.id)))
     return res.map(a => this.constructRecordObject(a))

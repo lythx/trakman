@@ -39,6 +39,8 @@ import LocalRankingResult from './static_components/result/LocalRankingResult.co
 import DediRankingResult from './static_components/result/DediRankingResult.component.js'
 import RoundAveragesRanking from './static_components/result/RoundAveragesRanking.component.js'
 import AdminPanelResult from './static_components/result/AdminPanelResult.component.js'
+import WinnersRanking from './static_components/result/WinnersRanking.component.js'
+import MostRecordsRanking from './static_components/result/MostRecordsRanking.component.js'
 
 /*
 ------------------
@@ -116,6 +118,8 @@ let staticComponents: {
   readonly dediRankingResult: DediRankingResult
   readonly roundAveragesRanking: RoundAveragesRanking
   readonly adminPanelResult: AdminPanelResult
+  readonly winnersRanking: WinnersRanking
+  readonly mostRecordsRanking: MostRecordsRanking
 }
 
 let dynamicComponents: {
@@ -177,7 +181,9 @@ const events: TMListener[] = [
         localRankingResult: new LocalRankingResult(),
         dediRankingResult: new DediRankingResult(),
         roundAveragesRanking: new RoundAveragesRanking(),
-        adminPanelResult: new AdminPanelResult()
+        adminPanelResult: new AdminPanelResult(),
+        winnersRanking: new WinnersRanking(),
+        mostRecordsRanking: new MostRecordsRanking()
       }
       for (const c of Object.values(staticComponents)) {
         if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }

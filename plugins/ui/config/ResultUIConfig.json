@@ -264,5 +264,29 @@
       "",
       ""
     ]
+  },
+  "winnersRanking": {
+    "height": 12.92,
+    "side": true,
+    "title": "Most Wins",
+    "icon": "placeholder",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
+  },
+  "mostRecordsRanking": {
+    "height": 12.92,
+    "side": true,
+    "title": "Most Records",
+    "icon": "placeholder",
+    "entries": 5,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
   }
 }
