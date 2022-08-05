@@ -23,7 +23,7 @@ export default class LocalRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.PlayerRecord', (): void => {
-        this.display()
+      this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
@@ -32,20 +32,20 @@ export default class LocalRanking extends StaticComponent {
       if (TM.localRecords.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.LocalRecords', (): void => {
-     this.display() 
+      this.display()
     })
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players) {
+    for (const player of TM.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

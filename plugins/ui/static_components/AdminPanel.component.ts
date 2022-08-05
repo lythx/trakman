@@ -1,4 +1,4 @@
-import { getStaticPosition, CONFIG,  IDS, staticHeader, getIcon } from '../UiUtils.js'
+import { getStaticPosition, CONFIG, IDS, staticHeader, getIcon } from '../UiUtils.js'
 import { TRAKMAN as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
@@ -11,24 +11,24 @@ export default class AdminPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.admin,'race')
+    super(IDS.admin, 'race')
     const pos = getStaticPosition('admin')
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
     TM.addListener('Controller.PrivilegeChanged', (info) => {
-        this.displayToPlayer(info.login)
+      this.displayToPlayer(info.login)
     })
   }
 
   display(): void {
-    for (const e of TM.players) {
+    for (const e of TM.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    const privilege: number = TM.getPlayer(login)?.privilege ?? 0
+    const privilege: number = TM.players.get(login)?.privilege ?? 0
     if (privilege > 0) {
       TM.sendManialink(this.xml, login)
     }

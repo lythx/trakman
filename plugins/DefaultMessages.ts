@@ -17,7 +17,7 @@ const events: TMListener[] = [
     event: ['Controller.BeginMap', 'Controller.Ready'],
     callback: async (): Promise<void> => {
       const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
-      for (const player of TM.players) {
+      for (const player of TM.players.list) {
         const index: number = TM.localRecords.findIndex(a => a.login === player.login)
         if (index === -1) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a personal best on this map.`, player.login)

@@ -271,7 +271,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
     help: 'Message a player.',
     callback: (info: MessageInfo, login: string, text: string): void => {
-      const playerInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const playerInfo: TMPlayer | undefined = TM.players.get(login)
       if (playerInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server.`, info.login)
         return

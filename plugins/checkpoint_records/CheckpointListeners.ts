@@ -22,7 +22,7 @@ const onMapStart = async (): Promise<void> => {
     return
   }
   currentBestSecs = res
-  const playerSecs = await allCpsDB.get(currentMapDBId, ...TM.players.map(a => a.login))
+  const playerSecs = await allCpsDB.get(currentMapDBId, ...TM.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
     await TM.fatalError(`Failed to fetch player checkpoints for map ${TM.map.id}`, playerSecs.message)
     return
@@ -141,7 +141,7 @@ const getMapCheckpoints = (): ({ login: string, nickname: string, checkpoint: nu
 
 const getPlayerCheckpoints = (): ({ login: string, checkpoints: (number | null)[] })[] => {
   const arr: ({ login: string, checkpoints: (number | null)[] })[] = []
-  for (const [i, e] of TM.players.entries()) {
+  for (const [i, e] of TM.players.list.entries()) {
     arr[i] = {
       login: e.login,
       checkpoints: new Array(TM.map.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.checkpoints[i] ?? null)

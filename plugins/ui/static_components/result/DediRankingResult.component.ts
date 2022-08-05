@@ -33,7 +33,7 @@ export default class DediRankingResult extends StaticComponent {
   display(): void {
     if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players) {
+    for (const player of TM.players.list) {
       this.displayToPlayer(player.login)
     }
   }

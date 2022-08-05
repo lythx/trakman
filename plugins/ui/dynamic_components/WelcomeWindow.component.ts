@@ -27,7 +27,7 @@ export default class WelcomeWindow extends PopupWindow {
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))
     }
-    for (const e of TM.players) {
+    for (const e of TM.players.list) {
       if (this.welcomedPlayers.includes(e.login) === false) {
         this.welcomedPlayers.push(e.login)
         TM.openManialink(this.openId, e.login)

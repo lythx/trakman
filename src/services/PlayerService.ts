@@ -42,6 +42,11 @@ export class PlayerService {
     })
   }
 
+  /**
+* Gets the player information
+* @param login Player login
+* @returns Player object or undefined if the player isn't online
+*/
   static getPlayer(login: string): TMPlayer | undefined {
     return this._players.find(p => p.login === login)
   }
@@ -167,11 +172,12 @@ export class PlayerService {
     return leaveInfo
   }
 
-  static async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined>
-  static async fetchPlayer(login: string[]): Promise<TMOfflinePlayer[]>
-  static async fetchPlayer(login: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
-    return await this.repo.get(login as any)
-  }
+  /**
+   * Fetches the player information from the database
+   * @param login Player login
+   * @returns Player object or undefined if the player isn't in the database
+   */
+  static fetchPlayer = this.repo.get.bind(this.repo)
 
   static async setPrivilege(login: string, privilege: number, callerLogin?: string): Promise<void> {
     const player: TMPlayer | undefined = this._players.find(a => a.login === login)

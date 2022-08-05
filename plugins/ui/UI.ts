@@ -275,7 +275,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      // for (const player of TM.players) {
+      // for (const player of TM.players.list) {
       //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
     }
@@ -326,7 +326,7 @@ const events: TMListener[] = [
       //TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
       // TODO: Display current challenge record widgets
-      // for (const player of TM.players) {
+      // for (const player of TM.players.list) {
       //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
 

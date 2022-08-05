@@ -166,7 +166,7 @@ const commands: TMCommand[] = [
     help: 'Kick a specific player.',
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, login: string, reason?: string): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const targetInfo: TMPlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return
@@ -196,9 +196,9 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo === undefined) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
@@ -226,9 +226,9 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Specified player was not muted.`, info.login)
         return
       }
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
@@ -251,7 +251,7 @@ const commands: TMCommand[] = [
     help: 'Force a player into specmode.',
     params: [{ name: 'login' }],
     callback: (info: MessageInfo, login: string): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const targetInfo: TMPlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return
@@ -281,7 +281,7 @@ const commands: TMCommand[] = [
     help: 'Force a player into playermode.',
     params: [{ name: 'login' }],
     callback: (info: MessageInfo, login: string): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const targetInfo: TMPlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return

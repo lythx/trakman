@@ -22,13 +22,13 @@ export default class AdminPanelResult extends StaticComponent {
   }
 
   display(): void {
-    for (const e of TM.players) {
+    for (const e of TM.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    const privilege: number = TM.getPlayer(login)?.privilege ?? 0
+    const privilege: number = TM.players.get(login)?.privilege ?? 0
     if (privilege > 0) {
       TM.sendManialink(this.xml, login)
     }
