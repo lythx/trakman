@@ -54,7 +54,7 @@ export default class CheckpointRecords extends PopupWindow {
   }
 
   private reRenderToPlayer(login: string): void {
-    if(!this.getPlayersWithWindowOpen().includes(login)) { return }
+    if (!this.getPlayersWithWindowOpen().includes(login)) { return }
     const page = this.paginator.getPageByLogin(login)
     this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
@@ -77,7 +77,7 @@ export default class CheckpointRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(TM.safeString(TM.strip(cps[i + cpIndex - 1]?.nickname ?? '-', false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(cps[i + cpIndex - 1]?.nickname ?? '-', false)), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
@@ -92,7 +92,7 @@ export default class CheckpointRecords extends PopupWindow {
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
       const cp = cps?.[i + cpIndex - 1]
-      return centeredText(cp === null ? '--:--.-' : TM.Utils.getTimeString(cp.checkpoint), w, h)
+      return centeredText(cp === null ? '--:--.-' : TM.utils.getTimeString(cp.checkpoint), w, h)
     }
 
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
@@ -105,14 +105,14 @@ export default class CheckpointRecords extends PopupWindow {
         if (cps?.[i + cpIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.better}-${TM.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.equal}${TM.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${this.diffColours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
-      return centeredText(differenceString + ' ' + TM.Utils.getTimeString(cp), w, h)
+      return centeredText(differenceString + ' ' + TM.utils.getTimeString(cp), w, h)
     }
 
     const rows = Math.min(this.entries, cps.length - cpIndex)

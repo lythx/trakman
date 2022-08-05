@@ -7,15 +7,15 @@ const commands: TMCommand[] = [
     params: [{ name: 'name', type: 'multiword' }],
     callback: (info: MessageInfo, name: string): void => {
       if (name.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No name specified.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No name specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the server name to ${TM.palette.highlight + name}$z$s${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the server name to ${TM.utils.palette.highlight + name}$z$s${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -31,15 +31,15 @@ const commands: TMCommand[] = [
     params: [{ name: 'comment', type: 'multiword' }],
     callback: (info: MessageInfo, comment: string): void => {
       if (comment.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No comment specified.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No comment specified.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the server comment to ${TM.palette.highlight + comment}$z$s${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the server comment to ${TM.utils.palette.highlight + comment}$z$s${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -56,15 +56,15 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (password !== undefined && !regex.test(password)) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the player password to ${TM.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the player password to ${TM.utils.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -81,15 +81,15 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
       if (password !== undefined && !regex.test(password)) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Invalid password (ASCII mismatch).`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Invalid password (ASCII mismatch).`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the spectator password to ${TM.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the spectator password to ${TM.utils.palette.highlight + (password !== undefined ? password : 'none (disabled)')}$z$s${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -107,9 +107,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the max players amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the max players amount to ${TM.utils.palette.highlight + amount}${TM.utils.palette.admin}.`
         }],
       },
         {
@@ -127,9 +127,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the max spectators amount to ${TM.palette.highlight + amount}${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the max spectators amount to ${TM.utils.palette.highlight + amount}${TM.utils.palette.admin}.`
         }],
       },
         {
@@ -147,9 +147,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the podium time to ${TM.palette.highlight + Math.round(time / 1000)}${TM.palette.admin} seconds.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the podium time to ${TM.utils.palette.highlight + Math.round(time / 1000)}${TM.utils.palette.admin} seconds.`
         }],
       },
         {
@@ -167,9 +167,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the time limit to ${TM.palette.highlight + Math.round(time / 1000)}${TM.palette.admin} seconds.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the time limit to ${TM.utils.palette.highlight + Math.round(time / 1000)}${TM.utils.palette.admin} seconds.`
         }],
       },
         {
@@ -187,9 +187,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has set `
-            + `the notice to ${TM.palette.highlight + TM.strip(notice, true)}${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has set `
+            + `the notice to ${TM.utils.palette.highlight + TM.utils.strip(notice, true)}${TM.utils.palette.admin}.`
         }],
       },
         {
@@ -207,9 +207,9 @@ const commands: TMCommand[] = [
       TM.multiCall({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.palette.admin} the map download.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `${TM.utils.palette.highlight + (allowed ? 'allowed' : 'disallowed')}${TM.utils.palette.admin} the map download.`
         }]
       },
         {
@@ -229,9 +229,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (disabled ? 'disabled' : 'enabled')}${TM.palette.admin} checkpoint respawning.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `${TM.utils.palette.highlight + (disabled ? 'disabled' : 'enabled')}${TM.utils.palette.admin} checkpoint respawning.`
         }]
       },
         {
@@ -259,9 +259,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} forced opponent display.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `${TM.utils.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.utils.palette.admin} forced opponent display.`
         }]
       },
         {
@@ -282,10 +282,10 @@ const commands: TMCommand[] = [
       const coppers: any[] | Error = await TM.call('GetServerCoppers')
       if (coppers instanceof Error) {
         TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't retrieve the coppers amount.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't retrieve the coppers amount.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Current server coppers amount${TM.palette.highlight}: ${coppers[0]}${TM.palette.admin}.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin}Current server coppers amount${TM.utils.palette.highlight}: ${coppers[0]}${TM.utils.palette.admin}.`, info.login)
     },
     privilege: 3
   },
@@ -295,7 +295,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'value', type: 'int' }],
     callback: (info: MessageInfo, value: number): void => {
       if (![0, 1, 2].includes(value)) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Possible values are ${TM.palette.highlight}0, 1 & 2${TM.palette.error}.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Possible values are ${TM.utils.palette.highlight}0, 1 & 2${TM.utils.palette.error}.`, info.login)
         return
       }
       let status: string
@@ -312,9 +312,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `updated server visibility to${TM.palette.highlight + ':' + status}${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `updated server visibility to${TM.utils.palette.highlight + ':' + status}${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -335,9 +335,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} server replay autosaving.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `${TM.utils.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.utils.palette.admin} server replay autosaving.`
         }]
       },
         {
@@ -357,9 +357,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-            + `${TM.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.palette.admin} server validation replay autosaving.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+            + `${TM.utils.palette.highlight + (enabled ? 'enabled' : 'disabled')}${TM.utils.palette.admin} server validation replay autosaving.`
         }]
       },
         {
@@ -376,9 +376,9 @@ const commands: TMCommand[] = [
     help: 'Remove all records on the ongoing map.',
     callback: (info: MessageInfo): void => {
       TM.removeAllRecords(TM.map.id, info.login)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has `
-        + `${TM.palette.highlight + 'cleared out'}${TM.palette.admin} the current map records.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
+        + `${TM.utils.palette.highlight + 'cleared out'}${TM.utils.palette.admin} the current map records.`)
     },
     privilege: 3
   },
@@ -387,8 +387,8 @@ const commands: TMCommand[] = [
     help: 'Kill the controller.',
     callback: (info: MessageInfo): never => {
       TM.callNoRes('ChatSendServerMessage', [{
-        string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-          + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has killed the controller :,(`
+        string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+          + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has killed the controller :,(`
       }])
       process.exit(0)
     },
@@ -399,8 +399,8 @@ const commands: TMCommand[] = [
     help: 'Stop the server.',
     callback: async (info: MessageInfo): Promise<void> => {
       await TM.call('ChatSendServerMessage', [{
-        string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-          + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has killed the server :,(`
+        string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+          + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has killed the server :,(`
       }])
       TM.call('StopServer')
     },

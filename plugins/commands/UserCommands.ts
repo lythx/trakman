@@ -8,7 +8,7 @@ const commands: TMCommand[] = [
     aliases: ['ct', 'colourtest'],
     help: 'Display all the colours in order [TO BE REMOVED].',
     callback: (): void => {
-      const col: string[] = Object.values(TM.colours)
+      const col: string[] = Object.values(TM.utils.colours)
       TM.sendMessage(col.map((v): string => `${v}>`).join(' '))
     },
     privilege: 1
@@ -18,14 +18,14 @@ const commands: TMCommand[] = [
     aliases: [
       'laston', 'wins', 'stats', 'song', 'mod',
       'server', 'nations', 'visitors', 'track', 'map',
-      'playtime', 'players',  'summary',
+      'playtime', 'players', 'summary',
       'topsums', 'toprecs', 'chatlog', 'topdons', 'autojuke',
       'xlist', 'history', 'jukebox', 'top100', 'rank',
       'topwins', 'active', 'nextmap', 'nextrank', 'pb',
       'tmxinfo', 'tmxrecs'
     ],
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
         + `use the /bug command with the command name (or talk to one of the devs).`, info.login)
     },
     privilege: 0
@@ -138,7 +138,7 @@ const commands: TMCommand[] = [
     help: 'Express the deep emotions hidden within your sinful soul.',
     params: [{ name: 'thoughts', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, thoughts?: string): void => {
-      TM.sendMessage(`$i${info.nickname}$z$s$i${TM.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
+      TM.sendMessage(`$i${info.nickname}$z$s$i${TM.utils.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
   },
@@ -178,7 +178,7 @@ const commands: TMCommand[] = [
     aliases: ['time'],
     help: 'Find out about the current server time.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Current server time is ${TM.palette.highlight + (new Date().toString())}${TM.palette.servermsg}.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Current server time is ${TM.utils.palette.highlight + (new Date().toString())}${TM.utils.palette.servermsg}.`, info.login)
     },
     privilege: 0
   },
@@ -186,8 +186,8 @@ const commands: TMCommand[] = [
     aliases: ['bm', 'bootme', 'dienow'],
     help: 'Part your ways with life.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}`
-        + `${TM.palette.servermsg} has passed away for good. May their soul ${TM.palette.highlight}rest in peace${TM.palette.servermsg}.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
+        + `${TM.utils.palette.servermsg} has passed away for good. May their soul ${TM.utils.palette.highlight}rest in peace${TM.utils.palette.servermsg}.`)
       TM.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
     },
     privilege: 0
@@ -196,8 +196,8 @@ const commands: TMCommand[] = [
     aliases: ['rq', 'ragequit'],
     help: 'Signal your dissatisfaction with whatever is happening right now.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}`
-        + `${TM.palette.error} has ragequit.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
+        + `${TM.utils.palette.error} has ragequit.`)
       TM.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
     },
     privilege: 0
@@ -273,10 +273,10 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, login: string, text: string): void => {
       const playerInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (playerInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.error}-PM- $g[${info.nickname}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
+      TM.sendMessage(`${TM.utils.palette.error}-PM- $g[${info.nickname}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
   },
@@ -284,7 +284,7 @@ const commands: TMCommand[] = [
     aliases: ['test'],
     params: [{ name: 'nickname', type: 'multiword' }],
     callback: (info: MessageInfo, nickname: string): void => {
-      TM.sendMessage(TM.nicknameToLogin(nickname) ?? 'didnt work lol')
+      TM.sendMessage(TM.utils.nicknameToLogin(nickname) ?? 'didnt work lol')
     },
     privilege: 0
   },
@@ -295,7 +295,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, text: string): void => {
       const embed = new EmbedBuilder()
         .setTitle('Bug report')
-        .setDescription(`Sent by ${TM.strip(info.nickname)}`)
+        .setDescription(`Sent by ${TM.utils.strip(info.nickname)}`)
         .setColor(0x0099ff)
         .setTimestamp(Date.now())
         .setThumbnail(('https://media.sketchfab.com/models/c842e2bec3c2463b977de99762014d4a/thumbnails/513ca7ac0d1349a3820d6a927a23cb5c/60be795961244327984a71b1ec8b8dcd.jpeg'))
@@ -310,7 +310,7 @@ const commands: TMCommand[] = [
         embeds: [embed]
       })
 
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Bug successfully submitted.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin}Bug successfully submitted.`, info.login)
     },
     privilege: 0
   },
@@ -326,7 +326,7 @@ const commands: TMCommand[] = [
     aliases: ['admin', 'a'],
     callback: (info: MessageInfo): void => {
       if (info.privilege > 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.admin}Command prefix ${TM.colours.white}/a ${TM.palette.admin}or ${TM.colours.white}/admin ${TM.palette.admin}is not used. Use ${TM.colours.white}//[command] ${TM.palette.admin}for admin commands instead.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin}Command prefix ${TM.utils.colours.white}/a ${TM.utils.palette.admin}or ${TM.utils.colours.white}/admin ${TM.utils.palette.admin}is not used. Use ${TM.utils.colours.white}//[command] ${TM.utils.palette.admin}for admin commands instead.`, info.login)
       }
     },
     privilege: 0
@@ -340,9 +340,9 @@ for (const command of commands) { TM.addCommand(command) }
 TM.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
-    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.karma}`
-      + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.karma} has voted `
-      + `${TM.palette.highlight + info.text.trim()}${TM.palette.karma} for this map.`)
+    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.karma}`
+      + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.karma} has voted `
+      + `${TM.utils.palette.highlight + info.text.trim()}${TM.utils.palette.karma} for this map.`)
     await TM.addVote(TM.map.id, info.login, playerVote as any)
   }
 })

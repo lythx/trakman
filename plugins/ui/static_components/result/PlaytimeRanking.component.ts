@@ -53,7 +53,7 @@ export default class PlaytimeRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.playtimeRanking.title, CFG.playtimeRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(this.ranking.map(a => a.playtime.toString()), this.ranking.map(a => TM.safeString(TM.strip(a.nickname, false))))}
+        ${this.list.constructXml(this.ranking.map(a => a.playtime.toString()), this.ranking.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

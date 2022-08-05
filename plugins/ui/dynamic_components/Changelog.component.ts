@@ -50,7 +50,7 @@ export default class Changelog extends PopupWindow {
       `<quad posn="${this.marginBig} ${this.marginBig - imageHeight} 6" sizen="${w - this.marginBig * 2} ${h - (headerH + this.margin + imageHeight)}" image="${imageUrl}"/>`
     return `<format textsize="1"/>
       <quad posn="0 0 3" sizen="${versioW} ${headerH}" bgcolor="${this.headerBg}"/>
-      ${centeredText(`$s${TM.palette.tmGreen}${title}`, versioW, headerH, { padding: this.margin, textScale: 1.4 })}
+      ${centeredText(`$s${TM.utils.palette.tmGreen}${title}`, versioW, headerH, { padding: this.margin, textScale: 1.4 })}
       <frame posn="${versioW + this.margin} 0 2">
         <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBg}"/>
         ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: 1.4 })}

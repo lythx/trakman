@@ -48,12 +48,12 @@ export default class MapWidget extends StaticComponent {
     const grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(rows).fill(1))
     const texts: (string | undefined)[] = [
       cfg.title,
-      TM.safeString(map.name),
-      TM.safeString(author),
-      TM.Utils.getTimeString(map.authorTime),
-      date === undefined ? undefined : TM.formatDate(date),
+      TM.utils.safeString(map.name),
+      TM.utils.safeString(author),
+      TM.utils.getTimeString(map.authorTime),
+      date === undefined ? undefined : TM.utils.formatDate(date),
       tmxmap?.awards === undefined ? undefined : tmxmap?.awards.toString(),
-      tmxwr === undefined ? undefined : TM.Utils.getTimeString(tmxwr)
+      tmxwr === undefined ? undefined : TM.utils.getTimeString(tmxwr)
     ]
     const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
     if (MapAuthorData.currentAuthor?.nation !== undefined) {
@@ -84,7 +84,7 @@ export default class MapWidget extends StaticComponent {
       return `
       <frame posn="0 0 1">
         ${i === 0 ? staticHeader(texts[i] ?? '', icons[i] ?? '', true) :
-          staticHeader(TM.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
+          staticHeader(TM.utils.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
             textScale: cfg.textScale,
             textBackgrund: CONFIG.static.bgColor,
             centerVertically: true,

@@ -6,7 +6,7 @@ TM.addCommand({
   params: [{ name: 'option', optional: true }],
   callback: async (info, option?: string): Promise<void> => {
     if (info.privilege <= 0 && TM.jukebox.some(a => a.callerLogin === info.login)) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.vote}You can't add more than one map to the queue.`)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.vote}You can't add more than one map to the queue.`)
       return
     }
     switch (option) {
@@ -23,8 +23,8 @@ TM.addCommand({
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
         TM.addToJukebox(map.id, info.login)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.vote} to the queue.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
+          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
       }
       case 'noauthor': {
@@ -41,8 +41,8 @@ TM.addCommand({
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
         TM.addToJukebox(map.id, info.login)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.vote} to the queue.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
+          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
       }
       case 'norank': {
@@ -66,8 +66,8 @@ TM.addCommand({
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
         TM.addToJukebox(map.id, info.login)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.vote} to the queue.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
+          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
       }
       default: {
@@ -81,8 +81,8 @@ TM.addCommand({
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
         TM.addToJukebox(map.id, info.login)
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname, true)} `
-          + `${TM.palette.vote}added ${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.vote} to the queue.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
+          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
       }
     }
   },

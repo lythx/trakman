@@ -9,7 +9,7 @@ const fetchPlayerData = async (login: string): Promise<{ nickname: string, natio
     return json
   } else {
     // No error check, nation cannot be undefined
-    return { nickname: json?.nickname, nation: (TM.Utils.nationToNationCode(json?.path?.split('|')[1]) as any) }
+    return { nickname: json?.nickname, nation: (TM.utils.nationToNationCode(json?.path?.split('|')[1]) as any) }
   }
 }
 

@@ -14,31 +14,31 @@ const commands: TMCommand[] = [
       const file: any = await fs.readFile(path, 'base64').catch(err => err)
       if (file instanceof Error) {
         TM.error('Error when reading file on addlocal', file.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}File ${TM.palette.highlight + path} is not accessible.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}File ${TM.utils.palette.highlight + path} is not accessible.`, info.login)
         return
       }
       const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const res: any[] | Error = await TM.call('GetNextChallengeInfo')
       if (res instanceof Error) {
         TM.error('Failed to get next map info', res.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
       const name: string = res[0].Name
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
-        + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from local files.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued `
+        + `${TM.utils.palette.highlight + TM.utils.strip(name, true)}${TM.utils.palette.admin} from local files.`)
     },
     privilege: 1
   },
@@ -60,25 +60,25 @@ const commands: TMCommand[] = [
       const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the file to the server.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
       const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map into queue.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
       const nextInfo: any[] | Error = await TM.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
         TM.error('Failed to get next map info', nextInfo.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to obtain the next map info.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
         return
       }
       const name: string = nextInfo[0].Name
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
-        + `${TM.palette.highlight + TM.strip(name, true)}${TM.palette.admin} from URL.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued `
+        + `${TM.utils.palette.highlight + TM.utils.strip(name, true)}${TM.utils.palette.admin} from URL.`)
     },
     privilege: 1
   },
@@ -92,12 +92,12 @@ const commands: TMCommand[] = [
       const res: any[] | Error = await TM.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't remove the current map.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't remove the current map.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from the playlist.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+        + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from the playlist.`)
     },
     privilege: 1
   },
@@ -108,8 +108,8 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has skipped the ongoing map.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has skipped the ongoing map.`
         }]
       },
         {
@@ -125,8 +125,8 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has restarted the ongoing map.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has restarted the ongoing map.`
         }]
       },
         {
@@ -140,11 +140,11 @@ const commands: TMCommand[] = [
     help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
       if (TM.previousMaps[0] === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Can't queue previous map because map history is empty. This happens if server was restarted.`)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Can't queue previous map because map history is empty. This happens if server was restarted.`)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the previous map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.callNoRes('NextChallenge')
@@ -155,8 +155,8 @@ const commands: TMCommand[] = [
     aliases: ['rq', 'requeue', 'replay'],
     help: 'Requeue the ongoing map.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has requeued the ongoing map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the ongoing map.`)
       TM.addToJukebox(TM.map.id, info.login)
     },
     privilege: 1
@@ -168,16 +168,16 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, login: string, reason?: string): void => {
       const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return
       }
-      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.utils.palette.highlight}: ${reason}${TM.utils.palette.admin}.`
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.${reasonString}`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has kicked `
+            + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin}.${reasonString}`
         }]
       },
         {
@@ -200,20 +200,20 @@ const commands: TMCommand[] = [
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo === undefined) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
         }
       }
       const res: true | Error = await TM.addToMutelist(targetInfo.login, info.login, reason, expireDate)
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to add to mute list.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server failed to add to mute list.`, info.login)
         return
       }
-      const reasonString: string = reason === undefined ? '' : ` Reason${TM.palette.highlight}: ${reason}${TM.palette.admin}.`
-      const durationString: string = duration === undefined ? '' : ` for ${TM.palette.highlight}${TM.msToTime(duration)}`
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has muted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}${durationString}.${TM.palette.admin}${reasonString}`)
+      const reasonString: string = reason === undefined ? '' : ` Reason${TM.utils.palette.highlight}: ${reason}${TM.utils.palette.admin}.`
+      const durationString: string = duration === undefined ? '' : ` for ${TM.utils.palette.highlight}${TM.utils.msToTime(duration)}`
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has muted `
+        + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin}${durationString}.${TM.utils.palette.admin}${reasonString}`)
     },
     privilege: 2
   },
@@ -223,25 +223,25 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       if (TM.mutelist.some(a => a.login === login) === false) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Specified player was not muted.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Specified player was not muted.`, info.login)
         return
       }
       let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
         targetInfo = await TM.fetchPlayer(login)
         if (targetInfo == null) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Unknown player.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
         }
       }
       const res: boolean | Error = await TM.removeFromMutelist(targetInfo.login, info.login)
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server failed to remove from mute list.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server failed to remove from mute list.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unmuted `
-        + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has unmuted `
+        + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin}.`
       )
     },
     privilege: 2
@@ -253,15 +253,15 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, login: string): void => {
       const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into specmode.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has forced `
+            + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin} into specmode.`
         }]
       },
         {
@@ -283,15 +283,15 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, login: string): void => {
       const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
       if (targetInfo === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Player is not on the server`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin} into playermode.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has forced `
+            + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin} into playermode.`
         }]
       },
         {
@@ -314,9 +314,9 @@ const commands: TMCommand[] = [
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has kicked `
-            + `${TM.palette.highlight + TM.strip(login)}${TM.palette.admin}.`
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has kicked `
+            + `${TM.utils.palette.highlight + TM.utils.strip(login)}${TM.utils.palette.admin}.`
         }]
       },
         {
@@ -333,18 +333,18 @@ const commands: TMCommand[] = [
     params: [{ name: 'index', type: 'int' }],
     callback: (info: MessageInfo, index: number): void => {
       if (TM.jukebox[index] === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No such index in the queue.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No such index in the queue.`, info.login)
         return
       }
       const map: TMMap | undefined = TM.jukebox.map(a => a.map).find(a => a === TM.jukebox.map(a => a.map)[index])
       if (map === undefined) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Couldn't find this index in the queue.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't find this index in the queue.`, info.login)
         return
       }
       TM.removeFromJukebox(map.id, info.login)
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + TM.strip(map.name)}${TM.palette.admin} from the queue.`
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+        + `${TM.utils.palette.highlight + TM.utils.strip(map.name)}${TM.utils.palette.admin} from the queue.`
       )
     },
     privilege: 1
@@ -354,15 +354,15 @@ const commands: TMCommand[] = [
     help: 'Clear the entirety of the current map queue',
     callback: (info: MessageInfo): void => {
       if (TM.jukebox.length === 0) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}No maps in the queue.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No maps in the queue.`, info.login)
         return
       }
       for (const map of TM.jukebox) {
         TM.removeFromJukebox(map.map.id, info.login)
       }
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + 'all mapos'}${TM.palette.admin} from the queue.`
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+        + `${TM.utils.palette.highlight + 'all mapos'}${TM.utils.palette.admin} from the queue.`
       )
     },
     privilege: 1
@@ -372,14 +372,14 @@ const commands: TMCommand[] = [
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo): void => {
       if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Server not in rounds mode.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server not in rounds mode.`, info.login)
         return
       }
       TM.multiCallNoRes({
         method: 'ChatSendServerMessage',
         params: [{
-          string: `${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has forced `
+          string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+            + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has forced `
             + `the ongoing round to end.`
         }]
       },

@@ -49,7 +49,7 @@ export default class DonatorsRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.donatorsRanking.title, CFG.donatorsRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(this.ranking.map(a => a.amount.toString()), this.ranking.map(a => TM.safeString(TM.strip(a.nickname, false))))}
+        ${this.list.constructXml(this.ranking.map(a => a.amount.toString()), this.ranking.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

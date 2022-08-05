@@ -43,11 +43,11 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
   const status: boolean | Error = await TM.sendCoppers(payerLogin, amount, 'Donation')
   if (status instanceof Error) {
     TM.error(`Failed to receive ${amount} coppers donation from player ${payerLogin}`, status.message)
-    TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`, payerLogin)
+    TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, payerLogin)
   } else if (status === true) {
     void addToDB(payerLogin, amount)
-    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(payerNickname)}${TM.palette.donation} `
-      + `donated ${TM.palette.highlight}${amount}C${TM.palette.donation} to the server.`)
+    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(payerNickname)}${TM.utils.palette.donation} `
+      + `donated ${TM.utils.palette.highlight}${amount}C${TM.utils.palette.donation} to the server.`)
   }
 }
 

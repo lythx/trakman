@@ -55,7 +55,7 @@ export default class KarmaRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.karmaRanking.title, CFG.karmaRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(this.ranking.map(a => Math.round(a.karma).toString()), this.ranking.map(a => TM.safeString(TM.strip(a.name, false))))}
+        ${this.list.constructXml(this.ranking.map(a => Math.round(a.karma).toString()), this.ranking.map(a => TM.utils.safeString(TM.utils.strip(a.name, false))))}
       </frame>
       </frame>
     </manialink>`

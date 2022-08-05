@@ -23,9 +23,9 @@ export default class GuestlistList extends PopupWindow {
                     return
                 } else {
                     TM.removeFromGuestlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-                        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-                        + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} from guestlist.`)
+                    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+                        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+                        + `${TM.utils.palette.highlight + targetPlayer.nickname}${TM.utils.palette.admin} from guestlist.`)
                 }
             } // 
 
@@ -55,7 +55,7 @@ export default class GuestlistList extends PopupWindow {
             cancer.push(await TM.fetchPlayer(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.safeString(TM.strip(cancer[i - 1]?.nickname ?? '', false)), w, h)
+            return centeredText(TM.utils.safeString(TM.utils.strip(cancer[i - 1]?.nickname ?? '', false)), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(guestlisted[i - 1].login, w, h)

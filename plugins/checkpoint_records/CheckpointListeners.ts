@@ -82,21 +82,21 @@ TM.addCommand({
   callback(info, cpIndex?: number) {
     const secs = currentPlayerSecs.find(a => a.login === info.login)
     if (secs === undefined) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You have no checkpoint records on the ongoing map.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You have no checkpoint records on the ongoing map.`, info.login)
       return
     }
     if (cpIndex === undefined) {
       secs.checkpoints.length = 0
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Your checkpoints on the ongoing map were removed.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your checkpoints on the ongoing map were removed.`, info.login)
       void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
     } else {
       if (cpIndex < 1 || cpIndex > TM.map.checkpointsAmount) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
         return
       }
       secs.checkpoints[cpIndex - 1] = undefined
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Your ${TM.palette.highlight + TM.Utils.getPositionString(cpIndex)}`
-        + `${TM.palette.servermsg} checkpoint was removed.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your ${TM.utils.palette.highlight + TM.utils.getPositionString(cpIndex)}`
+        + `${TM.utils.palette.servermsg} checkpoint was removed.`, info.login)
       void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
     }
     emitEvent('DeletePlayerCheckpoint', info.login)
@@ -111,19 +111,19 @@ TM.addCommand({
   callback(info, cpIndex?: number) {
     if (cpIndex === undefined) {
       currentBestSecs.length = 0
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + 'all checkpoint records'}${TM.palette.admin} on the ongoing map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+        + `${TM.utils.palette.highlight + 'all checkpoint records'}${TM.utils.palette.admin} on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId)
     } else {
       if (cpIndex < 1 || cpIndex > TM.map.checkpointsAmount) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
         return
       }
       currentBestSecs[cpIndex - 1] = undefined
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed the `
-        + `${TM.palette.highlight + TM.Utils.getPositionString(cpIndex)}${TM.palette.admin} checkpoint record on the ongoing map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed the `
+        + `${TM.utils.palette.highlight + TM.utils.getPositionString(cpIndex)}${TM.utils.palette.admin} checkpoint record on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId, cpIndex - 1)
     }
     emitEvent('DeleteBestCheckpoint', currentBestSecs, currentPlayerSecs)

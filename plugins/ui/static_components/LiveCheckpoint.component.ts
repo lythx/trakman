@@ -7,7 +7,7 @@ export default class LiveCheckpoint extends StaticComponent {
   private readonly bg: string = CONFIG.static.bgColor
   private readonly width: number = CONFIG.static.width
   private readonly height: number = CONFIG.liveCheckpoint.height
-  private readonly positionX: number 
+  private readonly positionX: number
   private readonly positionY: number
   private readonly side: boolean = CONFIG.liveCheckpoint.side
   private readonly title: string = CONFIG.liveCheckpoint.title
@@ -22,7 +22,7 @@ export default class LiveCheckpoint extends StaticComponent {
 
   constructor() {
     super(IDS.liveCheckpoint, 'race')
-    const pos  = getStaticPosition('liveCheckpoint')
+    const pos = getStaticPosition('liveCheckpoint')
     this.positionX = pos.x
     this.positionY = pos.y
     TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
@@ -38,7 +38,7 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
     TM.sendManialink(`
     <manialink id="${this.id}">
@@ -54,20 +54,20 @@ export default class LiveCheckpoint extends StaticComponent {
   }
 
   displayToPlayer(login: string, checkpointTime?: number, difference?: number): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
     let timeString: string = ''
     if (checkpointTime !== undefined) {
-      timeString = TM.Utils.getTimeString(checkpointTime)
+      timeString = TM.utils.getTimeString(checkpointTime)
     }
     let differenceString: string = ''
     if (difference !== undefined) {
       if (difference > 0) {
-        differenceString = `(${this.colours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+        differenceString = `(${this.colours.better}-${TM.utils.getTimeString(difference)}$FFF)`
       } else if (difference === 0) {
-        differenceString = `(${this.colours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+        differenceString = `(${this.colours.equal}${TM.utils.getTimeString(difference)}$FFF)`
       } else {
-        differenceString = `(${this.colours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+        differenceString = `(${this.colours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
       }
     }
     const txt: string = timeString + differenceString

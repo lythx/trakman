@@ -52,11 +52,11 @@ export default class LocalCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const dateCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.formatDate(records[i + playerIndex].date, true), w, h)
+      return centeredText(TM.utils.formatDate(records[i + playerIndex].date, true), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -74,11 +74,11 @@ export default class LocalCps extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
+        ${centeredText(TM.utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(TM.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -109,7 +109,7 @@ export default class LocalCps extends PopupWindow {
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(indexCell, nickNameCell, loginCell,dateCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, loginCell, dateCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
         arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }

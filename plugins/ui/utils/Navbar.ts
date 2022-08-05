@@ -9,8 +9,8 @@ export default class Navbar {
 
   readonly width: number
   readonly height: number
-   buttons: { name: string, action: number }[]
-   buttonWidth: number
+  buttons: { name: string, action: number }[]
+  buttonWidth: number
   //TODO THIS IN CONFIG FILE
   readonly textScale: number = 0.75
   //AND THIS
@@ -40,7 +40,7 @@ export default class Navbar {
       xml += `<frame posn="${w * i} 0 1">
             <quad posn="0 0 3" sizen="${w - this.margin} ${this.height}" image="f" imagefocus="${this.hoverImage}" action="${e.action}"/>
             <quad posn="0 0 2" sizen="${w - this.margin} ${this.height}" bgcolor="${this.bg}"/>
-            <label posn="${w / 2} -${(this.height / 2)} 9" sizen="${(w * (1 / this.textScale)) - (this.padding * 2)} ${this.height}" scale="${this.textScale}" text="${TM.safeString(e.name)}" valign="center" halign="center"/>
+            <label posn="${w / 2} -${(this.height / 2)} 9" sizen="${(w * (1 / this.textScale)) - (this.padding * 2)} ${this.height}" scale="${this.textScale}" text="${TM.utils.safeString(e.name)}" valign="center" halign="center"/>
             </frame>`
     }
     return xml
