@@ -2,8 +2,8 @@ import { TRAKMAN as TM } from "../src/Trakman.js";
 
 const topPlayerRecords: { login: string, nickname: string, amount: number }[] = []
 const updateListeners: (() => void)[] = []
-const initialize =async () => {
-  const res: any[] | Error = await TM.queryDB(`SELECT count(*)::int as amount, nickname, login FROM records
+const initialize = async () => {
+  const res: any[] | Error = await TM.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
   JOIN player_ids ON player_ids.id=records.player_id
   JOIN players ON players.id=records.player_id
   JOIN maps ON maps.id=records.map_id
@@ -18,7 +18,7 @@ const initialize =async () => {
 }
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
-void initialize()
+  void initialize()
 })
 
 // TM.addListener('Controller.PlayerJoin', (info): void => {

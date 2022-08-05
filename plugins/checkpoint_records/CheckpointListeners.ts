@@ -10,7 +10,7 @@ let currentMapDBId: number
 const currentPlayerSecs: PlayerCheckpoints[] = []
 
 const onMapStart = async (): Promise<void> => {
-  const DBId = await TM.getMapDBId(TM.map.id)
+  const DBId = await TM.db.getMapId(TM.map.id)
   if (DBId === undefined) {
     await TM.fatalError(`Failed to fetch current map (${TM.map.id}) id from database`)
     return

@@ -7,7 +7,7 @@ const updateListeners: (() => void)[] = []
 const topUpdateListeners: (() => void)[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await TM.queryDB(`select p.login, count(p.id)::int
+  const res: any[] | Error = await TM.db.query(`select p.login, count(p.id)::int
   from votes v
   join player_ids p on v.player_id = p.id
   group by p.login
@@ -59,7 +59,7 @@ TM.addListener('Controller.KarmaVote', (info): void => {
 
 TM.addListener('Controller.PlayerJoin', async (info): Promise<void> => {
   const id: number | undefined = await TM.getPlayerDBId(info.login)
-  const res: any[] | Error = await TM.queryDB(`SELECT count(*) FROM VOTES
+  const res: any[] | Error = await TM.db.query(`SELECT count(*) FROM VOTES
       WHERE player_id=$1`, id)
   if (res instanceof Error) {
     TM.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)

@@ -16,7 +16,7 @@ const events: TMListener[] = [
   {
     event: ['Controller.BeginMap', 'Controller.Ready'],
     callback: async (): Promise<void> => {
-      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
+      const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
       for (const player of TM.players) {
         const index: number = TM.localRecords.findIndex(a => a.login === player.login)
         if (index === -1) {
@@ -55,7 +55,7 @@ const events: TMListener[] = [
           + `${TM.utils.palette.rank + TM.utils.getPositionString(index + 1)} ${TM.utils.palette.record}record.`, player.login)
       }
       const playerRank: number | undefined = player.rank
-      const allRanks: any[] | Error = await TM.queryDB(`select count(*) from players;`)
+      const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
       if (allRanks instanceof Error) {
         Logger.error('how')
         return
