@@ -16,8 +16,8 @@ export default class BanList extends PopupWindow {
         TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
             if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
-                const targetPlayer = TM.players[info.answer - this.openId - 1000]
-                const targetInfo = TM.getPlayer(targetPlayer.login)
+                const targetPlayer = TM.players.list[info.answer - this.openId - 1000]
+                const targetInfo = TM.players.get(targetPlayer.login)
                 if (targetInfo === undefined) {
                     return
                 } else {
@@ -52,7 +52,7 @@ export default class BanList extends PopupWindow {
         const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of bannedplayers) {
-            fetchedPlayers.push(await TM.fetchPlayer(player.login))
+            fetchedPlayers.push(await TM.players.fetch(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(TM.utils.safeString(TM.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)

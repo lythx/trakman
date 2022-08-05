@@ -4,7 +4,7 @@ const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 
 const fetchPlayerData = async (login: string): Promise<{ nickname: string, nation: string } | Error | false> => {
   if (regex.test(login) === true) { return false }
-  const json: any = await TM.fetchWebServices(login)
+  const json: any = await TM.players.fetchWebservices(login)
   if (json instanceof Error) { // UNKOWN PLAYER MOMENT
     return json
   } else {

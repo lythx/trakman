@@ -20,7 +20,7 @@ const onMapStart = async (): Promise<void> => {
     return
   }
   currentBestSecs = res
-  const playerSecs = await allSecsDB.get(currentMapDBId, ...TM.players.map(a => a.login))
+  const playerSecs = await allSecsDB.get(currentMapDBId, ...TM.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
     await TM.fatalError(`Failed to fetch player sectors for map ${TM.map.id}`, playerSecs.message)
     return
@@ -168,7 +168,7 @@ const getMapSectors = (): ({ login: string, nickname: string, sector: number, da
 
 const getPlayerSectors = (): ({ login: string, sectors: (number | null)[] })[] => {
   const arr: ({ login: string, sectors: (number | null)[] })[] = []
-  for (const [i, e] of TM.players.entries()) {
+  for (const [i, e] of TM.players.list.entries()) {
     arr[i] = {
       login: e.login,
       sectors: new Array(TM.map.checkpointsAmount).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.sectors[i] ?? null)

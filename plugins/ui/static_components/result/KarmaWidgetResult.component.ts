@@ -1,4 +1,4 @@
-import { centeredText, Grid, RESULTCONFIG as CONFIG,  IDS, resultStaticHeader, getIcon, getResultPosition } from '../../UiUtils.js'
+import { centeredText, Grid, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon, getResultPosition } from '../../UiUtils.js'
 import { TRAKMAN as TM } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 
@@ -24,13 +24,13 @@ export default class KarmaWidgetResult extends StaticComponent {
     //   this.display()
     // }, 100)
     TM.addListener('Controller.KarmaVote', (): void => {
-        this.display()
+      this.display()
     })
     TM.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
     TM.addListener('Controller.ManiakarmaVotes', (): void => {
-        this.display()
+      this.display()
     })
     TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
@@ -42,14 +42,14 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
-    for (const e of TM.players) {
+    if (this.isDisplayed === false) { return }
+    for (const e of TM.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.constructXml(login), login)
   }
 

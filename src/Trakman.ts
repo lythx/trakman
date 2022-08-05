@@ -67,30 +67,61 @@ export const TRAKMAN = {
 
   },
 
+  players: {
+
+    get: PlayerService.getPlayer.bind(PlayerService),
+
+    fetch: PlayerService.fetchPlayer.bind(PlayerService),
+
+    /**
+   * Fetches Trackmania Webservices for player information
+   * @param login Player login
+   * @returns Player information in JSON or error if unsuccessful
+   */
+    async fetchWebservices(login: string): Promise<{
+      id: number
+      login: string
+      nickname: string
+      united: boolean
+      path: string
+      idZone: number
+    } | Error> {
+      if (process.env.USE_WEBSERVICES !== "YES") {
+        return new Error('Use webservices set to false')
+      }
+      const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
+      const options = {
+        host: `ws.trackmania.com`,
+        path: `/tmf/players/${login}/`,
+        headers: {
+          'Authorization': au,
+        }
+      }
+      return new Promise((resolve): void => {
+        http.request(options, function (res): void {
+          let data: string = ''
+          res.on('data', function (chunk): void {
+            data += chunk
+          })
+          if (res.statusCode === 200) {
+            Logger.debug(JSON.parse(data))
+            res.on('end', (): void => resolve(JSON.parse(data)))
+            return
+          }
+          res.on('end', (): void => resolve(new Error(data)))
+        }).end()
+      })
+    },
+
+    get list() { return PlayerService.players }
+
+  },
+
   // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
 
   // Implement client idk
   DatabaseClient: Database,
-
-  /**
-   * Gets the player information
-   * @param login Player login
-   * @returns Player object or undefined if the player isn't online
-   */
-  getPlayer(login: string): TMPlayer | undefined {
-    return PlayerService.players.find(a => a.login === login)
-  },
-
-  /**
-   * Fetches the player information from the database
-   * @param login Player login
-   * @returns Player object or undefined if the player isn't in the database
-   */
-  async fetchPlayer(login: string): Promise<TMOfflinePlayer | undefined> {
-    return (await PlayerService.fetchPlayer(login))
-  },
-
 
   /**
    * Gets the player record on the ongoing map
@@ -292,45 +323,6 @@ export const TRAKMAN = {
   },
 
   /**
-   * Fetches Trackmania Webservices for player information
-   * @param login Player login
-   * @returns Player information in JSON or error if unsuccessful
-   */
-  async fetchWebServices(login: string): Promise<{
-    id: number
-    login: string
-    nickname: string
-    united: boolean
-    path: string
-    idZone: number
-  } | Error> {
-    if (process.env.USE_WEBSERVICES !== "YES") {
-      return new Error('Use webservices set to false')
-    }
-    const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
-    const options = {
-      host: `ws.trackmania.com`,
-      path: `/tmf/players/${login}/`,
-      headers: {
-        'Authorization': au,
-      }
-    }
-    return new Promise((resolve): void => {
-      http.request(options, function (res): void {
-        let data: string = ''
-        res.on('data', function (chunk): void {
-          data += chunk
-        })
-        if (res.statusCode === 200) {
-          res.on('end', (): void => resolve(JSON.parse(data)))
-          return
-        }
-        res.on('end', (): void => resolve(new Error(data)))
-      }).end()
-    })
-  },
-
-  /**
    * Adds a player to the server ban list
    * @param ip Player IP address
    * @param login Player login
@@ -499,10 +491,6 @@ export const TRAKMAN = {
 
   get serverConfig(): ServerInfo {
     return ServerConfig.config
-  },
-
-  get players(): TMPlayer[] {
-    return PlayerService.players
   },
 
   get localRecords(): TMLocalRecord[] {

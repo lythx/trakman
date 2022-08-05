@@ -13,7 +13,7 @@ export default class LiveRanking extends StaticComponent {
   private readonly maxRecords: number = 250
 
   constructor() {
-    super(IDS.live,'race')
+    super(IDS.live, 'race')
     const side: boolean = CONFIG.live.side
     const pos = getStaticPosition('live')
     this.positionX = pos.x
@@ -23,7 +23,7 @@ export default class LiveRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.LiveRecord', (): void => {
-        this.display()
+      this.display()
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (TM.liveRecords.some(a => a.login === info.login)) { this.display() }
@@ -34,15 +34,15 @@ export default class LiveRanking extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players) {
+    for (const player of TM.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 

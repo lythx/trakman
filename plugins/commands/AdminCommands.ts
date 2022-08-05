@@ -52,7 +52,7 @@ const commands: TMCommand[] = [
     help: 'Ban a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, login: string, duration?: number, reason?: string): void => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(login)
+      const targetInfo: TMPlayer | undefined = TM.players.get(login)
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player ${login} is not on the server.`, info.login)
@@ -85,9 +85,9 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Specified player was not banned.`, info.login)
         return
       }
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
@@ -107,9 +107,9 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
@@ -142,9 +142,9 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Specified player was not blacklisted.`, info.login)
         return
       }
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player.`, info.login)
           return
@@ -210,9 +210,9 @@ const commands: TMCommand[] = [
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player or no login specified.`, info.login)
           return
@@ -238,9 +238,9 @@ const commands: TMCommand[] = [
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = TM.getPlayer(login)
+      let targetInfo: TMOfflinePlayer | undefined = TM.players.get(login)
       if (targetInfo === undefined) {
-        targetInfo = await TM.fetchPlayer(login)
+        targetInfo = await TM.players.fetch(login)
         if (targetInfo == null) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player or no login specified.`, info.login)
           return
@@ -266,7 +266,7 @@ const commands: TMCommand[] = [
     help: 'Mute a player and disable their commands.',
     // TODO params
     callback: async (info: MessageInfo): Promise<void> => {
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
+      const targetInfo: TMPlayer | undefined = TM.players.get(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unknown player or no login specified.`, info.login)
         return
@@ -316,7 +316,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No login specified.`, info.login)
         return
       }
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
+      const targetInfo: TMPlayer | undefined = TM.players.get(info.text)
       if (targetInfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server.`, info.login)
         return
@@ -370,7 +370,7 @@ const commands: TMCommand[] = [
         return
       }
       hfsList.splice(hfsList.indexOf(info.login), 1)
-      const targetInfo: TMPlayer | undefined = TM.getPlayer(info.text)
+      const targetInfo: TMPlayer | undefined = TM.players.get(info.text)
       TM.multiCallNoRes(
         {
           method: 'ForceSpectator',
@@ -419,7 +419,7 @@ const commands: TMCommand[] = [
       }
       let teamInt: number
       let teamColour: string
-      const playerinfo: TMPlayer | undefined = TM.getPlayer(player)
+      const playerinfo: TMPlayer | undefined = TM.players.get(player)
       if (playerinfo === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server.`, info.login)
         return

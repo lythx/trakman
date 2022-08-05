@@ -31,8 +31,8 @@ export default class PlayerList extends PopupWindow {
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 2000 && info.answer < this.openId + 3000) {
 
-        const targetPlayer = TM.players[info.answer - this.openId - 2000]
-        const targetInfo = TM.getPlayer(targetPlayer.login)
+        const targetPlayer = TM.players.list[info.answer - this.openId - 2000]
+        const targetInfo = TM.players.get(targetPlayer.login)
         if (targetInfo === undefined) {
           return
         } else {
@@ -45,7 +45,7 @@ export default class PlayerList extends PopupWindow {
       } // Ban
 
       if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 3000]
+        const targetPlayer = TM.players.list[info.answer - this.openId - 3000]
         const status = await TM.addToMutelist(targetPlayer.login, info.login)
         if (status instanceof Error) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}An error occured while muting the player.`, info.login)
@@ -57,7 +57,7 @@ export default class PlayerList extends PopupWindow {
       } // Mute
 
       if (info.answer >= this.openId + 4000 && info.answer < this.openId + 6000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 4000]
+        const targetPlayer = TM.players.list[info.answer - this.openId - 4000]
         if (targetPlayer.login === undefined) {
           return
         } else {
@@ -70,7 +70,7 @@ export default class PlayerList extends PopupWindow {
       } // Blacklist
 
       if (info.answer >= this.openId + 5000 && info.answer < this.openId + 6000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 5000]
+        const targetPlayer = TM.players.list[info.answer - this.openId - 5000]
         const status = await TM.addToGuestlist(targetPlayer.login, info.login)
         if (status instanceof Error) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}An error occured while adding player to the guestlist.`, info.login)
@@ -86,7 +86,7 @@ export default class PlayerList extends PopupWindow {
   }
 
   protected constructContent(login: string, params: any): string {
-    const players = TM.players
+    const players = TM.players.list
     const headers = [
       (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
       (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),

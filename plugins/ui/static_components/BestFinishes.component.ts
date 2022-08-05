@@ -52,7 +52,7 @@ export default class BestFinishes extends StaticComponent {
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    for (const e of TM.players) {
+    for (const e of TM.players.list) {
       this.displayToPlayer(e.login)
     }
   }

@@ -44,7 +44,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands]
     for (const e of paginators) {
       e.onPageChange = (login: string, page: number): void => {
-        const privilege = TM.getPlayer(login)?.privilege ?? 0
+        const privilege = TM.players.get(login)?.privilege ?? 0
         this.displayToPlayer(login, {
           page, paginator: e, commands: commands[paginators.indexOf(e)], privilege, singleType: true
         }, `${page}/${e.pageCount}`)
@@ -118,7 +118,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
-    const player: TMPlayer | undefined = TM.getPlayer(info.login)
+    const player: TMPlayer | undefined = TM.players.get(info.login)
     if (player === undefined) { return }
     const paginator: Paginator = this.paginators[player.privilege]
     const commands: TMCommand[] = this.commandLists[player.privilege]
