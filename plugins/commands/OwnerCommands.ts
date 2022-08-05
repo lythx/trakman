@@ -20,22 +20,22 @@ const commands: TMCommand[] = [
         }
         while (res.some(a => a.filename === file.name)) { //yes
           file.name = [...file.name.split('').slice(0, file.name.length - 15), (Math.random() + 1).toString(36).slice(-1), '.Challenge.Gbx'].join('')
-        } 
+        }
         const write: any[] | Error = await TM.call('WriteFile', [{ string: file.name }, { base64: file.content.toString('base64') }])
         if (write instanceof Error) {
           TM.error('Failed to write file', write.message)
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the map ${TM.utils.palette.highlight + TM.utils.strip(file.name.slice(0, 14), false)}$z$s ${TM.utils.palette.error}file to the server.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}file to the server.`, info.login)
           continue
         }
         const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
           TM.error('Failed to insert map to jukebox', insert.message)
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(file.name.slice(0, 14), false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
           continue
         }
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
           + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued `
-          + `${TM.utils.palette.highlight + TM.utils.strip(file.name.slice(0, 14), true)}${TM.utils.palette.admin} from TMX.`)
+          + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from TMX.`)
       }
     },
     privilege: 4
