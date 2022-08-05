@@ -47,7 +47,7 @@ export default class MostRecordsRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.mostRecordsRanking.title, CFG.mostRecordsRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(TopPlayerRecords.list.map(a => a.amount.toString()), TopPlayerRecords.list.map(a => TM.safeString(TM.strip(a.nickname, false))))}
+        ${this.list.constructXml(TopPlayerRecords.list.map(a => a.amount.toString()), TopPlayerRecords.list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

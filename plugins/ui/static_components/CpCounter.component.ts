@@ -13,7 +13,7 @@ export default class CpCounter extends StaticComponent {
     private readonly posY: number
 
     constructor() {
-        super(IDS.cpCounter,'race')
+        super(IDS.cpCounter, 'race')
         const pos = getStaticPosition('rank')
         this.posY = pos.y
         TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
@@ -27,12 +27,12 @@ export default class CpCounter extends StaticComponent {
     }
 
     display(): void {
-        if(this.isDisplayed === false) { return }
+        if (this.isDisplayed === false) { return }
         const cps = TM.map.checkpointsAmount - 1
         let xml: string = ''
 
         if (cps === 0) {
-            xml += centeredText(`${TM.palette.tmGreen}No CPs`, this.width, this.height, { yOffset: 1 })
+            xml += centeredText(`${TM.utils.palette.tmGreen}No CPs`, this.width, this.height, { yOffset: 1 })
         } else {
             xml += centeredText('0' + '/' + cps.toString(), this.width, this.height, { yOffset: 1 })
         }
@@ -48,15 +48,15 @@ export default class CpCounter extends StaticComponent {
     }
 
     displayToPlayer(login: string, params?: any): void | Promise<void> {
-        if(this.isDisplayed === false) { return }
+        if (this.isDisplayed === false) { return }
 
         const cps = TM.map.checkpointsAmount - 1
         let xml: string = ''
 
         if (cps === 0) {
-            xml += centeredText(`${TM.palette.tmGreen}No CPs`, this.width, this.height, { yOffset: 1 })
+            xml += centeredText(`${TM.utils.palette.tmGreen}No CPs`, this.width, this.height, { yOffset: 1 })
         } else if (params === cps) {
-            xml += centeredText(TM.palette.tmGreen + params + '/' + cps, this.width, this.height, { yOffset: 1 })
+            xml += centeredText(TM.utils.palette.tmGreen + params + '/' + cps, this.width, this.height, { yOffset: 1 })
         } else {
             xml += centeredText('0' + '/' + cps.toString(), this.width, this.height, { yOffset: 1 })
         }

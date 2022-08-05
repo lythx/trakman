@@ -66,11 +66,11 @@ export const MAPLIST = {
   },
 
   searchByName: (query: string): TMMap[] => {
-    return (TM.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
+    return (TM.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
   searchByAuthor: (query: string): TMMap[] => {
-    return (TM.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
+    return (TM.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
   filterNoFinish: (login: string): TMMap[] => {

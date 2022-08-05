@@ -109,21 +109,21 @@ TM.addCommand({
   callback(info, sectorIndex?: number) {
     const secs = currentPlayerSecs.find(a => a.login === info.login)
     if (secs === undefined) {
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}You have no sector records on the ongoing map.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You have no sector records on the ongoing map.`, info.login)
       return
     }
     if (sectorIndex === undefined) {
       secs.sectors.length = 0
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Your sectors on the ongoing map were removed.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your sectors on the ongoing map were removed.`, info.login)
       void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
     } else {
       if (sectorIndex < 1 || sectorIndex > TM.map.checkpointsAmount) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
         return
       }
       secs.sectors[sectorIndex - 1] = undefined
-      TM.sendMessage(`${TM.palette.server}» ${TM.palette.servermsg}Your ${TM.palette.highlight + TM.Utils.getPositionString(sectorIndex)}`
-        + `${TM.palette.servermsg} sector was removed.`, info.login)
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your ${TM.utils.palette.highlight + TM.utils.getPositionString(sectorIndex)}`
+        + `${TM.utils.palette.servermsg} sector was removed.`, info.login)
       void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
     }
     emitEvent('DeletePlayerSector', info.login)
@@ -138,19 +138,19 @@ TM.addCommand({
   callback(info, sectorIndex?: number) {
     if (sectorIndex === undefined) {
       currentBestSecs.length = 0
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-        + `${TM.palette.highlight + 'all sector records'}${TM.palette.admin} on the ongoing map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
+        + `${TM.utils.palette.highlight + 'all sector records'}${TM.utils.palette.admin} on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId)
     } else {
       if (sectorIndex < 1 || sectorIndex > TM.map.checkpointsAmount + 1) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
         return
       }
       currentBestSecs[sectorIndex - 1] = undefined
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed the `
-        + `${TM.palette.highlight + TM.Utils.getPositionString(sectorIndex)}${TM.palette.admin} sector on the ongoing map.`)
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed the `
+        + `${TM.utils.palette.highlight + TM.utils.getPositionString(sectorIndex)}${TM.utils.palette.admin} sector on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
     }
     emitEvent('DeleteBestSector', currentBestSecs, currentPlayerSecs)

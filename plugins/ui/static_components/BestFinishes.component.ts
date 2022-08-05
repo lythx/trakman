@@ -51,14 +51,14 @@ export default class BestFinishes extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     for (const e of TM.players) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(`
     <manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
@@ -97,12 +97,12 @@ export default class BestFinishes extends StaticComponent {
       if (fin === undefined) { return '' }
       let format = fin.login === login ? `<format textcolor="${this.selfColour}"/>` : ''
       if (i === this.newestFinish) { format = `<format textcolor="${this.newestColour}"/>` }
-      return bg + format + centeredText(TM.Utils.getTimeString(fin.time), w, h, { textScale: this.textScale, padding: this.textPadding })
+      return bg + format + centeredText(TM.utils.getTimeString(fin.time), w, h, { textScale: this.textScale, padding: this.textPadding })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (verticallyCenteredText(TM.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
+      return this.bestFinishes[i] === undefined ? '' : bg + (verticallyCenteredText(TM.utils.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []

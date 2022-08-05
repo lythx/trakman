@@ -18,7 +18,7 @@ export default class LiveCps extends PopupWindow {
 
   constructor() {
     super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, CONFIG.liveCps.navbar)
-    const records= TM.liveRecords
+    const records = TM.liveRecords
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -52,7 +52,7 @@ export default class LiveCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -70,11 +70,11 @@ export default class LiveCps extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
+        ${centeredText(TM.utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(TM.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -126,11 +126,11 @@ export default class LiveCps extends PopupWindow {
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
-      cpIndex = this.cpsOnFirstPage 
+      cpIndex = this.cpsOnFirstPage
       for (let i: number = 2; i < cpPage; i++) {
         cpIndex += this.cpsOnNextPages
       }
-      cpsToDisplay = Math.min(cpAmount - cpIndex , this.cpsOnNextPages)
+      cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
     }
     return [cpIndex, cpsToDisplay]
   }

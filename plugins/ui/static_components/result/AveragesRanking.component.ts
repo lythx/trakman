@@ -9,7 +9,7 @@ export default class AveragesRanking extends StaticComponent {
   private readonly height = CFG.averagesRanking.height
   private readonly entries = CFG.averagesRanking.entries
   private readonly posX: number
-  private readonly posY : number
+  private readonly posY: number
   private readonly list: List
   private readonly side = CFG.averagesRanking.side
   private xml = ''
@@ -48,7 +48,7 @@ export default class AveragesRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.averagesRanking.title, CFG.averagesRanking.icon, this.side)}
       <frame posn="0 ${-CFG.staticHeader.height - CFG.marginSmall} 2">
-        ${this.list.constructXml(this.ranking.map(a => a.average.toFixed(2)), this.ranking.map(a => TM.safeString(TM.strip(a.nickname, false))))}
+        ${this.list.constructXml(this.ranking.map(a => a.average.toFixed(2)), this.ranking.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

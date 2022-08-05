@@ -7,7 +7,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo): Promise<void> => {
       const res: any[] | Error = await TM.queryDB('SELECT * FROM maps;')
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get maps from the database.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to get maps from the database.`, info.login)
         return
       }
       for (const map of res) {
@@ -15,24 +15,24 @@ const commands: TMCommand[] = [
           continue
         const file: { name: string, content: Buffer } | Error = await TM.fetchMapFileByUid(map.id)
         if (file instanceof Error) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}is not on TMX.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}is not on TMX.`, info.login)
           continue
         }
         const write: any[] | Error = await TM.call('WriteFile', [{ string: file.name }, { base64: file.content }])
         if (write instanceof Error) {
           TM.error('Failed to write file', write.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to write the map ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}file to the server.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}file to the server.`, info.login)
           continue
         }
         const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: file.name }])
         if (insert instanceof Error) {
           TM.error('Failed to insert map to jukebox', insert.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
           continue
         }
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-          + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
-          + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+          + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued `
+          + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from TMX.`)
       }
     },
     privilege: 4
@@ -43,7 +43,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo): Promise<void> => {
       const res: any[] | Error = await TM.queryDB('SELECT * FROM maps;')
       if (res instanceof Error) {
-        TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to get maps from the database.`, info.login)
+        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to get maps from the database.`, info.login)
         return
       }
       for (const map of res) {
@@ -52,12 +52,12 @@ const commands: TMCommand[] = [
         const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: map.filename }])
         if (insert instanceof Error) {
           TM.error('Failed to insert map to jukebox', insert.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map ${TM.utils.palette.highlight + TM.utils.strip(map.name, false)}$z$s ${TM.utils.palette.error}into queue.`, info.login)
           continue
         }
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
-          + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
-          + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from server files.`)
+        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
+          + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued `
+          + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from server files.`)
       }
     },
     privilege: 4

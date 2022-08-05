@@ -25,24 +25,24 @@ export default class DonationPanel extends StaticComponent {
         const status = await TM.sendCoppers(info.login, amount, 'Please give me coper')
         if (status instanceof Error) {
           TM.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`, info.login)
+          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, info.login)
         } else if (status === true) {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}${TM.palette.donation} `
-            + `donated ${TM.palette.highlight}${amount}C${TM.palette.donation} to the server.`)
+          TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}${TM.utils.palette.donation} `
+            + `donated ${TM.utils.palette.highlight}${amount}C${TM.utils.palette.donation} to the server.`)
         }
       }
     })
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     for (const player of TM.players) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     if (TM.getPlayer(login)?.isUnited) {
       TM.sendManialink(this.xml, login)
     }

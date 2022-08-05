@@ -39,7 +39,7 @@ export default class DropdownMenu {
     for (const [i, e] of this.options.entries()) {
       xml += `<frame posn="0 0 9">
             <quad posn="0 ${this.optionHeight * i} 1" sizen="${this.width} ${this.optionHeight}" image="${this.backgroundImage}" imagefocus="${this.hoverImage}" action="${e.action}"/>
-            <label posn="${this.width / 2} -${this.optionHeight / 2} 2" sizen="${(this.width * (1 / this.textScale)) - (this.textPadding * 2)} ${this.optionHeight}" scale="${this.textScale}" text="${TM.safeString(e.name)}" valign="center" halign="center"/>
+            <label posn="${this.width / 2} -${this.optionHeight / 2} 2" sizen="${(this.width * (1 / this.textScale)) - (this.textPadding * 2)} ${this.optionHeight}" scale="${this.textScale}" text="${TM.utils.safeString(e.name)}" valign="center" halign="center"/>
             </frame>`
     }
     return xml

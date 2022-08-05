@@ -55,11 +55,11 @@ export default class LocalSectors extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const dateCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.formatDate(records[i + playerIndex].date, true), w, h)
+      return centeredText(TM.utils.formatDate(records[i + playerIndex].date, true), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -77,11 +77,11 @@ export default class LocalSectors extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
+        ${centeredText(TM.utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(TM.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''

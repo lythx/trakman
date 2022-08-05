@@ -54,7 +54,7 @@ export default class SectorRecords extends PopupWindow {
   }
 
   private reRenderToPlayer(login: string): void {
-    if(!this.getPlayersWithWindowOpen().includes(login)) { return }
+    if (!this.getPlayersWithWindowOpen().includes(login)) { return }
     const page = this.paginator.getPageByLogin(login)
     this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
@@ -77,7 +77,7 @@ export default class SectorRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(TM.safeString(TM.strip(sectors[i + sectorIndex - 1]?.nickname ?? '-', false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(sectors[i + sectorIndex - 1]?.nickname ?? '-', false)), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
@@ -92,7 +92,7 @@ export default class SectorRecords extends PopupWindow {
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
       const sector = sectors?.[i + sectorIndex - 1]
-      return centeredText(sector === null ? '--:--.-' : TM.Utils.getTimeString(sector.sector), w, h)
+      return centeredText(sector === null ? '--:--.-' : TM.utils.getTimeString(sector.sector), w, h)
     }
 
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
@@ -105,14 +105,14 @@ export default class SectorRecords extends PopupWindow {
         if (sectors?.[i + sectorIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.better}-${TM.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.equal}${TM.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${this.diffColours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
-      return centeredText(differenceString + ' ' + TM.Utils.getTimeString(sector), w, h)
+      return centeredText(differenceString + ' ' + TM.utils.getTimeString(sector), w, h)
     }
 
     const emptyCell: GridCellObject = {
@@ -131,7 +131,7 @@ export default class SectorRecords extends PopupWindow {
         return centeredText('--:--.-', w, h)
       }
       const sum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
-      return centeredText(TM.Utils.getTimeString(sum), w, h)
+      return centeredText(TM.utils.getTimeString(sum), w, h)
     }
 
     const pesonalTotalTime: GridCellFunction = (i, j, w, h) => {
@@ -145,14 +145,14 @@ export default class SectorRecords extends PopupWindow {
         const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
         const difference = bestSum - sum
         if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.better}-${TM.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.equal}${TM.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${this.diffColours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
-      return centeredText(differenceString + ' ' + TM.Utils.getTimeString(sum), w, h)
+      return centeredText(differenceString + ' ' + TM.utils.getTimeString(sum), w, h)
     }
 
     const rows = Math.min(this.entries, sectors.length - sectorIndex)

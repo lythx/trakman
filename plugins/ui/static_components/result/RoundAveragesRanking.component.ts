@@ -25,7 +25,7 @@ export default class RoundAveragesRanking extends StaticComponent {
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
       } else {
-        entry.average = (entry.average * entry.finishcount + info.time) /( entry.finishcount + 1)
+        entry.average = (entry.average * entry.finishcount + info.time) / (entry.finishcount + 1)
         entry.finishcount++
       }
     })
@@ -51,7 +51,7 @@ export default class RoundAveragesRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.roundAveragesRanking.title, CFG.roundAveragesRanking.icon, this.side)}
       <frame posn="0 ${-CFG.staticHeader.height - CFG.marginSmall} 2">
-        ${this.list.constructXml(this.averages.map(a => TM.Utils.getTimeString(a.average)), this.averages.map(a => TM.safeString(TM.strip(a.nickname, false))))}
+        ${this.list.constructXml(this.averages.map(a => TM.utils.getTimeString(a.average)), this.averages.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

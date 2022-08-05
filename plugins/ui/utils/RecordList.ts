@@ -318,7 +318,7 @@ export default class RecordList {
     if (this.side === true) {
       posX = -(width + (this.colGap * 2) + (offset * (width + this.colGap))) + this.colGap
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
-        return a instanceof Date ? TM.formatDate(a, true) : a
+        return a instanceof Date ? TM.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       ret += `<quad posn="${posX} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
@@ -345,7 +345,7 @@ export default class RecordList {
     else {
       posX = this.columnWidths.reduce((acc, cur): number => acc + cur, 0) + (offset * (width + this.colGap))
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
-        return a instanceof Date ? TM.formatDate(a, true) : a
+        return a instanceof Date ? TM.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       if (topInfo.length === 3) {
@@ -383,7 +383,7 @@ export default class RecordList {
           }
           ret += `<quad posn="${posX + (this.iColW * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.iColW - this.colGap} ${h}" bgcolor="${this.bg}"/>
           <format textcolor="${colour}"/>
-          ${this.centeredText(TM.Utils.getTimeString(cp), this.iColW - this.colGap, h, posX + (this.iColW * j), this.rowHeight * (i + 1))}
+          ${this.centeredText(TM.utils.getTimeString(cp), this.iColW - this.colGap, h, posX + (this.iColW * j), this.rowHeight * (i + 1))}
           <format textcolor="FFFF"/>`
         }
       }
@@ -420,7 +420,7 @@ export default class RecordList {
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.colGap
     const colour: string = timeColour === undefined ? 'FFFF' : (this.timeColours)[timeColour]
-    const t: string = (`${time === undefined ? '' : TM.Utils.getTimeString(time)}`).toString()
+    const t: string = (`${time === undefined ? '' : TM.utils.getTimeString(time)}`).toString()
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>
     ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}
@@ -432,7 +432,7 @@ export default class RecordList {
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[2] - this.colGap
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
-    ${this.verticallyCenteredText((`${TM.strip(name ?? '', false)}`), width, height, posX)}`
+    ${this.verticallyCenteredText((`${TM.utils.strip(name ?? '', false)}`), width, height, posX)}`
   }
 
   private centeredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number, yOffset: number = 0): string => {
@@ -440,7 +440,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = (parentWidth / 2) + xOffset
     const posY: number = (parentHeight / 2) + yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${TM.safeString(text)}" valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${TM.utils.safeString(text)}" valign="center" halign="center"/>`
   }
 
   private verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number): string => {
@@ -448,7 +448,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = xOffset + padding
     const posY: number = parentHeight / 2
-    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${TM.safeString(text)}" valign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${TM.utils.safeString(text)}" valign="center"/>`
   }
 
   private stringToIcon = (str: string) => {

@@ -95,7 +95,7 @@ export default class CurrentCps extends PopupWindow {
     const entriesToDisplay = this.currentCheckpoints.length - index
     // Add n to index everywhere to make display relative to page
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(this.currentCheckpoints[i - 1 + index].nickname, false)), w, h)
+      return centeredText(TM.utils.safeString(TM.utils.strip(this.currentCheckpoints[i - 1 + index].nickname, false)), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(this.currentCheckpoints[i - 1 + index].login, w, h)
@@ -103,21 +103,21 @@ export default class CurrentCps extends PopupWindow {
     const checkpointCell = (i: number, j: number, w: number, h: number): string => {
       const entry = this.currentCheckpoints[i - 1 + index]
       if (entry?.pbCheckpoint === undefined) { // If player has no pb then just displays the formatted time
-        return centeredText(TM.Utils.getTimeString(entry.checkpoint), w, h)
+        return centeredText(TM.utils.getTimeString(entry.checkpoint), w, h)
       }
       else { // Else calculates the difference and displays formatted difference and time
         const difference = entry.pbCheckpoint - entry.checkpoint
         let differenceString: string = ''
         if (difference !== undefined) {
           if (difference > 0) {
-            differenceString = `(${this.colours.better}-${TM.Utils.getTimeString(difference)}$FFF)`
+            differenceString = `(${this.colours.better}-${TM.utils.getTimeString(difference)}$FFF)`
           } else if (difference === 0) {
-            differenceString = `(${this.colours.equal}${TM.Utils.getTimeString(difference)}$FFF)`
+            differenceString = `(${this.colours.equal}${TM.utils.getTimeString(difference)}$FFF)`
           } else {
-            differenceString = `(${this.colours.worse}+${TM.Utils.getTimeString(Math.abs(difference))}$FFF)`
+            differenceString = `(${this.colours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
           }
         }
-        const str = TM.Utils.getTimeString(entry.checkpoint) + differenceString
+        const str = TM.utils.getTimeString(entry.checkpoint) + differenceString
         return centeredText(str, w, h)
       }
     }
@@ -126,7 +126,7 @@ export default class CurrentCps extends PopupWindow {
       if (pbCheckpoint === undefined) { // If player has no pb display -:--.--
         return centeredText('-:--.--', w, h)
       } else { // Else display the formatted pb checkpoint
-        return centeredText(TM.Utils.getTimeString(pbCheckpoint), w, h)
+        return centeredText(TM.utils.getTimeString(pbCheckpoint), w, h)
       }
     }
     const pbTimeCell = (i: number, j: number, w: number, h: number): string => {
@@ -134,7 +134,7 @@ export default class CurrentCps extends PopupWindow {
       if (pbTime === undefined) { // If player has no pb display -:--.--
         return centeredText('-:--.--', w, h)
       } else { // Else display the formatted pb time
-        return centeredText(TM.Utils.getTimeString(pbTime), w, h)
+        return centeredText(TM.utils.getTimeString(pbTime), w, h)
       }
     }
     const arr = headers

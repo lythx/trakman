@@ -55,7 +55,7 @@
 //       const replaysXml = this.getReplaysXml(tmxInfo)
 //       const image = tmxInfo === null
 //         ? ICN.mapNoImage
-//         : TM.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
+//         : TM.utils.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
       // xml += `
       //   <frame posn="${i * 26} 0 0.02">
       //     <quad posn="0 0 1" sizen="25 53" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
@@ -65,10 +65,10 @@
       //     <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + titles[i]}"/>
       //     <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
       //     <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${image}"/>
-      //     <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(TM.strip(challenge.name, false))}"/>
-      //     <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.safeString(challenge.author)}"/>
+      //     <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + TM.utils.safeString(TM.utils.strip(challenge.name, false))}"/>
+      //     <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.utils.safeString(challenge.author)}"/>
       //     <quad posn="0.4 -28.2 3" sizen="1.9 1.9" image="${ICN.timerA}"/>
-      //     <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(challenge.authorTime)}"/>
+      //     <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.utils.getTimeString(challenge.authorTime)}"/>
       //     <quad posn="0.4 -30.2 3" sizen="1.9 1.9" image="${ICN.environment}"/>
       //     <label posn="2.5 -30.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.environment}"/>
       //     <quad posn="0.4 -32.2 3" sizen="1.9 1.9" image="${ICN.heart}"/>
@@ -145,7 +145,7 @@
     //             <quad posn="6 -49.2 3" sizen="3.2 3.2" image="${ICN.mapDownload}"
     //              url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
     //             <quad posn="11 -49.2 3" sizen="3.2 3.2" image="${ICN.lineGraph}"
-    //              url="${TM.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
+    //              url="${TM.utils.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
     //             <quad posn="16 -49.2 3" sizen="3.2 3.2" 
     //              image="${ICN.MX}"
     //              url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
@@ -154,7 +154,7 @@
   // private getPositionString(login: string, challengeId: string): string {
   //   const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
   //   if (recordIndex === 0) { return "--." }
-  //   else { return TM.Utils.getPositionString(recordIndex) }
+  //   else { return TM.utils.getPositionString(recordIndex) }
   // }
 
   // private getReplaysXml(tmxInfo: TMXTrackInfo | null): string {
@@ -173,9 +173,9 @@
         // replaysXml += `
         //   <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
         //   <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" 
-        //    text="${CFG.widgetStyleRace.formattingCodes + TM.safeString(tmxInfo.replays[i].name)}"/>
+        //    text="${CFG.widgetStyleRace.formattingCodes + TM.utils.safeString(tmxInfo.replays[i].name)}"/>
         //   <label posn="12.5 ${txtPos} 3" sizen="4 2" scale="1" halign="center" 
-        //    text="${CFG.widgetStyleRace.formattingCodes + TM.Utils.getTimeString(tmxInfo.replays[i].time)}"/>
+        //    text="${CFG.widgetStyleRace.formattingCodes + TM.utils.getTimeString(tmxInfo.replays[i].time)}"/>
         //   <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" 
         //    text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.replays[i].recordDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
         //   <quad posn="22.15 ${imgPos + 0.2} 3" sizen="1.9 1.9" 
