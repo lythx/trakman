@@ -117,20 +117,35 @@ export const TRAKMAN = {
 
   },
 
+  records: {
+
+    getLocal: RecordService.getLocal.bind(RecordService),
+
+    getLive: RecordService.getLive.bind(RecordService),
+
+    remove: RecordService.remove.bind(RecordService),
+
+    removeAll: RecordService.removeAll.bind(RecordService),
+
+    fetchByMap: RecordService.fetch.bind(RecordService),
+
+    fetchOne: RecordService.fetchOne.bind(RecordService),
+
+    fetchByLogin: RecordService.fetchRecordsByLogin.bind(RecordService),
+
+    get local() { return RecordService.localRecords },
+
+    get live() { return RecordService.liveRecords },
+
+    get localsAmount() { return RecordService.localsAmount }
+
+  },
+
   // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
 
   // Implement client idk
   DatabaseClient: Database,
-
-  /**
-   * Gets the player record on the ongoing map
-   * @param login Player login
-   * @returns Record object or undefined if the player doesn't have a local record
-   */
-  getPlayerRecord(login: string): TMRecord | undefined {
-    return RecordService.localRecords.find(a => a.login === login && a.map === MapService.current.id)
-  },
 
   /**
    * Gets the player dedimania record on the ongoing map
@@ -417,33 +432,11 @@ export const TRAKMAN = {
     Client.addProxy(methods, callback)
   },
 
-  /**
-   * Removes a player record
-   * @param login Player login
-   * @param mapId Map UID
-   * @returns Database response
-   */
-  removeRecord: (login: string, mapId: string, callerLogin?: string): void => {
-    RecordService.remove(login, mapId, callerLogin)
-  },
-
-  /**
-   * Removes all player records on given map
-   * @param mapId Map UID
-   * @returns Database response
-   */
-  removeAllRecords: (mapId: string, callerLogin?: string): void => {
-    RecordService.removeAll(mapId, callerLogin)
-  },
-
   get serverState(): "race" | "result" {
     return GameService.state
   },
 
-  get localRecordsAmount(): number {
-    return RecordService.localsAmount
-  },
-
+  // TO BE REMOVED
   get playerRanks(): {
     [login: string]: {
       mapId: string;
@@ -453,12 +446,7 @@ export const TRAKMAN = {
     return RecordService.playerRanks
   },
 
-  fetchRecords: RecordService.fetchRecords.bind(RecordService),
-
-  fetchRecord: RecordService.fetchRecord.bind(RecordService),
-
-  fetchRecordsByLogin: RecordService.fetchRecordsByLogin.bind(RecordService),
-
+  // TO BE REMOVED
   fetchMapRank: RecordService.fetchMapRank.bind(RecordService),
 
   /**
@@ -493,16 +481,8 @@ export const TRAKMAN = {
     return ServerConfig.config
   },
 
-  get localRecords(): TMLocalRecord[] {
-    return RecordService.localRecords
-  },
-
   get dediRecords(): TMDedi[] {
     return [...DedimaniaService.dedis]
-  },
-
-  get liveRecords(): FinishInfo[] {
-    return RecordService.liveRecords
   },
 
   get map(): TMCurrentMap {

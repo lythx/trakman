@@ -18,7 +18,7 @@ export default class LiveCps extends PopupWindow {
 
   constructor() {
     super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, CONFIG.liveCps.navbar)
-    const records = TM.liveRecords
+    const records = TM.records.live
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -29,11 +29,11 @@ export default class LiveCps extends PopupWindow {
     }
     TM.addListener('Controller.BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.records.live.length / this.entries))
       this.reRender()
     })
     TM.addListener('Controller.LiveRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(TM.liveRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.records.live.length / this.entries))
       this.reRender()
     })
   }
@@ -43,7 +43,7 @@ export default class LiveCps extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records = TM.liveRecords
+    const records = TM.records.live
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
     const cpTypes = getCpTypes(records.map(a => a.checkpoints))

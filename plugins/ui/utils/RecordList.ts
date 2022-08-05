@@ -280,7 +280,7 @@ export default class RecordList {
   private getTimeColours(login: string, playerIndex: number, records: UiRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
     if (this.getColoursFromPb === true && playerIndex === -1) {
-      const pb: number | undefined = TM.localRecords.find(a => a.login === login)?.time
+      const pb: number | undefined = TM.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
         for (let i: number = 0; i < records.length; i++) {
           if (pb <= records?.[i]?.time) {
