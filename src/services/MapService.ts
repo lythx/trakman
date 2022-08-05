@@ -21,6 +21,10 @@ export class MapService {
     })
   }
 
+  static get(uid: string) {
+    return this._maps.find(a => a.id === uid)
+  }
+
   static get current(): TMCurrentMap {
     return this._current
   }
@@ -85,6 +89,12 @@ export class MapService {
     await this.repo.add(...mapsNotInDBObjects)
   }
 
+  /**
+   * Adds a map to the server
+   * @param filename Path to the map file
+   * @param callerLogin Login of the player who is adding the map
+   * @returns Added map object or error if unsuccessful
+   */
   static async add(fileName: string, callerLogin?: string): Promise<TMMap | Error> {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
     if (insert instanceof Error) { return insert }

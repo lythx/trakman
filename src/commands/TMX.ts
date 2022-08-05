@@ -22,7 +22,7 @@ const command: TMCommand = {
       TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to write file.`, info.login)
       return
     }
-    const map: TMMap | Error = await TM.addMap(file.name, info.login)
+    const map: TMMap | Error = await TM.maps.add(file.name, info.login)
     if (map instanceof Error) {
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content: string = file.content.toString()
@@ -30,7 +30,7 @@ const command: TMCommand = {
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
             const id: string = content.substring(i + 12, i + 12 + 27)
-            const map: TMMap | undefined = TM.maps.find(a => a.id === id)
+            const map: TMMap | undefined = TM.maps.list.find(a => a.id === id)
             if (map === undefined) {
               TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to queue the map.`, info.login)
               return

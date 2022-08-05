@@ -125,7 +125,7 @@ export default class LiveSectors extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = TM.map.checkpointsAmount
+    const cpAmount = TM.maps.current.checkpointsAmount
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
@@ -154,7 +154,7 @@ export default class LiveSectors extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages: number = 1
-    const cpAmount = TM.map.checkpointsAmount
+    const cpAmount = TM.maps.current.checkpointsAmount
     for (let i: number = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++

@@ -88,7 +88,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
-      const map: TMMap = TM.map
+      const map: TMMap = TM.maps.current
       const res: any[] | Error = await TM.client.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
@@ -157,7 +157,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the ongoing map.`)
-      TM.addToJukebox(TM.map.id, info.login)
+      TM.addToJukebox(TM.maps.current.id, info.login)
     },
     privilege: 1
   },

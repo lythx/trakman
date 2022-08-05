@@ -28,7 +28,7 @@ export default class CpCounter extends StaticComponent {
 
     display(): void {
         if (this.isDisplayed === false) { return }
-        const cps = TM.map.checkpointsAmount - 1
+        const cps = TM.maps.current.checkpointsAmount - 1
         let xml: string = ''
 
         if (cps === 0) {
@@ -50,7 +50,7 @@ export default class CpCounter extends StaticComponent {
     displayToPlayer(login: string, params?: any): void | Promise<void> {
         if (this.isDisplayed === false) { return }
 
-        const cps = TM.map.checkpointsAmount - 1
+        const cps = TM.maps.current.checkpointsAmount - 1
         let xml: string = ''
 
         if (cps === 0) {

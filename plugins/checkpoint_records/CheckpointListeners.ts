@@ -10,21 +10,21 @@ let currentMapDBId: number
 const currentPlayerSecs: PlayerCheckpoints[] = []
 
 const onMapStart = async (): Promise<void> => {
-  const DBId = await TM.db.getMapId(TM.map.id)
+  const DBId = await TM.db.getMapId(TM.maps.current.id)
   if (DBId === undefined) {
-    await TM.fatalError(`Failed to fetch current map (${TM.map.id}) id from database`)
+    await TM.fatalError(`Failed to fetch current map (${TM.maps.current.id}) id from database`)
     return
   }
   currentMapDBId = DBId
   const res = await bestSecsDB.get(currentMapDBId)
   if (res instanceof Error) {
-    await TM.fatalError(`Failed to fetch best checkpoints for map ${TM.map.id}`, res.message)
+    await TM.fatalError(`Failed to fetch best checkpoints for map ${TM.maps.current.id}`, res.message)
     return
   }
   currentBestSecs = res
   const playerSecs = await allCpsDB.get(currentMapDBId, ...TM.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player checkpoints for map ${TM.map.id}`, playerSecs.message)
+    await TM.fatalError(`Failed to fetch player checkpoints for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.length = 0
@@ -69,7 +69,7 @@ TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
 TM.addListener('Controller.PlayerJoin', async (info) => {
   const playerSecs = await allCpsDB.get(currentMapDBId, info.login)
   if (playerSecs instanceof Error) {
-    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.map.id}`, playerSecs.message)
+    await TM.fatalError(`Failed to fetch player ${info.login} sectors for map ${TM.maps.current.id}`, playerSecs.message)
     return
   }
   currentPlayerSecs.push(...playerSecs)
@@ -90,7 +90,7 @@ TM.commands.add({
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Your checkpoints on the ongoing map were removed.`, info.login)
       void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
     } else {
-      if (cpIndex < 1 || cpIndex > TM.map.checkpointsAmount) {
+      if (cpIndex < 1 || cpIndex > TM.maps.current.checkpointsAmount) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
         return
       }
@@ -116,7 +116,7 @@ TM.commands.add({
         + `${TM.utils.palette.highlight + 'all checkpoint records'}${TM.utils.palette.admin} on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId)
     } else {
-      if (cpIndex < 1 || cpIndex > TM.map.checkpointsAmount) {
+      if (cpIndex < 1 || cpIndex > TM.maps.current.checkpointsAmount) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
         return
       }
@@ -132,7 +132,7 @@ TM.commands.add({
 })
 
 const getMapCheckpoints = (): ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] => {
-  const arr: ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] = new Array(TM.map.checkpointsAmount - 1).fill(null)
+  const arr: ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] = new Array(TM.maps.current.checkpointsAmount - 1).fill(null)
   for (const [i, e] of currentBestSecs.entries()) {
     arr[i] = e ?? null
   }
@@ -144,7 +144,7 @@ const getPlayerCheckpoints = (): ({ login: string, checkpoints: (number | null)[
   for (const [i, e] of TM.players.list.entries()) {
     arr[i] = {
       login: e.login,
-      checkpoints: new Array(TM.map.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.checkpoints[i] ?? null)
+      checkpoints: new Array(TM.maps.current.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.checkpoints[i] ?? null)
     }
   }
   return arr

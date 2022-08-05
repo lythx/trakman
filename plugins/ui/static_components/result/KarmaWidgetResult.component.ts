@@ -36,7 +36,7 @@ export default class KarmaWidgetResult extends StaticComponent {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        TM.addVote(TM.map.id, info.login, votes[index])
+        TM.addVote(TM.maps.current.id, info.login, votes[index])
       }
     })
   }
@@ -54,14 +54,14 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    const votes: TMVote[] = TM.votes.filter(a => a.mapId === TM.map.id)
+    const votes: TMVote[] = TM.votes.filter(a => a.mapId === TM.maps.current.id)
     const voteAmounts: number[] = []
     for (const e of this.options) {
       voteAmounts.unshift(votes.filter(a => a.vote === e).length)
     }
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
-    const karma: number = TM.voteRatios.find(a => a.mapId === TM.map.id)?.ratio ?? 0
+    const karma: number = TM.voteRatios.find(a => a.mapId === TM.maps.current.id)?.ratio ?? 0
     const mkVotes = TM.mkMapKarma
     const mkKarmaValue: number = TM.mkMapKarmaValue
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)

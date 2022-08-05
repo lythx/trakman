@@ -174,6 +174,38 @@ export const TRAKMAN = {
 
   },
 
+  maps: {
+
+    get: MapService.get.bind(MapService),
+
+    add: MapService.add.bind(MapService),
+
+    remove: MapService.remove.bind(MapService),
+
+    get list() { return MapService.maps },
+
+    get current() { return MapService.current }
+
+    //perhaps add fetchmap if we dont keep maps outside of current selection
+
+  },
+
+  log: {
+
+    fatal: Logger.fatal.bind(Logger),
+
+    error: Logger.error.bind(Logger),
+
+    warn: Logger.warn.bind(Logger),
+
+    info: Logger.info.bind(Logger),
+
+    debug: Logger.debug.bind(Logger),
+
+    trace: Logger.trace.bind(Logger)
+
+  },
+
   /**
  * Sends a server message
  * @param message Message to be sent
@@ -246,20 +278,6 @@ export const TRAKMAN = {
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
   addListener: Events.addListener,
-
-  /**
-   * Adds a map to the server
-   * @param filename Path to the map file
-   * @param callerLogin Login of the player who is adding the map
-   * @returns Added map object or error if unsuccessful
-   */
-  async addMap(filename: string, callerLogin?: string): Promise<TMMap | Error> {
-    return await MapService.add(filename, callerLogin)
-  },
-
-  async removeMap(id: string, callerLogin?: string): Promise<boolean | Error> {
-    return await MapService.remove(id, callerLogin)
-  },
 
   /**
    * Outputs an error message into the console
@@ -460,14 +478,6 @@ export const TRAKMAN = {
 
   get serverConfig(): ServerInfo {
     return ServerConfig.config
-  },
-
-  get map(): TMCurrentMap {
-    return MapService.current
-  },
-
-  get maps(): TMMap[] {
-    return MapService.maps
   },
 
   get mapQueue(): TMMap[] {
