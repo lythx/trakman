@@ -62,7 +62,7 @@ TM.addListener('Controller.PlayerJoin', async (info): Promise<void> => {
   const res: any[] | Error = await TM.db.query(`SELECT count(*) FROM VOTES
       WHERE player_id=$1`, id)
   if (res instanceof Error) {
-    TM.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
+    TM.log.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
     return
   }
   voteCounts.push({ login: info.login, count: Number(res[0].count) })

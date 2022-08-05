@@ -44,7 +44,7 @@ export default class MapList extends PopupWindow {
         const mapId = this.challengeActionIds[info.answer - (this.openId + this.mapAddId)]
         if (mapId === undefined) {
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Error while adding the map to queue.`, info.login)
-          TM.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
+          TM.log.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
           return
         }
         const gotQueued = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
@@ -269,7 +269,7 @@ export default class MapList extends PopupWindow {
     const challenge = this.sortedList.find(a => a.id === mapId)
     if (challenge === undefined) {
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Error while adding the map to queue.`, login)
-      TM.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
+      TM.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
       return false
     }
     if (TM.jukebox.some(a => a.map.id === mapId)) {
