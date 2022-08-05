@@ -16,7 +16,7 @@ db.initialize()
 
 export const fixCoherence = async () => {
     const maps = await mapRepo.getAll()
-    const players = await db.query(`SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, rank, average FROM players 
+    const players = await db.query(`SELECT player_ids.login, nickname, region, wins, time_played, visits, is_united, last_online, average FROM players 
     JOIN player_ids ON players.id=player_ids.id`)
     const records = (await repo.get(...maps.map(a => a.id))).sort((a, b) => a.time - b.time)
     for (const e of players.rows) {
