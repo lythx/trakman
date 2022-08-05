@@ -18,7 +18,7 @@ export default class DediSectors extends PopupWindow {
 
   constructor() {
     super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, CONFIG.dediSectors.navbar)
-    const records = TM.dediRecords
+    const records = TM.dedis.list
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -29,11 +29,11 @@ export default class DediSectors extends PopupWindow {
     }
     TM.addListener('Controller.DedimaniaRecords', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.dedis.list.length / this.entries))
       this.reRender()
     })
     TM.addListener('Controller.DedimaniaRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(TM.dedis.list.length / this.entries))
       this.reRender()
     })
   }
@@ -44,7 +44,7 @@ export default class DediSectors extends PopupWindow {
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
     const records: TMDedi[] = []
-    for (const e of TM.dediRecords) {
+    for (const e of TM.dedis.list) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
