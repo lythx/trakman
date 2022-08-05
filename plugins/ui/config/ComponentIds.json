@@ -17,6 +17,7 @@
     "votersRanking": 1000,
     "visitorsRanking": 1100,
     "playtimeRanking": 1200,
+    "donatorsRanking": 1300,
     "TMXWindow": 2000,
     "localCps": 3000,
     "dediCps": 4000,

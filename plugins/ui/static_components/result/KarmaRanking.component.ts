@@ -22,7 +22,7 @@ export default class KarmaRanking extends StaticComponent {
     this.posX = pos.x
     this.posY = pos.y
     this.entries = CFG.karmaRanking.entries
-    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.karmaRanking.columnProportions as any, { background: CFG.static.bgColor })
+    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.karmaRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     const topMaps = TM.voteRatios.sort((a, b) => b.ratio - a.ratio).filter(a => a.amount > MIN_AMOUNT).slice(0, this.entries)
     this.ranking = topMaps.map(a => ({ name: TM.maps.find(b => b.id === a.mapId)?.name ?? '', karma: a.ratio }))
     this.constructXml()

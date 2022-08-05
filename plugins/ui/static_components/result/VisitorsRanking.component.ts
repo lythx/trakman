@@ -20,7 +20,7 @@ export default class VisitorsRanking extends StaticComponent {
     this.posX = pos.x
     this.posY = pos.y
     this.entries = CFG.visitorsRanking.entries
-    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.visitorsRanking.columnProportions as any, { background: CFG.static.bgColor })
+    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.visitorsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     this.constructXml()
     TM.addListener('Controller.EndMap', () => {
       this.constructXml()
