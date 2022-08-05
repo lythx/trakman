@@ -46,7 +46,7 @@ export default class BestCps extends StaticComponent {
         this.newestCp = info.index
         this.display()
       }
-      const page = this.paginator.setPageForLogin(info.player.login, Math.ceil((info.index + 3) / this.entries))
+      const page = this.paginator.setPageForLogin(info.player.login, Math.ceil((info.index +1) / this.entries))
       this.displayToPlayer(info.player.login, { page })
     })
     TM.addListener('Controller.BeginMap', () => {

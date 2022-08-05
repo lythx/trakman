@@ -47,8 +47,8 @@
   },
   "staticHeader": {
     "format": "$s",
-    "bgColor": "CCC6",
-    "iconBgColor": "CCC6",
+    "bgColor": "8886",
+    "iconBgColor": "8886",
     "textScale": 1,
     "squareWidth": 1.7,
     "rectangleWidth": 12.8,
@@ -153,6 +153,18 @@
   "playtimeRanking": {
     "height": 12.92,
     "title": "Top Hours Played",
+    "icon": "people",
+    "entries": 5,
+    "side": true,
+    "columnProportions": [
+      1,
+      1.9,
+      5.1
+    ]
+  },
+  "donatorsRanking": {
+    "height": 12.92,
+    "title": "Top Donators",
     "icon": "people",
     "entries": 5,
     "side": true,
