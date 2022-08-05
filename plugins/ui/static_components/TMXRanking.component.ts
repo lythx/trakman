@@ -25,13 +25,13 @@ export default class TMXRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.TMXCurrent?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -46,7 +46,7 @@ export default class TMXRanking extends StaticComponent {
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo: TMXMapInfo | null = TM.TMXCurrent
+    const tmxInfo: TMXMapInfo | null = TM.tmx.current
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }
