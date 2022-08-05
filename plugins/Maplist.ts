@@ -7,16 +7,16 @@ const atSort: TMMap[] = []
 const positionSorts: { login: string, list: TMMap[] }[] = []
 const cachedSearches: { query: string, list: TMMap[] }[] = []
 
-TM.addListener('Controller.Ready', () => {
-  const arr1 = TM.maps.sort((a, b) => a.name.localeCompare(b.name))
-  authorSort.push(...arr1.sort((a, b) => a.author.localeCompare(b.author)))
-  nameSort.push(...[...authorSort].sort((a, b) => a.name.localeCompare(b.name)))
-  karmaSort.push(...[...authorSort].sort((a, b) => {
-    const aKarma = TM.voteRatios.find(c => c.mapId === a.id)?.ratio ?? 0
-    const bKarma = TM.voteRatios.find(c => c.mapId === b.id)?.ratio ?? 0
+TM.addListener('Controller.Ready', (): void => {
+  const arr1: TMMap[] = TM.maps.sort((a, b): number => a.name.localeCompare(b.name))
+  authorSort.push(...arr1.sort((a, b): number => a.author.localeCompare(b.author)))
+  nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
+  karmaSort.push(...[...authorSort].sort((a, b): number => {
+    const aKarma: number = TM.voteRatios.find(c => c.mapId === a.id)?.ratio ?? 0
+    const bKarma: number = TM.voteRatios.find(c => c.mapId === b.id)?.ratio ?? 0
     return bKarma - aKarma
   }))
-  atSort.push(...[...authorSort].sort((a, b) => a.authorTime - b.authorTime))
+  atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
 })
 
 export const MAPLIST = {
@@ -40,11 +40,11 @@ export const MAPLIST = {
 
   getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<TMMap[]> => {
     if (sort === 'best') {
-      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.map(a => a.id))).sort((a, b) => a.rank - b.rank)
-      const list = [...authorSort]
+      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
+      const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
-      for (let i = 0; i < list.length; i++) {
-        const index = ranks.findIndex(a => a.mapId === list[i].id)
+      for (let i: number = 0; i < list.length; i++) {
+        const index: number = ranks.findIndex(a => a.mapId === list[i].id)
         if (index !== -1) {
           ranked[index] = list[i]
         }
@@ -52,11 +52,11 @@ export const MAPLIST = {
       return ranked
     }
     else {
-      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.map(a => a.id))).sort((a, b) => b.rank - a.rank)
-      const list = [...authorSort]
+      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
+      const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
-      for (let i = 0; i < list.length; i++) {
-        const index = ranks.findIndex(a => a.mapId === list[i].id)
+      for (let i: number = 0; i < list.length; i++) {
+        const index: number = ranks.findIndex(a => a.mapId === list[i].id)
         if (index !== -1) {
           ranked[index] = list[i]
         }

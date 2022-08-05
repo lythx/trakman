@@ -23,7 +23,7 @@ export default class GuestlistList extends PopupWindow {
                     return
                 } else {
                     TM.removeFromGuestlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
                         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
                         + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} from guestlist.`)
                 }

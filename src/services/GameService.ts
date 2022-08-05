@@ -4,7 +4,7 @@ import { Logger } from '../Logger.js'
 export class GameService {
 
   private static _game: TMGame
-  private static readonly proxyMethods = [
+  private static readonly proxyMethods: string[] = [
     'SetGameMode',
     'SetChatTime',
     'SetFinishTimeout',
@@ -28,14 +28,14 @@ export class GameService {
     'SetCupNbWinners'
   ]
   private static _state: 'race' | 'result' = 'race'
-  private static _timerStartTimestamp = Date.now()
+  private static _timerStartTimestamp: number = Date.now()
 
   static async initialize(): Promise<void> {
-    const status = this.update()
+    const status: Promise<void> = this.update()
     if (status instanceof Error) {
       await Logger.fatal('Failed to retrieve game info. Error:', status.message)
     }
-    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
+    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]): Promise<void> => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
@@ -46,7 +46,7 @@ export class GameService {
     this._state = state
   }
 
-  static startTimer() {
+  static startTimer(): void {
     this._timerStartTimestamp = Date.now()
   }
 

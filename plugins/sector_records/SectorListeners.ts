@@ -138,7 +138,7 @@ TM.addCommand({
   callback(info, sectorIndex?: number) {
     if (sectorIndex === undefined) {
       currentBestSecs.length = 0
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
         + `${TM.palette.highlight + 'all sector records'}${TM.palette.admin} on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId)
@@ -148,7 +148,7 @@ TM.addCommand({
         return
       }
       currentBestSecs[sectorIndex - 1] = undefined
-      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+      TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
         + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed the `
         + `${TM.palette.highlight + TM.Utils.getPositionString(sectorIndex)}${TM.palette.admin} sector on the ongoing map.`)
       void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)

@@ -8,7 +8,8 @@ const fetchPlayerData = async (login: string): Promise<{ nickname: string, natio
   if (json instanceof Error) { // UNKOWN PLAYER MOMENT
     return json
   } else {
-    return { nickname: json?.nickname, nation: TM.countries.find(a => a.name === json?.path?.split('|')[1])?.code as any }
+    // No error check, nation cannot be undefined
+    return { nickname: json?.nickname, nation: (TM.Utils.nationToNationCode(json?.path?.split('|')[1]) as any) }
   }
 }
 
@@ -18,7 +19,7 @@ const nextAuthorListeners: ((data?: { nickname: string, nation: string }) => voi
 let currentAuthorData: { nickname: string, nation: string } | undefined
 let nextAuthorData: { nickname: string, nation: string } | undefined
 
-TM.addListener('Controller.Ready', async () => {
+TM.addListener('Controller.Ready', async (): Promise<void> => {
   const res = await fetchPlayerData(TM.map.author)
   if (res instanceof Error || res === false) {
     currentAuthorData = undefined
@@ -30,7 +31,7 @@ TM.addListener('Controller.Ready', async () => {
   }
 })
 
-TM.addListener('Controller.EndMap', async () => {
+TM.addListener('Controller.EndMap', async (): Promise<void> => {
   const res = await fetchPlayerData(TM.mapQueue[0].author)
   if (res instanceof Error || res === false) {
     nextAuthorData = undefined
@@ -42,7 +43,7 @@ TM.addListener('Controller.EndMap', async () => {
   }
 })
 
-TM.addListener('Controller.JukeboxChanged', async () => {
+TM.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
   if (TM.serverState === 'result') {
     const res = await fetchPlayerData(TM.mapQueue[0].author)
     if (res instanceof Error || res === false) {
@@ -56,7 +57,7 @@ TM.addListener('Controller.JukeboxChanged', async () => {
   }
 })
 
-TM.addListener('Controller.BeginMap', () => {
+TM.addListener('Controller.BeginMap', (): void => {
   currentAuthorData = nextAuthorData
   nextAuthorData = undefined
   for (const e of currentAuthorListeners) {
@@ -77,11 +78,11 @@ export const MapAuthorData = {
     return nextAuthorData
   },
 
-  onCurrentAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)): void => {
+  onCurrentAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)) => {
     currentAuthorListeners.push(callback)
   },
 
-  onNextAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)): void => {
+  onNextAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)) => {
     nextAuthorListeners.push(callback)
   }
 

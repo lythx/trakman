@@ -6,7 +6,7 @@ type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
 export abstract class Logger {
 
-  private static logLevel = 0
+  private static logLevel: number = 0
   private static readonly consoleColours = {
     black: '\u001b[30m',
     red: '\u001b[31m',
@@ -27,7 +27,7 @@ export abstract class Logger {
     cyan: 0x00FFFF,
     white: 0xFFFFFF
   }
-  private static readonly logDir = './logs'
+  private static readonly logDir: string = './logs'
   private static readonly logTypes = {
     fatal: {
       level: 1, colour: this.consoleColours.red,
@@ -55,25 +55,25 @@ export abstract class Logger {
     },
   }
   private static crashed: boolean = false
-  private static readonly useDiscord = process.env.USE_DISCORD_LOG === 'YES'
+  private static readonly useDiscord: boolean = process.env.USE_DISCORD_LOG === 'YES'
   private static webhook: WebhookClient
   private static discordLogLevel: number
-  private static isFirstLog = true
+  private static isFirstLog: boolean = true
 
   static async initialize(): Promise<void> {
     this.logLevel = Number(process.env.LOG_LEVEL)
     if (isNaN(this.logLevel)) {
       throw new Error('Error while initializing logger: LOG_LEVEL is not a number. Check if its set in the .env file.')
     }
-    await fs.mkdir(this.logDir).catch((err: Error) => {
+    await fs.mkdir(this.logDir).catch((err: Error): void => {
       if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
-    process.on('uncaughtException', (err: Error) => {
+    process.on('uncaughtException', (err: Error): void => {
       void Logger.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
-    process.on('unhandledRejection', (err: Error) => {
+    process.on('unhandledRejection', (err: Error): void => {
       void Logger.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
     if (this.useDiscord === true) {
@@ -93,8 +93,8 @@ export abstract class Logger {
   static async fatal(...lines: any[]): Promise<void> {
     if (this.crashed === true) { return }
     this.crashed = true
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'fatal'
     await this.writeLog(tag, location, date, lines)
     process.exit(1)
@@ -102,49 +102,50 @@ export abstract class Logger {
 
   static error(...lines: any[]): void {
     if (this.crashed === true) { return }
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'error'
     void this.writeLog(tag, location, date, lines)
   }
 
   static warn(...lines: any[]): void {
     if (this.crashed === true) { return }
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'warn'
     void this.writeLog(tag, location, date, lines)
   }
 
   static info(...lines: any[]): void {
     if (this.crashed === true) { return }
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'info'
     void this.writeLog(tag, location, date, lines)
   }
 
   static debug(...lines: any[]): void {
     if (this.crashed === true) { return }
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'debug'
     void this.writeLog(tag, location, date, lines)
   }
 
   static trace(...lines: any[]): void {
     if (this.crashed === true) { return }
-    const date = new Date().toUTCString()
-    const location = this.getLocation()
+    const date: string = new Date().toUTCString()
+    const location: string = this.getLocation()
     const tag: Tag = 'trace'
     void this.writeLog(tag, location, date, lines)
   }
 
   private static async writeLog(tag: Tag, location: string, date: string, lines: any[]): Promise<void> {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
-    const logStr = this.getLogfileString(tag, lines, location, date)
+    const logStr: string = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
-    let str = lines.join('\n').replace(/[_*~|>`]/g, '\\$&')
+    // This in theory should work but regex is weird. Maybe just remove the characters then?
+    let str: string = lines.join('\n').replace(/[_*~|>`]/g, '\\$&')
     if (str.length > 500) {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
     }
@@ -152,13 +153,16 @@ export abstract class Logger {
       await fs.appendFile(file, logStr)
     }
     if (this.useDiscord === true && this.logTypes[tag].level <= this.discordLogLevel) {
-      const users = process.env.USERS_TO_PING_ON_CRASH
-      const pings = users === undefined ? [] : users.split(',')
-      const embed = new EmbedBuilder()
+      const users: string | undefined = process.env.USERS_TO_PING_ON_CRASH
+      const pings: string[] = users === undefined ? [] : users.split(',')
+      // Useless feature incoming..
+      const thumbs: string | undefined = process.env.EMBED_IMAGE_URLS
+      const embedThumbnails: string[] = thumbs === undefined ? [] : thumbs.split(',')
+      const embed: EmbedBuilder = new EmbedBuilder()
         .setTitle(`${tag.toUpperCase()} on server ${process.env.SERVER_LOGIN}`)
         .setColor(this.logTypes[tag].discordColour)
         .setTimestamp(new Date())
-        .setThumbnail(('https://cdn.discordapp.com/attachments/800663457779023872/999374713312776372/unknown.png'))
+        .setThumbnail(embedThumbnails[~~(Math.random() * embedThumbnails.length)])
         .addFields([
           {
             name: location,
@@ -166,7 +170,7 @@ export abstract class Logger {
           }
         ]
         )
-      const separator = this.isFirstLog === false ? undefined : '---------------------------------------------'
+      const separator: string | undefined = this.isFirstLog === false ? undefined : '---------------------------------------------'
       if (tag === 'fatal') {
         await this.webhook.send({
           content: (separator ?? '') + '\n' + pings.join(' '),
@@ -183,31 +187,31 @@ export abstract class Logger {
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {
-    let ret = `<${tag.toUpperCase()}> [${date.substring(5, date.length - 4)}] (${location}) ${lines[0]}\n`
-    for (let i = 1; i < lines.length; i++) {
+    let ret: string = `<${tag.toUpperCase()}> [${date.substring(5, date.length - 4)}] (${location}) ${lines[0]}\n`
+    for (let i: number = 1; i < lines.length; i++) {
       ret += `\t${lines[i]}\n`
     }
     return ret
   }
 
   private static getConsoleString(tag: Tag, lines: string[], location: string, date: string): string {
-    const colour = this.logTypes[tag].colour
-    const colourString = `\u001b${colour}`
-    let ret = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date.substring(5, date.length - 4)}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
-    for (let i = 1; i < lines.length; i++) {
+    const colour: string = this.logTypes[tag].colour
+    const colourString: string = `\u001b${colour}`
+    let ret: string = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date.substring(5, date.length - 4)}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
+    for (let i: number = 1; i < lines.length; i++) {
       ret += `\n\t${lines[i]}`
     }
     return ret
   }
 
   private static getLocation(): string {
-    const stack = new Error().stack
+    const stack: string | undefined = new Error().stack
     if (stack === undefined) {
       return ''
     }
-    let s = stack.split('\n')[3].split(' ').filter(a => a !== '')
+    let s: string[] = stack.split('\n')[3].split(' ').filter(a => a !== '')
     s = s[s.length - 1].split('/')
-    const str = s[s.length - 1]
+    const str: string = s[s.length - 1]
     return str.split(':').slice(0, 2).join(':')
   }
 

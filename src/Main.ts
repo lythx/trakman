@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     else { Logger.trace('Connected to ManiaLive') }
   }
   Logger.trace('Enabling callbacks...')
-  const cb = await Listeners.initialize()
+  const cb: true | Error = await Listeners.initialize()
   if (cb instanceof Error) {
     Logger.fatal('Failed to enable callbacks', cb.message)
   }

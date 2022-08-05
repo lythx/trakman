@@ -17,7 +17,7 @@ export class DedimaniaRequest {
   constructor(method: string, params: CallParams[], sessionKey?: string) {
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
-      const str = this.handleParamType(param)
+      const str: string | Error = this.handleParamType(param)
       if (str instanceof Error) { throw str }
       xml += `<param><value>${str}</value></param>`
     }

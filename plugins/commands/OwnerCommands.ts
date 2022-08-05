@@ -30,7 +30,7 @@ const commands: TMCommand[] = [
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
           continue
         }
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
           + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
           + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from TMX.`)
       }
@@ -55,7 +55,7 @@ const commands: TMCommand[] = [
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to insert the map ${TM.palette.highlight + TM.strip(map.name, false)}$z$s ${TM.palette.error}into queue.`, info.login)
           continue
         }
-        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+        TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
           + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added and queued `
           + `${TM.palette.highlight + TM.strip(map.name, true)}${TM.palette.admin} from server files.`)
       }

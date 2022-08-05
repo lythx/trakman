@@ -75,9 +75,9 @@ export const Utils = {
     const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
       return [a[0], [a[0], ...a[1]]]
     }))
-    let strippedStr = ''
+    let strippedStr: string = ''
     for (const letter of str) {
-      let foundLetter = false
+      let foundLetter: boolean = false
       for (const key in charmap) {
         if (charmap[key].includes(letter)) {
           strippedStr += key
@@ -94,7 +94,7 @@ export const Utils = {
 
   matchString,
 
-  nationToNationCode(nation: string) {
+  nationToNationCode(nation: string): string | undefined {
     return countries.find(a => a.name === nation)?.code
   },
 
@@ -107,7 +107,7 @@ export const Utils = {
  * @returns Object containing the string to use, whether calculation is needed, and the difference
  */
   getRankingString(prevPos: number, currPos: number, prevTime: number, currTime: number): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
-    let calc = false
+    let calc: boolean = false
     const obj: any = {
       status: ``,
       difference: undefined
@@ -163,13 +163,13 @@ function matchString<T extends { [key: string]: any }>
     for (const e of possibleMatches) {
       arr.push({ str: e as any, value: dsc.twoStrings(searchString, e) })
     }
-    return arr.sort((a, b) => b.value - a.value)
+    return arr.sort((a, b): number => b.value - a.value)
   } else {
     const arr: { obj: T, value: number }[] = []
     for (const e of possibleMatches) {
       arr.push({ obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ? Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key]) })
     }
-    return arr.sort((a, b) => b.value - a.value)
+    return arr.sort((a, b): number => b.value - a.value)
   }
 }
 

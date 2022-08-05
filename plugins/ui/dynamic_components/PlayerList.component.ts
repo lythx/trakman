@@ -38,7 +38,7 @@ export default class PlayerList extends PopupWindow {
         } else {
           TM.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
           TM.call('Kick', [{ string: targetPlayer.login }])
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has banned `
             + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`)
         }
@@ -50,7 +50,7 @@ export default class PlayerList extends PopupWindow {
         if (status instanceof Error) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}An error occured while muting the player.`, info.login)
         } else {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has muted `
             + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`)
         }
@@ -63,7 +63,7 @@ export default class PlayerList extends PopupWindow {
         } else {
           TM.addToBlacklist(targetPlayer.login, info.login)
           TM.call('Kick', [{ string: targetPlayer.login }])
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has blacklisted `
             + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`)
         }
@@ -75,7 +75,7 @@ export default class PlayerList extends PopupWindow {
         if (status instanceof Error) {
           TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}An error occured while adding player to the guestlist.`, info.login)
         } else {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
+          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info.login)} `
             + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added `
             + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} to guestlist.`)
         }
