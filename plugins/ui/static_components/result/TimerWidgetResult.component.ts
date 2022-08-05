@@ -18,13 +18,13 @@ export default class RankWidh extends StaticComponent {
     this.constructXml()
   }
 
-  display(): void {  
-      if(!this.isDisplayed) { return }
+  display(): void {
+    if (!this.isDisplayed) { return }
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if(!this.isDisplayed) { return }
+    if (!this.isDisplayed) { return }
     TM.sendManialink(this.xml, login)
   }
 

@@ -19,12 +19,12 @@ export default class PreviousAndBest extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.xml, login)
   }
 

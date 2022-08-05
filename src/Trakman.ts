@@ -104,7 +104,6 @@ export const TRAKMAN = {
             data += chunk
           })
           if (res.statusCode === 200) {
-            Logger.debug(JSON.parse(data))
             res.on('end', (): void => resolve(JSON.parse(data)))
             return
           }
@@ -149,72 +148,37 @@ export const TRAKMAN = {
 
   },
 
-  // TO BE REMOVED
-  getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
+  messages: {
 
-  // Implement client idk
-  DatabaseClient: Database,
+    get list() { return ChatService.messages },
 
-  /**
-   * Gets the recent player messages
-   * @param login Player login
-   * @returns Array of recent player messages
-   */
-  getPlayerMessages(login: string): TMMessage[] {
-    return ChatService.messages.filter(a => a.login === login)
+    // TODO ADD FETCH BY AMOUNT AND DATE UTILITIES AFTER CHANGING CHAT TABLE
+
+  },
+
+  commands: {
+
+    add: ChatService.addCommand.bind(ChatService),
+
+    get list() { return ChatService.commandList }
+
+  },
+
+  client: {
+
+    call: Client.call.bind(Client),
+
+    callNoRes: Client.callNoRes.bind(Client),
+
+    addProxy: Client.addProxy.bind(Client),
+
   },
 
   /**
-   * Calls a dedicated server method and awaits the response
-   * @param method Dedicated server method to be executed
-   * @param params Optional params for the dedicated server method
-   * @returns Server response or error if the server returns one
-   */
-  async call(method: string, params: any[] = []): Promise<any[] | Error> {
-    return await Client.call(method, params)
-  },
-
-  /**
-   * Calls a dedicated server method without caring for the response
-   * @param method Dedicated server method to be executed
-   * @param params Optional params for the dedicated server method
-   */
-  callNoRes(method: string, params: any[] = []): void {
-    Client.callNoRes(method, params)
-  },
-
-  /**
-   * Calls multiple dedicated server methods simultaneously and awaits the response
-   * @param calls Array of dedicated server calls
-   * @returns Server response or error if the server returns one
-   */
-  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
-    return Utils.multiCall(...calls)
-  },
-
-  /**
-   * Calls multiple dedicated server methods simultaneously without caring for the response
-   * @param calls Array of dedicated server calls
-   */
-  multiCallNoRes(...calls: TMCall[]): void {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params: any[] = c.params === undefined ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    Client.callNoRes('system.multicall', [{ array: arr }])
-  },
-
-  /**
-   * Sends a server message
-   * @param message Message to be sent
-   * @param login Optional player login (or comma-joined list of logins)
-   */
+ * Sends a server message
+ * @param message Message to be sent
+ * @param login Optional player login (or comma-joined list of logins)
+ */
   sendMessage(message: string, login?: string): void {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
@@ -239,12 +203,40 @@ export const TRAKMAN = {
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
   },
 
+  // TO BE REMOVED
+  getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
+
+  // Implement client idk
+  DatabaseClient: Database,
+
+
+  //CHANGE LATER
   /**
-   * Adds a chat command to the server
-   * @param command Chat command to register
+   * Calls multiple dedicated server methods simultaneously and awaits the response
+   * @param calls Array of dedicated server calls
+   * @returns Server response or error if the server returns one
    */
-  addCommand(command: TMCommand): void {
-    ChatService.addCommand(command)
+  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+    return Utils.multiCall(...calls)
+  },
+
+  //CHANGE LATER
+  /**
+   * Calls multiple dedicated server methods simultaneously without caring for the response
+   * @param calls Array of dedicated server calls
+   */
+  multiCallNoRes(...calls: TMCall[]): void {
+    const arr: any[] = []
+    for (const c of calls) {
+      const params: any[] = c.params === undefined ? [] : c.params
+      arr.push({
+        struct: {
+          methodName: { string: c.method },
+          params: { array: params }
+        }
+      })
+    }
+    Client.callNoRes('system.multicall', [{ array: arr }])
   },
 
   /**
@@ -422,14 +414,6 @@ export const TRAKMAN = {
     return GameService.remainingResultTime
   },
 
-  /**
-   * Adds a callback listener which will be executed when one of the specified dedicated methods gets called
-   * @param methods Array of dedicated server methods
-   * @param callback Callback to execute
-   */
-  addProxy: (methods: string[], callback: ((parms: any) => void)): void => {
-    Client.addProxy(methods, callback)
-  },
 
   get serverState(): "race" | "result" {
     return GameService.state
@@ -470,10 +454,8 @@ export const TRAKMAN = {
     return await VoteService.fetch(mapId)
   },
 
-  sendCoppers: Utils.sendCoppers.bind(Utils),
-
   get gameInfo(): TMGame {
-    return Object.assign(GameService.game)
+    return GameService.game
   },
 
   get serverConfig(): ServerInfo {
@@ -482,10 +464,6 @@ export const TRAKMAN = {
 
   get map(): TMCurrentMap {
     return MapService.current
-  },
-
-  get messages(): TMMessage[] {
-    return [...ChatService.messages]
   },
 
   get maps(): TMMap[] {
@@ -510,10 +488,6 @@ export const TRAKMAN = {
 
   get voteRatios() {
     return VoteService.voteRatios
-  },
-
-  get commandList(): TMCommand[] {
-    return ChatService.commandList
   },
 
   get UIIDS() {

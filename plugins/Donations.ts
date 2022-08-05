@@ -40,7 +40,7 @@ const addToDB = async (login: string, amount: number): Promise<void> => {
 }
 
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<void> => {
-  const status: boolean | Error = await TM.sendCoppers(payerLogin, amount, 'Donation')
+  const status: boolean | Error = await TM.utils.sendCoppers(payerLogin, amount, 'Donation')
   if (status instanceof Error) {
     TM.error(`Failed to receive ${amount} coppers donation from player ${payerLogin}`, status.message)
     TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, payerLogin)

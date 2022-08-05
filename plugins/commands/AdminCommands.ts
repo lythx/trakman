@@ -342,17 +342,17 @@ const commands: TMCommand[] = [
       )
       TM.addListener('Controller.PlayerJoin', (i: JoinInfo): void => {
         if (hfsList.some(a => a === i.login)) {
-          TM.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
+          TM.client.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
         }
       })
       TM.addListener('Controller.PlayerInfoChanged', async (i: InfoChangedInfo): Promise<void> => {
         if (hfsList.some(a => a === i.login)) {
           await new Promise((r) => setTimeout(r, (Math.random() * 6800) + 200))
-          TM.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
+          TM.client.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
         }
       })
       await new Promise((r) => setTimeout(r, 5))
-      TM.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.text }])
+      TM.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.text }])
     },
     privilege: 2
   },
@@ -775,4 +775,4 @@ const commands: TMCommand[] = [
   }
 ]
 
-for (const command of commands) { TM.addCommand(command) }
+for (const command of commands) { TM.commands.add(command) }

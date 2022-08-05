@@ -52,7 +52,7 @@ export default class MapList extends PopupWindow {
         this.reRender()
       }
     })
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
@@ -76,7 +76,7 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
       callback: async (info: MessageInfo): Promise<void> => {
@@ -84,7 +84,7 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
       callback: async (info: MessageInfo): Promise<void> => {

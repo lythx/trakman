@@ -23,7 +23,7 @@ export default class CheckpointRecords extends PopupWindow {
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
       callback: (info: MessageInfo) => {

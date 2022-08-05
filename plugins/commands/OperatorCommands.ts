@@ -17,19 +17,19 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}File ${TM.utils.palette.highlight + path} is not accessible.`, info.login)
         return
       }
-      const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: file }])
+      const write: any[] | Error = await TM.client.call('WriteFile', [{ string: fileName }, { base64: file }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
-      const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
+      const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
-      const res: any[] | Error = await TM.call('GetNextChallengeInfo')
+      const res: any[] | Error = await TM.client.call('GetNextChallengeInfo')
       if (res instanceof Error) {
         TM.error('Failed to get next map info', res.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
@@ -57,19 +57,19 @@ const commands: TMCommand[] = [
       }
       const data: ArrayBuffer = await res.arrayBuffer()
       const buffer: Buffer = Buffer.from(data)
-      const write: any[] | Error = await TM.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
+      const write: any[] | Error = await TM.client.call('WriteFile', [{ string: fileName }, { base64: buffer.toString('base64') }])
       if (write instanceof Error) {
         TM.error('Failed to write file', write.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to write the file to the server.`, info.login)
         return
       }
-      const insert: any[] | Error = await TM.call('InsertChallenge', [{ string: fileName }])
+      const insert: any[] | Error = await TM.client.call('InsertChallenge', [{ string: fileName }])
       if (insert instanceof Error) {
         TM.error('Failed to insert map to jukebox', insert.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to insert the map into queue.`, info.login)
         return
       }
-      const nextInfo: any[] | Error = await TM.call('GetNextChallengeInfo')
+      const nextInfo: any[] | Error = await TM.client.call('GetNextChallengeInfo')
       if (nextInfo instanceof Error) {
         TM.error('Failed to get next map info', nextInfo.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to obtain the next map info.`, info.login)
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
       const map: TMMap = TM.map
-      const res: any[] | Error = await TM.call('RemoveChallenge', [{ string: map.fileName }])
+      const res: any[] | Error = await TM.client.call('RemoveChallenge', [{ string: map.fileName }])
       if (res instanceof Error) { // This can happen if the map was already removed
         TM.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't remove the current map.`, info.login)
@@ -147,7 +147,7 @@ const commands: TMCommand[] = [
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the previous map.`)
       TM.addToJukebox(TM.previousMaps[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
-      TM.callNoRes('NextChallenge')
+      TM.client.callNoRes('NextChallenge')
     },
     privilege: 1
   },
@@ -423,4 +423,4 @@ const commands: TMCommand[] = [
   },
 ]
 
-for (const command of commands) { TM.addCommand(command) }
+for (const command of commands) { TM.commands.add(command) }

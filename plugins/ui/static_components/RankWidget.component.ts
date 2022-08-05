@@ -4,14 +4,14 @@ import StaticComponent from '../StaticComponent.js'
 
 export default class RankWidget extends StaticComponent {
 
-  private readonly width =  CONFIG.static.width
+  private readonly width = CONFIG.static.width
   private readonly height = CONFIG.rank.height
   private readonly positionY: number
   private readonly positionX: number
   private xml: string = ''
 
   constructor() {
-    super(IDS.rank,'race')
+    super(IDS.rank, 'race')
     const pos = getStaticPosition('rank')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -19,12 +19,12 @@ export default class RankWidget extends StaticComponent {
   }
 
   display(): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if(this.isDisplayed === false) { return }
+    if (this.isDisplayed === false) { return }
     TM.sendManialink(this.xml, login)
   }
 

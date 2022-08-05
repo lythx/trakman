@@ -16,7 +16,7 @@ export default class Changelog extends PopupWindow {
     TM.addListener('Controller.Ready', (info) => {
       //   TM.sendMessage todo send changelog message to everyone
     })
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['changes', 'changelog'],
       help: 'Display list of controller changes',
       callback: (info) => {
