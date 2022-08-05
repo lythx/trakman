@@ -31,6 +31,7 @@ import KarmaRanking from './static_components/result/KarmaRanking.component.js'
 import VotersRanking from './static_components/result/VotersRanking.component.js'
 import VisitorsRanking from './static_components/result/VisitorsRanking.component.js'
 import PlaytimeRanking from './static_components/result/PlaytimeRanking.component.js'
+import DonatorsRanking from './static_components/result/DonatorsRanking.component.js'
 
 /*
 ------------------
@@ -100,6 +101,7 @@ let staticComponents: {
   readonly votersRanking: VotersRanking
   readonly visitorsRanking: VisitorsRanking
   readonly playtimeRanking: PlaytimeRanking
+  readonly donatorsRanking: DonatorsRanking
 }
 
 let dynamicComponents: {
@@ -153,7 +155,8 @@ const events: TMListener[] = [
         karmaRanking: new KarmaRanking(),
         votersRanking: new VotersRanking(),
         visitorsRanking: new VisitorsRanking(),
-        playtimeRanking: new PlaytimeRanking()
+        playtimeRanking: new PlaytimeRanking(),
+        donatorsRanking: new DonatorsRanking()
       }
       for (const c of Object.values(staticComponents)) {
         if (c.displayMode === 'race' || c.displayMode === 'always') { await c.display() }

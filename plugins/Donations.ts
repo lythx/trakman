@@ -7,34 +7,24 @@ await TM.queryDB(`CREATE TABLE IF NOT EXISTS donations(
   PRIMARY KEY(player_id, date)
 );`)
 
+const updateListeners: (() => void)[] = []
 const topDonators: { login: string, nickname: string, amount: number }[] = []
 // const onlineDonators: { login: string, amount: number }[] = []
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
-  const res: any[] | Error = await TM.queryDB(`SELECT amount, login, nickname FROM donations
-  JOIN players ON players.id=donations.player_id`)
+  const res: any[] | Error = await TM.queryDB(`SELECT SUM(amount) AS amount, login, nickname FROM donations
+  JOIN players ON players.id=donations.player_id
+  JOIN player_ids ON player_ids.id=donations.player_id
+  GROUP BY (login, nickname)
+  ORDER BY amount DESC
+  LIMIT 10`)
+  console.log(res)
   if (res instanceof Error) {
     TM.error(res)
     return
   }
-  const donations: { login: string, nickname: string, amount: number }[] = []
-  while (res.length > 0) {
-    const login = res[0].login
-    let i: number = 0
-    let amount: number = 0
-    while (true) {
-      if (res[i] === undefined) { break }
-      if (res[i].login === login) {
-        amount += res[i].amount
-        res.splice(i, 1)
-        i--
-      }
-      i++
-    }
-    donations.push({ ...res[0], amount })
-  }
-  topDonators.push(...donations.sort((a, b): number => b.amount - a.amount).slice(0, 10))
-})
+  topDonators.push(...res)
+}, true)
 
 const addToDB = async (login: string, amount: number): Promise<void> => {
   const date: number = Date.now()
@@ -58,4 +48,16 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
   }
 }
 
-export const Donations = { donate }
+export const Donations = {
+
+  donate,
+
+  onUpdate(callback: () => void) {
+    updateListeners.push(callback)
+  },
+
+  get topDonators() {
+    return [...topDonators]
+  }
+
+}
