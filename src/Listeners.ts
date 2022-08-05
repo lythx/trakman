@@ -25,6 +25,7 @@ export class Listeners {
           return
         }
         const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
+        // Get player ladder rank here for dedimania or watever
         if (playerInfo instanceof Error) {
           Logger.error(`Failed to get player ${params[0]} info`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
@@ -190,8 +191,9 @@ export class Listeners {
         }
         const lastId: string = JukeboxService.current.id
         JukeboxService.nextMap()
-        if (lastId === JukeboxService.current.id) { TMXService.restartMap() }
-        else {
+        if (lastId === JukeboxService.current.id) {
+          TMXService.restartMap()
+        } else {
           await TMXService.nextMap()
           await VoteService.nextMap()
         }
@@ -219,6 +221,7 @@ export class Listeners {
           winnerLogin: login,
           winnerWins: wins
         }
+        // Both awaits may be voids if possible?
         void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
         await PlayerService.calculateAveragesAndRanks()
         Events.emitEvent('Controller.EndMap', endMapInfo)
@@ -234,7 +237,8 @@ export class Listeners {
         }
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play
-        // if (params[1][0] == 4)
+
+        // Doesn't seem to matter actually
       }
     },
     {
@@ -264,6 +268,7 @@ export class Listeners {
       event: 'TrackMania.ChallengeListModified',
       callback: (params: any[]): void => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
+        // TODO: Make this not hardcoded?
         Client.callNoRes('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
       }
     },
@@ -292,8 +297,12 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        if (info.isSpectator || info.isTemporarySpectator || info.isPureSpectator) { PlayerService.setPlayerSpectatorStatus(info.login, true) }
-        else { PlayerService.setPlayerSpectatorStatus(info.login, false) }
+        // TODO: Need to check which of these are actually "spectator"
+        if (info.isSpectator /*|| info.isTemporarySpectator*/ || info.isPureSpectator) {
+          PlayerService.setPlayerSpectatorStatus(info.login, true)
+        } else {
+          PlayerService.setPlayerSpectatorStatus(info.login, false)
+        }
         Events.emitEvent('Controller.PlayerInfoChanged', info)
       }
     },

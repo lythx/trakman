@@ -73,14 +73,14 @@ export abstract class DedimaniaService {
         { string: name },
         { string: environment },
         { string: author },
-        { string: 'TMF' },
+        { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
         { int: GameService.game.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
             Private: { boolean: cfg.password === '' },
-            SrvIP: { string: '127.0.0.1' },
+            SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
             SrvPort: { string: '5000' },
             XmlRpcPort: { string: '5000' },
             NumPlayers: { int: PlayerService.players.filter(a => !a.isSpectator).length },
