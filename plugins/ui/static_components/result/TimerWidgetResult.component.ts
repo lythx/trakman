@@ -2,7 +2,7 @@ import { RESULTCONFIG as CONFIG, getResultPosition, IDS } from '../../UiUtils.js
 import { TRAKMAN as TM } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 
-export default class TimerWidgetResult extends StaticComponent {
+export default class RankWidh extends StaticComponent {
 
   private readonly width = CONFIG.static.width
   private readonly height = CONFIG.timer.height
@@ -29,8 +29,6 @@ export default class TimerWidgetResult extends StaticComponent {
   }
 
   private constructXml(): void {
-    const headerHeight: number = CONFIG.staticHeader.height
-    const marginSmall: number = CONFIG.marginSmall
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
