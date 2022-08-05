@@ -75,7 +75,7 @@ TM.addListener('Controller.PlayerJoin', async (info) => {
   currentPlayerSecs.push(...playerSecs)
 })
 
-TM.addCommand({
+TM.commands.add({
   aliases: ['delmycp', 'deletemycp'],
   help: 'Delete personal cp records or one cp on the current map. Index is 1 based',
   params: [{ name: 'cpIndex', type: 'int', optional: true }],
@@ -104,7 +104,7 @@ TM.addCommand({
   privilege: 0
 })
 
-TM.addCommand({
+TM.commands.add({
   aliases: ['delcp', 'deletecp'],
   help: 'Delete all best cp records or one cp record on current map. Index is 1 based',
   params: [{ name: 'cpIndex', type: 'int', optional: true }],

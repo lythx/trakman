@@ -1,6 +1,6 @@
 import { TRAKMAN as TM } from "../src/Trakman.js";
 
-TM.addCommand({
+TM.commands.add({
   aliases: ['aj', 'autojuke'],
   help: 'Juke a random map. Options: nofinish(nofin), norank, noauthor',
   params: [{ name: 'option', optional: true }],

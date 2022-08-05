@@ -73,7 +73,7 @@ import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
-  TM.callNoRes('SetForcedMods',
+  TM.client.callNoRes('SetForcedMods',
     [{
       boolean: true
     },
@@ -146,7 +146,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: async (status: 'race' | 'result'): Promise<void> => {
-      await TM.call('SendHideManialinkPage')
+      await TM.client.call('SendHideManialinkPage')
       loadMod()
       initalizeKeyListeners()
       customUi = new CustomUi()
@@ -276,7 +276,7 @@ const events: TMListener[] = [
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
       // for (const player of TM.players.list) {
-      //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+      //     TM.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
     }
   },
@@ -302,8 +302,8 @@ const events: TMListener[] = [
       // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
 
       // This can be improved after queue/jukebox, as we can get next challenge from there also
-      // const info = await TM.call('GetNextChallengeInfo')
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+      // const info = await TM.client.call('GetNextChallengeInfo')
+      // TM.client.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
       // TODO: Display all the podium/score widgets
     }
@@ -314,7 +314,7 @@ const events: TMListener[] = [
       customUi.display()
       loadMod()
       // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
+      // TM.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
       // console.log(TM.challengeQueue)
       // console.log(TM.previousChallenges)
       // TODO: Fetch the next challenge info
@@ -323,15 +323,15 @@ const events: TMListener[] = [
       // This is easier achievable with queue/jukebox
 
       // TODO: Display current challenge widget
-      //TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+      //TM.client.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
       // TODO: Display current challenge record widgets
       // for (const player of TM.players.list) {
-      //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+      //     TM.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
 
       // // testing only
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
+      // TM.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
 
       // TODO: Display the miscellaneous widgets:
       // Clock, addfav, cpcounter, gamemode, visitors,

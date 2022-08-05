@@ -8,7 +8,7 @@ export default abstract class DynamicComponent {
     this.id = id
   }
 
-  abstract displayToPlayer(login: string): void 
+  abstract displayToPlayer(login: string): void
 
   hideToPlayer(login: string): void {
     TM.sendManialink(`<manialink id="${this.id}"></manialink>`, login)

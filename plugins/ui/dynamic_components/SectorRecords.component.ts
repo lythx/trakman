@@ -23,7 +23,7 @@ export default class SectorRecords extends PopupWindow {
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
       callback: (info: MessageInfo) => {

@@ -30,11 +30,11 @@ export default class CommandList extends PopupWindow<DisplayParams> {
 
   constructor() {
     super(IDS.commandList, stringToObjectProperty(CONFIG.commandList.icon, ICONS), CONFIG.commandList.title, CONFIG.commandList.navbar)
-    this.userCommands = TM.commandList.filter(a => a.help !== undefined && a.privilege === 0)
-    this.opCommands = TM.commandList.filter(a => a.help !== undefined && a.privilege === 1)
-    this.adminCommands = TM.commandList.filter(a => a.help !== undefined && a.privilege === 2)
-    this.masteradminCommands = TM.commandList.filter(a => a.help !== undefined && a.privilege === 3)
-    this.ownerCommands = TM.commandList.filter(a => a.help !== undefined && a.privilege === 4)
+    this.userCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 0)
+    this.opCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 1)
+    this.adminCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 2)
+    this.masteradminCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 3)
+    this.ownerCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 4)
     this.userPaginator = new Paginator(this.openId + 100, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))
     this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))
     this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))

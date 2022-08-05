@@ -37,7 +37,7 @@ export default class PlayerList extends PopupWindow {
           return
         } else {
           TM.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
-          TM.call('Kick', [{ string: targetPlayer.login }])
+          TM.client.call('Kick', [{ string: targetPlayer.login }])
           TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
             + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has banned `
             + `${TM.utils.palette.highlight + TM.utils.strip(targetInfo.nickname)}${TM.utils.palette.admin}.`)
@@ -62,7 +62,7 @@ export default class PlayerList extends PopupWindow {
           return
         } else {
           TM.addToBlacklist(targetPlayer.login, info.login)
-          TM.call('Kick', [{ string: targetPlayer.login }])
+          TM.client.call('Kick', [{ string: targetPlayer.login }])
           TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
             + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has blacklisted `
             + `${TM.utils.palette.highlight + TM.utils.strip(targetPlayer.nickname)}${TM.utils.palette.admin}.`)

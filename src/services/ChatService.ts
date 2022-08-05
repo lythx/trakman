@@ -19,6 +19,11 @@ export abstract class ChatService {
     await this.loadLastSessionMessages()
   }
 
+
+  /**
+   * Adds a chat command to the server
+   * @param command Chat command to register
+   */
   static addCommand(command: TMCommand): void {
     const prefix: string = command.privilege === 0 ? '/' : '//'
     this._commandList.push(command)

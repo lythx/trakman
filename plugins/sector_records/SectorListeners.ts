@@ -102,7 +102,7 @@ TM.addListener('Controller.PlayerJoin', async (info) => {
   currentPlayerSecs.push(...playerSecs)
 })
 
-TM.addCommand({
+TM.commands.add({
   aliases: ['delmysec', 'deletemysector'],
   help: 'Delete player personal sectors or one sector on the current map. Index is 1 based.',
   params: [{ name: 'sectorIndex', type: 'int', optional: true }],
@@ -131,7 +131,7 @@ TM.addCommand({
   privilege: 0
 })
 
-TM.addCommand({
+TM.commands.add({
   aliases: ['delsec', 'deletesector'],
   help: 'Delete all sector records or one sector record on current map. Index is 1 based.',
   params: [{ name: 'sectorIndex', type: 'int', optional: true }],

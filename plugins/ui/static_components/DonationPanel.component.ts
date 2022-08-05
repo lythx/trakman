@@ -22,7 +22,7 @@ export default class DonationPanel extends StaticComponent {
     TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + this.amounts.length) {
         const amount = this.amounts[info.answer - (this.id + 1)]
-        const status = await TM.sendCoppers(info.login, amount, 'Please give me coper')
+        const status = await TM.utils.sendCoppers(info.login, amount, 'Please give me coper')
         if (status instanceof Error) {
           TM.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
           TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, info.login)

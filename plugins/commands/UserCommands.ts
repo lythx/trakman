@@ -129,7 +129,7 @@ const commands: TMCommand[] = [
           }]
         })
       await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
-      TM.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      TM.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0
   },
@@ -188,7 +188,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
         + `${TM.utils.palette.servermsg} has passed away for good. May their soul ${TM.utils.palette.highlight}rest in peace${TM.utils.palette.servermsg}.`)
-      TM.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
+      TM.client.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
     },
     privilege: 0
   },
@@ -198,7 +198,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
         + `${TM.utils.palette.error} has ragequit.`)
-      TM.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
+      TM.client.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
     },
     privilege: 0
   },
@@ -333,7 +333,7 @@ const commands: TMCommand[] = [
   },
 ]
 
-for (const command of commands) { TM.addCommand(command) }
+for (const command of commands) { TM.commands.add(command) }
 
 // Vote handler
 

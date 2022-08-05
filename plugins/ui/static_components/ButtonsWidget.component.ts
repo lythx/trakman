@@ -27,7 +27,7 @@ export default class ButtonsWidget extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.grid = new Grid(this.width + CONFIG.marginSmall, this.height + CONFIG.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['s', 'skip'],
       help: 'Start a vote to skip the ongoing map',
       callback: info => {
@@ -35,7 +35,7 @@ export default class ButtonsWidget extends StaticComponent {
       },
       privilege: 0
     })
-    TM.addCommand({
+    TM.commands.add({
       aliases: ['r', 'res', 'replay'],
       help: 'Start a vote to replay the ongoing map',
       callback: info => {
@@ -160,7 +160,7 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (result === true) {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.vote}Vote to ${TM.utils.palette.highlight}skip `
         + `${TM.utils.palette.vote}the ongoing map ${TM.utils.palette.highlight}has passed${TM.utils.palette.vote}.`)
-      TM.callNoRes('NextChallenge')
+      TM.client.callNoRes('NextChallenge')
     } else if (result.result === true) {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to skip the ongoing map passed`)
@@ -170,7 +170,7 @@ export default class ButtonsWidget extends StaticComponent {
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(player)} `
           + `${TM.utils.palette.highlight + TM.utils.strip(player?.nickname ?? result.callerLogin, true)}${TM.utils.palette.admin} has passed the vote to skip the ongoing map`)
       }
-      TM.callNoRes('NextChallenge')
+      TM.client.callNoRes('NextChallenge')
     } else {
       if (result.callerLogin === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to skip the ongoing was cancelled`)
@@ -239,7 +239,7 @@ export default class ButtonsWidget extends StaticComponent {
 
   private onSkipButtonClick = async (login: string, nickname: string): Promise<void> => {
     if (this.lastMapRes) { return }
-    const res: boolean | Error = await TM.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
+    const res: boolean | Error = await TM.utils.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
     if (res instanceof Error) {
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`)
     } else if (res === true) {
@@ -258,7 +258,7 @@ export default class ButtonsWidget extends StaticComponent {
           this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
           await this.display()
           if (countDown === 0) {
-            TM.callNoRes('NextChallenge')
+            TM.client.callNoRes('NextChallenge')
             clearInterval(interval)
           }
         }
@@ -269,7 +269,7 @@ export default class ButtonsWidget extends StaticComponent {
   private onResButtonClick = async (login: string, nickname: string): Promise<void> => {
     const cost: number = this.resCosts[this.resCostIndex]
     if (cost === undefined) { return }
-    const res: boolean | Error = await TM.sendCoppers(login, cost, 'Pay to restart the ongoing map')
+    const res: boolean | Error = await TM.utils.sendCoppers(login, cost, 'Pay to restart the ongoing map')
     if (res instanceof Error) {
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`)
     } else if (res === true) {

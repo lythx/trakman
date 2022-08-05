@@ -279,7 +279,7 @@ const commands: TMCommand[] = [
     help: 'Check the amount of coppers the server owns.',
     callback: async (info: MessageInfo): Promise<void> => {
       // TODO: Return immediately if the server isn't united. How to check tho..?
-      const coppers: any[] | Error = await TM.call('GetServerCoppers')
+      const coppers: any[] | Error = await TM.client.call('GetServerCoppers')
       if (coppers instanceof Error) {
         TM.error(`Couldn't retrieve the coppers amount.`, coppers.message)
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't retrieve the coppers amount.`, info.login)
@@ -386,7 +386,7 @@ const commands: TMCommand[] = [
     aliases: ['kc', 'killcontroller'],
     help: 'Kill the controller.',
     callback: (info: MessageInfo): never => {
-      TM.callNoRes('ChatSendServerMessage', [{
+      TM.client.callNoRes('ChatSendServerMessage', [{
         string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
           + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has killed the controller :,(`
       }])
@@ -398,14 +398,14 @@ const commands: TMCommand[] = [
     aliases: ['sd', 'shutdown'],
     help: 'Stop the server.',
     callback: async (info: MessageInfo): Promise<void> => {
-      await TM.call('ChatSendServerMessage', [{
+      await TM.client.call('ChatSendServerMessage', [{
         string: `${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
           + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has killed the server :,(`
       }])
-      TM.call('StopServer')
+      TM.client.call('StopServer')
     },
     privilege: 3
   }
 ]
 
-for (const command of commands) { TM.addCommand(command) }
+for (const command of commands) { TM.commands.add(command) }
