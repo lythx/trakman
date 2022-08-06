@@ -64,6 +64,11 @@ export abstract class JukeboxService {
     }
   }
 
+  
+  /**
+   * Adds a map to the queue
+   * @param mapId Map UID
+   */
   static add(mapId: string, callerLogin?: string, setAsNextMap?: true): void | Error {
     const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
@@ -79,6 +84,10 @@ export abstract class JukeboxService {
     }
   }
 
+  /**
+   * Removes a map from the queue
+   * @param mapId Map UID
+   */
   static remove(mapId: string, callerLogin?: string): boolean {
     if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
@@ -95,6 +104,9 @@ export abstract class JukeboxService {
     return true
   }
 
+  /**
+   * Removes all maps from jukebox
+   */
   static clear(callerLogin?: string): void {
     let n: number = this._queue.length
     for (let i: number = 0; i < n; i++) {
@@ -112,6 +124,9 @@ export abstract class JukeboxService {
     }
   }
 
+  /**
+   * Shuffle the map list and jukebox
+   */
   static shuffle(callerLogin?: string): void {
     MapService.shuffle(callerLogin)
     this._queue.length = 0

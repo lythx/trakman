@@ -36,7 +36,7 @@ export default class KarmaWidgetResult extends StaticComponent {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        TM.addVote(TM.maps.current.id, info.login, votes[index])
+        TM.karma.add(TM.maps.current.id, info.login, votes[index])
       }
     })
   }

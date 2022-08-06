@@ -20,7 +20,7 @@ log
 
 admin
 
-queue
+queue/jukebox
 
 karma
 

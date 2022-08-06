@@ -52,12 +52,12 @@ export class GameService {
 
   static get remainingMapTime(): number {
     if (this._state === 'result') { return 0 }
-    return Math.round((this.game.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
+    return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
   static get remainingResultTime(): number {
     if (this._state === 'race') { return 0 }
-    return Math.round((this.game.chatTime - (Date.now() - this._timerStartTimestamp)) / 1000)
+    return Math.round((this.config.chatTime - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
   static get state(): 'race' | 'result' {
@@ -99,7 +99,7 @@ export class GameService {
     }
   }
 
-  static get game(): TMGame {
+  static get config(): TMGame {
     return this._game
   }
 

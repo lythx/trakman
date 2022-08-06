@@ -3,8 +3,8 @@ import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { Client } from '../client/Client.js'
-import { TRAKMAN as TM } from '../Trakman.js'
 import { Logger } from '../Logger.js'
+import { Utils } from '../Utils.js'
 import CONFIG from '../../config.json' assert { type: 'json' }
 
 export abstract class ChatService {
@@ -35,7 +35,7 @@ export abstract class ChatService {
         return
       }
       if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${TM.utils.palette.server}»${TM.utils.palette.error} You have no permission to use this command.` }, { string: info.login }])
+        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}»${Utils.palette.error} You have no permission to use this command.` }, { string: info.login }])
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
@@ -45,28 +45,28 @@ export abstract class ChatService {
         for (const [i, param] of command.params.entries()) {
           if (params[i] === undefined && param.optional === true) { continue }
           if (params[i] === undefined && param.optional === undefined) {
-            TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Required param ${param.name} not specified.`, info.login)
+            Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Required param ${param.name} not specified.` }, { string: info.login }])
             return
           }
           if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
           switch (param.type) {
             case 'int':
               if (!Number.isInteger(Number(params[i]))) {
-                TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Provided wrong argument type for parameter <${param.name}>: int.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: int.` }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'double':
               if (isNaN(Number(params[i]))) {
-                TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Provided wrong argument type for parameter <${param.name}>: double.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: double.` }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'boolean':
               if (!['true', 'yes', 'y', '1', 'false', 'no', 'n', '0'].includes(params[i].toLowerCase())) {
-                TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Provided wrong argument type for parameter <${param.name}>: boolean.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: boolean.` }, { string: info.login }])
                 return
               }
               parsedParams.push(['true', 'yes', 'y', '1',].includes(params[i].toLowerCase()))
@@ -79,7 +79,7 @@ export abstract class ChatService {
               const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
               const time: number = Number(params[i].substring(0, params[i].length - 1))
               if (isNaN(time)) {
-                TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.` }, { string: info.login }])
                 return
               }
               switch (unit) {
@@ -96,7 +96,7 @@ export abstract class ChatService {
                   parsedParams.push(time * 1000 * 60 * 60 * 24)
                   break
                 default:
-                  TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Provided wrong argument type for time <${param.name}>: time.`, info.login)
+                  Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time <${param.name}>: time.` }, { string: info.login }])
               }
               break
             case 'multiword':

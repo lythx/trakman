@@ -343,7 +343,7 @@ TM.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void>
     TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.karma}`
       + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.karma} has voted `
       + `${TM.utils.palette.highlight + info.text.trim()}${TM.utils.palette.karma} for this map.`)
-    await TM.addVote(TM.maps.current.id, info.login, playerVote as any)
+    await TM.karma.add(TM.maps.current.id, info.login, playerVote as any)
   }
 })
 

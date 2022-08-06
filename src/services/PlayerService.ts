@@ -203,10 +203,10 @@ export class PlayerService {
    */
   static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
     let laps
-    if (GameService.game.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
+    if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
-    } else if (GameService.game.gameMode === 3) { // laps gamemode
-      laps = GameService.game.lapsNo
+    } else if (GameService.config.gameMode === 3) { // laps gamemode
+      laps = GameService.config.lapsNo
     } else { // rounds, cup, teams and lap map
       laps = MapService.current.lapsAmount
     }
