@@ -139,13 +139,13 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previous'],
     help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
-      if (TM.previousMaps[0] === undefined) {
+      if (TM.jukebox.previous[0] === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Can't queue previous map because map history is empty. This happens if server was restarted.`)
         return
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the previous map.`)
-      TM.addToJukebox(TM.previousMaps[0].id, info.login)
+      TM.jukebox.add(TM.jukebox.previous[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.client.callNoRes('NextChallenge')
     },
@@ -157,7 +157,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the ongoing map.`)
-      TM.addToJukebox(TM.maps.current.id, info.login)
+      TM.jukebox.add(TM.maps.current.id, info.login)
     },
     privilege: 1
   },
@@ -332,16 +332,16 @@ const commands: TMCommand[] = [
     help: 'Drop the specified track from the map queue',
     params: [{ name: 'index', type: 'int' }],
     callback: (info: MessageInfo, index: number): void => {
-      if (TM.jukebox[index] === undefined) {
+      if (TM.jukebox.juked[index] === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No such index in the queue.`, info.login)
         return
       }
-      const map: TMMap | undefined = TM.jukebox.map(a => a.map).find(a => a === TM.jukebox.map(a => a.map)[index])
+      const map: TMMap | undefined = TM.jukebox.juked.map(a => a.map).find(a => a === TM.jukebox.juked.map(a => a.map)[index])
       if (map === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't find this index in the queue.`, info.login)
         return
       }
-      TM.removeFromJukebox(map.id, info.login)
+      TM.jukebox.remove(map.id, info.login)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
         + `${TM.utils.palette.highlight + TM.utils.strip(map.name)}${TM.utils.palette.admin} from the queue.`
@@ -353,12 +353,12 @@ const commands: TMCommand[] = [
     aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
     help: 'Clear the entirety of the current map queue',
     callback: (info: MessageInfo): void => {
-      if (TM.jukebox.length === 0) {
+      if (TM.jukebox.juked.length === 0) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}No maps in the queue.`, info.login)
         return
       }
-      for (const map of TM.jukebox) {
-        TM.removeFromJukebox(map.map.id, info.login)
+      for (const map of TM.jukebox.juked) {
+        TM.jukebox.remove(map.map.id, info.login)
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
@@ -371,7 +371,7 @@ const commands: TMCommand[] = [
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo): void => {
-      if (TM.gameInfo.gameMode === 1 || TM.gameInfo.gameMode === 4) { // TimeAttack & Stunts
+      if (TM.gameConfig.gameMode === 1 || TM.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server not in rounds mode.`, info.login)
         return
       }

@@ -35,7 +35,7 @@ const command: TMCommand = {
               TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to queue the map.`, info.login)
               return
             }
-            TM.addToJukebox(id, info.login)
+            TM.jukebox.add(id, info.login)
             TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin} ` +
               `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} is already on the server, ` +
               `it will be ${TM.utils.palette.highlight}queued ${TM.utils.palette.admin}instead.`, info.login)

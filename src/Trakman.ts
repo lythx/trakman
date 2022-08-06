@@ -206,11 +206,48 @@ export const TRAKMAN = {
 
   },
 
+  jukebox: {
+
+    add: JukeboxService.add.bind(JukeboxService),
+
+    remove: JukeboxService.add.bind(JukeboxService),
+
+    clear: JukeboxService.clear.bind(JukeboxService),
+
+    shuffle: JukeboxService.shuffle.bind(JukeboxService),
+
+    get next() { return JukeboxService.queue },
+
+    get previous() { return JukeboxService.previous },
+
+    get current() { return JukeboxService.current },
+
+    get juked() { return JukeboxService.jukebox }
+
+  },
+
+  karma: {
+
+    /**
+     * Adds a player vote to the database and to Maniakarma service if its running
+     * @param mapId Map UID
+     * @param login Player login
+     * @param vote Player vote
+     */
+    async add(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+      if (process.env.USE_MANIAKARMA === 'YES') {
+        ManiakarmaService.addVote(mapId, login, vote)
+      }
+      await VoteService.add(mapId, login, vote)
+    },
+
+  },
+
   /**
- * Sends a server message
- * @param message Message to be sent
- * @param login Optional player login (or comma-joined list of logins)
- */
+  * Sends a server message
+  * @param message Message to be sent
+  * @param login Optional player login (or comma-joined list of logins)
+  */
   sendMessage(message: string, login?: string): void {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
@@ -286,36 +323,6 @@ export const TRAKMAN = {
    */
   setPrivilege(login: string, privilege: number, adminLogin: string): void {
     PlayerService.setPrivilege(login, privilege, adminLogin)
-  },
-
-  /**
-   * Adds a map to the queue
-   * @param mapId Map UID
-   */
-  addToJukebox(mapId: string, callerLogin?: string, setAsNextMap?: true): void {
-    JukeboxService.add(mapId, callerLogin, setAsNextMap)
-  },
-
-  /**
-   * Removes a map from the queue
-   * @param mapId Map UID
-   */
-  removeFromJukebox(mapId: string, callerLogin?: string): void {
-    JukeboxService.remove(mapId, callerLogin)
-  },
-
-  /**
-   * Removes all maps from jukebox
-   */
-  clearJukebox(callerLogin?: string): void {
-    JukeboxService.clear(callerLogin)
-  },
-
-  /**
-   * Shuffle the map list and jukebox
-   */
-  shuffleJukebox(adminLogin: string): void {
-    JukeboxService.shuffle(adminLogin)
   },
 
   /**
@@ -435,19 +442,6 @@ export const TRAKMAN = {
   fetchMapRank: RecordService.fetchMapRank.bind(RecordService),
 
   /**
-   * Adds a player vote to the database and to Maniakarma service if its running
-   * @param mapId Map UID
-   * @param login Player login
-   * @param vote Player vote
-   */
-  async addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
-    if (process.env.USE_MANIAKARMA === 'YES') {
-      ManiakarmaService.addVote(mapId, login, vote)
-    }
-    await VoteService.add(mapId, login, vote)
-  },
-
-  /**
    * Fetches all votes for a map
    * @param mapId Map UID
    * @returns Database response
@@ -456,24 +450,12 @@ export const TRAKMAN = {
     return await VoteService.fetch(mapId)
   },
 
-  get gameInfo(): TMGame {
-    return GameService.game
+  get gameConfig(): TMGame {
+    return GameService.config
   },
 
   get serverConfig(): ServerInfo {
     return ServerConfig.config
-  },
-
-  get mapQueue(): TMMap[] {
-    return JukeboxService.queue
-  },
-
-  get jukebox() {
-    return JukeboxService.jukebox
-  },
-
-  get previousMaps(): TMMap[] {
-    return JukeboxService.previous
   },
 
   get votes(): TMVote[] {

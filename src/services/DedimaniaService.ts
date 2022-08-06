@@ -49,7 +49,7 @@ export abstract class DedimaniaService {
   }
 
   static getDedi(login: string): TMDedi | undefined {
-    return this._dedis.find(a=>a.login === login)
+    return this._dedis.find(a => a.login === login)
   }
 
   static async getRecords(id: string, name: string, environment: string, author: string): Promise<true | Error> {
@@ -74,7 +74,7 @@ export abstract class DedimaniaService {
         { string: environment },
         { string: author },
         { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
-        { int: GameService.game.gameMode },
+        { int: GameService.config.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
@@ -132,7 +132,7 @@ export abstract class DedimaniaService {
         { string: environment },
         { string: author },
         { string: 'TMF' },
-        { int: GameService.game.gameMode },
+        { int: GameService.config.gameMode },
         { int: checkpointsAmount },
         { int: this.dedisAmount },
         { array: recordsArray }

@@ -32,7 +32,7 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
 })
 
 TM.addListener('Controller.EndMap', async (): Promise<void> => {
-  const res = await fetchPlayerData(TM.mapQueue[0].author)
+  const res = await fetchPlayerData(TM.jukebox.next[0].author)
   if (res instanceof Error || res === false) {
     nextAuthorData = undefined
   } else {
@@ -45,7 +45,7 @@ TM.addListener('Controller.EndMap', async (): Promise<void> => {
 
 TM.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
   if (TM.serverState === 'result') {
-    const res = await fetchPlayerData(TM.mapQueue[0].author)
+    const res = await fetchPlayerData(TM.jukebox.next[0].author)
     if (res instanceof Error || res === false) {
       nextAuthorData = undefined
     } else {

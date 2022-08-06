@@ -272,17 +272,17 @@ export default class MapList extends PopupWindow {
       TM.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
       return false
     }
-    if (TM.jukebox.some(a => a.map.id === mapId)) {
-      TM.removeFromJukebox(mapId, login)
+    if (TM.jukebox.juked.some(a => a.map.id === mapId)) {
+      TM.jukebox.remove(mapId, login)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickName, true)} `
         + `${TM.utils.palette.vote}removed ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} from the queue.`)
     }
     else {
-      if (privilege <= 0 && TM.jukebox.some(a => a.callerLogin === login)) {
+      if (privilege <= 0 && TM.jukebox.juked.some(a => a.callerLogin === login)) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.vote}You can't add more than one map to the queue.`)
         return false
       }
-      TM.addToJukebox(mapId, login)
+      TM.jukebox.add(mapId, login)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickName, true)} `
         + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} to the queue.`)
     }
@@ -335,12 +335,12 @@ export default class MapList extends PopupWindow {
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
     const width = (w - this.margin * 3) - this.iconW
     const height = h - this.margin
-    const index = TM.jukebox.findIndex(a => a.map.id === mapId)
-    const prevIndex = [TM.maps.current, ...TM.previousMaps].findIndex(a => a.id === mapId)
+    const index = TM.jukebox.juked.findIndex(a => a.map.id === mapId)
+    const prevIndex = [TM.maps.current, ...TM.jukebox.previous].findIndex(a => a.id === mapId)
     const player = TM.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
-    if (player?.privilege <= 0 && (prevIndex !== -1 || (TM.jukebox[index]?.callerLogin !== undefined && TM.jukebox[index].callerLogin !== login))) {
+    if (player?.privilege <= 0 && (prevIndex !== -1 || (TM.jukebox.juked[index]?.callerLogin !== undefined && TM.jukebox.juked[index].callerLogin !== login))) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="7777"/>
         <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>`
     }

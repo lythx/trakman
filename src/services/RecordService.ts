@@ -179,11 +179,11 @@ export class RecordService {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
-    if (GameService.game.gameMode === 1 || !MapService.current.isLapRace) {
+    if (GameService.config.gameMode === 1 || !MapService.current.isLapRace) {
       laps = 1
-    } else if (GameService.game.gameMode === 3) {
-      laps = GameService.game.lapsNo
-    } else if (GameService.game.gameMode === 4) {
+    } else if (GameService.config.gameMode === 3) {
+      laps = GameService.config.lapsNo
+    } else if (GameService.config.gameMode === 4) {
       return false// TODO STUNTS MODE
     } else {
       laps = MapService.current.lapsAmount
