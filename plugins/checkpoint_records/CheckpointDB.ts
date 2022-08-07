@@ -10,7 +10,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
   PRIMARY KEY(map_id, index),
   CONSTRAINT fk_player_id
     FOREIGN KEY(player_id) 
-      REFERENCES player_ids(id),
+      REFERENCES players(id),
   CONSTRAINT fk_map_id
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
@@ -22,7 +22,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
   PRIMARY KEY(map_id, player_id),
   CONSTRAINT fk_player_id
     FOREIGN KEY(player_id) 
-      REFERENCES player_ids(id),
+      REFERENCES players(id),
   CONSTRAINT fk_map_id
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
@@ -41,7 +41,7 @@ export const allCpsDB = {
     if (playerLogins.length === 0) { return [] }
     const playerDBIds = await TM.getPlayerDBId(playerLogins)
     const query = `SELECT checkpoints, login FROM checkpoint_records
-    JOIN player_ids ON player_ids.id=checkpoint_records.player_id
+    JOIN players ON players.id=checkpoint_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
     const res: { checkpoints: number[], login: string }[] | Error = (await DB.query(query, mapDBId, ...playerDBIds.map(a => a.id))).rows
     if (res instanceof Error) {
@@ -75,7 +75,6 @@ export const bestSecsDB = {
     const res: { checkpoint: number, date: Date, index: number, login: string, nickname: string }[] | Error =
       (await DB.query(`SELECT checkpoint, index, date, login, nickname FROM best_checkpoint_records 
     JOIN players ON players.id=best_checkpoint_records.player_id
-    JOIN player_ids ON player_ids.id=best_checkpoint_records.player_id
     WHERE map_id=$1;`, mapId)).rows
     if (res instanceof Error) {
       TM.log.error(`Error when fetching checkpoint records on map ${mapDBId}`, res.message)

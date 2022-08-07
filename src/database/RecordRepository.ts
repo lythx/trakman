@@ -1,6 +1,6 @@
 import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
-import { PlayerIdsRepository } from './PlayerIdsRepository.js'
+import { PlayerRepository } from './PlayerRepository.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS records(
@@ -12,14 +12,14 @@ const createQuery: string = `
       PRIMARY KEY(map_id, player_id),
       CONSTRAINT fk_player_id
         FOREIGN KEY(player_id) 
-	        REFERENCES player_ids(id),
+	        REFERENCES players(id),
       CONSTRAINT fk_map_id
         FOREIGN KEY(map_id)
           REFERENCES map_ids(id)
   );`
 
 const mapIdsRepo = new MapIdsRepository()
-const playerIdsRepo = new PlayerIdsRepository()
+const playerRepo = new PlayerRepository()
 
 interface TableEntry {
   readonly uid: string
@@ -34,7 +34,7 @@ export class RecordRepository extends Repository {
 
   async initialize(): Promise<void> {
     await mapIdsRepo.initialize()
-    await playerIdsRepo.initialize()
+    await playerRepo.initialize()
     await super.initialize(createQuery)
   }
 
@@ -43,7 +43,7 @@ export class RecordRepository extends Repository {
     const query = `INSERT INTO records(map_id, player_id, time, checkpoints, date) 
     ${this.getInsertValuesString(5, records.length)}`
     const mapIds = await mapIdsRepo.get(records.map(a => a.map))
-    const playerIds = await playerIdsRepo.get(records.map(a => a.login))
+    const playerIds = await playerRepo.getId(records.map(a => a.login))
     const values: any[] = []
     for (const [i, record] of records.entries()) {
       values.push(mapIds[i].id, playerIds[i].id, record.time, record.checkpoints, record.date)
@@ -53,7 +53,6 @@ export class RecordRepository extends Repository {
 
   async getAll(): Promise<TMRecord[]> {
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
-    JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
     JOIN players ON players.id=records.player_id
     ORDER BY time ASC,
@@ -65,7 +64,6 @@ export class RecordRepository extends Repository {
   async get(...mapUids: string[]): Promise<TMRecord[]> {
     if (mapUids.length === 0) { return [] }
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
-    JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
     JOIN players ON players.id=records.player_id
     WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
@@ -79,13 +77,12 @@ export class RecordRepository extends Repository {
   async getByLogin(...logins: string[]): Promise<TMRecord[]> {
     if (logins.length === 0) { return [] }
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
-    JOIN player_ids ON player_ids.id=records.player_id
     JOIN map_ids ON map_ids.id=records.map_id
     JOIN players ON players.id=records.player_id
-    WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join(' ').slice(0, -3)}
+    WHERE ${logins.map((a, i) => `players.id=$${i + 1} OR `).join(' ').slice(0, -3)}
     ORDER BY time ASC,
     date ASC;`
-    const playerIds = await playerIdsRepo.get(logins)
+    const playerIds = await playerRepo.getId(logins)
     const res = (await this.query(query, ...playerIds.map(a => a.id)))
     return res.map(a => this.constructRecordObject(a))
   }
@@ -93,9 +90,8 @@ export class RecordRepository extends Repository {
 
   async getOne(mapUid: string, login: string): Promise<TMRecord | undefined> {
     const mapId = await mapIdsRepo.get(mapUid)
-    const playerId = await playerIdsRepo.get(login)
+    const playerId = await playerRepo.getId(login)
     const query: string = `SELECT time, checkpoints, date FROM records 
-    JOIN players ON players.id=records.player_id
     WHERE map_id=$1 AND player_id=$2`
     const res = (await this.query(query, mapId, playerId))
     return this.constructRecordObject({ uid: mapUid, login, ...res[0] })
@@ -103,7 +99,7 @@ export class RecordRepository extends Repository {
 
   async remove(mapUid: string, login: string): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
-    const playerId = await playerIdsRepo.get(login)
+    const playerId = await playerRepo.getId(login)
     const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`
     await this.query(query, mapId, playerId)
   }
@@ -116,15 +112,15 @@ export class RecordRepository extends Repository {
 
   async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
-    const playerId = await playerIdsRepo.get(login)
+    const playerId = await playerRepo.getId(login)
     const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'
     await this.query(query, time, checkpoints, date, mapId, playerId)
   }
 
   async countRecords(login: string): Promise<number> {
-    const playerId = await playerIdsRepo.get(login)
-    const query = `select count(*) from records where login=$1;`
-    return Number((await this.query(query, playerId))[0].count)
+    const playerId = await playerRepo.getId(login)
+    const query = `SELECT COUNT(*)::int from RECORDS where player_id=$1;`
+    return (await this.query(query, playerId))[0].count
   }
 
   private constructRecordObject(entry: TableEntry): TMRecord {

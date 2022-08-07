@@ -9,7 +9,7 @@ const topUpdateListeners: (() => void)[] = []
 const initialize = async () => {
   const res: any[] | Error = await TM.db.query(`select p.login, count(p.id)::int
   from votes v
-  join player_ids p on v.player_id = p.id
+  join players p on v.player_id = p.id
   group by p.login
   order by count desc
   limit 10;`)

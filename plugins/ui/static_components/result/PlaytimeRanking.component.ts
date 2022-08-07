@@ -21,7 +21,7 @@ export default class PlaytimeRanking extends StaticComponent {
     this.constructXml()
     TM.addListener('Controller.EndMap', async () => {
       const res = await TM.db.query(`SELECT nickname, time_played FROM players
-      JOIN player_ids ON player_ids.id=players.id
+      JOIN players ON players.id=players.id
       ORDER BY time_played DESC
       LIMIT ${this.entries + 1}`)
       if (res instanceof Error) {
