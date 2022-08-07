@@ -5,57 +5,18 @@
     "dotenv": "^16.0.0",
     "node-fetch": "^3.2.4",
     "pg": "^8.7.3",
-    "tracer": "^1.1.5",
     "typescript": "^4.6.4",
-    "uuid": "^8.3.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.1",
     "@types/node": "^17.0.33",
     "@types/pg": "^8.6.5",
-    "@types/uuid": "^8.3.4",
     "@types/xml2js": "^0.4.11",
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
-    "eslint": "7.32.0",
-    "jest": "27.5.1",
-    "standard": "^17.0.0",
-    "ts-jest": "27.1.4",
-    "ts-mockito": "^2.6.1",
-    "ts-node": "^10.7.0",
-    "ts-standard": "^11.0.0"
-  },
-  "ts-standard": {
-    "ignore": [
-      "built",
-      ".*",
-      "node-modules",
-      "src/**/*.js",
-      "tests/**/*.js"
-    ]
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "roots": [
-      "built/tests"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    }
+    "ts-node": "^10.7.0"
   },
   "scripts": {
-    "unit": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "test": "npm run unit && ts-standard",
-    "build": "tsc",
-    "prod": "npm run build && node ./built/src/Main.js",
-    "debug": "npm run build && node --inspect ./built/src/Main.js"
+    "build": "npx tsc",
+    "start": "node ./built/src/Main.js"
   },
   "type": "module"
 }
