@@ -43,19 +43,6 @@ export class PlayerService {
   }
 
   /**
-* Gets the player information
-* @param login Player login
-* @returns Player object or undefined if the player isn't online
-*/
-  static getPlayer(login: string): TMPlayer | undefined {
-    return this._players.find(p => p.login === login)
-  }
-
-  static get players(): TMPlayer[] {
-    return this._players
-  }
-
-  /**
    * Add all the players in the server into local storage and database
    * Only called in the beginning as a start job
    */
@@ -84,11 +71,11 @@ export class PlayerService {
     let s: string[] = fullRegion.split('|')
     s.shift()
     const region: string = s.join('|')
-    const nation: string = fullRegion.split('|')[1]
-    let nationCode: string | undefined = Utils.nationToNationCode(nation)
-    if (nationCode === undefined) {
+    const country: string = fullRegion.split('|')[1]
+    let countryCode: string | undefined = Utils.countryToCode(country)
+    if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
-      await Logger.fatal(`Error adding player ${login} to memory, nation ${nation} is not in the country list`)
+      await Logger.fatal(`Error adding player ${login} to memory, nation ${country} is not in the country list`)
       return {} as any // Shut up IDE
     }
     const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
@@ -100,8 +87,8 @@ export class PlayerService {
         id,
         login,
         nickname,
-        nation,
-        nationCode,
+        country: country,
+        countryCode: countryCode,
         timePlayed: 0,
         joinTimestamp: Date.now(),
         visits: 1,
@@ -120,8 +107,8 @@ export class PlayerService {
       player = {
         login,
         nickname,
-        nation,
-        nationCode,
+        country: country,
+        countryCode: countryCode,
         timePlayed: playerData.timePlayed,
         joinTimestamp: Date.now(),
         visits: serverStart === true ? playerData.visits : playerData.visits + 1, // Prevent adding visits on server start
@@ -261,6 +248,19 @@ export class PlayerService {
       await this.repo.updateAverage(rank.login, sum / amount)
     }
     this.ranks = await this.repo.getRanks()
+  }
+
+  /**
+* Gets the player information
+* @param login Player login
+* @returns Player object or undefined if the player isn't online
+*/
+  static getPlayer(login: string): TMPlayer | undefined {
+    return this._players.find(p => p.login === login)
+  }
+
+  static get players(): TMPlayer[] {
+    return [...this._players]
   }
 
 }

@@ -73,7 +73,7 @@ export const TRAKMAN = {
 
     fetch: PlayerService.fetchPlayer.bind(PlayerService),
 
-    /**
+  /**
    * Fetches Trackmania Webservices for player information
    * @param login Player login
    * @returns Player information in JSON or error if unsuccessful

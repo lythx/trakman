@@ -68,7 +68,7 @@ const events: TMListener[] = [
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.servermsg}${TM.utils.getTitle(player)}${TM.utils.palette.highlight}: `
         + `${TM.utils.strip(player.nickname, true)}${TM.utils.palette.servermsg} Country${TM.utils.palette.highlight}: `
-        + `${player.nation} ${TM.utils.palette.servermsg}Visits${TM.utils.palette.highlight}: ${player.visits}${TM.utils.palette.servermsg}.`)
+        + `${player.country} ${TM.utils.palette.servermsg}Visits${TM.utils.palette.highlight}: ${player.visits}${TM.utils.palette.servermsg}.`)
     }
   },
   {

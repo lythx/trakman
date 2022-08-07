@@ -2,22 +2,22 @@ import { TRAKMAN as TM } from '../src/Trakman.js'
 
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 
-const fetchPlayerData = async (login: string): Promise<{ nickname: string, nation: string } | Error | false> => {
+const fetchPlayerData = async (login: string): Promise<{ nickname: string, country: string } | Error | false> => {
   if (regex.test(login) === true) { return false }
   const json: any = await TM.players.fetchWebservices(login)
   if (json instanceof Error) { // UNKOWN PLAYER MOMENT
     return json
   } else {
     // No error check, nation cannot be undefined
-    return { nickname: json?.nickname, nation: (TM.utils.nationToNationCode(json?.path?.split('|')[1]) as any) }
+    return { nickname: json?.nickname, country: (TM.utils.countryToCode(json?.path?.split('|')[1]) as any) }
   }
 }
 
-const currentAuthorListeners: ((data?: { nickname: string, nation: string }) => void)[] = []
-const nextAuthorListeners: ((data?: { nickname: string, nation: string }) => void)[] = []
+const currentAuthorListeners: ((data?: { nickname: string, country: string }) => void)[] = []
+const nextAuthorListeners: ((data?: { nickname: string, country: string }) => void)[] = []
 
-let currentAuthorData: { nickname: string, nation: string } | undefined
-let nextAuthorData: { nickname: string, nation: string } | undefined
+let currentAuthorData: { nickname: string, country: string } | undefined
+let nextAuthorData: { nickname: string, country: string } | undefined
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
   const res = await fetchPlayerData(TM.maps.current.author)
@@ -78,11 +78,11 @@ export const MapAuthorData = {
     return nextAuthorData
   },
 
-  onCurrentAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)) => {
+  onCurrentAuthorChange: (callback: ((data?: { nickname: string, country: string }) => void)) => {
     currentAuthorListeners.push(callback)
   },
 
-  onNextAuthorChange: (callback: ((data?: { nickname: string, nation: string }) => void)) => {
+  onNextAuthorChange: (callback: ((data?: { nickname: string, country: string }) => void)) => {
     nextAuthorListeners.push(callback)
   }
 

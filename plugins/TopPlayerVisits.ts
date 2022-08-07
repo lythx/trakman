@@ -5,10 +5,10 @@ const updateListeners: (() => void)[] = []
 
 const initialize = async () => {
   const allPlayers: any[] | Error = await TM.db.query(`SELECT login, visits FROM players
-  JOIN players ON players.id=players.id
   ORDER BY visits DESC,
   last_online DESC
   LIMIT 10`)
+  console.log(allPlayers)
   if (allPlayers instanceof Error) {
     return
   }

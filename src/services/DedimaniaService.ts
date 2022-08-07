@@ -246,7 +246,7 @@ export abstract class DedimaniaService {
           {
             struct: {
               Login: { string: player.login },
-              Nation: { string: player.nationCode },
+              Nation: { string: player.countryCode },
               TeamName: { string: '' },
               TeamId: { int: -1 },
               IsSpec: { boolean: player.isSpectator },
@@ -268,8 +268,8 @@ export abstract class DedimaniaService {
       time,
       checkpoints,
       nickname: player.nickname,
-      nation: player.nation,
-      nationCode: player.nationCode,
+      country: player.country,
+      countryCode: player.countryCode,
       timePlayed: player.timePlayed,
       joinTimestamp: player.joinTimestamp,
       wins: player.wins,
