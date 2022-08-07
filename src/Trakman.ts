@@ -73,11 +73,11 @@ export const TRAKMAN = {
 
     fetch: PlayerService.fetchPlayer.bind(PlayerService),
 
-  /**
-   * Fetches Trackmania Webservices for player information
-   * @param login Player login
-   * @returns Player information in JSON or error if unsuccessful
-   */
+    /**
+     * Fetches Trackmania Webservices for player information
+     * @param login Player login
+     * @returns Player information in JSON or error if unsuccessful
+     */
     async fetchWebservices(login: string): Promise<{
       id: number
       login: string
@@ -437,16 +437,6 @@ export const TRAKMAN = {
    */
   removeFromGuestlist: async (login: string, callerLogin?: string): Promise<boolean | Error> => {
     return await AdministrationService.removeFromGuestlist(login, callerLogin)
-  },
-
-  // TO BE REMOVED
-  get playerRanks(): {
-    [login: string]: {
-      mapId: string;
-      rank: number;
-    }[];
-  } {
-    return RecordService.playerRanks
   },
 
   // TO BE REMOVED

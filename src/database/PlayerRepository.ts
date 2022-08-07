@@ -48,10 +48,10 @@ export class PlayerRepository extends Repository {
       return res[0] === undefined ? undefined : this.constructPlayerObject(res[0])
     }
     if (logins.length === 0) { return [] }
-    const query: string = `SELECT login, nickname, region, wins, time_played, visits, is_united, last_online, average, privilege FROM players 
+    const query: string = `SELECT players.login, nickname, region, wins, time_played, visits, is_united, last_online, average, privilege FROM players 
     LEFT JOIN privileges ON players.login=privileges.login
     WHERE ${logins.map((a, i) => `players.login=$${i + 1} OR `).join('').slice(0, -3)}`
-    const res = await this.query(query, logins)
+    const res = await this.query(query, ...logins)
     return res.map(a => this.constructPlayerObject(a))
   }
 

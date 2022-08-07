@@ -4,6 +4,7 @@ import 'dotenv/config'
 import CONFIG from '../../config.json' assert { type: 'json' }
 import { Logger } from '../Logger.js'
 import { Events } from '../Events.js'
+import { MapService } from './MapService.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
@@ -227,6 +228,7 @@ export abstract class TMXService {
       downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${TMXId}`,
       replays
     }
+    void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
     return mapInfo
   }
 

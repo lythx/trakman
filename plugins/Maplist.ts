@@ -7,6 +7,10 @@ const atSort: TMMap[] = []
 const positionSorts: { login: string, list: TMMap[] }[] = []
 const cachedSearches: { query: string, list: TMMap[] }[] = []
 
+const initializeLists = () => {
+
+}
+
 TM.addListener('Controller.Ready', (): void => {
   const arr1: TMMap[] = TM.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
   authorSort.push(...arr1.sort((a, b): number => a.author.localeCompare(b.author)))
@@ -17,6 +21,23 @@ TM.addListener('Controller.Ready', (): void => {
     return bKarma - aKarma
   }))
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
+})
+
+TM.addListener('Controller.MapAdded', (map) => {
+  authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
+  nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
+  const ratio = TM.voteRatios.find(a => a.mapId === map.id)?.ratio ?? 0
+  karmaSort.splice(karmaSort.findIndex(a => map.author.localeCompare(a.author)
+    && map.name.localeCompare(a.name)
+    && ratio > (TM.voteRatios.find(b => b.mapId === a.id)?.ratio ?? 0)), 0, map)
+  atSort.splice(atSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name) && map.authorTime < a.authorTime), 0, map)
+})
+
+TM.addListener('Controller.MapRemoved', (map) => {
+  authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
+  nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
+  karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)
+  atSort.splice(atSort.findIndex(a => a.id === map.id), 1)
 })
 
 export const MAPLIST = {

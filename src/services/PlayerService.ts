@@ -255,11 +255,11 @@ export class PlayerService {
 * @param login Player login
 * @returns Player object or undefined if the player isn't online
 */
-  static getPlayer(login: string): TMPlayer | undefined {
+  static getPlayer(login: string): Readonly<TMPlayer & { currentCheckpoints: Readonly<Readonly<TMCheckpoint>[]> }> | undefined {
     return this._players.find(p => p.login === login)
   }
 
-  static get players(): TMPlayer[] {
+  static get players(): Readonly<TMPlayer & { currentCheckpoints: Readonly<TMCheckpoint>[] }>[] {
     return [...this._players]
   }
 
