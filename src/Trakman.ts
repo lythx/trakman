@@ -18,10 +18,10 @@ import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import http from 'http'
-import { PlayerIdsRepository } from './database/PlayerIdsRepository.js'
+import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 
-const playerIdsRepo: PlayerIdsRepository = new PlayerIdsRepository()
+const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
 
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
@@ -300,7 +300,7 @@ export const TRAKMAN = {
   },
 
   // TO BE REMOVED
-  getPlayerDBId: playerIdsRepo.get.bind(playerIdsRepo),
+  getPlayerDBId: playerIdsRepo.getId.bind(playerIdsRepo),
 
   // Implement client idk
   DatabaseClient: Database,

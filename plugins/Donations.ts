@@ -14,7 +14,6 @@ const topDonators: { login: string, nickname: string, amount: number }[] = []
 const initialize = async () => {
   const res: any[] | Error = await TM.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
   JOIN players ON players.id=donations.player_id
-  JOIN player_ids ON player_ids.id=donations.player_id
   GROUP BY (login, nickname)
   ORDER BY amount DESC
   LIMIT 10`)

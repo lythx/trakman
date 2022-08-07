@@ -10,7 +10,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
   PRIMARY KEY(map_id, index),
   CONSTRAINT fk_player_id
     FOREIGN KEY(player_id) 
-      REFERENCES player_ids(id),
+      REFERENCES players(id),
   CONSTRAINT fk_map_id
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
@@ -22,7 +22,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
   PRIMARY KEY(map_id, player_id),
   CONSTRAINT fk_player_id
     FOREIGN KEY(player_id) 
-      REFERENCES player_ids(id),
+      REFERENCES players(id),
   CONSTRAINT fk_map_id
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
@@ -41,7 +41,7 @@ export const allSecsDB = {
     if (playerLogins.length === 0) { return [] }
     const playerDBIds = await TM.getPlayerDBId(playerLogins)
     const query = `SELECT sectors, login FROM sector_records
-    JOIN player_ids ON player_ids.id=sector_records.player_id
+    JOIN players ON players.id=sector_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
     const res: { sectors: number[], login: string }[] | Error = (await DB.query(query, mapDBId, ...playerDBIds.map(a => a.id))).rows
     if (res instanceof Error) {
@@ -75,7 +75,6 @@ export const bestSecsDB = {
     const res: { sector: number, date: Date, index: number, login: string, nickname: string }[] | Error =
       (await DB.query(`SELECT sector, index, date, login, nickname FROM best_sector_records 
     JOIN players ON players.id=best_sector_records.player_id
-    JOIN player_ids ON player_ids.id=best_sector_records.player_id
     WHERE map_id=$1;`, mapId)).rows
     if (res instanceof Error) {
       TM.log.error(`Error when fetching sector records on map ${mapDBId}`, res.message)

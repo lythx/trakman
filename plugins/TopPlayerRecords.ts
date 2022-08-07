@@ -4,7 +4,6 @@ const topPlayerRecords: { login: string, nickname: string, amount: number }[] = 
 const updateListeners: (() => void)[] = []
 const initialize = async () => {
   const res: any[] | Error = await TM.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
-  JOIN player_ids ON player_ids.id=records.player_id
   JOIN players ON players.id=records.player_id
   JOIN maps ON maps.id=records.map_id
   GROUP BY (nickname, login, last_online)
