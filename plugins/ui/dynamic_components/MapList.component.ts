@@ -92,12 +92,15 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.addListener(['Controller.MapAdded', 'Controller.MapRemoved'], () => {
+    TM.addListener('Controller.MapRemoved', (map) => {
       const arr = TM.maps.list.sort((a, b) => a.name.localeCompare(b.name))
       this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
       let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
+      for (const e of this.playerQueries) {
+        e.list.splice(e.list.findIndex(a => a.id === map.id), 1)
+      }
       this.reRender()
     })
   }

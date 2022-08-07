@@ -14,7 +14,7 @@ export class RecordService {
   private static readonly _liveRecords: FinishInfo[] = []
   static readonly localsAmount: number = Number(process.env.LOCALS_AMOUNT)
   static readonly initialLocals: TMLocalRecord[] = []
-  private static readonly _playerRanks: { [login: string]: { mapId: string, rank: number }[] } = {}
+  private static readonly _playerRanks: { login: string, mapId: string, rank: number }[] = []
 
   static async initialize(): Promise<void> {
     if (this.localsAmount === NaN) {
@@ -22,14 +22,7 @@ export class RecordService {
     }
     await this.repo.initialize()
     await this.fetchAndSaveRecords(MapService.current.id)
-    this.initialLocals.push(...this._localRecords)
-    Events.addListener('Controller.BeginMap', (): void => {
-      this.initialLocals.length = 0
-      this.initialLocals.push(...this._localRecords)
-    })
-    for (const e of PlayerService.players) {
-      this.fetchAndSaveRanks(e.login)
-    }
+    await this.fetchAndSaveRanks()
   }
 
   /**
@@ -50,14 +43,52 @@ export class RecordService {
     return this._liveRecords.find(a => a.login === login)
   }
 
+  /**
+   * Fetches given player local rank on given map
+   * @param login 
+   * @param mapId
+   */
   static async fetchMapRank(login: string, mapId: string): Promise<number | undefined>
+  /**
+   * Fetches given player local ranks on given maps
+   * @param login 
+   * @param mapIds 
+   */
   static async fetchMapRank(login: string, mapIds: string[]): Promise<{ mapId: string, rank: number }[]>
   static async fetchMapRank(login: string, mapIds: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
     if (typeof mapIds === 'string') {
-      return undefined //TODO
+      const find = this._playerRanks.filter(a => mapIds === a.mapId && a.rank !== -1 && a.login === login)
+      if (find !== undefined) {
+        return find
+      }
+      const records: TMRecord[] = await this.repo.get(mapIds)
+      let rank: number | undefined
+      let i: number = -1
+      while (true) {
+        i++
+        if (records[i] === undefined) { break }
+        const id: string = records[i].map
+        let index: number = 0
+        let j: number = 0
+        while (true) {
+          if (records[j] === undefined) {
+            rank = -1
+            break
+          }
+          if (records[j].map === id) {
+            if (records[j].login === login) {
+              rank = index + 1
+              break
+            }
+            index++
+          }
+          j++
+        }
+      }
+      return rank
     } else {
-      if (this._playerRanks[login] !== undefined) {
-        return this._playerRanks[login].filter(a => mapIds.includes(a.mapId) && a.rank !== -1)
+      if (PlayerService.players.some(a => a.login === login)) {
+        return this._playerRanks.filter(a => mapIds.includes(a.mapId) && a.rank !== -1 && a.login === login)
       }
       const records: TMRecord[] = await this.repo.get(...mapIds)
       const positions: number[] = []
@@ -94,60 +125,62 @@ export class RecordService {
     }
   }
 
-  static async fetchAndSaveRanks(login: string): Promise<void> {
+  static async fetchAndSaveRanks(...logins: string[]): Promise<void> {
+    if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
     let records: TMRecord[] = await this.repo.getAll()
-    const r: { mapId: string, rank: number }[] = []
+    const r: { login: string, mapId: string, rank: number }[] = []
     let index: number = 0
     while (records.length > 0) {
-      r[index] = {
-        mapId: records[0].map,
-        rank: -1
-      }
       let currentMap: string = records[0].map
-      let i: number = 0
-      let pos: number = 0
-      while (true) {
-        if (records[i] === undefined) { break }
-        if (records[i].map === currentMap) {
-          if (records[i].login === login) {
-            r[index].rank = pos + 1
-            break
-          }
-          pos++
+      for (let j = 0; j < logins.length; j++) {
+        r[index] = {
+          login: records[0].login,
+          mapId: records[0].map,
+          rank: -1
         }
-        i++
+        let currentLogin: string = logins[j]
+        let i: number = 0
+        let pos: number = 0
+        while (true) {
+          if (records[i] === undefined) { break }
+          if (records[i].map === currentMap) {
+            if (records[i].login === currentLogin) {
+              r[index].rank = pos + 1
+              break
+            }
+            pos++
+          }
+          i++
+        }
+        index++
       }
       records = records.filter(a => a.map !== currentMap)
-      index++
     }
-    this._playerRanks[login] = r
+    this._playerRanks.push(...r)
   }
 
-  static async fetchAndSaveRecords(mapId: string): Promise<TMLocalRecord[]> {
+  static async fetchAndSaveRecords(mapId: string): Promise<void> {
     this._localRecords.length = 0
     this._liveRecords.length = 0
+    this.initialLocals.length = 0
     const records: TMRecord[] = await this.repo.get(mapId)
+    const players: TMOfflinePlayer[] = await PlayerService.fetchPlayer(records.map(a => a.login))
     for (const e of records) {
-      const player: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(e.login)
+      const player = players.find(a => a.login === e.login)
       if (player === undefined) {
         Logger.fatal('Cant find login in players table even though it has record in records table.')
-        return []
+        return
       }
       this._localRecords.push({
         ...e,
         ...player
       })
     }
+    this.initialLocals.push(...this._localRecords)
     Events.emitEvent('Controller.LocalRecords', records)
-    return this._localRecords
   }
 
-  static get playerRanks(): {
-    [login: string]: {
-      mapId: string;
-      rank: number;
-    }[];
-  } {
+  static get playerRanks(): { login: string; mapId: string; rank: number; }[] {
     return this._playerRanks
   }
 

@@ -245,6 +245,7 @@ export class Listeners {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
+        if(PlayerService.getPlayer(params[1])?.privilege === -1) { return }
         const temp: any = PlayerService.getPlayer(params[1])
         temp.answer = params[2]
         const info: ManialinkClickInfo = temp

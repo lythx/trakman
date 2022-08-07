@@ -15,21 +15,21 @@ export class MapService {
     await this.initializeList()
     await this.setCurrent()
     Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
-      this.maps.length = 0
+      this._maps.length = 0
       await this.initializeList()
-      Events.emitEvent('Controller.MatchSettingsUpdated', this.maps)
+      Events.emitEvent('Controller.MatchSettingsUpdated', this._maps)
     })
   }
 
-  static get(uid: string) {
+  static get(uid: string): Readonly<TMMap> | undefined {
     return this._maps.find(a => a.id === uid)
   }
 
-  static get current(): TMCurrentMap {
+  static get current(): Readonly<TMCurrentMap> {
     return this._current
   }
 
-  static get maps(): TMMap[] {
+  static get maps(): Readonly<TMMap>[] {
     return [...this._maps]
   }
 
@@ -55,14 +55,32 @@ export class MapService {
     this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
   }
 
+  static async setAwardsAndLbRating(uid: string, awards: number, lbRating: number) {
+    const map = this._maps.find(a => a.id === uid)
+    if (map === undefined) { return }
+    map.awards = awards
+    map.leaderboardRating = lbRating
+    await this.repo.setAwardsAndLbRating(uid, awards, lbRating)
+  }
+
   /**
    * Download all the maps from the server and store them in a field
    */
   private static async initializeList(): Promise<void> {
+    const current = await Client.call('GetCurrentChallengeInfo')
+    if (current instanceof Error) {
+      Logger.fatal('Error while getting the current map', current.message)
+      return
+    }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
     if (mapList instanceof Error) {
       Logger.fatal('Error while getting the map list', mapList.message)
       return
+    }
+    if(!mapList.some(a=>a.UId === current[0].UId)) {
+      mapList.push(current[0])
+      const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: current[0].FileName }])
+      if (insert instanceof Error) { await Logger.fatal('Failed to insert current challenge')}
     }
     const DBMapList: TMMap[] = await this.repo.getAll()
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
@@ -95,16 +113,16 @@ export class MapService {
    * @param callerLogin Login of the player who is adding the map
    * @returns Added map object or error if unsuccessful
    */
-  static async add(fileName: string, callerLogin?: string): Promise<TMMap | Error> {
-    const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: fileName }])
+  static async add(filename: string, callerLogin?: string): Promise<TMMap | Error> {
+    const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: filename }])
     if (insert instanceof Error) { return insert }
-    if (insert[0] === false) { return new Error(`Failed to insert map ${fileName}`) }
-    const dbRes: TMMap | undefined = await this.repo.getByFilename(fileName)
+    if (insert[0] === false) { return new Error(`Failed to insert map ${filename}`) }
+    const dbRes: TMMap | undefined = await this.repo.getByFilename(filename)
     let obj: TMMap
     if (dbRes !== undefined) {
       obj = dbRes
     } else {
-      const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: fileName }])
+      const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: filename }])
       if (res instanceof Error) { return res }
       obj = this.constructNewMapObject(res[0])
       void this.repo.add(obj)
@@ -161,13 +179,22 @@ export class MapService {
    * @param info - GetChallengeInfo dedicated server call response
    */
   private static constructNewMapObject(info: any): TMMap {
+    info.Mood = info.Mood.trim()
+    if (!["Sunrise", "Day", "Sunset", "Night"].includes(info.Mood)) {
+      info.Mood = 'Day'
+    }
+    if (info.Environnement === 'Speed') {
+      info.Environnement = 'Desert'
+    } else if (info.Environnement === 'Alpine') {
+      info.Environnement = 'Snow'
+    }
     return {
       id: info.UId,
       name: info.Name,
       fileName: info.FileName,
       author: info.Author,
       environment: info.Environnement,
-      mood: info.Mood.trim(),
+      mood: info.Mood,
       bronzeTime: info.BronzeTime,
       silverTime: info.SilverTime,
       goldTime: info.GoldTime,

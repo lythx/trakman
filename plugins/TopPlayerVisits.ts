@@ -8,7 +8,6 @@ const initialize = async () => {
   ORDER BY visits DESC,
   last_online DESC
   LIMIT 10`)
-  console.log(allPlayers)
   if (allPlayers instanceof Error) {
     return
   }

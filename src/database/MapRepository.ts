@@ -5,7 +5,7 @@ const createQuery: string = `
 CREATE TABLE IF NOT EXISTS maps(
   id INT4 NOT NULL,
   name VARCHAR(60) NOT NULL,
-  filename VARCHAR(254) NOT NULL UNIQUE,
+  filename VARCHAR(255) NOT NULL UNIQUE,
   author VARCHAR(40) NOT NULL,
   environment INT2 NOT NULL,
   mood INT2 NOT NULL,
@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS maps(
   author_time INT4 NOT NULL,
   copper_price INT4 NOT NULL,
   is_lap_race BOOLEAN NOT NULL,
+  add_date TIMESTAMP NOT NULL,
+  leaderboard_rating INT4,
+  awards INT2,
   laps_amount INT2,
   checkpoints_amount INT2,
-  add_date TIMESTAMP NOT NULL,
   PRIMARY KEY(id),
   CONSTRAINT fk_map_id
     FOREIGN KEY(id) 
@@ -37,9 +39,11 @@ interface TableEntry {
   readonly author_time: number
   readonly copper_price: number
   readonly is_lap_race: boolean
+  readonly add_date: Date
+  readonly leaderboard_rating: number | null
+  readonly awards: number | null
   readonly laps_amount: number | null
   readonly checkpoints_amount: number | null
-  readonly add_date: Date
 }
 
 const moods = {
@@ -52,7 +56,7 @@ const moods = {
 const environments = {
   Stadium: 1,
   Island: 2,
-  Speed: 3,
+  Desert: 3,
   Rally: 4,
   Bay: 5,
   Coast: 6,
@@ -72,20 +76,21 @@ export class MapRepository extends Repository {
     if (maps.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date) ${this.getInsertValuesString(15, maps.length)}`
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, maps.length)}`
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     const values: any[] = []
     for (const [i, map] of maps.entries()) {
       values.push(ids[i].id, map.name,
-        map.fileName, map.author, environments[map.environment], 1, map.bronzeTime, map.silverTime,
-        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate)
+        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
+        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate,
+        map.leaderboardRating, map.awards)
     }
     await this.query(query, ...values)
   }
 
   async getAll(): Promise<TMMap[]> {
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps 
+    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps 
     JOIN map_ids ON maps.id=map_ids.id;`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
@@ -98,8 +103,8 @@ export class MapRepository extends Repository {
       isArr = false
       mapIds = [mapIds]
     } else if (mapIds.length === 0) { return [] }
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
+    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
@@ -118,8 +123,8 @@ export class MapRepository extends Repository {
       isArr = false
       fileNames = [fileNames]
     } else if (fileNames.length === 0) { return [] }
-    const query = `SELECT name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, uid FROM maps
+    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)};`
     const res = (await this.query(query, ...fileNames))
@@ -142,6 +147,12 @@ export class MapRepository extends Repository {
     await this.query(query, lapsAmount, cpsAmount, id)
   }
 
+  async setAwardsAndLbRating(uid: string, awards: number, lbRating: number): Promise<void> {
+    const id = await mapIdsRepo.get(uid)
+    const query = `UPDATE maps SET awards=$1, leaderboard_rating=$2 WHERE id=$3`
+    await this.query(query, awards, lbRating, id)
+  }
+
   private constructMapObject(entry: TableEntry): TMMap {
     return {
       id: entry.uid,
@@ -156,9 +167,11 @@ export class MapRepository extends Repository {
       authorTime: entry.author_time,
       copperPrice: entry.copper_price,
       isLapRace: entry.is_lap_race,
+      addDate: entry.add_date,
       lapsAmount: entry.laps_amount ?? undefined,
       checkpointsAmount: entry.checkpoints_amount ?? undefined,
-      addDate: entry.add_date
+      awards: entry.awards ?? undefined,
+      leaderboardRating: entry.leaderboard_rating ?? undefined
     }
   }
 

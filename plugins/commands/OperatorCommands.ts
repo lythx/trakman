@@ -89,12 +89,7 @@ const commands: TMCommand[] = [
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
       const map: TMMap = TM.maps.current
-      const res: any[] | Error = await TM.client.call('RemoveChallenge', [{ string: map.fileName }])
-      if (res instanceof Error) { // This can happen if the map was already removed
-        TM.log.error(`Couldn't remove ${map.fileName} from the playlist.`, res.message)
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't remove the current map.`, info.login)
-        return
-      }
+      await TM.maps.remove(map.id, info.login)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
         + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from the playlist.`)
