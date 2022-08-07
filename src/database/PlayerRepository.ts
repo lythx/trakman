@@ -4,9 +4,9 @@ import { Utils } from '../Utils.js'
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
     id INT4 GENERATED ALWAYS AS IDENTITY,
-    login VARCHAR(25) NOT NULL UNIQUE,
+    login VARCHAR(40) NOT NULL UNIQUE,
     nickname VARCHAR(45) NOT NULL,
-    region VARCHAR(100) NOT NULL,
+    region VARCHAR(58) NOT NULL,
     wins INT4 NOT NULL,
     time_played INT4 NOT NULL,
     visits INT4 NOT NULL,
@@ -61,7 +61,7 @@ export class PlayerRepository extends Repository {
     ${this.getInsertValuesString(8, players.length)};`
     const values: any[] = []
     for (const player of players) {
-      values.push(player.login, player.nickname, player.region, player.wins, player.timePlayed, player.visits, player.isUnited, player.lastOnline)
+      values.push(player.login, player.nickname, player.region, player.wins, Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline)
     }
     await this.query(query, ...values)
   }
@@ -83,7 +83,7 @@ export class PlayerRepository extends Repository {
 
   async updateOnLeave(login: string, timePlayed: number, date: Date): Promise<void> {
     const query: string = `UPDATE players SET time_played=$1, last_online=$2 WHERE login=$3;`
-    await this.query(query, timePlayed, date, login)
+    await this.query(query, Math.round(timePlayed / 1000), date, login)
   }
 
   async getAverage(login: string): Promise<number | undefined>
@@ -135,14 +135,14 @@ export class PlayerRepository extends Repository {
   }
 
   private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
-    const nation: string = entry.region.split('|')[0]
+    const country: string = entry.region.split('|')[0]
     return {
       login: entry.login,
       nickname: entry.nickname,
-      nation: nation,
-      nationCode: Utils.nationToNationCode(nation) as any,
+      country: country,
+      countryCode: Utils.countryToCode(country) as any,
       region: entry.region,
-      timePlayed: entry.time_played,
+      timePlayed: entry.time_played * 1000,
       lastOnline: entry.last_online ?? undefined,
       visits: entry.visits,
       isUnited: entry.is_united,

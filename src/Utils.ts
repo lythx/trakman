@@ -120,8 +120,8 @@ export const Utils = {
 
   matchString,
 
-  nationToNationCode(nation: string): string | undefined {
-    return countries.find(a => a.name === nation)?.code
+  countryToCode(country: string): string | undefined {
+    return countries.find(a => a.name === country)?.code
   },
 
   /**
@@ -198,7 +198,7 @@ export const Utils = {
  * @param player Object of the player to get the title for
  * @returns The title string
  */
-  getTitle(player: { login: string, privilege: number, nation: string }): string {
+  getTitle(player: { login: string, privilege: number, country: string }): string {
     // Apparently this is a thing
     const specialTitle: string | undefined = specialTitles[player?.login as keyof typeof specialTitles]
     if (specialTitle !== undefined) {
@@ -247,33 +247,33 @@ export const Utils = {
     return str.replace(/[&"]/g, (m): string => { return map[m as keyof typeof map] })
   },
 
-    /**
-   * Attempts to convert the player nickname to their login via charmap
-   * @param nickName Player nickname
-   * @returns Possibly matching login or undefined if unsuccessful
-   */
-     nicknameToLogin(nickName: string): string | undefined {
-      const nicknames = PlayerService.players.map(a => ({ login: a.login, nickname: Utils.strip(a.nickname).toLowerCase() }))
-      const strippedNicknames: { nickname: string, login: string }[] = []
-      for (const e of nicknames) {
-        strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })
+  /**
+ * Attempts to convert the player nickname to their login via charmap
+ * @param nickName Player nickname
+ * @returns Possibly matching login or undefined if unsuccessful
+ */
+  nicknameToLogin(nickName: string): string | undefined {
+    const nicknames = PlayerService.players.map(a => ({ login: a.login, nickname: Utils.strip(a.nickname).toLowerCase() }))
+    const strippedNicknames: { nickname: string, login: string }[] = []
+    for (const e of nicknames) {
+      strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })
+    }
+    const matches: { login: string, value: number }[] = []
+    for (const e of strippedNicknames) {
+      const value = dsc.twoStrings(e.nickname, nickName.toLowerCase())
+      if (value > 0.4) {
+        matches.push({ login: e.login, value })
       }
-      const matches: { login: string, value: number }[] = []
-      for (const e of strippedNicknames) {
-        const value = dsc.twoStrings(e.nickname, nickName.toLowerCase())
-        if (value > 0.4) {
-          matches.push({ login: e.login, value })
-        }
-      }
-      if (matches.length === 0) {
-        return undefined
-      }
-      const s = matches.sort((a, b): number => b.value - a.value)
-      if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
-        return undefined
-      }
-      return s[0].login
-    },
+    }
+    if (matches.length === 0) {
+      return undefined
+    }
+    const s = matches.sort((a, b): number => b.value - a.value)
+    if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
+      return undefined
+    }
+    return s[0].login
+  },
 
   /**
    * Formats date into calendar display

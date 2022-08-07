@@ -62,8 +62,8 @@ export default class MapWidgetResult extends StaticComponent {
       tmxwr === undefined ? undefined : TM.utils.getTimeString(tmxwr)
     ]
     const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
-    if (MapAuthorData?.nextAuthorData?.nation !== undefined) {
-      icons[2] = (flags as any)[MapAuthorData?.nextAuthorData?.nation] // cope typescript
+    if (MapAuthorData?.nextAuthorData?.country !== undefined) {
+      icons[2] = (flags as any)[MapAuthorData?.nextAuthorData?.country] // cope typescript
     }
     const headerCFG = RCFG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {

@@ -3,8 +3,8 @@ interface MessageInfo {
   readonly login: string
   readonly text: string
   readonly nickname: string
-  readonly nation: string
-  readonly nationCode: string
+  readonly country: string
+  readonly countryCode: string
   readonly wins: number
   readonly timePlayed: number
   readonly joinTimestamp: number
