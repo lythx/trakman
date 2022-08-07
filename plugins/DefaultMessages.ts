@@ -43,7 +43,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Welcome to ${TM.utils.palette.highlight + TM.utils.strip(TM.serverConfig.name)}${TM.utils.palette.error}. `
+      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Welcome to ${TM.utils.palette.highlight + TM.utils.strip(TM.state.serverConfig.name)}${TM.utils.palette.error}. `
         + `This server is running Trakman ${TM.utils.palette.highlight}v${config.version}${TM.utils.palette.error}.\n`
         + `${TM.utils.palette.server}» ${TM.utils.palette.error}You can see the recent changes with the ${TM.utils.palette.highlight}/changes ${TM.utils.palette.error}command.`, player.login)
       const index: number = TM.records.local.findIndex(a => a.login === player.login)

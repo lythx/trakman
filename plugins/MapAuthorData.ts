@@ -44,7 +44,7 @@ TM.addListener('Controller.EndMap', async (): Promise<void> => {
 })
 
 TM.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
-  if (TM.serverState === 'result') {
+  if (TM.state.current === 'result') {
     const res = await fetchPlayerData(TM.jukebox.next[0].author)
     if (res instanceof Error || res === false) {
       nextAuthorData = undefined

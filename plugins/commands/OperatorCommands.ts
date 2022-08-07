@@ -371,7 +371,7 @@ const commands: TMCommand[] = [
     aliases: ['er', 'endround'],
     help: 'End the ongoing race in rounds-based gamemodes.',
     callback: (info: MessageInfo): void => {
-      if (TM.gameConfig.gameMode === 1 || TM.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (TM.state.gameConfig.gameMode === 1 || TM.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server not in rounds mode.`, info.login)
         return
       }
