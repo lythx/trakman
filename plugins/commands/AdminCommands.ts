@@ -413,7 +413,7 @@ const commands: TMCommand[] = [
     help: 'Force a player into a team.',
     params: [{ name: 'player' }, { name: 'team' }],
     callback: async (info: MessageInfo, player: string, team: string): Promise<void> => {
-      if (TM.gameConfig.gameMode === 1 || TM.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (TM.state.gameConfig.gameMode === 1 || TM.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server not in rounds mode.`, info.login)
         return
       }
@@ -457,7 +457,7 @@ const commands: TMCommand[] = [
     help: 'Set whether the server is in warmup mode.',
     params: [{ name: 'enabled', type: 'boolean' }],
     callback: (info: MessageInfo, enabled: boolean): void => {
-      if (TM.gameConfig.gameMode === 1 || TM.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (TM.state.gameConfig.gameMode === 1 || TM.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Server not in rounds mode.`, info.login)
         return
       }
@@ -483,7 +483,7 @@ const commands: TMCommand[] = [
     help: 'Set the laps amount in laps mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 3) {
+      if (TM.state.gameConfig.gameMode !== 3) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in LAPS gamemode.`, info.login)
         return
       }
@@ -513,7 +513,7 @@ const commands: TMCommand[] = [
     help: 'Set the laps amount in rounds mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 0) {
+      if (TM.state.gameConfig.gameMode !== 0) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in ROUNDS gamemode.`, info.login)
         return
       }
@@ -543,7 +543,7 @@ const commands: TMCommand[] = [
     help: 'Set the points limit for rounds mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 0) {
+      if (TM.state.gameConfig.gameMode !== 0) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in ROUNDS gamemode.`, info.login)
         return
       }
@@ -573,7 +573,7 @@ const commands: TMCommand[] = [
     help: 'Set the points limit for teams mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 2) {
+      if (TM.state.gameConfig.gameMode !== 2) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in TEAMS gamemode.`, info.login)
         return
       }
@@ -603,7 +603,7 @@ const commands: TMCommand[] = [
     help: 'Set the max obtainable points per round for teams mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 2) {
+      if (TM.state.gameConfig.gameMode !== 2) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in TEAMS gamemode.`, info.login)
         return
       }
@@ -633,7 +633,7 @@ const commands: TMCommand[] = [
     help: 'Set the points limit for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 5) {
+      if (TM.state.gameConfig.gameMode !== 5) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in CUP gamemode.`, info.login)
         return
       }
@@ -663,7 +663,7 @@ const commands: TMCommand[] = [
     help: 'Set the amount of rounds per map for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 5) {
+      if (TM.state.gameConfig.gameMode !== 5) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in CUP gamemode.`, info.login)
         return
       }
@@ -693,7 +693,7 @@ const commands: TMCommand[] = [
     help: 'Set the amount of rounds in warmup for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 5) {
+      if (TM.state.gameConfig.gameMode !== 5) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in CUP gamemode.`, info.login)
         return
       }
@@ -719,7 +719,7 @@ const commands: TMCommand[] = [
     help: 'Set the amount of winners for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: MessageInfo, amount: number): void => {
-      if (TM.gameConfig.gameMode !== 5) {
+      if (TM.state.gameConfig.gameMode !== 5) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Only available in CUP gamemode.`, info.login)
         return
       }

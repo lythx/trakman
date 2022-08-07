@@ -146,7 +146,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
     const startMsg: string = `${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname)} `
       + `${TM.utils.palette.vote}started a vote to ${TM.utils.palette.highlight}skip ${TM.utils.palette.vote}the ongoing map.`
-    if (TM.remainingMapTime <= 30) { return }
+    if (TM.state.remainingMapTime <= 30) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.utils.palette.highlight}Vote to ${TM.utils.palette.tmRed}SKIP${TM.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
     const result = await voteWindow.startAndGetResult(TM.players.list.map(a => a.login))
     if (result === undefined) {
@@ -190,7 +190,7 @@ export default class ButtonsWidget extends StaticComponent {
     }
     const startMsg: string = `${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname)} `
       + `${TM.utils.palette.vote}started a vote to ${TM.utils.palette.highlight}replay ${TM.utils.palette.vote}the ongoing map.`
-    if (TM.remainingMapTime <= 30) { return }
+    if (TM.state.remainingMapTime <= 30) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.utils.palette.highlight}Vote to ${TM.utils.palette.tmGreen}REPLAY${TM.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
     const result = await voteWindow.startAndGetResult(TM.players.list.map(a => a.login))
     if (result === undefined) {

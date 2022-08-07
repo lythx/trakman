@@ -243,6 +243,33 @@ export const TRAKMAN = {
 
   },
 
+  state: {
+
+    /**
+     * @returns remaining map time in seconds
+     */
+    get remainingMapTime(): number {
+      return GameService.remainingMapTime
+    },
+
+    get remainingResultTime(): number {
+      return GameService.remainingResultTime
+    },
+
+    get current(): "race" | "result" {
+      return GameService.state
+    },
+
+    get gameConfig(): TMGame {
+      return GameService.config
+    },
+
+    get serverConfig(): ServerInfo {
+      return ServerConfig.config
+    }
+
+  },
+
   /**
   * Sends a server message
   * @param message Message to be sent
@@ -412,22 +439,6 @@ export const TRAKMAN = {
     return await AdministrationService.removeFromGuestlist(login, callerLogin)
   },
 
-  /**
-   * @returns remaining map time in seconds
-   */
-  get remainingMapTime(): number {
-    return GameService.remainingMapTime
-  },
-
-  get remainingResultTime(): number {
-    return GameService.remainingResultTime
-  },
-
-
-  get serverState(): "race" | "result" {
-    return GameService.state
-  },
-
   // TO BE REMOVED
   get playerRanks(): {
     [login: string]: {
@@ -450,14 +461,6 @@ export const TRAKMAN = {
     return await VoteService.fetch(mapId)
   },
 
-  get gameConfig(): TMGame {
-    return GameService.config
-  },
-
-  get serverConfig(): ServerInfo {
-    return ServerConfig.config
-  },
-
   get votes(): TMVote[] {
     return VoteService.votes
   },
@@ -466,6 +469,7 @@ export const TRAKMAN = {
     return VoteService.voteRatios
   },
 
+  // REMOVE LATER
   get UIIDS() {
     return { ..._UIIDS }
   },
