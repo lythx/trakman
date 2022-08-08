@@ -43,7 +43,7 @@ export class Listeners {
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
-        void RecordService.fetchAndSaveRanks(playerInfo[0].Login)
+        void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
         void DedimaniaService.playerJoin(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1])
       }
     },
@@ -169,7 +169,7 @@ export class Listeners {
         GameService.state = 'race'
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         await GameService.update()
-        await RecordService.fetchAndSaveRecords(params[0].UId)
+        await RecordService.fetchAndStoreRecords(params[0].UId)
         await MapService.setCurrent()
         const c: any = params[0]
         const info: BeginMapInfo = {

@@ -31,7 +31,7 @@ export class PlayerService {
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
-      if (info.previousPosition > RecordService.localsAmount && info.position <= RecordService.localsAmount) {
+      if (info.previousPosition > RecordService.maxLocalsAmount && info.position <= RecordService.maxLocalsAmount) {
         this.newLocalsAmount++
       }
     })
@@ -118,7 +118,7 @@ export class PlayerService {
         ip,
         region,
         isUnited,
-        average: RecordService.localsAmount,
+        average: RecordService.maxLocalsAmount,
         rank: index === -1 ? undefined : (index + 1)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
@@ -263,7 +263,7 @@ export class PlayerService {
    * Calculates and updates averages and ranks in players table and runtime
    */
   static async calculateAveragesAndRanks(): Promise<void> {
-    const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocalsAmount).map(a => a.login)
+    const logins = RecordService.localRecords.slice(0, RecordService.maxLocalsAmount + this.newLocalsAmount).map(a => a.login)
     const localRecords = RecordService.localRecords
     const initialLocals = RecordService.initialLocals
     const amount: number = MapService.mapCount
@@ -272,7 +272,7 @@ export class PlayerService {
       // Get rank from the start of the race
       let previousRank: number = initialLocals.findIndex(a => a.login === avg.login) + 1
       // If player doesnt have rank set it to locals amount
-      if (previousRank === 0) { previousRank = RecordService.localsAmount }
+      if (previousRank === 0) { previousRank = RecordService.maxLocalsAmount }
       // Get rank from the end of the race
       let newRank: number = localRecords.findIndex(a => a.login === avg.login) + 1
       // Calculate average

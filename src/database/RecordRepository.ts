@@ -1,6 +1,7 @@
 import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
 import { PlayerRepository } from './PlayerRepository.js'
+import { Utils } from '../Utils.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS records(
@@ -30,6 +31,19 @@ interface TableEntry {
   readonly nickname: string
 }
 
+type TableEntryWithPlayerInfo = TableEntry & {
+  readonly login: string
+  readonly nickname: string
+  readonly region: string
+  readonly wins: number
+  readonly time_played: number
+  readonly visits: number
+  readonly is_united: boolean
+  readonly privilege?: number
+  readonly last_online: Date | null
+  readonly average: number
+}
+
 export class RecordRepository extends Repository {
 
   async initialize(): Promise<void> {
@@ -55,7 +69,8 @@ export class RecordRepository extends Repository {
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
     JOIN map_ids ON map_ids.id=records.map_id
     JOIN players ON players.id=records.player_id
-    ORDER BY time ASC,
+    ORDER BY uid ASC,
+    time ASC,
     date ASC;`
     const res = (await this.query(query))
     return res.map(a => this.constructRecordObject(a))
@@ -72,6 +87,21 @@ export class RecordRepository extends Repository {
     const mapIds = await mapIdsRepo.get(mapUids)
     const res = (await this.query(query, ...mapIds.map(a => a.id)))
     return res.map(a => this.constructRecordObject(a))
+  }
+
+  async getLocalRecords(...mapUids: string[]): Promise<TMLocalRecord[]> {
+    if (mapUids.length === 0) { return [] }
+    const query = `SELECT uid, players.login, time, checkpoints, date, nickname, region, wins, time_played, 
+    visits, is_united, last_online, average, privilege FROM records
+    JOIN map_ids ON map_ids.id=records.map_id
+    JOIN players ON players.id=records.player_id
+    LEFT JOIN privileges ON privileges.login=players.login
+    WHERE ${mapUids.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
+    ORDER BY time ASC,
+    date ASC;`
+    const mapIds = await mapIdsRepo.get(mapUids)
+    const res = (await this.query(query, ...mapIds.map(a => a.id)))
+    return res.map(a => this.constuctLocalRecord(a))
   }
 
   async getByLogin(...logins: string[]): Promise<TMRecord[]> {
@@ -131,6 +161,28 @@ export class RecordRepository extends Repository {
       date: entry.date,
       checkpoints: entry.checkpoints,
       nickname: entry.nickname
+    }
+  }
+
+  private constuctLocalRecord(entry: TableEntryWithPlayerInfo): TMLocalRecord {
+    const country: string = entry.region.split('|')[0]
+    return {
+      map: entry.uid,
+      login: entry.login,
+      time: entry.time,
+      date: entry.date,
+      checkpoints: entry.checkpoints,
+      nickname: entry.nickname,
+      country: country,
+      countryCode: Utils.countryToCode(country) as any,
+      region: entry.region,
+      timePlayed: entry.time_played * 1000,
+      lastOnline: entry.last_online ?? undefined,
+      visits: entry.visits,
+      isUnited: entry.is_united,
+      wins: entry.wins,
+      privilege: entry.privilege ?? 0,
+      average: entry.average
     }
   }
 
