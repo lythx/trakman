@@ -21,6 +21,9 @@ export class PlayerService {
   private static newLocalsAmount: number
   private static ranks: string[]
 
+  /**
+   * Fetches ranks, players and creates playerlist
+   */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
     await this.privilegeRepo.initialize()
@@ -75,6 +78,14 @@ export class PlayerService {
 
   /**
    * Adds a player into the list and database
+   * @param login Player login
+   * @param nickname Player nickname
+   * @param fullRegion Player region received from dedicated server
+   * @param isSpectator True if player joined as spectator
+   * @param id Player dedicated server id
+   * @param ip Player ip address
+   * @param isUnited True if player has united version of game
+   * @param serverStart True if executed on server start
    */
   static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
     let s: string[] = fullRegion.split('|').slice(1)
@@ -144,6 +155,7 @@ export class PlayerService {
 
   /**
    * Remove the player from local memory, save timePlayed and lastOnline in database
+   * @param login Player login
    */
   static leave(login: string): LeaveInfo | Error {
     const date: Date = new Date()
@@ -314,7 +326,7 @@ export class PlayerService {
   }
 
   /**
-   * @returns All online players. This method creates copy of players array
+   * @returns All online players
    */
   static get players(): Readonly<TMPlayer & { currentCheckpoints: Readonly<TMCheckpoint>[] }>[] {
     return [...this._players]

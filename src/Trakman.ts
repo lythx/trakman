@@ -152,9 +152,13 @@ export const trakman = {
 
   messages: {
 
-    get list() { return ChatService.messages },
+    fetch: ChatService.fetch.bind(ChatService),
 
-    // TODO ADD FETCH BY AMOUNT AND DATE UTILITIES AFTER CHANGING CHAT TABLE
+    fetchByLogin: ChatService.fetchByLogin.bind(ChatService),
+
+    get: ChatService.get.bind(ChatService),
+
+    get list() { return ChatService._messages }
 
   },
 
