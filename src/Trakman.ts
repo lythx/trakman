@@ -134,11 +134,17 @@ export const trakman = {
 
     fetchByLogin: RecordService.fetchRecordsByLogin.bind(RecordService),
 
+    fetchRecordCount: RecordService.fetchRecordCount.bind(RecordService),
+
     get local() { return RecordService.localRecords },
+
+    get localCount() { return RecordService.localRecordCount },
 
     get live() { return RecordService.liveRecords },
 
-    get localsAmount() { return RecordService.localsAmount }
+    get liveCount() { return RecordService.liveRecordsCount },
+
+    get maxLocalsAmount() { return RecordService.maxLocalsAmount }
 
   },
 
@@ -448,7 +454,7 @@ export const trakman = {
   },
 
   // TO BE REMOVED
-  fetchMapRank: RecordService.fetchMapRank.bind(RecordService),
+  fetchMapRank: RecordService.getRank.bind(RecordService),
 
   /**
    * Fetches all votes for a map

@@ -321,7 +321,7 @@ export default class MapList extends PopupWindow {
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
       if (positions[i] === -1 || positions[i] === undefined) { ret.push("--.") }
-      else { ret.push(TM.utils.getPositionString(positions[i] > TM.records.localsAmount ? TM.records.localsAmount : positions[i])) }
+      else { ret.push(TM.utils.getPositionString(positions[i] > TM.records.maxLocalsAmount ? TM.records.maxLocalsAmount : positions[i])) }
     }
     return ret
   }

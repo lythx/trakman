@@ -52,7 +52,7 @@ TM.commands.add({
         do {
           i++
           if (i * 500 > TM.maps.list.length) { break }
-          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.localsAmount))
+          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.maxLocalsAmount))
         } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
         const list: TMMap[] = TM.maps.list.slice(0, (i + 1) * fetchSize)
         const eligibleMaps: TMMap[] = list.filter(a =>
