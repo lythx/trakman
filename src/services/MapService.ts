@@ -273,7 +273,7 @@ export class MapService {
   }
 
   /**
-   * @returns All maps from current playlist. This method creates copy of maps array
+   * @returns All maps from current playlist
    */
   static get maps(): Readonly<TMMap>[] {
     return [...this._maps]

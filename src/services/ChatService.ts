@@ -7,24 +7,29 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import CONFIG from '../../config.json' assert { type: 'json' }
 
+/**
+ * This service manages chat table and chat commands
+ */
 export abstract class ChatService {
 
   private static readonly messagesArraySize: number = CONFIG.messagesInRuntimeMemory
-  static readonly messages: TMMessage[] = []
+  static readonly _messages: TMMessage[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
 
+  /**
+   * Fetches messages from database
+   */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    await this.loadLastSessionMessages()
+    this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
   }
-
 
   /**
    * Adds a chat command to the server
    * @param command Chat command to register
    */
-  static addCommand(command: TMCommand): void {
+  static addCommand(command: TMCommand): void { // TODO CHANGE AFTER IMPLEMENTING LOGIN TYPE
     const prefix: string = command.privilege === 0 ? '/' : '//'
     this._commandList.push(command)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
@@ -119,82 +124,84 @@ export abstract class ChatService {
         }
       }
       const messageInfo: MessageInfo = {
-        id: info.id,
-        login: info.login,
-        text: input.split(' ').splice(1).join(' '),
-        nickname: info.nickname,
-        country: info.country,
-        countryCode: info.countryCode,
-        wins: info.wins,
-        timePlayed: info.timePlayed,
-        joinTimestamp: info.joinTimestamp,
-        privilege: info.privilege,
-        isSpectator: info.isSpectator,
-        playerId: info.playerId,
-        ip: info.ip,
-        region: info.region,
-        isUnited: info.isUnited
+        ...info,
+        text: input.split(' ').splice(1).join(' ')
       }
       command.callback(messageInfo, ...parsedParams)
     })
   }
 
-  static async loadLastSessionMessages(): Promise<void> {
-    const result: ChatDBEntry[] = await this.repo.get(this.messagesArraySize)
-    for (const m of result) {
-      const message: TMMessage = {
-        id: m.id,
-        login: m.login,
-        text: m.message,
-        date: m.date
-      }
-      this.messages.push(message)
-    }
-  }
-
+  /**
+   * Adds message to the database and runtime memory
+   * @param login Player login
+   * @param text Message text
+   * @returns Message object or Error if unsuccessfull
+   */
   static add(login: string, text: string): MessageInfo | Error {
-    const message: TMMessage = {
-      id: randomUUID(),
-      login,
-      text,
-      date: new Date()
-    }
-    const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
+    const player: TMPlayer | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }
-    const messageInfo: MessageInfo = {
-      id: message.id,
+    const message: TMMessage = {
       login,
-      text,
       nickname: player.nickname,
-      country: player.country,
-      countryCode: player.countryCode,
-      wins: player.wins,
-      timePlayed: player.timePlayed,
-      joinTimestamp: player.joinTimestamp,
-      privilege: player.privilege,
-      isSpectator: player.isSpectator,
-      playerId: player.id,
-      ip: player.ip,
-      region: player.region,
-      isUnited: player.isUnited
+      text,
+      date: new Date()
+    }
+    const messageInfo: MessageInfo = {
+      text,
+      date: message.date,
+      ...player
     }
     if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
-      this.messages.unshift(message)
-      void this.repo.add(message)
+      this._messages.unshift(message)
+      void this.repo.add(login, text, message.date)
       Logger.trace(`${player.login} sent message: ${text}`)
     }
-    this.messages.length = Math.min(this.messagesArraySize, this.messages.length)
+    this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo
   }
 
-  static async getByLogin(login: string, limit: number): Promise<ChatDBEntry[]> {
-    return await this.repo.getByLogin(login, limit)
+  /**
+   * Fetches chat messages written by specified player
+   * @param login Player login
+   * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
+   * @returns Array of message objects
+   */
+  static async fetchByLogin(login: string, options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+    return await this.repo.getByLogin(login, options)
   }
 
+  /**
+   * Fetches chat messages
+   * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
+   * @returns Array of message objects
+   */
+  static async fetch(options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+    return await this.repo.get(options)
+  }
+
+  /**
+   * Gets recent chat messages written by specified player
+   * @param login Player login 
+   * @returns Array of message objects
+   */
+  static get(login: string): Readonly<TMMessage>[] {
+    return this._messages.filter(a => a.login === login)
+  }
+
+  /**
+   * @returns Array of message objects
+   */
+  static get messages(): Readonly<TMMessage>[] {
+    return [...this._messages]
+  }
+
+  /**
+   * @returns Array of command objects
+   */
   static get commandList(): TMCommand[] {
     return [...this._commandList]
   }

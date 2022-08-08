@@ -1,36 +1,75 @@
-import { Repository } from './OldRepository.js'
+import { Repository } from './Repository.js'
+import { PlayerRepository } from './PlayerRepository.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS chat(
-      id uuid primary key not null,
-      login varchar(25) not null,
-      message varchar(250) not null,
-      date timestamp not null
+      player_id INT4 NOT NULL,
+      message VARCHAR(150) NOT NULL,
+      date TIMESTAMP NOT NULL,
+      PRIMARY KEY(player_id, date),
+      CONSTRAINT fk_player_id
+        FOREIGN KEY(player_id) 
+	        REFERENCES players(id) 
   );
 `
+
+const playerRepo = new PlayerRepository()
 
 export class ChatRepository extends Repository {
 
   async initialize(): Promise<void> {
-    await super.initialize()
-    await this.db.query(createQuery)
+    await playerRepo.initialize()
+    await super.initialize(createQuery)
   }
 
-  async get(limit: number): Promise<ChatDBEntry[]> {
-    const query: string = 'SELECT * FROM chat ORDER BY date DESC LIMIT $1'
-    const res = await this.db.query(query, [limit])
-    return res.rows
+  async get(options?: { limit?: number, date?: Date }): Promise<TMMessage[]> {
+    let i = 1
+    let limitStr = ''
+    let dateStr = ''
+    const params = []
+    if (options?.date !== undefined) {
+      dateStr = `WHERE date>$${i}`
+      params.push(options.date)
+    }
+    if (options?.limit !== undefined) {
+      limitStr = `LIMIT $${i}`
+      params.push(options.limit)
+    }
+    const query: string = `SELECT login, nickname, message, date FROM chat 
+    JOIN players ON players.id=chat.player_id
+    ORDER BY date DESC 
+    ${dateStr}
+    ${limitStr}`
+    if (params.length === 0) { return await this.query(query) }
+    return await this.query(query, ...params)
   }
 
-  async getByLogin(login: string, limit: number): Promise<ChatDBEntry[]> {
-    const query: string = 'SELECT id, message, date FROM chat WHERE login = $1 ORDER BY date DESC LIMIT $2;'
-    const response = await this.db.query(query, [login, limit])
-    return response.rows
+  async getByLogin(login: string, options?: { limit?: number, date?: Date }): Promise<TMMessage[]> {
+    let i = 2
+    let limitStr = ''
+    let dateStr = ''
+    const params = []
+    if (options?.date !== undefined) {
+      dateStr = `AND date>$${i}`
+      params.push(options.date)
+    }
+    if (options?.limit !== undefined) {
+      limitStr = `LIMIT $${i}`
+      params.push(options.limit)
+    }
+    const query: string = `SELECT login, nickname, message, date FROM chat 
+    JOIN players ON players.id=chat.player_id
+    ORDER BY date DESC 
+    WHERE login=$1${dateStr}
+    ${limitStr}`
+    if (params.length === 0) { return await this.query(query, login) }
+    return await this.query(query,login, ...params)
   }
 
-  async add(message: TMMessage): Promise<void> {
-    const query: string = 'INSERT INTO chat(id, login, message, date) VALUES ($1, $2, $3, $4) RETURNING id;'
-    await this.db.query(query, [message.id, message.login, message.text, message.date])
+  async add(login: string, text: string, date: Date): Promise<void> {
+    const id = await playerRepo.getId(login)
+    const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
+    await this.query(query, id, text, date)
   }
 
 }
