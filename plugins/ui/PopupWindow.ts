@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../../src/Trakman.js";
+import { trakman as TM } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
 import { CONFIG, IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.json' assert { type: 'json' }

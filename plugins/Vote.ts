@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../src/Trakman.js"
+import { trakman as TM } from "../src/Trakman.js"
 import { addKeyListener } from "./ui/utils/KeyListener.js"
 import IDS from './ui/config/UtilIds.json' assert { type: 'json' }
 

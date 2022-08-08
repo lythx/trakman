@@ -1,4 +1,8 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { trakman as TM, palette as p } from '../src/Trakman.js'
+
+TM.utils.palette.admin
+p.admin
+
 import config from '../config.json' assert { type: 'json' }
 import { Logger } from '../src/Logger.js'
 import 'dotenv/config'

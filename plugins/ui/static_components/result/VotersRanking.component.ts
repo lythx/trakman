@@ -1,6 +1,6 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import { trakman as TM } from '../../../../src/Trakman.js'
 import { PlayerVoteCount } from '../../../PlayerVoteCount.js'
 
 export default class VotersRanking extends StaticComponent {

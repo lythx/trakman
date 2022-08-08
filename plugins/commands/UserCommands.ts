@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 import { WebhookClient, EmbedBuilder } from 'discord.js'
 const webhooker = new WebhookClient({ url: 'https://canary.discord.com/api/webhooks/999357577076949073/4SvvSUfkkqKEzaN-g9aEWRSUWx5GuqUO4i3MKEv76rCowpRXzVhbNWMst8ajC3mA0ERf' })
 

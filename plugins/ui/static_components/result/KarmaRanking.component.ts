@@ -1,6 +1,6 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import { trakman as TM } from '../../../../src/Trakman.js'
 
 const MIN_AMOUNT = 5 // TODO: this in config file
 

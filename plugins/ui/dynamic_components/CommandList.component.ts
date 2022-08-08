@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../../../src/Trakman.js";
+import { trakman as TM } from "../../../src/Trakman.js";
 import { Paginator, Grid, ICONS, centeredText, IDS, CONFIG, closeButton, stringToObjectProperty, Navbar, GridCellFunction } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
 

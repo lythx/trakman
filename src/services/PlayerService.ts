@@ -9,17 +9,36 @@ import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
 
+/**
+ * This service manages online players on the server and players table in the database
+ */
 export class PlayerService {
 
-  private static readonly _players: TMPlayer[] = []
+  private static _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
+  // Move to admin service
   private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
-  private static newLocals: number
+  private static newLocalsAmount: number
   private static ranks: string[]
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
     await this.privilegeRepo.initialize()
+    void this.setOwner()
+    this.ranks = await this.repo.getRanks()
+    await this.addAllFromList()
+    Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
+      if (info.previousPosition > RecordService.localsAmount && info.position <= RecordService.localsAmount) {
+        this.newLocalsAmount++
+      }
+    })
+    Events.addListener('Controller.BeginMap', (): void => {
+      this.newLocalsAmount = 0
+    })
+  }
+
+  // Move to admin service
+  private static async setOwner(): Promise<void> {
     const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
     const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
     if (newOwnerLogin === undefined) {
@@ -30,16 +49,6 @@ export class PlayerService {
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
       await this.setPrivilege(newOwnerLogin, 4)
     }
-    this.ranks = await this.repo.getRanks()
-    await this.addAllFromList()
-    Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
-      if (info.previousPosition > RecordService.localsAmount && info.position <= RecordService.localsAmount) {
-        this.newLocals++
-      }
-    })
-    Events.addListener('Controller.BeginMap', (): void => {
-      this.newLocals = 0
-    })
   }
 
   /**
@@ -233,7 +242,7 @@ export class PlayerService {
   }
 
   static async calculateAveragesAndRanks(): Promise<void> {
-    const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocals).map((a, i) => ({ login: a.login, position: i + 1 }))
+    const logins = RecordService.localRecords.slice(0, RecordService.localsAmount + this.newLocalsAmount).map((a, i) => ({ login: a.login, position: i + 1 }))
     const amount: number = MapService.maps.length
     const ranks = await this.repo.getAverage(logins.map(a => a.login))
     for (const rank of ranks) {

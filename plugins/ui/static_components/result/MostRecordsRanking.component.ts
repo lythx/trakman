@@ -1,6 +1,6 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import { trakman as TM } from '../../../../src/Trakman.js'
 import { TopPlayerRecords } from '../../../TopPlayerRecords.js'
 
 export default class MostRecordsRanking extends StaticComponent {

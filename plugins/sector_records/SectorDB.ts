@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 import { BestSectors } from './SectorTypes.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(

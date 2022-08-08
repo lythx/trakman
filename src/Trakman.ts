@@ -30,7 +30,7 @@ await mapIdsRepo.initialize()
 const DB: Database = new Database()
 await DB.initialize()
 
-export const TRAKMAN = {
+export const trakman = {
 
   utils: Utils,
 
@@ -497,3 +497,5 @@ export const TRAKMAN = {
   }
 
 }
+
+export const palette = Utils.palette 

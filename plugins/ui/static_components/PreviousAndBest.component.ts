@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG as CFG, CONFIG, IDS } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class PreviousAndBest extends StaticComponent {
