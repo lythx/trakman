@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import { trakman as TM } from '../../../../src/Trakman.js'
 import { RESULTCONFIG as CFG, List, IDS, resultStaticHeader, getResultPosition } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { TopPlayerRanks } from '../../../TopPlayerAverages.js'

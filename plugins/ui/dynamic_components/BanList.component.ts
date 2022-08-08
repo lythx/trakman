@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
 export default class BanList extends PopupWindow {

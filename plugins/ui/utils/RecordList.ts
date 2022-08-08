@@ -1,7 +1,7 @@
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import RESULTCONFIG from '../config/ResultUIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.json' assert { type: 'json' }
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 
 

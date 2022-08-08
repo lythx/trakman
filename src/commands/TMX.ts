@@ -1,7 +1,7 @@
 import { ChatService } from '../services/ChatService.js'
 import { TMXService } from '../services/TMXService.js'
 import { Client } from '../client/Client.js'
-import { TRAKMAN as TM } from '../Trakman.js'
+import { trakman as TM } from '../Trakman.js'
 
 const command: TMCommand = {
   aliases: ['add'],

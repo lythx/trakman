@@ -1,6 +1,6 @@
 import { PlayerService } from '../services/PlayerService.js'
 import { ChatService } from '../services/ChatService.js'
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 
 const commands: TMCommand[] = [
   {

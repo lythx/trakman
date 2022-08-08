@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../src/Trakman.js";
+import { trakman as TM } from "../src/Trakman.js";
 
 const voteCounts: { login: string, count: number }[] = []
 const initialVotes: TMVote[] = []

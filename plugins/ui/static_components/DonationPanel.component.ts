@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { IDS, CONFIG, getStaticPosition, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
 

@@ -2,7 +2,7 @@
 
 import StaticComponent from '../StaticComponent.js'
 import { CONFIG, IDS, centeredText, getStaticPosition } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 
 export default class CpCounter extends StaticComponent {
 

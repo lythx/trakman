@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 import fs from 'node:fs/promises'
 import fetch from 'node-fetch'
 

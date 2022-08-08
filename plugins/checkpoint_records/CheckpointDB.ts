@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 import { BestCheckpoints } from './CheckpointTypes.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(

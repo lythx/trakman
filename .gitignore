@@ -111,4 +111,5 @@ dist
 /built/
 .run/
 
-# Plugins
+# Debugger
+.vscode

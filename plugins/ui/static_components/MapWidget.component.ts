@@ -1,6 +1,6 @@
 import { IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObjectProperty } from '../UiUtils.js'
 import flags from '../config/FlagIcons.json' assert { type: 'json' }
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { MapAuthorData } from '../../MapAuthorData.js'
 

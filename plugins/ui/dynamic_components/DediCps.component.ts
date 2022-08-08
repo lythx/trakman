@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { TRAKMAN as TM } from "../../../src/Trakman.js";
+import { trakman as TM } from "../../../src/Trakman.js";
 import { IDS, Paginator, Grid, centeredText, CONFIG, getIcon, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 
 export default class DediCps extends PopupWindow {

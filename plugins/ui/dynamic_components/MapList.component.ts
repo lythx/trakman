@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { TRAKMAN as TM } from "../../../src/Trakman.js";
+import { trakman as TM } from "../../../src/Trakman.js";
 import { centeredText, closeButton, CONFIG, Grid, IDS, verticallyCenteredText, getIcon } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import { MAPLIST as ML } from '../../Maplist.js'

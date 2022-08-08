@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG, IDS, Grid, constuctButton, ICONS, stringToObjectProperty, VoteWindow } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import Config from '../../../config.json' assert { type: 'json' }
 

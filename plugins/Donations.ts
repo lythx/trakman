@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../src/Trakman.js'
+import { trakman as TM } from '../src/Trakman.js'
 
 await TM.db.query(`CREATE TABLE IF NOT EXISTS donations(
   player_id INT4 GENERATED ALWAYS AS IDENTITY,

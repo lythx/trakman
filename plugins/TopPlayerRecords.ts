@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../src/Trakman.js";
+import { trakman as TM } from "../src/Trakman.js";
 
 const topPlayerRecords: { login: string, nickname: string, amount: number }[] = []
 const updateListeners: (() => void)[] = []

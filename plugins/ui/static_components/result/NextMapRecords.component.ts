@@ -1,6 +1,6 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, RecordList, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { TRAKMAN as TM } from '../../../../src/Trakman.js'
+import { trakman as TM } from '../../../../src/Trakman.js'
 
 export default class NextMapRecords extends StaticComponent {
 

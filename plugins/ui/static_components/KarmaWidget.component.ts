@@ -1,5 +1,5 @@
 import { getStaticPosition, centeredText, Grid, CONFIG, horizontallyCenteredText, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class KarmaWidget extends StaticComponent {

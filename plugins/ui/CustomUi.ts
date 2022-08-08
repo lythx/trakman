@@ -1,5 +1,5 @@
 import { CONFIG as CFG } from './UiUtils.js'
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 
 export default class CustomUi {
 
