@@ -164,7 +164,7 @@ export class RecordService {
     this._liveRecords.length = 0
     this.initialLocals.length = 0
     const records: TMRecord[] = await this.repo.get(mapId)
-    const players: TMOfflinePlayer[] = await PlayerService.fetchPlayer(records.map(a => a.login))
+    const players: TMOfflinePlayer[] = await PlayerService.fetch(records.map(a => a.login))
     for (const e of records) {
       const player = players.find(a => a.login === e.login)
       if (player === undefined) {

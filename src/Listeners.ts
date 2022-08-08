@@ -82,7 +82,7 @@ export class Listeners {
         if (params[0] === 0) { // Ignore inexistent people //please elaborate
           return
         }
-        const player: TMPlayer | undefined = PlayerService.getPlayer(params[1])
+        const player: TMPlayer | undefined = PlayerService.get(params[1])
         if (player === undefined) {
           Logger.error(`Can't find player ${params[1]} in memory on checkpoint event`)
           return
@@ -245,8 +245,8 @@ export class Listeners {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
-        if(PlayerService.getPlayer(params[1])?.privilege === -1) { return }
-        const temp: any = PlayerService.getPlayer(params[1])
+        if (PlayerService.get(params[1])?.privilege === -1) { return }
+        const temp: any = PlayerService.get(params[1])
         temp.answer = params[2]
         const info: ManialinkClickInfo = temp
         Events.emitEvent('Controller.ManialinkClick', info)

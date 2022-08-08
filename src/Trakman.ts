@@ -69,9 +69,9 @@ export const trakman = {
 
   players: {
 
-    get: PlayerService.getPlayer.bind(PlayerService),
+    get: PlayerService.get.bind(PlayerService),
 
-    fetch: PlayerService.fetchPlayer.bind(PlayerService),
+    fetch: PlayerService.fetch.bind(PlayerService),
 
     /**
      * Fetches Trackmania Webservices for player information
@@ -112,7 +112,9 @@ export const trakman = {
       })
     },
 
-    get list() { return PlayerService.players }
+    get list() { return PlayerService.players },
+
+    get count() { return PlayerService.playerCount }
 
   },
 
@@ -178,15 +180,17 @@ export const trakman = {
 
     get: MapService.get.bind(MapService),
 
+    fetch: MapService.fetch.bind(MapService),
+
     add: MapService.add.bind(MapService),
 
     remove: MapService.remove.bind(MapService),
 
     get list() { return MapService.maps },
 
-    get current() { return MapService.current }
+    get current() { return MapService.current },
 
-    //perhaps add fetchmap if we dont keep maps outside of current selection
+    get count() { return MapService.mapCount }
 
   },
 
@@ -358,7 +362,7 @@ export const trakman = {
    * @param login Player login
    */
   openManialink(id: number, login: string): void {
-    const temp: any = PlayerService.getPlayer(login)
+    const temp: any = PlayerService.get(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
