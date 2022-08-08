@@ -10,7 +10,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
@@ -34,7 +34,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
@@ -63,7 +63,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
@@ -92,7 +92,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
@@ -121,7 +121,7 @@ const commands: TMCommand[] = [
     callback: async (info: MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetchPlayer(targetLogin)
+      const targetInfo: TMOfflinePlayer | undefined = await PlayerService.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
