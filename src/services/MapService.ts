@@ -194,63 +194,6 @@ export class MapService {
   }
 
   /**
-   * Gets a map from current playlist. Playlist is stored in runtime memory
-   * @param uid Map uid
-   * @returns map object or undefined if map is not in the playlist
-   */
-  static get(uid: string): Readonly<TMMap> | undefined
-  /**
-   * Gets multiple maps from current playlist. Playlist is stored in runtime memory.
-   * If some map is not present in memory it won't be returned. Returned array is not in initial order
-   * @param uids Array of map uids
-   * @returns Array of map objects
-   */
-  static get(uids: string[]): Readonly<TMMap>[]
-  static get(uids: string | string[]): Readonly<TMMap> | Readonly<TMMap>[] | undefined {
-    if (typeof uids === 'string') {
-      return this._maps.find(a => a.id === uids)
-    }
-    return this._maps.filter(a => uids.includes(a.id))
-  }
-
-  /**
-   * Fetches a map from the database. This method should be used to get maps which are not in the current Match Settings
-   * @param uid Map uid
-   * @returns Map object or undefined if map is not in the playlist
-   */
-  static fetch(uid: string): Promise<TMMap | undefined>
-  /**
-   * Fetches multiple maps from the database. This method should be used to get maps which are not in the current Match Settings
-   * @param uids Array of map uids
-   * @returns Map objects array
-   */
-  static fetch(uids: string[]): Promise<TMMap[]>
-  static fetch(uids: string | string[]): Promise<TMMap | undefined | TMMap[]> {
-    return this.repo.get(uids as any)
-  }
-
-  /**
-   * @returns Currently played map
-   */
-  static get current(): Readonly<TMCurrentMap> {
-    return this._current
-  }
-
-  /**
-   * @returns All maps from current playlist. This method creates copy of maps array
-   */
-  static get maps(): Readonly<TMMap>[] {
-    return [...this._maps]
-  }
-
-  /**
-   * @returns Amount of maps in current playlist
-   */
-  static get mapCount(): number {
-    return this._maps.length
-  }
-
-  /**
    * Contstructs TMMap object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
    */
@@ -283,6 +226,64 @@ export class MapService {
       checkpointsAmount: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date()
     }
+  }
+
+  /**
+   * Gets a map from current playlist. Playlist is stored in runtime memory
+   * @param uid Map uid
+   * @returns map object or undefined if map is not in the playlist
+   */
+  static get(uid: string): Readonly<TMMap> | undefined
+  /**
+   * Gets multiple maps from current playlist. Playlist is stored in runtime memory.
+   * If some map is not present in memory it won't be returned. Returned array is not in initial order
+   * @param uids Array of map uids
+   * @returns Array of map objects
+   */
+  static get(uids: string[]): Readonly<TMMap>[]
+  static get(uids: string | string[]): Readonly<TMMap> | Readonly<TMMap>[] | undefined {
+    if (typeof uids === 'string') {
+      return this._maps.find(a => a.id === uids)
+    }
+    return this._maps.filter(a => uids.includes(a.id))
+  }
+
+  /**
+   * Fetches a map from the database. This method should be used to get maps which are not in the current Match Settings
+   * @param uid Map uid
+   * @returns Map object or undefined if map is not in the database
+   */
+  static fetch(uid: string): Promise<TMMap | undefined>
+  /**
+   * Fetches multiple maps from the database. This method should be used to get maps which are not in the current Match Settings
+   * If some map is not present in the database it won't be returned. Returned array is not in initial order
+   * @param uids Array of map uids
+   * @returns Map objects array
+   */
+  static fetch(uids: string[]): Promise<TMMap[]>
+  static fetch(uids: string | string[]): Promise<TMMap | undefined | TMMap[]> {
+    return this.repo.get(uids as any)
+  }
+
+  /**
+   * @returns Currently played map
+   */
+  static get current(): Readonly<TMCurrentMap> {
+    return this._current
+  }
+
+  /**
+   * @returns All maps from current playlist. This method creates copy of maps array
+   */
+  static get maps(): Readonly<TMMap>[] {
+    return [...this._maps]
+  }
+
+  /**
+   * @returns Amount of maps in current playlist
+   */
+  static get mapCount(): number {
+    return this._maps.length
   }
 
 }
