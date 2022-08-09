@@ -1,53 +1,51 @@
-import { trakman as TM } from "../../src/Trakman.js";
+import { trakman as tm } from "../../src/Trakman.js";
+import config from './Config.js'
 
-const topPlayerVisits: { login: string, visits: number }[] = []
-const updateListeners: (() => void)[] = []
+let topList: { login: string, nickname: string, visits: number }[] = []
+
+const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, visits: number }[]) => void)[] = []
 
 const initialize = async () => {
-  const allPlayers: any[] | Error = await TM.db.query(`SELECT login, visits FROM players
+  const res: any[] | Error = await tm.db.query(`SELECT login, nickname, visits FROM players
   ORDER BY visits DESC,
   last_online DESC
-  LIMIT 10`)
-  if (allPlayers instanceof Error) {
+  LIMIT ${config.visitsCount}`)
+  if (res instanceof Error) {
+    await tm.log.fatal('Failed to fetch top visits', res.message, res.stack)
     return
   }
-  topPlayerVisits.push(...allPlayers.slice(0, 10))
+  topList = res
 }
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-TM.addListener('Controller.PlayerJoin', (info): void => {
-  const topIndex: number = topPlayerVisits.findIndex(a => a.login === info.login)
-  if (topIndex === -1 && info.visits > topPlayerVisits[topPlayerVisits.length - 1].visits) {
-    topPlayerVisits.splice(topPlayerVisits.findIndex(a => a.visits < info.visits), 0, { login: info.login, visits: info.visits })
-    topPlayerVisits.length = 10
-    for (const e of updateListeners) {
-      e()
-    }
-  } else if (topIndex !== -1) {
-    const newIndex: number = topPlayerVisits.findIndex(a => a.visits < info.visits)
-    if (newIndex < topIndex) {
-      const entry = topPlayerVisits.splice(topIndex, 1)
-      topPlayerVisits.splice(newIndex, 0, entry[0])
-    } else {
-      topPlayerVisits[topIndex].visits++
-    }
-    for (const e of updateListeners) {
-      e()
-    }
+tm.addListener('Controller.PlayerJoin', (info) => {
+  const login = info.login
+  const visits = info.visits
+  if (visits <= topList[topList.length - 1].visits) { return }
+  const entry = topList.find(a => a.login === login)
+  if (entry !== undefined) {
+    entry.visits = visits
+    topList.sort((a, b) => b.visits - a.visits)
+  } else {
+    topList.splice(topList.findIndex(a => a.visits < visits), 1)
+    topList.length = config.visitsCount
+  }
+  for (const e of updateListeners) {
+    e(login, [...topList])
   }
 })
 
-export const TopPlayerVisits = {
+export const topVisits = {
 
   get list() {
-    return [...topPlayerVisits]
+    return [...topList]
   },
 
-  onUpdate(callback: () => void) {
+  onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, visits: number }[]) => void) {
     updateListeners.push(callback)
-  },
+  }
 
 }

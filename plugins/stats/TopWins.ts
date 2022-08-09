@@ -1,4 +1,5 @@
 import { trakman as tm } from "../../src/Trakman.js";
+import config from './Config.js'
 
 let topList: { login: string, nickname: string, wins: number }[] = []
 
@@ -8,7 +9,7 @@ const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, wins FROM players
   ORDER BY wins DESC,
   last_online DESC
-  LIMIT 10`)
+  LIMIT ${config.winsCount}`)
   if (res instanceof Error) {
     await tm.log.fatal('Failed to fetch top wins', res.message, res.stack)
     return
@@ -31,7 +32,7 @@ tm.addListener('Controller.EndMap', (info) => {
     topList.sort((a, b) => b.wins - a.wins)
   } else {
     topList.splice(topList.findIndex(a => a.wins < wins), 1)
-    topList.length = 10
+    topList.length = config.winsCount
   }
   for (const e of updateListeners) {
     e(login, [...topList])
@@ -46,6 +47,6 @@ export const topWins = {
 
   onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, wins: number }[]) => void) {
     updateListeners.push(callback)
-  },
+  }
 
 }
