@@ -1,9 +1,11 @@
-import { trakman as TM } from "../../src/Trakman.js";
+import { trakman as tm } from "../../src/Trakman.js";
 
-const topPlayerRecords: { login: string, nickname: string, amount: number }[] = []
-const updateListeners: (() => void)[] = []
+let topList: { login: string, nickname: string, amount: number }[] = []
+let onlineList: { login: string, nickname: string, amount: number }[] = []
+const listeners: (() => void)[] = []
+
 const initialize = async () => {
-  const res: any[] | Error = await TM.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
+  const res: any[] | Error = await tm.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
   JOIN players ON players.id=records.player_id
   JOIN maps ON maps.id=records.map_id
   GROUP BY (nickname, login, last_online)
@@ -11,13 +13,18 @@ const initialize = async () => {
   last_online DESC
   LIMIT 10`)
   if (res instanceof Error) {
+    await tm.log.fatal('Failed to fetch top records', res.message, res.stack)
     return
   }
-  topPlayerRecords.push(...res.slice(0, 10))
+  topList = res
 }
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
+})
+
+tm.addListener('Controller.PlayerJoin',(info)=> {
+  
 })
 
 // TM.addListener('Controller.PlayerJoin', (info): void => {
@@ -42,14 +49,14 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
 //   }
 // })
 
-export const TopPlayerRecords = {
+export const topRecords = {
 
   get list() {
-    return [...topPlayerRecords]
+    return [...topList]
   },
 
   onUpdate(callback: () => void) {
-    updateListeners.push(callback)
+    listeners.push(callback)
   },
 
 }
