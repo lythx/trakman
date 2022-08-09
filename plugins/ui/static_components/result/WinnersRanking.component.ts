@@ -1,7 +1,7 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { TopPlayerWins } from '../../../TopPlayerWins.js'
+import { topWins } from '../../../stats/TopWins.js'
 
 export default class WinnersRanking extends StaticComponent {
 
@@ -22,7 +22,7 @@ export default class WinnersRanking extends StaticComponent {
     TM.addListener('Controller.EndMap', () => {
       this.constructXml()
     })
-    TopPlayerWins.onUpdate(() => {
+    topWins.onUpdate(() => {
       if (this.isDisplayed === true) {
         this.constructXml()
         this.display()
@@ -42,12 +42,13 @@ export default class WinnersRanking extends StaticComponent {
   }
 
   constructXml() {
+    const list = topWins.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.winnersRanking.title, CFG.winnersRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(TopPlayerWins.list.map(a => a.wins.toString()), TopPlayerWins.list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

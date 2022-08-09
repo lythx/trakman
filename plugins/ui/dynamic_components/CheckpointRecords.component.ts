@@ -1,7 +1,7 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
-import { checkpointRecords } from '../../CheckpointRecords.js'
+import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 
 export default class CheckpointRecords extends PopupWindow {
 

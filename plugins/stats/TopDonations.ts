@@ -1,4 +1,4 @@
-import { trakman as TM } from '../src/Trakman.js'
+import { trakman as TM } from '../../src/Trakman.js'
 
 const updateListeners: (() => void)[] = []
 const topDonators: { login: string, nickname: string, amount: number }[] = []
@@ -49,7 +49,7 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
   }
 }
 
-export const Donations = {
+export const donations = {
 
   donate,
 

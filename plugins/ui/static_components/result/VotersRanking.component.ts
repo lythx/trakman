@@ -1,7 +1,7 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { PlayerVoteCount } from '../../../PlayerVoteCount.js'
+import { stats } from '../../../stats/Stats.js'
 
 export default class VotersRanking extends StaticComponent {
 
@@ -25,7 +25,7 @@ export default class VotersRanking extends StaticComponent {
     TM.addListener('Controller.EndMap', () => {
       this.constructXml()
     })
-    PlayerVoteCount.onTopVoteCountUpdated(() => {
+    stats.votes.onUpdate(() => {
       if (this.isDisplayed === true) {
         this.constructXml()
         this.display()
@@ -45,12 +45,13 @@ export default class VotersRanking extends StaticComponent {
   }
 
   constructXml() {
+    const votes = stats.votes.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.votersRanking.title, CFG.votersRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(PlayerVoteCount.topVoteCounts.map(a => a.count.toString()), PlayerVoteCount.topVoteCounts.map(a => a.login))}
+        ${this.list.constructXml(votes.map(a => a.count.toString()), votes.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`
