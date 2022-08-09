@@ -1,5 +1,6 @@
 import { trakman as TM } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
+import { donations } from '../../Donations.js'
 import { IDS, CONFIG, getStaticPosition, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
 
 export default class DonationPanel extends StaticComponent {
@@ -19,17 +20,10 @@ export default class DonationPanel extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXML()
-    TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    TM.addListener('Controller.ManialinkClick',  (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + this.amounts.length) {
         const amount = this.amounts[info.answer - (this.id + 1)]
-        const status = await TM.utils.sendCoppers(info.login, amount, 'Please give me coper')
-        if (status instanceof Error) {
-          TM.log.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`, info.login)
-        } else if (status === true) {
-          TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}${TM.utils.palette.donation} `
-            + `donated ${TM.utils.palette.highlight}${amount}C${TM.utils.palette.donation} to the server.`)
-        }
+       void donations.donate(info.login, info.nickname, amount)
       }
     })
   }
