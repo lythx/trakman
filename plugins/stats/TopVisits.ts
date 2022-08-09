@@ -2,7 +2,6 @@ import { trakman as tm } from "../../src/Trakman.js";
 import config from './Config.js'
 
 let topList: { login: string, nickname: string, visits: number }[] = []
-
 const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, visits: number }[]) => void)[] = []
 
 const initialize = async () => {
