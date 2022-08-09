@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import { JukeboxService } from './JukeboxService.js'
 import 'dotenv/config'
 import CONFIG from '../../config.json' assert { type: 'json' }
 import { Logger } from '../Logger.js'
@@ -21,13 +20,13 @@ export abstract class TMXService {
 
   static async initialize(): Promise<void> {
     if (this.isActive === false) { return }
-    if (this.nextSize > JukeboxService.queueLength) {
-      await Logger.fatal(`jukeboxQueueSize (${JukeboxService.queueLength}) can't be lower than tmxMapPrefetch (${this.nextSize}). Change your config.json file`)
+    if (this.nextSize > MapService.queueSize) {
+      await Logger.fatal(`jukeboxQueueSize (${MapService.queueSize}) can't be lower than tmxMapPrefetch (${this.nextSize}). Change your config.json file`)
     }
-    const current: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.current.id)
+    const current: TMXMapInfo | Error = await this.fetchMapInfo(MapService.current.id)
     this._current = current instanceof Error ? null : current
     for (let i: number = 0; i < this.nextSize; i++) {
-      const id: string = JukeboxService.queue[i].id
+      const id: string = MapService.queue[i].id
       const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
       this._next.push(map instanceof Error ? null : map)
     }
@@ -43,7 +42,7 @@ export abstract class TMXService {
       return
     }
     this._current = next
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
     Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
@@ -66,7 +65,7 @@ export abstract class TMXService {
   static async removeMap(index: number): Promise<void> {
     if (this.isActive === false || index >= this.nextSize) { return }
     this._next.splice(index, 1)
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
     Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
@@ -234,10 +233,6 @@ export abstract class TMXService {
 
   private static siteToPrefix(game: TMXSite): TMXPrefix {
     return this.prefixes[this.sites.indexOf(game)]
-  }
-
-  private static prefixToSite(prefix: TMXPrefix): TMXSite {
-    return this.sites[this.prefixes.indexOf(prefix)]
   }
 
 }

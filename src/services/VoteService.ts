@@ -1,6 +1,5 @@
 import { Events } from "../Events.js";
 import { VoteRepository } from "../database/VoteRepository.js";
-import { JukeboxService } from "./JukeboxService.js";
 import { MapService } from "./MapService.js";
 import { Logger } from "../Logger.js";
 import { Client } from "../client/Client.js";
@@ -38,7 +37,7 @@ export abstract class VoteService {
       }
     }
     for (let i: number = 0; i < 4; i++) {
-      const id: string = [JukeboxService.current, ...JukeboxService.queue][i].id
+      const id: string = [MapService.current, ...MapService.queue][i].id
       this.mapsWithVotesStored.push(id)
       this._votes.push(...res.filter(a => a.mapId === id))
     }
@@ -53,7 +52,7 @@ export abstract class VoteService {
   }
 
   static async nextMap(): Promise<void> {
-    const id: string = JukeboxService.queue[2].id
+    const id: string = MapService.queue[2].id
     const res: TMVote[] = await this.repo.get(id)
     this.mapsWithVotesStored.push(id)
     this.mapsWithVotesStored.shift()

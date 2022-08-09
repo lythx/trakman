@@ -97,13 +97,13 @@ export class RecordService {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
-    if (GameService.config.gameMode === 1 || !MapService.current.isLapRace) {
+    if (GameService.config.gameMode === 1 || !MapService.current.isLapRace) { // TA mode or not a lap map
       laps = 1
-    } else if (GameService.config.gameMode === 3) {
+    } else if (GameService.config.gameMode === 3) { // Laps mode
       laps = GameService.config.lapsNo
-    } else if (GameService.config.gameMode === 4) {
+    } else if (GameService.config.gameMode === 4) { // Stunts mode
       return false// TODO STUNTS MODE
-    } else {
+    } else { // Rounds / Teams / Cup mode
       laps = MapService.current.lapsAmount
     }
     const cpAmount: number = cpsPerLap * laps
@@ -117,8 +117,7 @@ export class RecordService {
       ...player,
       checkpoints: [...checkpoints],
       map,
-      time,
-      date
+      time
     }
     const localRecord: RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
@@ -136,34 +135,30 @@ export class RecordService {
    * @returns Record object if local record gets added, undefined otherwise
    */
   private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TMPlayer): Promise<RecordInfo | undefined> {
-    const pb: number | undefined = this._localRecords.find(a => a.login === player.login)?.time
-    const position: number = this._localRecords.filter(a => a.time <= time).length + 1
-    if (pb === undefined) {
+    const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
+    let position: number = this._localRecords.findIndex(a => a.time > time) + 1
+    // If player gets the worst record on the server set position to array length + 1
+    if (position === 0) { position = this._localRecords.length + 1 }
+    if (previousIndex === -1) {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(-1, position, -1, time, player.login, 'local'))
-      await this.repo.add(recordInfo)
+      void this.repo.add(recordInfo)
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
+    const pb: number | undefined = this._localRecords[previousIndex].time
     if (time === pb) {
-      const previousPosition: number = this._localRecords
-        .findIndex(a => a.login === this._localRecords.find(a => a.login === player.login)?.login) + 1
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
-      Logger.info(...this.getLogString(previousPosition, previousPosition, time, time, player.login, 'local'))
+      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
+      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player.login, 'local'))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     if (time < pb) {
-      const previousIndex: number = this._localRecords.findIndex(a => a.login === player.login)
-      if (previousIndex === -1) {
-        Logger.error(`Can't find player ${player.login} in memory`)
-        return
-      }
       const previousTime: number | undefined = this._localRecords[previousIndex].time
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._localRecords.splice(previousIndex, 1)
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'local'))
-      await this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
+      void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
   }

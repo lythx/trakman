@@ -339,7 +339,7 @@ export default class MapList extends PopupWindow {
     const width = (w - this.margin * 3) - this.iconW
     const height = h - this.margin
     const index = TM.jukebox.juked.findIndex(a => a.map.id === mapId)
-    const prevIndex = [TM.maps.current, ...TM.jukebox.previous].findIndex(a => a.id === mapId)
+    const prevIndex = [TM.maps.current, ...TM.jukebox.history].findIndex(a => a.id === mapId)
     const player = TM.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined

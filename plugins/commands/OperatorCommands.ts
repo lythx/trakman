@@ -134,13 +134,13 @@ const commands: TMCommand[] = [
     aliases: ['pt', 'prev', 'previous'],
     help: 'Requeue the previously played map.',
     callback: async (info: MessageInfo): Promise<void> => {
-      if (TM.jukebox.previous[0] === undefined) {
+      if (TM.jukebox.history[0] === undefined) {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Can't queue previous map because map history is empty. This happens if server was restarted.`)
         return
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the previous map.`)
-      TM.jukebox.add(TM.jukebox.previous[0].id, info.login)
+      TM.jukebox.add(TM.jukebox.history[0].id, info.login)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.client.callNoRes('NextChallenge')
     },

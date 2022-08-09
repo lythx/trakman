@@ -9,7 +9,6 @@ import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
 import { Database } from './database/DB.js'
 import { TMXService } from './services/TMXService.js'
-import { JukeboxService } from './services/JukeboxService.js'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
@@ -222,21 +221,35 @@ export const trakman = {
 
   jukebox: {
 
-    add: JukeboxService.add.bind(JukeboxService),
+    add: MapService.addToJukebox.bind(MapService),
 
-    remove: JukeboxService.add.bind(JukeboxService),
+    remove: MapService.removeFromJukebox.bind(MapService),
 
-    clear: JukeboxService.clear.bind(JukeboxService),
+    clear: MapService.clearJukebox.bind(MapService),
 
-    shuffle: JukeboxService.shuffle.bind(JukeboxService),
+    shuffle: MapService.shuffle.bind(MapService),
 
-    get next() { return JukeboxService.queue },
+    getFromQueue: MapService.getFromQueue.bind(MapService),
 
-    get previous() { return JukeboxService.previous },
+    getFromJukebox: MapService.getFromJukebox.bind(MapService),
 
-    get current() { return JukeboxService.current },
+    getFromHistory: MapService.getFromHistory.bind(MapService),
 
-    get juked() { return JukeboxService.jukebox }
+    get queueCount() { return MapService.queueSize },
+
+    get historyCount() { return MapService.historyCount },
+
+    get maxHistoryCount() { return MapService.historySize },
+
+    get jukedCount() { return MapService.jukeboxCount },
+
+    get queue() { return MapService.queue },
+
+    get history() { return MapService.history },
+
+    get current() { return MapService.current },
+
+    get juked() { return MapService.jukebox }
 
   },
 
