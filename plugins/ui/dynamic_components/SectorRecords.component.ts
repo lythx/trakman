@@ -1,7 +1,7 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as TM } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
-import { sectorRecords } from '../../SectorRecords.js'
+import { sectorRecords } from '../../sector_records/SectorRecords.js'
 
 export default class SectorRecords extends PopupWindow {
 

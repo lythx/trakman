@@ -1,18 +1,19 @@
-import { trakman as TM } from "../src/Trakman.js";
+import { trakman as TM } from "../../src/Trakman.js";
 
-const topPlayerWins: { login: string, nickname: string, wins: number }[] = []
+const topPlayerRecords: { login: string, nickname: string, amount: number }[] = []
 const updateListeners: (() => void)[] = []
-
 const initialize = async () => {
-  const res: any[] | Error = await TM.db.query(`SELECT login, nickname, wins FROM players
-  JOIN players ON players.id=players.id
-  ORDER BY wins DESC,
+  const res: any[] | Error = await TM.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
+  JOIN players ON players.id=records.player_id
+  JOIN maps ON maps.id=records.map_id
+  GROUP BY (nickname, login, last_online)
+  ORDER BY amount DESC,
   last_online DESC
   LIMIT 10`)
   if (res instanceof Error) {
     return
   }
-  topPlayerWins.push(...res.slice(0, 10))
+  topPlayerRecords.push(...res.slice(0, 10))
 }
 
 TM.addListener('Controller.Ready', async (): Promise<void> => {
@@ -41,10 +42,10 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
 //   }
 // })
 
-export const TopPlayerWins = {
+export const TopPlayerRecords = {
 
   get list() {
-    return [...topPlayerWins]
+    return [...topPlayerRecords]
   },
 
   onUpdate(callback: () => void) {

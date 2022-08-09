@@ -1,7 +1,7 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { TopPlayerVisits } from '../../../TopPlayerVisits.js'
+import { TopPlayerVisits } from '../../../stats/TopVisits.js'
 
 export default class VisitorsRanking extends StaticComponent {
 

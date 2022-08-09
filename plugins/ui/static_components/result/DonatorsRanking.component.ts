@@ -1,7 +1,7 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { Donations } from '../../../Donations.js'
+import { donations } from '../../../stats/TopDonations.js'
 
 export default class DonatorsRanking extends StaticComponent {
 
@@ -20,9 +20,9 @@ export default class DonatorsRanking extends StaticComponent {
     this.entries = CFG.donatorsRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.donatorsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     this.constructXml()
-    this.ranking = Donations.topDonators
+    this.ranking = donations.topDonators
     TM.addListener('Controller.EndMap', async () => {
-      this.ranking = Donations.topDonators
+      this.ranking = donations.topDonators
       this.constructXml()
       this.display()
     })

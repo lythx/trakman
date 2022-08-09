@@ -1,7 +1,7 @@
 import { trakman as TM } from '../../../../src/Trakman.js'
 import { RESULTCONFIG as CFG, List, IDS, resultStaticHeader, getResultPosition } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { TopPlayerRanks } from '../../../TopPlayerAverages.js'
+import { TopPlayerRanks } from '../../../stats/TopAverages.js'
 
 export default class AveragesRanking extends StaticComponent {
 

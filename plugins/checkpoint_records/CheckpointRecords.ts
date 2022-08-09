@@ -1,6 +1,6 @@
-import { addListener } from './checkpoint_records/CheckpointEvents.js'
-import { fetchMapCheckpoints } from './checkpoint_records/CheckpointDB.js'
-import { getMapCheckpoints, getPlayerCheckpoints } from './checkpoint_records/CheckpointListeners.js'
+import { addListener } from './CheckpointEvents.js'
+import { fetchMapCheckpoints } from './CheckpointDB.js'
+import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.js'
 
 export const checkpointRecords = {
 
