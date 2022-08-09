@@ -268,6 +268,7 @@ export class PlayerService {
     const initialLocals = RecordService.initialLocals
     const amount: number = MapService.mapCount
     const averages = await this.repo.getAverage(logins)
+    const arr: { login: string, average: number }[] = []
     for (const avg of averages) {
       // Get rank from the start of the race
       let previousRank: number = initialLocals.findIndex(a => a.login === avg.login) + 1
@@ -281,10 +282,12 @@ export class PlayerService {
       if (onlinePlayer !== undefined) { // Set average in runtime if player is online
         onlinePlayer.average = average
       }
+      arr.push({ login: avg.login, average })
       await this.repo.updateAverage(avg.login, average) // Set average in the database
     }
     // Get ranks for all players
     this.ranks = await this.repo.getRanks()
+    Events.emitEvent("Controller.RanksAndAveragesUpdated", arr)
   }
 
   /**

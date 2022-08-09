@@ -18,16 +18,7 @@ export default class WinnersRanking extends StaticComponent {
     super(IDS.winnersRanking, 'result')
     this.entries = CFG.winnersRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.winnersRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
-    this.constructXml()
-    TM.addListener('Controller.EndMap', () => {
-      this.constructXml()
-    })
-    topWins.onUpdate(() => {
-      if (this.isDisplayed === true) {
-        this.constructXml()
-        this.display()
-      }
-    })
+    topWins.onUpdate(() =>this.display())
   }
 
   display(): void {
@@ -46,10 +37,10 @@ export default class WinnersRanking extends StaticComponent {
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
-      ${resultStaticHeader(CFG.winnersRanking.title, CFG.winnersRanking.icon, this.side)}
-      <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
-      </frame>
+        ${resultStaticHeader(CFG.winnersRanking.title, CFG.winnersRanking.icon, this.side)}
+        <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
+          ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        </frame>
       </frame>
     </manialink>`
   }

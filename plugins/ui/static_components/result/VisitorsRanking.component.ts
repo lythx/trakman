@@ -1,7 +1,7 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { TopPlayerVisits } from '../../../stats/TopVisits.js'
+import { stats } from '../../../stats/Stats.js'
 
 export default class VisitorsRanking extends StaticComponent {
 
@@ -21,16 +21,7 @@ export default class VisitorsRanking extends StaticComponent {
     this.posY = pos.y
     this.entries = CFG.visitorsRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.visitorsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
-    this.constructXml()
-    TM.addListener('Controller.EndMap', () => {
-      this.constructXml()
-    })
-    TopPlayerVisits.onUpdate(() => {
-      if (this.isDisplayed === true) {
-        this.constructXml()
-        this.display()
-      }
-    })
+    stats.visits.onUpdate(() => this.display())
   }
 
   display(): void {
@@ -45,12 +36,13 @@ export default class VisitorsRanking extends StaticComponent {
   }
 
   constructXml() {
+    const list = stats.visits.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.visitorsRanking.title, CFG.visitorsRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(TopPlayerVisits.list.map(a => a.visits.toString()), TopPlayerVisits.list.map(a => a.login))}
+        ${this.list.constructXml(list.map(a => a.visits.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

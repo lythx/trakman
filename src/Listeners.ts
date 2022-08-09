@@ -222,7 +222,7 @@ export class Listeners {
         }
         // Both awaits may be voids if possible?
         void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
-        await PlayerService.calculateAveragesAndRanks()
+        void PlayerService.calculateAveragesAndRanks()
         Events.emitEvent('Controller.EndMap', endMapInfo)
       }
     },

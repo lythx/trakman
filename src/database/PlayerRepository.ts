@@ -97,7 +97,8 @@ export class PlayerRepository extends Repository {
     }
     if (logins.length === 0) { return [] }
     const query: string = `SELECT players.login, average FROM players 
-    WHERE ${logins.map((a, i) => `players.login=$${i + 1} OR `).join('').slice(0, -3)}`
+    WHERE ${logins.map((a, i) => `players.login=$${i + 1} OR `).join('').slice(0, -3)}
+    ORDER BY average ASC`
     const res = await this.query(query, ...logins)
     return res
   }
