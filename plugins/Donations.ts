@@ -46,6 +46,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
       tm.log.error(`Failed to get donation info for player ${logins}`, res.message, res.stack)
       return
     }
+    if (res[0] === undefined) { return undefined }
     return {
       login: logins, nickname: res[0].nickname,
       sum: res.reduce((acc, cur) => acc += cur.amount, 0),
@@ -65,7 +66,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
   const ret: DonationInfo[] = []
   for (const login of logins) {
     const arr = res.filter(a => a.login === login)
-    if (arr.length === 0) {continue }
+    if (arr.length === 0) { continue }
     ret.push({
       login, nickname: arr[0]?.nickname,
       sum: arr.reduce((acc, cur) => acc += cur.amount, 0),
@@ -81,7 +82,7 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
     tm.log.error(`Failed to save donation from player ${login} (amount ${amount})`, 'Failed to fetch player DB ID')
     return
   }
- await tm.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
+  await tm.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
 }
 
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<boolean | Error> => {
