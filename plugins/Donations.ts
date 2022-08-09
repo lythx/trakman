@@ -1,15 +1,14 @@
 import { trakman as TM } from '../src/Trakman.js'
 
-await TM.db.query(`CREATE TABLE IF NOT EXISTS donations(
-  player_id INT4 GENERATED ALWAYS AS IDENTITY,
-  amount INT4 NOT NULL,
-  date TIMESTAMP NOT NULL
-  PRIMARY KEY(player_id, date)
-);`)
-
 const updateListeners: (() => void)[] = []
 const topDonators: { login: string, nickname: string, amount: number }[] = []
 // const onlineDonators: { login: string, amount: number }[] = []
+await TM.db.query(`CREATE TABLE IF NOT EXISTS donations(
+  player_id INT4 GENERATED ALWAYS AS IDENTITY,
+  amount INT4 NOT NULL,
+  date TIMESTAMP NOT NULL,
+  PRIMARY KEY(player_id, date)
+);`)
 
 const initialize = async () => {
   const res: any[] | Error = await TM.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations

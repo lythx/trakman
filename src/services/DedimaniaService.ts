@@ -4,7 +4,6 @@ import { PlayerService } from './PlayerService.js'
 import { GameService } from './GameService.js'
 import { MapService } from './MapService.js'
 import { ServerConfig } from '../ServerConfig.js'
-import { JukeboxService } from './JukeboxService.js'
 import { Events } from '../Events.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
@@ -66,7 +65,7 @@ export abstract class DedimaniaService {
     }
     const cfg: ServerInfo = ServerConfig.config
     const nextIds: string[] = []
-    for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+    for (let i: number = 0; i < 5; i++) { nextIds.push(MapService.queue[i].id) }
     const dedis: any[] | Error = await DedimaniaClient.call('dedimania.CurrentChallenge',
       [
         { string: id },
@@ -182,7 +181,7 @@ export abstract class DedimaniaService {
     setInterval(async (): Promise<void> => {
       const cfg: ServerInfo = ServerConfig.config
       const nextIds: any[] = []
-      for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+      for (let i: number = 0; i < 5; i++) { nextIds.push(MapService.queue[i].id) }
       const status: any[] | Error = await DedimaniaClient.call('dedimania.UpdateServerPlayers',
         [
           { string: 'TMF' },

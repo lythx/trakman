@@ -45,7 +45,7 @@ export default class MapWidgetResult extends StaticComponent {
   private updateXML(): void {
     const rows = 5
     this.height = (RCFG.staticHeader.height + RCFG.marginSmall) * rows + RCFG.marginSmall
-    const map = TM.jukebox.next[0]
+    const map = TM.jukebox.queue[0]
     const author: string = MapAuthorData?.nextAuthorData?.nickname ?? map.author
     const cfg = RCFG.map
     const tmxmap = TM.tmx.next[0]

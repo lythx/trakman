@@ -18,7 +18,7 @@ export class PlayerService {
   private static readonly repo: PlayerRepository = new PlayerRepository()
   // Move to admin service
   private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
-  private static newLocalsAmount: number
+  private static newLocalsAmount = 0
   private static ranks: string[]
 
   /**
@@ -113,7 +113,7 @@ export class PlayerService {
         visits: 1,
         currentCheckpoints: [],
         wins: 0,
-        privilege: 0,
+        privilege,
         isSpectator,
         ip,
         region,

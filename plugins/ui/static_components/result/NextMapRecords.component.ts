@@ -25,7 +25,7 @@ export default class NextMapRecords extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     TM.addListener('Controller.EndMap', async () => {
-      const mapId = TM.jukebox.next[0].id
+      const mapId = TM.jukebox.queue[0].id
       this.records = await TM.records.fetchByMap(mapId)
       this.display()
     })

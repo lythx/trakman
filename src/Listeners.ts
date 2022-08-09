@@ -7,7 +7,6 @@ import { DedimaniaService } from './services/DedimaniaService.js'
 import 'dotenv/config'
 import { GameService } from './services/GameService.js'
 import { MapService } from './services/MapService.js'
-import { JukeboxService } from './services/JukeboxService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
@@ -170,7 +169,6 @@ export class Listeners {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         await GameService.update()
         await RecordService.fetchAndStoreRecords(params[0].UId)
-        await MapService.setCurrent()
         const c: any = params[0]
         const info: BeginMapInfo = {
           id: c.UId,
@@ -189,11 +187,12 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.localRecords
         }
-        const lastId: string = JukeboxService.current.id
-        JukeboxService.nextMap()
-        if (lastId === JukeboxService.current.id) {
+        const lastId: string = MapService.current.id
+        await MapService.setCurrent()
+        if (lastId === MapService.current.id) {
           TMXService.restartMap()
         } else {
+          MapService.updateJukebox()
           await TMXService.nextMap()
           await VoteService.nextMap()
         }

@@ -13,7 +13,6 @@ import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
-import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
@@ -50,8 +49,6 @@ async function main(): Promise<void> {
   Logger.trace('Fetching maps...')
   await MapService.initialize()
   Logger.trace('Map service instantiated')
-  JukeboxService.initialize()
-  Logger.trace('Jukebox service instantiated')
   Logger.trace('Fetching records...')
   await RecordService.initialize()
   Logger.trace('Records fetched')

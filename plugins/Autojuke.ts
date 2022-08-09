@@ -14,7 +14,7 @@ TM.commands.add({
         const mapsWithRec: string[] = (await TM.records.fetchByLogin(info.login)).map(a => a.map)
         const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.previous.some(b => b.id === a.id) &&
+          !TM.jukebox.history.some(b => b.id === a.id) &&
           TM.maps.current.id !== a.id &&
           !mapsWithRec.includes(a.id))
         if (eligibleMaps.length === 0) {
@@ -32,7 +32,7 @@ TM.commands.add({
           .filter(a => TM.maps.list.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
         const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.previous.some(b => b.id === a.id) &&
+          !TM.jukebox.history.some(b => b.id === a.id) &&
           TM.maps.current.id !== a.id &&
           !mapsWithAuthor.includes(a.id))
         if (eligibleMaps.length === 0) {
@@ -57,7 +57,7 @@ TM.commands.add({
         const list: TMMap[] = TM.maps.list.slice(0, (i + 1) * fetchSize)
         const eligibleMaps: TMMap[] = list.filter(a =>
           !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.previous.some(b => b.id === a.id) &&
+          !TM.jukebox.history.some(b => b.id === a.id) &&
           TM.maps.current.id !== a.id &&
           !ranks.some(b => a.id === b.mapId))
         if (eligibleMaps.length === 0) {
@@ -73,7 +73,7 @@ TM.commands.add({
       default: {
         const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
           !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.previous.some(b => b.id === a.id) &&
+          !TM.jukebox.history.some(b => b.id === a.id) &&
           TM.maps.current.id !== a.id)
         if (eligibleMaps.length === 0) {
           TM.sendMessage('No maps available', info.login)

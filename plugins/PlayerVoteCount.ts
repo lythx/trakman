@@ -23,7 +23,7 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
 
 TM.addListener('Controller.EndMap', (): void => {
   initialVotes.length = 0
-  initialVotes.push(...TM.votes.filter(a => a.mapId === TM.jukebox.next[0].id))
+  initialVotes.push(...TM.votes.filter(a => a.mapId === TM.jukebox.queue[0].id))
 })
 
 TM.addListener('Controller.KarmaVote', (info): void => {

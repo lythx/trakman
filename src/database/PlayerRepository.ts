@@ -57,11 +57,11 @@ export class PlayerRepository extends Repository {
 
   async add(...players: TMOfflinePlayer[]): Promise<void> {
     if (players.length === 0) { return }
-    const query: string = `INSERT INTO players(login, nickname, region, wins, time_played, visits, is_united, last_online) 
-    ${this.getInsertValuesString(8, players.length)};`
+    const query: string = `INSERT INTO players(login, nickname, region, wins, time_played, visits, is_united, last_online, average) 
+    ${this.getInsertValuesString(9, players.length)};`
     const values: any[] = []
     for (const player of players) {
-      values.push(player.login, player.nickname, player.region, player.wins, Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline)
+      values.push(player.login, player.nickname, player.region, player.wins, Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline, player.average)
     }
     await this.query(query, ...values)
   }
