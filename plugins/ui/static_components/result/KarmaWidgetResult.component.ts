@@ -54,14 +54,14 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    const votes: TMVote[] = TM.votes.filter(a => a.mapId === TM.maps.current.id)
+    const votes: TMVote[] = TM.karma.current
     const voteAmounts: number[] = []
     for (const e of this.options) {
       voteAmounts.unshift(votes.filter(a => a.vote === e).length)
     }
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
-    const karma: number = TM.voteRatios.find(a => a.uid === TM.maps.current.id)?.ratio ?? 0
+    const karma: number = TM.maps.current.voteRatio
     const mkVotes = TM.mkMapKarma
     const mkKarmaValue: number = TM.mkMapKarmaValue
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)

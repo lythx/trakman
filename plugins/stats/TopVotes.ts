@@ -1,7 +1,7 @@
 import { trakman as tm } from "../../src/Trakman.js";
 
 let onlineList: { login: string, nickname: string, count: number }[] = []
-const initialVotes: TMVote[] = []
+let initialVotes: TMVote[] = []
 let topList: { login: string, nickname: string, count: number }[] = []
 const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void)[] = []
 
@@ -21,14 +21,12 @@ const initialize = async () => {
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
-  const map = tm.jukebox.current
-  initialVotes.push(...tm.votes.filter(a => a.mapId === map.id))
+  initialVotes = tm.karma.current
 })
 
-tm.addListener('Controller.EndMap', (): void => {
-  const nextMap = tm.jukebox.queue[0]
+tm.addListener('Controller.BeginMap', (info): void => {
   initialVotes.length = 0
-  initialVotes.push(...tm.votes.filter(a => a.mapId === nextMap.id))
+  initialVotes = tm.karma.current
 })
 
 tm.addListener('Controller.KarmaVote', (info): void => {
