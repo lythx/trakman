@@ -29,8 +29,10 @@ export default class AdminPanelResult extends StaticComponent {
 
   displayToPlayer(login: string): void {
     const privilege: number = TM.players.get(login)?.privilege ?? 0
-    if (privilege > 0) {
-      TM.sendManialink(this.xml, login)
+    if (this.isDisplayed) {
+      if (privilege > 0) {
+        TM.sendManialink(this.xml, login)
+      }
     }
   }
 
