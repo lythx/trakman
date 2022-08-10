@@ -68,7 +68,7 @@ export class VoteRepository extends Repository {
   async get(...mapUids: string[]): Promise<TMVote[]> {
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
-    JOIN maps ON maps.id=votes.map_id
+    JOIN map_ids ON map_ids.id=votes.map_id
     WHERE ${mapUids.map((a, i) => `votes.map_id=$${i + 1} OR `).join('').slice(0, -3)}`
     const ids = await mapIdsRepo.get(mapUids)
     const res = await this.query(query, ids.map(a => a.id))
