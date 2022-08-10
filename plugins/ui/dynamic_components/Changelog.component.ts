@@ -33,7 +33,7 @@ export default class Changelog extends PopupWindow {
       (i, j, w, h) => this.constructEntry('0.3', '31/07/2022',
         `- Added changelog\n- Added sector records\n- Added checkpoint records\n- Implemented player ranks\n- Implemented reconnect on\n  dedimania server restart\n- Fixed a ton of bugs`, w, h),
       (i, j, w, h) => this.constructEntry('0.4', '10/08/2022',
-        `- Added map list utilites\n- Added autojuke\n- Added endscreen ui\n- Fixed a ton ton ton of bugs`, w, h)
+        `- Added map list utilites\n- Added autojuke\n- Added endscreen ui\n- Implemented donations table\n- Fixed a ton ton ton of bugs`, w, h)
     ]
     return grid.constructXml(entries)
   }
