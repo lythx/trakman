@@ -214,7 +214,6 @@ export default class MapList extends PopupWindow {
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - this.iconW
       const karmaW = width - (this.timeW + this.positionW + this.margin * 4 + this.iconW * 2)
-      const karmaRatio = TM.voteRatios.find(a => a.mapId === maps[index].id)?.ratio
       return `
         <frame posn="${this.margin} ${-this.margin} 3">
           <format textsize="1"/>
@@ -256,7 +255,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[5])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(karmaRatio === undefined ? '-' : Math.round(karmaRatio).toString(), karmaW, rowH - this.margin, { textScale: 1, padding: 0.1 })}
+              ${centeredText(Math.round(maps[index].voteRatio).toString(), karmaW, rowH - this.margin, { textScale: 1, padding: 0.1 })}
             </frame>
           </frame>
         </frame>`

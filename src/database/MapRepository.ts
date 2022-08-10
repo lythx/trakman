@@ -44,6 +44,8 @@ interface TableEntry {
   readonly awards: number | null
   readonly laps_amount: number | null
   readonly checkpoints_amount: number | null
+  readonly vote_count: number
+  readonly vote_sum: number
 }
 
 const moods = {
@@ -90,8 +92,12 @@ export class MapRepository extends Repository {
 
   async getAll(): Promise<TMMap[]> {
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps 
-    JOIN map_ids ON maps.id=map_ids.id;`
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
+    JOIN map_ids ON maps.id=map_ids.id
+    LEFT JOIN votes ON votes.map_id=maps.id
+    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
@@ -104,9 +110,13 @@ export class MapRepository extends Repository {
       mapIds = [mapIds]
     } else if (mapIds.length === 0) { return [] }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
-    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
+    LEFT JOIN votes ON votes.map_id=maps.id
+    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
     const ids = await mapIdsRepo.get(mapIds)
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
@@ -124,14 +134,37 @@ export class MapRepository extends Repository {
       fileNames = [fileNames]
     } else if (fileNames.length === 0) { return [] }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards FROM maps
+    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
+    LEFT JOIN votes ON votes.map_id=maps.id
     WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)};`
     const res = (await this.query(query, ...fileNames))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
     }
     return res.map((a, i) => this.constructMapObject({ ...a, filename: fileNames[i] }))
+  }
+
+  async getVoteCountAndRatio(mapId: string): Promise<{ ratio: number, count: number } | undefined>
+  async getVoteCountAndRatio(mapIds: string[]): Promise<{ uid: string, ratio: number, count: number }[]>
+  async getVoteCountAndRatio(mapIds: string | string[]): Promise<{ ratio: number, count: number } |
+    { uid: string, ratio: number, count: number }[] | undefined> {
+    let isArr = true
+    if (typeof mapIds === 'string') {
+      isArr = false
+      mapIds = [mapIds]
+    } else if (mapIds.length === 0) { return [] }
+    const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote) FROM map_ids
+    LEFT JOIN votes ON votes.map_id=maps.id
+    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+    GROUP BY uid;`
+    const ids = await mapIdsRepo.get(mapIds)
+    const res = (await this.query(query, ...ids.map(a => a.id)))
+    if (isArr === false) {
+      return res[0] === undefined ? undefined : { ratio: (((res[0].sum / res[0].count) + 3) / 6) * 100, count: res[0].count }
+    }
+    return res.map(a => ({ uid: a.uid, ratio: (((a.sum / a.count) + 3) / 6) * 100, count: a.count }))
   }
 
   async remove(...mapIds: string[]): Promise<void> {
@@ -171,7 +204,9 @@ export class MapRepository extends Repository {
       lapsAmount: entry.laps_amount ?? undefined,
       checkpointsAmount: entry.checkpoints_amount ?? undefined,
       awards: entry.awards ?? undefined,
-      leaderboardRating: entry.leaderboard_rating ?? undefined
+      leaderboardRating: entry.leaderboard_rating ?? undefined,
+      voteCount: entry.vote_count,
+      voteRatio: (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100
     }
   }
 

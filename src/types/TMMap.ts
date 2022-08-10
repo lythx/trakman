@@ -12,6 +12,8 @@ interface TMMap {
   readonly copperPrice: number
   readonly isLapRace: boolean
   readonly addDate: Date
+  voteCount: number
+  voteRatio: number
   lapsAmount?: number
   checkpointsAmount?: number
   leaderboardRating?: number
