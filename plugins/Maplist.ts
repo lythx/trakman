@@ -15,9 +15,10 @@ TM.addListener('Controller.Ready', (): void => {
   const arr1: TMMap[] = TM.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
   authorSort.push(...arr1.sort((a, b): number => a.author.localeCompare(b.author)))
   nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
+  const maps = TM.maps.list
   karmaSort.push(...[...authorSort].sort((a, b): number => {
-    const aKarma: number = TM.voteRatios.find(c => c.uid === a.id)?.ratio ?? 0
-    const bKarma: number = TM.voteRatios.find(c => c.uid === b.id)?.ratio ?? 0
+    const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
+    const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
     return bKarma - aKarma
   }))
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
@@ -26,10 +27,10 @@ TM.addListener('Controller.Ready', (): void => {
 TM.addListener('Controller.MapAdded', (map) => {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
-  const ratio = TM.voteRatios.find(a => a.uid === map.id)?.ratio ?? 0
+  const ratio = map.voteRatio
   karmaSort.splice(karmaSort.findIndex(a => map.author.localeCompare(a.author)
     && map.name.localeCompare(a.name)
-    && ratio > (TM.voteRatios.find(b => b.uid === a.id)?.ratio ?? 0)), 0, map)
+    && ratio > map.voteRatio), 0, map)
   atSort.splice(atSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name) && map.authorTime < a.authorTime), 0, map)
 })
 

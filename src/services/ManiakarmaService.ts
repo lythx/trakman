@@ -168,11 +168,11 @@ export abstract class ManiakarmaService {
   }
 
   private static async fixCoherence(): Promise<void> {
-    const localVotes: TMVote[] = VoteService.votes.filter(a => a.mapId === MapService.current.id)
+    const localVotes: TMVote[] = VoteService.current
     const mkVotes: MKVote[] = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-        await VoteService.add(e.mapId, e.login, e.vote)
+        await VoteService.add(e.login, e.vote)
       }
     }
     for (const e of localVotes) {

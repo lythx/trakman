@@ -265,8 +265,18 @@ export const trakman = {
       if (process.env.USE_MANIAKARMA === 'YES') {
         ManiakarmaService.addVote(mapId, login, vote)
       }
-      await VoteService.add(mapId, login, vote)
+      await VoteService.add(login, vote)
     },
+
+    fetch: VoteService.fetch.bind(VoteService),
+
+    get: VoteService.get.bind(VoteService),
+
+    get current() { return VoteService.current },
+
+    get currentCount() { return VoteService.currentCount },
+
+    get list() { return VoteService.votes }
 
   },
 
@@ -468,23 +478,6 @@ export const trakman = {
 
   // TO BE REMOVED
   fetchMapRank: RecordService.getRank.bind(RecordService),
-
-  /**
-   * Fetches all votes for a map
-   * @param mapId Map UID
-   * @returns Database response
-   */
-  async fetchVotes(mapId: string): Promise<any[]> {
-    return await VoteService.fetch(mapId)
-  },
-
-  get votes(): TMVote[] {
-    return VoteService.votes
-  },
-
-  get voteRatios() {
-    return VoteService.voteRatios
-  },
 
   // REMOVE LATER
   get UIIDS() {
