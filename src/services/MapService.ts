@@ -42,7 +42,7 @@ export class MapService {
   }
 
   /**
-   * Download all the maps from the server and store them in the list
+   * Downloads all the maps from the server and store them in the list
    */
   private static async createList(): Promise<void> {
     const current = await Client.call('GetCurrentChallengeInfo')
@@ -61,20 +61,22 @@ export class MapService {
       const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: current[0].FileName }])
       if (insert instanceof Error) { await Logger.fatal('Failed to insert current challenge') }
     }
-    const DBMapList: TMMap[] = await this.repo.getAll()
+    const DBMapList: TMMap[] = (await this.repo.getAll())
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
     if (mapsNotInDB.length > 100) { // TODO implement progress bar here perhaps (?)
       Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
     }
     const mapsNotInDBObjects: TMMap[] = []
     // Fetch info and add all maps which were not present in the database
+    const voteRatios = await this.repo.getVoteCountAndRatio(mapsNotInDB.map(a => a.UId))
     for (const c of mapsNotInDB) {
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
       if (res instanceof Error) {
-        Logger.fatal(`Unable to retrieve map info for map id: ${c.id}, filename: ${c.fileName}`, res.message)
+        Logger.fatal(`Unable to retrieve map info for map id: ${c.UId}, filename: ${c.FileName}`, res.message)
         return
       }
-      mapsNotInDBObjects.push(this.constructNewMapObject(res[0]))
+      const v = voteRatios.find(a => a.uid === c.UId)
+      mapsNotInDBObjects.push(({ ...this.constructNewMapObject(res[0]), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
     }
     const mapsInMapList: TMMap[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
@@ -96,7 +98,7 @@ export class MapService {
     const res: any[] | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
       Logger.error('Unable to retrieve current map info.', res.message)
-      return 
+      return
     }
     const mapInfo: TMMap | undefined = this._maps.find(a => a.id === res[0].UId)
     if (mapInfo === undefined) {
@@ -111,6 +113,19 @@ export class MapService {
     }
     this._current = mapInfo as any
     void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
+  }
+
+  /**
+   * Sets vote ratios and counts for given maps. This method is called from VoteService
+   * @param data Vote data objects
+   */
+  static setVoteData(...data: { uid: string, count: number, ratio: number }[]): void {
+    for (const e of data) {
+      const map = this._maps.find(a => a.id === e.uid)
+      if (map === undefined) { continue }
+      map.voteCount = e.count
+      map.voteRatio = e.ratio
+    }
   }
 
   /**
@@ -140,11 +155,13 @@ export class MapService {
     const dbEntry: TMMap | undefined = await this.repo.getByFilename(filename)
     let obj: TMMap
     if (dbEntry !== undefined) { // If map is present in the database use the database info
-      obj = dbEntry
+      obj = { ...dbEntry }
     } else { // Otherwise fetch the info from server and save it in the database
       const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: filename }])
       if (res instanceof Error) { return res }
-      obj = this.constructNewMapObject(res[0])
+      const voteRatios = await this.repo.getVoteCountAndRatio(res[0].UId)
+      const serverData = this.constructNewMapObject(res[0])
+      obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
       void this.repo.add(obj)
     }
     this._maps.push(obj)
@@ -317,7 +334,7 @@ export class MapService {
    * Contstructs TMMap object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
    */
-  private static constructNewMapObject(info: any): TMMap {
+  private static constructNewMapObject(info: any): Omit<TMMap, 'voteCount' | 'voteRatio'> {
     // Translate mood to controller type (some maps have non standard mood or space in front of it)
     info.Mood = info.Mood.trim()
     if (!["Sunrise", "Day", "Sunset", "Night"].includes(info.Mood)) { // If map has non-standard mood set it to day
@@ -380,9 +397,22 @@ export class MapService {
    * @param uids Array of map uids
    * @returns Map objects array
    */
-  static fetch(uids: string[]): Promise<TMMap[]>
-  static fetch(uids: string | string[]): Promise<TMMap | undefined | TMMap[]> {
-    return this.repo.get(uids as any)
+  static async fetch(uids: string[]): Promise<TMMap[]>
+  static async fetch(uids: string | string[]): Promise<TMMap | undefined | TMMap[]> {
+    if (typeof uids === 'string') {
+      const data = await this.repo.get(uids)
+      if (data === undefined) { return undefined }
+      const v = await this.repo.getVoteCountAndRatio(uids)
+      return { ...data, voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }
+    }
+    const data = await this.repo.get(uids)
+    const ret: TMMap[] = []
+    const voteRatios = await this.repo.getVoteCountAndRatio(uids)
+    for (const e of data) {
+      const v = voteRatios.find(a => a.uid === e.id)
+      ret.push({ ...e, voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 })
+    }
+    return ret
   }
 
   /**

@@ -7,7 +7,7 @@ import { Client } from "../client/Client.js";
 export abstract class VoteService {
 
   private static readonly repo: VoteRepository = new VoteRepository()
-  private static readonly _voteRatios: { readonly mapId: string, ratio: number, amount: number }[] = []
+  private static readonly _voteRatios: { readonly uid: string, ratio: number, count: number }[] = []
   private static _votes: TMVote[] = []
   private static readonly mapsWithVotesStored: string[] = []
   private static readonly voteValues: number[] = [0, 20, 40, -1, 60, 80, 100]
@@ -28,12 +28,12 @@ export abstract class VoteService {
     for (const e of MapService.maps) {
       const m = maps.find(a => a.mapId === e.id)
       if (m === undefined) {
-        this._voteRatios.push({ mapId: e.id, ratio: 0, amount: 0 })
+        this._voteRatios.push({ uid: e.id, ratio: 0, count: 0 })
       } else {
         const amount: number = m.votes.length
         const sum: number = m.votes.map(a => this.voteValues[a + 3]).reduce((acc, cur): number => acc + cur, 0)
         const ratio: number = sum / amount
-        this._voteRatios.push({ mapId: m.mapId, ratio, amount })
+        this._voteRatios.push({ uid: m.mapId, ratio, count: amount })
       }
     }
     for (let i: number = 0; i < 4; i++) {
@@ -41,13 +41,15 @@ export abstract class VoteService {
       this.mapsWithVotesStored.push(id)
       this._votes.push(...res.filter(a => a.mapId === id))
     }
+    MapService.setVoteData(...this._voteRatios)
+    //console.log(JSON.stringify(MapService.maps, null, 2))
   }
 
   static get votes(): TMVote[] {
     return [...this._votes]
   }
 
-  static get voteRatios(): { readonly mapId: string, ratio: number, amount: number }[] {
+  static get voteRatios(): { readonly uid: string, ratio: number, count: number }[] {
     return [...this._voteRatios]
   }
 
@@ -60,7 +62,7 @@ export abstract class VoteService {
     this._votes = this._votes.filter(a => this.mapsWithVotesStored.includes(a.mapId))
     Logger.debug(
       `curr. map karma stats:`,
-      `ratios obj: ` + JSON.stringify(this._voteRatios.find(a => a.mapId === id)),
+      `ratios obj: ` + JSON.stringify(this._voteRatios.find(a => a.uid === id)),
       `amt of votes: ` + (this._votes.filter(a => a.mapId === id).length.toString())
     )
   }
@@ -106,7 +108,7 @@ export abstract class VoteService {
   }
 
   private static async updateVoteRatio(mapId: string): Promise<void> {
-    const ratio = this._voteRatios.find(a => a.mapId === mapId)
+    const ratio = this._voteRatios.find(a => a.uid === mapId)
     if (ratio === undefined) {
       return
     }
@@ -122,5 +124,5 @@ export abstract class VoteService {
       ratio.ratio = sum / amount
     }
   }
-
+  
 }

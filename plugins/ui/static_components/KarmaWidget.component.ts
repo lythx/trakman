@@ -61,7 +61,7 @@ export default class KarmaWidget extends StaticComponent {
     }
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
-    const karma: number = TM.voteRatios.find(a => a.mapId === TM.maps.current.id)?.ratio ?? 0
+    const karma: number = TM.voteRatios.find(a => a.uid === TM.maps.current.id)?.ratio ?? 0
     const mkVotes = TM.mkMapKarma
     const mkKarmaValue: number = TM.mkMapKarmaValue
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
