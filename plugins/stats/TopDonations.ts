@@ -12,7 +12,7 @@ const initialize = async () => {
   ORDER BY amount DESC
   LIMIT 10`)
   if (res instanceof Error) {
-    TM.log.error(res)
+    await TM.log.fatal(res)
     return
   }
   topList.push(...res)

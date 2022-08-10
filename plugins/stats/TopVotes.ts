@@ -12,7 +12,10 @@ const initialize = async () => {
   GROUP BY (login, nickname)
   ORDER BY count DESC
   LIMIT 10;`)
-  if (res instanceof Error) { return }
+  if (res instanceof Error) { 
+    await tm.log.fatal('Failed to fetch top votes', res.message, res.stack)
+    return 
+  }
   topList.push(...res)
 }
 

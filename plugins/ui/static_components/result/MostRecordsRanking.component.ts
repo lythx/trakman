@@ -1,7 +1,7 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as TM } from '../../../../src/Trakman.js'
-import { topRecords } from '../../../stats/TopRecords.js'
+import { stats } from '../../../stats/Stats.js'
 
 export default class MostRecordsRanking extends StaticComponent {
 
@@ -22,11 +22,8 @@ export default class MostRecordsRanking extends StaticComponent {
     TM.addListener('Controller.EndMap', () => {
       this.constructXml()
     })
-    topRecords.onUpdate(() => {
-      if (this.isDisplayed === true) {
-        this.constructXml()
+    stats.records.onUpdate(() => {
         this.display()
-      }
     })
   }
 
@@ -42,12 +39,13 @@ export default class MostRecordsRanking extends StaticComponent {
   }
 
   constructXml() {
+    const list = stats.records.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.mostRecordsRanking.title, CFG.mostRecordsRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(topRecords.list.map(a => a.amount.toString()), topRecords.list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(list.map(a => a.amount.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`
