@@ -29,6 +29,7 @@ export abstract class VoteService {
    */
   static async nextMap(): Promise<void> {
     const newId: string = MapService.queue[this.prefetchCount - 1].id
+    if (this._votes.some(a => a.uid === newId)) { return }
     const res: TMVote[] = await this.repo.get(newId)
     this._votes.unshift({ uid: newId, votes: res })
     this._votes.length = Math.min(this._votes.length, this.prefetchCount * 2 + 1)
@@ -53,13 +54,21 @@ export abstract class VoteService {
       v.date = date
       v.vote = vote
       void this.repo.update(map.id, login, vote, date)
+      this.updateMapVoteData(map.id, voteArr)
       Events.emitEvent('Controller.KarmaVote', v)
       return
     }
     const obj = { login, mapId: map.id, date, vote }
     voteArr.push(obj)
     void this.repo.add(obj)
+    this.updateMapVoteData(map.id, voteArr)
     Events.emitEvent('Controller.KarmaVote', obj)
+  }
+
+  private static updateMapVoteData(uid: string, arr: TMVote[]) {
+    const count = arr.length
+    const sum = arr.reduce((acc, cur) => acc += cur.vote, 0)
+    MapService.setVoteData({ uid, count, ratio: count === 0 ? 0 : (((sum / count) + 3) / 6) * 100 })
   }
 
   static async fetch(mapId: string): Promise<TMVote[] | undefined>

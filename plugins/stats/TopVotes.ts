@@ -24,7 +24,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   initialVotes = tm.karma.current
 })
 
-tm.addListener('Controller.BeginMap', (info): void => {
+tm.addListener('Controller.BeginMap', (): void => {
   initialVotes.length = 0
   initialVotes = tm.karma.current
 })

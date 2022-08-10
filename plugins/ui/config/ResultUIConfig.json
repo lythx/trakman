@@ -217,7 +217,7 @@
       4
     ],
     "topCount": 5,
-    "displayNoRecordEntry": true
+    "displayNoRecordEntry": false
   },
   "dedis": {
     "height": 12.92,
@@ -237,7 +237,7 @@
       "slower": "personWorse"
     },
     "topCount": 5,
-    "displayNoRecordEntry": true
+    "displayNoRecordEntry": false
   },
   "roundAveragesRanking": {
     "height": 12.92,

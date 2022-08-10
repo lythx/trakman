@@ -145,7 +145,7 @@
       4
     ],
     "topCount": 5,
-    "displayNoRecordEntry": false
+    "displayNoRecordEntry": true
   },
   "live": {
     "height": 15.07,
@@ -160,7 +160,7 @@
       4
     ],
     "topCount": 3,
-    "displayNoRecordEntry": false
+    "displayNoRecordEntry": true
   },
   "buttons": {
     "height": 14.5,
@@ -313,7 +313,7 @@
       "slower": "personWorse"
     },
     "topCount": 5,
-    "displayNoRecordEntry": false
+    "displayNoRecordEntry": true
   },
   "tmx": {
     "height": 8.68,
