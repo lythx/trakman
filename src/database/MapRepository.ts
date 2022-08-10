@@ -138,7 +138,9 @@ export class MapRepository extends Repository {
     count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     LEFT JOIN votes ON votes.map_id=maps.id
-    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)};`
+    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)}
+    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
@@ -154,17 +156,20 @@ export class MapRepository extends Repository {
     if (typeof mapIds === 'string') {
       isArr = false
       mapIds = [mapIds]
-    } else if (mapIds.length === 0) { return [] }
+    }
     const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote) FROM map_ids
-    LEFT JOIN votes ON votes.map_id=maps.id
+    LEFT JOIN votes ON votes.map_id=map_ids.id
     WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY uid;`
     const ids = await mapIdsRepo.get(mapIds)
+    if (ids.length === 0) {
+      return isArr ? [] : undefined
+    }
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
-      return res[0] === undefined ? undefined : { ratio: (((res[0].sum / res[0].count) + 3) / 6) * 100, count: res[0].count }
+      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) + 3) / 6) * 100, count: res[0].count }
     }
-    return res.map(a => ({ uid: a.uid, ratio: (((a.sum / a.count) + 3) / 6) * 100, count: a.count }))
+    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) + 3) / 6) * 100, count: a.count }))
   }
 
   async remove(...mapIds: string[]): Promise<void> {
@@ -206,7 +211,7 @@ export class MapRepository extends Repository {
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,
-      voteRatio: (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100
+      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100
     }
   }
 

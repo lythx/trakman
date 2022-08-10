@@ -18,7 +18,7 @@ export default abstract class StaticComponent {
         TM.addListener('Controller.EndMap', () => {
           this._isDisplayed = false
           this.hide()
-        })
+        }, true)
         break
       case 'result':
         TM.addListener('Controller.EndMap', async () => {
@@ -28,7 +28,7 @@ export default abstract class StaticComponent {
         TM.addListener('Controller.BeginMap', () => {
           this._isDisplayed = false
           this.hide()
-        })
+        }, true)
     }
     TM.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
       if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
