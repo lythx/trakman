@@ -77,15 +77,15 @@ const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event
  * @param event callback event name
  * @param params callback params
  */
-const emitEvent = <T extends keyof EventWithCallbackInterface | TMEvent>(event: T,
-  params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams): void => {
+const emitEvent = async <T extends keyof EventWithCallbackInterface | TMEvent>(event: T,
+  params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams): Promise<void> => {
   if (controllerReady === false) { return }
   const matchingEvents: {
     event: TMEvent,
     callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams) => void | Promise<void>)
   }[] = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
-    listener.callback(params)
+    await listener.callback(params)
   }
 }
 
