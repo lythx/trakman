@@ -1,4 +1,4 @@
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
 import { CONFIG, Grid, ICONS, IDS, GridCellFunction, stringToObjectProperty, centeredText, closeButton } from '../UiUtils.js'
 
@@ -10,28 +10,28 @@ export default class WelcomeWindow extends PopupWindow {
   constructor() {
     super(IDS.welcomeWindow, stringToObjectProperty(CONFIG.welcomeWindow.icon, ICONS), CONFIG.welcomeWindow.title, CONFIG.welcomeWindow.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], { background: CONFIG.grid.bg, margin: 1 })
-    TM.addListener('Controller.PlayerJoin', (info) => {
+    tm.addListener('Controller.PlayerJoin', (info) => {
       if (this.welcomedPlayers.includes(info.login) === false) {
         this.welcomedPlayers.push(info.login)
-        TM.openManialink(this.openId, info.login)
-        void TM.db.query('INSERT INTO welcomed_players(login) VALUES($1)', info.login)
+        tm.openManialink(this.openId, info.login)
+        void tm.db.query('INSERT INTO welcomed_players(login) VALUES($1)', info.login)
       }
     })
     void this.initializeDb()
   }
 
   async initializeDb() {
-    await TM.db.query(`CREATE TABLE IF NOT EXISTS welcomed_players(
+    await tm.db.query(`CREATE TABLE IF NOT EXISTS welcomed_players(
     login VARCHAR(25) NOT NULL PRIMARY KEY)`)
-    const res = await TM.db.query('SELECT login FROM welcomed_players')
+    const res = await tm.db.query('SELECT login FROM welcomed_players')
     if (!(res instanceof Error)) {
       this.welcomedPlayers.push(...res.map(a => a.login))
     }
-    for (const e of TM.players.list) {
+    for (const e of tm.players.list) {
       if (this.welcomedPlayers.includes(e.login) === false) {
         this.welcomedPlayers.push(e.login)
-        TM.openManialink(this.openId, e.login)
-        void TM.db.query('INSERT INTO welcomed_players(login) VALUES($1)', e.login)
+        tm.openManialink(this.openId, e.login)
+        void tm.db.query('INSERT INTO welcomed_players(login) VALUES($1)', e.login)
       }
     }
   }

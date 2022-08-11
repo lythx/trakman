@@ -1,4 +1,4 @@
-import { trakman as TM } from '../../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
 import { WebhookClient, EmbedBuilder } from 'discord.js'
 const webhooker = new WebhookClient({ url: 'https://canary.discord.com/api/webhooks/999357577076949073/4SvvSUfkkqKEzaN-g9aEWRSUWx5GuqUO4i3MKEv76rCowpRXzVhbNWMst8ajC3mA0ERf' })
 
@@ -8,8 +8,8 @@ const commands: TMCommand[] = [
     aliases: ['ct', 'colourtest'],
     help: 'Display all the colours in order [TO BE REMOVED].',
     callback: (): void => {
-      const col: string[] = Object.values(TM.utils.colours)
-      TM.sendMessage(col.map((v): string => `${v}>`).join(' '))
+      const col: string[] = Object.values(tm.utils.colours)
+      tm.sendMessage(col.map((v): string => `${v}>`).join(' '))
     },
     privilege: 1
   },
@@ -25,7 +25,7 @@ const commands: TMCommand[] = [
       'tmxinfo', 'tmxrecs'
     ],
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
         + `use the /bug command with the command name (or talk to one of the devs).`, info.login)
     },
     privilege: 0
@@ -36,7 +36,7 @@ const commands: TMCommand[] = [
     help: 'Greet a certain someone.',
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Hey, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Hey, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -44,7 +44,7 @@ const commands: TMCommand[] = [
     aliases: ['bb', 'bye'],
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Goodbye, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Goodbye, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -53,7 +53,7 @@ const commands: TMCommand[] = [
     help: 'Express your gratitude.',
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Thanks, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Thanks, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -62,7 +62,7 @@ const commands: TMCommand[] = [
     help: 'Inform others that you\'ve enjoyed the race.',
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Good game, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Good game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -71,7 +71,7 @@ const commands: TMCommand[] = [
     help: 'Allow others to find out about your disenjoyment of the round.',
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Bad game, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Bad game, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -80,7 +80,7 @@ const commands: TMCommand[] = [
     help: 'Rain your blessings upon the few selected by thy divine ritual.',
     params: [{ name: 'name', type: 'multiword' }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Nice one, ${name}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Nice one, ${name}!`)
     },
     privilege: 0
   },
@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
     help: 'Mention that you\'ve had a great time racing just now.',
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, name: string): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Good race, ${name || 'everyone'}!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Good race, ${name || 'everyone'}!`)
     },
     privilege: 0
   },
@@ -97,7 +97,7 @@ const commands: TMCommand[] = [
     aliases: ['bgm'],
     help: 'Let others know you didn\'t do your best.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Bad game for me! :,(`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Bad game for me! :,(`)
     },
     privilege: 0
   },
@@ -105,7 +105,7 @@ const commands: TMCommand[] = [
     aliases: ['brb'],
     help: 'Notify people of your potential absence.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] Be right back!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] Be right back!`)
     },
     privilege: 0
   },
@@ -113,7 +113,7 @@ const commands: TMCommand[] = [
     aliases: ['afk', 'imstupid'],
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: MessageInfo): Promise<void> => {
-      await TM.multiCall(
+      await tm.multiCall(
         {
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 1 }]
@@ -129,7 +129,7 @@ const commands: TMCommand[] = [
           }]
         })
       await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
-      TM.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: 0
   },
@@ -138,7 +138,7 @@ const commands: TMCommand[] = [
     help: 'Express the deep emotions hidden within your sinful soul.',
     params: [{ name: 'thoughts', type: 'multiword', optional: true }],
     callback: (info: MessageInfo, thoughts?: string): void => {
-      TM.sendMessage(`$i${info.nickname}$z$s$i${TM.utils.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
+      tm.sendMessage(`$i${info.nickname}$z$s$i${tm.utils.colours.amber} ${thoughts === undefined ? '' : thoughts}`)
     },
     privilege: 0
   },
@@ -146,7 +146,7 @@ const commands: TMCommand[] = [
     aliases: ['lol'],
     help: 'Indicate your amusement.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoL!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] LoL!`)
     },
     privilege: 0
   },
@@ -154,7 +154,7 @@ const commands: TMCommand[] = [
     aliases: ['lool'],
     help: 'Indicate your excess amusement.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoL!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoL!`)
     },
     privilege: 0
   },
@@ -162,7 +162,7 @@ const commands: TMCommand[] = [
     aliases: ['loool'],
     help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
+      tm.sendMessage(`$g[${info.nickname}$z$s$g] LoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoL!`)
     },
     privilege: 0
   },
@@ -170,7 +170,7 @@ const commands: TMCommand[] = [
     aliases: ['h', 'help', 'helpall'],
     help: 'Display the commands list.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.commandList, info.login)
+      tm.openManialink(tm.UIIDS.commandList, info.login)
     },
     privilege: 0
   },
@@ -178,7 +178,7 @@ const commands: TMCommand[] = [
     aliases: ['time'],
     help: 'Find out about the current server time.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.servermsg}Current server time is ${TM.utils.palette.highlight + (new Date().toString())}${TM.utils.palette.servermsg}.`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.servermsg}Current server time is ${tm.utils.palette.highlight + (new Date().toString())}${tm.utils.palette.servermsg}.`, info.login)
     },
     privilege: 0
   },
@@ -186,9 +186,9 @@ const commands: TMCommand[] = [
     aliases: ['bm', 'bootme', 'dienow'],
     help: 'Part your ways with life.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
-        + `${TM.utils.palette.servermsg} has passed away for good. May their soul ${TM.utils.palette.highlight}rest in peace${TM.utils.palette.servermsg}.`)
-      TM.client.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname)}`
+        + `${tm.utils.palette.servermsg} has passed away for good. May their soul ${tm.utils.palette.highlight}rest in peace${tm.utils.palette.servermsg}.`)
+      tm.client.callNoRes('Kick', [{ string: info.login }, { string: `Not everyone is resilient enough for life's myriad of challenges.` }])
     },
     privilege: 0
   },
@@ -196,9 +196,9 @@ const commands: TMCommand[] = [
     aliases: ['rq', 'ragequit'],
     help: 'Signal your dissatisfaction with whatever is happening right now.',
     callback: (info: MessageInfo): void => {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname)}`
-        + `${TM.utils.palette.error} has ragequit.`)
-      TM.client.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname)}`
+        + `${tm.utils.palette.error} has ragequit.`)
+      tm.client.callNoRes('Kick', [{ string: info.login }, { string: `Don't let the anger devour your mind.` }])
     },
     privilege: 0
   },
@@ -206,7 +206,7 @@ const commands: TMCommand[] = [
     aliases: ['tmxinfo'],
     help: 'Display TMX info.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.TMXWindow, info.login)
+      tm.openManialink(tm.UIIDS.TMXWindow, info.login)
     },
     privilege: 0
   },
@@ -214,7 +214,7 @@ const commands: TMCommand[] = [
     aliases: ['cp', 'cptms', 'recs'],
     help: 'Display current map local checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.localCps, info.login)
+      tm.openManialink(tm.UIIDS.localCps, info.login)
     },
     privilege: 0
   },
@@ -222,7 +222,7 @@ const commands: TMCommand[] = [
     aliases: ['dcp', 'dedicptms', 'dedirecs'],
     help: 'Display current map dedimania checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.dediCps, info.login)
+      tm.openManialink(tm.UIIDS.dediCps, info.login)
     },
     privilege: 0
   },
@@ -230,7 +230,7 @@ const commands: TMCommand[] = [
     aliases: ['lcp', 'livecptms', 'liverecs'],
     help: 'Display current map live checkpoints.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.liveCps, info.login)
+      tm.openManialink(tm.UIIDS.liveCps, info.login)
     },
     privilege: 0
   },
@@ -238,7 +238,7 @@ const commands: TMCommand[] = [
     aliases: ['sc', 'sectms'],
     help: 'Display current map local sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.localSectors, info.login)
+      tm.openManialink(tm.UIIDS.localSectors, info.login)
     },
     privilege: 0
   },
@@ -246,7 +246,7 @@ const commands: TMCommand[] = [
     aliases: ['dsc', 'dedisectms'],
     help: 'Display current map dedimania sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.dediSectors, info.login)
+      tm.openManialink(tm.UIIDS.dediSectors, info.login)
     },
     privilege: 0
   },
@@ -254,7 +254,7 @@ const commands: TMCommand[] = [
     aliases: ['lsc', 'livesectms'],
     help: 'Display current map live sectors.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.liveSectors, info.login)
+      tm.openManialink(tm.UIIDS.liveSectors, info.login)
     },
     privilege: 0
   },
@@ -262,7 +262,7 @@ const commands: TMCommand[] = [
     aliases: ['ccp', 'currentcps'],
     help: 'Display each online players current cp.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.currentCps, info.login)
+      tm.openManialink(tm.UIIDS.currentCps, info.login)
     },
     privilege: 0
   },
@@ -271,12 +271,12 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }, { name: 'text', type: 'multiword', optional: true }],
     help: 'Message a player.',
     callback: (info: MessageInfo, login: string, text: string): void => {
-      const playerInfo: TMPlayer | undefined = TM.players.get(login)
+      const playerInfo: TMPlayer | undefined = tm.players.get(login)
       if (playerInfo === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player is not on the server.`, info.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Player is not on the server.`, info.login)
         return
       }
-      TM.sendMessage(`${TM.utils.palette.error}-PM- $g[${info.nickname}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
+      tm.sendMessage(`${tm.utils.palette.error}-PM- $g[${info.nickname}$z$s$g => ${playerInfo.nickname}$z$s$g] ${text}`, [info.login, playerInfo.login].join())
     },
     privilege: 0
   },
@@ -284,7 +284,7 @@ const commands: TMCommand[] = [
     aliases: ['test'],
     params: [{ name: 'nickname', type: 'multiword' }],
     callback: (info: MessageInfo, nickname: string): void => {
-      TM.sendMessage(TM.utils.nicknameToLogin(nickname) ?? 'didnt work lol')
+      tm.sendMessage(tm.utils.nicknameToLogin(nickname) ?? 'didnt work lol')
     },
     privilege: 0
   },
@@ -295,7 +295,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo, text: string): void => {
       const embed = new EmbedBuilder()
         .setTitle('Bug report')
-        .setDescription(`Sent by ${TM.utils.strip(info.nickname)}`)
+        .setDescription(`Sent by ${tm.utils.strip(info.nickname)}`)
         .setColor(0x0099ff)
         .setTimestamp(Date.now())
         .setThumbnail(('https://media.sketchfab.com/models/c842e2bec3c2463b977de99762014d4a/thumbnails/513ca7ac0d1349a3820d6a927a23cb5c/60be795961244327984a71b1ec8b8dcd.jpeg'))
@@ -310,7 +310,7 @@ const commands: TMCommand[] = [
         embeds: [embed]
       })
 
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin}Bug successfully submitted.`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.admin}Bug successfully submitted.`, info.login)
     },
     privilege: 0
   },
@@ -318,7 +318,7 @@ const commands: TMCommand[] = [
     aliases: ['info'],
     help: 'Display info about the controller.',
     callback: (info: MessageInfo): void => {
-      TM.openManialink(TM.UIIDS.welcomeWindow, info.login)
+      tm.openManialink(tm.UIIDS.welcomeWindow, info.login)
     },
     privilege: 0
   },
@@ -326,24 +326,24 @@ const commands: TMCommand[] = [
     aliases: ['admin', 'a'],
     callback: (info: MessageInfo): void => {
       if (info.privilege > 0) {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin}Command prefix ${TM.utils.colours.white}/a ${TM.utils.palette.admin}or ${TM.utils.colours.white}/admin ${TM.utils.palette.admin}is not used. Use ${TM.utils.colours.white}//[command] ${TM.utils.palette.admin}for admin commands instead.`, info.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.admin}Command prefix ${tm.utils.colours.white}/a ${tm.utils.palette.admin}or ${tm.utils.colours.white}/admin ${tm.utils.palette.admin}is not used. Use ${tm.utils.colours.white}//[command] ${tm.utils.palette.admin}for admin commands instead.`, info.login)
       }
     },
     privilege: 0
   },
 ]
 
-for (const command of commands) { TM.commands.add(command) }
+for (const command of commands) { tm.commands.add(command) }
 
 // Vote handler
 
-TM.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
+tm.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
   if (['+++', '++', '+', '-', '--', '---'].includes(info.text.trim()) && info.privilege >= 0) {
     const playerVote: number = ['---', '--', '-', '', '+', '++', '+++'].indexOf(info.text) - 3
-    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.karma}`
-      + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.karma} has voted `
-      + `${TM.utils.palette.highlight + info.text.trim()}${TM.utils.palette.karma} for this map.`)
-    await TM.karma.add(TM.maps.current.id, info, playerVote as any)
+    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.karma}`
+      + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.karma} has voted `
+      + `${tm.utils.palette.highlight + info.text.trim()}${tm.utils.palette.karma} for this map.`)
+    await tm.karma.add(tm.maps.current.id, info, playerVote as any)
   }
 })
 

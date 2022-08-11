@@ -1,5 +1,5 @@
 import { getStaticPosition, RecordList, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
 
@@ -24,21 +24,21 @@ export default class TMXRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
-      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
+      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players.list) {
+    for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
@@ -46,11 +46,11 @@ export default class TMXRanking extends StaticComponent {
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo: TMXMapInfo | null = TM.tmx.current
+    const tmxInfo: TMXMapInfo | null = tm.tmx.current
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }
-    TM.sendManialink(`<manialink id="${this.id}">
+    tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.tmx.title, stringToObjectProperty(CONFIG.tmx.icon, ICONS), true)}

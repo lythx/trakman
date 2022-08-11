@@ -1,4 +1,4 @@
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import { RESULTCONFIG as CFG, List, IDS, resultStaticHeader, getResultPosition } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 
@@ -20,7 +20,7 @@ export default class RoundAveragesRanking extends StaticComponent {
     this.posX = pos.x
     this.posY = pos.y
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.roundAveragesRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
-    TM.addListener('Controller.PlayerFinish', async (info) => {
+    tm.addListener('Controller.PlayerFinish', async (info) => {
       const entry = this.averages.find(a => a.login === info.login)
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
@@ -29,7 +29,7 @@ export default class RoundAveragesRanking extends StaticComponent {
         entry.finishcount++
       }
     })
-    TM.addListener('Controller.BeginMap', () => {
+    tm.addListener('Controller.BeginMap', () => {
       this.averages.length = 0
     })
   }
@@ -37,12 +37,12 @@ export default class RoundAveragesRanking extends StaticComponent {
   display(): void {
     if (this.isDisplayed === false) { return }
     this.constructXml()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   constructXml() {
@@ -51,7 +51,7 @@ export default class RoundAveragesRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.roundAveragesRanking.title, CFG.roundAveragesRanking.icon, this.side)}
       <frame posn="0 ${-CFG.staticHeader.height - CFG.marginSmall} 2">
-        ${this.list.constructXml(this.averages.map(a => TM.utils.getTimeString(a.average)), this.averages.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(this.averages.map(a => tm.utils.getTimeString(a.average)), this.averages.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

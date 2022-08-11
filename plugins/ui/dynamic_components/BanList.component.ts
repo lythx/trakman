@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
 export default class BanList extends PopupWindow {
@@ -13,18 +13,18 @@ export default class BanList extends PopupWindow {
         this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.banList.columnProportions, new Array(this.entries).fill(1),
             { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
-        TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+        tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
             if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
-                const targetPlayer = TM.players.list[info.answer - this.openId - 1000]
-                const targetInfo = TM.players.get(targetPlayer.login)
+                const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
+                const targetInfo = tm.players.get(targetPlayer.login)
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    TM.removeFromBanlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
-                        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has unbanned `
-                        + `${TM.utils.palette.highlight + TM.utils.strip(targetPlayer.nickname)}${TM.utils.palette.admin}.`
+                    tm.removeFromBanlist(targetPlayer.login, info.login)
+                    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unbanned `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`
                     )
                 }
             } // 
@@ -48,14 +48,14 @@ export default class BanList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Unban ', w, h),
 
         ]
-        const bannedplayers = TM.banlist
+        const bannedplayers = tm.banlist
         const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of bannedplayers) {
-            fetchedPlayers.push(await TM.players.fetch(player.login))
+            fetchedPlayers.push(await tm.players.fetch(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.utils.safeString(TM.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)
+            return centeredText(tm.utils.safeString(tm.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(bannedplayers[i - 1]?.login ?? '', w, h)
@@ -64,12 +64,12 @@ export default class BanList extends PopupWindow {
             return centeredText(bannedplayers[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)
         }
         const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.utils.safeString(bannedplayers[i - 1]?.reason ?? 'No reason specified'), w, h)
+            return centeredText(tm.utils.safeString(bannedplayers[i - 1]?.reason ?? 'No reason specified'), w, h)
         }
         const unbanButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.banList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
-        const players = TM.banlist
+        const players = tm.banlist
         const rows = Math.min(this.entries, players.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {

@@ -1,4 +1,4 @@
-import { trakman as TM } from "../../../src/Trakman.js";
+import { trakman as tm } from "../../../src/Trakman.js";
 import { Paginator, Grid, ICONS, centeredText, IDS, CONFIG, closeButton, stringToObjectProperty, Navbar, GridCellFunction } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
 
@@ -30,11 +30,11 @@ export default class CommandList extends PopupWindow<DisplayParams> {
 
   constructor() {
     super(IDS.commandList, stringToObjectProperty(CONFIG.commandList.icon, ICONS), CONFIG.commandList.title, CONFIG.commandList.navbar)
-    this.userCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 0)
-    this.opCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 1)
-    this.adminCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 2)
-    this.masteradminCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 3)
-    this.ownerCommands = TM.commands.list.filter(a => a.help !== undefined && a.privilege === 4)
+    this.userCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 0)
+    this.opCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 1)
+    this.adminCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 2)
+    this.masteradminCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 3)
+    this.ownerCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 4)
     this.userPaginator = new Paginator(this.openId + 100, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))
     this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))
     this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / this.itemsPerPage))
@@ -44,7 +44,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands]
     for (const e of paginators) {
       e.onPageChange = (login: string, page: number): void => {
-        const privilege = TM.players.get(login)?.privilege ?? 0
+        const privilege = tm.players.get(login)?.privilege ?? 0
         this.displayToPlayer(login, {
           page, paginator: e, commands: commands[paginators.indexOf(e)], privilege, singleType: true
         }, `${page}/${e.pageCount}`)
@@ -62,7 +62,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       this.paginators.push(paginator)
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(this.itemsPerPage).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
-    TM.addListener("Controller.ManialinkClick", (info) => {
+    tm.addListener("Controller.ManialinkClick", (info) => {
       if (info.answer >= this.openId + 100 && info.answer <= this.openId + 500) {
         switch (info.answer - this.openId) {
           case 100: {
@@ -102,7 +102,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
     })
-    TM.addListener("Controller.PrivilegeChanged", (info) => {
+    tm.addListener("Controller.PrivilegeChanged", (info) => {
       const p: { login: string, params: DisplayParams } | undefined = this.getPlayersWithWindowOpen(true).find(a => a.login === info.login)
       if (p !== undefined) {
         if (info.newPrivilege < p.params.privilege || p.params.singleType === undefined) {
@@ -118,7 +118,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
-    const player: TMPlayer | undefined = TM.players.get(info.login)
+    const player: TMPlayer | undefined = tm.players.get(info.login)
     if (player === undefined) { return }
     const paginator: Paginator = this.paginators[player.privilege]
     const commands: TMCommand[] = this.commandLists[player.privilege]
@@ -152,7 +152,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const command: TMCommand = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.utils.safeString(TM.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: TMCommand = params.commands[i + n]
@@ -171,12 +171,12 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.utils.safeString(TM.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: TMCommand = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${TM.utils.safeString(TM.utils.strip(command.help ?? '', true))}" valign="center" halign="center"/>`
+      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / this.textScale)) - 1} ${h}" scale="${this.textScale}" text="${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign="center" halign="center"/>`
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)

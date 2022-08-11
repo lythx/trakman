@@ -1,7 +1,7 @@
 import { ChatService } from '../services/ChatService.js'
 import { TMXService } from '../services/TMXService.js'
 import { Client } from '../client/Client.js'
-import { trakman as TM } from '../Trakman.js'
+import { trakman as tm } from '../Trakman.js'
 
 const command: TMCommand = {
   aliases: ['add'],
@@ -12,17 +12,17 @@ const command: TMCommand = {
     const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite)
     const file: { name: string, content: Buffer } | Error = await TMXService.fetchMapFile(id, site).catch((err: Error) => err)
     if (file instanceof Error) {
-      TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Failed to fetch file from ${TM.utils.palette.highlight + (tmxSite || 'TMNF')} TMX` +
-        `${TM.utils.palette.error}, check if you specified the correct game.`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}»${tm.utils.palette.error} Failed to fetch file from ${tm.utils.palette.highlight + (tmxSite || 'TMNF')} TMX` +
+        `${tm.utils.palette.error}, check if you specified the correct game.`, info.login)
       return
     }
     const base64String: string = file.content.toString('base64')
     const write: any[] | Error = await Client.call('WriteFile', [{ string: file.name }, { base64: base64String }])
     if (write instanceof Error) {
-      TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to write file.`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}»${tm.utils.palette.error} Server failed to write file.`, info.login)
       return
     }
-    const map: TMMap | Error = await TM.maps.add(file.name, info)
+    const map: TMMap | Error = await tm.maps.add(file.name, info)
     if (map instanceof Error) {
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content: string = file.content.toString()
@@ -30,26 +30,26 @@ const command: TMCommand = {
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
             const id: string = content.substring(i + 12, i + 12 + 27)
-            const map: TMMap | undefined = TM.maps.list.find(a => a.id === id)
+            const map: TMMap | undefined = tm.maps.list.find(a => a.id === id)
             if (map === undefined) {
-              TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to queue the map.`, info.login)
+              tm.sendMessage(`${tm.utils.palette.server}»${tm.utils.palette.error} Server failed to queue the map.`, info.login)
               return
             }
-            TM.jukebox.add(id, info)
-            TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.admin} ` +
-              `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} is already on the server, ` +
-              `it will be ${TM.utils.palette.highlight}queued ${TM.utils.palette.admin}instead.`, info.login)
+            tm.jukebox.add(id, info)
+            tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.admin} ` +
+              `${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.admin} is already on the server, ` +
+              `it will be ${tm.utils.palette.highlight}queued ${tm.utils.palette.admin}instead.`, info.login)
             return
           }
           i++
         }
       }
-      TM.sendMessage(`${TM.utils.palette.server}»${TM.utils.palette.error} Server failed to queue the map.`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}»${tm.utils.palette.error} Server failed to queue the map.`, info.login)
       return
     }
-    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} ` +
-      `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has added and queued ` +
-      `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from TMX.`)
+    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+      `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added and queued ` +
+      `${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.admin} from TMX.`)
   },
   privilege: 1
 }

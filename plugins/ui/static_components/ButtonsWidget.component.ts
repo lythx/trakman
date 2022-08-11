@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG, IDS, Grid, constuctButton, ICONS, stringToObjectProperty, VoteWindow } from '../UiUtils.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import Config from '../../../config.json' assert { type: 'json' }
 
@@ -27,7 +27,7 @@ export default class ButtonsWidget extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.grid = new Grid(this.width + CONFIG.marginSmall, this.height + CONFIG.marginSmall, new Array(4).fill(1), new Array(3).fill(1))
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['s', 'skip'],
       help: 'Start a vote to skip the ongoing map',
       callback: info => {
@@ -35,7 +35,7 @@ export default class ButtonsWidget extends StaticComponent {
       },
       privilege: 0
     })
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['r', 'res', 'replay'],
       help: 'Start a vote to replay the ongoing map',
       callback: info => {
@@ -49,13 +49,13 @@ export default class ButtonsWidget extends StaticComponent {
     if (this.isDisplayed === false) { return }
     if (this.xml === '') { await this.initialize() }
     this.constructXml()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   private constructXml(): void {
@@ -86,13 +86,13 @@ export default class ButtonsWidget extends StaticComponent {
   }
 
   private updatePlayerCount(): void {
-    const players: TMPlayer[] = TM.players.list
+    const players: TMPlayer[] = tm.players.list
     this.iconData[this.config.players.index].text1 = `${players.filter(a => a.isSpectator === true).length} SPECS`
     this.iconData[this.config.players.index].text2 = `${players.filter(a => a.isSpectator === false).length} PLAYERS`
   }
 
   private setupListeners(): void {
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       this.updatePlayerCount()
       if (info.visits === 0) {
         const prevAmount: number = Number(this.iconData[this.config.visitors.index].text1)
@@ -100,15 +100,15 @@ export default class ButtonsWidget extends StaticComponent {
       }
       void this.display()
     })
-    TM.addListener('Controller.PlayerLeave', (): void => {
+    tm.addListener('Controller.PlayerLeave', (): void => {
       this.updatePlayerCount()
       void this.display()
     })
-    TM.addListener('Controller.PlayerInfoChanged', (): void => {
+    tm.addListener('Controller.PlayerInfoChanged', (): void => {
       this.updatePlayerCount()
       void this.display()
     })
-    TM.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('Controller.BeginMap', (): void => {
       this.resVoteCount = 0
       this.skipVoteCount = 0
       this.lastMapRes = false
@@ -119,7 +119,7 @@ export default class ButtonsWidget extends StaticComponent {
       this.updateVoteAndPayButtons()
       void this.display()
     })
-    TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
+    tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo): Promise<void> => {
       switch (info.answer - this.id) {
         case 1: this.onSkipVoteButtonClick(info.login, info.nickname)
           break
@@ -130,81 +130,81 @@ export default class ButtonsWidget extends StaticComponent {
         case 4: this.onResButtonClick(info.login, info.nickname)
       }
     })
-    TM.addListener('Controller.MapAdded', (): void => {
-      this.iconData[this.config.maps.index].text1 = (TM.maps.list.length).toString()
+    tm.addListener('Controller.MapAdded', (): void => {
+      this.iconData[this.config.maps.index].text1 = (tm.maps.list.length).toString()
     })
-    TM.addListener('Controller.MapRemoved', (): void => {
-      this.iconData[this.config.maps.index].text1 = (TM.maps.list.length).toString()
+    tm.addListener('Controller.MapRemoved', (): void => {
+      this.iconData[this.config.maps.index].text1 = (tm.maps.list.length).toString()
     })
   }
 
   private async onSkipVoteButtonClick(login: string, nickname: string): Promise<void> {
     if (this.lastMapRes) { return }
     if (this.skipVoteCount === 2) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Too many votes failed.`, login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Too many votes failed.`, login)
       return
     }
-    const startMsg: string = `${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname)} `
-      + `${TM.utils.palette.vote}started a vote to ${TM.utils.palette.highlight}skip ${TM.utils.palette.vote}the ongoing map.`
-    if (TM.state.remainingMapTime <= 30) { return }
-    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.utils.palette.highlight}Vote to ${TM.utils.palette.tmRed}SKIP${TM.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
-    const result = await voteWindow.startAndGetResult(TM.players.list.map(a => a.login))
+    const startMsg: string = `${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname)} `
+      + `${tm.utils.palette.vote}started a vote to ${tm.utils.palette.highlight}skip ${tm.utils.palette.vote}the ongoing map.`
+    if (tm.state.remainingMapTime <= 30) { return }
+    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${tm.utils.palette.highlight}Vote to ${tm.utils.palette.tmRed}SKIP${tm.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteRed')
+    const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}A vote is already running.`, login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}A vote is already running.`, login)
       return
     }
     this.skipVoteCount++
     if (result === false) {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.vote}Vote to ${TM.utils.palette.highlight}skip `
-        + `${TM.utils.palette.vote}the ongoing map ${TM.utils.palette.highlight}did not pass${TM.utils.palette.vote}.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}skip `
+        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}did not pass${tm.utils.palette.vote}.`)
     } else if (result === true) {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.vote}Vote to ${TM.utils.palette.highlight}skip `
-        + `${TM.utils.palette.vote}the ongoing map ${TM.utils.palette.highlight}has passed${TM.utils.palette.vote}.`)
-      TM.client.callNoRes('NextChallenge')
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}skip `
+        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}has passed${tm.utils.palette.vote}.`)
+      tm.client.callNoRes('NextChallenge')
     } else if (result.result === true) {
       if (result.callerLogin === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to skip the ongoing map passed`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map passed`)
       } else {
-        const player: TMPlayer | undefined = TM.players.get(result.callerLogin)
+        const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(player)} `
-          + `${TM.utils.palette.highlight + TM.utils.strip(player?.nickname ?? result.callerLogin, true)}${TM.utils.palette.admin} has passed the vote to skip the ongoing map`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
+          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has passed the vote to skip the ongoing map`)
       }
-      TM.client.callNoRes('NextChallenge')
+      tm.client.callNoRes('NextChallenge')
     } else {
       if (result.callerLogin === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to skip the ongoing was cancelled`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing was cancelled`)
       } else {
-        const player: TMPlayer | undefined = TM.players.get(result.callerLogin)
+        const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(player)} `
-          + `${TM.utils.palette.highlight + TM.utils.strip(player?.nickname ?? result.callerLogin, true)}${TM.utils.palette.admin} has cancelled the vote to skip the ongoing map`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
+          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has cancelled the vote to skip the ongoing map`)
       }
     }
   }
 
   private async onResVoteButtonClick(login: string, nickname: string): Promise<void> {
     if (this.resVoteCount === 2) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Too many votes failed.`, login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Too many votes failed.`, login)
       return
     }
-    const startMsg: string = `${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname)} `
-      + `${TM.utils.palette.vote}started a vote to ${TM.utils.palette.highlight}replay ${TM.utils.palette.vote}the ongoing map.`
-    if (TM.state.remainingMapTime <= 30) { return }
-    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${TM.utils.palette.highlight}Vote to ${TM.utils.palette.tmGreen}REPLAY${TM.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
-    const result = await voteWindow.startAndGetResult(TM.players.list.map(a => a.login))
+    const startMsg: string = `${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname)} `
+      + `${tm.utils.palette.vote}started a vote to ${tm.utils.palette.highlight}replay ${tm.utils.palette.vote}the ongoing map.`
+    if (tm.state.remainingMapTime <= 30) { return }
+    const voteWindow: VoteWindow = new VoteWindow(login, 0.5, `${tm.utils.palette.highlight}Vote to ${tm.utils.palette.tmGreen}REPLAY${tm.utils.palette.highlight} the ongoing map`, startMsg, 30, 'voteGreen')
+    const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}A vote is already running.`, login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}A vote is already running.`, login)
       return
     }
     this.resVoteCount++
     if (result === false) {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.vote}Vote to ${TM.utils.palette.highlight}replay `
-        + `${TM.utils.palette.vote}the ongoing map ${TM.utils.palette.highlight}did not pass${TM.utils.palette.vote}.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}replay `
+        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}did not pass${tm.utils.palette.vote}.`)
     } else if (result === true) {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.vote}Vote to ${TM.utils.palette.highlight}replay `
-        + `${TM.utils.palette.vote}the ongoing map ${TM.utils.palette.highlight}has passed${TM.utils.palette.vote}.`)
-      TM.jukebox.add(TM.maps.current.id, undefined, true)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}replay `
+        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}has passed${tm.utils.palette.vote}.`)
+      tm.jukebox.add(tm.maps.current.id, undefined, true)
       this.resVoteCount++
       this.isRes = true
       this.onMapReplay()
@@ -212,13 +212,13 @@ export default class ButtonsWidget extends StaticComponent {
       this.display()
     } else if (result.result === true) {
       if (result.callerLogin === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to replay the ongoing map passed`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map passed`)
       } else {
-        const player: TMPlayer | undefined = TM.players.get(result.callerLogin)
+        const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(player)} `
-          + `${TM.utils.palette.highlight + TM.utils.strip(player.nickname, true)}${TM.utils.palette.admin} has passed the vote to replay the ongoing map`)
-        TM.jukebox.add(TM.maps.current.id, undefined, true)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
+          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has passed the vote to replay the ongoing map`)
+        tm.jukebox.add(tm.maps.current.id, undefined, true)
       }
       this.resVoteCount++
       this.isRes = true
@@ -227,27 +227,27 @@ export default class ButtonsWidget extends StaticComponent {
       this.display()
     } else {
       if (result.callerLogin === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin} Vote to replay the ongoing map was cancelled`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map was cancelled`)
       } else {
-        const player: TMPlayer | undefined = TM.players.get(result.callerLogin)
+        const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(player)} `
-          + `${TM.utils.palette.highlight + TM.utils.strip(player.nickname, true)}${TM.utils.palette.admin} has cancelled the vote to replay the ongoing map`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
+          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to replay the ongoing map`)
       }
     }
   }
 
   private onSkipButtonClick = async (login: string, nickname: string): Promise<void> => {
     if (this.lastMapRes) { return }
-    const res: boolean | Error = await TM.utils.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
+    const res: boolean | Error = await tm.utils.sendCoppers(login, this.skipCost, 'Pay to skip the ongoing map')
     if (res instanceof Error) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`)
     } else if (res === true) {
       const cfg = this.config.paySkip
       let countDown: number = cfg.timeout
       const startTime: number = Date.now()
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.highlight + TM.utils.strip(nickname)}${TM.utils.palette.donation} has paid ${TM.utils.palette.highlight}`
-        + `${this.skipCost}C ${TM.utils.palette.donation}to skip the ongoing map. Skipping in ${TM.utils.palette.highlight}${countDown}s${TM.utils.palette.donation}.`)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(nickname)}${tm.utils.palette.donation} has paid ${tm.utils.palette.highlight}`
+        + `${this.skipCost}C ${tm.utils.palette.donation}to skip the ongoing map. Skipping in ${tm.utils.palette.highlight}${countDown}s${tm.utils.palette.donation}.`)
       this.iconData[cfg.index].text1 = cfg.title3
       this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
       await this.display()
@@ -258,7 +258,7 @@ export default class ButtonsWidget extends StaticComponent {
           this.iconData[cfg.index].text2 = cfg.title4.replace(/\$SECONDS\$/, countDown.toString())
           await this.display()
           if (countDown === 0) {
-            TM.client.callNoRes('NextChallenge')
+            tm.client.callNoRes('NextChallenge')
             clearInterval(interval)
           }
         }
@@ -269,13 +269,13 @@ export default class ButtonsWidget extends StaticComponent {
   private onResButtonClick = async (login: string, nickname: string): Promise<void> => {
     const cost: number = this.resCosts[this.resCostIndex]
     if (cost === undefined) { return }
-    const res: boolean | Error = await TM.utils.sendCoppers(login, cost, 'Pay to restart the ongoing map')
+    const res: boolean | Error = await tm.utils.sendCoppers(login, cost, 'Pay to restart the ongoing map')
     if (res instanceof Error) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Failed to process payment.`)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`)
     } else if (res === true) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.highlight + TM.utils.strip(nickname)}${TM.utils.palette.donation} has paid ${TM.utils.palette.highlight}`
-        + `${cost}C ${TM.utils.palette.donation}to replay the ongoing map.`)
-      TM.jukebox.add(TM.maps.current.id, { login, nickname })
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(nickname)}${tm.utils.palette.donation} has paid ${tm.utils.palette.highlight}`
+        + `${cost}C ${tm.utils.palette.donation}to replay the ongoing map.`)
+      tm.jukebox.add(tm.maps.current.id, { login, nickname })
       this.resCostIndex++
       this.isRes = true
       this.onMapReplay()
@@ -417,7 +417,7 @@ export default class ButtonsWidget extends StaticComponent {
 
   private initialize = async (): Promise<void> => {
     // Visit counter
-    const res: any[] | Error = await TM.db.query('SELECT count(*) FROM players;')
+    const res: any[] | Error = await tm.db.query('SELECT count(*) FROM players;')
     if (res instanceof Error) {
       throw new Error('Failed to fetch players from database.')
     }
@@ -431,7 +431,7 @@ export default class ButtonsWidget extends StaticComponent {
       padding: cfg.visitors.padding
     }
     // Player and spectator counter
-    const all: TMPlayer[] = TM.players.list
+    const all: TMPlayer[] = tm.players.list
     const players: number = all.filter(a => !a.isSpectator).length
     this.iconData[cfg.players.index] = {
       icon: stringToObjectProperty(cfg.players.icon, ICONS),
@@ -465,7 +465,7 @@ export default class ButtonsWidget extends StaticComponent {
     // Map list
     this.iconData[cfg.maps.index] = {
       icon: stringToObjectProperty(cfg.maps.icon, ICONS),
-      text1: TM.maps.list.length.toString(),
+      text1: tm.maps.list.length.toString(),
       text2: cfg.maps.title,
       iconWidth: cfg.maps.width,
       iconHeight: cfg.maps.height,

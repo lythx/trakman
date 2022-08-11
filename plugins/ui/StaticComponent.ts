@@ -1,4 +1,4 @@
-import { trakman as TM } from "../../src/Trakman.js"
+import { trakman as tm } from "../../src/Trakman.js"
 
 export default abstract class StaticComponent {
 
@@ -11,29 +11,29 @@ export default abstract class StaticComponent {
     this.displayMode = displayMode
     switch (displayMode) {
       case 'race':
-        TM.addListener('Controller.BeginMap', async () => {
+        tm.addListener('Controller.BeginMap', async () => {
           this._isDisplayed = true
           await this.display()
         })
-        TM.addListener('Controller.EndMap', () => {
+        tm.addListener('Controller.EndMap', () => {
           this._isDisplayed = false
           this.hide()
         }, true)
         break
       case 'result':
-        TM.addListener('Controller.EndMap', async () => {
+        tm.addListener('Controller.EndMap', async () => {
           this._isDisplayed = true
           await this.display()
         })
-        TM.addListener('Controller.BeginMap', () => {
+        tm.addListener('Controller.BeginMap', () => {
           this._isDisplayed = false
           this.hide()
         }, true)
     }
-    TM.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
+    tm.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
       if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
-    if (TM.state.current !== this.displayMode && this.displayMode !== 'always') {
+    if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {
       this._isDisplayed = false
     }
   }
@@ -48,7 +48,7 @@ export default abstract class StaticComponent {
 
   hide(): void {
     this._isDisplayed = false
-    TM.sendManialink(`<manialink id="${this.id}"></manialink>`)
+    tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
   }
 
 }

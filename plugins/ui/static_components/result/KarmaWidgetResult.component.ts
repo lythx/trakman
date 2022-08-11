@@ -1,5 +1,5 @@
 import { centeredText, Grid, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon, getResultPosition } from '../../UiUtils.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 
 export default class KarmaWidgetResult extends StaticComponent {
@@ -23,47 +23,47 @@ export default class KarmaWidgetResult extends StaticComponent {
     //   this.updateXML()
     //   this.display()
     // }, 100)
-    TM.addListener('Controller.KarmaVote', (): void => {
+    tm.addListener('Controller.KarmaVote', (): void => {
       this.display()
     })
-    TM.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
-    TM.addListener('Controller.ManiakarmaVotes', (): void => {
+    tm.addListener('Controller.ManiakarmaVotes', (): void => {
       this.display()
     })
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        TM.karma.add(TM.maps.current.id, info, votes[index])
+        tm.karma.add(tm.maps.current.id, info, votes[index])
       }
     })
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    for (const e of TM.players.list) {
+    for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.constructXml(login), login)
+    tm.sendManialink(this.constructXml(login), login)
   }
 
   private constructXml(login: string): string {
-    const votes: TMVote[] = TM.karma.current
+    const votes: TMVote[] = tm.karma.current
     const voteAmounts: number[] = []
     for (const e of this.options) {
       voteAmounts.unshift(votes.filter(a => a.vote === e).length)
     }
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
-    const karma: number = TM.maps.current.voteRatio
-    const mkVotes = TM.mkMapKarma
-    const mkKarmaValue: number = TM.mkMapKarmaValue
+    const karma: number = tm.maps.current.voteRatio
+    const mkVotes = tm.mkMapKarma
+    const mkKarmaValue: number = tm.mkMapKarmaValue
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const maxMkAmount: number = Math.max(...Object.values(mkVotes))
     const personalVote = votes.find(a => a.login === login)?.vote

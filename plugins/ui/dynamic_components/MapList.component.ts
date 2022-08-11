@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { trakman as TM } from "../../../src/Trakman.js";
+import { trakman as tm } from "../../../src/Trakman.js";
 import { centeredText, closeButton, CONFIG, Grid, IDS, verticallyCenteredText, getIcon } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import { MAPLIST as ML } from '../../Maplist.js'
@@ -27,7 +27,7 @@ export default class MapList extends PopupWindow {
 
   constructor() {
     super(IDS.mapList, getIcon(CONFIG.mapList.icon), CONFIG.mapList.title, CONFIG.mapList.navbar)
-    const arr = TM.maps.list.sort((a, b) => a.name.localeCompare(b.name))
+    const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
     this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
     const pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
@@ -39,12 +39,12 @@ export default class MapList extends PopupWindow {
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(this.columns).fill(1), new Array(this.rows).fill(1),
       { background: 'FFFA', margin: CONFIG.grid.margin })
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + this.mapAddId && info.answer <= this.openId + this.mapAddId + 5000) {
         const mapId = this.challengeActionIds[info.answer - (this.openId + this.mapAddId)]
         if (mapId === undefined) {
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Error while adding the map to queue.`, info.login)
-          TM.log.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding the map to queue.`, info.login)
+          tm.log.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
           return
         }
         const gotQueued = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
@@ -52,13 +52,13 @@ export default class MapList extends PopupWindow {
         this.reRender()
       }
     })
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: async (info: MessageInfo, query?: string): Promise<void> => {
         if (query === undefined) {
-          TM.openManialink(this.openId, info.login)
+          tm.openManialink(this.openId, info.login)
           return
         }
         const option = query.split(' ').filter(a => a !== '')[0]
@@ -76,7 +76,7 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
       callback: async (info: MessageInfo): Promise<void> => {
@@ -84,7 +84,7 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
       callback: async (info: MessageInfo): Promise<void> => {
@@ -92,8 +92,8 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    TM.addListener('Controller.MapRemoved', (map) => {
-      const arr = TM.maps.list.sort((a, b) => a.name.localeCompare(b.name))
+    tm.addListener('Controller.MapRemoved', (map) => {
+      const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
       this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
       let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
@@ -223,7 +223,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[1])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${verticallyCenteredText(TM.utils.safeString(TM.utils.strip(maps[index].name, false)), width, rowH - this.margin, { textScale: 1 })}
+              ${verticallyCenteredText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width, rowH - this.margin, { textScale: 1 })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
@@ -231,7 +231,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[2])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${verticallyCenteredText(TM.utils.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
+              ${verticallyCenteredText(tm.utils.safeString(maps[index].author), width, rowH - this.margin, { textScale: 1 })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
@@ -239,7 +239,7 @@ export default class MapList extends PopupWindow {
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${getIcon(this.icons[3])}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.timeW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(TM.utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin, { textScale: 1, padding: 0.2 })}
+              ${centeredText(tm.utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin, { textScale: 1, padding: 0.2 })}
             </frame>
           </frame>
           <frame posn="${this.timeW + this.iconW + this.margin * 2} ${-rowH * 3} 2">
@@ -270,29 +270,29 @@ export default class MapList extends PopupWindow {
   private handleMapClick(mapId: string, login: string, nickname: string, privilege: number): boolean {
     const challenge = this.sortedList.find(a => a.id === mapId)
     if (challenge === undefined) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Error while adding the map to queue.`, login)
-      TM.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding the map to queue.`, login)
+      tm.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
       return false
     }
-    if (TM.jukebox.juked.some(a => a.map.id === mapId)) {
-      TM.jukebox.remove(mapId, { login, nickname })
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname, true)} `
-        + `${TM.utils.palette.vote}removed ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} from the queue.`)
+    if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
+      tm.jukebox.remove(mapId, { login, nickname })
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname, true)} `
+        + `${tm.utils.palette.vote}removed ${tm.utils.palette.highlight + tm.utils.strip(challenge.name, true)}${tm.utils.palette.vote} from the queue.`)
     }
     else {
-      if (privilege <= 0 && TM.jukebox.juked.some(a => a.callerLogin === login)) {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.vote}You can't add more than one map to the queue.`)
+      if (privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === login)) {
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`)
         return false
       }
-      TM.jukebox.add(mapId, { login, nickname })
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname, true)} `
-        + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} to the queue.`)
+      tm.jukebox.add(mapId, { login, nickname })
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname, true)} `
+        + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(challenge.name, true)}${tm.utils.palette.vote} to the queue.`)
     }
     return true
   }
 
   private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
-    const records = await TM.records.fetchByMap(...mapIds)
+    const records = await tm.records.fetchByMap(...mapIds)
     const positions: number[] = []
     let i = -1
     while (true) {
@@ -320,7 +320,7 @@ export default class MapList extends PopupWindow {
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
       if (positions[i] === -1 || positions[i] === undefined) { ret.push("--.") }
-      else { ret.push(TM.utils.getPositionString(positions[i] > TM.records.maxLocalsAmount ? TM.records.maxLocalsAmount : positions[i])) }
+      else { ret.push(tm.utils.getPositionString(positions[i] > tm.records.maxLocalsAmount ? tm.records.maxLocalsAmount : positions[i])) }
     }
     return ret
   }
@@ -337,12 +337,12 @@ export default class MapList extends PopupWindow {
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
     const width = (w - this.margin * 3) - this.iconW
     const height = h - this.margin
-    const index = TM.jukebox.juked.findIndex(a => a.map.id === mapId)
-    const prevIndex = [TM.maps.current, ...TM.jukebox.history].findIndex(a => a.id === mapId)
-    const player = TM.players.get(login)
+    const index = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
+    const prevIndex = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
+    const player = tm.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
-    if (player?.privilege <= 0 && (prevIndex !== -1 || (TM.jukebox.juked[index]?.callerLogin !== undefined && TM.jukebox.juked[index].callerLogin !== login))) {
+    if (player?.privilege <= 0 && (prevIndex !== -1 || (tm.jukebox.juked[index]?.callerLogin !== undefined && tm.jukebox.juked[index].callerLogin !== login))) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="7777"/>
         <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>`
     }
@@ -361,7 +361,7 @@ export default class MapList extends PopupWindow {
             ${centeredText(`$0F0Queued`, this.queueW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
           <frame posn="${this.queueW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${this.queueNumberW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`$0F0${TM.utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
+            ${centeredText(`$0F0${tm.utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: 0.1, textScale: 1 })}
           </frame>
           </frame>`
     }

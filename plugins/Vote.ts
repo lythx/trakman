@@ -1,4 +1,4 @@
-import { trakman as TM } from "../src/Trakman.js"
+import { trakman as tm } from "../src/Trakman.js"
 import { addKeyListener } from "./ui/utils/KeyListener.js"
 import IDS from './ui/config/UtilIds.json' assert { type: 'json' }
 
@@ -42,21 +42,21 @@ export class Vote {
     this.cancelOnRoundStart = dontCancelOnRoundStart === undefined
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
-      TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
+      tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
       addKeyListener('F5', (info): void => Vote.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
       addKeyListener('F6', (info): void => Vote.listener({ ...info, answer: this.noId }), 1, 'voteNo')
-      TM.commands.add({
+      tm.commands.add({
         aliases: ['y', 'yes'],
-        callback: (info): void => TM.openManialink(this.yesId, info.login),
+        callback: (info): void => tm.openManialink(this.yesId, info.login),
         privilege: 0
       })
-      TM.commands.add({
+      tm.commands.add({
         aliases: ['n', 'no'],
-        callback: (info): void => TM.openManialink(this.noId, info.login),
+        callback: (info): void => tm.openManialink(this.noId, info.login),
         privilege: 0
       })
-      TM.addListener("Controller.EndMap", (): void => Vote.endMapListener())
-      TM.addListener('Controller.BeginMap', (): void => Vote.startMapListener())
+      tm.addListener("Controller.EndMap", (): void => Vote.endMapListener())
+      tm.addListener('Controller.BeginMap', (): void => Vote.startMapListener())
     }
   }
 

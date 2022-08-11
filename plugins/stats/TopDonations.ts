@@ -1,4 +1,4 @@
-import { trakman as TM } from '../../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
 import { donations } from '../Donations.js'
 import config from './Config.js'
 
@@ -6,19 +6,19 @@ const listeners: ((updatedLogin: string, list: { login: string, nickname: string
 let topList: { login: string, nickname: string, amount: number }[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await TM.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
+  const res: any[] | Error = await tm.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
   JOIN players ON players.id=donations.player_id
   GROUP BY (login, nickname)
   ORDER BY amount DESC
   LIMIT 10`)
   if (res instanceof Error) {
-    await TM.log.fatal(res)
+    await tm.log.fatal(res)
     return
   }
   topList.push(...res)
 }
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 }, true)
 

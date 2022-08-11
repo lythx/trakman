@@ -1,5 +1,5 @@
 import StaticComponent from '../StaticComponent.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { IDS, CONFIG, getStaticPosition, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 
 export default class LiveCheckpoint extends StaticComponent {
@@ -25,8 +25,8 @@ export default class LiveCheckpoint extends StaticComponent {
     const pos = getStaticPosition('liveCheckpoint')
     this.positionX = pos.x
     this.positionY = pos.y
-    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
-      const pb: TMRecord | undefined = TM.records.getLocal(info.player.login)
+    tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
+      const pb: TMRecord | undefined = tm.records.getLocal(info.player.login)
       if (pb !== undefined) {
         const cpIndex: number = info.index
         const diff: number = pb.checkpoints[cpIndex] - info.time
@@ -40,7 +40,7 @@ export default class LiveCheckpoint extends StaticComponent {
   display(): void {
     if (this.isDisplayed === false) { return }
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
-    TM.sendManialink(`
+    tm.sendManialink(`
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <quad posn="0 0 6" sizen="${this.width} ${this.height}" action="${IDS.currentCps}"/> 
@@ -58,20 +58,20 @@ export default class LiveCheckpoint extends StaticComponent {
     const iconUrl: string = stringToObjectProperty(this.icon, ICONS)
     let timeString: string = ''
     if (checkpointTime !== undefined) {
-      timeString = TM.utils.getTimeString(checkpointTime)
+      timeString = tm.utils.getTimeString(checkpointTime)
     }
     let differenceString: string = ''
     if (difference !== undefined) {
       if (difference > 0) {
-        differenceString = `(${this.colours.better}-${TM.utils.getTimeString(difference)}$FFF)`
+        differenceString = `(${this.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
       } else if (difference === 0) {
-        differenceString = `(${this.colours.equal}${TM.utils.getTimeString(difference)}$FFF)`
+        differenceString = `(${this.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
       } else {
-        differenceString = `(${this.colours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
+        differenceString = `(${this.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
       }
     }
     const txt: string = timeString + differenceString
-    TM.sendManialink(`
+    tm.sendManialink(`
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <quad posn="0 0 6" sizen="${this.width} ${this.height}" action="${IDS.currentCps}"/>

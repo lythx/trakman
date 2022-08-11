@@ -1,6 +1,6 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import { topWins } from '../../../stats/TopWins.js'
 
 export default class WinnersRanking extends StaticComponent {
@@ -18,18 +18,18 @@ export default class WinnersRanking extends StaticComponent {
     super(IDS.winnersRanking, 'result')
     this.entries = CFG.winnersRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.winnersRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
-    topWins.onUpdate(() =>this.display())
+    topWins.onUpdate(() => this.display())
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
     this.constructXml()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   constructXml() {
@@ -39,7 +39,7 @@ export default class WinnersRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
         ${resultStaticHeader(CFG.winnersRanking.title, CFG.winnersRanking.icon, this.side)}
         <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-          ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+          ${this.list.constructXml(list.map(a => a.wins.toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
         </frame>
       </frame>
     </manialink>`
