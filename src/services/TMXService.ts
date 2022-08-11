@@ -220,7 +220,11 @@ export abstract class TMXService {
       downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${TMXId}`,
       replays
     }
-    void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    if (!Number.isInteger(mapInfo.awards) || !Number.isInteger(mapInfo.leaderboardRating)) {
+      Logger.debug(JSON.stringify(mapInfo, null, 2))
+    } else {
+      void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    }
     return mapInfo
   }
 
