@@ -755,7 +755,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Player ${login} has no record on this map.`, info.login)
         return
       }
-      TM.records.remove(playerRecord.login, TM.maps.current.id, info.login)
+      TM.records.remove(playerRecord, TM.maps.current.id, info)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
         + `removed the record of ${TM.utils.palette.highlight + (TM.utils.strip(playerRecord.nickname, true))}${TM.utils.palette.admin} on the ongoing map.`)
@@ -766,7 +766,7 @@ const commands: TMCommand[] = [
     aliases: ['shuf', 'shuffle'],
     help: 'Shuffle the map queue.',
     callback: async (info: MessageInfo): Promise<void> => {
-      TM.jukebox.shuffle(info.login)
+      TM.jukebox.shuffle(info)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has `
         + `shuffled the queue.`)

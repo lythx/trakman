@@ -67,7 +67,7 @@ export class PlayerService {
     for (const player of playerList) {
       const detailedPlayerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
       if (detailedPlayerInfo instanceof Error) {
-        Logger.fatal(`Error when fetching player ${player.Login} information from the server`, detailedPlayerInfo.message)
+        Logger.fatal(`Error when fetching player information from the server for ${Utils.strip(player.NickName)} (${player.Login})`, detailedPlayerInfo.message)
         return
       }
       // OnlineRights is 0 for nations and 3 for united ?XD
@@ -94,7 +94,7 @@ export class PlayerService {
     let countryCode: string | undefined = Utils.countryToCode(country)
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
-      await Logger.fatal(`Error adding player ${login} to memory, nation ${country} is not in the country list`)
+      await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
       return {} as any // Shut up IDE
     }
     const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
@@ -147,8 +147,8 @@ export class PlayerService {
     }
     this._players.push(player)
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${player.login} joined, visits: ${player.visits}, ` +
-        `nickname: ${player.nickname}, region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
+      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
+        `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
   }
@@ -175,7 +175,7 @@ export class PlayerService {
     }
     void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
     this._players.splice(playerIndex, 1)
-    Logger.info(`Player ${player.login} left after playing for ${Utils.getTimeString(sessionTime)}`)
+    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.msToTime(sessionTime)}`)
     return leaveInfo
   }
 

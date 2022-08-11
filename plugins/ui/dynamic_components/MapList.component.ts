@@ -267,7 +267,7 @@ export default class MapList extends PopupWindow {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) + params.paginator.constructXml(login)
   }
 
-  private handleMapClick(mapId: string, login: string, nickName: string, privilege: number): boolean {
+  private handleMapClick(mapId: string, login: string, nickname: string, privilege: number): boolean {
     const challenge = this.sortedList.find(a => a.id === mapId)
     if (challenge === undefined) {
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Error while adding the map to queue.`, login)
@@ -275,8 +275,8 @@ export default class MapList extends PopupWindow {
       return false
     }
     if (TM.jukebox.juked.some(a => a.map.id === mapId)) {
-      TM.jukebox.remove(mapId, login)
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickName, true)} `
+      TM.jukebox.remove(mapId, { login, nickname })
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname, true)} `
         + `${TM.utils.palette.vote}removed ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} from the queue.`)
     }
     else {
@@ -284,8 +284,8 @@ export default class MapList extends PopupWindow {
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.vote}You can't add more than one map to the queue.`)
         return false
       }
-      TM.jukebox.add(mapId, login)
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickName, true)} `
+      TM.jukebox.add(mapId, { login, nickname })
+      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(nickname, true)} `
         + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(challenge.name, true)}${TM.utils.palette.vote} to the queue.`)
     }
     return true

@@ -22,7 +22,7 @@ export default class KarmaWidget extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.height - this.headerH
-    this.grid = new Grid((this.width + this.margin - this.buttonW) / 2, this.margin+ this.height - this.headerH, new Array(3).fill(1), new Array(3).fill(1),
+    this.grid = new Grid((this.width + this.margin - this.buttonW) / 2, this.margin + this.height - this.headerH, new Array(3).fill(1), new Array(3).fill(1),
       { background: CONFIG.static.bgColor, margin: this.margin })
     // setInterval(() => {
     //   this.updateXML()
@@ -41,7 +41,7 @@ export default class KarmaWidget extends StaticComponent {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        TM.karma.add(TM.maps.current.id, info.login, votes[index])
+        TM.karma.add(TM.maps.current.id, info, votes[index])
       }
     })
   }
@@ -125,12 +125,12 @@ export default class KarmaWidget extends StaticComponent {
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[1])}"/>`,
 
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[2])}"/>`,
-      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h , { padding: 0.1, textScale: 0.65 }),
-      (i, j, w, h) => centeredText(mkKarma, w, h , { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h, { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(mkKarma, w, h, { padding: 0.1, textScale: 0.65 }),
 
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[3])}"/>`,
-      (i, j, w, h) => centeredText(totalVotes.toString(), w , h, { padding: 0.1, textScale: 0.65 }),
-      (i, j, w, h) => centeredText(mkAmount, w , h , { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(totalVotes.toString(), w, h, { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(mkAmount, w, h, { padding: 0.1, textScale: 0.65 }),
     ]
     return this.grid.constructXml(arr)
   }

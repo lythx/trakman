@@ -275,7 +275,7 @@ export default class ButtonsWidget extends StaticComponent {
     } else if (res === true) {
       TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.highlight + TM.utils.strip(nickname)}${TM.utils.palette.donation} has paid ${TM.utils.palette.highlight}`
         + `${cost}C ${TM.utils.palette.donation}to replay the ongoing map.`)
-      TM.jukebox.add(TM.maps.current.id, login)
+      TM.jukebox.add(TM.maps.current.id, { login, nickname })
       this.resCostIndex++
       this.isRes = true
       this.onMapReplay()

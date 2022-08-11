@@ -89,7 +89,7 @@ const commands: TMCommand[] = [
       // TODO: Import node:fs to unlinkSync the file (optionally?)
       // TODO: Implement remove map
       const map: TMMap = TM.maps.current
-      await TM.maps.remove(map.id, info.login)
+      await TM.maps.remove(map.id, info)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
         + `${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.admin} from the playlist.`)
@@ -140,7 +140,7 @@ const commands: TMCommand[] = [
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the previous map.`)
-      TM.jukebox.add(TM.jukebox.history[0].id, info.login)
+      TM.jukebox.add(TM.jukebox.history[0].id, info)
       await new Promise((r) => setTimeout(r, 5)) // Let the server think first
       TM.client.callNoRes('NextChallenge')
     },
@@ -152,7 +152,7 @@ const commands: TMCommand[] = [
     callback: (info: MessageInfo): void => {
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has requeued the ongoing map.`)
-      TM.jukebox.add(TM.maps.current.id, info.login)
+      TM.jukebox.add(TM.maps.current.id, info)
     },
     privilege: 1
   },
@@ -336,7 +336,7 @@ const commands: TMCommand[] = [
         TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Couldn't find this index in the queue.`, info.login)
         return
       }
-      TM.jukebox.remove(map.id, info.login)
+      TM.jukebox.remove(map.id, info)
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
         + `${TM.utils.palette.highlight + TM.utils.strip(map.name)}${TM.utils.palette.admin} from the queue.`
@@ -353,7 +353,7 @@ const commands: TMCommand[] = [
         return
       }
       for (const map of TM.jukebox.juked) {
-        TM.jukebox.remove(map.map.id, info.login)
+        TM.jukebox.remove(map.map.id, info)
       }
       TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
         + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has removed `
