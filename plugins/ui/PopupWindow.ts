@@ -1,4 +1,4 @@
-import { trakman as TM } from "../../src/Trakman.js";
+import { trakman as tm } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
 import { CONFIG, IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.json' assert { type: 'json' }
@@ -46,11 +46,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.navbarBottom, this.frameMidBottom, this.frameBottom] = this.constructFrame()
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === this.openId) { this.onOpen(info) }
       else if (info.answer === this.closeId) { this.onClose(info) }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
       const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
@@ -78,7 +78,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
             <quad posn="0 0 2" sizen="${this.headerHeight} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.headerHeight - this.margin * 2} ${this.headerHeight - this.margin * 2}" image="${this.headerIcon}"/>
             <quad posn="${this.headerHeight + this.margin} 0 2" sizen="${this.windowWidth - (this.headerHeight + this.headerPageWidth + this.margin * 2)} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
-            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="1" text="${TM.utils.safeString(this.title)}" valign="center" halign="center"/>
+            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="1" text="${tm.utils.safeString(this.title)}" valign="center" halign="center"/>
             <frame posn="${this.headerHeight + this.windowWidth - (this.headerHeight + this.headerPageWidth)} 0 4">
               <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBg}"/>`,
       `
@@ -131,7 +131,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
     PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
-    TM.sendManialink(`${this.headerLeft}
+    tm.sendManialink(`${this.headerLeft}
     <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" valign="center" halign="center"/>
     ${this.headerRight}
     ${this.constructNavbar(login, params)}

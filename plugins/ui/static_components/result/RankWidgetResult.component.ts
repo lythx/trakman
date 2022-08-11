@@ -1,5 +1,5 @@
 import { RESULTCONFIG as CONFIG, getResultPosition, IDS } from '../../UiUtils.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 
 export default class RankWidgetResult extends StaticComponent {
@@ -20,12 +20,12 @@ export default class RankWidgetResult extends StaticComponent {
 
     display(): void {
         if (!this.isDisplayed) { return }
-        TM.sendManialink(this.xml)
+        tm.sendManialink(this.xml)
     }
 
     displayToPlayer(login: string): void {
         if (!this.isDisplayed) { return }
-        TM.sendManialink(this.xml, login)
+        tm.sendManialink(this.xml, login)
     }
 
     private constructXml(): void {

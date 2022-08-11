@@ -1,4 +1,4 @@
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { donations } from '../../Donations.js'
 import { IDS, CONFIG, getStaticPosition, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
@@ -20,25 +20,25 @@ export default class DonationPanel extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXML()
-    TM.addListener('Controller.ManialinkClick',  (info: ManialinkClickInfo) => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + this.amounts.length) {
         const amount = this.amounts[info.answer - (this.id + 1)]
-       void donations.donate(info.login, info.nickname, amount)
+        void donations.donate(info.login, info.nickname, amount)
       }
     })
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    for (const player of TM.players.list) {
+    for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
     if (this.isDisplayed === false) { return }
-    if (TM.players.get(login)?.isUnited) {
-      TM.sendManialink(this.xml, login)
+    if (tm.players.get(login)?.isUnited) {
+      tm.sendManialink(this.xml, login)
     }
   }
 

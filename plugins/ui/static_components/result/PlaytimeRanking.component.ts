@@ -1,6 +1,6 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import { stats } from '../../../stats/Stats.js'
 
 export default class PlaytimeRanking extends StaticComponent {
@@ -26,12 +26,12 @@ export default class PlaytimeRanking extends StaticComponent {
   display(): void {
     if (this.isDisplayed === false) { return }
     this.constructXml()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   constructXml() {
@@ -41,7 +41,7 @@ export default class PlaytimeRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.playtimeRanking.title, CFG.playtimeRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(list.map(a => (a.playtime / (60 * 60 * 1000)).toFixed(0)), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(list.map(a => (a.playtime / (60 * 60 * 1000)).toFixed(0)), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

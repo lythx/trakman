@@ -1,6 +1,6 @@
 import { IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObjectProperty } from '../UiUtils.js'
 import flags from '../config/FlagIcons.json' assert { type: 'json' }
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { MapAuthorData } from '../../MapAuthorData.js'
 
@@ -29,31 +29,31 @@ export default class MapWidget extends StaticComponent {
 
   display(): void {
     this.updateXML()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   private updateXML(): void {
     const rows = 4
     this.height = (CONFIG.staticHeader.height + CONFIG.marginSmall) * rows + CONFIG.marginSmall
-    const map = TM.maps.current
+    const map = tm.maps.current
     const author: string = MapAuthorData.currentAuthor?.nickname ?? map.author
     const cfg = CONFIG.map
-    const tmxmap = TM.tmx.current
+    const tmxmap = tm.tmx.current
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(rows).fill(1))
     const texts: (string | undefined)[] = [
       cfg.title,
-      TM.utils.safeString(map.name),
-      TM.utils.safeString(author),
-      TM.utils.getTimeString(map.authorTime),
-      date === undefined ? undefined : TM.utils.formatDate(date),
+      tm.utils.safeString(map.name),
+      tm.utils.safeString(author),
+      tm.utils.getTimeString(map.authorTime),
+      date === undefined ? undefined : tm.utils.formatDate(date),
       tmxmap?.awards === undefined ? undefined : tmxmap?.awards.toString(),
-      tmxwr === undefined ? undefined : TM.utils.getTimeString(tmxwr)
+      tmxwr === undefined ? undefined : tm.utils.getTimeString(tmxwr)
     ]
     const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
     if (MapAuthorData.currentAuthor?.country !== undefined) {
@@ -84,7 +84,7 @@ export default class MapWidget extends StaticComponent {
       return `
       <frame posn="0 0 1">
         ${i === 0 ? staticHeader(texts[i] ?? '', icons[i] ?? '', true) :
-          staticHeader(TM.utils.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
+          staticHeader(tm.utils.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
             textScale: cfg.textScale,
             textBackgrund: CONFIG.static.bgColor,
             centerVertically: true,

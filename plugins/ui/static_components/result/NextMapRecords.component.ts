@@ -1,6 +1,6 @@
 import { getResultPosition, IDS, RESULTCONFIG as CFG, RecordList, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 
 export default class NextMapRecords extends StaticComponent {
 
@@ -24,26 +24,26 @@ export default class NextMapRecords extends StaticComponent {
     this.list.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.EndMap', async () => {
-      const mapId = TM.jukebox.queue[0].id
-      this.records = await TM.records.fetchByMap(mapId)
+    tm.addListener('Controller.EndMap', async () => {
+      const mapId = tm.jukebox.queue[0].id
+      this.records = await tm.records.fetchByMap(mapId)
       this.display()
     })
-    TM.addListener('Controller.BeginMap', () => {
+    tm.addListener('Controller.BeginMap', () => {
       this.records.length = 0
     })
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    for (const e of TM.players.list) {
+    for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(`<manialink id="${this.id}">
+    tm.sendManialink(`<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
         ${resultStaticHeader(CFG.nextMapRecords.title, CFG.nextMapRecords.icon, this.side)}

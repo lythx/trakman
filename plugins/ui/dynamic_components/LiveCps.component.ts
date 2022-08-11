@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { trakman as TM } from "../../../src/Trakman.js";
+import { trakman as tm } from "../../../src/Trakman.js";
 import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 
 export default class LiveCps extends PopupWindow {
@@ -18,7 +18,7 @@ export default class LiveCps extends PopupWindow {
 
   constructor() {
     super(IDS.liveCps, stringToObjectProperty(CONFIG.liveCps.icon, ICONS), CONFIG.liveCps.title, CONFIG.liveCps.navbar)
-    const records = TM.records.live
+    const records = tm.records.live
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -27,13 +27,13 @@ export default class LiveCps extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    TM.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('Controller.BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(TM.records.live.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
-    TM.addListener('Controller.LiveRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(TM.records.live.length / this.entries))
+    tm.addListener('Controller.LiveRecord', (): void => {
+      this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
   }
@@ -43,7 +43,7 @@ export default class LiveCps extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records = TM.records.live
+    const records = tm.records.live
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
     const cpTypes = getCpTypes(records.map(a => a.checkpoints))
@@ -52,7 +52,7 @@ export default class LiveCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.utils.safeString(TM.utils.strip(records[i + playerIndex].nickname, false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -70,11 +70,11 @@ export default class LiveCps extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.utils.getTimeString(cp), w, h)}`
+        ${centeredText(tm.utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(tm.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -122,7 +122,7 @@ export default class LiveCps extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = TM.maps.current.checkpointsAmount - 1
+    const cpAmount = tm.maps.current.checkpointsAmount - 1
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
@@ -151,7 +151,7 @@ export default class LiveCps extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages: number = 1
-    const cpAmount = TM.maps.current.checkpointsAmount - 1
+    const cpAmount = tm.maps.current.checkpointsAmount - 1
     for (let i: number = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++

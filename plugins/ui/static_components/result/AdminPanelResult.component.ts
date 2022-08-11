@@ -1,5 +1,5 @@
 import { getResultPosition, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon } from '../../UiUtils.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 
 export default class AdminPanelResult extends StaticComponent {
@@ -16,22 +16,22 @@ export default class AdminPanelResult extends StaticComponent {
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
-    TM.addListener('Controller.PrivilegeChanged', (info) => {
+    tm.addListener('Controller.PrivilegeChanged', (info) => {
       this.displayToPlayer(info.login)
     })
   }
 
   display(): void {
-    for (const e of TM.players.list) {
+    for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    const privilege: number = TM.players.get(login)?.privilege ?? 0
+    const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (this.isDisplayed) {
       if (privilege > 0) {
-        TM.sendManialink(this.xml, login)
+        tm.sendManialink(this.xml, login)
       }
     }
   }

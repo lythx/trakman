@@ -1,5 +1,5 @@
 import { getStaticPosition, centeredText, RecordList, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
 
@@ -22,16 +22,16 @@ export default class LocalRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.PlayerRecord', (): void => {
+    tm.addListener('Controller.PlayerRecord', (): void => {
       this.display()
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (TM.records.local.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (TM.records.local.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.LocalRecords', (): void => {
+    tm.addListener('Controller.LocalRecords', (): void => {
       this.display()
     })
   }
@@ -39,19 +39,19 @@ export default class LocalRanking extends StaticComponent {
   display(): void {
     if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players.list) {
+    for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(`<manialink id="${this.id}">
+    tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.locals.title, stringToObjectProperty(CONFIG.locals.icon, ICONS), true, { actionId: IDS.localCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.records.local.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })).slice(0, this.maxRecords))}
+          ${this.recordList.constructXml(login, tm.records.local.map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login })).slice(0, this.maxRecords))}
         </frame>
       </frame>
     </manialink>`,

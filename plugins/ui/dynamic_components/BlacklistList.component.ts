@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator } from '../UiUtils.js'
 
 export default class BlacklistList extends PopupWindow {
@@ -14,26 +14,26 @@ export default class BlacklistList extends PopupWindow {
         this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.blacklistList.columnProportions, new Array(this.entries).fill(1),
             { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
-        TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+        tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
             if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
-                const targetPlayer = TM.players.list[info.answer - this.openId - 1000]
-                const targetInfo = TM.players.get(targetPlayer.login)
+                const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
+                const targetInfo = tm.players.get(targetPlayer.login)
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    TM.removeFromBlacklist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.admin}${TM.utils.getTitle(info)} `
-                        + `${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.admin} has unblacklisted `
-                        + `${TM.utils.palette.highlight + TM.utils.strip(targetPlayer.nickname)}${TM.utils.palette.admin}.`
+                    tm.removeFromBlacklist(targetPlayer.login, info.login)
+                    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unblacklisted `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`
                     )
                 }
             } //
         })
-        const blacklist = TM.blacklist
+        const blacklist = tm.blacklist
         this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(blacklist.length / this.entries))
         this.paginator.onPageChange = (login: string, page: number) => {
-            const blacklist = TM.blacklist
+            const blacklist = tm.blacklist
             let pageCount = Math.ceil(blacklist.length / this.entries)
             if (pageCount === 0) {
                 pageCount = 1
@@ -52,7 +52,7 @@ export default class BlacklistList extends PopupWindow {
     }
 
     protected onOpen(info: ManialinkClickInfo): void {
-        const blacklist = TM.blacklist
+        const blacklist = tm.blacklist
         let pageCount = Math.ceil(blacklist.length / this.entries)
         if (pageCount === 0) {
             pageCount = 1
@@ -70,7 +70,7 @@ export default class BlacklistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Unblacklist ', w, h, { padding: 0.2 }),
 
         ]
-        const blacklisted = TM.blacklist
+        const blacklisted = tm.blacklist
         // const blacklisted: BlacklistDBEntry[] = []
         // for(let i = 0; i<100; i++) {
         //     blacklisted.push({login: Math.random().toString(), expires: new Date(Math.random()), caller: Math.random().toString(), reason: Math.random().toString(), date: new Date(Math.random())})
@@ -78,10 +78,10 @@ export default class BlacklistList extends PopupWindow {
         const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of blacklisted) {
-            fetchedPlayers.push(await TM.players.fetch(player.login))
+            fetchedPlayers.push(await tm.players.fetch(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.utils.safeString((TM.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false))), w, h)
+            return centeredText(tm.utils.safeString((tm.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false))), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(blacklisted[i - 1].login, w, h)
@@ -90,7 +90,7 @@ export default class BlacklistList extends PopupWindow {
             return centeredText(blacklisted[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)
         }
         const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.utils.safeString(blacklisted[i - 1]?.reason ?? 'No reason specified'), w, h)
+            return centeredText(tm.utils.safeString(blacklisted[i - 1]?.reason ?? 'No reason specified'), w, h)
         }
         const unblButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.blacklistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`

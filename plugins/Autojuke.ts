@@ -1,48 +1,48 @@
-import { trakman as TM } from "../src/Trakman.js";
+import { trakman as tm } from "../src/Trakman.js";
 
-TM.commands.add({
+tm.commands.add({
   aliases: ['aj', 'autojuke'],
   help: 'Juke a random map. Options: nofinish(nofin), norank, noauthor',
   params: [{ name: 'option', optional: true }],
   callback: async (info, option?: string): Promise<void> => {
-    if (info.privilege <= 0 && TM.jukebox.juked.some(a => a.callerLogin === info.login)) {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.vote}You can't add more than one map to the queue.`)
+    if (info.privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === info.login)) {
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`)
       return
     }
     switch (option) {
       case 'nofinish': case 'nofin': {
-        const mapsWithRec: string[] = (await TM.records.fetchByLogin(info.login)).map(a => a.map)
-        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
-          !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.history.some(b => b.id === a.id) &&
-          TM.maps.current.id !== a.id &&
+        const mapsWithRec: string[] = (await tm.records.fetchByLogin(info.login)).map(a => a.map)
+        const eligibleMaps: TMMap[] = tm.maps.list.filter(a =>
+          !tm.jukebox.juked.some(b => b.map.id === a.id) &&
+          !tm.jukebox.history.some(b => b.id === a.id) &&
+          tm.maps.current.id !== a.id &&
           !mapsWithRec.includes(a.id))
         if (eligibleMaps.length === 0) {
-          TM.sendMessage('No unfinished maps available', info.login)
+          tm.sendMessage('No unfinished maps available', info.login)
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info)
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
-          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
+        tm.jukebox.add(map.id, info)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)} `
+          + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.vote} to the queue.`)
         break
       }
       case 'noauthor': {
-        const mapsWithAuthor: string[] = (await TM.records.fetchByLogin(info.login))
-          .filter(a => TM.maps.list.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
-        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
-          !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.history.some(b => b.id === a.id) &&
-          TM.maps.current.id !== a.id &&
+        const mapsWithAuthor: string[] = (await tm.records.fetchByLogin(info.login))
+          .filter(a => tm.maps.list.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time).map(a => a.map)
+        const eligibleMaps: TMMap[] = tm.maps.list.filter(a =>
+          !tm.jukebox.juked.some(b => b.map.id === a.id) &&
+          !tm.jukebox.history.some(b => b.id === a.id) &&
+          tm.maps.current.id !== a.id &&
           !mapsWithAuthor.includes(a.id))
         if (eligibleMaps.length === 0) {
-          TM.sendMessage('No maps with no author time available', info.login)
+          tm.sendMessage('No maps with no author time available', info.login)
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info)
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
-          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
+        tm.jukebox.add(map.id, info)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)} `
+          + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.vote} to the queue.`)
         break
       }
       case 'norank': {
@@ -51,38 +51,38 @@ TM.commands.add({
         const fetchSize: number = 300
         do {
           i++
-          if (i * 500 > TM.maps.list.length) { break }
-          ranks.push(...(await TM.fetchMapRank(info.login, TM.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= TM.records.maxLocalsAmount))
+          if (i * 500 > tm.maps.list.length) { break }
+          ranks.push(...(await tm.fetchMapRank(info.login, tm.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= tm.records.maxLocalsAmount))
         } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
-        const list: TMMap[] = TM.maps.list.slice(0, (i + 1) * fetchSize)
+        const list: TMMap[] = tm.maps.list.slice(0, (i + 1) * fetchSize)
         const eligibleMaps: TMMap[] = list.filter(a =>
-          !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.history.some(b => b.id === a.id) &&
-          TM.maps.current.id !== a.id &&
+          !tm.jukebox.juked.some(b => b.map.id === a.id) &&
+          !tm.jukebox.history.some(b => b.id === a.id) &&
+          tm.maps.current.id !== a.id &&
           !ranks.some(b => a.id === b.mapId))
         if (eligibleMaps.length === 0) {
-          TM.sendMessage('No maps with no rank available', info.login)
+          tm.sendMessage('No maps with no rank available', info.login)
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info)
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
-          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
+        tm.jukebox.add(map.id, info)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)} `
+          + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.vote} to the queue.`)
         break
       }
       default: {
-        const eligibleMaps: TMMap[] = TM.maps.list.filter(a =>
-          !TM.jukebox.juked.some(b => b.map.id === a.id) &&
-          !TM.jukebox.history.some(b => b.id === a.id) &&
-          TM.maps.current.id !== a.id)
+        const eligibleMaps: TMMap[] = tm.maps.list.filter(a =>
+          !tm.jukebox.juked.some(b => b.map.id === a.id) &&
+          !tm.jukebox.history.some(b => b.id === a.id) &&
+          tm.maps.current.id !== a.id)
         if (eligibleMaps.length === 0) {
-          TM.sendMessage('No maps available', info.login)
+          tm.sendMessage('No maps available', info.login)
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info)
-        TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
-          + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
+        tm.jukebox.add(map.id, info)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)} `
+          + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(map.name, true)}${tm.utils.palette.vote} to the queue.`)
       }
     }
   },

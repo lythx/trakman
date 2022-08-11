@@ -1,15 +1,15 @@
-import { trakman as TM } from '../src/Trakman.js'
+import { trakman as tm } from '../src/Trakman.js'
 
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 
 const fetchPlayerData = async (login: string): Promise<{ nickname: string, country: string } | Error | false> => {
   if (regex.test(login) === true) { return false }
-  const json: any = await TM.players.fetchWebservices(login)
+  const json: any = await tm.players.fetchWebservices(login)
   if (json instanceof Error) { // UNKOWN PLAYER MOMENT
     return json
   } else {
     // No error check, nation cannot be undefined
-    return { nickname: json?.nickname, country: (TM.utils.countryToCode(json?.path?.split('|')[1]) as any) }
+    return { nickname: json?.nickname, country: (tm.utils.countryToCode(json?.path?.split('|')[1]) as any) }
   }
 }
 
@@ -19,8 +19,8 @@ const nextAuthorListeners: ((data?: { nickname: string, country: string }) => vo
 let currentAuthorData: { nickname: string, country: string } | undefined
 let nextAuthorData: { nickname: string, country: string } | undefined
 
-TM.addListener('Controller.Ready', async (): Promise<void> => {
-  const res = await fetchPlayerData(TM.maps.current.author)
+tm.addListener('Controller.Ready', async (): Promise<void> => {
+  const res = await fetchPlayerData(tm.maps.current.author)
   if (res instanceof Error || res === false) {
     currentAuthorData = undefined
   } else {
@@ -31,7 +31,7 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
   }
 })
 
-TM.addListener('Controller.EndMap', async (info): Promise<void> => {
+tm.addListener('Controller.EndMap', async (info): Promise<void> => {
   if (info.isRestart === true) {
     nextAuthorData === currentAuthorData
     for (const e of nextAuthorListeners) {
@@ -39,7 +39,7 @@ TM.addListener('Controller.EndMap', async (info): Promise<void> => {
     }
     return
   }
-  const res = await fetchPlayerData(TM.jukebox.queue[0].author)
+  const res = await fetchPlayerData(tm.jukebox.queue[0].author)
   if (res instanceof Error || res === false) {
     nextAuthorData = undefined
   } else {
@@ -50,9 +50,9 @@ TM.addListener('Controller.EndMap', async (info): Promise<void> => {
   }
 })
 
-TM.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
-  if (TM.state.current === 'result') {
-    const res = await fetchPlayerData(TM.jukebox.queue[0].author)
+tm.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
+  if (tm.state.current === 'result') {
+    const res = await fetchPlayerData(tm.jukebox.queue[0].author)
     if (res instanceof Error || res === false) {
       nextAuthorData = undefined
     } else {
@@ -64,7 +64,7 @@ TM.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
   }
 })
 
-TM.addListener('Controller.BeginMap', (): void => {
+tm.addListener('Controller.BeginMap', (): void => {
   currentAuthorData = nextAuthorData
   nextAuthorData = undefined
   for (const e of currentAuthorListeners) {

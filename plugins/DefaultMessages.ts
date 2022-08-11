@@ -1,6 +1,6 @@
-import { trakman as TM, palette as p } from '../src/Trakman.js'
+import { trakman as tm, palette as p } from '../src/Trakman.js'
 
-TM.utils.palette.admin
+tm.utils.palette.admin
 p.admin
 
 import config from '../config.json' assert { type: 'json' }
@@ -11,24 +11,24 @@ const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: (): void => {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.servermsg}Trakman ${TM.utils.palette.highlight}`
-        + `v${config.version}${TM.utils.palette.servermsg} startup sequence successful.`)
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.servermsg}You can see the changelog with `
-        + `${TM.utils.palette.highlight}/changes${TM.utils.palette.servermsg}.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.servermsg}Trakman ${tm.utils.palette.highlight}`
+        + `v${config.version}${tm.utils.palette.servermsg} startup sequence successful.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.servermsg}You can see the changelog with `
+        + `${tm.utils.palette.highlight}/changes${tm.utils.palette.servermsg}.`)
     }
   },
   {
     event: ['Controller.BeginMap', 'Controller.Ready'],
     callback: async (): Promise<void> => {
-      const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
-      for (const player of TM.players.list) {
-        const index: number = TM.records.local.findIndex(a => a.login === player.login)
+      const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`)
+      for (const player of tm.players.list) {
+        const index: number = tm.records.local.findIndex(a => a.login === player.login)
         if (index === -1) {
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a personal best on this map.`, player.login)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You don't have a personal best on this map.`, player.login)
         } else {
-          const rec: TMLocalRecord = TM.records.local[index]
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}Personal best${TM.utils.palette.highlight}: ${TM.utils.getTimeString(rec.time)}${TM.utils.palette.record}, the `
-            + `${TM.utils.palette.rank + TM.utils.getPositionString(index + 1)} ${TM.utils.palette.record}record.`, player.login)
+          const rec: TMLocalRecord = tm.records.local[index]
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.record}Personal best${tm.utils.palette.highlight}: ${tm.utils.getTimeString(rec.time)}${tm.utils.palette.record}, the `
+            + `${tm.utils.palette.rank + tm.utils.getPositionString(index + 1)} ${tm.utils.palette.record}record.`, player.login)
         }
         const playerRank: number | undefined = player.rank
         if (allRanks instanceof Error) {
@@ -36,10 +36,10 @@ const events: TMListener[] = [
           return
         }
         if (playerRank === undefined) {
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a rank on the server yet.`, player.login)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You don't have a rank on the server yet.`, player.login)
         } else {
-          TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}You are currently ranked ${TM.utils.palette.rank + TM.utils.getPositionString(playerRank)} ${TM.utils.palette.record}out `
-            + `of ${TM.utils.palette.highlight + allRanks[0].count}${TM.utils.palette.record} people total.`, player.login)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.record}You are currently ranked ${tm.utils.palette.rank + tm.utils.getPositionString(playerRank)} ${tm.utils.palette.record}out `
+            + `of ${tm.utils.palette.highlight + allRanks[0].count}${tm.utils.palette.record} people total.`, player.login)
         }
       }
     }
@@ -47,32 +47,32 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}Welcome to ${TM.utils.palette.highlight + TM.utils.strip(TM.state.serverConfig.name)}${TM.utils.palette.error}. `
-        + `This server is running Trakman ${TM.utils.palette.highlight}v${config.version}${TM.utils.palette.error}.\n`
-        + `${TM.utils.palette.server}» ${TM.utils.palette.error}You can see the recent changes with the ${TM.utils.palette.highlight}/changes ${TM.utils.palette.error}command.`, player.login)
-      const index: number = TM.records.local.findIndex(a => a.login === player.login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Welcome to ${tm.utils.palette.highlight + tm.utils.strip(tm.state.serverConfig.name)}${tm.utils.palette.error}. `
+        + `This server is running Trakman ${tm.utils.palette.highlight}v${config.version}${tm.utils.palette.error}.\n`
+        + `${tm.utils.palette.server}» ${tm.utils.palette.error}You can see the recent changes with the ${tm.utils.palette.highlight}/changes ${tm.utils.palette.error}command.`, player.login)
+      const index: number = tm.records.local.findIndex(a => a.login === player.login)
       if (index === -1) {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a personal best on this map.`, player.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You don't have a personal best on this map.`, player.login)
       } else {
-        const rec: TMLocalRecord = TM.records.local[index]
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}Personal best${TM.utils.palette.highlight}: ${TM.utils.getTimeString(rec.time)}${TM.utils.palette.record}, the `
-          + `${TM.utils.palette.rank + TM.utils.getPositionString(index + 1)} ${TM.utils.palette.record}record.`, player.login)
+        const rec: TMLocalRecord = tm.records.local[index]
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.record}Personal best${tm.utils.palette.highlight}: ${tm.utils.getTimeString(rec.time)}${tm.utils.palette.record}, the `
+          + `${tm.utils.palette.rank + tm.utils.getPositionString(index + 1)} ${tm.utils.palette.record}record.`, player.login)
       }
       const playerRank: number | undefined = player.rank
-      const allRanks: any[] | Error = await TM.db.query(`select count(*) from players;`)
+      const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`)
       if (allRanks instanceof Error) {
         Logger.error('how')
         return
       }
       if (playerRank === undefined) {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.error}You don't have a rank on the server yet.`, player.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You don't have a rank on the server yet.`, player.login)
       } else {
-        TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}You are currently ranked ${TM.utils.palette.rank + TM.utils.getPositionString(playerRank)} ${TM.utils.palette.record}out `
-          + `of ${TM.utils.palette.highlight + allRanks[0].count}${TM.utils.palette.record} people total.`, player.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.record}You are currently ranked ${tm.utils.palette.rank + tm.utils.getPositionString(playerRank)} ${tm.utils.palette.record}out `
+          + `of ${tm.utils.palette.highlight + allRanks[0].count}${tm.utils.palette.record} people total.`, player.login)
       }
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.servermsg}${TM.utils.getTitle(player)}${TM.utils.palette.highlight}: `
-        + `${TM.utils.strip(player.nickname, true)}${TM.utils.palette.servermsg} Country${TM.utils.palette.highlight}: `
-        + `${player.country} ${TM.utils.palette.servermsg}Visits${TM.utils.palette.highlight}: ${player.visits}${TM.utils.palette.servermsg}.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.servermsg}${tm.utils.getTitle(player)}${tm.utils.palette.highlight}: `
+        + `${tm.utils.strip(player.nickname, true)}${tm.utils.palette.servermsg} Country${tm.utils.palette.highlight}: `
+        + `${player.country} ${tm.utils.palette.servermsg}Visits${tm.utils.palette.highlight}: ${player.visits}${tm.utils.palette.servermsg}.`)
     }
   },
   {
@@ -81,15 +81,15 @@ const events: TMListener[] = [
       if (endMapInfo.winnerLogin === undefined || endMapInfo.winnerWins === undefined) {
         return
       }
-      TM.sendMessage(`${TM.utils.palette.server}» ${TM.utils.palette.record}You have won your `
-        + `${TM.utils.palette.rank + TM.utils.getPositionString(endMapInfo.winnerWins)}${TM.utils.palette.record} race.`, endMapInfo.winnerLogin)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.record}You have won your `
+        + `${tm.utils.palette.rank + tm.utils.getPositionString(endMapInfo.winnerWins)}${tm.utils.palette.record} race.`, endMapInfo.winnerLogin)
     }
   },
   {
     event: 'Controller.PlayerLeave',
     callback: (player: LeaveInfo): void => {
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(player.nickname, true)}${TM.utils.palette.servermsg} `
-        + `has quit after ${TM.utils.palette.highlight + TM.utils.msToTime(player.sessionTime)}${TM.utils.palette.servermsg}.`)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.servermsg} `
+        + `has quit after ${tm.utils.palette.highlight + tm.utils.msToTime(player.sessionTime)}${tm.utils.palette.servermsg}.`)
     }
   },
   {
@@ -101,23 +101,23 @@ const events: TMListener[] = [
         prevPos = -1
         prevTime = -1
       }
-      const rs = TM.utils.getRankingString(prevPos, info.position, prevTime, info.time)
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.record} has `
-        + `${rs.status} the ${TM.utils.palette.rank + TM.utils.getPositionString(info.position)}${TM.utils.palette.record} `
-        + `local record. Time${TM.utils.palette.highlight}: ${TM.utils.getTimeString(info.time)}`
-        + `${rs.difference !== undefined ? ` ${TM.utils.palette.record}$n(${TM.utils.palette.rank + info.previousPosition} ${TM.utils.palette.highlight}-${rs.difference + TM.utils.palette.record})` : ``}`)
+      const rs = tm.utils.getRankingString(prevPos, info.position, prevTime, info.time)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.record} has `
+        + `${rs.status} the ${tm.utils.palette.rank + tm.utils.getPositionString(info.position)}${tm.utils.palette.record} `
+        + `local record. Time${tm.utils.palette.highlight}: ${tm.utils.getTimeString(info.time)}`
+        + `${rs.difference !== undefined ? ` ${tm.utils.palette.record}$n(${tm.utils.palette.rank + info.previousPosition} ${tm.utils.palette.highlight}-${rs.difference + tm.utils.palette.record})` : ``}`)
     }
   },
   {
     event: 'Controller.DedimaniaRecord',
     callback: (info: DediRecordInfo): void => {
-      const rs = TM.utils.getRankingString(info.previousPosition, info.position, info.previousTime, info.time)
-      TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)}${TM.utils.palette.dedirecord} has `
-        + `${rs.status} the ${TM.utils.palette.rank + TM.utils.getPositionString(info.position)}${TM.utils.palette.dedirecord} `
-        + `dedimania record. Time${TM.utils.palette.highlight}: ${TM.utils.getTimeString(info.time)}`
-        + `${rs.difference !== undefined ? ` ${TM.utils.palette.dedirecord}$n(${TM.utils.palette.rank + info.previousPosition} ${TM.utils.palette.highlight}-${rs.difference + TM.utils.palette.dedirecord})` : ``}`)
+      const rs = tm.utils.getRankingString(info.previousPosition, info.position, info.previousTime, info.time)
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.dedirecord} has `
+        + `${rs.status} the ${tm.utils.palette.rank + tm.utils.getPositionString(info.position)}${tm.utils.palette.dedirecord} `
+        + `dedimania record. Time${tm.utils.palette.highlight}: ${tm.utils.getTimeString(info.time)}`
+        + `${rs.difference !== undefined ? ` ${tm.utils.palette.dedirecord}$n(${tm.utils.palette.rank + info.previousPosition} ${tm.utils.palette.highlight}-${rs.difference + tm.utils.palette.dedirecord})` : ``}`)
     }
   },
 ]
 
-for (const event of events) { TM.addListener(event.event, event.callback) }
+for (const event of events) { tm.addListener(event.event, event.callback) }

@@ -1,5 +1,5 @@
 // import PopupWindow from "../PopupWindow.js";
-// import { TRAKMAN as TM } from "../../../src/Trakman.js";
+// import { trakman as tm } from "../../../src/Trakman.js";
 // import { CONFIG as CFG, headerIconTitleText, ICONS as ICN, ICONS, IDS } from '../UiUtils.js'
 // import { Paginator } from "../UiUtils.js";
 
@@ -20,7 +20,7 @@
 
 //   protected onOpen(info: ManialinkClickInfo): void {
 //     //for now its getting update here but thats bad, should be on event
-//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
+//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, tm.previousChallenges.length) - 1) / this.itemsPerPage)
 //     const nextCount = Math.ceil((this.queueMapsCount - 1) / this.itemsPerPage)
 //     this.paginator.updatePageCount(prevCount + 1 + nextCount)
 //     this.displayToPlayer(info.login, prevCount + 1)
@@ -31,20 +31,20 @@
 //   }
 
 //   protected constructContent(login: string, page: number): string {
-//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, TM.previousChallenges.length) - 1) / this.itemsPerPage)
-//     const challenges = TM.challenges
+//     const prevCount = Math.ceil((Math.min(this.previousMapsCount, tm.previousChallenges.length) - 1) / this.itemsPerPage)
+//     const challenges = tm.challenges
 //     challenges.sort((a, b) => a.author.localeCompare(b.author))
 //     let xml = ''
 //     const titles = [CFG.map.titles.lastTrack, CFG.map.titles.currTrack, CFG.map.titles.nextTrack]
 //     const pages = [
-//       [TM.previousChallenges[3], TM.previousChallenges[2], TM.previousChallenges[1]],
-//       [TM.previousChallenges[0], TM.challenge, TM.challengeQueue[0]],
-//       [TM.challengeQueue[1], TM.challengeQueue[2], TM.challengeQueue[3]]
+//       [tm.previousChallenges[3], tm.previousChallenges[2], tm.previousChallenges[1]],
+//       [tm.previousChallenges[0], tm.challenge, tm.challengeQueue[0]],
+//       [tm.challengeQueue[1], tm.challengeQueue[2], tm.challengeQueue[3]]
 //     ]
 //     const TMXPages = [
-//       [TM.TMXPrevious[3], TM.TMXPrevious[2], TM.TMXPrevious[1]],
-//       [TM.TMXPrevious[0], TM.TMXCurrent, TM.TMXNext[0]],
-//       [TM.TMXNext[1], TM.TMXNext[2], TM.TMXNext[3]]
+//       [tm.TMXPrevious[3], tm.TMXPrevious[2], tm.TMXPrevious[1]],
+//       [tm.TMXPrevious[0], tm.TMXCurrent, tm.TMXNext[0]],
+//       [tm.TMXNext[1], tm.TMXNext[2], tm.TMXNext[3]]
 //     ]
 //     for (let i = 0; i < this.itemsPerPage; i++) {
 //       const challenge = pages[page - prevCount][i]
@@ -55,7 +55,7 @@
 //       const replaysXml = this.getReplaysXml(tmxInfo)
 //       const image = tmxInfo === null
 //         ? ICN.mapNoImage
-//         : TM.utils.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
+//         : tm.utils.safeString(tmxInfo.thumbnailUrl + `&.jpeg`)
       // xml += `
       //   <frame posn="${i * 26} 0 0.02">
       //     <quad posn="0 0 1" sizen="25 53" style="BgsPlayerCard" substyle="BgRacePlayerName"/>
@@ -65,10 +65,10 @@
       //     <label posn="3.5 -0.67 3" sizen="13.55 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + titles[i]}"/>
       //     <quad posn="1 -3.5 2" sizen="23 18" style="Bgs1" substyle="BgCard"/>
       //     <quad posn="1.1 -3.6 3" sizen="22.8 17.8" image="${image}"/>
-      //     <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + TM.utils.safeString(TM.utils.strip(challenge.name, false))}"/>
-      //     <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${TM.utils.safeString(challenge.author)}"/>
+      //     <label posn="1 -22.5 3" sizen="15.2 3" scale="1.5" text="${CFG.widgetStyleRace.formattingCodes + tm.utils.safeString(tm.utils.strip(challenge.name, false))}"/>
+      //     <label posn="1 -25.7 3" sizen="16.2 2" scale="1.2" text="${CFG.widgetStyleRace.formattingCodes}by ${tm.utils.safeString(challenge.author)}"/>
       //     <quad posn="0.4 -28.2 3" sizen="1.9 1.9" image="${ICN.timerA}"/>
-      //     <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + TM.utils.getTimeString(challenge.authorTime)}"/>
+      //     <label posn="2.5 -28.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tm.utils.getTimeString(challenge.authorTime)}"/>
       //     <quad posn="0.4 -30.2 3" sizen="1.9 1.9" image="${ICN.environment}"/>
       //     <label posn="2.5 -30.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.environment}"/>
       //     <quad posn="0.4 -32.2 3" sizen="1.9 1.9" image="${ICN.heart}"/>
@@ -77,10 +77,10 @@
       //     <label posn="10.1 -28.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}${challenge.addDate.getDate().toString().padStart(2, '0')}/${(challenge.addDate.getMonth() + 1).toString().padStart(2, '0')}/${challenge.addDate.getFullYear()}"/>
       //     <quad posn="8 -30.2 3" sizen="1.9 1.9" image="${ICN.sun}"/>
       //     <label posn="10.1 -30.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.mood}"/>
-      //     <quad posn="17.5 -28.2 3" sizen="1.9 1.9" 
+      //     <quad posn="17.5 -28.2 3" sizen="1.9 1.9"
       //      image="${ICN.barGraph}"/>
       //     <label posn="19.6 -28.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + positionString}"/>
-      //     <quad posn="17.5 -30.2 3" sizen="1.9 1.9" 
+      //     <quad posn="17.5 -30.2 3" sizen="1.9 1.9"
       //      image="${ICN.cash}"/>
       //     <label posn="19.6 -30.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + challenge.copperPrice}"/>
       //     ${tmxXml}
@@ -124,7 +124,7 @@
   //       tmxDiffImage = ICN.empty
   //   }
     //   return `
-    //             <quad posn="0.4 -34.2 3" sizen="1.9 1.9" 
+    //             <quad posn="0.4 -34.2 3" sizen="1.9 1.9"
     //              image="${ICN.mapQuestionMark}"/>
     //             <label posn="2.5 -34.38 3" sizen="5.25 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.type} "/>
     //             <quad posn="0.4 -36.2 3" sizen="1.9 1.9" image="${ICN.routes}"/>
@@ -134,7 +134,7 @@
     //             <quad posn="8 -34.2 3" sizen="1.9 1.9" image="${tmxDiffImage}"/>
     //             <label posn="10.1 -34.38 3" sizen="7.15 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + tmxInfo.difficulty}"/>
     //             <quad posn="8 -36.2 3" sizen="1.9 1.9" image="${ICN.tools}"/>
-    //             <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1" 
+    //             <label posn="10.1 -36.38 3" sizen="7.15 2" scale="1"
     //              text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.lastUpdateDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.lastUpdateDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.lastUpdateDate.getFullYear()}"/>
     //             <quad posn="17.5 -32.2 3" sizen="1.9 1.9" image="${lbIcon}"/>
     //             <label posn="19.6 -32.38 3" sizen="5 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes + lbRating}"/>
@@ -145,25 +145,25 @@
     //             <quad posn="6 -49.2 3" sizen="3.2 3.2" image="${ICN.mapDownload}"
     //              url="${tmxInfo.downloadUrl.replace(/^https:\/\//, '')}"/>
     //             <quad posn="11 -49.2 3" sizen="3.2 3.2" image="${ICN.lineGraph}"
-    //              url="${TM.utils.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
-    //             <quad posn="16 -49.2 3" sizen="3.2 3.2" 
+    //              url="${tm.utils.safeString(`http://dedimania.net/tmstats/?do=stat&Uid=${tmxInfo.id}&Show=RECORDS`.replace(/^https:\/\//, ''))}"/>
+    //             <quad posn="16 -49.2 3" sizen="3.2 3.2"
     //              image="${ICN.MX}"
     //              url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
   // }
 
   // private getPositionString(login: string, challengeId: string): string {
-  //   const recordIndex = TM.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
+  //   const recordIndex = tm.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
   //   if (recordIndex === 0) { return "--." }
-  //   else { return TM.utils.getPositionString(recordIndex) }
+  //   else { return tm.utils.getPositionString(recordIndex) }
   // }
 
   // private getReplaysXml(tmxInfo: TMXTrackInfo | null): string {
   //   let replaysXml = `<quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
-  //           <quad posn="5.55 -39.5 3" sizen="1.9 1.9" 
+  //           <quad posn="5.55 -39.5 3" sizen="1.9 1.9"
   //            image="${ICN.account}"/>
-  //           <quad posn="11.55 -39.5 3" sizen="1.9 1.9" 
+  //           <quad posn="11.55 -39.5 3" sizen="1.9 1.9"
   //            image="${ICN.timer}"/>
-  //           <quad posn="17.55 -39.5 3" sizen="1.9 1.9" 
+  //           <quad posn="17.55 -39.5 3" sizen="1.9 1.9"
   //            image="${ICN.calendar}"/>`
     //const positionIcons = [ICN.one, ICN.two, ICN.three]
     // for (let i = 0; i < 3; i++) {
@@ -172,14 +172,14 @@
     //   if (tmxInfo !== null && tmxInfo.replays[i] !== undefined) {
         // replaysXml += `
         //   <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
-        //   <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" 
-        //    text="${CFG.widgetStyleRace.formattingCodes + TM.utils.safeString(tmxInfo.replays[i].name)}"/>
-        //   <label posn="12.5 ${txtPos} 3" sizen="4 2" scale="1" halign="center" 
-        //    text="${CFG.widgetStyleRace.formattingCodes + TM.utils.getTimeString(tmxInfo.replays[i].time)}"/>
-        //   <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" 
+        //   <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1"
+        //    text="${CFG.widgetStyleRace.formattingCodes + tm.utils.safeString(tmxInfo.replays[i].name)}"/>
+        //   <label posn="12.5 ${txtPos} 3" sizen="4 2" scale="1" halign="center"
+        //    text="${CFG.widgetStyleRace.formattingCodes + tm.utils.getTimeString(tmxInfo.replays[i].time)}"/>
+        //   <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1"
         //    text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.replays[i].recordDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
-        //   <quad posn="22.15 ${imgPos + 0.2} 3" sizen="1.9 1.9" 
-        //    image="${ICN.download}" 
+        //   <quad posn="22.15 ${imgPos + 0.2} 3" sizen="1.9 1.9"
+        //    image="${ICN.download}"
         //    url="${tmxInfo.replays[i].url.replace(/^https:\/\//, '')}"/>`
       // }
       // else {

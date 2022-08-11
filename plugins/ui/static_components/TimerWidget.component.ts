@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class TimerWidget extends StaticComponent {
@@ -19,11 +19,11 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display(): void {
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   private constructXml(): void {

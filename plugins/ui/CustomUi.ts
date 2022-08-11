@@ -1,10 +1,10 @@
 import { CONFIG as CFG } from './UiUtils.js'
-import { trakman as TM } from '../../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
 
 export default class CustomUi {
 
   display(): void {
-    TM.sendManialink(
+    tm.sendManialink(
       `<custom_ui>
           <notice visible="${CFG.customUi.notice}"/>
           <challenge_info visible="${CFG.customUi.challengeInfo}"/>
@@ -19,7 +19,7 @@ export default class CustomUi {
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(
+    tm.sendManialink(
       `<custom_ui>
           <notice visible="${CFG.customUi.notice}"/>
           <challenge_info visible="${CFG.customUi.challengeInfo}"/>

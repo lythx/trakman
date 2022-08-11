@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 
@@ -19,21 +19,21 @@ export default class CheckpointRecords extends PopupWindow {
     super(IDS.checkpointRecords, iconurl, CONFIG.checkpointRecords.title, CONFIG.checkpointRecords.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.checkpointRecords.columnProportions, new Array(this.entries + 1).fill(1),
       { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(TM.maps.current.checkpointsAmount / this.entries))
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
-    TM.commands.add({
+    tm.commands.add({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
       callback: (info: MessageInfo) => {
-        TM.openManialink(this.openId, info.login)
+        tm.openManialink(this.openId, info.login)
       },
       privilege: 0
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(TM.maps.current.checkpointsAmount / this.entries))
+      this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
       this.reRender()
     })
     checkpointRecords.addListener('PlayerCheckpoint', (login) => this.reRenderToPlayer(login))
@@ -77,7 +77,7 @@ export default class CheckpointRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(TM.utils.safeString(TM.utils.strip(cps[i + cpIndex - 1]?.nickname ?? '-', false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(cps[i + cpIndex - 1]?.nickname ?? '-', false)), w, h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
@@ -92,7 +92,7 @@ export default class CheckpointRecords extends PopupWindow {
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
       const cp = cps?.[i + cpIndex - 1]
-      return centeredText(cp === null ? '--:--.-' : TM.utils.getTimeString(cp.checkpoint), w, h)
+      return centeredText(cp === null ? '--:--.-' : tm.utils.getTimeString(cp.checkpoint), w, h)
     }
 
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
@@ -105,14 +105,14 @@ export default class CheckpointRecords extends PopupWindow {
         if (cps?.[i + cpIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${TM.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.better}-${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${TM.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${this.diffColours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${TM.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${this.diffColours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
-      return centeredText(differenceString + ' ' + TM.utils.getTimeString(cp), w, h)
+      return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)
     }
 
     const rows = Math.min(this.entries, cps.length - cpIndex)

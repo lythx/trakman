@@ -1,6 +1,6 @@
 import { IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as TM } from '../../../../src/Trakman.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
 import { stats } from '../../../stats/Stats.js'
 
 export default class MostRecordsRanking extends StaticComponent {
@@ -19,23 +19,23 @@ export default class MostRecordsRanking extends StaticComponent {
     this.entries = CFG.mostRecordsRanking.entries
     this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.mostRecordsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
     this.constructXml()
-    TM.addListener('Controller.EndMap', () => {
+    tm.addListener('Controller.EndMap', () => {
       this.constructXml()
     })
     stats.records.onUpdate(() => {
-        this.display()
+      this.display()
     })
   }
 
   display(): void {
     if (this.isDisplayed === false) { return }
     this.constructXml()
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   constructXml() {
@@ -45,7 +45,7 @@ export default class MostRecordsRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${resultStaticHeader(CFG.mostRecordsRanking.title, CFG.mostRecordsRanking.icon, this.side)}
       <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
-        ${this.list.constructXml(list.map(a => a.amount.toString()), list.map(a => TM.utils.safeString(TM.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(list.map(a => a.amount.toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

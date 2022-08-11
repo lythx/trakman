@@ -1,4 +1,4 @@
-import { trakman as TM } from "../src/Trakman.js"
+import { trakman as tm } from "../src/Trakman.js"
 
 const authorSort: TMMap[] = []
 const nameSort: TMMap[] = []
@@ -11,11 +11,11 @@ const initializeLists = () => {
 
 }
 
-TM.addListener('Controller.Ready', (): void => {
-  const arr1: TMMap[] = TM.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
+tm.addListener('Controller.Ready', (): void => {
+  const arr1: TMMap[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
   authorSort.push(...arr1.sort((a, b): number => a.author.localeCompare(b.author)))
   nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
-  const maps = TM.maps.list
+  const maps = tm.maps.list
   karmaSort.push(...[...authorSort].sort((a, b): number => {
     const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
     const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
@@ -24,7 +24,7 @@ TM.addListener('Controller.Ready', (): void => {
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
 })
 
-TM.addListener('Controller.MapAdded', (map) => {
+tm.addListener('Controller.MapAdded', (map) => {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   const ratio = map.voteRatio
@@ -34,7 +34,7 @@ TM.addListener('Controller.MapAdded', (map) => {
   atSort.splice(atSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name) && map.authorTime < a.authorTime), 0, map)
 })
 
-TM.addListener('Controller.MapRemoved', (map) => {
+tm.addListener('Controller.MapRemoved', (map) => {
   authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
   nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
   karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)
@@ -62,7 +62,7 @@ export const MAPLIST = {
 
   getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<TMMap[]> => {
     if (sort === 'best') {
-      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
+      const ranks: { mapId: string; rank: number; }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < list.length; i++) {
@@ -74,7 +74,7 @@ export const MAPLIST = {
       return ranked
     }
     else {
-      const ranks: { mapId: string; rank: number; }[] = (await TM.fetchMapRank(login, TM.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
+      const ranks: { mapId: string; rank: number; }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < list.length; i++) {
@@ -88,11 +88,11 @@ export const MAPLIST = {
   },
 
   searchByName: (query: string): TMMap[] => {
-    return (TM.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
+    return (tm.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
   searchByAuthor: (query: string): TMMap[] => {
-    return (TM.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
+    return (tm.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
   filterNoFinish: (login: string): TMMap[] => {
