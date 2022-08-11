@@ -206,11 +206,11 @@ export class MapService {
   /**
    * Puts current map into history array, changes current map and updates the queue
    */
-  static updateJukebox() {
+  static async update() {
+    await this.setCurrent()
     this._history.unshift(this._current)
     this._history.length = Math.min(this.historySize, this._history.length)
-    this._current = MapService.current
-    if (this._current.id === this._queue[0].map.id) {
+    if(this._current.id === this._queue[0].map.id) {
       this._queue.shift()
       this.fillQueue()
     }

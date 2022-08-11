@@ -5,5 +5,6 @@ type EndMapInfo = Readonly<TMCurrentMap> & {
     readonly wasWarmUp: boolean
     readonly continuesOnNextMap: boolean
     readonly winnerLogin?: string
-    readonly winnerWins?: number
+    readonly winnerWins?: number,
+    readonly isRestart: boolean
 }

@@ -47,13 +47,6 @@ export abstract class TMXService {
     Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
-  static restartMap(): void {
-    if (this.isActive === false) { return }
-    this._previous.unshift(this._current === null ? null : { ...this._current })
-    this._previous.length = Math.min(this._previous.length, this.previousSize)
-    Events.emitEvent('Controller.TMXQueueChanged', this.next)
-  }
-
   static async addMap(id: string, index: number): Promise<void> {
     if (this.isActive === false || index >= this.nextSize) { return }
     const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
