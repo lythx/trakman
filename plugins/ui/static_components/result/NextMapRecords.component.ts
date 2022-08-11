@@ -19,7 +19,7 @@ export default class NextMapRecords extends StaticComponent {
     this.posX = pos.x
     this.posY = pos.y
     this.entries = CFG.nextMapRecords.entries
-    this.list = new RecordList(this.id, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), this.entries, this.side, 3, 5, false,
+    this.list = new RecordList(this.id, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), this.entries, this.side, 5, 5, false,
       { getColoursFromPb: true, resultMode: true })
     this.list.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
