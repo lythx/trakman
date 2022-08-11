@@ -50,7 +50,7 @@ export abstract class VoteService {
     if (v?.vote === vote) {
       return // Return if same vote already exists
     }
-    Logger.trace(`${Utils.strip(playerObject.nickname)} ({${playerObject.login}}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
+    Logger.trace(`${Utils.strip(playerObject.nickname)} (${playerObject.login}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
     if (v !== undefined) {
       v.date = date
       v.vote = vote

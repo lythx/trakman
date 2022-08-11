@@ -191,12 +191,13 @@ export class Listeners {
         }
         if (isRestart === false) {
           await MapService.update()
-          await TMXService.nextMap()
           await VoteService.nextMap()
+          void TMXService.nextMap() // This takes a long time, also there is an event for this
         }
         ServerConfig.update()
         Events.emitEvent('Controller.BeginMap', info)
-        await DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
+        // There is an event for this
+        void DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
       }
     },
     {
