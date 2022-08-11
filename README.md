@@ -16,8 +16,8 @@ On Windows, the installation instructions might be a little goofy and I'm not wi
 1. Get a hold of the current main branch via `git clone` or by downloading the source
 2. `$ npm i` to install all the dependencies
 3. Copy `.env.example` to `.env` and configure [settings](#settings)
-4. `$ npx tsc` to [transpile](https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html#compiling-your-code) the code
-5. `$ node ./built/src/Main.js` to run the controller
+4. `$ npm run build` to [transpile](https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html#compiling-your-code) the code
+5. `$ npm run start` to run the controller
 
 ### Settings
 The following settings are currently supported by the `.env` file:
