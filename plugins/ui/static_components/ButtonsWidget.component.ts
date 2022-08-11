@@ -311,6 +311,7 @@ export default class ButtonsWidget extends StaticComponent {
       // If map wasn't resd
       if (this.isRes === false && this.lastMapRes === false) {
         // Vote to skip
+        this.resCostIndex = 0
         this.iconData[cfg.voteSkip.index] = {
           icon: stringToObjectProperty(cfg.voteSkip.icon, ICONS),
           text1: cfg.voteSkip.title1,
