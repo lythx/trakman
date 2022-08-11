@@ -31,6 +31,16 @@ export class GameService {
   private static _timerStartTimestamp: number = Date.now()
 
   static async initialize(): Promise<void> {
+    Client.callNoRes(`SetCallVoteRatios`,
+      [{
+        array: [{
+          struct: {
+            Command: { string: `*` },
+            Ratio: { double: -1.0 }
+          }
+        }]
+      }]
+    )
     const status: Promise<void> = this.update()
     if (status instanceof Error) {
       await Logger.fatal('Failed to retrieve game info. Error:', status.message)

@@ -12,10 +12,9 @@ export abstract class VoteService {
   private static readonly prefetchCount: number = 4
 
   /**
-   * Disables CallVotes on dedicated server, fetches votes for current and next maps
+   * Fetches votes for current and next maps
    */
   static async initialize(): Promise<void> {
-    Client.callNoRes('SetCallVoteTimeout', [{ int: 0 }])
     await this.repo.initialize()
     const res: TMVote[] = await this.repo.getAll()
     const maps = [MapService.current, ...MapService.queue]
