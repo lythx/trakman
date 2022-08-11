@@ -13,6 +13,8 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 
+let isRestart = false
+
 export class Listeners {
   private static readonly listeners: TMListener[] = [
     {
@@ -187,12 +189,8 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.localRecords
         }
-        const lastId: string = MapService.current.id
-        await MapService.setCurrent()
-        if (lastId === MapService.current.id) {
-          TMXService.restartMap()
-        } else {
-          MapService.updateJukebox()
+        if (isRestart === false) {
+          await MapService.update()
           await TMXService.nextMap()
           await VoteService.nextMap()
         }
@@ -205,6 +203,7 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
+        isRestart = params[4]
         GameService.state = 'result'
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
@@ -218,7 +217,8 @@ export class Listeners {
           localRecords: RecordService.localRecords,
           liveRecords: RecordService.liveRecords,
           winnerLogin: login,
-          winnerWins: wins
+          winnerWins: wins,
+          isRestart
         }
         // Both awaits may be voids if possible?
         void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)

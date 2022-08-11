@@ -31,7 +31,14 @@ TM.addListener('Controller.Ready', async (): Promise<void> => {
   }
 })
 
-TM.addListener('Controller.EndMap', async (): Promise<void> => {
+TM.addListener('Controller.EndMap', async (info): Promise<void> => {
+  if (info.isRestart === true) {
+    nextAuthorData === currentAuthorData
+    for (const e of nextAuthorListeners) {
+      e(nextAuthorData)
+    }
+    return
+  }
   const res = await fetchPlayerData(TM.jukebox.queue[0].author)
   if (res instanceof Error || res === false) {
     nextAuthorData = undefined
@@ -74,7 +81,7 @@ export const MapAuthorData = {
     return currentAuthorData
   },
 
-  get nextAuthorData() {
+  get nextAuthor() {
     return nextAuthorData
   },
 

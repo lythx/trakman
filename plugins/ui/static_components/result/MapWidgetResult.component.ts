@@ -11,6 +11,7 @@ export default class MapWidgetResult extends StaticComponent {
   private positionX: number
   private positionY: number
   private xml: string = ''
+  private isRestart = false
 
   constructor() {
     super(IDS.mapResult, 'result')
@@ -29,6 +30,9 @@ export default class MapWidgetResult extends StaticComponent {
     TM.addListener('Controller.TMXQueueChanged', () => {
       this.display()
     })
+    TM.addListener('Controller.EndMap', (info) => {
+      this.isRestart = info.isRestart
+    }, true)
   }
 
   async display(): Promise<void> {
@@ -45,10 +49,11 @@ export default class MapWidgetResult extends StaticComponent {
   private updateXML(): void {
     const rows = 5
     this.height = (RCFG.staticHeader.height + RCFG.marginSmall) * rows + RCFG.marginSmall
-    const map = TM.jukebox.queue[0]
-    const author: string = MapAuthorData?.nextAuthorData?.nickname ?? map.author
+    const map = this.isRestart ? TM.jukebox.current : TM.jukebox.queue[0]
+    const authorData = this.isRestart ? MapAuthorData.currentAuthor : MapAuthorData.nextAuthor
+    const author: string = authorData?.nickname ?? map.author
     const cfg = RCFG.map
-    const tmxmap = TM.tmx.next[0]
+    const tmxmap = this.isRestart ? TM.tmx.current : TM.tmx.next[0]
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - RCFG.marginSmall, [1], new Array(rows).fill(1))
@@ -62,8 +67,8 @@ export default class MapWidgetResult extends StaticComponent {
       tmxwr === undefined ? undefined : TM.utils.getTimeString(tmxwr)
     ]
     const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
-    if (MapAuthorData?.nextAuthorData?.country !== undefined) {
-      icons[2] = (flags as any)[MapAuthorData?.nextAuthorData?.country] // cope typescript
+    if (authorData?.country !== undefined) {
+      icons[2] = flags[authorData?.country as keyof typeof flags] // cope typescript
     }
     const headerCFG = RCFG.staticHeader
     const cell = (i: number, j: number, w: number, h: number): string => {

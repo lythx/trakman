@@ -125,12 +125,12 @@ export default class KarmaWidget extends StaticComponent {
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[1])}"/>`,
 
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[2])}"/>`,
-      (i, j, w, h) => centeredText(Math.round(karma).toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 }),
-      (i, j, w, h) => centeredText(mkKarma, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h , { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(mkKarma, w, h , { padding: 0.1, textScale: 0.65 }),
 
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[3])}"/>`,
-      (i, j, w, h) => centeredText(totalVotes.toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 }),
-      (i, j, w, h) => centeredText(mkAmount, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(totalVotes.toString(), w , h, { padding: 0.1, textScale: 0.65 }),
+      (i, j, w, h) => centeredText(mkAmount, w , h , { padding: 0.1, textScale: 0.65 }),
     ]
     return this.grid.constructXml(arr)
   }
