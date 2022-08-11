@@ -22,7 +22,7 @@ TM.commands.add({
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info.login)
+        TM.jukebox.add(map.id, info)
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
           + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
@@ -40,7 +40,7 @@ TM.commands.add({
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info.login)
+        TM.jukebox.add(map.id, info)
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
           + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
@@ -65,7 +65,7 @@ TM.commands.add({
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info.login)
+        TM.jukebox.add(map.id, info)
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
           + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
         break
@@ -80,7 +80,7 @@ TM.commands.add({
           return
         }
         const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
-        TM.jukebox.add(map.id, info.login)
+        TM.jukebox.add(map.id, info)
         TM.sendMessage(`${TM.utils.palette.server}»» ${TM.utils.palette.highlight + TM.utils.strip(info.nickname, true)} `
           + `${TM.utils.palette.vote}added ${TM.utils.palette.highlight + TM.utils.strip(map.name, true)}${TM.utils.palette.vote} to the queue.`)
       }

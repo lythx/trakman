@@ -28,7 +28,7 @@ export class Listeners {
         const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
         // Get player ladder rank here for dedimania or watever
         if (playerInfo instanceof Error) {
-          Logger.error(`Failed to get player ${params[0]} info`, playerInfo.message)
+          Logger.error(`Failed to get player info for login ${params[0]}`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
@@ -45,7 +45,7 @@ export class Listeners {
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
-        void DedimaniaService.playerJoin(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1])
+        void DedimaniaService.playerJoin(joinInfo)
       }
     },
     {
@@ -58,9 +58,9 @@ export class Listeners {
         const leaveInfo: LeaveInfo | Error = PlayerService.leave(params[0])
         if (!(leaveInfo instanceof Error)) {
           Events.emitEvent('Controller.PlayerLeave', leaveInfo)
+          // Dedimania playerleave is just api info update irrelevant for controller hence its after the event
+          void DedimaniaService.playerLeave(leaveInfo)
         }
-        // Dedimania playerleave is just api info update irrelevant for controller hence its after the event
-        void DedimaniaService.playerLeave(params[0])
       }
     },
     {

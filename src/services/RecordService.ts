@@ -142,14 +142,14 @@ export class RecordService {
     if (previousIndex === -1) {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
       this._localRecords.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(-1, position, -1, time, player.login, 'local'))
+      Logger.info(...this.getLogString(-1, position, -1, time, player, 'local'))
       void this.repo.add(recordInfo)
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     const pb: number | undefined = this._localRecords[previousIndex].time
     if (time === pb) {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
-      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player.login, 'local'))
+      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, 'local'))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     if (time < pb) {
@@ -157,7 +157,7 @@ export class RecordService {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._localRecords.splice(previousIndex, 1)
       this._localRecords.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'local'))
+      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'local'))
       void this.repo.update(recordInfo.map, recordInfo.login, recordInfo.time, recordInfo.checkpoints, recordInfo.date)
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
@@ -178,54 +178,56 @@ export class RecordService {
     if (pb === undefined) {
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
-      Logger.trace(...this.getLogString(-1, position, -1, time, player.login, 'live'))
+      Logger.trace(...this.getLogString(-1, position, -1, time, player, 'live'))
       return recordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === player.login)?.login) + 1
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
-      Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player.login, 'live'))
+      Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live'))
       return recordInfo
     }
     if (time < pb) {
       const previousIndex: number = this._liveRecords.findIndex(a => a.login === player.login)
       if (previousIndex === -1) {
-        Logger.error(`Can't find player ${player.login} in memory`)
+        Logger.error(`Can't find player ${player.nickname} (${player.login}) in memory`)
         return
       }
       const previousTime: number | undefined = this._liveRecords[previousIndex].time
       const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
-      Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player.login, 'live'))
+      Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'live'))
       return recordInfo
     }
   }
 
   /**
    * Removes a player record
-   * @param login Player login
+   * @param playerObject Player object
    * @param mapId Map uid
+   * @param caller Caller player object
    */
-  static remove(login: string, mapId: string, callerLogin?: string): void {
-    if (callerLogin !== undefined) {
-      Logger.info(`${callerLogin} has removed ${login} record on map ${mapId}`)
+  static remove(playerObject: { login: string, nickname: string }, mapId: string, caller?: { login: string, nickname: string }): void {
+    if (caller !== undefined) {
+      Logger.info(`${caller.nickname} (${caller.login}) has removed the record of ${playerObject.nickname} (${playerObject.login}) on map ${mapId}`)
     } else {
-      Logger.info(`${login} record on map ${mapId} has been removed`)
+      Logger.info(`The record of ${playerObject.nickname} (${playerObject.login}) on map ${mapId} has been removed`)
     }
-    this._localRecords.splice(this._localRecords.findIndex(a => a.login === login && a.map === mapId), 1)
+    this._localRecords.splice(this._localRecords.findIndex(a => a.login === playerObject.login && a.map === mapId), 1)
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    void this.repo.remove(login, mapId)
+    void this.repo.remove(playerObject.login, mapId)
   }
 
   /**
    * Removes all records on a given map
    * @param mapId Map uid
+   * @param caller Caller player object
    * @returns Database response
    */
-  static removeAll(mapId: string, callerLogin?: string): void {
-    if (callerLogin !== undefined) {
-      Logger.info(`${callerLogin} has removed records on map ${mapId}`)
+  static removeAll(mapId: string, caller?: { login: string, nickname: string }): void {
+    if (caller !== undefined) {
+      Logger.info(`${caller.nickname} (${caller.login}) has removed all records on map ${mapId}`)
     } else {
       Logger.info(`Records on map ${mapId} have been removed`)
     }
@@ -281,13 +283,13 @@ export class RecordService {
    * @param position Record position
    * @param previousTime Previous record time
    * @param time Record time
-   * @param login Player login
+   * @param playerObject Player object containing login and nickname
    * @param recordType Record type ('live' or 'local')
    * @returns Array of strings formatted for Logger output
    */
-  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string, recordType: 'live' | 'local'): string[] {
+  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, playerObject: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
     const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
-    return [`${login} has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+    return [`${Utils.strip(playerObject.nickname)} (${playerObject.login}) has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
   /**

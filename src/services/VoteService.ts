@@ -1,8 +1,9 @@
-import { Events } from "../Events.js";
-import { VoteRepository } from "../database/VoteRepository.js";
-import { MapService } from "./MapService.js";
-import { Logger } from "../Logger.js";
-import { Client } from "../client/Client.js";
+import { Events } from "../Events.js"
+import { VoteRepository } from "../database/VoteRepository.js"
+import { MapService } from "./MapService.js"
+import { Logger } from "../Logger.js"
+import { Client } from "../client/Client.js"
+import { Utils } from '../Utils.js'
 
 export abstract class VoteService {
 
@@ -40,25 +41,25 @@ export abstract class VoteService {
    * @param login Player login
    * @param vote Vote value 
    */
-  static async add(login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+  static async add(playerObject: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
     const date: Date = new Date()
     const map = MapService.current
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
     if (voteArr === undefined) { return }
-    const v = voteArr?.find(a => a.login === login)
+    const v = voteArr?.find(a => a.login === playerObject.login)
     if (v?.vote === vote) {
       return // Return if same vote already exists
     }
-    Logger.trace(`Player ${login} voted ${vote} for map ${map.id}`)
+    Logger.trace(`${Utils.strip(playerObject.nickname)} ({${playerObject.login}}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
     if (v !== undefined) {
       v.date = date
       v.vote = vote
-      void this.repo.update(map.id, login, vote, date)
+      void this.repo.update(map.id, playerObject.login, vote, date)
       this.updateMapVoteData(map.id, voteArr)
       Events.emitEvent('Controller.KarmaVote', v)
       return
     }
-    const obj = { login, mapId: map.id, date, vote }
+    const obj = { login: playerObject.login, mapId: map.id, date, vote }
     voteArr.push(obj)
     void this.repo.add(obj)
     this.updateMapVoteData(map.id, voteArr)

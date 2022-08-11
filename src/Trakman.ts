@@ -258,14 +258,14 @@ export const trakman = {
     /**
      * Adds a player vote to the database and to Maniakarma service if its running
      * @param mapId Map UID
-     * @param login Player login
+     * @param playerObject Player object containing login and nickname
      * @param vote Player vote
      */
-    async add(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+    async add(mapId: string, playerObject: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
       if (process.env.USE_MANIAKARMA === 'YES') {
-        ManiakarmaService.addVote(mapId, login, vote)
+        ManiakarmaService.addVote(mapId, playerObject.login, vote)
       }
-      await VoteService.add(login, vote)
+      await VoteService.add(playerObject, vote)
     },
 
     fetch: VoteService.fetch.bind(VoteService),

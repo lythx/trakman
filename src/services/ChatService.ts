@@ -1,5 +1,4 @@
 import { ChatRepository } from '../database/ChatRepository.js'
-import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { Client } from '../client/Client.js'
@@ -44,7 +43,7 @@ export abstract class ChatService {
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
-      Logger.info(`${info.login} used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+      Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
       const parsedParams: (string | number | boolean | undefined)[] = []
       if (command.params) {
         for (const [i, param] of command.params.entries()) {
@@ -158,7 +157,7 @@ export abstract class ChatService {
     if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
       this._messages.unshift(message)
       void this.repo.add(login, text, message.date)
-      Logger.trace(`${player.login} sent message: ${text}`)
+      Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
     }
     this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo

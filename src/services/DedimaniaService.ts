@@ -137,7 +137,7 @@ export abstract class DedimaniaService {
         { array: recordsArray }
       ]
     )
-    if (status instanceof Error) { Logger.error(`Failed to send dedimania records for map ${name}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to send dedimania records for map ${Utils.strip(name)} (${mapId})`, status.message) }
     return true
   }
 
@@ -150,13 +150,13 @@ export abstract class DedimaniaService {
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this.newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-      Logger.info(this.getLogString(-1, position, -1, time, player.login))
+      Logger.info(this.getLogString(-1, position, -1, time, player))
       return dediRecordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._dedis.findIndex(a => a.login === this._dedis.find(a => a.login === player.login)?.login) + 1
       const dediRecordInfo: DediRecordInfo = this.constructRecordObject(player, mapId, checkpoints, time, time, previousPosition, previousPosition)
-      Logger.info(this.getLogString(previousPosition, previousPosition, time, time, player.login))
+      Logger.info(this.getLogString(previousPosition, previousPosition, time, time, player))
       return dediRecordInfo
     }
     if (time < pb) {
@@ -171,7 +171,7 @@ export abstract class DedimaniaService {
       this._dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
       this.newDedis = this.newDedis.filter(a => a.login !== player.login)
       this.newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-      Logger.info(this.getLogString(previousIndex + 1, position, previousTime, time, player.login))
+      Logger.info(this.getLogString(previousIndex + 1, position, previousTime, time, player))
       return dediRecordInfo
     }
     return false
@@ -209,31 +209,31 @@ export abstract class DedimaniaService {
     }, 240000)
   }
 
-  static async playerJoin(login: string, nickname: string, region: string, isSpectator: boolean): Promise<void> {
+  static async playerJoin(playerObject: { login: string, nickname: string, region: string, isSpectator: boolean }): Promise<void> {
     if (this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerArrive',
       [
         { string: 'TMF' },
-        { string: login },
-        { string: nickname },
-        { string: region },
+        { string: playerObject.login },
+        { string: playerObject.nickname },
+        { string: playerObject.region },
         { string: '' }, // TEAMNAME
         { int: 0 }, // TODO: PLAYER LADDER RANK
-        { boolean: isSpectator },
+        { boolean: playerObject.isSpectator },
         { boolean: false } // OFFICIAL MODE ALWAYS FALSE
       ]
     )
-    if (status instanceof Error) { Logger.error(`Failed to update dedimania player information for ${login}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to update dedimania player information for ${Utils.strip(playerObject.nickname)} (${playerObject.login})`, status.message) }
   }
 
-  static async playerLeave(login: string): Promise<void> {
+  static async playerLeave(playerObject: { login: string, nickname: string }): Promise<void> {
     if (this.isActive === false) { return }
     const status: any[] | Error = await DedimaniaClient.call('dedimania.PlayerLeave',
       [
         { string: 'TMF' },
-        { string: login }
+        { string: playerObject.login }
       ])
-    if (status instanceof Error) { Logger.error(`Failed to update player information for ${login}`, status.message) }
+    if (status instanceof Error) { Logger.error(`Failed to update player information for ${Utils.strip(playerObject.nickname)} (${playerObject.login})`, status.message) }
   }
 
   private static getPlayersArray(): any[] {
@@ -284,9 +284,9 @@ export abstract class DedimaniaService {
     }
   }
 
-  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, login: string): string[] {
+  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, playerObject: { login: string, nickname: string }): string[] {
     const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
-    return [`${login} has ${rs.status} the ${Utils.getPositionString(position)} dedimania record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+    return [`${Utils.strip(playerObject.nickname)} (${playerObject.login}) has ${rs.status} the ${Utils.getPositionString(position)} dedimania record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
 }

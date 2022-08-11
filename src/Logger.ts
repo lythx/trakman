@@ -71,10 +71,10 @@ export abstract class Logger {
       }
     })
     process.on('uncaughtException', (err: Error): void => {
-      void Logger.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
+      void this.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
     process.on('unhandledRejection', (err: Error): void => {
-      void Logger.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
+      void this.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
     if (this.useDiscord === true) {
       this.discordLogLevel = Number(process.env.DISCORD_LOG_LEVEL)
@@ -89,7 +89,7 @@ export abstract class Logger {
       this.webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL })
     }
   }
-  
+
   /**
    * Outputs an error message into the console and exits the process
    * @param lines Error messages
