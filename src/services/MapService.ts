@@ -215,7 +215,7 @@ export class MapService {
       this._queue.shift()
       this.fillQueue()
     }
-    void this.updateNextMap()
+    await this.updateNextMap()
   }
 
   /**
