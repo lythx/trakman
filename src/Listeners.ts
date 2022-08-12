@@ -209,7 +209,7 @@ export class Listeners {
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists
-        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1) ? undefined : await PlayerService.addWin(login)
+        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1 || params[0].BestTime === 0) ? undefined : await PlayerService.addWin(login)
         const endMapInfo: EndMapInfo = {
           ...MapService.current,
           isRestarted: params[4],
