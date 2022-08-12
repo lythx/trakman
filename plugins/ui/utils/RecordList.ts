@@ -353,8 +353,10 @@ export default class RecordList {
         <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
         <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
       } else if (topInfo.length === 2 && record.url === undefined) {
-        ret += `<quad posn="${posX} 0 1" sizen="${(width / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + (width / 2)} 0 1" sizen="${(width / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>`
+        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
+        ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX)}
+        <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
+        ${this.centeredText(topInfo[1], ((width - this.iIconW) / 2) - this.colGap, h, posX + ((width - this.iIconW) / 2))}`
       } else if (topInfo.length === 2) {
         ret += `<quad posn="${posX} 0 1" sizen="${width - (this.iIconW + this.colGap)} ${h}" bgcolor="${this.headerBg}"/>
         <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
