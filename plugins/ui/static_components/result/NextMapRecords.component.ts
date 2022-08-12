@@ -29,6 +29,11 @@ export default class NextMapRecords extends StaticComponent {
       this.records = await tm.records.fetchByMap(mapId)
       this.display()
     })
+    tm.addListener('Controller.JukeboxChanged', async () => {
+      const mapId = tm.jukebox.queue[0].id
+      this.records = await tm.records.fetchByMap(mapId)
+      this.display()
+    })
     tm.addListener('Controller.BeginMap', () => {
       this.records.length = 0
     })
