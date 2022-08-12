@@ -80,7 +80,7 @@ export class Listeners {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
-        if (params[0] === 0) { // Ignore inexistent people //please elaborate
+        if (params[0] === 0) { // Ignore inexistent people //please elaborate // pid 0 = dedicated server
           return
         }
         const player: TMPlayer | undefined = PlayerService.get(params[1])
@@ -167,8 +167,8 @@ export class Listeners {
     {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]): Promise<void> => {
-        GameService.state = 'race'
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
+        GameService.state = 'race'
         await GameService.update()
         await RecordService.fetchAndStoreRecords(params[0].UId)
         const c: any = params[0]
@@ -189,7 +189,7 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.localRecords
         }
-        if (isRestart === false) {
+        if (isRestart == false) {
           await MapService.update()
           await VoteService.nextMap()
           void TMXService.nextMap() // This takes a long time, also there is an event for this
@@ -204,7 +204,7 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
-        isRestart = params[4]
+        isRestart = params[params.length - 1] // NADEO HQ BE LIKE HOW ABOUT WE PUT AN OPTIONAL PARAMETER AS THE FIRST ONE
         GameService.state = 'result'
         // Get winner login from the callback
         const login: string | undefined = params[0].Login

@@ -62,7 +62,7 @@ export const MAPLIST = {
 
   getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<TMMap[]> => {
     if (sort === 'best') {
-      const ranks: { mapId: string; rank: number; }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
+      const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < list.length; i++) {
@@ -74,7 +74,7 @@ export const MAPLIST = {
       return ranked
     }
     else {
-      const ranks: { mapId: string; rank: number; }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
+      const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < list.length; i++) {
