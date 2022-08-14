@@ -65,11 +65,9 @@ export const MAPLIST = {
       const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
-      for (let i: number = 0; i < list.length; i++) {
-        const index: number = ranks.findIndex(a => a.mapId === list[i].id)
-        if (index !== -1) {
-          ranked[index] = list[i]
-        }
+      for (let i: number = 0; i < ranks.length; i++) {
+        const entry = list.find(a => a.id === ranks[i].mapId)
+        if (entry !== undefined) { ranked.push(entry) }
       }
       return ranked
     }
