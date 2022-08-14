@@ -163,22 +163,22 @@ export default class ButtonsWidget extends StaticComponent {
       tm.client.callNoRes('NextChallenge')
     } else if (result.result === true) {
       if (result.callerLogin === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map passed`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map passed.`)
       } else {
         const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has passed the vote to skip the ongoing map`)
+          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has passed the vote to skip the ongoing map.`)
       }
       tm.client.callNoRes('NextChallenge')
     } else {
       if (result.callerLogin === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing was cancelled`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map was cancelled.`)
       } else {
         const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has cancelled the vote to skip the ongoing map`)
+          + `${tm.utils.palette.highlight + tm.utils.strip(player?.nickname ?? result.callerLogin, true)}${tm.utils.palette.admin} has cancelled the vote to skip the ongoing map.`)
       }
     }
   }
@@ -212,12 +212,12 @@ export default class ButtonsWidget extends StaticComponent {
       this.display()
     } else if (result.result === true) {
       if (result.callerLogin === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map passed`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map passed.`)
       } else {
         const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has passed the vote to replay the ongoing map`)
+          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has passed the vote to replay the ongoing map.`)
         tm.jukebox.add(tm.maps.current.id, undefined, true)
       }
       this.resVoteCount++
@@ -227,12 +227,12 @@ export default class ButtonsWidget extends StaticComponent {
       this.display()
     } else {
       if (result.callerLogin === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map was cancelled`)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map was cancelled.`)
       } else {
         const player: TMPlayer | undefined = tm.players.get(result.callerLogin)
         if (player === undefined) { return }
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(player)} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to replay the ongoing map`)
+          + `${tm.utils.palette.highlight + tm.utils.strip(player.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to replay the ongoing map.`)
       }
     }
   }
