@@ -169,6 +169,7 @@ export class Listeners {
       callback: async (params: any[]): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         GameService.state = 'race'
+        Logger.debug('GAMESTATE: RACE = ', GameService.state)
         await GameService.update()
         await RecordService.fetchAndStoreRecords(params[0].UId)
         const c: any = params[0]
@@ -206,6 +207,7 @@ export class Listeners {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         isRestart = params[params.length - 1] // NADEO HQ BE LIKE HOW ABOUT WE PUT AN OPTIONAL PARAMETER AS THE FIRST ONE
         GameService.state = 'result'
+        Logger.debug('GAMESTATE: RESULT = ', GameService.state)
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists

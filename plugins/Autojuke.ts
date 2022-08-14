@@ -6,7 +6,7 @@ tm.commands.add({
   params: [{ name: 'option', optional: true }],
   callback: async (info, option?: string): Promise<void> => {
     if (info.privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === info.login)) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`, info.login)
       return
     }
     switch (option) {
