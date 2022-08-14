@@ -281,7 +281,7 @@ export default class MapList extends PopupWindow {
     }
     else {
       if (privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === login)) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`, login)
         return false
       }
       tm.jukebox.add(mapId, { login, nickname })
@@ -320,7 +320,7 @@ export default class MapList extends PopupWindow {
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
       if (positions[i] === -1 || positions[i] === undefined) { ret.push("--.") }
-      else { ret.push(tm.utils.getPositionString(positions[i] > tm.records.maxLocalsAmount ? tm.records.maxLocalsAmount : positions[i])) }
+      else { ret.push(tm.utils.getPositionString(positions[i])) }
     }
     return ret
   }
