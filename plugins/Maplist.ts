@@ -69,8 +69,6 @@ export const MAPLIST = {
         const entry = list.find(a => a.id === ranks[i].mapId)
         if (entry !== undefined) { ranked.push(entry) }
       }
-      console.log(ranks[0], ranks[ranks.length - 1])
-      console.log(ranked[0], ranked[ranked.length - 1])
       return ranked
     }
     else {
