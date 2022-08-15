@@ -51,7 +51,7 @@ tm.commands.add({
         const fetchSize: number = 300
         do {
           i++
-          if (i * 500 > tm.maps.list.length) { break }
+          if (i * fetchSize > tm.maps.list.length) { break }
           ranks.push(...(await tm.fetchMapRank(info.login, tm.maps.list.slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id))).filter(a => a.rank <= tm.records.maxLocalsAmount))
         } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
         const list: TMMap[] = tm.maps.list.slice(0, (i + 1) * fetchSize)

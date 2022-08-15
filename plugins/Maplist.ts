@@ -107,7 +107,7 @@ export const MAPLIST = {
     const fetchSize: number = 300
     do {
       i++
-      if (i * 500 > tm.maps.list.length) { break }
+      if (i * fetchSize > tm.maps.list.length) { break }
       ranks.push(...(await tm.fetchMapRank(login, authorSort
         .slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id)))
         .filter(a => a.rank <= tm.records.maxLocalsAmount))
