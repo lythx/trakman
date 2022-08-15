@@ -35,7 +35,7 @@ export abstract class ManiakarmaService {
       Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     })
     Events.addListener('Controller.EndMap', async (): Promise<void> => {
-      await this.sendVotes()
+      void this.sendVotes() // Their server dies every other hour
     })
   }
 
@@ -85,13 +85,7 @@ export abstract class ManiakarmaService {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
-    Logger.debug(
-      `curr. map maniakarma stats`,
-      `mk api url: ` + this.apiUrl,
-      `mk api authcode: ` + this.authCode,
-      `mk karma value: ` + this._mapKarmaValue.toString(),
-      `mk vote stats: ` + JSON.stringify(this._mapKarma)
-    )
+    //Logger.debug(`curr. map maniakarma stats`, `mk api url: ` + this.apiUrl, `mk api authcode: ` + this.authCode, `mk karma value: ` + this._mapKarmaValue.toString(), `mk vote stats: ` + JSON.stringify(this._mapKarma))
     await this.fixCoherence()
   }
 
@@ -172,7 +166,7 @@ export abstract class ManiakarmaService {
     const mkVotes: MKVote[] = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-      //  await VoteService.add( e.login, e.vote)
+        //  await VoteService.add( e.login, e.vote)
       }
     }
     for (const e of localVotes) {

@@ -204,19 +204,19 @@ export class RecordService {
 
   /**
    * Removes a player record
-   * @param playerObject Player object
+   * @param player Player object
    * @param mapId Map uid
    * @param caller Caller player object
    */
-  static remove(playerObject: { login: string, nickname: string }, mapId: string, caller?: { login: string, nickname: string }): void {
+  static remove(player: { login: string, nickname: string }, mapId: string, caller?: { login: string, nickname: string }): void {
     if (caller !== undefined) {
-      Logger.info(`${caller.nickname} (${caller.login}) has removed the record of ${playerObject.nickname} (${playerObject.login}) on map ${mapId}`)
+      Logger.info(`${caller.nickname} (${caller.login}) has removed the record of ${player.nickname} (${player.login}) on map ${mapId}`)
     } else {
-      Logger.info(`The record of ${playerObject.nickname} (${playerObject.login}) on map ${mapId} has been removed`)
+      Logger.info(`The record of ${player.nickname} (${player.login}) on map ${mapId} has been removed`)
     }
-    this._localRecords.splice(this._localRecords.findIndex(a => a.login === playerObject.login && a.map === mapId), 1)
+    this._localRecords.splice(this._localRecords.findIndex(a => a.login === player.login && a.map === mapId), 1)
     Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    void this.repo.remove(playerObject.login, mapId)
+    void this.repo.remove(player.login, mapId)
   }
 
   /**
@@ -283,13 +283,13 @@ export class RecordService {
    * @param position Record position
    * @param previousTime Previous record time
    * @param time Record time
-   * @param playerObject Player object containing login and nickname
+   * @param player Player object containing login and nickname
    * @param recordType Record type ('live' or 'local')
    * @returns Array of strings formatted for Logger output
    */
-  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, playerObject: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
+  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
     const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
-    return [`${Utils.strip(playerObject.nickname)} (${playerObject.login}) has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
   /**

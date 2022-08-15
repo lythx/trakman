@@ -25,8 +25,8 @@ const commands: TMCommand[] = [
       'tmxinfo', 'tmxrecs'
     ],
     callback: (info: MessageInfo): void => {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unfortunately, this command isn't implemented yet.. If you really want it to be available ASAP,`
-        + `use the /bug command with the command name (or talk to one of the devs).`, info.login)
+      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unfortunately, this command isn't implemented yet. If you really want it to be available ASAP,`
+        + ` use the /bug command with the command name (or spam wiseraven#3282 @discord).`, info.login)
     },
     privilege: 0
   },
