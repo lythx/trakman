@@ -96,7 +96,7 @@ export const MAPLIST = {
 
   filterNoRank: async (login: string): Promise<TMMap[]> => {
     const mapsWithAuthor: string[] = (await tm.records.fetchByLogin(login))
-      .filter(a => tm.maps.list.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time)
+      .filter(a => authorSort.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time)
       .map(a => a.map)
     return authorSort.filter(a => !mapsWithAuthor.includes(a.id))
   },
@@ -107,7 +107,7 @@ export const MAPLIST = {
     const fetchSize: number = 300
     do {
       i++
-      if (i * fetchSize > tm.maps.list.length) { break }
+      if (i * fetchSize > authorSort.length) { break }
       ranks.push(...(await tm.fetchMapRank(login, authorSort
         .slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id)))
         .filter(a => a.rank <= tm.records.maxLocalsAmount))
