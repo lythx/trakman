@@ -13,7 +13,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 
-let isRestart = false
+let isRestart: boolean = false
 
 export class Listeners {
   private static readonly listeners: TMListener[] = [
@@ -22,11 +22,11 @@ export class Listeners {
       callback: async (params: any[]): Promise<void> => {
         // [0] = Login, [1] = IsSpectator
         if (params[0] === undefined) {
+          // Me on my way to kick that pesky undefined
           Client.callNoRes('Kick', [{ string: params[0] }])
           return
         }
         const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
-        // Get player ladder rank here for dedimania or watever
         if (playerInfo instanceof Error) {
           Logger.error(`Failed to get player info for login ${params[0]}`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: params[0] }])
@@ -43,8 +43,11 @@ export class Listeners {
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
-        // Dedimania playerjoin is just api info update irrelevant for controller hence its after the event
+        // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
+        // Dedimania won't be a part of core.
+        // Dedimania playerjoin updates the player nickname and current status on the dedimania website.
+        // Their server is pretty bad so awaiting this might be a bad idea
         void DedimaniaService.playerJoin(joinInfo)
       }
     },
@@ -52,13 +55,12 @@ export class Listeners {
       event: 'TrackMania.PlayerDisconnect',
       callback: (params: any[]): void => {
         // [0] = Login
-        if (AdministrationService.banlist.some(a => a.login === params[0]) || AdministrationService.blacklist.some(a => a.login === params[0])) {
-          return
-        }
         const leaveInfo: LeaveInfo | Error = PlayerService.leave(params[0])
         if (!(leaveInfo instanceof Error)) {
           Events.emitEvent('Controller.PlayerLeave', leaveInfo)
-          // Dedimania playerleave is just api info update irrelevant for controller hence its after the event
+          // Dedimania won't be a part of core.
+          // Dedimania playerleave updates the current player status on the dedimania website.
+          // Their server is pretty bad so awaiting this might be a bad idea
           void DedimaniaService.playerLeave(leaveInfo)
         }
       }
@@ -67,7 +69,8 @@ export class Listeners {
       event: 'TrackMania.PlayerChat',
       callback: (params: any[]): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCmd
-        if (params[0] === 0) { // Ignore server messages
+        // Ignore server messages (PID 0 = Server)
+        if (params[0] === 0) {
           return
         }
         const messageInfo: MessageInfo | Error = ChatService.add(params[1], params[2])
@@ -80,7 +83,8 @@ export class Listeners {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
-        if (params[0] === 0) { // Ignore inexistent people //please elaborate // pid 0 = dedicated server
+        // Ignore inexistent people // Please elaborate // PID 0 = Server
+        if (params[0] === 0) {
           return
         }
         const player: TMPlayer | undefined = PlayerService.get(params[1])
@@ -90,22 +94,29 @@ export class Listeners {
         }
         const checkpoint: TMCheckpoint = { index: params[4], time: params[2], lap: params[3] }
         const cpStatus: boolean | Error = PlayerService.addCP(player, checkpoint)
+        // Last CP = Finish
         if (cpStatus === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
             const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
+            // Register player finish
             Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
             if (obj.localRecord !== undefined) {
+              // Register player local record
               Events.emitEvent('Controller.PlayerRecord', obj.localRecord)
             }
             if (obj.liveRecord !== undefined) {
+              // Register player live record
               Events.emitEvent('Controller.LiveRecord', obj.liveRecord)
             }
             if (!(dediRecord instanceof Error) && dediRecord !== false) {
+              // Dedimania won't be a part of core.
+              // Register dedimania record
               Events.emitEvent('Controller.DedimaniaRecord', dediRecord)
             }
           }
           return
+          // Real CP
         } else if (cpStatus === false) {
           const info: CheckpointInfo = {
             time: params[2],
@@ -113,6 +124,7 @@ export class Listeners {
             index: params[4],
             player
           }
+          // Register player checkpoint
           Events.emitEvent('Controller.PlayerCheckpoint', info)
         }
       }
@@ -168,9 +180,11 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
+        // Set game state to 'race'
         GameService.state = 'race'
-        Logger.debug('GAMESTATE: RACE = ', GameService.state)
+        // Update server parameters
         await GameService.update()
+        // Get records for current map
         await RecordService.fetchAndStoreRecords(params[0].UId)
         const c: any = params[0]
         const info: BeginMapInfo = {
@@ -190,14 +204,20 @@ export class Listeners {
           checkpointsAmount: c.NbCheckpoints,
           records: RecordService.localRecords
         }
+        // Check whether the map was restarted
         if (isRestart == false) {
+          // In case it wasn't, update the ongoing map
           await MapService.update()
           await VoteService.nextMap()
-          void TMXService.nextMap() // This takes a long time, also there is an event for this
+          // This takes a long time, also there is an event for this
+          void TMXService.nextMap()
         }
+        // Update server config
         ServerConfig.update()
+        // Register map update
         Events.emitEvent('Controller.BeginMap', info)
-        // There is an event for this
+        // Dedimania won't be a part of core.
+        // There is an event for dedimania records, thus no need to await
         void DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
       }
     },
@@ -205,9 +225,10 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async (params: any[]): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
+        // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         isRestart = params[params.length - 1] // NADEO HQ BE LIKE HOW ABOUT WE PUT AN OPTIONAL PARAMETER AS THE FIRST ONE
+        // Set game state to 'result'
         GameService.state = 'result'
-        Logger.debug('GAMESTATE: RESULT = ', GameService.state)
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists
@@ -223,10 +244,13 @@ export class Listeners {
           winnerWins: wins,
           isRestart
         }
-        // Both awaits may be voids if possible?
-        void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
+        // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
+        // Register map ending
         Events.emitEvent('Controller.EndMap', endMapInfo)
+        // Dedimania won't be a part of core.
+        // We don't care about this, the records will likely be sent anyway lol
+        void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
       }
     },
     {
