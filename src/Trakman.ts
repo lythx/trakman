@@ -307,6 +307,14 @@ export const trakman = {
 
   },
 
+  admin: {
+
+    ban: AdministrationService.ban.bind(AdministrationService),
+
+    unban: AdministrationService.unban.bind(AdministrationService)
+
+  },
+
   /**
   * Sends a server message
   * @param message Message to be sent
@@ -399,26 +407,6 @@ export const trakman = {
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
-  },
-
-  /**
-   * Adds a player to the server ban list
-   * @param ip Player IP address
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional ban reason
-   * @param expireDate Optional ban expire date
-   */
-  addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server ban list
-   * @param login Player login
-   */
-  removeFromBanlist: (login: string, callerLogin?: string): boolean => {
-    return AdministrationService.removeFromBanlist(login, callerLogin)
   },
 
   /**

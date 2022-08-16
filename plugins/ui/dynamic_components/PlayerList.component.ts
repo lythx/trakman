@@ -36,7 +36,7 @@ export default class PlayerList extends PopupWindow {
         if (targetInfo === undefined) {
           return
         } else {
-          tm.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
+          tm.admin.ban(targetInfo.ip, targetPlayer.login, info, targetInfo.nickname)
           tm.client.call('Kick', [{ string: targetPlayer.login }])
           tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
             + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has banned `
