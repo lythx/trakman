@@ -1,5 +1,5 @@
 import UTILIDS from '../config/UtilIds.json' assert { type: 'json' }
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 
 let keyListeners: { callback: ((info: ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number, id: string }[] = []
 
@@ -12,7 +12,7 @@ export const removeKeyListener = (id: string) => {
 }
 
 export const initialize = () => {
-  TM.sendManialink(`<manialinks>
+  tm.sendManialink(`<manialinks>
 <manialink id="${UTILIDS.F5}">
   <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${UTILIDS.F5}"/>
 </manialink>
@@ -25,8 +25,8 @@ export const initialize = () => {
 </manialinks>`)
 }
 
-TM.addListener('Controller.PlayerJoin', (info) => {
-  TM.sendManialink(`<manialinks>
+tm.addListener('Controller.PlayerJoin', (info) => {
+  tm.sendManialink(`<manialinks>
   <manialink id="${UTILIDS.F5}">
     <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${UTILIDS.F5}"/>
   </manialink>
@@ -41,7 +41,7 @@ TM.addListener('Controller.PlayerJoin', (info) => {
 
 
 
-TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
   switch (info.answer) {
     case UTILIDS.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)

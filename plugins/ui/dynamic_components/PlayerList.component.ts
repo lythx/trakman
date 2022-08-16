@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
 import { CONFIG, IDS, stringToObjectProperty, ICONS, Grid, centeredText, closeButton } from '../UiUtils.js'
 
@@ -28,56 +28,56 @@ export default class PlayerList extends PopupWindow {
     this.headerGrid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1), { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
     //ACTIONS
-    TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 2000 && info.answer < this.openId + 3000) {
 
-        const targetPlayer = TM.players[info.answer - this.openId - 2000]
-        const targetInfo = TM.getPlayer(targetPlayer.login)
+        const targetPlayer = tm.players.list[info.answer - this.openId - 2000]
+        const targetInfo = tm.players.get(targetPlayer.login)
         if (targetInfo === undefined) {
           return
         } else {
-          TM.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
-          TM.call('Kick', [{ string: targetPlayer.login }])
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has banned `
-            + `${TM.palette.highlight + TM.strip(targetInfo.nickname)}${TM.palette.admin}.`)
+          tm.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
+          tm.client.call('Kick', [{ string: targetPlayer.login }])
+          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has banned `
+            + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}.`)
         }
       } // Ban
 
       if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 3000]
-        const status = await TM.addToMutelist(targetPlayer.login, info.login)
+        const targetPlayer = tm.players.list[info.answer - this.openId - 3000]
+        const status = await tm.addToMutelist(targetPlayer.login, info.login)
         if (status instanceof Error) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}An error occured while muting the player.`, info.login)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while muting the player.`, info.login)
         } else {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has muted `
-            + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`)
+          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has muted `
+            + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
         }
       } // Mute
 
       if (info.answer >= this.openId + 4000 && info.answer < this.openId + 6000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 4000]
+        const targetPlayer = tm.players.list[info.answer - this.openId - 4000]
         if (targetPlayer.login === undefined) {
           return
         } else {
-          TM.addToBlacklist(targetPlayer.login, info.login)
-          TM.call('Kick', [{ string: targetPlayer.login }])
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has blacklisted `
-            + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`)
+          tm.addToBlacklist(targetPlayer.login, info.login)
+          tm.client.call('Kick', [{ string: targetPlayer.login }])
+          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
+            + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
         }
       } // Blacklist
 
       if (info.answer >= this.openId + 5000 && info.answer < this.openId + 6000) {
-        const targetPlayer = TM.players[info.answer - this.openId - 5000]
-        const status = await TM.addToGuestlist(targetPlayer.login, info.login)
+        const targetPlayer = tm.players.list[info.answer - this.openId - 5000]
+        const status = await tm.addToGuestlist(targetPlayer.login, info.login)
         if (status instanceof Error) {
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}An error occured while adding player to the guestlist.`, info.login)
+          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while adding player to the guestlist.`, info.login)
         } else {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-            + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has added `
-            + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} to guestlist.`)
+          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added `
+            + `${tm.utils.palette.highlight + targetPlayer.nickname}${tm.utils.palette.admin} to guestlist.`)
         }
       } // Add to Guestlist
 
@@ -86,7 +86,7 @@ export default class PlayerList extends PopupWindow {
   }
 
   protected constructContent(login: string, params: any): string {
-    const players = TM.players
+    const players = tm.players.list
     const headers = [
       (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
       (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
@@ -99,7 +99,7 @@ export default class PlayerList extends PopupWindow {
       (i: number, j: number, w: number, h: number) => centeredText(' Forcespec ', w, h),
     ]
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(players[i].nickname, false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(players[i].nickname, false)), w, h)
     }
     const loginCell = (i: number, j: number, w: number, h: number): string => {
       return centeredText(players[i].login, w, h)
@@ -114,7 +114,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
     }
     const muteCell = (i: number, j: number, w: number, h: number): string => {
-      const mutelist = TM.mutelist
+      const mutelist = tm.mutelist
       let iconser = stringToObjectProperty(CONFIG.playerList.mute, ICONS)
       if (mutelist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.ban, ICONS)
@@ -126,7 +126,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
     }
     const guestlistCell = (i: number, j: number, w: number, h: number): string => {
-      let guestlist = TM.guestlist
+      let guestlist = tm.guestlist
       let iconser = stringToObjectProperty(CONFIG.playerList.addGuest, ICONS)
       if (guestlist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.removeGuest, ICONS)

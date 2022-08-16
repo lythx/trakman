@@ -1,5 +1,10 @@
-import { TRAKMAN as TM } from '../../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
 
+/*
+-----------------
+STATIC COMPONENTS
+-----------------
+*/
 import CustomUi from './CustomUi.js'
 //import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/RankWidget.component.js'
@@ -17,7 +22,31 @@ import AdminPanel from './static_components/AdminPanel.component.js'
 import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/BestCps.component.js'
 import BestFinishes from './static_components/BestFinishes.component.js'
+import CpCounter from './static_components/CpCounter.component.js'
 
+import MapWidgetResult from './static_components/result/MapWidgetResult.component.js'
+import NextMapRecords from './static_components/result/NextMapRecords.component.js'
+import TimerWidgetResult from './static_components/result/TimerWidgetResult.component.js'
+import KarmaRanking from './static_components/result/KarmaRanking.component.js'
+import VotersRanking from './static_components/result/VotersRanking.component.js'
+import VisitorsRanking from './static_components/result/VisitorsRanking.component.js'
+import PlaytimeRanking from './static_components/result/PlaytimeRanking.component.js'
+import DonatorsRanking from './static_components/result/DonatorsRanking.component.js'
+import AveragesRanking from './static_components/result/AveragesRanking.component.js'
+import RankWidgetResult from './static_components/result/RankWidgetResult.component.js'
+import KarmaWidgetResult from './static_components/result/KarmaWidgetResult.component.js'
+import LocalRankingResult from './static_components/result/LocalRankingResult.component.js'
+import DediRankingResult from './static_components/result/DediRankingResult.component.js'
+import RoundAveragesRanking from './static_components/result/RoundAveragesRanking.component.js'
+import AdminPanelResult from './static_components/result/AdminPanelResult.component.js'
+import WinnersRanking from './static_components/result/WinnersRanking.component.js'
+import MostRecordsRanking from './static_components/result/MostRecordsRanking.component.js'
+
+/*
+------------------
+DYNAMIC COMPONENTS
+------------------
+*/
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
 //import TMXWindow from './dynamic_components/TMXWindow.component.js'
@@ -44,7 +73,7 @@ import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
-  TM.callNoRes('SetForcedMods',
+  tm.client.callNoRes('SetForcedMods',
     [{
       boolean: true
     },
@@ -73,6 +102,24 @@ let staticComponents: {
   readonly donationPanel: DonationPanel
   readonly bestCps: BestCps
   readonly bestFinishes: BestFinishes
+  //readonly cpCounter: CpCounter
+  readonly nextMapRecords: NextMapRecords
+  readonly mapWidgetResult: MapWidgetResult
+  readonly timerWidgetResult: TimerWidgetResult
+  readonly karmaRanking: KarmaRanking
+  readonly votersRanking: VotersRanking
+  readonly visitorsRanking: VisitorsRanking
+  readonly playtimeRanking: PlaytimeRanking
+  readonly donatorsRanking: DonatorsRanking
+  readonly averagesRanking: AveragesRanking
+  readonly rankWidgetResult: RankWidgetResult
+  readonly karmaWidgetResult: KarmaWidgetResult
+  readonly localRankingResult: LocalRankingResult
+  readonly dediRankingResult: DediRankingResult
+  readonly roundAveragesRanking: RoundAveragesRanking
+  readonly adminPanelResult: AdminPanelResult
+  readonly winnersRanking: WinnersRanking
+  readonly mostRecordsRanking: MostRecordsRanking
 }
 
 let dynamicComponents: {
@@ -98,8 +145,8 @@ let dynamicComponents: {
 const events: TMListener[] = [
   {
     event: 'Controller.Ready',
-    callback: async (): Promise<void> => {
-      await TM.call('SendHideManialinkPage')
+    callback: async (status: 'race' | 'result'): Promise<void> => {
+      await tm.client.call('SendHideManialinkPage')
       loadMod()
       initalizeKeyListeners()
       customUi = new CustomUi()
@@ -118,9 +165,29 @@ const events: TMListener[] = [
         adminPanel: new AdminPanel(),
         donationPanel: new DonationPanel(),
         bestCps: new BestCps(),
-        bestFinishes: new BestFinishes()
+        bestFinishes: new BestFinishes(),
+        //cpCounter: new CpCounter(),
+        nextMapRecords: new NextMapRecords(),
+        mapWidgetResult: new MapWidgetResult(),
+        timerWidgetResult: new TimerWidgetResult(),
+        karmaRanking: new KarmaRanking(),
+        votersRanking: new VotersRanking(),
+        visitorsRanking: new VisitorsRanking(),
+        playtimeRanking: new PlaytimeRanking(),
+        donatorsRanking: new DonatorsRanking(),
+        averagesRanking: new AveragesRanking(),
+        rankWidgetResult: new RankWidgetResult(),
+        karmaWidgetResult: new KarmaWidgetResult(),
+        localRankingResult: new LocalRankingResult(),
+        dediRankingResult: new DediRankingResult(),
+        roundAveragesRanking: new RoundAveragesRanking(),
+        adminPanelResult: new AdminPanelResult(),
+        winnersRanking: new WinnersRanking(),
+        mostRecordsRanking: new MostRecordsRanking()
       }
-      for (const c of Object.values(staticComponents)) { await c.display() }
+      for (const c of Object.values(staticComponents)) {
+        if (c.displayMode === status || c.displayMode === 'always') { await c.display() }
+      }
       dynamicComponents = {
         mapList: new MapList(),
         commandList: new CommandList(),
@@ -208,8 +275,8 @@ const events: TMListener[] = [
   {
     event: 'Controller.PlayerRecord',
     callback: async (info: RecordInfo) => {
-      // for (const player of TM.players) {
-      //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+      // for (const player of tm.players.list) {
+      //     tm.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
     }
   },
@@ -235,8 +302,8 @@ const events: TMListener[] = [
       // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
 
       // This can be improved after queue/jukebox, as we can get next challenge from there also
-      // const info = await TM.call('GetNextChallengeInfo')
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+      // const info = await tm.client.call('GetNextChallengeInfo')
+      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
       // TODO: Display all the podium/score widgets
     }
@@ -247,24 +314,24 @@ const events: TMListener[] = [
       customUi.display()
       loadMod()
       // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
-      // console.log(TM.challengeQueue)
-      // console.log(TM.previousChallenges)
+      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
+      // console.log(tm.challengeQueue)
+      // console.log(tm.previousChallenges)
       // TODO: Fetch the next challenge info
       // Temporarily moved to EndChallenge
       // We'd need to store the nextchallenge in a variable
       // This is easier achievable with queue/jukebox
 
       // TODO: Display current challenge widget
-      //TM.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
+      //tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
 
       // TODO: Display current challenge record widgets
-      // for (const player of TM.players) {
-      //     TM.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
+      // for (const player of tm.players.list) {
+      //     tm.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
       // }
 
       // // testing only
-      // TM.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
+      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
 
       // TODO: Display the miscellaneous widgets:
       // Clock, addfav, cpcounter, gamemode, visitors,
@@ -273,7 +340,7 @@ const events: TMListener[] = [
   },
 ]
 
-for (const event of events) { TM.addListener(event.event, event.callback) }
+for (const event of events) { tm.addListener(event.event, event.callback) }
 
 export const UI = {
 

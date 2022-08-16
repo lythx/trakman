@@ -2,7 +2,7 @@ import { Repository } from './OldRepository.js'
 
 const createQueries: string[] = [
   `CREATE TABLE IF NOT EXISTS banlist(
-    ip VARCHAR(15) NOT NULL,
+    ip VARCHAR(16) NOT NULL,
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller VARCHAR(25) NOT NULL,

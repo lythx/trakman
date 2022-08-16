@@ -1,7 +1,7 @@
 import { Repository } from "./Repository.js";
 
 const createQuery = `CREATE TABLE IF NOT EXISTS privileges(
-    login VARCHAR(25) NOT NULL,
+    login VARCHAR(40) NOT NULL,
     privilege INT2 NOT NULL,
     PRIMARY KEY(login)
 );`

@@ -1,11 +1,10 @@
 import { Client } from '../client/Client.js'
-import { Events } from '../Events.js'
 import { Logger } from '../Logger.js'
 
 export class GameService {
 
   private static _game: TMGame
-  private static readonly proxyMethods = [
+  private static readonly proxyMethods: string[] = [
     'SetGameMode',
     'SetChatTime',
     'SetFinishTimeout',
@@ -28,16 +27,51 @@ export class GameService {
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
   ]
+  private static _state: 'race' | 'result'
+  private static _timerStartTimestamp: number = Date.now()
 
   static async initialize(): Promise<void> {
-    const status = this.update()
+    Client.callNoRes(`SetCallVoteRatios`,
+      [{
+        array: [{
+          struct: {
+            Command: { string: `*` },
+            Ratio: { double: -1.0 }
+          }
+        }]
+      }]
+    )
+    const status: Promise<void> = this.update()
     if (status instanceof Error) {
       await Logger.fatal('Failed to retrieve game info. Error:', status.message)
     }
-    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]) => {
+    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]): Promise<void> => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
+    this.startTimer()
+  }
+
+  static set state(state: 'race' | 'result') {
+    this._state = state
+  }
+
+  static startTimer(): void {
+    this._timerStartTimestamp = Date.now()
+  }
+
+  static get remainingMapTime(): number {
+    if (this._state === 'result') { return 0 }
+    return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
+  }
+
+  static get remainingResultTime(): number {
+    if (this._state === 'race') { return 0 }
+    return Math.round((this.config.chatTime - (Date.now() - this._timerStartTimestamp)) / 1000)
+  }
+
+  static get state(): 'race' | 'result' {
+    return this._state
   }
 
   static async update(): Promise<void> {
@@ -75,7 +109,7 @@ export class GameService {
     }
   }
 
-  static get game(): TMGame {
+  static get config(): TMGame {
     return this._game
   }
 

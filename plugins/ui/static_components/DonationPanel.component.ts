@@ -1,5 +1,6 @@
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
+import { donations } from '../../Donations.js'
 import { IDS, CONFIG, getStaticPosition, stringToObjectProperty, ICONS, staticHeader, centeredText } from '../UiUtils.js'
 
 export default class DonationPanel extends StaticComponent {
@@ -14,36 +15,30 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.liveCheckpoint, { displayOnRace: true, hideOnResult: true })
+    super(IDS.liveCheckpoint, 'race')
     const pos = getStaticPosition('donationPanel')
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXML()
-    TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + this.amounts.length) {
         const amount = this.amounts[info.answer - (this.id + 1)]
-        const status = await TM.sendCoppers(info.login, amount, 'Please give me coper')
-        if (status instanceof Error) {
-          TM.error(`Failed to receive ${amount} coppers donation from player ${info.login}`, status.message)
-          TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Failed to process payment.`, info.login)
-        } else if (status === true) {
-          TM.sendMessage(`${TM.palette.server}»» ${TM.palette.highlight + TM.strip(info.nickname)}${TM.palette.donation} `
-            + `donated ${TM.palette.highlight}${amount}C${TM.palette.donation} to the server.`)
-        }
+        void donations.donate(info.login, info.nickname, amount)
       }
     })
   }
 
   display(): void {
-    this._isDisplayed = true
-    for (const player of TM.players) {
+    if (this.isDisplayed === false) { return }
+    for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
-    if (TM.getPlayer(login)?.isUnited) {
-      TM.sendManialink(this.xml, login)
+    if (this.isDisplayed === false) { return }
+    if (tm.players.get(login)?.isUnited) {
+      tm.sendManialink(this.xml, login)
     }
   }
 

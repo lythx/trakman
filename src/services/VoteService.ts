@@ -1,127 +1,101 @@
-import { Events } from "../Events.js";
-import { VoteRepository } from "../database/VoteRepository.js";
-import { JukeboxService } from "./JukeboxService.js";
-import { MapService } from "./MapService.js";
-import { Logger } from "../Logger.js";
-import { Client } from "../client/Client.js";
+import { Events } from "../Events.js"
+import { VoteRepository } from "../database/VoteRepository.js"
+import { MapService } from "./MapService.js"
+import { Logger } from "../Logger.js"
+import { Client } from "../client/Client.js"
+import { Utils } from '../Utils.js'
 
 export abstract class VoteService {
 
   private static readonly repo: VoteRepository = new VoteRepository()
-  private static readonly _voteRatios: { readonly mapId: string, ratio: number, amount: number }[] = []
-  private static _votes: TMVote[] = []
-  private static readonly mapsWithVotesStored: string[] = []
-  private static readonly voteValues: number[] = [0, 20, 40, -1, 60, 80, 100]
+  private static _votes: { uid: string, votes: TMVote[] }[] = []
+  private static readonly prefetchCount: number = 4
 
+  /**
+   * Fetches votes for current and next maps
+   */
   static async initialize(): Promise<void> {
-    Client.callNoRes('SetCallVoteTimeout', [{ int: 0 }])
     await this.repo.initialize()
     const res: TMVote[] = await this.repo.getAll()
-    const maps: { readonly mapId: string, votes: number[] }[] = []
-    for (const e of res) {
-      const map = maps.find(a => a.mapId === e.mapId)
-      if (map === undefined) {
-        maps.push({ mapId: e.mapId, votes: [e.vote] })
-      } else {
-        map.votes.push(e.vote)
-      }
-    }
-    for (const e of MapService.maps) {
-      const m = maps.find(a => a.mapId === e.id)
-      if (m === undefined) {
-        this._voteRatios.push({ mapId: e.id, ratio: 0, amount: 0 })
-      } else {
-        const amount: number = m.votes.length
-        const sum: number = m.votes.map(a => this.voteValues[a + 3]).reduce((acc, cur): number => acc + cur, 0)
-        const ratio: number = sum / amount
-        this._voteRatios.push({ mapId: m.mapId, ratio, amount })
-      }
-    }
-    for (let i: number = 0; i < 4; i++) {
-      const id: string = [JukeboxService.current, ...JukeboxService.queue][i].id
-      this.mapsWithVotesStored.push(id)
-      this._votes.push(...res.filter(a => a.mapId === id))
+    const maps = [MapService.current, ...MapService.queue]
+    for (let i: number = 0; i < this.prefetchCount + 1; i++) {
+      const uid: string = maps[i].id
+      this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
     }
   }
 
-  static get votes(): TMVote[] {
-    return [...this._votes]
-  }
-
-  static get voteRatios(): { readonly mapId: string, ratio: number, amount: number }[] {
-    return [...this._voteRatios]
-  }
-
+  /**
+   * Fetches new map and deletes the last map in array from memory
+   */
   static async nextMap(): Promise<void> {
-    const id: string = JukeboxService.queue[2].id
-    const res: TMVote[] = await this.repo.get(id)
-    this.mapsWithVotesStored.push(id)
-    this.mapsWithVotesStored.shift()
-    this._votes.push(...res)
-    this._votes = this._votes.filter(a => this.mapsWithVotesStored.includes(a.mapId))
-    Logger.debug(
-      `curr. map karma stats:`,
-      `ratios obj: ` + JSON.stringify(this._voteRatios.find(a => a.mapId === id)),
-      `amt of votes: ` + (this._votes.filter(a => a.mapId === id).length.toString())
-    )
+    const newId: string = MapService.queue[this.prefetchCount - 1].id
+    if (this._votes.some(a => a.uid === newId)) { return }
+    const res: TMVote[] = await this.repo.get(newId)
+    this._votes.unshift({ uid: newId, votes: res })
+    this._votes.length = Math.min(this._votes.length, this.prefetchCount * 2 + 1)
   }
 
-  static async fetch(mapId: string): Promise<TMVote[]> {
-    if (this._votes.some(a => a.mapId === mapId)) {
-      return this._votes.filter(a => a.mapId === mapId)
-    }
-    return await this.repo.get(mapId)
-  }
-
-  static async add(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
-    if (this._votes.find(a => a.login === login && a.vote === vote && a.mapId === mapId)) {
+  /**
+   * Adds a vote on the current map to runtime memory and database
+   * @param login Player login
+   * @param vote Vote value 
+   */
+  static async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+    const date: Date = new Date()
+    const map = MapService.current
+    const voteArr = this._votes.find(a => a.uid === map.id)?.votes
+    if (voteArr === undefined) { return }
+    const v = voteArr?.find(a => a.login === player.login)
+    if (v?.vote === vote) {
       return // Return if same vote already exists
     }
-    Logger.trace(`Player ${login} voted ${vote} for map ${mapId}`)
-    const date: Date = new Date()
-    const v: TMVote | undefined = this._votes.find(a => a.mapId === mapId && a.login === login)
-    if (v !== undefined) { // If previous vote is in memory
+    Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
+    if (v !== undefined) {
       v.date = date
       v.vote = vote
-      await this.updateVoteRatio(mapId)
-      void this.repo.update(mapId, login, vote, date)
-      Events.emitEvent('Controller.KarmaVote', v as KarmaVoteInfo)
-    } else {
-      const res: TMVote | undefined = await this.repo.getByLogin(mapId, login)
-      if (res === undefined) { // If previous vote doesn't exist
-        void this.repo.add({ mapId, login, vote, date })
-        if (this.mapsWithVotesStored.includes(mapId)) {
-          void this._votes.push({ login, mapId, vote, date })
-        }
-        await this.updateVoteRatio(mapId)
-        Events.emitEvent('Controller.KarmaVote', { mapId, login, vote, date } as KarmaVoteInfo)
-      } else { // If previous vote is in the db
-        void this.repo.update(mapId, login, vote, date)
-        if (this.mapsWithVotesStored.includes(mapId)) { // Push if map votes are in memory
-          this._votes.push({ login, mapId, vote, date })
-        }
-        await this.updateVoteRatio(mapId)
-        Events.emitEvent('Controller.KarmaVote', { mapId, login, vote, date } as KarmaVoteInfo)
-      }
-    }
-  }
-
-  private static async updateVoteRatio(mapId: string): Promise<void> {
-    const ratio = this._voteRatios.find(a => a.mapId === mapId)
-    if (ratio === undefined) {
+      void this.repo.update(map.id, player.login, vote, date)
+      this.updateMapVoteData(map.id, voteArr)
+      Events.emitEvent('Controller.KarmaVote', v)
       return
     }
-    const mapVotes: TMVote[] = this._votes.filter(a => a.mapId === mapId)
-    if (this.mapsWithVotesStored.includes(mapId)) {
-      const amount: number = mapVotes.length
-      const sum: number = mapVotes.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
-      ratio.ratio = sum / amount
-    } else {
-      const res: TMVote[] = await this.repo.get(mapId)
-      const amount: number = res.length
-      const sum: number = res.map(a => this.voteValues[a.vote + 3]).reduce((acc, cur): number => acc + cur, 0)
-      ratio.ratio = sum / amount
+    const obj = { login: player.login, mapId: map.id, date, vote }
+    voteArr.push(obj)
+    void this.repo.add(obj)
+    this.updateMapVoteData(map.id, voteArr)
+    Events.emitEvent('Controller.KarmaVote', obj)
+  }
+
+  private static updateMapVoteData(uid: string, arr: TMVote[]) {
+    const count = arr.length
+    const sum = arr.reduce((acc, cur) => acc += cur.vote, 0)
+    MapService.setVoteData({ uid, count, ratio: count === 0 ? 0 : (((sum / count) + 3) / 6) * 100 })
+  }
+
+  static async fetch(mapId: string): Promise<TMVote[] | undefined>
+  static async fetch(mapIds: string[]): Promise<{ uid: string, votes: TMVote[] }[]>
+  static async fetch(mapIds: string | string[]): Promise<TMVote[] | undefined | { uid: string, votes: TMVote[] }[]> {
+    return await this.repo.get(mapIds as any)
+  }
+
+  static get(uid: string): TMVote[] | undefined
+  static get(uids: string[]): { uid: string, votes: TMVote[] }[]
+  static get(uids: string | string[]): TMVote[] | undefined | { uid: string, votes: TMVote[] }[] {
+    if (typeof uids === 'string') {
+      return this._votes.find(a => a.uid === uids)?.votes
     }
+    return this._votes.filter(a => uids.includes(a.uid))
+  }
+
+  static get current(): TMVote[] {
+    return this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []
+  }
+
+  static get currentCount(): number {
+    return this._votes.find(a => a.uid === MapService.current.id)?.votes?.length ?? 0
+  }
+
+  static get votes(): { uid: string, votes: TMVote[] }[] {
+    return [...this._votes]
   }
 
 }

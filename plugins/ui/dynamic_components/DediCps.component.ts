@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
-import { TRAKMAN as TM } from "../../../src/Trakman.js";
-import {  IDS, Paginator, Grid, centeredText, CONFIG,getIcon, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { trakman as tm } from "../../../src/Trakman.js";
+import { IDS, Paginator, Grid, centeredText, CONFIG, getIcon, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 
 export default class DediCps extends PopupWindow {
 
@@ -18,7 +18,7 @@ export default class DediCps extends PopupWindow {
 
   constructor() {
     super(IDS.dediCps, getIcon(CONFIG.dediCps.icon), CONFIG.dediCps.title, CONFIG.dediCps.navbar)
-    const records: TMDedi[] = TM.dediRecords
+    const records: TMDedi[] = tm.dedis.list
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -27,13 +27,13 @@ export default class DediCps extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    TM.addListener('Controller.DedimaniaRecords', (): void => {
+    tm.addListener('Controller.DedimaniaRecords', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(tm.dedis.list.length / this.entries))
       this.reRender()
     })
-    TM.addListener('Controller.DedimaniaRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(TM.dediRecords.length / this.entries))
+    tm.addListener('Controller.DedimaniaRecord', (): void => {
+      this.paginator.setPageCount(Math.ceil(tm.dedis.list.length / this.entries))
       this.reRender()
     })
   }
@@ -43,7 +43,7 @@ export default class DediCps extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records = TM.dediRecords
+    const records = tm.dedis.list
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
     const cpTypes = getCpTypes(records.map(a => a.checkpoints))
@@ -52,7 +52,7 @@ export default class DediCps extends PopupWindow {
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
     const nickNameCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.safeString(TM.strip(records[i + playerIndex].nickname, false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
@@ -60,7 +60,7 @@ export default class DediCps extends PopupWindow {
       if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
-      return  ret
+      return ret
     }
 
     const cell = (i: number, j: number, w: number, h: number): string => {
@@ -70,11 +70,11 @@ export default class DediCps extends PopupWindow {
       const colour: string = cpType === undefined ? 'FFFF' : (this.cpColours as any)[cpType]
       const cp = record.checkpoints[(j - startCells) + cpIndex]
       return cp === undefined ? '' : `<format textcolor="${colour}"/>
-        ${centeredText(TM.Utils.getTimeString(cp), w, h)}`
+        ${centeredText(tm.utils.getTimeString(cp), w, h)}`
     }
 
     const finishCell = (i: number, j: number, w: number, h: number): string => {
-      return centeredText(TM.Utils.getTimeString(records[i + playerIndex].time), w, h)
+      return centeredText(tm.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
     const emptyCell = (): string => ''
@@ -122,15 +122,15 @@ export default class DediCps extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = TM.map.checkpointsAmount - 1
+    const cpAmount = tm.maps.current.checkpointsAmount - 1
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex: number = 0
     if (cpPage > 1) {
-      cpIndex = this.cpsOnFirstPage 
+      cpIndex = this.cpsOnFirstPage
       for (let i: number = 2; i < cpPage; i++) {
         cpIndex += this.cpsOnNextPages
       }
-      cpsToDisplay = Math.min(cpAmount - cpIndex , this.cpsOnNextPages)
+      cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
     }
     return [cpIndex, cpsToDisplay]
   }
@@ -151,7 +151,7 @@ export default class DediCps extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages: number = 1
-    const cpAmount = TM.map.checkpointsAmount - 1
+    const cpAmount = tm.maps.current.checkpointsAmount - 1
     for (let i: number = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++

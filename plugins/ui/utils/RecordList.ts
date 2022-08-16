@@ -1,10 +1,9 @@
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
+import RESULTCONFIG from '../config/ResultUIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.json' assert { type: 'json' }
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 
-const CFG = CONFIG.recordsList
-const INFO = CONFIG.recordsList.info
 
 interface UiRecord {
   readonly time: number
@@ -21,20 +20,21 @@ type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
 export default class RecordList {
 
-  readonly iCols: number = INFO.columns
-  readonly iColW: number = INFO.columnWidth
-  readonly iIconW: number = INFO.iconWidth
-  readonly iIcon: string = INFO.icon
-  readonly iBg: string = INFO.bgColor
-  readonly bg: string = CONFIG.static.bgColor
-  readonly headerBg: string = CONFIG.staticHeader.bgColor
-  readonly colGap: number = CFG.columnGap
-  readonly rowGap: number = CFG.rowGap
-  readonly format: string = CONFIG.static.format
-  readonly markerWidth: number = CFG.markerWidth
-  readonly iconVPadding: number = CFG.iconVerticalPadding
-  readonly iconHPadding: number = CFG.iconHorizontalPadding
+  readonly iCols: number
+  readonly iColW: number
+  readonly iIconW: number
+  readonly iIcon: string
+  readonly iBg: string
+  readonly bg: string
+  readonly headerBg: string
+  readonly colGap: number
+  readonly rowGap: number
+  readonly format: string
+  readonly markerWidth: number
+  readonly iconVPadding: number
+  readonly iconHPadding: number
   readonly id: number
+  readonly config
   iRows: number = 0
   isFullRow: boolean = false
   readonly columnWidths: number[]
@@ -48,9 +48,32 @@ export default class RecordList {
   readonly markers: { readonly you: string; readonly faster: string; readonly slower: string; }
   readonly noRecordEntry: boolean
   readonly getColoursFromPb: boolean
+  readonly downloadIcon: string
   readonly clickListeners: Function[] = []
+  readonly timeColours: {
+    slower: string;
+    faster: string;
+    you: string;
+    top: string;
+  }
 
-  constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean, getColoursFromPb?: true) {
+  constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
+    options?: { getColoursFromPb?: true, resultMode?: true }) {
+    this.config = options?.resultMode === true ? RESULTCONFIG : CONFIG
+    const CFG = this.config.recordsList
+    const INFO = CFG.info
+    this.colGap = CFG.columnGap
+    this.rowGap = CFG.rowGap
+    this.iCols = INFO.columns
+    this.iColW = INFO.columnWidth
+    this.format = this.config.static.format
+    this.iIconW = INFO.iconWidth
+    this.iIcon = INFO.icon
+    this.markerWidth = CFG.markerWidth
+    this.iconVPadding = CFG.iconVerticalPadding
+    this.iconHPadding = CFG.iconHorizontalPadding
+    this.downloadIcon = CFG.downloadIcon
+    this.timeColours = CFG.timeColours
     this.id = id
     this.rows = rows
     this.rowHeight = (height + this.rowGap) / rows
@@ -63,8 +86,11 @@ export default class RecordList {
     const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
     this.noRecordEntry = noRecordEntry
-    this.getColoursFromPb = getColoursFromPb ?? false
+    this.getColoursFromPb = options?.getColoursFromPb ?? false
     this.setupListeners()
+    this.iBg = INFO.bgColor
+    this.bg = this.config.static.bgColor
+    this.headerBg = this.config.staticHeader.bgColor
   }
 
   onClick(callback: Function): void {
@@ -103,7 +129,7 @@ export default class RecordList {
   }
 
   private setupListeners(): void {
-    TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === IDS.ClearAlerts) {
         const index: number = this.infos.findIndex(a => a.login === info.login)
         if (index !== -1) {
@@ -147,7 +173,7 @@ export default class RecordList {
       }
     }
     if (this.noRecordEntry === true && playerRecord === undefined) {
-      const player: TMPlayer | undefined = TM.getPlayer(login)
+      const player: TMPlayer | undefined = tm.players.get(login)
       if (player !== undefined) {
         ret.push({ index: -1, record: { name: player.nickname, time: -1 } })
       }
@@ -236,7 +262,7 @@ export default class RecordList {
       }
       const login: string | undefined = records[i].login
       if (login !== undefined) {
-        const player: TMPlayer | undefined = TM.getPlayer(login)
+        const player: TMPlayer | undefined = tm.players.get(login)
         if (player !== undefined) {
           if (i < playerIndex) {
             ret.push('slower')
@@ -254,7 +280,7 @@ export default class RecordList {
   private getTimeColours(login: string, playerIndex: number, records: UiRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
     if (this.getColoursFromPb === true && playerIndex === -1) {
-      const pb: number | undefined = TM.localRecords.find(a => a.login === login)?.time
+      const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
         for (let i: number = 0; i < records.length; i++) {
           if (pb <= records?.[i]?.time) {
@@ -292,7 +318,7 @@ export default class RecordList {
     if (this.side === true) {
       posX = -(width + (this.colGap * 2) + (offset * (width + this.colGap))) + this.colGap
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
-        return a instanceof Date ? TM.formatDate(a, true) : a
+        return a instanceof Date ? tm.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       ret += `<quad posn="${posX} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
@@ -305,7 +331,7 @@ export default class RecordList {
         ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${width - ((this.iIconW + this.colGap) * 2)} ${h}" bgcolor="${this.headerBg}"/>
         ${this.centeredText(topInfo[0], width - ((this.iIconW * 2) + this.colGap), h, posX + this.iIconW + this.colGap)}
         <quad posn="${posX + this.iIconW + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
-        <quad posn="${posX + this.iIconW + this.iconHPadding + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.stringToIcon(CFG.downloadIcon)}"/>`
+        <quad posn="${posX + this.iIconW + this.iconHPadding + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.stringToIcon(this.downloadIcon)}"/>`
       } else if (topInfo.length === 2) {
         ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
         ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX + this.iIconW + this.colGap)}
@@ -319,7 +345,7 @@ export default class RecordList {
     else {
       posX = this.columnWidths.reduce((acc, cur): number => acc + cur, 0) + (offset * (width + this.colGap))
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
-        return a instanceof Date ? TM.formatDate(a, true) : a
+        return a instanceof Date ? tm.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       if (topInfo.length === 3) {
@@ -327,8 +353,10 @@ export default class RecordList {
         <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
         <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
       } else if (topInfo.length === 2 && record.url === undefined) {
-        ret += `<quad posn="${posX} 0 1" sizen="${(width / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + (width / 2)} 0 1" sizen="${(width / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>`
+        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
+        ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX)}
+        <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
+        ${this.centeredText(topInfo[1], ((width - this.iIconW) / 2) - this.colGap, h, posX + ((width - this.iIconW) / 2))}`
       } else if (topInfo.length === 2) {
         ret += `<quad posn="${posX} 0 1" sizen="${width - (this.iIconW + this.colGap)} ${h}" bgcolor="${this.headerBg}"/>
         <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
@@ -357,7 +385,7 @@ export default class RecordList {
           }
           ret += `<quad posn="${posX + (this.iColW * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.iColW - this.colGap} ${h}" bgcolor="${this.bg}"/>
           <format textcolor="${colour}"/>
-          ${this.centeredText(TM.Utils.getTimeString(cp), this.iColW - this.colGap, h, posX + (this.iColW * j), this.rowHeight * (i + 1))}
+          ${this.centeredText(tm.utils.getTimeString(cp), this.iColW - this.colGap, h, posX + (this.iColW * j), this.rowHeight * (i + 1))}
           <format textcolor="FFFF"/>`
         }
       }
@@ -393,10 +421,10 @@ export default class RecordList {
     const posX: number = this.columnWidths[0]
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.colGap
-    const colour: string = timeColour === undefined ? 'FFFF' : (CFG.timeColours)[timeColour]
-    const t: string = (`${time === undefined ? '' : TM.Utils.getTimeString(time)}`).toString()
+    const colour: string = timeColour === undefined ? 'FFFF' : (this.timeColours)[timeColour]
+    const t: string = (`${time === undefined ? '' : tm.utils.getTimeString(time)}`).toString()
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
-    <format textsize="1" textcolor="${time === -1 ? CFG.timeColours.you : colour}"/>
+    <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>
     ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}
     <format textsize="1" textcolor="FFFF"/>`
   }
@@ -406,7 +434,7 @@ export default class RecordList {
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[2] - this.colGap
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
-    ${this.verticallyCenteredText((`${TM.strip(name ?? '', false)}`), width, height, posX)}`
+    ${this.verticallyCenteredText((`${tm.utils.strip(name ?? '', false)}`), width, height, posX)}`
   }
 
   private centeredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number, yOffset: number = 0): string => {
@@ -414,7 +442,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = (parentWidth / 2) + xOffset
     const posY: number = (parentHeight / 2) + yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${tm.utils.safeString(text)}" valign="center" halign="center"/>`
   }
 
   private verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number): string => {
@@ -422,7 +450,7 @@ export default class RecordList {
     const padding: number = 0.2
     const posX: number = xOffset + padding
     const posY: number = parentHeight / 2
-    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${CONFIG.static.format}${TM.safeString(text)}" valign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${tm.utils.safeString(text)}" valign="center"/>`
   }
 
   private stringToIcon = (str: string) => {

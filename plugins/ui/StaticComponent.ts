@@ -1,27 +1,41 @@
-import { TRAKMAN as TM } from "../../src/Trakman.js"
+import { trakman as tm } from "../../src/Trakman.js"
 
 export default abstract class StaticComponent {
 
-  protected _isDisplayed: boolean = false
+  displayMode: 'race' | 'result' | 'always' | 'none'
+  private _isDisplayed: boolean = true
   readonly id: number
 
-  constructor(id: number, display?: { displayOnRace?: true, displayOnResult?: true, hideOnRace?: true, hideOnResult?: true }) {
+  constructor(id: number, displayMode: 'race' | 'result' | 'always' | 'none') {
     this.id = id
-    if (display?.displayOnRace === true) {
-      TM.addListener('Controller.BeginMap', async () => { await this.display() })
+    this.displayMode = displayMode
+    switch (displayMode) {
+      case 'race':
+        tm.addListener('Controller.BeginMap', async () => {
+          this._isDisplayed = true
+          await this.display()
+        })
+        tm.addListener('Controller.EndMap', () => {
+          this._isDisplayed = false
+          this.hide()
+        }, true)
+        break
+      case 'result':
+        tm.addListener('Controller.EndMap', async () => {
+          this._isDisplayed = true
+          await this.display()
+        })
+        tm.addListener('Controller.BeginMap', () => {
+          this._isDisplayed = false
+          this.hide()
+        }, true)
     }
-    if (display?.displayOnResult === true) {
-      TM.addListener('Controller.EndMap', async () => { await this.display() })
-    }
-    if (display?.hideOnRace === true) {
-      TM.addListener('Controller.BeginMap', () => { this.hide() })
-    }
-    if (display?.hideOnResult === true) {
-      TM.addListener('Controller.EndMap', () => { this.hide() })
-    }
-    TM.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
-      if (this._isDisplayed) { await this.displayToPlayer(info.login) }
+    tm.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
+      if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
+    if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {
+      this._isDisplayed = false
+    }
   }
 
   get isDisplayed(): boolean {
@@ -34,7 +48,7 @@ export default abstract class StaticComponent {
 
   hide(): void {
     this._isDisplayed = false
-    TM.sendManialink(`<manialink id="${this.id}"></manialink>`)
+    tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
   }
 
 }

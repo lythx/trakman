@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { CONFIG, IDS, Grid, centeredText, verticallyCenteredText, stringToObjectProperty, ICONS, Paginator } from '../UiUtils.js'
 
@@ -31,9 +31,9 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(IDS.bestFinishes, { displayOnRace: true, hideOnResult: true })
+    super(IDS.bestFinishes, 'race')
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
-    TM.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+    tm.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
       let index = this.bestFinishes.findIndex(a => a.time > info.time)
       if (index === -1) { index = this.bestFinishes.length }
       if (index < this.entries) {
@@ -43,7 +43,7 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
-    TM.addListener('Controller.BeginMap', () => {
+    tm.addListener('Controller.BeginMap', () => {
       this.newestFinish = -1
       this.bestFinishes.length = 0
       this.display()
@@ -51,14 +51,15 @@ export default class BestFinishes extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
-    for (const e of TM.players) {
+    if (this.isDisplayed === false) { return }
+    for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(`
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(`
     <manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1"/>
@@ -96,12 +97,12 @@ export default class BestFinishes extends StaticComponent {
       if (fin === undefined) { return '' }
       let format = fin.login === login ? `<format textcolor="${this.selfColour}"/>` : ''
       if (i === this.newestFinish) { format = `<format textcolor="${this.newestColour}"/>` }
-      return bg + format + centeredText(TM.Utils.getTimeString(fin.time), w, h, { textScale: this.textScale, padding: this.textPadding })
+      return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, { textScale: this.textScale, padding: this.textPadding })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (verticallyCenteredText(TM.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
+      return this.bestFinishes[i] === undefined ? '' : bg + (verticallyCenteredText(tm.utils.strip(this.bestFinishes[i].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []

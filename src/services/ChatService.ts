@@ -1,67 +1,76 @@
 import { ChatRepository } from '../database/ChatRepository.js'
-import { randomUUID } from 'crypto'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
 import { Client } from '../client/Client.js'
-import { TRAKMAN as TM } from '../Trakman.js'
 import { Logger } from '../Logger.js'
+import { Utils } from '../Utils.js'
 import CONFIG from '../../config.json' assert { type: 'json' }
 
+/**
+ * This service manages chat table and chat commands
+ */
 export abstract class ChatService {
 
-  private static readonly messagesArraySize = CONFIG.messagesInRuntimeMemory
-  static readonly messages: TMMessage[] = []
+  private static readonly messagesArraySize: number = CONFIG.messagesInRuntimeMemory
+  static readonly _messages: TMMessage[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
 
+  /**
+   * Fetches messages from database
+   */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    await this.loadLastSessionMessages()
+    this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
   }
 
-  static addCommand(command: TMCommand): void {
+  /**
+   * Adds a chat command to the server
+   * @param command Chat command to register
+   */
+  static addCommand(command: TMCommand): void { // TODO CHANGE AFTER IMPLEMENTING LOGIN TYPE
     const prefix: string = command.privilege === 0 ? '/' : '//'
     this._commandList.push(command)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     Events.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
       const input: string = info.text?.trim()
-      const usedAlias = input.split(' ').shift()?.toLowerCase()
+      const usedAlias: string | undefined = input.split(' ').shift()?.toLowerCase()
       if (!command.aliases.some((alias: string): boolean => usedAlias === (prefix + alias))) {
         return
       }
       if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${TM.palette.server}»${TM.palette.error} You have no permission to use this command.` }, { string: info.login }])
+        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}»${Utils.palette.error} You have no permission to use this command.` }, { string: info.login }])
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
-      Logger.info(`${info.login} used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+      Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
       const parsedParams: (string | number | boolean | undefined)[] = []
       if (command.params) {
         for (const [i, param] of command.params.entries()) {
           if (params[i] === undefined && param.optional === true) { continue }
           if (params[i] === undefined && param.optional === undefined) {
-            TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Required param ${param.name} not specified.`, info.login)
+            Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Required param ${param.name} not specified.` }, { string: info.login }])
             return
           }
           if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
           switch (param.type) {
             case 'int':
               if (!Number.isInteger(Number(params[i]))) {
-                TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for parameter <${param.name}>: int.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: int.` }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'double':
               if (isNaN(Number(params[i]))) {
-                TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for parameter <${param.name}>: double.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: double.` }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'boolean':
               if (!['true', 'yes', 'y', '1', 'false', 'no', 'n', '0'].includes(params[i].toLowerCase())) {
-                TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for parameter <${param.name}>: boolean.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: boolean.` }, { string: info.login }])
                 return
               }
               parsedParams.push(['true', 'yes', 'y', '1',].includes(params[i].toLowerCase()))
@@ -74,7 +83,7 @@ export abstract class ChatService {
               const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
               const time: number = Number(params[i].substring(0, params[i].length - 1))
               if (isNaN(time)) {
-                TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.`, info.login)
+                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.` }, { string: info.login }])
                 return
               }
               switch (unit) {
@@ -91,7 +100,7 @@ export abstract class ChatService {
                   parsedParams.push(time * 1000 * 60 * 60 * 24)
                   break
                 default:
-                  TM.sendMessage(`${TM.palette.server}» ${TM.palette.error}Provided wrong argument type for time <${param.name}>: time.`, info.login)
+                  Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time <${param.name}>: time.` }, { string: info.login }])
               }
               break
             case 'multiword':
@@ -114,82 +123,84 @@ export abstract class ChatService {
         }
       }
       const messageInfo: MessageInfo = {
-        id: info.id,
-        login: info.login,
-        text: input.split(' ').splice(1).join(' '),
-        nickname: info.nickname,
-        nation: info.nation,
-        nationCode: info.nationCode,
-        wins: info.wins,
-        timePlayed: info.timePlayed,
-        joinTimestamp: info.joinTimestamp,
-        privilege: info.privilege,
-        isSpectator: info.isSpectator,
-        playerId: info.playerId,
-        ip: info.ip,
-        region: info.region,
-        isUnited: info.isUnited
+        ...info,
+        text: input.split(' ').splice(1).join(' ')
       }
       command.callback(messageInfo, ...parsedParams)
     })
   }
 
-  static async loadLastSessionMessages(): Promise<void> {
-    const result: ChatDBEntry[] = await this.repo.get(this.messagesArraySize)
-    for (const m of result) {
-      const message: TMMessage = {
-        id: m.id,
-        login: m.login,
-        text: m.message,
-        date: m.date
-      }
-      this.messages.push(message)
-    }
-  }
-
+  /**
+   * Adds message to the database and runtime memory
+   * @param login Player login
+   * @param text Message text
+   * @returns Message object or Error if unsuccessfull
+   */
   static add(login: string, text: string): MessageInfo | Error {
-    const message: TMMessage = {
-      id: randomUUID(),
-      login,
-      text,
-      date: new Date()
-    }
-    const player: TMPlayer | undefined = PlayerService.players.find(a => a.login === login)
+    const player: TMPlayer | undefined = PlayerService.get(login)
     if (player === undefined) {
-      const errStr = `Error while adding message. Cannot find player ${login} in the memory`
+      const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }
-    const messageInfo: MessageInfo = {
-      id: message.id,
+    const message: TMMessage = {
       login,
-      text,
       nickname: player.nickname,
-      nation: player.nation,
-      nationCode: player.nationCode,
-      wins: player.wins,
-      timePlayed: player.timePlayed,
-      joinTimestamp: player.joinTimestamp,
-      privilege: player.privilege,
-      isSpectator: player.isSpectator,
-      playerId: player.id,
-      ip: player.ip,
-      region: player.region,
-      isUnited: player.isUnited
+      text,
+      date: new Date()
+    }
+    const messageInfo: MessageInfo = {
+      text,
+      date: message.date,
+      ...player
     }
     if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
-      this.messages.unshift(message)
-      void this.repo.add(message)
-      Logger.trace(`${player.login} sent message: ${text}`)
+      this._messages.unshift(message)
+      void this.repo.add(login, text, message.date)
+      Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
     }
-    this.messages.length = Math.min(this.messagesArraySize, this.messages.length)
+    this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo
   }
 
-  static async getByLogin(login: string, limit: number): Promise<ChatDBEntry[]> {
-    return await this.repo.getByLogin(login, limit)
+  /**
+   * Fetches chat messages written by specified player
+   * @param login Player login
+   * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
+   * @returns Array of message objects
+   */
+  static async fetchByLogin(login: string, options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+    return await this.repo.getByLogin(login, options)
   }
 
+  /**
+   * Fetches chat messages
+   * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
+   * @returns Array of message objects
+   */
+  static async fetch(options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+    return await this.repo.get(options)
+  }
+
+  /**
+   * Gets recent chat messages written by specified player
+   * @param login Player login 
+   * @returns Array of message objects
+   */
+  static get(login: string): Readonly<TMMessage>[] {
+    return this._messages.filter(a => a.login === login)
+  }
+
+  /**
+   * @returns Array of message objects
+   */
+  static get messages(): Readonly<TMMessage>[] {
+    return [...this._messages]
+  }
+
+  /**
+   * @returns Array of command objects
+   */
   static get commandList(): TMCommand[] {
     return [...this._commandList]
   }

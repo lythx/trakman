@@ -4,4 +4,5 @@ interface TMRecord {
   readonly time: number
   readonly date: Date
   readonly checkpoints: number[]
+  readonly nickname: string
 }

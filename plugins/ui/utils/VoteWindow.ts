@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../../../src/Trakman.js"
+import { trakman as tm } from "../../../src/Trakman.js"
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.json' assert { type: 'json' }
@@ -60,7 +60,7 @@ export default class VoteWindow {
       }
       if (this.vote.start(eligibleLogins) === false) { return }
       for (const e of this.vote.loginList) {
-        TM.sendMessage(this.chatMessage, e)
+        tm.sendMessage(this.chatMessage, e)
       }
     })
   }
@@ -75,7 +75,7 @@ export default class VoteWindow {
 
   private display(votes: { login: string; vote: boolean; }[], seconds: number) {
     for (const e of this.vote.loginList) {
-      TM.sendManialink(`<manialink id="${this.id}">
+      tm.sendManialink(`<manialink id="${this.id}">
         <format textsize="1"/>
         <frame posn="${this.positionX} ${this.positionY} 1">
           ${this.constructHeader()}
@@ -91,7 +91,7 @@ export default class VoteWindow {
   }
 
   private hide() {
-    TM.sendManialink(`<manialink id="${this.id}"></manialink>`)
+    tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
   }
 
   private constructHeader() {
