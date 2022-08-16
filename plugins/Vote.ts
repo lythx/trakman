@@ -1,13 +1,13 @@
-import { TRAKMAN as TM } from "../src/Trakman.js"
+import { trakman as tm } from "../src/Trakman.js"
 import { addKeyListener } from "./ui/utils/KeyListener.js"
 import IDS from './ui/config/UtilIds.json' assert { type: 'json' }
 
 export class Vote {
 
-  private static isListenerAdded = false
-  private static isDisplayed = false
-  readonly yesId = IDS.VoteWindow.voteYes
-  readonly noId = IDS.VoteWindow.voteNo
+  private static isListenerAdded: boolean = false
+  private static isDisplayed: boolean = false
+  readonly yesId: number = IDS.VoteWindow.voteYes
+  readonly noId: number = IDS.VoteWindow.voteNo
   readonly goal: number
   private readonly votes: { login: string, vote: boolean }[] = []
   static listener: ((info: ManialinkClickInfo) => void) = () => undefined
@@ -28,7 +28,7 @@ export class Vote {
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   loginList: string[] = []
-  private isActive = false
+  private isActive: boolean = false
   private seconds: number
   private interrupted: { callerLogin?: string, result: boolean } | undefined
   private readonly cancelOnRoundEnd: boolean
@@ -42,21 +42,21 @@ export class Vote {
     this.cancelOnRoundStart = dontCancelOnRoundStart === undefined
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
-      TM.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => Vote.listener(info))
-      addKeyListener('F5', (info) => Vote.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
-      addKeyListener('F6', (info) => Vote.listener({ ...info, answer: this.noId }), 1, 'voteNo')
-      TM.addCommand({
+      tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
+      addKeyListener('F5', (info): void => Vote.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
+      addKeyListener('F6', (info): void => Vote.listener({ ...info, answer: this.noId }), 1, 'voteNo')
+      tm.commands.add({
         aliases: ['y', 'yes'],
-        callback: (info) => TM.openManialink(this.yesId, info.login),
+        callback: (info): void => tm.openManialink(this.yesId, info.login),
         privilege: 0
       })
-      TM.addCommand({
+      tm.commands.add({
         aliases: ['n', 'no'],
-        callback: (info) => TM.openManialink(this.noId, info.login),
+        callback: (info): void => tm.openManialink(this.noId, info.login),
         privilege: 0
       })
-      TM.addListener("Controller.EndMap", () => Vote.endMapListener())
-      TM.addListener('Controller.BeginMap', () => Vote.startMapListener())
+      tm.addListener("Controller.EndMap", (): void => Vote.endMapListener())
+      tm.addListener('Controller.BeginMap', (): void => Vote.startMapListener())
     }
   }
 
@@ -71,7 +71,7 @@ export class Vote {
     Vote.onInterrupt = this.onInterrupt
     Vote.onSecondsChanged = this.onSecondsChanged
     Vote.isDisplayed = true
-    Vote.listener = (info: ManialinkClickInfo) => {
+    Vote.listener = (info: ManialinkClickInfo): void => {
       if (this.isActive === true && this.loginList.includes(info.login)) {
         const vote = this.votes.find(a => a.login === info.login)
         if (vote === undefined) {
@@ -84,22 +84,22 @@ export class Vote {
         Vote.onUpdate(this.votes, this.seconds, info)
       }
     }
-    Vote.startMapListener = () => {
+    Vote.startMapListener = (): void => {
       if (this.cancelOnRoundStart) { this.cancel() }
     }
-    Vote.endMapListener = () => {
+    Vote.endMapListener = (): void => {
       if (this.cancelOnRoundEnd) { this.cancel() }
     }
-    const startTime = Date.now()
+    const startTime: number = Date.now()
     this.isActive = true
     this.loginList = eligibleLogins
-    const maxSeconds = this.seconds + 1
-    const interval = setInterval(() => {
+    const maxSeconds: number = this.seconds + 1
+    const interval = setInterval((): void => {
       if (Date.now() > startTime + (maxSeconds - this.seconds) * 1000) {
         if (this.interrupted !== undefined) {
-          this.clearListeners()
           clearInterval(interval)
           Vote.onInterrupt(this.interrupted, this.votes)
+          this.clearListeners()
           Vote.isDisplayed = false
           return
         }
@@ -118,8 +118,8 @@ export class Vote {
   }
 
   private conclude(): boolean {
-    const allVotes = this.votes.length
-    const yesVotes = this.votes.filter(a => a.vote === true).length
+    const allVotes: number = this.votes.length
+    const yesVotes: number = this.votes.filter(a => a.vote === true).length
     this.isActive = false
     return (yesVotes / allVotes) > this.goal
   }
@@ -134,7 +134,7 @@ export class Vote {
     this.interrupted = { callerLogin, result: false }
   }
 
-  clearListeners() {
+  clearListeners(): void {
     Vote.onUpdate = () => undefined
     Vote.onEnd = () => undefined
     Vote.onInterrupt = () => undefined

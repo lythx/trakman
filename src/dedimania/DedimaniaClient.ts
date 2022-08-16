@@ -2,9 +2,9 @@ import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
 import 'dotenv/config'
-import { JukeboxService } from '../services/JukeboxService.js'
 import { Logger } from '../Logger.js'
 import Config from '../../config.json' assert { type: 'json' }
+import { MapService } from '../services/MapService.js'
 
 export abstract class DedimaniaClient {
 
@@ -24,7 +24,7 @@ export abstract class DedimaniaClient {
     this.socket.setKeepAlive(true)
     this.setupListeners()
     const nextIds: any[] = []
-    for (let i: number = 0; i < 5; i++) { nextIds.push(JukeboxService.queue[i].id) }
+    for (let i: number = 0; i < 5; i++) { nextIds.push(MapService.queue[i].id) }
     if (process.env.SERVER_NATION === undefined) { await Logger.fatal('SERVER_NATION is undefined. Check your .env file') }
     if (process.env.SERVER_PACKMASK === undefined) { await Logger.fatal('SERVER_PACKMASK is undefined. Check your .env file') }
     const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{

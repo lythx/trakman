@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
 export default class GuestlistList extends PopupWindow {
@@ -14,18 +14,18 @@ export default class GuestlistList extends PopupWindow {
         this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.guestlistList.columnProportions, new Array(this.entries).fill(1),
             { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
-        TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+        tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
             if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
-                const targetPlayer = TM.players[info.answer - this.openId - 1000]
-                const targetInfo = TM.getPlayer(targetPlayer.login)
+                const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
+                const targetInfo = tm.players.get(targetPlayer.login)
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    TM.removeFromGuestlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-                        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has removed `
-                        + `${TM.palette.highlight + targetPlayer.nickname}${TM.palette.admin} from guestlist.`)
+                    tm.removeFromGuestlist(targetPlayer.login, info.login)
+                    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
+                        + `${tm.utils.palette.highlight + targetPlayer.nickname}${tm.utils.palette.admin} from guestlist.`)
                 }
             } // 
 
@@ -48,14 +48,14 @@ export default class GuestlistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, { padding: 0.2 }),
 
         ]
-        const guestlisted = TM.guestlist
+        const guestlisted = tm.guestlist
         const cancer: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of guestlisted) {
-            cancer.push(await TM.fetchPlayer(player.login))
+            cancer.push(await tm.players.fetch(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.safeString(TM.strip(cancer[i - 1]?.nickname ?? '', false)), w, h)
+            return centeredText(tm.utils.safeString(tm.utils.strip(cancer[i - 1]?.nickname ?? '', false)), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(guestlisted[i - 1].login, w, h)
@@ -70,7 +70,7 @@ export default class GuestlistList extends PopupWindow {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
 
-        const players = TM.guestlist
+        const players = tm.guestlist
         const rows = Math.min(this.entries, players.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {

@@ -35,7 +35,7 @@ export abstract class ManiakarmaService {
       Events.emitEvent('Controller.ManiakarmaVotes', { votes: this._mapKarma, karma: this._mapKarmaValue })
     })
     Events.addListener('Controller.EndMap', async (): Promise<void> => {
-      await this.sendVotes()
+      void this.sendVotes() // Their server dies every other hour
     })
   }
 
@@ -77,7 +77,7 @@ export abstract class ManiakarmaService {
     const json: any = this.getJson(await res.text())
     this._mapKarmaValue = json?.result?.votes?.[0]?.karma?.[0]
     for (const key of Object.keys(this._mapKarma)) {
-      (this._mapKarma as any)[key] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
+      this._mapKarma[key as keyof typeof this._mapKarma] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
     }
     const vote: number = Number(json?.result?.players[0]?.player[0]?.$?.vote)
     const v: number | undefined = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
@@ -85,13 +85,7 @@ export abstract class ManiakarmaService {
       return
     }
     this.storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
-    Logger.debug(
-      `curr. map maniakarma stats`,
-      `mk api url: ` + this.apiUrl,
-      `mk api authcode: ` + this.authCode,
-      `mk karma value: ` + this._mapKarmaValue.toString(),
-      `mk vote stats: ` + JSON.stringify(this._mapKarma)
-    )
+    //Logger.debug(`curr. map maniakarma stats`, `mk api url: ` + this.apiUrl, `mk api authcode: ` + this.authCode, `mk karma value: ` + this._mapKarmaValue.toString(), `mk vote stats: ` + JSON.stringify(this._mapKarma))
     await this.fixCoherence()
   }
 
@@ -168,11 +162,11 @@ export abstract class ManiakarmaService {
   }
 
   private static async fixCoherence(): Promise<void> {
-    const localVotes: TMVote[] = VoteService.votes.filter(a => a.mapId === MapService.current.id)
+    const localVotes: TMVote[] = VoteService.current
     const mkVotes: MKVote[] = this._playerVotes
     for (const e of mkVotes) {
       if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-        await VoteService.add(e.mapId, e.login, e.vote)
+        //  await VoteService.add( e.login, e.vote)
       }
     }
     for (const e of localVotes) {

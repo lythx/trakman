@@ -1,5 +1,9 @@
+import { Client } from "./client/Client.js"
+import { Logger } from "./Logger.js"
+import { GameService } from './services/GameService.js'
+
 interface EventWithCallbackInterface {
-  "Controller.Ready": []
+  "Controller.Ready": 'result' | 'race'
   "Controller.PlayerChat": MessageInfo
   "Controller.PlayerJoin": JoinInfo
   "Controller.PlayerLeave": LeaveInfo
@@ -21,15 +25,34 @@ interface EventWithCallbackInterface {
   "Controller.MatchSettingsUpdated": TMMap[]
   "Controller.PrivilegeChanged": PrivilegeChangedInfo
   "Controller.LocalRecords": TMRecord[]
+  "Controller.JukeboxChanged": TMMap[]
+  "Controller.TMXQueueChanged": (TMXMapInfo | null)[]
+  "Controller.RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
 }
 
 
 const eventListeners: { event: TMEvent, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
-const initialize = (): void => {
+const initialize = async () => {
+  const res = await Client.call('GetStatus')
+  if (res instanceof Error) {
+    await Logger.fatal('Failed to get server status', res.message, res.stack)
+    return
+  }
+  let status: 'result' | 'race'
+  if (res[0].Code === 5) {
+    status = 'result'
+  } else if (res[0].Code === 4) {
+    status = 'race'
+  } else {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    initialize()
+    return
+  }
+  GameService.state = status
   controllerReady = true
-  emitEvent('Controller.Ready', [])
+  emitEvent('Controller.Ready', status)
 }
 
 /**

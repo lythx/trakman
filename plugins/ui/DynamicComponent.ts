@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from "../../src/Trakman.js"
+import { trakman as tm } from "../../src/Trakman.js"
 
 export default abstract class DynamicComponent {
 
@@ -8,10 +8,10 @@ export default abstract class DynamicComponent {
     this.id = id
   }
 
-  abstract displayToPlayer(login: string): void 
+  abstract displayToPlayer(login: string): void
 
   hideToPlayer(login: string): void {
-    TM.sendManialink(`<manialink id="${this.id}"></manialink>`, login)
+    tm.sendManialink(`<manialink id="${this.id}"></manialink>`, login)
   }
 
 }

@@ -1,17 +1,17 @@
 import { getStaticPosition, CONFIG, IDS } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class RankWidget extends StaticComponent {
 
-  private readonly width =  CONFIG.static.width
+  private readonly width = CONFIG.static.width
   private readonly height = CONFIG.rank.height
   private readonly positionY: number
   private readonly positionX: number
   private xml: string = ''
 
   constructor() {
-    super(IDS.rank, { displayOnRace: true, hideOnResult: true })
+    super(IDS.rank, 'race')
     const pos = getStaticPosition('rank')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -19,12 +19,13 @@ export default class RankWidget extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
-    TM.sendManialink(this.xml)
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(this.xml, login)
   }
 
   private constructXml(): void {

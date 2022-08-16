@@ -1,6 +1,6 @@
-import { addListener } from './sector_records/SectorEvents.js'
-import { fetchMapSectors } from './sector_records/SectorDB.js'
-import { getMapSectors, getPlayerSectors } from './sector_records/SectorListeners.js'
+import { addListener } from './SectorEvents.js'
+import { fetchMapSectors } from './SectorDB.js'
+import { getMapSectors, getPlayerSectors } from './SectorListeners.js'
 
 export const sectorRecords = {
 

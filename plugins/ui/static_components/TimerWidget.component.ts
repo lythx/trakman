@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG, ICONS, IDS, staticHeader, stringToObjectProperty } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class TimerWidget extends StaticComponent {
@@ -11,7 +11,7 @@ export default class TimerWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.timer, { displayOnRace: true, hideOnResult: true })
+    super(IDS.timer, 'race')
     const pos = getStaticPosition('timer')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -19,12 +19,11 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
-    TM.sendManialink(this.xml)
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    tm.sendManialink(this.xml, login)
   }
 
   private constructXml(): void {
@@ -36,7 +35,6 @@ export default class TimerWidget extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.timer.title, stringToObjectProperty(CONFIG.timer.icon, ICONS), true)}
         <quad posn="0 -${headerHeight + marginSmall} 1" sizen="${this.width} ${this.height - (headerHeight + marginSmall)}" bgcolor="${CONFIG.static.bgColor}"/>
-        <quad posn="10.8 -2.6 3" sizen="4.2 3.3" image="${stringToObjectProperty(CONFIG.timer.hourglassOverlay, ICONS)}"/>
       </frame>
     </manialink>`
   }

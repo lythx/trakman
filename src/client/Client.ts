@@ -21,6 +21,12 @@ export abstract class Client {
     }
   }
 
+  /**
+   * Calls a dedicated server method and awaits the response
+   * @param method Dedicated server method to be executed
+   * @param params Optional params for the dedicated server method
+   * @returns Server response or error if the server returns one
+   */
   static async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
     const request: ClientRequest = new ClientRequest(method, params)
@@ -33,6 +39,11 @@ export abstract class Client {
     return response
   }
 
+  /**
+   * Calls a dedicated server method without caring for the response
+   * @param method Dedicated server method to be executed
+   * @param params Optional params for the dedicated server method
+   */
   static callNoRes(method: string, params: CallParams[] = []): void {
     this.requestId++
     const request: ClientRequest = new ClientRequest(method, params)
@@ -41,6 +52,11 @@ export abstract class Client {
     void this.getProxyResponse(method, params, this.requestId)
   }
 
+    /**
+   * Adds a callback listener which will be executed when one of the specified dedicated methods gets called
+   * @param methods Array of dedicated server methods
+   * @param callback Callback to execute
+   */
   static addProxy(methods: string[], callback: ((method: string, params: CallParams[], response: any[]) => void)): void {
     this.proxies.push({ methods, callback })
   }

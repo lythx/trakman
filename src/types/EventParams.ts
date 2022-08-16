@@ -17,4 +17,6 @@ type EventParams =
   MapRemovedInfo |
   BillUpdatedInfo |
   TMMap[] |
-  any[]
+  (TMXMapInfo | null)[] |
+  any[] | 
+  ('result' | 'race')

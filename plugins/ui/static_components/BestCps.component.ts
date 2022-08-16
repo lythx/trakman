@@ -1,4 +1,4 @@
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import { CONFIG, IDS, Grid, centeredText, rightAlignedText, verticallyCenteredText, stringToObjectProperty, ICONS, Paginator } from '../UiUtils.js'
 
@@ -35,23 +35,23 @@ export default class BestCps extends StaticComponent {
   private grid: Grid
 
   constructor() {
-    super(IDS.bestCps, { displayOnRace: true, hideOnResult: true })
-    this.cpAmount = TM.map.checkpointsAmount - 1
+    super(IDS.bestCps, 'race')
+    this.cpAmount = tm.maps.current.checkpointsAmount - 1
     this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
-    TM.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+    tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
         this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickname }
         this.paginator.setPageCount(Math.ceil(this.bestCps.length / this.entries))
         this.newestCp = info.index
         this.display()
       }
-      const page = this.paginator.setPageForLogin(info.player.login, Math.ceil((info.index + 3) / this.entries))
+      const page = this.paginator.setPageForLogin(info.player.login, Math.ceil((info.index + 1) / this.entries))
       this.displayToPlayer(info.player.login, { page })
     })
-    TM.addListener('Controller.BeginMap', () => {
+    tm.addListener('Controller.BeginMap', () => {
       this.newestCp = -1
-      this.cpAmount = TM.map.checkpointsAmount - 1
+      this.cpAmount = tm.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
       this.paginator.resetPlayerPages()
       this.grid = new Grid(this.width + this.margin * 2, this.contentHeight + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { margin: this.margin })
@@ -64,17 +64,18 @@ export default class BestCps extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
-    for (const e of TM.players) {
+    if (this.isDisplayed === false) { return }
+    for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string, params?: { page?: number }): void {
+    if (this.isDisplayed === false) { return }
     const page = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
 
     const pageCount = this.paginator.pageCount
-    TM.sendManialink(`
+    tm.sendManialink(`
     <manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1"/>
@@ -137,12 +138,12 @@ export default class BestCps extends StaticComponent {
       if (cp === undefined) { return '' }
       let format = cp.login === login ? `<format textcolor="${this.selfColour}"/>` : ''
       if (i + cpIndex === this.newestCp) { format = `<format textcolor="${this.newestColour}"/>` }
-      return bg + format + centeredText(TM.Utils.getTimeString(cp.time), w, h, { textScale: this.textScale, padding: this.textPadding })
+      return bg + format + centeredText(tm.utils.getTimeString(cp.time), w, h, { textScale: this.textScale, padding: this.textPadding })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}"/>`
-      return this.bestCps[i + cpIndex] === undefined ? '' : bg + (this.bestCps[i + cpIndex] === undefined ? '' : verticallyCenteredText(TM.strip(this.bestCps[i + cpIndex].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
+      return this.bestCps[i + cpIndex] === undefined ? '' : bg + (this.bestCps[i + cpIndex] === undefined ? '' : verticallyCenteredText(tm.utils.strip(this.bestCps[i + cpIndex].nickname, false), w, h, { textScale: this.textScale, padding: this.textPadding }))
     }
 
     const cpsToDisplay = this.cpAmount - cpIndex

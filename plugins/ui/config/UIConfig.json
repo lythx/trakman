@@ -130,8 +130,7 @@
     "height": 6.45,
     "side": true,
     "title": "Timer",
-    "icon": "clock",
-    "hourglassOverlay": "hourglass"
+    "icon": "clock"
   },
   "locals": {
     "height": 34.12,
@@ -797,5 +796,15 @@
       },
       "commandList"
     ]
+  },
+  "cpCounter": {
+    "height": 4.8,
+    "width": 4,
+    "title": "Cp Count",
+    "side": "false",
+    "icon": "mxLogo"
+  },
+  "list": {
+    "margin": 0.15
   }
 }

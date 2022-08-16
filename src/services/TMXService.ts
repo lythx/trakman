@@ -1,8 +1,9 @@
 import fetch from 'node-fetch'
-import { JukeboxService } from './JukeboxService.js'
 import 'dotenv/config'
 import CONFIG from '../../config.json' assert { type: 'json' }
 import { Logger } from '../Logger.js'
+import { Events } from '../Events.js'
+import { MapService } from './MapService.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
@@ -19,13 +20,13 @@ export abstract class TMXService {
 
   static async initialize(): Promise<void> {
     if (this.isActive === false) { return }
-    if (this.nextSize > JukeboxService.queueLength) {
-      await Logger.fatal(`jukeboxQueueSize (${JukeboxService.queueLength}) can't be lower than tmxMapPrefetch (${this.nextSize}). Change your config.json file`)
+    if (this.nextSize > MapService.queueSize) {
+      await Logger.fatal(`jukeboxQueueSize (${MapService.queueSize}) can't be lower than tmxMapPrefetch (${this.nextSize}). Change your config.json file`)
     }
-    const current: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.current.id)
+    const current: TMXMapInfo | Error = await this.fetchMapInfo(MapService.current.id)
     this._current = current instanceof Error ? null : current
     for (let i: number = 0; i < this.nextSize; i++) {
-      const id: string = JukeboxService.queue[i].id
+      const id: string = MapService.queue[i].id
       const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
       this._next.push(map instanceof Error ? null : map)
     }
@@ -41,14 +42,9 @@ export abstract class TMXService {
       return
     }
     this._current = next
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
-  }
-
-  static restartMap(): void {
-    if (this.isActive === false) { return }
-    this._previous.unshift(this._current === null ? null : { ...this._current })
-    this._previous.length = Math.min(this._previous.length, this.previousSize)
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static async addMap(id: string, index: number): Promise<void> {
@@ -56,13 +52,15 @@ export abstract class TMXService {
     const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
     this._next.splice(index, 0, map instanceof Error ? null : map)
     this._next.length = this.nextSize
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static async removeMap(index: number): Promise<void> {
     if (this.isActive === false || index >= this.nextSize) { return }
     this._next.splice(index, 1)
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(JukeboxService.queue[this.nextSize - 1].id)
+    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
     this._next.push(map instanceof Error ? null : map)
+    Events.emitEvent('Controller.TMXQueueChanged', this.next)
   }
 
   static get current(): TMXMapInfo | null {
@@ -81,11 +79,26 @@ export abstract class TMXService {
   }
 
   /**
+   * Fetches the map from TMX via its UID
+   * @param mapId Map UID
+   * @returns TMX map data or error if unsuccessful
+   */
+  static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
+  /**
    * Fetches map gbx file from tmx by TMX id, returns name and file in base64 string
    */
-  static async fetchMapFile(tmxId: number, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
-    const prefix: TMXPrefix = this.siteToPrefix(site)
-    const url = `https://${prefix}.tm-exchange.com/trackgbx/${tmxId}`
+  static async fetchMapFile(tmxId: number, site?: TMXSite): Promise<{ name: string, content: Buffer } | Error>
+  static async fetchMapFile(id: number | string, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+    let prefix: TMXPrefix = this.siteToPrefix(site)
+    if (typeof id === 'string') {
+      const res = await this.getTMXId(id)
+      if (res instanceof Error) {
+        return res
+      }
+      id = res.id
+      prefix = res.prefix
+    }
+    const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.error(`Error while fetching map file from TMX (url: ${url})`, res.message)
@@ -101,13 +114,15 @@ export abstract class TMXService {
   }
 
   /**
-   * Fetches map gbx file from tmx map id, returns name and file in base64 string
+   * Fetches the map from TMX via its UID
+   * @param mapId Map UID
+   * @returns TMX map data or error if unsuccessful
    */
-  static async fetchMapFileByUid(mapId: string): Promise<{ name: string, content: Buffer } | Error> {
+  private static async getTMXId(mapId: string): Promise<{ id: number, prefix: TMXPrefix } | Error> {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) {
-      const url = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info by uuid from TMX (url: ${url})`, res.message)
@@ -122,17 +137,19 @@ export abstract class TMXService {
     if (prefix === undefined) { return new Error('Cannot fetch map data from TMX') }
     const s: string[] = data.split('\t')
     const id: number = Number(s[0])
-    return await this.fetchMapFile(id, this.prefixToSite(prefix))
+    return { id, prefix }
   }
 
   /**
-   * Fetches TMX info for map with given id
+   * Fetches TMX for map information
+   * @param mapId Map UID
+   * @returns Map info from TMX or error if unsuccessful
    */
   static async fetchMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) { // Search for right prefix
-      const url = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
@@ -145,12 +162,11 @@ export abstract class TMXService {
       }
     }
     if (prefix === undefined) {
-      this._current = null
       return new Error('Cannot fetch map data from TMX')
     }
     const s: string[] = data.split('\t')
     const TMXId: number = Number(s[0])
-    const url = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
+    const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
     if (replaysRes instanceof Error) {
       Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
@@ -204,15 +220,16 @@ export abstract class TMXService {
       downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${TMXId}`,
       replays
     }
+    if (!Number.isInteger(mapInfo.awards) || !Number.isInteger(mapInfo.leaderboardRating)) {
+      Logger.debug(JSON.stringify(mapInfo, null, 2))
+    } else {
+      void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    }
     return mapInfo
   }
 
-  private static siteToPrefix(game: TMXSite) {
+  private static siteToPrefix(game: TMXSite): TMXPrefix {
     return this.prefixes[this.sites.indexOf(game)]
-  }
-
-  private static prefixToSite(prefix: TMXPrefix): TMXSite {
-    return this.sites[this.prefixes.indexOf(prefix)]
   }
 
 }

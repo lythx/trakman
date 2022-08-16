@@ -1,5 +1,5 @@
 import { getStaticPosition, centeredText, RecordList, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 import 'dotenv/config'
 
@@ -13,7 +13,7 @@ export default class LiveRanking extends StaticComponent {
   private readonly maxRecords: number = 250
 
   constructor() {
-    super(IDS.live, { displayOnRace: true, hideOnResult: true })
+    super(IDS.live, 'race')
     const side: boolean = CONFIG.live.side
     const pos = getStaticPosition('live')
     this.positionX = pos.x
@@ -22,34 +22,33 @@ export default class LiveRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    TM.addListener('Controller.LiveRecord', (): void => {
-      if (this._isDisplayed) {
-        this.display()
-      }
+    tm.addListener('Controller.LiveRecord', (): void => {
+      this.display()
     })
-    TM.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (this._isDisplayed && TM.liveRecords.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
-    TM.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (this._isDisplayed && TM.liveRecords.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
   }
 
   display(): void {
-    this._isDisplayed = true
+    if (this.isDisplayed === false) { return }
     // Here all manialinks have to be constructed separately because they are different for every player
-    for (const player of TM.players) {
+    for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(`<manialink id="${this.id}">
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
         ${staticHeader(CONFIG.live.title, stringToObjectProperty(CONFIG.live.icon, ICONS), true, { actionId: IDS.liveCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, TM.liveRecords.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, tm.records.live.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
         </frame>
       </frame>
     </manialink>`,

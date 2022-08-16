@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText } from '../UiUtils.js'
 
 export default class BanList extends PopupWindow {
@@ -13,18 +13,18 @@ export default class BanList extends PopupWindow {
         this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.banList.columnProportions, new Array(this.entries).fill(1),
             { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
 
-        TM.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+        tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
             if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
-                const targetPlayer = TM.players[info.answer - this.openId - 1000]
-                const targetInfo = TM.getPlayer(targetPlayer.login)
+                const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
+                const targetInfo = tm.players.get(targetPlayer.login)
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    TM.removeFromBanlist(targetPlayer.login, info.login)
-                    TM.sendMessage(`${TM.palette.server}»» ${TM.palette.admin}${TM.getTitle(info)} `
-                        + `${TM.palette.highlight + TM.strip(info.nickname, true)}${TM.palette.admin} has unbanned `
-                        + `${TM.palette.highlight + TM.strip(targetPlayer.nickname)}${TM.palette.admin}.`
+                    tm.removeFromBanlist(targetPlayer.login, info.login)
+                    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unbanned `
+                        + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`
                     )
                 }
             } // 
@@ -48,14 +48,14 @@ export default class BanList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Unban ', w, h),
 
         ]
-        const bannedplayers = TM.banlist
+        const bannedplayers = tm.banlist
         const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of bannedplayers) {
-            fetchedPlayers.push(await TM.fetchPlayer(player.login))
+            fetchedPlayers.push(await tm.players.fetch(player.login))
         }
         const nicknameCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.safeString(TM.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)
+            return centeredText(tm.utils.safeString(tm.utils.strip(fetchedPlayers[i - 1]?.nickname ?? '', false)), w, h)
         }
         const loginCell = (i: number, j: number, w: number, h: number) => {
             return centeredText(bannedplayers[i - 1]?.login ?? '', w, h)
@@ -64,12 +64,12 @@ export default class BanList extends PopupWindow {
             return centeredText(bannedplayers[i - 1]?.expireDate?.toUTCString() ?? 'No date specified', w, h)
         }
         const reasonCell = (i: number, j: number, w: number, h: number) => {
-            return centeredText(TM.safeString(bannedplayers[i - 1]?.reason ?? 'No reason specified'), w, h)
+            return centeredText(tm.utils.safeString(bannedplayers[i - 1]?.reason ?? 'No reason specified'), w, h)
         }
         const unbanButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.banList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
-        const players = TM.banlist
+        const players = tm.banlist
         const rows = Math.min(this.entries, players.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {

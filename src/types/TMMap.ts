@@ -3,7 +3,7 @@ interface TMMap {
   readonly name: string
   readonly fileName: string
   readonly author: string
-  readonly environment: 'Stadium' | 'Island' | 'Speed' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+  readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
   readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
   readonly bronzeTime: number
   readonly silverTime: number
@@ -11,7 +11,11 @@ interface TMMap {
   readonly authorTime: number
   readonly copperPrice: number
   readonly isLapRace: boolean
+  readonly addDate: Date
+  voteCount: number
+  voteRatio: number
   lapsAmount?: number
   checkpointsAmount?: number
-  readonly addDate: Date
+  leaderboardRating?: number
+  awards?: number
 }

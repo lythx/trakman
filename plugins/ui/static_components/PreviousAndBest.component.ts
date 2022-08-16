@@ -1,5 +1,5 @@
 import { getStaticPosition, CONFIG as CFG, CONFIG, IDS } from '../UiUtils.js'
-import { TRAKMAN as TM } from '../../../src/Trakman.js'
+import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class PreviousAndBest extends StaticComponent {
@@ -11,7 +11,7 @@ export default class PreviousAndBest extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.previousAndBest, { displayOnRace: true, hideOnResult: true })
+    super(IDS.previousAndBest, 'race')
     const pos = getStaticPosition('previousAndBest')
     this.positionX = pos.x
     this.positionY = pos.y
@@ -19,12 +19,13 @@ export default class PreviousAndBest extends StaticComponent {
   }
 
   display(): void {
-    this._isDisplayed = true
-    TM.sendManialink(this.xml)
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    TM.sendManialink(this.xml, login)
+    if (this.isDisplayed === false) { return }
+    tm.sendManialink(this.xml, login)
   }
 
   private constructXml(): void {

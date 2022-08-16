@@ -13,7 +13,6 @@ import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
-import { JukeboxService } from './services/JukeboxService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
@@ -35,8 +34,8 @@ async function main(): Promise<void> {
   ])
   if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
-  if(process.env.FIX_RANK_COHERENCE === "YES") {
-      await fixCoherence()
+  if (process.env.FIX_RANK_COHERENCE === "YES") {
+    await fixCoherence()
   }
   Logger.trace('Retrieving game info...')
   await GameService.initialize()
@@ -50,8 +49,6 @@ async function main(): Promise<void> {
   Logger.trace('Fetching maps...')
   await MapService.initialize()
   Logger.trace('Map service instantiated')
-  JukeboxService.initialize()
-  Logger.trace('Jukebox service instantiated')
   Logger.trace('Fetching records...')
   await RecordService.initialize()
   Logger.trace('Records fetched')
@@ -88,12 +85,12 @@ async function main(): Promise<void> {
     else { Logger.trace('Connected to ManiaLive') }
   }
   Logger.trace('Enabling callbacks...')
-  const cb = await Listeners.initialize()
+  const cb: true | Error = await Listeners.initialize()
   if (cb instanceof Error) {
     Logger.fatal('Failed to enable callbacks', cb.message)
   }
   Logger.trace('Callbacks enabled')
-  Events.initialize()
+  await Events.initialize()
   Logger.trace('Controller events enabled')
   Logger.info('Controller started successfully')
 }
