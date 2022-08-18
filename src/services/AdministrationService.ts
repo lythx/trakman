@@ -4,24 +4,23 @@ import { AdministrationRepository } from "../database/AdministrationRepository.j
 import CONFIG from "../../config.json" assert { type: 'json' }
 import { PlayerService } from "./PlayerService.js";
 import { BanlistRepository } from '../database/BanlistRepository.js'
+import { BlacklistRepository } from '../database/BlacklistRepository.js'
 
 export class AdministrationService {
 
   private static readonly repo: AdministrationRepository = new AdministrationRepository()
-  private static readonly banRepo = new BanlistRepository()
+  private static readonly banlistRepo = new BanlistRepository()
+  private static readonly blacklistRepo = new BlacklistRepository()
   private static _banlist: TMBanlistEntry[] = []
-  private static readonly _blacklist: { readonly login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date }[] = []
+  private static _blacklist: TMBlacklistEntry[] = []
   private static readonly _mutelist: { readonly login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date }[] = []
   private static readonly _guestlist: { readonly login: string, date: Date, callerLogin: string }[] = []
   private static readonly guestListFile: string = CONFIG.guestlistFilePath
 
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    this._banlist = await this.banRepo.get()
-    const blacklist: BlacklistDBEntry[] = await this.repo.getBlacklist()
-    for (const e of blacklist) {
-      this._blacklist.push({ login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
-    }
+    this._banlist = await this.banlistRepo.get()
+    this._blacklist = await this.blacklistRepo.get()
     const mutelist: MutelistDBEntry[] = await this.repo.getMutelist()
     for (const e of mutelist) {
       this._mutelist.push({ login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
@@ -74,17 +73,19 @@ export class AdministrationService {
       entry.reason = reason
       entry.expireDate = expireDate
       entry.date = date
-      void this.banRepo.update(ip, login, date, caller.login, reason, expireDate)
+      void this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
       Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
       return true
     }
-    const banRes = await Client.call('Ban', [{ string: login }])
+    const params: CallParams[] = reason === undefined ? [{ string: login }, { boolean: true }] :
+      [{ string: login }, { string: reason }, { boolean: true }]
+    const banRes = await Client.call('BanAndBlackList', params)
     if (banRes instanceof Error) { return banRes }
     this._banlist.push({
       ip, login, nickname, date, callerNickname: caller.nickname,
       callerLogin: caller.login, reason, expireDate
     })
-    void this.repo.addToBanlist(ip, login, date, caller.login, reason, expireDate)
+    void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
     Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
     return true
@@ -101,7 +102,7 @@ export class AdministrationService {
     const unbanRes = await Client.call('UnBan', [{ string: login }])
     if (unbanRes instanceof Error) { return unbanRes }
     this._banlist = this._banlist.filter(a => a.login !== login)
-    void this.repo.removeFromBanlist(login)
+    void this.banlistRepo.remove(login)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unbanned ${login}`)
     } else {
@@ -110,26 +111,44 @@ export class AdministrationService {
     return true
   }
 
-  static get blacklist(): { readonly login: string, readonly date: Date, readonly callerLogin: string, readonly reason?: string, readonly expireDate?: Date }[] {
+  static get blacklist(): TMBlacklistEntry[] {
     return [...this._blacklist]
   }
 
-  static addToBlacklist(login: string, callerLogin: string, reason?: string, expireDate?: Date): void {
+  /**
+   * Blacklists a player
+   * @param login Player login
+   * @param caller Caller player object
+   * @param nickname Optional player nickname
+   * @param reason Optional ban reason
+   * @param expireDate Optional ban expire date
+   * @returns True if successfull, Error if server call fails
+   */
+  static async addToBlacklist(login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
     const date: Date = new Date()
     const entry = this._blacklist.find(a => a.login === login)
     const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
-      entry.callerLogin = callerLogin
+      entry.callerLogin = caller.login
+      entry.callerNickname = caller.nickname
       entry.reason = reason
       entry.expireDate = expireDate
-      void this.repo.updateBlacklist(login, date, callerLogin, reason, expireDate)
-      Logger.info(`${callerLogin} has blacklisted ${login}`, durationString, reasonString)
-      return
+      entry.date = date
+      void this.blacklistRepo.update(login, date, caller.login, reason, expireDate)
+      Logger.info(`${caller.nickname} (${caller.login}) has banned ${login}`, durationString, reasonString)
+      return true
     }
-    this._blacklist.push({ login, date, callerLogin, reason, expireDate })
-    void this.repo.addToBlacklist(login, date, callerLogin, reason, expireDate)
-    Logger.info(`${callerLogin} has blacklisted ${login}`, durationString, reasonString)
+    const blRes = await Client.call('BlackList', [{ string: login }])
+    if (blRes instanceof Error) { return blRes }
+    this._banlist.push({
+      ip, login, nickname, date, callerNickname: caller.nickname,
+      callerLogin: caller.login, reason, expireDate
+    })
+    void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
+    Logger.info(`${caller.nickname} (${caller.login}) has banned ${login}`, durationString, reasonString)
+    Client.callNoRes('Kick', [{ string: login }])
+    return true
   }
 
   static removeFromBlacklist(login: string, callerLogin?: string): boolean {
@@ -225,7 +244,7 @@ export class AdministrationService {
     }
     for (const login of this._banlist.map(a => a.login)) {
       if (!banlist.some((a: any): boolean => a.Login === login)) {
-        const res: any[] | Error = await Client.call('Ban', [{ string: login }])
+        const res: any[] | Error = await Client.call('BanAndBlackList', [{ string: login }])
         if (res instanceof Error) {
           Logger.error(`Failed to add login ${login} to banlist`, `Server responded with error:`, res.message)
         }
