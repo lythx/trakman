@@ -18,6 +18,7 @@ interface EventWithCallbackInterface {
   "Controller.DedimaniaRecords": MapDedisInfo
   "Controller.DedimaniaRecord": DediRecordInfo
   "Controller.KarmaVote": KarmaVoteInfo
+  "Controller.VotesPrefetch": Readonly<TMVote>[]
   "Controller.ManiakarmaVotes": MKVotesInfo
   "Controller.MapAdded": MapAddedInfo
   "Controller.MapRemoved": MapRemovedInfo
