@@ -46,7 +46,7 @@ export default class PlayerList extends PopupWindow {
 
       if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
         const targetPlayer = tm.players.list[info.answer - this.openId - 3000]
-        const status = await tm.addToMutelist(targetPlayer.login, info.login)
+        const status = await tm.admin.mute(targetPlayer.login, info)
         if (status instanceof Error) {
           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while muting the player.`, info.login)
         } else {
@@ -61,7 +61,7 @@ export default class PlayerList extends PopupWindow {
         if (targetPlayer.login === undefined) {
           return
         } else {
-          tm.addToBlacklist(targetPlayer.login, info.login)
+          tm.admin.addToBlacklist(targetPlayer.login, info)
           tm.client.call('Kick', [{ string: targetPlayer.login }])
           tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
             + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
@@ -71,7 +71,7 @@ export default class PlayerList extends PopupWindow {
 
       if (info.answer >= this.openId + 5000 && info.answer < this.openId + 6000) {
         const targetPlayer = tm.players.list[info.answer - this.openId - 5000]
-        const status = await tm.addToGuestlist(targetPlayer.login, info.login)
+        const status = await tm.admin.addGuest(targetPlayer.login, info)
         if (status instanceof Error) {
           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while adding player to the guestlist.`, info.login)
         } else {

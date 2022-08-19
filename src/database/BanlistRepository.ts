@@ -38,7 +38,7 @@ export class BanlistRepository extends Repository {
     const query: string = `SELECT ip, banlist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM banlist
     JOIN players AS caller ON caller.id=banlist.caller_id
-    LEFT JOIN players; AS player ON player.login=banlist.login`
+    LEFT JOIN players AS player ON player.login=banlist.login`
     return (await this.query(query)).map(a => this.constructBanObject(a))
   }
 

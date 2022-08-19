@@ -9,7 +9,6 @@ import { GameService } from './services/GameService.js'
 import { MapService } from './services/MapService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './services/TMXService.js'
-import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 
@@ -33,13 +32,6 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
-        const canJoin = AdministrationService.checkIfCanJoin(params[0], ip)
-        if (canJoin !== true) {
-          const reason: string = typeof canJoin.reason === 'string' ? `\nReason: ${canJoin.reason}` : ''
-          Client.callNoRes('Kick', [{ string: params[0] },
-          { string: `You have been ${canJoin.banMethod === 'ban' ? 'banned' : 'blacklisted'} on this server.${reason}` }])
-          return
-        }
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1],
           playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
@@ -83,7 +75,7 @@ export class Listeners {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async (params: any[]): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
-        // Ignore inexistent people // Please elaborate // PID 0 = Server
+        // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
         if (params[0] === 0) {
           return
         }

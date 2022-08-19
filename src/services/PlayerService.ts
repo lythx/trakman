@@ -16,8 +16,7 @@ export class PlayerService {
 
   private static _players: TMPlayer[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
-  // Move to admin service
-  private static readonly privilegeRepo: PrivilegeRepository = new PrivilegeRepository()
+  private static readonly privilegeRepo = new PrivilegeRepository()
   private static newLocalsAmount = 0
   private static ranks: string[]
 
@@ -26,8 +25,6 @@ export class PlayerService {
    */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    await this.privilegeRepo.initialize()
-    void this.setOwner()
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
@@ -38,20 +35,6 @@ export class PlayerService {
     Events.addListener('Controller.BeginMap', (): void => {
       this.newLocalsAmount = 0
     })
-  }
-
-  // Move to admin service
-  private static async setOwner(): Promise<void> {
-    const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
-    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
-    if (newOwnerLogin === undefined) {
-      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
-      return
-    }
-    if (oldOwnerLogin !== newOwnerLogin) {
-      if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
-      await this.setPrivilege(newOwnerLogin, 4)
-    }
   }
 
   /**
@@ -177,26 +160,6 @@ export class PlayerService {
     this._players.splice(playerIndex, 1)
     Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.msToTime(sessionTime)}`)
     return leaveInfo
-  }
-
-  // Move to admin service
-  static async setPrivilege(login: string, privilege: number, callerLogin?: string): Promise<void> {
-    const player: TMPlayer | undefined = this._players.find(a => a.login === login)
-    if (player !== undefined) { player.privilege = privilege }
-    if (callerLogin !== undefined) {
-      Logger.info(`Player ${callerLogin} changed ${login} privilege to ${privilege}`)
-    } else {
-      Logger.info(`${login} privilege set to ${privilege}`)
-    }
-    const offlinePlayer: TMOfflinePlayer | undefined = await this.repo.get(login)
-    Events.emitEvent('Controller.PrivilegeChanged', {
-      player: offlinePlayer === undefined ? undefined : { ...offlinePlayer, privilege },
-      login,
-      previousPrivilege: offlinePlayer?.privilege ?? 0,
-      newPrivilege: privilege,
-      callerLogin
-    })
-    void this.privilegeRepo.set(login, privilege)
   }
 
   /**

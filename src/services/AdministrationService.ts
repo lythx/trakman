@@ -1,59 +1,246 @@
 import { Logger } from "../Logger.js";
 import { Client } from "../client/Client.js";
-import { AdministrationRepository } from "../database/AdministrationRepository.js";
 import CONFIG from "../../config.json" assert { type: 'json' }
-import { PlayerService } from "./PlayerService.js";
+import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
+import { MutelistRepository } from '../database/MutelistRepository.js'
+import { GuestlistRepository } from '../database/GuestlistRepository.js'
+import { PlayerService } from "./PlayerService.js";
+import { Events } from "../Events.js";
 
 export class AdministrationService {
 
-  private static readonly repo: AdministrationRepository = new AdministrationRepository()
+  private static readonly privilegeRepo = new PrivilegeRepository()
   private static readonly banlistRepo = new BanlistRepository()
   private static readonly blacklistRepo = new BlacklistRepository()
+  private static readonly mutelistRepo = new MutelistRepository()
+  private static readonly guestlistRepo = new GuestlistRepository()
   private static _banlist: TMBanlistEntry[] = []
   private static _blacklist: TMBlacklistEntry[] = []
-  private static readonly _mutelist: { readonly login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date }[] = []
-  private static readonly _guestlist: { readonly login: string, date: Date, callerLogin: string }[] = []
-  private static readonly guestListFile: string = CONFIG.guestlistFilePath
+  private static _mutelist: TMMutelistEntry[] = []
+  private static _guestlist: TMGuestlistEntry[] = []
+  private static readonly blacklistFile: string = CONFIG.blacklistFile
+  private static readonly guestlistFile: string = CONFIG.guestlistFile
 
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
+    await this.privilegeRepo.initialize()
+    void this.setOwner()
+    await this.banlistRepo.initialize()
+    await this.blacklistRepo.initialize()
+    await this.mutelistRepo.initialize()
+    await this.guestlistRepo.initialize()
     this._banlist = await this.banlistRepo.get()
     this._blacklist = await this.blacklistRepo.get()
-    const mutelist: MutelistDBEntry[] = await this.repo.getMutelist()
-    for (const e of mutelist) {
-      this._mutelist.push({ login: e.login, date: e.date, callerLogin: e.caller, reason: e.reason ?? undefined, expireDate: e.expires ?? undefined })
-    }
-    const guestlist: GuestlistDBEntry[] = await this.repo.getGuestlist()
-    for (const e of guestlist) {
-      this._guestlist.push({ login: e.login, date: e.date, callerLogin: e.caller })
-    }
-    await this.fixGuestlistCoherence()
-    await this.fixMutelistCoherence()
+    this._mutelist = await this.mutelistRepo.get()
+    this._guestlist = await this.guestlistRepo.get()
     await this.fixBanlistCoherence()
     await this.fixBlacklistCoherence()
-    this.poll()
-  }
-
-  static checkIfCanJoin(login: string, ip: string): true | { banMethod: 'ban' | 'blacklist', reason?: string } {
-    const banned = this._banlist.find(a => a.ip === ip)
-    if (banned !== undefined) {
-      return { banMethod: 'ban', reason: banned.reason }
-    }
-    const blacklisted = this._blacklist.find(a => a.login === login)
-    if (blacklisted !== undefined) {
-      return { banMethod: 'blacklist', reason: blacklisted.reason }
-    }
-    return true
-  }
-
-  static get banlist(): TMBanlistEntry[] {
-    return [...this._banlist]
+    await this.fixMutelistCoherence()
+    await this.fixGuestlistCoherence()
+    this.pollExpireDates()
   }
 
   /**
-   * Bans a player
+   * Sets the server owner to login specified in .env file and removes previous owner if it changed
+   */
+  private static async setOwner(): Promise<void> {
+    const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
+    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
+    if (newOwnerLogin === undefined) {
+      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
+      return
+    }
+    if (oldOwnerLogin !== newOwnerLogin) {
+      if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
+      await this.setPrivilege(newOwnerLogin, 4)
+    }
+  }
+
+  /**
+   * Bans and blacklists all the players present in banlist table if they aren't banned,
+   * unbans all players who are on the server banlist but not in banlist table
+   * (this method doesn't save the blacklist)
+   */
+  private static async fixBanlistCoherence(): Promise<void> {
+    const banlist: any[] | Error = await Client.call('GetBanList', [{ int: 5000 }, { int: 0 }])
+    if (banlist instanceof Error) {
+      await Logger.fatal('Failed to fetch banlist', 'Server responded with error:', banlist.message)
+      return
+    }
+    for (const e of this._banlist) {
+      if (!banlist.some((a: any): boolean => a.Login === e)) {
+        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
+          [{ string: e.login }, { string: e.reason }]
+        const res: any[] | Error = await Client.call('BanAndBlackList', params)
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to add login ${e} to banlist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    for (const login of banlist.map((a): string => a.Login)) {
+      if (!this._banlist.some((a: any): boolean => a.login === login)) {
+        const res: any[] | Error = await Client.call('UnBan', [{ string: login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to remove login ${login} from banlist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+  }
+
+  /**
+   * Blacklists all the players present in blacklist table if they aren't blacklisted,
+   * saves the blacklist file,
+   * unblacklists all players who are on the server blacklist but not in banlist and blacklist tables
+   * (this method needs to be run after banlist coherence is fixed)
+   */
+  private static async fixBlacklistCoherence(): Promise<void> {
+    const blacklist: any[] | Error = await Client.call('GetBlackList', [{ int: 5000 }, { int: 0 }])
+    if (blacklist instanceof Error) {
+      await Logger.fatal('Failed to fetch blacklist', 'Server responded with error:', blacklist.message)
+      return
+    }
+    for (const e of this._blacklist) {
+      if (!blacklist.some((a: any): boolean => a.Login === e)) {
+        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
+          [{ string: e.login }, { string: e.reason }]
+        const res: any[] | Error = await Client.call('BlackList', params)
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to add login ${e} to blacklist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    for (const login of blacklist.map((a): string => a.Login)) {
+      if (!this._blacklist.some((a: any): boolean => a.login === login) &&
+        !this._banlist.some((a: any): boolean => a.login === login)) {
+        const res: any[] | Error = await Client.call('UnBlackList', [{ string: login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to remove login ${login} from blacklist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    const save = await Client.call('SaveBlackList', [{ string: this.blacklistFile }])
+    if (save instanceof Error) {
+      await Logger.fatal(`Failed to save blacklist`, `Server responded with error:`, save.message)
+    }
+  }
+
+  /**
+   * Mutes all the players present in mutelist table if they aren't muted,
+   * unmutes all players who are on the server mutelist but not in mutelist table
+   */
+  private static async fixMutelistCoherence(): Promise<void> {
+    const mutelist: any[] | Error = await Client.call('GetMuteList', [{ int: 5000 }, { int: 0 }])
+    if (mutelist instanceof Error) {
+      await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', mutelist.message)
+      return
+    }
+    for (const e of this._mutelist) {
+      if (!mutelist.some((a: any): boolean => a.Login === e)) {
+        const res: any[] | Error = await Client.call('Ignore', [{ string: e.login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to add login ${e} to mutelist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    for (const login of mutelist.map((a): string => a.Login)) {
+      if (!this._mutelist.some((a: any): boolean => a.login === login)) {
+        const res: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to remove login ${login} from mutelist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+  }
+
+  /**  
+   * Adds all the players present in guestlist table to server guestlist if they aren't guests,
+   * removes all players who are on the server guestlist but not in guestlist table
+   */
+  private static async fixGuestlistCoherence(): Promise<void> {
+    const guestlist: any[] | Error = await Client.call('GetGuestList', [{ int: 5000 }, { int: 0 }])
+    if (guestlist instanceof Error) {
+      await Logger.fatal('Failed to fetch guestlist', 'Server responded with error:', guestlist.message)
+      return
+    }
+    for (const e of this._guestlist) {
+      if (!guestlist.some((a: any): boolean => a.Login === e)) {
+        const res: any[] | Error = await Client.call('AddGuest', [{ string: e.login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to add login ${e} to guestlist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    for (const login of guestlist.map((a): string => a.Login)) {
+      if (!this._guestlist.some((a: any): boolean => a.login === login)) {
+        const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
+        if (res instanceof Error) {
+          await Logger.fatal(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
+        }
+      }
+    }
+    const save = await Client.call('SaveGuestList', [{ string: this.guestlistFile }])
+    if (save instanceof Error) {
+      await Logger.fatal(`Failed to save guestlist`, `Server responded with error:`, save.message)
+    }
+  }
+
+  /**
+   * Checks for expired bans, blacklists and mutes every 5 seconds and calls functions to remove them
+   */
+  private static pollExpireDates(): void {
+    setInterval((): void => {
+      const date: Date = new Date()
+      for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
+        this.unban(e.login)
+      }
+      for (const e of this._blacklist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
+        this.unblacklist(e.login)
+      }
+      for (const e of this._mutelist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
+        this.unmute(e.login)
+      }
+    }, 5000)
+  }
+
+  /**
+   * Sets a player privilege level
+   * @param login Player login
+   * @param privilege Privilege level to set
+   * @param caller Optional caller player object
+   */
+  static async setPrivilege(login: string, privilege: number, caller?: { login: string, nickname: string }): Promise<void> {
+    const player: TMPlayer | undefined = PlayerService.get(login)
+    if (player !== undefined) { player.privilege = privilege }
+    if (caller !== undefined) {
+      Logger.info(`Player ${caller.login} changed ${login} privilege to ${privilege}`)
+    } else {
+      Logger.info(`${login} privilege set to ${privilege}`)
+    }
+    if (player === undefined) {
+      const player = await PlayerService.fetch(login)
+      Events.emitEvent('Controller.PrivilegeChanged', {
+        player: player === undefined ? undefined : { ...player, privilege },
+        login,
+        previousPrivilege: player?.privilege ?? 0,
+        newPrivilege: privilege,
+        caller
+      })
+      void this.privilegeRepo.set(login, privilege)
+      return
+    }
+    Events.emitEvent('Controller.PrivilegeChanged', {
+      player: player === undefined ? undefined : { ...player, privilege },
+      login,
+      previousPrivilege: player.privilege ?? 0,
+      newPrivilege: privilege,
+      caller
+    })
+    void this.privilegeRepo.set(login, privilege)
+  }
+
+  /**
+   * Bans, blacklists and kicks a player. Adds him to banlist table
    * @param ip Player IP address
    * @param login Player login
    * @param caller Caller player object
@@ -79,8 +266,8 @@ export class AdministrationService {
     }
     const params: CallParams[] = reason === undefined ? [{ string: login }, { boolean: true }] :
       [{ string: login }, { string: reason }, { boolean: true }]
-    const banRes = await Client.call('BanAndBlackList', params)
-    if (banRes instanceof Error) { return banRes }
+    const res = await Client.call('BanAndBlackList', params)
+    if (res instanceof Error) { return res }
     this._banlist.push({
       ip, login, nickname, date, callerNickname: caller.nickname,
       callerLogin: caller.login, reason, expireDate
@@ -92,15 +279,20 @@ export class AdministrationService {
   }
 
   /**
-   * Unbans a player
+   * Unbans a player and unblacklists him if he is not blacklisted. Deletes all ips tied to his login
+   * from banlist table
    * @param login Player login
    * @param caller Caller player object
    * @returns True if successfull, false if player was not banned, Error if dedicated server call fails
    */
   static async unban(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
     if (!this._banlist.some(a => a.login === login)) { return false }
-    const unbanRes = await Client.call('UnBan', [{ string: login }])
-    if (unbanRes instanceof Error) { return unbanRes }
+    const res = await Client.call('UnBan', [{ string: login }])
+    if (res instanceof Error) { return res }
+    if (!this._blacklist.some(a => a.login === login)) {
+      const res = await Client.call('UnBlackList', [{ string: login }])
+      if (res instanceof Error) { return res }
+    }
     this._banlist = this._banlist.filter(a => a.login !== login)
     void this.banlistRepo.remove(login)
     if (caller !== undefined) {
@@ -111,17 +303,13 @@ export class AdministrationService {
     return true
   }
 
-  static get blacklist(): TMBlacklistEntry[] {
-    return [...this._blacklist]
-  }
-
   /**
-   * Blacklists a player
+   * Blacklists and kicks a player, adds him to blacklist table. Saves the server blacklist
    * @param login Player login
    * @param caller Caller player object
    * @param nickname Optional player nickname
-   * @param reason Optional ban reason
-   * @param expireDate Optional ban expire date
+   * @param reason Optional blacklist reason
+   * @param expireDate Optional blacklist expire date
    * @returns True if successfull, Error if server call fails
    */
   static async addToBlacklist(login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
@@ -136,200 +324,276 @@ export class AdministrationService {
       entry.expireDate = expireDate
       entry.date = date
       void this.blacklistRepo.update(login, date, caller.login, reason, expireDate)
-      Logger.info(`${caller.nickname} (${caller.login}) has banned ${login}`, durationString, reasonString)
+      Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
       return true
     }
-    const blRes = await Client.call('BlackList', [{ string: login }])
-    if (blRes instanceof Error) { return blRes }
-    this._banlist.push({
-      ip, login, nickname, date, callerNickname: caller.nickname,
+    if (!this._banlist.some(a => a.login === login)) {
+      const res = await Client.call('BlackList', [{ string: login }])
+      if (res instanceof Error) { return res }
+    }
+    this._blacklist.push({
+      login, nickname, date, callerNickname: caller.nickname,
       callerLogin: caller.login, reason, expireDate
     })
-    void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
-    Logger.info(`${caller.nickname} (${caller.login}) has banned ${login}`, durationString, reasonString)
+    void this.blacklistRepo.add(login, date, caller.login, reason, expireDate)
+    Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
+    Client.callNoRes('SaveBlackList', [{ string: this.blacklistFile }])
     return true
   }
 
-  static removeFromBlacklist(login: string, callerLogin?: string): boolean {
-    const index: number = this._blacklist.findIndex(a => a.login === login)
-    if (index === -1) { return false }
-    this._blacklist.splice(index, 1)
-    void this.repo.removeFromBlacklist(login)
-    if (callerLogin !== undefined) {
-      Logger.info(`${callerLogin} has unblacklisted ${login}`)
+  /**
+   * Unblacklists a player if he is not banned and deletes him from blacklist table. Saves the server blacklist
+   * @param login Player login
+   * @param caller Caller player object
+   * @returns True if successfull, false if player was not blacklisted, Error if dedicated server call fails
+   */
+  static async unblacklist(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
+    if (!this._blacklist.some(a => a.login === login)) { return false }
+    if (!this._banlist.some(a => a.login === login)) {
+      const res = await Client.call('UnBlackList', [{ string: login }])
+      if (res instanceof Error) { return res }
+    }
+    this._blacklist = this._blacklist.filter(a => a.login !== login)
+    void this.blacklistRepo.remove(login)
+    if (caller !== undefined) {
+      Logger.info(`${caller.nickname} (${caller.login}) has unblacklisted ${login}`)
     } else {
       Logger.info(`${login} has been unblacklisted`)
     }
+    Client.callNoRes('SaveBlackList', [{ string: this.blacklistFile }])
     return true
   }
 
-  static get mutelist(): { readonly login: string, readonly date: Date, readonly callerLogin: string, readonly reason?: string, readonly expireDate?: Date }[] {
-    return [...this._mutelist]
-  }
-
-  static async addToMutelist(login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<true | Error> {
+  /**
+   * Mutes a player and adds him to mutelist table
+   * @param login Player login
+   * @param caller Caller player object
+   * @param nickname Optional player nickname
+   * @param reason Optional mute reason
+   * @param expireDate Optional mute expire date
+   * @returns True if successfull, Error if server call fails
+   */
+  static async mute(login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
     const date: Date = new Date()
     const entry = this._mutelist.find(a => a.login === login)
     const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
-      entry.callerLogin = callerLogin
+      entry.callerLogin = caller.login
+      entry.callerNickname = caller.nickname
       entry.reason = reason
       entry.expireDate = expireDate
-      void this.repo.updateMutelist(login, date, callerLogin, reason, expireDate)
-      Logger.info(`${callerLogin} has muted ${login}`, durationString, reasonString)
+      entry.date = date
+      void this.mutelistRepo.update(login, date, caller.login, reason, expireDate)
+      Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
       return true
     }
-    const res: any[] | Error = await Client.call('Ignore', [{ string: login }])
+    const res = await Client.call('Ignore', [{ string: login }])
     if (res instanceof Error) { return res }
-    this._mutelist.push({ login, date, callerLogin, reason, expireDate })
-    void this.repo.addToMutelist(login, date, callerLogin, reason, expireDate)
-    Logger.info(`${callerLogin} has muted ${login}`, durationString, reasonString)
+    this._mutelist.push({
+      login, nickname, date, callerNickname: caller.nickname,
+      callerLogin: caller.login, reason, expireDate
+    })
+    void this.mutelistRepo.add(login, date, caller.login, reason, expireDate)
+    Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
     return true
   }
 
-  static async removeFromMutelist(login: string, callerLogin?: string): Promise<boolean | Error> {
-    const index: number = this._mutelist.findIndex(a => a.login === login)
-    if (index === -1) { return false }
-    this._mutelist.splice(index, 1)
-    const mute: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
-    if (mute instanceof Error) { return mute }
-    await this.repo.removeFromMutelist(login)
-    if (callerLogin !== undefined) {
-      Logger.info(`${callerLogin} has unmuted ${login}`)
+  /**
+   * Unmutes a player and deletes him from mutelist table
+   * @param login Player login
+   * @param caller Caller player object
+   * @returns True if successfull, false if player was not muted, Error if dedicated server call fails
+   */
+  static async unmute(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
+    if (!this._mutelist.some(a => a.login === login)) { return false }
+    const res = await Client.call('UnIgnore', [{ string: login }])
+    if (res instanceof Error) { return res }
+    this._mutelist = this._mutelist.filter(a => a.login !== login)
+    void this.mutelistRepo.remove(login)
+    if (caller !== undefined) {
+      Logger.info(`${caller.nickname} (${caller.login}) has unmuted ${login}`)
     } else {
       Logger.info(`${login} has been unmuted`)
     }
     return true
   }
 
-  static get guestlist(): { readonly login: string, readonly date: Date, readonly callerLogin: string }[] {
+  /**
+   * Adds a player to server guestlist, saves it and adds him to guestlist table
+   * @param login Player login
+   * @param caller Caller player object
+   * @param nickname Optional player nickname
+   * @returns True if successfull, false is player was already in the guestlist, Error if server call fails
+   */
+  static async addGuest(login: string, caller: { login: string, nickname: string }, nickname?: string): Promise<boolean | Error> {
+    const date: Date = new Date()
+    const entry = this._guestlist.find(a => a.login === login)
+    if (entry !== undefined) { return false }
+    const res = await Client.call('AddGuest', [{ string: login }])
+    if (res instanceof Error) { return res }
+    this._guestlist.push({
+      login, nickname, date, callerNickname: caller.nickname,
+      callerLogin: caller.login
+    })
+    void this.guestlistRepo.add(login, date, caller.login)
+    Logger.info(`${caller.nickname} (${caller.login}) has added ${login} to guestlist`)
+    Client.callNoRes('SaveGuestList', [{ string: this.guestlistFile }])
+    return true
+  }
+
+  /**
+   * Removes a player from server guestlist, saves it and deletes him from guestlist table
+   * @param login Player login
+   * @param caller Caller player object
+   * @returns True if successfull, false if player was not in the guestlist, Error if dedicated server call fails
+   */
+  static async removeGuest(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
+    if (!this._guestlist.some(a => a.login === login)) { return false }
+    const res = await Client.call('RemoveGuest', [{ string: login }])
+    if (res instanceof Error) { return res }
+    this._guestlist = this._guestlist.filter(a => a.login !== login)
+    void this.guestlistRepo.remove(login)
+    if (caller !== undefined) {
+      Logger.info(`${caller.nickname} (${caller.login}) has removed ${login} from guestlist`)
+    } else {
+      Logger.info(`${login} has been removed from guestlist`)
+    }
+    Client.callNoRes('SaveGuestList', [{ string: this.guestlistFile }])
+    return true
+  }
+
+  /**
+   * Gets ban information for given login
+   * @param login Player login
+   * @returns Ban object or undefined if the player isn't banned
+   */
+  static getBan(login: string): Readonly<TMBanlistEntry> | undefined
+  /**
+   * Gets multiple bans information for given logins
+   * @param logins Array of player logins
+   * @returns Array of ban objects
+   */
+  static getBan(logins: string[]): Readonly<TMBanlistEntry>[]
+  static getBan(logins: string | string[]): Readonly<TMBanlistEntry> | Readonly<TMBanlistEntry>[] | undefined {
+    if (typeof logins === 'string') {
+      return this._banlist.find(a => a.login === logins)
+    }
+    return this._banlist.filter(a => logins.includes(a.login))
+  }
+
+  /**
+   * Gets blacklist information for given login
+   * @param login Player login
+   * @returns Blacklist object or undefined if the player isn't blacklisted
+   */
+  static getBlacklist(login: string): Readonly<TMBlacklistEntry> | undefined
+  /**
+   * Gets multiple blacklists information for given logins
+   * @param logins Array of player logins
+   * @returns Array of blacklist objects
+   */
+  static getBlacklist(logins: string[]): Readonly<TMBlacklistEntry>[]
+  static getBlacklist(logins: string | string[]): Readonly<TMBlacklistEntry> | Readonly<TMBlacklistEntry>[] | undefined {
+    if (typeof logins === 'string') {
+      return this._blacklist.find(a => a.login === logins)
+    }
+    return this._blacklist.filter(a => logins.includes(a.login))
+  }
+
+  /**
+   * Gets mute information for given login
+   * @param login Player login
+   * @returns Mute object or undefined if the player isn't muted
+   */
+  static getMute(login: string): Readonly<TMMutelistEntry> | undefined
+  /**
+   * Gets multiple mutes information for given logins
+   * @param logins Array of player logins
+   * @returns Array of mute objects
+   */
+  static getMute(logins: string[]): Readonly<TMMutelistEntry>[]
+  static getMute(logins: string | string[]): Readonly<TMMutelistEntry> | Readonly<TMMutelistEntry>[] | undefined {
+    if (typeof logins === 'string') {
+      return this._mutelist.find(a => a.login === logins)
+    }
+    return this._mutelist.filter(a => logins.includes(a.login))
+  }
+
+  /**
+   * Gets guest information for given login
+   * @param login Player login
+   * @returns Guest object or undefined if the player isn't in the guestlist
+   */
+  static getGuest(login: string): Readonly<TMGuestlistEntry> | undefined
+  /**
+   * Gets multiple guests information for given logins
+   * @param logins Array of player logins
+   * @returns Array of guest objects
+   */
+  static getGuest(logins: string[]): Readonly<TMGuestlistEntry>[]
+  static getGuest(logins: string | string[]): Readonly<TMGuestlistEntry> | Readonly<TMGuestlistEntry>[] | undefined {
+    if (typeof logins === 'string') {
+      return this._guestlist.find(a => a.login === logins)
+    }
+    return this._guestlist.filter(a => logins.includes(a.login))
+  }
+
+  /**
+   * @returns Array of all ban objects
+   */
+  static get banlist(): Readonly<TMBanlistEntry>[] {
+    return [...this._banlist]
+  }
+
+  /**
+   * @returns Array of all blacklist objects
+   */
+  static get blacklist(): Readonly<TMBlacklistEntry>[] {
+    return [...this._blacklist]
+  }
+
+  /**
+   * @returns Array of all mute objects
+   */
+  static get mutelist(): Readonly<TMMutelistEntry>[] {
+    return [...this._mutelist]
+  }
+
+  /**
+   * @returns Array of all guest objects
+   */
+  static get guestlist(): Readonly<TMGuestlistEntry>[] {
     return [...this._guestlist]
   }
 
-  static async addToGuestlist(login: string, callerLogin: string): Promise<boolean | Error> {
-    if (this._guestlist.some(a => a.login === login) === true) { return false }
-    const date: Date = new Date()
-    const res: any[] | Error = await Client.call('AddGuest', [{ string: login }])
-    if (res instanceof Error) { return res }
-    this._guestlist.push({ login, date, callerLogin })
-    Client.callNoRes('SaveGuestList', [{ string: this.guestListFile }])
-    void this.repo.addToGuestlist(login, date, callerLogin)
-    Logger.info(`${callerLogin} has added ${login} to guestlist`)
-    return true
+  /**
+   * @returns Number of banned players
+   */
+  static get banCount(): number {
+    return this._banlist.length
   }
 
-  static async removeFromGuestlist(login: string, callerLogin?: string): Promise<boolean | Error> {
-    const index: number = this._guestlist.findIndex(a => a.login === login)
-    if (index === -1) { return false }
-    const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
-    if (res instanceof Error) { return res }
-    Client.callNoRes('SaveGuestList', [{ string: this.guestListFile }])
-    this._guestlist.splice(index, 1)
-    void this.repo.removeFromGuestlist(login)
-    if (callerLogin !== undefined) {
-      Logger.info(`${callerLogin} has removed ${login} from guestlist`)
-    } else {
-      Logger.info(`${login} was removed from guestlist`)
-    }
-    return true
+  /**
+   * @returns Number of blacklisted players
+   */
+  static get blacklistCount(): number {
+    return this._blacklist.length
   }
 
-  private static async fixBanlistCoherence(): Promise<void> {
-    const banlist: any[] | Error = await Client.call('GetBanList', [{ int: 5000 }, { int: 0 }])
-    if (banlist instanceof Error) {
-      await Logger.fatal('Failed to fetch banlist', 'Server responded with error:', banlist.message)
-      return
-    }
-    for (const login of this._banlist.map(a => a.login)) {
-      if (!banlist.some((a: any): boolean => a.Login === login)) {
-        const res: any[] | Error = await Client.call('BanAndBlackList', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to add login ${login} to banlist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
-    for (const login of banlist.map((a): any => a.Login)) {
-      if (!this._banlist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('UnBan', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to remove login ${login} from banlist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
+  /**
+   * @returns Number of muted players
+   */
+  static get muteCount(): number {
+    return this._mutelist.length
   }
 
-  private static async fixBlacklistCoherence(): Promise<void> {
-    for (const e of PlayerService.players) {
-      if (this._blacklist.some(a => a.login === e.login)) {
-        await Client.call('Kick', [{ string: e.login }])
-      }
-    }
-  }
-
-  private static async fixGuestlistCoherence(): Promise<void> {
-    const guestList: any[] | Error = await Client.call('GetGuestList', [{ int: 5000 }, { int: 0 }])
-    if (guestList instanceof Error) {
-      await Logger.fatal('Failed to fetch guestlist', 'Server responded with error:', guestList.message)
-      return
-    }
-    for (const login of this._guestlist.map(a => a.login)) {
-      if (!guestList.some((a: any): boolean => a.Login === login)) {
-        const res: any[] | Error = await Client.call('AddGuest', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to add login ${login} to guestlist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
-    for (const login of guestList.map((a): any => a.Login)) {
-      if (!this._guestlist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
-    Client.callNoRes('SaveGuestList', [{ string: this.guestListFile }])
-  }
-
-  private static async fixMutelistCoherence(): Promise<void> {
-    const muteList: any[] | Error = await Client.call('GetIgnoreList', [{ int: 5000 }, { int: 0 }])
-    if (muteList instanceof Error) {
-      await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', muteList.message)
-      return
-    }
-    for (const login of this._mutelist.map(a => a.login)) {
-      if (!muteList.some((a: any): boolean => a.Login === login)) {
-        const res: any[] | Error = await Client.call('Ignore', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to add login ${login} to mutelist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
-    for (const login of muteList.map((a): any => a.Login)) {
-      if (!this._mutelist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to remove login ${login} from mutelist`, `Server responded with error:`, res.message)
-        }
-      }
-    }
-  }
-
-  private static poll(): void {
-    setInterval((): void => {
-      const date: Date = new Date()
-      for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
-        this.unban(e.login)
-      }
-      for (const e of this._blacklist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
-        this.removeFromBlacklist(e.login)
-      }
-      for (const e of this._mutelist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
-        this.removeFromMutelist(e.login)
-      }
-    }, 5000)
+  /**
+   * @returns Number of guests
+   */
+  static get guestCount(): number {
+    return this._guestlist.length
   }
 
 }
