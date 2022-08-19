@@ -114,7 +114,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      tm.addToBlacklist(targetInfo.login, info.login, reason, expireDate)
+      tm.admin.addToBlacklist(targetInfo.login, info, reason, targetInfo.nickname, expireDate)
       const reasonString: string = reason === undefined ? '' : ` Reason${tm.utils.palette.highlight}: ${reason}${tm.utils.palette.admin}.`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.multiCallNoRes({
@@ -149,7 +149,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      tm.removeFromBlacklist(targetInfo.login, info.login)
+      tm.admin.unblacklist(targetInfo.login, info)
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unblacklisted `
         + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}.`
@@ -217,7 +217,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: boolean | Error = await tm.addToGuestlist(login, info.login)
+      const res: boolean | Error = await tm.admin.addGuest(login, info)
       if (res instanceof Error) {
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to add to guest list.`, info.login)
         return
@@ -245,7 +245,7 @@ const commands: TMCommand[] = [
           return
         }
       }
-      const res: boolean | Error = await tm.removeFromGuestlist(login, info.login)
+      const res: boolean | Error = await tm.admin.removeGuest(login, info)
       if (res instanceof Error) {
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to remove from guest list.`, info.login)
         return
@@ -285,7 +285,7 @@ const commands: TMCommand[] = [
         return
       }
       else if (targetInfo.privilege < 1) {
-        tm.setPrivilege(targetLogin, -1, info.login)
+        tm.admin.setPrivilege(targetLogin, -1, info)
       }
       else {
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot disable commands of a privileged person.`, callerLogin)

@@ -22,7 +22,7 @@ export default class BlacklistList extends PopupWindow {
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    tm.removeFromBlacklist(targetPlayer.login, info.login)
+                    tm.admin.unblacklist(targetPlayer.login, info)
                     tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
                         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unblacklisted `
                         + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`

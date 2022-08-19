@@ -309,9 +309,47 @@ export const trakman = {
 
   admin: {
 
+    setPrivilege: AdministrationService.setPrivilege.bind(AdministrationService),
+
     ban: AdministrationService.ban.bind(AdministrationService),
 
-    unban: AdministrationService.unban.bind(AdministrationService)
+    unban: AdministrationService.unban.bind(AdministrationService),
+
+    addToBlacklist: AdministrationService.addToBlacklist.bind(AdministrationService),
+
+    unblacklist: AdministrationService.unblacklist.bind(AdministrationService),
+
+    mute: AdministrationService.mute.bind(AdministrationService),
+
+    unmute: AdministrationService.unmute.bind(AdministrationService),
+
+    addGuest: AdministrationService.addGuest.bind(AdministrationService),
+
+    removeGuest: AdministrationService.removeGuest.bind(AdministrationService),
+
+    getBan: AdministrationService.getBan.bind(AdministrationService),
+
+    getBlacklist: AdministrationService.getBlacklist.bind(AdministrationService),
+
+    getMute: AdministrationService.getMute.bind(AdministrationService),
+
+    getGuest: AdministrationService.getGuest.bind(AdministrationService),
+
+    get banlist() { return AdministrationService.banlist },
+
+    get blacklist() { return AdministrationService.blacklist },
+
+    get mutelist() { return AdministrationService.mutelist },
+
+    get guestlist() { return AdministrationService.guestlist },
+
+    get banCount() { return AdministrationService.banCount },
+
+    get blacklistCount() { return AdministrationService.blacklistCount },
+
+    get muteCount() { return AdministrationService.muteCount },
+
+    get guestCount() { return AdministrationService.guestCount }
 
   },
 
@@ -389,15 +427,6 @@ export const trakman = {
   addListener: Events.addListener,
 
   /**
-   * Sets a player privilege level
-   * @param login Player login
-   * @param privilege Privilege level
-   */
-  setPrivilege(login: string, privilege: number, adminLogin: string): void {
-    PlayerService.setPrivilege(login, privilege, adminLogin)
-  },
-
-  /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
@@ -407,61 +436,6 @@ export const trakman = {
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
-  },
-
-  /**
-   * Adds a player to the server blacklist
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional blacklist reason
-   * @param expireDate Optional blacklist expire date
-   */
-  addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server blacklist
-   * @param login Player login
-   */
-  removeFromBlacklist: (login: string, callerLogin?: string): boolean => {
-    return AdministrationService.removeFromBlacklist(login, callerLogin)
-  },
-
-  /**
-   * Adds a player to the server mute list
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional mute reason
-   * @param expireDate Optional mute expire date
-   */
-  addToMutelist: async (login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<true | Error> => {
-    return await AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server mute list
-   * @param login Player login
-   */
-  removeFromMutelist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromMutelist(login, callerLogin)
-  },
-
-  /**
-   * Adds a player to the server guest list
-   * @param login Player login
-   * @param callerLogin Admin login
-   */
-  addToGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
-    return await AdministrationService.addToGuestlist(login, callerLogin)
-  },
-
-  /**
-   * Removes a player from the server guest list
-   * @param login Player login
-   */
-  removeFromGuestlist: async (login: string, callerLogin?: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromGuestlist(login, callerLogin)
   },
 
   // TO BE REMOVED

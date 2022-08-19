@@ -1,7 +1,7 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
 
-const createQuery: string = `CREATE TABLE IF NOT EXISTS blacklist(
+const createQuery: string = `CREATE TABLE IF NOT EXISTS mutelist(
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller_id INT4 NOT NULL,
@@ -25,39 +25,39 @@ interface TableEntry {
 
 const playerRepo = new PlayerRepository()
 
-export class BlacklistRepository extends Repository {
+export class MutelistRepository extends Repository {
 
   async initialize(): Promise<void> {
     playerRepo.initialize()
     await super.initialize(createQuery)
   }
 
-  async get(): Promise<TMBlacklistEntry[]> {
-    const query: string = `SELECT blacklist.login, player.nickname, date, caller.login AS caller_login, 
-    caller.nickname AS caller_nickname, reason, expires FROM blacklist
-    JOIN players AS caller ON caller.id=blacklist.caller_id
-    LEFT JOIN players AS player ON player.login=blacklist.login`
-    return (await this.query(query)).map(a => this.constructBlacklistObject(a))
+  async get(): Promise<TMMutelistEntry[]> {
+    const query: string = `SELECT mutelist.login, player.nickname, date, caller.login AS caller_login, 
+    caller.nickname AS caller_nickname, reason, expires FROM mutelist
+    JOIN players AS caller ON caller.id=mutelist.caller_id
+    LEFT JOIN players AS player ON player.login=mutelist.login`
+    return (await this.query(query)).map(a => this.constructMutelistObject(a))
   }
 
   async add(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
-    const query: string = `INSERT INTO blacklist(login, date, caller_id, reason, expires) 
+    const query: string = `INSERT INTO mutelist(login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5);`
     const callerId = playerRepo.getId(callerLogin)
     await this.query(query, login, date, callerId, reason, expireDate)
   }
 
   async update(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
-    const query: string = `UPDATE blacklist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE login=$5;`
+    const query: string = `UPDATE mutelist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE login=$5;`
     await this.query(query, date, callerLogin, reason, expireDate, login)
   }
 
   async remove(login: string): Promise<void> {
-    const query: string = `DELETE FROM blacklist WHERE login=$1;`
+    const query: string = `DELETE FROM mutelist WHERE login=$1;`
     await this.query(query, login)
   }
 
-  private constructBlacklistObject(entry: TableEntry): TMBlacklistEntry {
+  private constructMutelistObject(entry: TableEntry): TMMutelistEntry {
     return {
       login: entry.login,
       nickname: entry.nickname ?? undefined,
