@@ -1,5 +1,5 @@
 export default {
-  enabled: true,
+  enabled: false,
   dediCount: 30,
   serverPassword: 'YourPassword',
   port: 8002,
