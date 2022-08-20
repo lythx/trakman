@@ -87,7 +87,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
   const temp: any = tm.maps.current
   temp.dedis = _dedis
   const mapDedisInfo: MapDedisInfo = temp
-  Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
+  //Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
   return true
 }
 
@@ -267,5 +267,5 @@ const constructRecordObject = (player: TMPlayer, mapId: string,
 
 const getLogString = (previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }): string[] => {
   const rs = tm.utils.getRankingString(previousPosition, position, previousTime, time)
-  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
 }
