@@ -48,7 +48,7 @@ export default class GuestlistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, { padding: 0.2 }),
 
         ]
-        const guestlisted = tm.guestlist
+        const guestlisted = tm.admin.guestlist
         const cancer: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of guestlisted) {
@@ -70,7 +70,7 @@ export default class GuestlistList extends PopupWindow {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
 
-        const players = tm.guestlist
+        const players = tm.admin.guestlist
         const rows = Math.min(this.entries, players.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {

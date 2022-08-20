@@ -446,22 +446,6 @@ export const trakman = {
     return { ..._UIIDS }
   },
 
-  get banlist() {
-    return AdministrationService.banlist
-  },
-
-  get blacklist() {
-    return AdministrationService.blacklist
-  },
-
-  get mutelist() {
-    return AdministrationService.mutelist
-  },
-
-  get guestlist() {
-    return AdministrationService.guestlist
-  },
-
   get mkPlayerVotes(): MKVote[] {
     return ManiakarmaService.playerVotes
   },

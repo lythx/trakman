@@ -114,7 +114,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
     }
     const muteCell = (i: number, j: number, w: number, h: number): string => {
-      const mutelist = tm.mutelist
+      const mutelist = tm.admin.mutelist
       let iconser = stringToObjectProperty(CONFIG.playerList.mute, ICONS)
       if (mutelist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.ban, ICONS)
@@ -126,7 +126,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
     }
     const guestlistCell = (i: number, j: number, w: number, h: number): string => {
-      let guestlist = tm.guestlist
+      let guestlist = tm.admin.guestlist
       let iconser = stringToObjectProperty(CONFIG.playerList.addGuest, ICONS)
       if (guestlist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.removeGuest, ICONS)

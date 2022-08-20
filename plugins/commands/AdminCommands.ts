@@ -61,7 +61,7 @@ const commands: TMCommand[] = [
       const result = await tm.admin.ban(target.ip, target.login, info, target.nickname, reason, expireDate)
       if (result instanceof Error) {
         tm.log.error(`Error while banning player ${tm.utils.strip(target.nickname)} (${target.login})`, result.message)
-        tm.sendMessage(`Error while banning player ${tm.utils.strip(target.nickname)} (${target.login})`, info.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while banning player ${tm.utils.strip(target.nickname)} (${target.login})`, info.login)
         return
       }
       const reasonString: string = reason === undefined ? '' : ` Reason${tm.utils.palette.highlight}: ${reason}${tm.utils.palette.admin}.`
@@ -69,7 +69,6 @@ const commands: TMCommand[] = [
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has banned `
         + `${tm.utils.palette.highlight + tm.utils.strip(target.nickname)}${tm.utils.palette.admin}${durationString}.${tm.utils.palette.admin}${reasonString}`)
-
     },
     privilege: 2
   },
@@ -86,7 +85,7 @@ const commands: TMCommand[] = [
       let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while unbanning player ${logStr}`, result.message)
-        tm.sendMessage(`Error while unbanning player ${logStr}`, info.login)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while unbanning player ${logStr}`, info.login)
         return
       }
       if (result === false) {
@@ -105,30 +104,23 @@ const commands: TMCommand[] = [
     help: 'Blacklist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo == null) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player.`, info.login)
-          return
-        }
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
       }
-      tm.admin.addToBlacklist(targetInfo.login, info, reason, targetInfo.nickname, expireDate)
+      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
+      const result = await tm.admin.addToBlacklist(login, info, target?.nickname, reason, expireDate)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while blacklisting player ${logStr}`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while blacklisting player ${logStr}`, info.login)
+        return
+      }
       const reasonString: string = reason === undefined ? '' : ` Reason${tm.utils.palette.highlight}: ${reason}${tm.utils.palette.admin}.`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.multiCallNoRes({
-        method: 'ChatSendServerMessage',
-        params: [{
-          string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
-            + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}${durationString}.${tm.utils.palette.admin}${reasonString}`
-        }]
-      },
-        {
-          method: 'Kick',
-          params: [{ string: targetInfo.login }, { string: reason === undefined ? 'No reason specified' : `Reason: ${reason}` }]
-        })
+      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin}${durationString}.${tm.utils.palette.admin}${reasonString}`)
     },
     privilege: 2
   },
@@ -137,22 +129,24 @@ const commands: TMCommand[] = [
     help: 'Unblacklist a specific player.',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (tm.blacklist.some(a => a.login === login) === false) {
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
+      }
+      const result = await tm.admin.unblacklist(login, info)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while unblacklisting player ${logStr}`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while unblacklisting player ${logStr}`, info.login)
+        return
+      }
+      if (result === false) {
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player was not blacklisted.`, info.login)
         return
       }
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo == null) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player.`, info.login)
-          return
-        }
-      }
-      tm.admin.unblacklist(targetInfo.login, info)
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unblacklisted `
-        + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}.`
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin}.`
       )
     },
     privilege: 2
@@ -204,31 +198,29 @@ const commands: TMCommand[] = [
     },
     privilege: 2
   },
-  {
+  { // change this to op perhaps?
     aliases: ['ag', 'addguest'],
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo == null) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player or no login specified.`, info.login)
-          return
-        }
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
       }
-      const res: boolean | Error = await tm.admin.addGuest(login, info)
-      if (res instanceof Error) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to add to guest list.`, info.login)
+      const result = await tm.admin.addGuest(login, info, target?.nickname)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while adding player ${logStr} to the guestlist`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding player ${logStr} to the guestlist`, info.login)
         return
       }
-      if (res === false) {
+      if (result === false) {
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player is already in the guestlist.`, info.login)
         return
       }
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added `
-        + `${tm.utils.palette.highlight + targetInfo.nickname}${tm.utils.palette.admin} to guestlist.`)
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin} to the guestlist.`)
     },
     privilege: 2
   },
@@ -237,26 +229,25 @@ const commands: TMCommand[] = [
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo == null) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player or no login specified.`, info.login)
-          return
-        }
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
       }
-      const res: boolean | Error = await tm.admin.removeGuest(login, info)
-      if (res instanceof Error) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to remove from guest list.`, info.login)
+      const result = await tm.admin.removeGuest(login, info)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while removing player ${logStr} from the guestlist`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while removing player ${logStr} from the guestlist`, info.login)
         return
       }
-      if (res === false) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player is not in the guestlist.`, info.login)
+      if (result === false) {
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player was not in the guestlist.`, info.login)
         return
       }
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
-        + `${tm.utils.palette.highlight + targetInfo.nickname}${tm.utils.palette.admin} from guestlist.`)
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin} from the guestlist.`
+      )
     },
     privilege: 2
   },
