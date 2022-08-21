@@ -69,12 +69,12 @@ export class AdministrationService {
       return
     }
     for (const e of this._banlist) {
-      if (!banlist.some((a: any): boolean => a.Login === e)) {
+      if (!banlist.some((a: any): boolean => a.Login === e.login)) {
         const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
           [{ string: e.login }, { string: e.reason }]
         const res: any[] | Error = await Client.call('BanAndBlackList', params)
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e} to banlist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to add login ${e.login} to banlist`, `Server responded with error:`, res.message)
         }
       }
     }
@@ -101,12 +101,12 @@ export class AdministrationService {
       return
     }
     for (const e of this._blacklist) {
-      if (!blacklist.some((a: any): boolean => a.Login === e)) {
+      if (!blacklist.some((a: any): boolean => a.Login === e.login)) {
         const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
           [{ string: e.login }, { string: e.reason }]
         const res: any[] | Error = await Client.call('BlackList', params)
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e} to blacklist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to add login ${e.login} to blacklist`, `Server responded with error:`, res.message)
         }
       }
     }
@@ -135,11 +135,12 @@ export class AdministrationService {
       await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', mutelist.message)
       return
     }
+    console.log(mutelist)
     for (const e of this._mutelist) {
-      if (!mutelist.some((a: any): boolean => a.Login === e)) {
+      if (!mutelist.some((a: any): boolean => a.Login === e.login)) {
         const res: any[] | Error = await Client.call('Ignore', [{ string: e.login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e} to mutelist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to add login ${e.login} to mutelist`, `Server responded with error:`, res.message)
         }
       }
     }
@@ -164,10 +165,10 @@ export class AdministrationService {
       return
     }
     for (const e of this._guestlist) {
-      if (!guestlist.some((a: any): boolean => a.Login === e)) {
+      if (!guestlist.some((a: any): boolean => a.Login === e.login)) {
         const res: any[] | Error = await Client.call('AddGuest', [{ string: e.login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e} to guestlist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to add login ${e.login} to guestlist`, `Server responded with error:`, res.message)
         }
       }
     }

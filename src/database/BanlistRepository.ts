@@ -45,7 +45,7 @@ export class BanlistRepository extends Repository {
   async add(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
     const query: string = `INSERT INTO banlist(ip, login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5, $6);`
-    const callerId = playerRepo.getId(callerLogin)
+    const callerId = await playerRepo.getId(callerLogin)
     await this.query(query, ip, login, date, callerId, reason, expireDate)
   }
 
