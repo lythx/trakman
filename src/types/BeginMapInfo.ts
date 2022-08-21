@@ -14,4 +14,5 @@ interface BeginMapInfo {
   readonly lapsAmount: number
   readonly checkpointsAmount: number
   readonly records: TMRecord[]
+  readonly isRestart: boolean
 }

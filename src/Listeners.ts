@@ -180,7 +180,8 @@ export class Listeners {
           lapRace: c.LapRace,
           lapsAmount: c.NbLaps,
           checkpointsAmount: c.NbCheckpoints,
-          records: RecordService.localRecords
+          records: RecordService.localRecords,
+          isRestart
         }
         // Check whether the map was restarted
         if (isRestart == false) {
