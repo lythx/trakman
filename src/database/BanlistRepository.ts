@@ -50,8 +50,9 @@ export class BanlistRepository extends Repository {
   }
 
   async update(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
-    const query: string = `UPDATE banlist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE ip=$5 AND login=$6;`
-    await this.query(query, date, callerLogin, reason, expireDate, ip, login)
+    const query: string = `UPDATE banlist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE ip=$5 AND login=$6;`
+    const callerId = await playerRepo.getId(callerLogin)
+    await this.query(query, date, callerId, reason, expireDate, ip, login)
   }
 
   async remove(login: string): Promise<void> {

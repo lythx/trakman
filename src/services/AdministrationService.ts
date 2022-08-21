@@ -59,7 +59,8 @@ export class AdministrationService {
 
   /**
    * Bans and blacklists all the players present in banlist table if they aren't banned,
-   * unbans all players who are on the server banlist but not in banlist table
+   * unbans all players who are on the server banlist but not in banlist table,
+   * kicks all banned players from the server
    * (this method doesn't save the blacklist)
    */
   private static async fixBanlistCoherence(): Promise<void> {
@@ -86,16 +87,23 @@ export class AdministrationService {
         }
       }
     }
+    for (const e of PlayerService.players) {
+      if (this._banlist.some(a => a.login === e.login)) {
+        Client.call('Kick', [{ string: e.login }])
+      }
+    }
   }
 
   /**
    * Blacklists all the players present in blacklist table if they aren't blacklisted,
    * saves the blacklist file,
-   * unblacklists all players who are on the server blacklist but not in banlist and blacklist tables
+   * unblacklists all players who are on the server blacklist but not in banlist and blacklist tables,
+   * kicks all blacklisted players from the server
    * (this method needs to be run after banlist coherence is fixed)
    */
   private static async fixBlacklistCoherence(): Promise<void> {
     const blacklist: any[] | Error = await Client.call('GetBlackList', [{ int: 5000 }, { int: 0 }])
+    console.log(blacklist)
     if (blacklist instanceof Error) {
       await Logger.fatal('Failed to fetch blacklist', 'Server responded with error:', blacklist.message)
       return
@@ -123,6 +131,11 @@ export class AdministrationService {
     if (save instanceof Error) {
       await Logger.fatal(`Failed to save blacklist`, `Server responded with error:`, save.message)
     }
+    for (const e of PlayerService.players) {
+      if (this._blacklist.some(a => a.login === e.login)) {
+        Client.call('Kick', [{ string: e.login }])
+      }
+    }
   }
 
   /**
@@ -135,7 +148,6 @@ export class AdministrationService {
       await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', mutelist.message)
       return
     }
-    console.log(mutelist)
     for (const e of this._mutelist) {
       if (!mutelist.some((a: any): boolean => a.Login === e.login)) {
         const res: any[] | Error = await Client.call('Ignore', [{ string: e.login }])
@@ -265,9 +277,8 @@ export class AdministrationService {
       Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
       return true
     }
-    const params: CallParams[] = reason === undefined ? [{ string: login }, { boolean: true }] :
-      [{ string: login }, { string: reason }, { boolean: true }]
-    const res = await Client.call('BanAndBlackList', params)
+    const res = await Client.call('BanAndBlackList',
+      [{ string: login }, { string: reason ?? 'No reason specified' }, { boolean: true }])
     if (res instanceof Error) { return res }
     this._banlist.push({
       ip, login, nickname, date, callerNickname: caller.nickname,
