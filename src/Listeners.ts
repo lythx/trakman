@@ -7,7 +7,6 @@ import 'dotenv/config'
 import { GameService } from './services/GameService.js'
 import { MapService } from './services/MapService.js'
 import { ServerConfig } from './ServerConfig.js'
-import { TMXService } from './services/TMXService.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 
@@ -188,8 +187,6 @@ export class Listeners {
           // In case it wasn't, update the ongoing map
           await MapService.update()
           await VoteService.nextMap()
-          // This takes a long time, also there is an event for this
-          void TMXService.nextMap()
         }
         // Update server config
         ServerConfig.update()

@@ -1,11 +1,12 @@
 import config from './Config.js'
 import { trakman as tm } from '../../src/Trakman.js'
 
+// fill with empty strings at start to avoid undefined error on startup
 const history: (TMXMapInfo | string)[] = []
-let current: TMXMapInfo | string
-const queue: (TMXMapInfo | string)[] = []
+let current: TMXMapInfo | string = ''
 const queueSize: number = config.queueSize
 const historySize: number = config.historyCount
+const queue: (TMXMapInfo | string)[] = new Array(queueSize).fill('')
 
 interface TMXMapChangedInfo {
   history: (TMXMapInfo | null)[]
@@ -35,11 +36,11 @@ const initialize = async (): Promise<void> => {
     await tm.log.fatal(`jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
   }
   const res: TMXMapInfo | Error = await tm.tmx.fetchMapInfo(tm.maps.current.id)
-  current = res instanceof Error ? tm.maps.current.id : current
+  current = res instanceof Error ? tm.maps.current.id : res
   const q = tm.jukebox.queue.slice(0, queueSize)
-  for (const e of q) {
+  for (const [i, e] of q.entries()) {
     const map: TMXMapInfo | Error = await tm.tmx.fetchMapInfo(e.id)
-    queue.push(map instanceof Error ? e.id : map)
+    queue[i] = map instanceof Error ? e.id : map
   }
   emitMapChangeEvent()
 }

@@ -11,7 +11,7 @@ import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
-import { TMXService } from './services/TMXService.js'
+import { TMXService } from './TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ManiakarmaService } from './services/ManiakarmaService.js'
@@ -60,11 +60,11 @@ async function main(): Promise<void> {
   Logger.trace('Loading server config...')
   await ServerConfig.initialize()
   Logger.trace('Server config loaded')
-  if (process.env.USE_TMX === 'YES') {
-    Logger.trace('Initializing TMX service...')
-    await TMXService.initialize()
-    Logger.trace('TMX service instantiated')
-  }
+  // if (process.env.USE_TMX === 'YES') { // TODO MOVE THESE LOGS TO THE PLUGIN
+  //   Logger.trace('Initializing TMX service...')
+  //   await TMXService.initialize()
+  //   Logger.trace('TMX service instantiated')
+  // }
   // if (process.env.USE_DEDIMANIA === 'YES') { // TODO MOVE THESE LOGS TO THE PLUGIN
   //   Logger.trace('Connecting to Dedimania...')
   //   const status: true | Error = await DedimaniaService.initialize()

@@ -24,7 +24,6 @@ interface EventWithCallbackInterface {
   "Controller.PrivilegeChanged": PrivilegeChangedInfo
   "Controller.LocalRecords": TMRecord[]
   "Controller.JukeboxChanged": TMMap[]
-  "Controller.TMXQueueChanged": (TMXMapInfo | null)[]
   "Controller.RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
 }
 
