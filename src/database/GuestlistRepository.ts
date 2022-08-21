@@ -39,7 +39,7 @@ export class GuestlistRepository extends Repository {
   async add(login: string, date: Date, callerLogin: string): Promise<void> {
     const query: string = `INSERT INTO guestlist(login, date, caller_id) 
     VALUES($1, $2, $3);`
-    const callerId = playerRepo.getId(callerLogin)
+    const callerId = await playerRepo.getId(callerLogin)
     await this.query(query, login, date, callerId)
   }
 

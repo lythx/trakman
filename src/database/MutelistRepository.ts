@@ -43,7 +43,7 @@ export class MutelistRepository extends Repository {
   async add(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
     const query: string = `INSERT INTO mutelist(login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5);`
-    const callerId = playerRepo.getId(callerLogin)
+    const callerId = await playerRepo.getId(callerLogin)
     await this.query(query, login, date, callerId, reason, expireDate)
   }
 
