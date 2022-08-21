@@ -2,7 +2,6 @@ import { getResultPosition, RecordList, RESULTCONFIG as CONFIG, IDS, resultStati
 import { trakman as tm } from '../../../../src/Trakman.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
-import 'dotenv/config'
 
 export default class DediRankingResult extends StaticComponent {
 
@@ -11,7 +10,7 @@ export default class DediRankingResult extends StaticComponent {
   private readonly positionX: number
   private readonly positionY: number
   private readonly recordList: RecordList
-  private readonly maxDedis: number = Number(process.env.DEDIS_AMOUNT)
+  private readonly maxDedis: number = dedimania.maxRecordCount
 
   constructor() {
     super(IDS.dedisResult, 'result')

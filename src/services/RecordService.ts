@@ -57,6 +57,7 @@ export class RecordService {
     const presentMaps = MapService.maps.map(a => a.id)
     if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
     let records: TMRecord[] = await this.repo.getAll()
+    if (records.length === 0) { return }
     let rank = 1
     let prevMap = records[0].map
     let curMap = records[0].map
@@ -80,7 +81,7 @@ export class RecordService {
       }
       rank++
       prevMap = records[i].map
-      curMap = records[i + 1].map
+      curMap = records[i + 1]?.map
     }
   }
 

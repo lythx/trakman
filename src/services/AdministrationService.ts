@@ -130,7 +130,7 @@ export class AdministrationService {
    * unmutes all players who are on the server mutelist but not in mutelist table
    */
   private static async fixMutelistCoherence(): Promise<void> {
-    const mutelist: any[] | Error = await Client.call('GetMuteList', [{ int: 5000 }, { int: 0 }])
+    const mutelist: any[] | Error = await Client.call('GetIgnoreList', [{ int: 5000 }, { int: 0 }])
     if (mutelist instanceof Error) {
       await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', mutelist.message)
       return

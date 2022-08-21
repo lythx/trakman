@@ -26,6 +26,21 @@ CREATE TABLE IF NOT EXISTS maps(
 	    REFERENCES map_ids(id)
 );`
 
+// fix this later probably
+const voteCreateQuery = `CREATE TABLE IF NOT EXISTS votes(
+  map_id INT4 NOT NULL,
+  player_id INT4 NOT NULL,
+  vote INT2 NOT NULL,
+  date TIMESTAMP NOT NULL,
+  PRIMARY KEY(map_id, player_id),
+  CONSTRAINT fk_player_id
+    FOREIGN KEY(player_id) 
+      REFERENCES players(id),
+  CONSTRAINT fk_map_id
+    FOREIGN KEY(map_id)
+      REFERENCES map_ids(id)
+);`
+
 interface TableEntry {
   readonly uid: string
   readonly name: string
@@ -72,6 +87,8 @@ export class MapRepository extends Repository {
   async initialize(): Promise<void> {
     await mapIdsRepo.initialize()
     await super.initialize(createQuery)
+    // This service joins vote service which gets initialized later therefore table needs to be created here
+    await this.query(voteCreateQuery)
   }
 
   async add(...maps: TMMap[]): Promise<void> {
