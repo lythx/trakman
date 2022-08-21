@@ -1,19 +1,36 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import { trakman as tm } from '../../src/Trakman.js'
 import Config from './Config.js'
+import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
-let _dedis: TMDedi[] = []
-let newDedis: TMDedi[] = []
+// TODO overloads and comments
+
+let currentDedis: DediRecord[] = []
+let newDedis: DediRecord[] = []
 const client = new DedimaniaClient()
+
+const recordListeners: ((record: NewDediRecord) => void)[] = []
+const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
+
+const emitRecordEvent = (record: NewDediRecord) => {
+  for (const e of recordListeners) { e(record) }
+}
+
+const emitFetchEvent = (dedis: DediRecord[]) => {
+  for (const e of fetchListeners) { e(dedis) }
+}
 
 const initialize = async (): Promise<void> => {
   const status: true | Error = await client.connect(Config.host, Config.port)
   if (status instanceof Error) {
-    if (status.message !== 'No response from dedimania server') { await tm.log.fatal('Failed to connect to dedimania', status.message) }
+    if (status.message !== 'No response from dedimania server') {
+      tm.log.error('Failed to connect to dedimania', status.message)
+    }
     else {
       tm.log.error(`${status.message}. Attempting to reconnect every 60 seconds...`)
       void reinitialize()
     }
+    return
   }
   updateServerPlayers()
   const current = tm.maps.current
@@ -32,22 +49,21 @@ const reinitialize = async (): Promise<void> => {
   await getRecords(current.id, current.name, current.environment, current.author)
 }
 
-const getRecords = async (id: string, name: string, environment: string, author: string): Promise<true | Error> => {
-  if (Config.enabled === false) { return new Error('Dedimania is not enabled') }
-  _dedis.length = 0
+const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
+  currentDedis.length = 0
   newDedis.length = 0
   if (client.connected === false) {
     let status: boolean | Error = false
     do {
       await new Promise((resolve) => setTimeout(resolve, 60000))
       status = await client.connect('dedimania.net', Config.port)
-      if (id !== tm.maps.current.id) { return new Error(`Failed to connect to dedimania`) }
+      if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
   const cfg: ServerInfo = tm.state.serverConfig
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
   const players = tm.players.list
-  const dedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
+  const rawDedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
     [
       { string: id },
       { string: name },
@@ -74,25 +90,23 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { int: Config.dediCount },
       { array: getPlayersArray() }
     ])
-  if (dedis instanceof Error) {
-    return dedis
+  if (rawDedis instanceof Error) {
+    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), reveived error:`, rawDedis.message)
+    return
   }
-  else if (dedis?.[0]?.Records === undefined) {
-    return new Error(`Failed to fetch records`)
+  else if (rawDedis?.[0]?.Records === undefined) {
+    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), received empty response`)
+    return
   }
-  for (const d of dedis[0].Records) {
-    const record: TMDedi = { login: d.Login, nickname: d.NickName, time: d.Best, checkpoints: d.Checks.slice(0, d.Checks.length - 1) }
-    _dedis.push(record)
-  }
-  const temp: any = tm.maps.current
-  temp.dedis = _dedis
-  const mapDedisInfo: MapDedisInfo = temp
-  //Events.emitEvent('Controller.DedimaniaRecords', mapDedisInfo)
-  return true
+  currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>
+  ({
+    login: a.Login, nickname: a.NickName, time: a.Best,
+    checkpoints: a.Checks.slice(0, a.Checks.length - 1)
+  }))
+  emitFetchEvent(currentDedis)
 }
 
-const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<true | Error> => {
-  if (Config.enabled === false) { return new Error('Dedimania is not enabled') }
+const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -119,43 +133,39 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
     ]
   )
   if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
-  return true
 }
 
-const addRecord = (mapId: string, player: TMPlayer, time: number, checkpoints: number[]): false | Error | DediRecordInfo => {
-  if (Config.enabled === false) { return new Error('Dedimania service is not enabled') }
-  const pb: number | undefined = _dedis.find(a => a.login === player.login)?.time
-  const position: number = _dedis.filter(a => a.time <= time).length + 1
-  if (position > Config.dediCount || time > (pb ?? Infinity)) { return false }
+const addRecord = (mapId: string, player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
+  time: number, checkpoints: number[]): void => {
+  const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
+  const position: number = currentDedis.filter(a => a.time <= time).length + 1
+  if (position > Config.dediCount || time > (pb ?? Infinity)) { return }
   if (pb === undefined) {
-    const dediRecordInfo: DediRecordInfo = constructRecordObject(player, mapId, checkpoints, time, -1, position, -1)
-    _dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, -1, position, -1)
+    currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
     newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
     tm.log.info(getLogString(-1, position, -1, time, player))
-    return dediRecordInfo
-  }
-  if (time === pb) {
-    const previousPosition: number = _dedis.findIndex(a => a.login === _dedis.find(a => a.login === player.login)?.login) + 1
-    const dediRecordInfo: DediRecordInfo = constructRecordObject(player, mapId, checkpoints, time, time, previousPosition, previousPosition)
+    emitRecordEvent(dediRecordInfo)
+  } else if (time === pb) {
+    const previousPosition: number = currentDedis.findIndex(a => a.login === currentDedis.find(a => a.login === player.login)?.login) + 1
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, time, previousPosition, previousPosition)
     tm.log.info(getLogString(previousPosition, previousPosition, time, time, player))
-    return dediRecordInfo
-  }
-  if (time < pb) {
-    const previousIndex: number = _dedis.findIndex(a => a.login === _dedis.find(a => a.login === player.login)?.login)
-    const previousTime: number = _dedis[previousIndex].time
-    if (previousTime === undefined) {
+    emitRecordEvent(dediRecordInfo)
+  } else if (time < pb) {
+    const previousIndex: number = currentDedis.findIndex(a => a.login === currentDedis.find(a => a.login === player.login)?.login)
+    const previousTime: number = currentDedis[previousIndex].time
+    if (previousTime === undefined) { // not sure if this is needed
       tm.log.error(`Can't find player ${player.login} in memory`)
-      return new Error(`Can't find player ${player.login} in memory`)
+      return
     }
-    const dediRecordInfo: DediRecordInfo = constructRecordObject(player, mapId, checkpoints, time, previousTime, position, _dedis.findIndex(a => a.login === player.login) + 1)
-    _dedis = _dedis.filter(a => a.login !== player.login)
-    _dedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, previousTime, position, currentDedis.findIndex(a => a.login === player.login) + 1)
+    currentDedis = currentDedis.filter(a => a.login !== player.login)
+    currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
     newDedis = newDedis.filter(a => a.login !== player.login)
     newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
     tm.log.info(getLogString(previousIndex + 1, position, previousTime, time, player))
-    return dediRecordInfo
+    emitRecordEvent(dediRecordInfo)
   }
-  return false
 }
 
 const updateServerPlayers = (): void => {
@@ -191,7 +201,6 @@ const updateServerPlayers = (): void => {
 }
 
 const playerJoin = async (player: { login: string, nickname: string, region: string, isSpectator: boolean }): Promise<void> => {
-  if (Config.enabled === false) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
     [
       { string: 'TMF' },
@@ -208,7 +217,6 @@ const playerJoin = async (player: { login: string, nickname: string, region: str
 }
 
 const playerLeave = async (player: { login: string, nickname: string }): Promise<void> => {
-  if (Config.enabled === false) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerLeave',
     [
       { string: 'TMF' },
@@ -240,32 +248,105 @@ const getPlayersArray = (): any[] => {
   return arr
 }
 
-const constructRecordObject = (player: TMPlayer, mapId: string,
-  checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): DediRecordInfo => {
+const constructRecordObject = (player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
+  checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): NewDediRecord => {
   return {
-    map: mapId,
-    login: player.login,
+    ...player,
     time,
     checkpoints,
-    nickname: player.nickname,
-    country: player.country,
-    countryCode: player.countryCode,
-    timePlayed: player.timePlayed,
-    joinTimestamp: player.joinTimestamp,
-    wins: player.wins,
-    privilege: player.privilege,
-    visits: player.visits,
     position,
     previousTime,
-    previousPosition,
-    playerId: player.id,
-    ip: player.ip,
-    region: player.region,
-    isUnited: player.isUnited
+    previousPosition
   }
 }
 
 const getLogString = (previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }): string[] => {
   const rs = tm.utils.getRankingString(previousPosition, position, previousTime, time)
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+}
+
+if (Config.isEnabled === true) {
+
+  tm.addListener('Controller.Ready', () => {
+    void initialize()
+  }, true)
+
+  tm.addListener('Controller.BeginMap', (info) => {
+    void getRecords(info.id, info.name, info.environment, info.author)
+  }, true)
+
+  tm.addListener('Controller.EndMap', (info) => {
+    void sendRecords(info.id, info.name, info.environment, info.author, info.checkpointsAmount)
+  })
+
+  tm.addListener('Controller.PlayerJoin', (info) => {
+    void playerJoin(info)
+  })
+
+  tm.addListener('Controller.PlayerLeave', (info) => {
+    void playerLeave(info)
+  })
+
+  tm.addListener('Controller.PlayerFinish', (info) => {
+    void addRecord(info.map, info, info.time, info.checkpoints)
+  }, true)
+
+}
+
+export const dedimania = {
+
+  /**
+   * Adds a callback function to execute on a dedimania record
+   * @param callback Function to execute on event. It takes new record object as a parameter
+   */
+  onRecord(callback: ((record: NewDediRecord) => void)) {
+    recordListeners.push(callback)
+  },
+
+  /**
+   * Adds a callback function to execute when dedimania records get fetched
+   * @param callback Function to execute on event. It takes record objects array as a parameter
+   */
+  onFetch(callback: ((dedis: DediRecord[]) => void)) {
+    fetchListeners.push(callback)
+  },
+
+  getRecord(logins: string | string[]) {
+    if (typeof logins === 'string') {
+      return currentDedis.find(a => a.login === logins)
+    }
+    return currentDedis.filter(a => logins.includes(a.login))
+  },
+
+  getNewRecord(logins: string | string[]) {
+    if (typeof logins === 'string') {
+      return newDedis.find(a => a.login === logins)
+    }
+    return newDedis.filter(a => logins.includes(a.login))
+  },
+
+  get records(): Readonly<DediRecord>[] {
+    return [...currentDedis]
+  },
+
+  get newRecords(): Readonly<DediRecord>[] {
+    return [...newDedis]
+  },
+
+  get recordCount(): number {
+    return currentDedis.length
+  },
+
+  get newRecordCount(): number {
+    return newDedis.length
+  },
+
+  get isEnabled(): boolean {
+    return Config.isEnabled
+  },
+
+  get maxRecordCount(): number {
+    return Config.dediCount
+  }
+
 }
