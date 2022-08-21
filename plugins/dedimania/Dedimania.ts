@@ -358,3 +358,5 @@ export const dedimania = {
   }
 
 }
+
+export { NewDediRecord, DediRecord }

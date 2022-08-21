@@ -1,5 +1,6 @@
 import { getResultPosition, RecordList, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
+import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
 import 'dotenv/config'
 
@@ -23,10 +24,10 @@ export default class DediRankingResult extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (tm.dedis.list.some(a => a.login === info.login)) { this.display() }
+      if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
     tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (tm.dedis.list.some(a => a.login === info.login)) { this.display() }
+      if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
   }
 
@@ -45,7 +46,7 @@ export default class DediRankingResult extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${resultStaticHeader(CONFIG.dedis.title, getIcon(CONFIG.dedis.icon), false, { actionId: IDS.dediCps })}
         <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
-          ${this.recordList.constructXml(login, tm.dedis.list.map(a => ({ ...a, name: a.nickname })))}
+          ${this.recordList.constructXml(login, dedimania.records.map(a => ({ ...a, name: a.nickname })))}
         </frame>
       </frame>
     </manialink>`,
