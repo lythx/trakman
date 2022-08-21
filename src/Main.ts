@@ -6,7 +6,6 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ChatService } from './services/ChatService.js'
 import './commands/InternalCommands.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
@@ -66,12 +65,12 @@ async function main(): Promise<void> {
     await TMXService.initialize()
     Logger.trace('TMX service instantiated')
   }
-  if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to Dedimania...')
-    const status: true | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
-    else { Logger.trace('Connected to Dedimania') }
-  }
+  // if (process.env.USE_DEDIMANIA === 'YES') { // TODO MOVE THESE LOGS TO THE PLUGIN
+  //   Logger.trace('Connecting to Dedimania...')
+  //   const status: true | Error = await DedimaniaService.initialize()
+  //   if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
+  //   else { Logger.trace('Connected to Dedimania') }
+  // }
   if (process.env.USE_MANIAKARMA === 'YES') {
     Logger.trace('Connecting to Maniakarma...')
     const status: void | Error = await ManiakarmaService.initialize()

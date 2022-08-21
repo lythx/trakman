@@ -15,8 +15,6 @@ interface EventWithCallbackInterface {
   "Controller.PlayerCheckpoint": CheckpointInfo
   "Controller.BeginMap": BeginMapInfo
   "Controller.EndMap": EndMapInfo
-  "Controller.DedimaniaRecords": MapDedisInfo
-  "Controller.DedimaniaRecord": DediRecordInfo
   "Controller.KarmaVote": KarmaVoteInfo
   "Controller.ManiakarmaVotes": MKVotesInfo
   "Controller.MapAdded": MapAddedInfo

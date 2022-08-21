@@ -200,6 +200,10 @@ const updateServerPlayers = (): void => {
   }, 240000)
 }
 
+/**
+ * Updates the player information and server plater list on the dedimania website
+ * @param player Player object
+ */
 const playerJoin = async (player: { login: string, nickname: string, region: string, isSpectator: boolean }): Promise<void> => {
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
     [
@@ -216,6 +220,10 @@ const playerJoin = async (player: { login: string, nickname: string, region: str
   if (status instanceof Error) { tm.log.error(`Failed to update dedimania player information for ${tm.utils.strip(player.nickname)} (${player.login})`, status.message) }
 }
 
+/**
+ * Updates the server player list on the dedimania website
+ * @param player Player object
+ */
 const playerLeave = async (player: { login: string, nickname: string }): Promise<void> => {
   const status: any[] | Error = await client.call('dedimania.PlayerLeave',
     [
