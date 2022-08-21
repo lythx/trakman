@@ -44,8 +44,9 @@ export class GuestlistRepository extends Repository {
   }
 
   async update(login: string, date: Date, callerLogin: string): Promise<void> {
-    const query: string = `UPDATE guestlist SET date=$1, caller=$2 WHERE login=$3;`
-    await this.query(query, date, callerLogin, login)
+    const query: string = `UPDATE guestlist SET date=$1, caller_id=$2 WHERE login=$3;`
+    const callerId = await playerRepo.getId(callerLogin)
+    await this.query(query, date, callerId, login)
   }
 
   async remove(login: string): Promise<void> {

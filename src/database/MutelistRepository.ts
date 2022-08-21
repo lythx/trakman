@@ -48,8 +48,9 @@ export class MutelistRepository extends Repository {
   }
 
   async update(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
-    const query: string = `UPDATE mutelist SET date=$1, caller=$2, reason=$3, expires=$4 WHERE login=$5;`
-    await this.query(query, date, callerLogin, reason, expireDate, login)
+    const query: string = `UPDATE mutelist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE login=$5;`
+    const callerId = await playerRepo.getId(callerLogin)
+    await this.query(query, date, callerId, reason, expireDate, login)
   }
 
   async remove(login: string): Promise<void> {
