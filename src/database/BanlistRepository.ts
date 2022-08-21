@@ -8,8 +8,8 @@ const createQuery: string = `CREATE TABLE IF NOT EXISTS banlist(
     caller_id INT4 NOT NULL,
     reason VARCHAR(250),
     expires TIMESTAMP,
-    PRIMARY KEY(ip, login)
-    CONSTRAINT fk_caller_id,
+    PRIMARY KEY(ip, login),
+    CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
 );`

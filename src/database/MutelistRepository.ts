@@ -7,8 +7,8 @@ const createQuery: string = `CREATE TABLE IF NOT EXISTS mutelist(
     caller_id INT4 NOT NULL,
     reason VARCHAR(250),
     expires TIMESTAMP,
-    PRIMARY KEY(login)
-    CONSTRAINT fk_caller_id,
+    PRIMARY KEY(login),
+    CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
 );`

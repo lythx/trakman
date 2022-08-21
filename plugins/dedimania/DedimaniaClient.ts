@@ -56,6 +56,10 @@ export class DedimaniaClient {
               tm.log.error(`Dedimania server didn't send sessionId`, `Received: ${this.response.data}`)
               resolve(new Error(`Dedimania server didn't send sessionId`))
               return
+            } else if (this.response.json[0] === false) {
+              tm.log.error(`Dedimania authentication failed`)
+              resolve(new Error(`Dedimania authentication failed`))
+              return
             }
             this.sessionId = this.response.sessionId
             this._connected = true
