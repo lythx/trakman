@@ -1,5 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
+import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
 import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
 
 export default class DediSectors extends PopupWindow {
@@ -18,7 +19,7 @@ export default class DediSectors extends PopupWindow {
 
   constructor() {
     super(IDS.dediSectors, stringToObjectProperty(CONFIG.dediSectors.icon, ICONS), CONFIG.dediSectors.title, CONFIG.dediSectors.navbar)
-    const records = tm.dedis.list
+    const records = dedimania.records
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
     this.paginator.onPageChange = (login: string): void => {
@@ -27,13 +28,13 @@ export default class DediSectors extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    tm.addListener('Controller.DedimaniaRecords', (): void => {
+    dedimania.onFetch((): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
-      this.paginator.setPageCount(Math.ceil(tm.dedis.list.length / this.entries))
+      this.paginator.setPageCount(Math.ceil(dedimania.recordCount / this.entries))
       this.reRender()
     })
-    tm.addListener('Controller.DedimaniaRecord', (): void => {
-      this.paginator.setPageCount(Math.ceil(tm.dedis.list.length / this.entries))
+    dedimania.onRecord((): void => {
+      this.paginator.setPageCount(Math.ceil(dedimania.recordCount / this.entries))
       this.reRender()
     })
   }
@@ -43,8 +44,8 @@ export default class DediSectors extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records: TMDedi[] = []
-    for (const e of tm.dedis.list) {
+    const records: DediRecord[] = []
+    for (const e of dedimania.records) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
