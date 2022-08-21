@@ -261,12 +261,6 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.DedimaniaRecords',
-    callback: async (info: MapDedisInfo) => {
-      // TODO: Fill in the Dedimania record widget
-    }
-  },
-  {
     event: 'Controller.PlayerDediRecord', // Not a thing yet
     callback: async (params: any[]) => { // Should return TMRecord (TMDedi?)
       // TODO: Update the Dedimania widget
