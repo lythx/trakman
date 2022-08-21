@@ -5,8 +5,8 @@ const createQuery: string = `CREATE TABLE IF NOT EXISTS guestlist(
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller_id INT4 NOT NULL,
-    PRIMARY KEY(login)
-    CONSTRAINT fk_caller_id,
+    PRIMARY KEY(login),
+    CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
 );`

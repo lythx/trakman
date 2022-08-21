@@ -31,7 +31,7 @@ export class ServerConfig {
   static async update(): Promise<void> {
     const res = await Utils.multiCall(
       { method: 'GetServerOptions' },
-      { method: 'GetDetailedPlayerInfo', params: [{ string: process.env.SERVER_LOGIN }] },
+      { method: 'GetDetailedPlayerInfo', params: [{ string: 'ciekma_test' }] }, //TODO FETCH THE LOGIN FIRST
       { method: 'GetVersion' }
     )
     if (res instanceof Error) {

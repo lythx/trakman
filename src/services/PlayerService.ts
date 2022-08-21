@@ -25,6 +25,7 @@ export class PlayerService {
    */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
+    await this.privilegeRepo.initialize()
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('Controller.PlayerRecord', (info: RecordInfo): void => {
