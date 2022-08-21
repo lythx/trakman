@@ -3,7 +3,6 @@ import { Events } from './Events.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { ChatService } from './services/ChatService.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
 import 'dotenv/config'
 import { GameService } from './services/GameService.js'
 import { MapService } from './services/MapService.js'
@@ -37,10 +36,7 @@ export class Listeners {
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
-        // Dedimania won't be a part of core.
-        // Dedimania playerjoin updates the player nickname and current status on the dedimania website.
-        // Their server is pretty bad so awaiting this might be a bad idea
-        void DedimaniaService.playerJoin(joinInfo)
+
       }
     },
     {
@@ -50,10 +46,6 @@ export class Listeners {
         const leaveInfo: LeaveInfo | Error = PlayerService.leave(params[0])
         if (!(leaveInfo instanceof Error)) {
           Events.emitEvent('Controller.PlayerLeave', leaveInfo)
-          // Dedimania won't be a part of core.
-          // Dedimania playerleave updates the current player status on the dedimania website.
-          // Their server is pretty bad so awaiting this might be a bad idea
-          void DedimaniaService.playerLeave(leaveInfo)
         }
       }
     },
@@ -90,7 +82,6 @@ export class Listeners {
         if (cpStatus === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
-            const dediRecord = DedimaniaService.addRecord(MapService.current.id, player, checkpoint.time, obj.finishInfo.checkpoints)
             // Register player finish
             Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
             if (obj.localRecord !== undefined) {
@@ -100,11 +91,6 @@ export class Listeners {
             if (obj.liveRecord !== undefined) {
               // Register player live record
               Events.emitEvent('Controller.LiveRecord', obj.liveRecord)
-            }
-            if (!(dediRecord instanceof Error) && dediRecord !== false) {
-              // Dedimania won't be a part of core.
-              // Register dedimania record
-              Events.emitEvent('Controller.DedimaniaRecord', dediRecord)
             }
           }
           return
@@ -208,9 +194,6 @@ export class Listeners {
         ServerConfig.update()
         // Register map update
         Events.emitEvent('Controller.BeginMap', info)
-        // Dedimania won't be a part of core.
-        // There is an event for dedimania records, thus no need to await
-        void DedimaniaService.getRecords(params[0].UId, params[0].Name, params[0].Environnement, params[0].Author)
       }
     },
     {
@@ -240,9 +223,6 @@ export class Listeners {
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
         Events.emitEvent('Controller.EndMap', endMapInfo)
-        // Dedimania won't be a part of core.
-        // We don't care about this, the records will likely be sent anyway lol
-        void DedimaniaService.sendRecords(endMapInfo.id, endMapInfo.name, endMapInfo.environment, endMapInfo.author, endMapInfo.checkpointsAmount)
       }
     },
     {
