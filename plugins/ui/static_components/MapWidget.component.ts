@@ -2,6 +2,7 @@ import { IDS, Grid, CONFIG, staticHeader, ICONS, getStaticPosition, stringToObje
 import flags from '../config/FlagIcons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
+import { tmx } from '../../tmx/Tmx.js'
 import { MapAuthorData } from '../../MapAuthorData.js'
 
 export default class MapWidget extends StaticComponent {
@@ -42,7 +43,7 @@ export default class MapWidget extends StaticComponent {
     const map = tm.maps.current
     const author: string = MapAuthorData.currentAuthor?.nickname ?? map.author
     const cfg = CONFIG.map
-    const tmxmap = tm.tmx.current
+    const tmxmap = tmx.current
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - CONFIG.marginSmall, [1], new Array(rows).fill(1))

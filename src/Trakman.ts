@@ -7,7 +7,7 @@ import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
 import { Database } from './database/DB.js'
-import { TMXService } from './services/TMXService.js'
+import { TMXService } from './TMXService.js'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
@@ -55,13 +55,7 @@ export const trakman = {
 
     fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
 
-    fetchMapFile: TMXService.fetchMapFile.bind(TMXService),
-
-    get current() { return TMXService.current },
-
-    get next() { return TMXService.next },
-
-    get previous() { return TMXService.previous }
+    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
 
   },
 

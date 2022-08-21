@@ -103,7 +103,6 @@ export class AdministrationService {
    */
   private static async fixBlacklistCoherence(): Promise<void> {
     const blacklist: any[] | Error = await Client.call('GetBlackList', [{ int: 5000 }, { int: 0 }])
-    console.log(blacklist)
     if (blacklist instanceof Error) {
       await Logger.fatal('Failed to fetch blacklist', 'Server responded with error:', blacklist.message)
       return

@@ -1,82 +1,13 @@
 import fetch from 'node-fetch'
-import 'dotenv/config'
-import CONFIG from '../../config.json' assert { type: 'json' }
-import { Logger } from '../Logger.js'
-import { Events } from '../Events.js'
-import { MapService } from './MapService.js'
+import { Logger } from './Logger.js'
+import { MapService } from './services/MapService.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
 export abstract class TMXService {
 
-  private static readonly _previous: (TMXMapInfo | null)[] = []
-  private static _current: TMXMapInfo | null
-  private static readonly _next: (TMXMapInfo | null)[] = []
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
-  private static readonly nextSize: number = CONFIG.tmxMapPrefetch
-  private static readonly previousSize: number = CONFIG.tmxPreviousMapsInRuntime
-  private static readonly isActive: boolean = process.env.USE_TMX === 'YES'
-
-  static async initialize(): Promise<void> {
-    if (this.isActive === false) { return }
-    if (this.nextSize > MapService.queueSize) {
-      await Logger.fatal(`jukeboxQueueSize (${MapService.queueSize}) can't be lower than tmxMapPrefetch (${this.nextSize}). Change your config.json file`)
-    }
-    const current: TMXMapInfo | Error = await this.fetchMapInfo(MapService.current.id)
-    this._current = current instanceof Error ? null : current
-    for (let i: number = 0; i < this.nextSize; i++) {
-      const id: string = MapService.queue[i].id
-      const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
-      this._next.push(map instanceof Error ? null : map)
-    }
-  }
-
-  static async nextMap(): Promise<void> {
-    if (this.isActive === false) { return }
-    this._previous.unshift(this._current)
-    this._previous.length = Math.min(this._previous.length, this.previousSize)
-    let next: TMXMapInfo | null | undefined = this._next.shift()
-    if (next === undefined) {
-      await Logger.fatal(`Can't find tmx prefetch in memory while setting next map`)
-      return
-    }
-    this._current = next
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
-    this._next.push(map instanceof Error ? null : map)
-    Events.emitEvent('Controller.TMXQueueChanged', this.next)
-  }
-
-  static async addMap(id: string, index: number): Promise<void> {
-    if (this.isActive === false || index >= this.nextSize) { return }
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(id)
-    this._next.splice(index, 0, map instanceof Error ? null : map)
-    this._next.length = this.nextSize
-    Events.emitEvent('Controller.TMXQueueChanged', this.next)
-  }
-
-  static async removeMap(index: number): Promise<void> {
-    if (this.isActive === false || index >= this.nextSize) { return }
-    this._next.splice(index, 1)
-    const map: TMXMapInfo | Error = await this.fetchMapInfo(MapService.queue[this.nextSize - 1].id)
-    this._next.push(map instanceof Error ? null : map)
-    Events.emitEvent('Controller.TMXQueueChanged', this.next)
-  }
-
-  static get current(): TMXMapInfo | null {
-    if (this.isActive === false) { return null }
-    return this._current === null ? null : { ...this._current }
-  }
-
-  static get next(): (TMXMapInfo | null)[] {
-    if (this.isActive === false) { return new Array(this.nextSize).fill(null) }
-    return [...this._next]
-  }
-
-  static get previous(): (TMXMapInfo | null)[] {
-    if (this.isActive === false) { return new Array(this.previousSize).fill(null) }
-    return [...this._previous]
-  }
 
   /**
    * Fetches the map from TMX via its UID
