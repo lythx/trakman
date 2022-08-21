@@ -3,7 +3,6 @@ import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { MapService } from './services/MapService.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
@@ -144,14 +143,6 @@ export const trakman = {
     get liveCount() { return RecordService.liveRecordsCount },
 
     get maxLocalsAmount() { return RecordService.maxLocalsAmount }
-
-  },
-
-  dedis: {
-
-    get: DedimaniaService.getDedi.bind(DedimaniaService),
-
-    get list() { return DedimaniaService.dedis }
 
   },
 
