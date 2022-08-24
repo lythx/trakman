@@ -6,6 +6,7 @@ import { Events } from './Events.js'
 import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { PlayerService } from "./services/PlayerService.js";
 import colours from './data/Colours.json' assert { type: 'json' }
+import config from '../Config.js'
 
 const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
@@ -288,48 +289,13 @@ export const Utils = {
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
 
+  strVar,
+
   get colours() {
     return colours
   },
 
-  get palette() {
-    return {
-      // All admin commands
-      admin: this.colours.erin,
-      // Dedi record messages
-      dedirecord: this.colours.darkpastelgreen,
-      // Dedi misc messages
-      dedimessage: this.colours.kellygreen,
-      // Donation messages
-      donation: this.colours.brilliantrose,
-      // Error messages
-      error: this.colours.red,
-      // General highlighting colour
-      highlight: this.colours.white,
-      // Karma messages
-      karma: this.colours.greenyellow,
-      // Server messages
-      servermsg: this.colours.erin,
-      // Misc messages
-      message: this.colours.lightseagreen,
-      // Rank highlighting colour
-      rank: this.colours.icterine,
-      // Record messages
-      record: this.colours.erin,
-      // Server message prefix colour
-      server: this.colours.yellow,
-      // Voting messages
-      vote: this.colours.chartreuse,
-      // Green
-      tmGreen: '$af4',
-      // Red
-      tmRed: '$e22',
-      // Yellow
-      tmYellow: '$fc1',
-      // Purple
-      tmPurple: '$73f'
-    }
-  },
+  palette: config.palette,
 
   get countries() {
     return countries
@@ -361,4 +327,17 @@ function matchString<T extends { [key: string]: any }>
   }
 }
 
-
+function strVar(str: string, variables: any[]): string
+function strVar(str: string, variables: { [name: string]: any }): string
+function strVar(str: string, vars: { [name: string]: any }): string {
+  if (Array.isArray(vars)) {
+    for (const e of vars) {
+      str = str.replace(/#{([^}]*)}/, e)
+    }
+    return str
+  }
+  for (const [k, v] of Object.entries(vars)) {
+    str = str.replace(`#{${k}}`, v)
+  }
+  return str
+}
