@@ -18,6 +18,7 @@ import { Logger } from './Logger.js'
 import http from 'http'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
+import config from '../Config.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -345,10 +346,11 @@ export const trakman = {
   */
   sendMessage(message: string, login?: string): void {
     if (login !== undefined) {
-      Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
+      Client.callNoRes('ChatSendServerMessageToLogin',
+        [{ string: config.prefixes.serverToPlayer + message }, { string: login }])
       return
     }
-    Client.callNoRes('ChatSendServerMessage', [{ string: message }])
+    Client.callNoRes('ChatSendServerMessage', [{ string: config.prefixes.serverToAll + message }])
   },
 
   /**
