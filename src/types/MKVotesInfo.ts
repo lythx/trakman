@@ -1,4 +1,4 @@
 interface MKVotesInfo {
-    readonly votes: MKMapVotes
-    readonly karma: number
+  readonly votes: MKMapVotes
+  readonly karma: number
 }
