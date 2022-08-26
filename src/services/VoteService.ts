@@ -21,6 +21,9 @@ export abstract class VoteService {
       const uid: string = maps[i].id
       this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
     }
+    Events.addListener('Controller.JukeboxChanged', ()=> {
+      this.updatePrefetch()
+    })
   }
 
   /**
@@ -39,7 +42,7 @@ export abstract class VoteService {
    * @param player Player object
    * @param vote Vote value 
    */
-  static async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+  static add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
     const date: Date = new Date()
     const map = MapService.current
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
