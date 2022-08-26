@@ -14,7 +14,6 @@ import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
-import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { Freezone } from '../plugins/Freezone.js'
 import { fixCoherence } from './FixRankCoherence.js'
 
@@ -71,12 +70,12 @@ async function main(): Promise<void> {
   //   if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
   //   else { Logger.trace('Connected to Dedimania') }
   // }
-  if (process.env.USE_MANIAKARMA === 'YES') {
-    Logger.trace('Connecting to Maniakarma...')
-    const status: void | Error = await ManiakarmaService.initialize()
-    if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
-    else { Logger.trace('Connected to Maniakarma') }
-  }
+  // if (process.env.USE_MANIAKARMA === 'YES') {
+  //   Logger.trace('Connecting to Maniakarma...')
+  //   const status: void | Error = await ManiakarmaService.initialize()
+  //   if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
+  //   else { Logger.trace('Connected to Maniakarma') }
+  // }
   if (process.env.USE_FREEZONE === 'YES') {
     Logger.trace('Connecting to ManiaLive...')
     const status: true | Error = await Freezone.initialize()

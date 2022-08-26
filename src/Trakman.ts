@@ -12,7 +12,6 @@ import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
-import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import http from 'http'
@@ -243,14 +242,10 @@ export const trakman = {
 
     /**
      * Adds a player vote to the database and to Maniakarma service if its running
-     * @param mapId Map UID
      * @param player Player object containing login and nickname
      * @param vote Player vote
      */
-    async add(mapId: string, player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
-      if (process.env.USE_MANIAKARMA === 'YES') {
-        ManiakarmaService.addVote(mapId, player.login, vote)
-      }
+    async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
       await VoteService.add(player, vote)
     },
 
@@ -431,22 +426,6 @@ export const trakman = {
   // REMOVE LATER
   get UIIDS() {
     return { ..._UIIDS }
-  },
-
-  get mkPlayerVotes(): MKVote[] {
-    return ManiakarmaService.playerVotes
-  },
-
-  get mkNewVotes(): MKVote[] {
-    return ManiakarmaService.newVotes
-  },
-
-  get mkMapKarmaValue(): number {
-    return ManiakarmaService.mapKarmaValue
-  },
-
-  get mkMapKarma() {
-    return ManiakarmaService.mapKarma
   }
 
 }
