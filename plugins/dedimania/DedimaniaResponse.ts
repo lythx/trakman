@@ -1,7 +1,8 @@
-import { Logger } from '../Logger.js'
+import { trakman as tm } from '../../src/Trakman.js'
 import xml2js from 'xml2js'
 
 export class DedimaniaResponse {
+
   private _status: string = 'pending'
   private _data: string = ''
   private _xml: string = ''
@@ -62,7 +63,7 @@ export class DedimaniaResponse {
         this._errorCode = 1
         this._errorString = 'Received invalid XML'
         isError = true
-        Logger.error('Received invalid XML from dedimania server', err.message, err.stack)
+        tm.log.error('Received invalid XML from dedimania server', err.message, err.stack)
         return
       }
       json = result

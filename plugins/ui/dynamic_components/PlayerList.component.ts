@@ -36,7 +36,7 @@ export default class PlayerList extends PopupWindow {
         if (targetInfo === undefined) {
           return
         } else {
-          tm.addToBanlist(targetInfo.ip, targetPlayer.login, info.login)
+          tm.admin.ban(targetInfo.ip, targetPlayer.login, info, targetInfo.nickname)
           tm.client.call('Kick', [{ string: targetPlayer.login }])
           tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
             + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has banned `
@@ -46,7 +46,7 @@ export default class PlayerList extends PopupWindow {
 
       if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
         const targetPlayer = tm.players.list[info.answer - this.openId - 3000]
-        const status = await tm.addToMutelist(targetPlayer.login, info.login)
+        const status = await tm.admin.mute(targetPlayer.login, info)
         if (status instanceof Error) {
           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while muting the player.`, info.login)
         } else {
@@ -61,7 +61,7 @@ export default class PlayerList extends PopupWindow {
         if (targetPlayer.login === undefined) {
           return
         } else {
-          tm.addToBlacklist(targetPlayer.login, info.login)
+          tm.admin.addToBlacklist(targetPlayer.login, info)
           tm.client.call('Kick', [{ string: targetPlayer.login }])
           tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
             + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
@@ -71,7 +71,7 @@ export default class PlayerList extends PopupWindow {
 
       if (info.answer >= this.openId + 5000 && info.answer < this.openId + 6000) {
         const targetPlayer = tm.players.list[info.answer - this.openId - 5000]
-        const status = await tm.addToGuestlist(targetPlayer.login, info.login)
+        const status = await tm.admin.addGuest(targetPlayer.login, info)
         if (status instanceof Error) {
           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while adding player to the guestlist.`, info.login)
         } else {
@@ -114,7 +114,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
     }
     const muteCell = (i: number, j: number, w: number, h: number): string => {
-      const mutelist = tm.mutelist
+      const mutelist = tm.admin.mutelist
       let iconser = stringToObjectProperty(CONFIG.playerList.mute, ICONS)
       if (mutelist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.ban, ICONS)
@@ -126,7 +126,7 @@ export default class PlayerList extends PopupWindow {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
     }
     const guestlistCell = (i: number, j: number, w: number, h: number): string => {
-      let guestlist = tm.guestlist
+      let guestlist = tm.admin.guestlist
       let iconser = stringToObjectProperty(CONFIG.playerList.addGuest, ICONS)
       if (guestlist.some(a => a.login === players[i].login)) {
         iconser = stringToObjectProperty(CONFIG.playerList.removeGuest, ICONS)

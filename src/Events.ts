@@ -15,11 +15,8 @@ interface EventWithCallbackInterface {
   "Controller.PlayerCheckpoint": CheckpointInfo
   "Controller.BeginMap": BeginMapInfo
   "Controller.EndMap": EndMapInfo
-  "Controller.DedimaniaRecords": MapDedisInfo
-  "Controller.DedimaniaRecord": DediRecordInfo
   "Controller.KarmaVote": KarmaVoteInfo
   "Controller.VotesPrefetch": Readonly<TMVote>[]
-  "Controller.ManiakarmaVotes": MKVotesInfo
   "Controller.MapAdded": MapAddedInfo
   "Controller.MapRemoved": MapRemovedInfo
   "Controller.BillUpdated": BillUpdatedInfo
@@ -27,7 +24,6 @@ interface EventWithCallbackInterface {
   "Controller.PrivilegeChanged": PrivilegeChangedInfo
   "Controller.LocalRecords": TMRecord[]
   "Controller.JukeboxChanged": TMMap[]
-  "Controller.TMXQueueChanged": (TMXMapInfo | null)[]
   "Controller.RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
 }
 

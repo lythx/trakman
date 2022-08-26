@@ -21,7 +21,7 @@ export default class BanList extends PopupWindow {
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    tm.removeFromBanlist(targetPlayer.login, info.login)
+                    tm.admin.unban(targetPlayer.login, info)
                     tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
                         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unbanned `
                         + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`
@@ -48,7 +48,7 @@ export default class BanList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Unban ', w, h),
 
         ]
-        const bannedplayers = tm.banlist
+        const bannedplayers = tm.admin.banlist
         const fetchedPlayers: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of bannedplayers) {
@@ -69,8 +69,7 @@ export default class BanList extends PopupWindow {
         const unbanButton = (i: number, j: number, w: number, h: number) => {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.banList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
-        const players = tm.banlist
-        const rows = Math.min(this.entries, players.length)
+        const rows = Math.min(this.entries, bannedplayers.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {
             arr.push(nicknameCell, loginCell, reasonCell, dateCell, unbanButton)

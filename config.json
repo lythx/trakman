@@ -1,5 +1,6 @@
 {
-    "guestlistFilePath": "guestlist.txt",
+    "blacklistFile": "blacklist.txt",
+    "guestlistFile": "guestlist.txt",
     "messagesInRuntimeMemory": 250,
     "jukeboxQueueSize": 30,
     "jukeboxPreviousMapsInRuntime": 30,

@@ -6,16 +6,14 @@ import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ChatService } from './services/ChatService.js'
 import './commands/InternalCommands.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
 import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
-import { TMXService } from './services/TMXService.js'
+import { TMXService } from './TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
-import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { Freezone } from '../plugins/Freezone.js'
 import { fixCoherence } from './FixRankCoherence.js'
 
@@ -61,23 +59,23 @@ async function main(): Promise<void> {
   Logger.trace('Loading server config...')
   await ServerConfig.initialize()
   Logger.trace('Server config loaded')
-  if (process.env.USE_TMX === 'YES') {
-    Logger.trace('Initializing TMX service...')
-    await TMXService.initialize()
-    Logger.trace('TMX service instantiated')
-  }
-  if (process.env.USE_DEDIMANIA === 'YES') {
-    Logger.trace('Connecting to Dedimania...')
-    const status: true | Error = await DedimaniaService.initialize()
-    if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
-    else { Logger.trace('Connected to Dedimania') }
-  }
-  if (process.env.USE_MANIAKARMA === 'YES') {
-    Logger.trace('Connecting to Maniakarma...')
-    const status: void | Error = await ManiakarmaService.initialize()
-    if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
-    else { Logger.trace('Connected to Maniakarma') }
-  }
+  // if (process.env.USE_TMX === 'YES') { // TODO MOVE THESE LOGS TO THE PLUGIN
+  //   Logger.trace('Initializing TMX service...')
+  //   await TMXService.initialize()
+  //   Logger.trace('TMX service instantiated')
+  // }
+  // if (process.env.USE_DEDIMANIA === 'YES') { // TODO MOVE THESE LOGS TO THE PLUGIN
+  //   Logger.trace('Connecting to Dedimania...')
+  //   const status: true | Error = await DedimaniaService.initialize()
+  //   if (status instanceof Error) { Logger.error('Failed to initialize Dedimania service') }
+  //   else { Logger.trace('Connected to Dedimania') }
+  // }
+  // if (process.env.USE_MANIAKARMA === 'YES') {
+  //   Logger.trace('Connecting to Maniakarma...')
+  //   const status: void | Error = await ManiakarmaService.initialize()
+  //   if (status instanceof Error) { Logger.error('Failed to initialize Maniakarma service') }
+  //   else { Logger.trace('Connected to Maniakarma') }
+  // }
   if (process.env.USE_FREEZONE === 'YES') {
     Logger.trace('Connecting to ManiaLive...')
     const status: true | Error = await Freezone.initialize()

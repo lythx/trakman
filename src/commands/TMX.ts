@@ -1,5 +1,5 @@
 import { ChatService } from '../services/ChatService.js'
-import { TMXService } from '../services/TMXService.js'
+import { TMXService } from '../TMXService.js'
 import { Client } from '../client/Client.js'
 import { trakman as tm } from '../Trakman.js'
 

@@ -190,25 +190,23 @@ const commands: TMCommand[] = [
     help: 'Mutelist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo === undefined) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player.`, info.login)
-          return
-        }
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
       }
-      const res: true | Error = await tm.addToMutelist(targetInfo.login, info.login, reason, expireDate)
-      if (res instanceof Error) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to add to mute list.`, info.login)
+      const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
+      const result = await tm.admin.mute(login, info, target?.nickname, reason, expireDate)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while muting player ${logStr}`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while muting player ${logStr}`, info.login)
         return
       }
       const reasonString: string = reason === undefined ? '' : ` Reason${tm.utils.palette.highlight}: ${reason}${tm.utils.palette.admin}.`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has muted `
-        + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}${durationString}.${tm.utils.palette.admin}${reasonString}`)
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin}${durationString}.${tm.utils.palette.admin}${reasonString}`)
     },
     privilege: 2
   },
@@ -217,26 +215,24 @@ const commands: TMCommand[] = [
     help: 'Unmute a specific player.',
     params: [{ name: 'login' }],
     callback: async (info: MessageInfo, login: string): Promise<void> => {
-      if (tm.mutelist.some(a => a.login === login) === false) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player was not muted.`, info.login)
+      let target: TMOfflinePlayer | undefined = tm.players.get(login)
+      if (target === undefined) {
+        target = await tm.players.fetch(login)
+      }
+      const result = await tm.admin.unmute(login, info)
+      let logStr = target === undefined ? `(${login})` : `${tm.utils.strip(target.nickname)} (${target.login})`
+      if (result instanceof Error) {
+        tm.log.error(`Error while unmuting player ${logStr}`, result.message)
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while unmuting player ${logStr}`, info.login)
         return
       }
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
-      if (targetInfo === undefined) {
-        targetInfo = await tm.players.fetch(login)
-        if (targetInfo == null) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player.`, info.login)
-          return
-        }
-      }
-      const res: boolean | Error = await tm.removeFromMutelist(targetInfo.login, info.login)
-      if (res instanceof Error) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Server failed to remove from mute list.`, info.login)
+      if (result === false) {
+        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Specified player was not muted.`, info.login)
         return
       }
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unmuted `
-        + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}.`
+        + `${tm.utils.palette.highlight + tm.utils.strip(target?.nickname ?? login)}${tm.utils.palette.admin}.`
       )
     },
     privilege: 2

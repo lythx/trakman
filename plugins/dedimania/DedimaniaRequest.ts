@@ -1,4 +1,5 @@
 export class DedimaniaRequest {
+
   readonly buffer: Buffer = Buffer.from(
     'POST /Dedimania HTTP/1.1\r\n' +
     'Host: dedimania.net\r\n' +

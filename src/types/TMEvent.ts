@@ -1,6 +1,7 @@
 type StringAutocomplete<T extends string> = T | Omit<string, T>
 
 type TMEvent = StringAutocomplete<
+
   "Controller.Ready" |
   "Controller.PlayerChat" |
   "Controller.PlayerJoin" |
@@ -13,16 +14,12 @@ type TMEvent = StringAutocomplete<
   "Controller.PlayerCheckpoint" |
   "Controller.BeginMap" |
   "Controller.EndMap" |
-  "Controller.DedimaniaRecords" |
-  "Controller.DedimaniaRecord" |
   "Controller.KarmaVote" |
   "Controller.VotesPrefetch" |
-  "Controller.ManiakarmaVotes" |
   "Controller.MapAdded" |
   "Controller.MapRemoved" |
   "Controller.BillUpdated" |
   "Controller.PrivilegeChanged" |
   "Controller.JukeboxChanged" |
-  "Controller.TMXQueueChanged" |
   "Controller.MatchSettingsUpdated" |
   "Controller.RanksAndAveragesUpdated">
