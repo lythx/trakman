@@ -55,7 +55,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
   if (client.connected === false) {
     let status: boolean | Error = false
     do {
-      await new Promise((resolve) => setTimeout(resolve, 60000))
+      await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeount * 1000))
       status = await client.connect('dedimania.net', config.port)
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
