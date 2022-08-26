@@ -10,7 +10,6 @@ type EventParams =
   BeginMapInfo |
   EndMapInfo |
   KarmaVoteInfo |
-  MKVotesInfo |
   MapAddedInfo |
   MapRemovedInfo |
   BillUpdatedInfo |

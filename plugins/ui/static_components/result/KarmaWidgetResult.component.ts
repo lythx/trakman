@@ -1,5 +1,6 @@
 import { centeredText, Grid, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon, getResultPosition } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
+import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
 
 export default class KarmaWidgetResult extends StaticComponent {
@@ -29,14 +30,13 @@ export default class KarmaWidgetResult extends StaticComponent {
     tm.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
-    tm.addListener('Controller.ManiakarmaVotes', (): void => {
-      this.display()
-    })
+    maniakarma.onMapFetch(this.display.bind(this))
+    maniakarma.onVote(this.display.bind(this))
     tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        tm.karma.add(tm.maps.current.id, info, votes[index])
+        tm.karma.add(info, votes[index])
       }
     })
   }
@@ -62,8 +62,8 @@ export default class KarmaWidgetResult extends StaticComponent {
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
     const karma: number = tm.maps.current.voteRatio
-    const mkVotes = tm.mkMapKarma
-    const mkKarmaValue: number = tm.mkMapKarmaValue
+    const mkVotes = maniakarma.mapKarma
+    const mkKarmaValue: number = maniakarma.mapKarmaRatio
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const maxMkAmount: number = Math.max(...Object.values(mkVotes))
     const personalVote = votes.find(a => a.login === login)?.vote
@@ -114,8 +114,8 @@ export default class KarmaWidgetResult extends StaticComponent {
     const height: number = this.height - this.headerH
     const width: number = (this.width + this.margin - this.buttonW) / 2 - this.margin
     const colour: string = karma > 0 ? '$F00' : '$0F0' //TODO
-    const mkKarma: string = process.env.USE_MANIAKARMA === 'YES' ? Math.round(mkKarmaValue).toString() : '-'
-    const mkAmount: string = process.env.USE_MANIAKARMA === 'YES' ? totalMkVotes.toString() : '-'
+    const mkKarma: string =maniakarma.isEnabled ? Math.round(mkKarmaValue).toString() : '-'
+    const mkAmount: string = maniakarma.isEnabled ? totalMkVotes.toString() : '-'
     const grid: Grid = new Grid(width, height, new Array(3).fill(1), new Array(3).fill(1))
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = [
       (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>`,

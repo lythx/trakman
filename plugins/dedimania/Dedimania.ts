@@ -1,6 +1,6 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import { trakman as tm } from '../../src/Trakman.js'
-import Config from './Config.js'
+import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
 // TODO overloads and comments
@@ -21,7 +21,7 @@ const emitFetchEvent = (dedis: DediRecord[]) => {
 }
 
 const initialize = async (): Promise<void> => {
-  const status: true | Error = await client.connect(Config.host, Config.port)
+  const status: true | Error = await client.connect(config.host, config.port)
   if (status instanceof Error) {
     if (status.message !== 'No response from dedimania server') {
       tm.log.error('Failed to connect to dedimania', status.message)
@@ -41,9 +41,9 @@ const reinitialize = async (): Promise<void> => {
   let status: true | Error
   do {
     await new Promise((resolve) => setTimeout(resolve, 60000))
-    status = await client.connect('dedimania.net', Config.port)
+    status = await client.connect(config.host, config.port)
   } while (status !== true)
-  tm.log.info('Initialized dedimania service after an error')
+  tm.log.info('Initialized dedimania after an error')
   updateServerPlayers()
   const current = tm.maps.current
   await getRecords(current.id, current.name, current.environment, current.author)
@@ -56,7 +56,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     let status: boolean | Error = false
     do {
       await new Promise((resolve) => setTimeout(resolve, 60000))
-      status = await client.connect('dedimania.net', Config.port)
+      status = await client.connect('dedimania.net', config.port)
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
@@ -87,7 +87,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
           NextFiveUID: { string: nextIds.join('/') }
         }
       },
-      { int: Config.dediCount },
+      { int: config.dediCount },
       { array: getPlayersArray() }
     ])
   if (rawDedis instanceof Error) {
@@ -129,7 +129,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
       { string: 'TMF' },
       { int: tm.state.gameConfig.gameMode },
       { int: checkpointsAmount },
-      { int: Config.dediCount },
+      { int: config.dediCount },
       { array: recordsArray }
     ]
   )
@@ -141,7 +141,7 @@ const addRecord = (player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
   if (client.connected === false) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
-  if (position > Config.dediCount || time > (pb ?? Infinity)) { return }
+  if (position > config.dediCount || time > (pb ?? Infinity)) { return }
   if (pb === undefined) {
     const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, -1, position, -1)
     currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
@@ -278,7 +278,7 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
 }
 
-if (Config.isEnabled === true) {
+if (config.isEnabled === true) {
 
   tm.addListener('Controller.Ready', () => {
     void initialize()
@@ -355,7 +355,7 @@ export const dedimania = {
   },
 
   get isEnabled(): boolean {
-    return Config.isEnabled
+    return config.isEnabled
   },
 
   get isConnected(): boolean {
@@ -363,7 +363,7 @@ export const dedimania = {
   },
 
   get maxRecordCount(): number {
-    return Config.dediCount
+    return config.dediCount
   }
 
 }

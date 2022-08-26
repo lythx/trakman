@@ -1,3 +1,3 @@
 export default {
-  isEnabled: false
+  isEnabled: true
 }

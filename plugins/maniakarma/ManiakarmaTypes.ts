@@ -12,8 +12,3 @@ export interface MKVote {
   readonly login: string
   vote: -3 | -2 | -1 | 1 | 2 | 3
 }
-
-export interface MKVotesInfo {
-  readonly votes: MKMapVotes
-  readonly karma: number
-}
