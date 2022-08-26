@@ -11,7 +11,7 @@ let mapKarmaValue: number = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
 let playerVotes: MKVote[] = []
 let newVotes: MKVote[] = []
-let lastMap = tm.maps.current
+let lastMap: Readonly<TMCurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
 const voteListeners: ((vote: MKVote) => void)[] = []
@@ -34,6 +34,7 @@ const checkResError = (json: any): boolean => {
 }
 
 const initialize = async (): Promise<void> => {
+  lastMap = tm.maps.current
   const status: true | Error = await authenticate()
   if (status instanceof Error) {
     tm.log.error(`Failed to connect to maniakarma`, status.message)
@@ -41,22 +42,18 @@ const initialize = async (): Promise<void> => {
     return
   }
   isConnected = true
-  for (const player of tm.players.list) {
-    await fetchVotes(player.login)
-  }
+  await fetchVotes(...tm.players.list.map(a => a.login))
 }
 
 const reinitialize = async (): Promise<void> => {
   let status: true | Error
   do {
-    await new Promise((resolve) => setTimeout(resolve, 60000))
+    await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
     status = await authenticate()
   } while (status !== true)
   tm.log.info('Initialized maniakarma after an error')
   isConnected = true
-  for (const player of tm.players.list) {
-    await fetchVotes(player.login)
-  }
+  await fetchVotes(...tm.players.list.map(a => a.login))
 }
 
 const authenticate = async (): Promise<true | Error> => {
@@ -80,8 +77,7 @@ const authenticate = async (): Promise<true | Error> => {
   return true
 }
 
-const fetchVotes = async (login: string): Promise<void> => {
-  if (isConnected === false) { return }
+const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   newVotes.length = 0
   playerVotes.length = 0
   const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({ // TODO check what happens if bs data
@@ -91,28 +87,34 @@ const fetchVotes = async (login: string): Promise<void> => {
     map: Buffer.from(tm.maps.current.name).toString('base64'),
     author: tm.maps.current.author,
     env: tm.maps.current.environment,
-    player: login
+    player: logins.join('|')
   })}`
   const res = await fetch(url).catch((err: Error) => err)
   if (res instanceof Error) {
-    tm.log.error(`Failed to fetch maniakarma votes for player ${login}`, res.message)
-    return
+    tm.log.error(`Failed to fetch maniakarma votes`, res.message)
+    return res
   }
   const json: any = getJson(await res.text())
   if (checkResError(json)) {
-    tm.log.error(`Failed to fetch maniakarma votes for player ${login}, received response:`, JSON.stringify(res.headers, null, 2))
-    return
+    tm.log.error(`Failed to fetch maniakarma votes, received response:`, JSON.stringify(json, null, 2))
+    return new Error(`Failed to fetch maniakarma votes`)
   }
-  mapKarmaValue =Number(json?.result?.votes?.[0]?.karma?.[0]) // TODO check if its a number
+  mapKarmaValue = Number(json?.result?.votes?.[0]?.karma?.[0]) // TODO check if its a number
   for (const key of Object.keys(mapKarma)) {
     mapKarma[key as keyof typeof mapKarma] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
   }
-  const vote: number = Number(json?.result?.players[0]?.player[0]?.$?.vote)
-  const v: number | undefined = [-3, -2, -1, 1, 2, 3].find(a => a === vote)
-  if (v === undefined) {
-    return
+  const ret: MKVote[] = []
+  for (const e of json?.result?.players[0]?.player) {
+    const vote = Number(e?.$?.vote)
+    const login = e?.$?.login
+    const arr: [-3, -2, -1, 1, 2, 3] = [-3, -2, -1, 1, 2, 3]
+    const v = arr.find(a => a === vote)
+    if (v !== undefined) {
+      ret.push({ mapId: tm.maps.current.id, vote: v, login })
+      storePlayerVotes(login, v)
+    }
   }
-  storePlayerVotes((json?.result?.players[0]?.player[0]?.$?.login).toString(), vote as any)
+  return ret
   // TODO remove this when works
   //Logger.debug(`curr. map maniakarma stats`, `mk api url: ` + apiUrl, `mk api authcode: ` + authCode, `mk karma value: ` + _mapKarmaValue.toString(), `mk vote stats: ` + JSON.stringify(_mapKarma))
   // TODO enable after voteservice is fixed
@@ -120,6 +122,7 @@ const fetchVotes = async (login: string): Promise<void> => {
 }
 
 const sendVotes = async (): Promise<void> => {
+  if (newVotes.length === 0) { return }
   const url: string = `${apiUrl}?Action=Vote&${new URLSearchParams({
     login: tm.state.serverConfig.login,
     authcode: authCode,
@@ -140,8 +143,9 @@ const sendVotes = async (): Promise<void> => {
     tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}`, res.message)
     return
   }
-  if (checkResError(getJson(await res.text()))) {
-    tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}, received response:`, JSON.stringify(res.headers, null, 2))
+  const json = getJson(await res.text())
+  if (checkResError(json)) {
+    tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}, received response:`, JSON.stringify(json, null, 2))
   }
 }
 
@@ -186,8 +190,8 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
     mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
     v.vote = vote
   }
-  const newVote = playerVotes.find(a => a.login === login)
-  if (newVote === undefined) { playerVotes.push({ mapId, login, vote }) }
+  const newVote = newVotes.find(a => a.login === login)
+  if (newVote === undefined) { newVotes.push({ mapId, login, vote }) }
   else { newVote.vote = vote }
   const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
   const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
@@ -214,12 +218,17 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
 const onBeginMap = async (isRestart: boolean) => {
   await sendVotes()
   if (isRestart === false) {
-    for (const player of tm.players.list) {
-      await fetchVotes(player.login)
-    }
+    await fetchVotes(...tm.players.list.map(a => a.login))
   }
   emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
   lastMap = tm.maps.current
+}
+
+const onPlayerJoin = async (login: string) => {
+  const votes = await fetchVotes(login)
+  if (!(votes instanceof Error)) {
+    emitPlayerFetch(votes[0])
+  }
 }
 
 if (config.isEnabled === true) {
@@ -227,7 +236,7 @@ if (config.isEnabled === true) {
     void initialize()
   }, true)
   tm.addListener('Controller.PlayerJoin', (info): void => {
-    void fetchVotes(info.login)
+    void onPlayerJoin(info.login)
   }, true)
   tm.addListener('Controller.BeginMap', (info): void => {
     void onBeginMap(info.isRestart)
@@ -235,6 +244,9 @@ if (config.isEnabled === true) {
   tm.addListener('Controller.KarmaVote', (info): void => {
     addVote(tm.maps.current.id, info.login, info.vote)
   })
+  setInterval(() => {
+    if (isConnected === false) { void initialize() }
+  }, config.reconnectTimeout)
 }
 
 export const maniakarma = {
