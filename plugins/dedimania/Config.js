@@ -6,5 +6,5 @@ export default {
   serverPassword: 'd8enNUt63K', // Dedicated server password from playerpage 
   port: 8002, // Dedimnia port (8002 for tmnf)
   host: 'dedimania.net',
-  reconnectTimeount: 120, // seconds
+  reconnectTimeout: 120, // seconds
 }

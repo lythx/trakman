@@ -24,10 +24,15 @@ export default class NextMapRecords extends StaticComponent {
     this.list.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('Controller.EndMap', async () => {
-      const mapId = tm.jukebox.queue[0].id
-      this.records = await tm.records.fetchByMap(mapId)
-      this.display()
+    tm.addListener('Controller.EndMap', async (info) => {
+      if(info.isRestart === true) {
+        this.records = tm.records.local
+        this.display()
+      } else {
+        const mapId = tm.jukebox.queue[0].id
+        this.records = await tm.records.fetchByMap(mapId)
+        this.display()
+      }
     })
     tm.addListener('Controller.JukeboxChanged', async () => {
       const mapId = tm.jukebox.queue[0].id

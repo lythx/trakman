@@ -71,6 +71,7 @@ export class VoteRepository extends Repository {
     JOIN map_ids ON map_ids.id=votes.map_id
     WHERE ${mapUids.map((a, i) => `votes.map_id=$${i + 1} OR `).join('').slice(0, -3)}`
     const ids = await mapIdsRepo.get(mapUids)
+    if(ids.length === 0) { return [] }
     const res = await this.query(query, ...ids.map(a => a.id))
     return res.map(a => this.constructVoteObject(a))
   }
