@@ -2,7 +2,6 @@ import { Events } from "../Events.js"
 import { VoteRepository } from "../database/VoteRepository.js"
 import { MapService } from "./MapService.js"
 import { Logger } from "../Logger.js"
-import { Client } from "../client/Client.js"
 import { Utils } from '../Utils.js'
 
 export abstract class VoteService {
@@ -22,6 +21,9 @@ export abstract class VoteService {
       const uid: string = maps[i].id
       this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
     }
+    Events.addListener('Controller.JukeboxChanged', ()=> {
+      this.updatePrefetch()
+    })
   }
 
   /**
@@ -37,10 +39,10 @@ export abstract class VoteService {
 
   /**
    * Adds a vote on the current map to runtime memory and database
-   * @param login Player login
+   * @param player Player object
    * @param vote Vote value 
    */
-  static async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
+  static add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
     const date: Date = new Date()
     const map = MapService.current
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
@@ -63,6 +65,29 @@ export abstract class VoteService {
     void this.repo.add(obj)
     this.updateMapVoteData(map.id, voteArr)
     Events.emitEvent('Controller.KarmaVote', obj)
+  }
+
+  static async updatePrefetch(): Promise<void> {
+    const arr: { uid: string, votes: TMVote[] }[] = []
+    const mapsToFetch: string[] = []
+    const maps = [...MapService.history, MapService.current, ...MapService.queue].reverse()
+    for (let i = 0; i < maps.length; i++) {
+      const uid: string = maps[i].id
+      const v = this._votes.find(a => a.uid === uid)
+      if (v === undefined) {
+        arr[i] = { uid, votes: [] }
+        mapsToFetch.push(uid)
+      } else {
+        arr[i] = v
+      }
+    }
+    const res = await this.repo.get(...mapsToFetch)
+    for (const e of mapsToFetch) {
+      const entry = arr.find(a => a.uid === e)
+      if (entry !== undefined) { entry.votes = res.filter(a => a.mapId === e) }
+    }
+    this._votes = arr
+    Events.emitEvent('Controller.VotesPrefetch', res)
   }
 
   private static updateMapVoteData(uid: string, arr: TMVote[]) {
