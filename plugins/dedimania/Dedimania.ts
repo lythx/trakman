@@ -27,7 +27,7 @@ const initialize = async (): Promise<void> => {
       tm.log.error('Failed to connect to dedimania', status.message)
     }
     else {
-      tm.log.error(`${status.message}. Attempting to reconnect every 60 seconds...`)
+      tm.log.error(`${status.message}. Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
       void reinitialize()
     }
     return
@@ -55,7 +55,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
   if (client.connected === false) {
     let status: boolean | Error = false
     do {
-      await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeount * 1000))
+      await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
       status = await client.connect('dedimania.net', config.port)
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
