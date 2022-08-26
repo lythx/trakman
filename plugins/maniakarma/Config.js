@@ -1,3 +1,4 @@
 export default {
-  isEnabled: true
+  isEnabled: true,
+  reconnectTimeout: 300 //seconds
 }
