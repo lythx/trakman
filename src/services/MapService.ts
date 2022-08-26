@@ -1,7 +1,6 @@
 import { Logger } from '../Logger.js'
 import { Client } from '../client/Client.js'
 import { MapRepository } from '../database/MapRepository.js'
-import { VoteService } from './VoteService.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import CONFIG from "../../config.json" assert { type: 'json' }
@@ -245,7 +244,6 @@ export class MapService {
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     this.updateNextMap()
-    VoteService.updatePrefetch()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -270,7 +268,6 @@ export class MapService {
     this._queue.splice(index, 1)
     this.fillQueue()
     this.updateNextMap()
-    VoteService.updatePrefetch()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
     return true
   }
@@ -289,7 +286,6 @@ export class MapService {
     }
     this.fillQueue()
     this.updateNextMap()
-    VoteService.updatePrefetch()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -307,7 +303,6 @@ export class MapService {
     this._queue.length = 0
     this.fillQueue()
     this.updateNextMap()
-    VoteService.updatePrefetch()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
