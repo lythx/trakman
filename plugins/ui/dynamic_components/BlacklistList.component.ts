@@ -22,7 +22,7 @@ export default class BlacklistList extends PopupWindow {
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    tm.removeFromBlacklist(targetPlayer.login, info.login)
+                    tm.admin.unblacklist(targetPlayer.login, info)
                     tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
                         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has unblacklisted `
                         + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`
@@ -30,10 +30,10 @@ export default class BlacklistList extends PopupWindow {
                 }
             } //
         })
-        const blacklist = tm.blacklist
+        const blacklist = tm.admin.blacklist
         this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(blacklist.length / this.entries))
         this.paginator.onPageChange = (login: string, page: number) => {
-            const blacklist = tm.blacklist
+            const blacklist = tm.admin.blacklist
             let pageCount = Math.ceil(blacklist.length / this.entries)
             if (pageCount === 0) {
                 pageCount = 1
@@ -52,7 +52,7 @@ export default class BlacklistList extends PopupWindow {
     }
 
     protected onOpen(info: ManialinkClickInfo): void {
-        const blacklist = tm.blacklist
+        const blacklist = tm.admin.blacklist
         let pageCount = Math.ceil(blacklist.length / this.entries)
         if (pageCount === 0) {
             pageCount = 1
@@ -70,7 +70,7 @@ export default class BlacklistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Unblacklist ', w, h, { padding: 0.2 }),
 
         ]
-        const blacklisted = tm.blacklist
+        const blacklisted = tm.admin.blacklist
         // const blacklisted: BlacklistDBEntry[] = []
         // for(let i = 0; i<100; i++) {
         //     blacklisted.push({login: Math.random().toString(), expires: new Date(Math.random()), caller: Math.random().toString(), reason: Math.random().toString(), date: new Date(Math.random())})

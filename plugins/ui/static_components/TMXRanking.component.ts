@@ -1,7 +1,7 @@
 import { getStaticPosition, RecordList, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 import StaticComponent from '../StaticComponent.js'
-import 'dotenv/config'
+import { tmx } from '../../tmx/Tmx.js'
 
 export default class TMXRanking extends StaticComponent {
 
@@ -25,13 +25,13 @@ export default class TMXRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     tm.addListener('Controller.LiveRecord', (info: FinishInfo): void => {
-      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
-      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
-      if (tm.tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -46,7 +46,7 @@ export default class TMXRanking extends StaticComponent {
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo: TMXMapInfo | null = tm.tmx.current
+    const tmxInfo: TMXMapInfo | null = tmx.current
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }

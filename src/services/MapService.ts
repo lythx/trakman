@@ -419,7 +419,7 @@ export class MapService {
   /**
    * Gets a map from queue
    * @param uid Map uid
-   * @returns Map object or undefined if map is not in the playlist
+   * @returns Map object or undefined if map is not in the queue
    */
   static getFromQueue(uid: string): Readonly<TMMap> | undefined
   /**
@@ -439,7 +439,7 @@ export class MapService {
   /**
    * Gets a map from map history
    * @param uid Map uid
-   * @returns Map object or undefined if map is not in the playlist
+   * @returns Map object or undefined if map is not in the history
    */
   static getFromHistory(uid: string): Readonly<TMMap> | undefined
   /**
@@ -459,7 +459,7 @@ export class MapService {
   /**
    * Gets a map from jukebox
    * @param uid Map uid
-   * @returns jukebox object or undefined if map is not in the playlist
+   * @returns jukebox object or undefined if map is not in the jukeboxed
    */
   static getFromJukebox(uid: string): Readonly<{ map: TMMap, callerLogin?: string }> | undefined
   /**

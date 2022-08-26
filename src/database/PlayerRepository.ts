@@ -87,7 +87,7 @@ export class PlayerRepository extends Repository {
   }
 
   async getAverage(login: string): Promise<number | undefined>
-  async getAverage(logins: string[]): Promise<{ login: string, average: number}[]>
+  async getAverage(logins: string[]): Promise<{ login: string, average: number }[]>
   async getAverage(logins: string | string[]): Promise<number | { login: string, average: number }[] | undefined> {
     if (typeof logins === 'string') {
       const query: string = `SELECT average FROM players

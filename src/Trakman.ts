@@ -3,22 +3,21 @@ import { GameService } from './services/GameService.js'
 import { PlayerService } from './services/PlayerService.js'
 import { RecordService } from './services/RecordService.js'
 import { MapService } from './services/MapService.js'
-import { DedimaniaService } from './services/DedimaniaService.js'
 import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
 import { Database } from './database/DB.js'
-import { TMXService } from './services/TMXService.js'
+import { TMXService } from './TMXService.js'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
 import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
 import { VoteService } from './services/VoteService.js'
-import { ManiakarmaService } from './services/ManiakarmaService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import http from 'http'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
+import config from '../Config.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -56,13 +55,7 @@ export const trakman = {
 
     fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
 
-    fetchMapFile: TMXService.fetchMapFile.bind(TMXService),
-
-    get current() { return TMXService.current },
-
-    get next() { return TMXService.next },
-
-    get previous() { return TMXService.previous }
+    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
 
   },
 
@@ -144,14 +137,6 @@ export const trakman = {
     get liveCount() { return RecordService.liveRecordsCount },
 
     get maxLocalsAmount() { return RecordService.maxLocalsAmount }
-
-  },
-
-  dedis: {
-
-    get: DedimaniaService.getDedi.bind(DedimaniaService),
-
-    get list() { return DedimaniaService.dedis }
 
   },
 
@@ -257,14 +242,10 @@ export const trakman = {
 
     /**
      * Adds a player vote to the database and to Maniakarma service if its running
-     * @param mapId Map UID
      * @param player Player object containing login and nickname
      * @param vote Player vote
      */
-    async add(mapId: string, player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
-      if (process.env.USE_MANIAKARMA === 'YES') {
-        ManiakarmaService.addVote(mapId, player.login, vote)
-      }
+    async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
       await VoteService.add(player, vote)
     },
 
@@ -307,6 +288,52 @@ export const trakman = {
 
   },
 
+  admin: {
+
+    setPrivilege: AdministrationService.setPrivilege.bind(AdministrationService),
+
+    ban: AdministrationService.ban.bind(AdministrationService),
+
+    unban: AdministrationService.unban.bind(AdministrationService),
+
+    addToBlacklist: AdministrationService.addToBlacklist.bind(AdministrationService),
+
+    unblacklist: AdministrationService.unblacklist.bind(AdministrationService),
+
+    mute: AdministrationService.mute.bind(AdministrationService),
+
+    unmute: AdministrationService.unmute.bind(AdministrationService),
+
+    addGuest: AdministrationService.addGuest.bind(AdministrationService),
+
+    removeGuest: AdministrationService.removeGuest.bind(AdministrationService),
+
+    getBan: AdministrationService.getBan.bind(AdministrationService),
+
+    getBlacklist: AdministrationService.getBlacklist.bind(AdministrationService),
+
+    getMute: AdministrationService.getMute.bind(AdministrationService),
+
+    getGuest: AdministrationService.getGuest.bind(AdministrationService),
+
+    get banlist() { return AdministrationService.banlist },
+
+    get blacklist() { return AdministrationService.blacklist },
+
+    get mutelist() { return AdministrationService.mutelist },
+
+    get guestlist() { return AdministrationService.guestlist },
+
+    get banCount() { return AdministrationService.banCount },
+
+    get blacklistCount() { return AdministrationService.blacklistCount },
+
+    get muteCount() { return AdministrationService.muteCount },
+
+    get guestCount() { return AdministrationService.guestCount }
+
+  },
+
   /**
   * Sends a server message
   * @param message Message to be sent
@@ -314,10 +341,11 @@ export const trakman = {
   */
   sendMessage(message: string, login?: string): void {
     if (login !== undefined) {
-      Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
+      Client.callNoRes('ChatSendServerMessageToLogin',
+        [{ string: config.prefixes.serverToPlayer + message }, { string: login }])
       return
     }
-    Client.callNoRes('ChatSendServerMessage', [{ string: message }])
+    Client.callNoRes('ChatSendServerMessage', [{ string: config.prefixes.serverToAll + message }])
   },
 
   /**
@@ -381,15 +409,6 @@ export const trakman = {
   addListener: Events.addListener,
 
   /**
-   * Sets a player privilege level
-   * @param login Player login
-   * @param privilege Privilege level
-   */
-  setPrivilege(login: string, privilege: number, adminLogin: string): void {
-    PlayerService.setPrivilege(login, privilege, adminLogin)
-  },
-
-  /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
@@ -401,119 +420,12 @@ export const trakman = {
     Events.emitEvent('Controller.ManialinkClick', info)
   },
 
-  /**
-   * Adds a player to the server ban list
-   * @param ip Player IP address
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional ban reason
-   * @param expireDate Optional ban expire date
-   */
-  addToBanlist: (ip: string, login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBanlist(ip, login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server ban list
-   * @param login Player login
-   */
-  removeFromBanlist: (login: string, callerLogin?: string): boolean => {
-    return AdministrationService.removeFromBanlist(login, callerLogin)
-  },
-
-  /**
-   * Adds a player to the server blacklist
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional blacklist reason
-   * @param expireDate Optional blacklist expire date
-   */
-  addToBlacklist: (login: string, callerLogin: string, reason?: string, expireDate?: Date): void => {
-    AdministrationService.addToBlacklist(login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server blacklist
-   * @param login Player login
-   */
-  removeFromBlacklist: (login: string, callerLogin?: string): boolean => {
-    return AdministrationService.removeFromBlacklist(login, callerLogin)
-  },
-
-  /**
-   * Adds a player to the server mute list
-   * @param login Player login
-   * @param callerLogin Admin login
-   * @param reason Optional mute reason
-   * @param expireDate Optional mute expire date
-   */
-  addToMutelist: async (login: string, callerLogin: string, reason?: string, expireDate?: Date): Promise<true | Error> => {
-    return await AdministrationService.addToMutelist(login, callerLogin, reason, expireDate)
-  },
-
-  /**
-   * Removes a player from the server mute list
-   * @param login Player login
-   */
-  removeFromMutelist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromMutelist(login, callerLogin)
-  },
-
-  /**
-   * Adds a player to the server guest list
-   * @param login Player login
-   * @param callerLogin Admin login
-   */
-  addToGuestlist: async (login: string, callerLogin: string): Promise<boolean | Error> => {
-    return await AdministrationService.addToGuestlist(login, callerLogin)
-  },
-
-  /**
-   * Removes a player from the server guest list
-   * @param login Player login
-   */
-  removeFromGuestlist: async (login: string, callerLogin?: string): Promise<boolean | Error> => {
-    return await AdministrationService.removeFromGuestlist(login, callerLogin)
-  },
-
   // TO BE REMOVED
   fetchMapRank: RecordService.getRank.bind(RecordService),
 
   // REMOVE LATER
   get UIIDS() {
     return { ..._UIIDS }
-  },
-
-  get banlist() {
-    return AdministrationService.banlist
-  },
-
-  get blacklist() {
-    return AdministrationService.blacklist
-  },
-
-  get mutelist() {
-    return AdministrationService.mutelist
-  },
-
-  get guestlist() {
-    return AdministrationService.guestlist
-  },
-
-  get mkPlayerVotes(): MKVote[] {
-    return ManiakarmaService.playerVotes
-  },
-
-  get mkNewVotes(): MKVote[] {
-    return ManiakarmaService.newVotes
-  },
-
-  get mkMapKarmaValue(): number {
-    return ManiakarmaService.mapKarmaValue
-  },
-
-  get mkMapKarma() {
-    return ManiakarmaService.mapKarma
   }
 
 }

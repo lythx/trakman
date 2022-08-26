@@ -22,7 +22,7 @@ export default class GuestlistList extends PopupWindow {
                 if (targetInfo === undefined) {
                     return
                 } else {
-                    tm.removeFromGuestlist(targetPlayer.login, info.login)
+                    tm.admin.removeGuest(targetPlayer.login, info)
                     tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
                         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
                         + `${tm.utils.palette.highlight + targetPlayer.nickname}${tm.utils.palette.admin} from guestlist.`)
@@ -48,7 +48,7 @@ export default class GuestlistList extends PopupWindow {
             (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, { padding: 0.2 }),
 
         ]
-        const guestlisted = tm.guestlist
+        const guestlisted = tm.admin.guestlist
         const cancer: (TMOfflinePlayer | undefined)[] = []
 
         for (const player of guestlisted) {
@@ -70,7 +70,7 @@ export default class GuestlistList extends PopupWindow {
             return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.guestlistList.icon, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
         }
 
-        const players = tm.guestlist
+        const players = tm.admin.guestlist
         const rows = Math.min(this.entries, players.length)
         const arr = headers
         for (let i = 0; i < rows; i++) {

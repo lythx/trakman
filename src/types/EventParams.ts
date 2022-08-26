@@ -9,14 +9,10 @@ type EventParams =
   CheckpointInfo |
   BeginMapInfo |
   EndMapInfo |
-  DediRecordInfo |
-  MapDedisInfo |
   KarmaVoteInfo |
-  MKVotesInfo |
   MapAddedInfo |
   MapRemovedInfo |
   BillUpdatedInfo |
   TMMap[] |
-  (TMXMapInfo | null)[] |
-  any[] | 
+  any[] |
   ('result' | 'race')
