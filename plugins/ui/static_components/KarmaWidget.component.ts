@@ -1,5 +1,6 @@
 import { getStaticPosition, centeredText, Grid, CONFIG, GridCellFunction, ICONS, IDS, staticHeader, getIcon } from '../UiUtils.js'
 import { trakman as tm } from '../../../src/Trakman.js'
+import { maniakarma } from '../../maniakarma/Maniakarma.js'
 import StaticComponent from '../StaticComponent.js'
 
 export default class KarmaWidget extends StaticComponent {
@@ -34,14 +35,13 @@ export default class KarmaWidget extends StaticComponent {
     tm.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
-    tm.addListener('Controller.ManiakarmaVotes', (): void => {
-      this.display()
-    })
+    maniakarma.onMapFetch(this.display.bind(this))
+    maniakarma.onVote(this.display.bind(this))
     tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
-        tm.karma.add(tm.maps.current.id, info, votes[index])
+        tm.karma.add(info, votes[index])
       }
     })
   }
@@ -67,8 +67,8 @@ export default class KarmaWidget extends StaticComponent {
     const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
     const karma: number = tm.maps.current.voteRatio
-    const mkVotes = tm.mkMapKarma
-    const mkKarmaValue: number = tm.mkMapKarmaValue
+    const mkVotes = maniakarma.mapKarma
+    const mkKarmaValue: number = maniakarma.mapKarmaRatio
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const maxMkAmount: number = Math.max(...Object.values(mkVotes))
     const personalVote = votes.find(a => a.login === login)?.vote
@@ -117,8 +117,8 @@ export default class KarmaWidget extends StaticComponent {
 
   private constructInfo(totalVotes: number, karma: number, totalMkVotes: number, mkKarmaValue: number): string {
     const colour: string = karma > 0 ? '$F00' : '$0F0' //TODO
-    const mkKarma: string = process.env.USE_MANIAKARMA === 'YES' ? Math.round(mkKarmaValue).toString() : '-'
-    const mkAmount: string = process.env.USE_MANIAKARMA === 'YES' ? totalMkVotes.toString() : '-'
+    const mkKarma: string = maniakarma.isEnabled ? Math.round(mkKarmaValue).toString() : '-'
+    const mkAmount: string = maniakarma.isEnabled ? totalMkVotes.toString() : '-'
     const arr: GridCellFunction[] = [
       (i, j, w, h) => ``,
       (i, j, w, h) => `<quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 2} ${h - this.margin * 2}" image="${getIcon(this.icons[0])}"/>`,

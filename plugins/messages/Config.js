@@ -4,7 +4,7 @@ export default {
   startup: `${p.servermsg}Trakman ${p.highlight}`
     + `v#{version}${p.servermsg} startup sequence successful.`,
   changelog: `${p.server}» ${p.error}You can see the recent changes with` +
-    `the ${p.highlight}/changes ${p.error}command.`,
+    ` the ${p.highlight}/changes ${p.error}command.`,
   noPb: `${p.error}You don't have a personal best on this map.`,
   pb: `${p.record}Personal best${p.highlight}: #{time}${p.record}, the `
     + `${p.rank}#{rank} ${p.record}record.`,
@@ -24,7 +24,7 @@ export default {
     + `#{status} the ${p.rank}#{position}${p.record} `
     + `local record. Time${p.highlight}: #{time}#{difference}`,
   recordDifference: ` ${p.record}$n(${p.rank}#{position} ${p.highlight}-#{time})`,
-  dediRecord: `${p.highlight}#{nickname}${p.record} has `
-    + `#{status} the ${p.rank}#{position}${p.record} `
+  dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
+    + `#{status} the ${p.rank}#{position}${p.dedirecord} `
     + `dedimania record. Time${p.highlight}: #{time}#{difference}`
 }

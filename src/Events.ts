@@ -16,7 +16,6 @@ interface EventWithCallbackInterface {
   "Controller.BeginMap": BeginMapInfo
   "Controller.EndMap": EndMapInfo
   "Controller.KarmaVote": KarmaVoteInfo
-  "Controller.ManiakarmaVotes": MKVotesInfo
   "Controller.MapAdded": MapAddedInfo
   "Controller.MapRemoved": MapRemovedInfo
   "Controller.BillUpdated": BillUpdatedInfo
