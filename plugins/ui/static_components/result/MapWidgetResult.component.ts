@@ -1,5 +1,6 @@
 import { RESULTCONFIG as RCFG, IDS, Grid, resultStaticHeader, ICONS, stringToObjectProperty, GridCellFunction, getResultPosition } from '../../UiUtils.js'
 import flags from '../../config/FlagIcons.json' assert {type: 'json'}
+import { tmx } from '../../../tmx/Tmx.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { MapAuthorData } from '../../../MapAuthorData.js'
@@ -27,9 +28,8 @@ export default class MapWidgetResult extends StaticComponent {
     tm.addListener('Controller.JukeboxChanged', () => {
       void this.display()
     })
-    tm.addListener('Controller.TMXQueueChanged', () => {
-      this.display()
-    })
+    tmx.onMapChange(() => this.display())
+    tmx.onQueueChange(() => this.display())
     tm.addListener('Controller.EndMap', (info) => {
       this.isRestart = info.isRestart
     }, true)
@@ -53,7 +53,7 @@ export default class MapWidgetResult extends StaticComponent {
     const authorData = this.isRestart ? MapAuthorData.currentAuthor : MapAuthorData.nextAuthor
     const author: string = authorData?.nickname ?? map.author
     const cfg = RCFG.map
-    const tmxmap = this.isRestart ? tm.tmx.current : tm.tmx.next[0]
+    const tmxmap = this.isRestart ? tmx.current : tmx.queue[0]
     const date: Date | undefined = tmxmap?.lastUpdateDate
     const tmxwr = tmxmap?.replays?.[0]?.time
     const grid = new Grid(this.width, this.height - RCFG.marginSmall, [1], new Array(rows).fill(1))
