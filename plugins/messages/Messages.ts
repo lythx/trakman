@@ -51,7 +51,7 @@ const events: TMListener[] = [
         name: tm.utils.strip(tm.state.serverConfig.name),
         version: config.version
       }), player.login)
-      tm.sendMessage(c.changelog)
+      tm.sendMessage(c.changelog, player.login)
       const index: number = tm.records.local.findIndex(a => a.login === player.login)
       if (index === -1) {
         tm.sendMessage(c.noPb, player.login)

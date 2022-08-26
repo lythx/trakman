@@ -21,7 +21,7 @@ export abstract class VoteService {
       const uid: string = maps[i].id
       this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
     }
-    Events.addListener('Controller.JukeboxChanged', ()=> {
+    Events.addListener('Controller.JukeboxChanged', () => {
       this.updatePrefetch()
     })
   }
@@ -70,9 +70,10 @@ export abstract class VoteService {
   static async updatePrefetch(): Promise<void> {
     const arr: { uid: string, votes: TMVote[] }[] = []
     const mapsToFetch: string[] = []
-    const maps = [...MapService.history, MapService.current, ...MapService.queue].reverse()
-    for (let i = 0; i < maps.length; i++) {
-      const uid: string = maps[i].id
+    const notQueueMaps = this._votes.slice(this.prefetchCount)
+    const queue = MapService.queue.slice(0, this.prefetchCount).reverse()
+    for (let i = 0; i < queue.length; i++) {
+      const uid: string = queue[i].id
       const v = this._votes.find(a => a.uid === uid)
       if (v === undefined) {
         arr[i] = { uid, votes: [] }
@@ -86,7 +87,7 @@ export abstract class VoteService {
       const entry = arr.find(a => a.uid === e)
       if (entry !== undefined) { entry.votes = res.filter(a => a.mapId === e) }
     }
-    this._votes = arr
+    this._votes = arr.concat(notQueueMaps)
     Events.emitEvent('Controller.VotesPrefetch', res)
   }
 
@@ -111,15 +112,15 @@ export abstract class VoteService {
     return this._votes.filter(a => uids.includes(a.uid))
   }
 
-  static get current(): TMVote[] {
-    return this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []
+  static get current(): Readonly<TMVote>[] {
+    return [...this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []]
   }
 
   static get currentCount(): number {
     return this._votes.find(a => a.uid === MapService.current.id)?.votes?.length ?? 0
   }
 
-  static get votes(): { uid: string, votes: TMVote[] }[] {
+  static get votes(): Readonly<{ uid: string, votes: TMVote[] }>[] {
     return [...this._votes]
   }
 

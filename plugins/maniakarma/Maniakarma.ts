@@ -234,6 +234,9 @@ const onPlayerJoin = async (login: string) => {
 if (config.isEnabled === true) {
   tm.addListener('Controller.Ready', () => {
     void initialize()
+    setInterval(() => {
+      if (isConnected === false) { void initialize() }
+    }, config.reconnectTimeout * 1000)
   }, true)
   tm.addListener('Controller.PlayerJoin', (info): void => {
     void onPlayerJoin(info.login)
@@ -244,9 +247,6 @@ if (config.isEnabled === true) {
   tm.addListener('Controller.KarmaVote', (info): void => {
     addVote(tm.maps.current.id, info.login, info.vote)
   })
-  setInterval(() => {
-    if (isConnected === false) { void initialize() }
-  }, config.reconnectTimeout)
 }
 
 export const maniakarma = {
