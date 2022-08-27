@@ -128,6 +128,8 @@ export const trakman = {
 
     fetchRecordCount: RecordService.fetchRecordCount.bind(RecordService),
 
+    fetchRank: RecordService.fetchRank.bind(RecordService),
+
     get local() { return RecordService.localRecords },
 
     get localCount() { return RecordService.localRecordCount },
@@ -421,7 +423,7 @@ export const trakman = {
   },
 
   // TO BE REMOVED
-  fetchMapRank: RecordService.getRank.bind(RecordService),
+  fetchMapRank: RecordService.fetchRank.bind(RecordService),
 
   // REMOVE LATER
   get UIIDS() {
