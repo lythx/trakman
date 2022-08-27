@@ -7,16 +7,16 @@ import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
-const client = new DedimaniaClient()
+const client: DedimaniaClient = new DedimaniaClient()
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 
-const emitRecordEvent = (record: NewDediRecord) => {
+const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
 }
 
-const emitFetchEvent = (dedis: DediRecord[]) => {
+const emitFetchEvent = (dedis: DediRecord[]): void => {
   for (const e of fetchListeners) { e(dedis) }
 }
 
@@ -108,6 +108,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
 
 const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
   if (client.connected === false) { return }
+  if (newDedis.length === 0) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -204,7 +205,7 @@ const updateServerPlayers = (): void => {
 }
 
 /**
- * Updates the player information and server plater list on the dedimania website
+ * Updates the player information and server player list on the dedimania website
  * @param player Player object
  */
 const playerJoin = async (player: { login: string, nickname: string, region: string, isSpectator: boolean }): Promise<void> => {
@@ -214,7 +215,7 @@ const playerJoin = async (player: { login: string, nickname: string, region: str
       { string: 'TMF' },
       { string: player.login },
       { string: player.nickname },
-      { string: player.region },
+      { string: tm.utils.countryToCode(player.region.split('|')[1]) },
       { string: '' }, // TEAMNAME
       { int: 0 }, // TODO: PLAYER LADDER RANK
       { boolean: player.isSpectator },
