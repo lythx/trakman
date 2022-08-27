@@ -299,15 +299,15 @@ export class RecordService {
    * @param mapId Map uid
    * @returns Rank or undefined if player doesn't have a record
    */
-  static async getRank(login: string, mapId: string): Promise<number | undefined>
+  static async fetchRank(login: string, mapId: string): Promise<number | undefined>
   /**
    * Fetches given player local ranks on given maps
    * @param login Player login
    * @param mapIds Array of map uids
    * @returns Array of objects with player ranks and map uids
    */
-  static async getRank(login: string, mapIds: string[]): Promise<{ mapId: string, rank: number }[]>
-  static async getRank(login: string, mapIds: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
+  static async fetchRank(login: string, mapIds: string[]): Promise<{ mapId: string, rank: number }[]>
+  static async fetchRank(login: string, mapIds: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
     if (typeof mapIds === 'string') {
       const find = this._playerRanks.find(a => mapIds === a.mapId && a.rank !== -1 && a.login === login)
       return find?.rank

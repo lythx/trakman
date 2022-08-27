@@ -5,6 +5,8 @@ import { Paginator } from "../UiUtils.js";
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js";
 
+//TODO FIX RECORDS BEING FETCHED EVERYTIME 
+
 export default class TMXWindow extends PopupWindow<number> {
 
   private readonly paginator: Paginator
@@ -42,7 +44,7 @@ export default class TMXWindow extends PopupWindow<number> {
     this.displayToPlayer(info.login, this.historyCount + 1)
   }
 
-  protected constructContent(login: string, page: number): string {
+  protected async constructContent(login: string, page: number): Promise<string> {
     const historyCount = Math.min(config.historyCount, tm.jukebox.historyCount)
     let maps: (TMMap | undefined)[]
     let tmxMaps: (TMXMapInfo | null | undefined)[]
@@ -63,18 +65,23 @@ export default class TMXWindow extends PopupWindow<number> {
       tmxMaps = [tmx.queue[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
       titles = [`${config.titles.next} #${index}`, `${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`]
     }
+    const allRecords = await tm.records.fetchByMap(...maps.filter(a => a !== undefined).map(a => (a as any).id))
     const cell: GridCellFunction = (i, j, w, h) => {
       const map = maps[j]
       if (map === undefined) { return '' }
       const grid = new Grid(w, h, [1], [1.2, 6.7, 1.2, 1.2, 4.5, 4.5],
         { background: config.infosBackground, margin: CONFIG.grid.margin })
       const tmxMap = tmxMaps[j] ?? undefined
+      const mapRecords = allRecords.filter(a => a.map === map.id)
+      let rank: number | undefined = mapRecords.findIndex(a => login === a.login) + 1
+      if (rank === 0) { rank = undefined }
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, tmxMap)
-      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, tm.records.local, tmxMap)
+      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, tmxMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructEntry(tm.utils.safeString(tm.utils.strip(map.name, false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
-      const infos: GridCellFunction = (ii, jj, ww, hh) => this.constructInfoXml(ww, hh, map, tmxMap)
+      const infos: GridCellFunction = (ii, jj, ww, hh) =>
+        this.constructInfoXml(ww, hh, map, rank, tmxMap)
       const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, tmxMap?.replays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
     }
@@ -172,7 +179,7 @@ export default class TMXWindow extends PopupWindow<number> {
     </frame>`
   }
 
-  private constructInfoXml(width: number, height: number, map: TMMap, tmxMap?: TMXMapInfo): string {
+  private constructInfoXml(width: number, height: number, map: TMMap, rank?: number, tmxMap?: TMXMapInfo): string {
     const cols = 4
     const rows = 4
     const grid = new Grid(width, height, [1.3, 1.3, 1, 1], new Array(rows).fill(1),
@@ -180,7 +187,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const infos: string[] = [
       tm.utils.getTimeString(map.authorTime),
       tm.utils.formatDate(map.addDate, true),
-      tm.utils.getPositionString(1), // TODO FIX
+      rank === undefined ? config.defaultText : tm.utils.getPositionString(rank),
       map.copperPrice.toString(),
       map.environment,
       map.mood,
