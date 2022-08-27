@@ -81,8 +81,6 @@ export class Listeners {
         if (cpStatus === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
-            // Register player finish
-            Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
             if (obj.localRecord !== undefined) {
               // Register player local record
               Events.emitEvent('Controller.PlayerRecord', obj.localRecord)
@@ -91,6 +89,8 @@ export class Listeners {
               // Register player live record
               Events.emitEvent('Controller.LiveRecord', obj.liveRecord)
             }
+            // Register player finish
+            Events.emitEvent('Controller.PlayerFinish', obj.finishInfo)
           }
           return
           // Real CP
