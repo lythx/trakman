@@ -4,7 +4,6 @@ import ICONS from '../config/Icons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../src/Trakman.js'
 import IDS from '../config/UtilIds.json' assert { type: 'json' }
 
-
 interface UiRecord {
   readonly time: number
   readonly login?: string
@@ -264,7 +263,7 @@ export default class RecordList {
       if (login !== undefined) {
         const player: TMPlayer | undefined = tm.players.get(login)
         if (player !== undefined) {
-          if (i < playerIndex) {
+          if (i < playerIndex || playerIndex === -1) {
             ret.push('slower')
           } else {
             ret.push('faster')

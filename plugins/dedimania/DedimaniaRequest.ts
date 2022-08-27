@@ -55,14 +55,14 @@ export class DedimaniaRequest {
         return `<double>${value}</double>`
       case 'string':
         if (typeof value !== 'string') {
-          return new Error(`Received ${type} instead of string while creating XML request.`)
+          return new Error(`Received ${typeof value} instead of string while creating XML request.`)
         }
         return `<string>${this.escapeHtml(value)}</string>`
       case 'base64':
         return `<base64>${value}</base64>`
       case 'array': {
         if (!Array.isArray(value)) {
-          return new Error(`Received ${type} instead of array while creating XML request.`)
+          return new Error(`Received ${typeof value} instead of array while creating XML request.`)
         }
         let arr: string = '<array><data>'
         for (const el of value) {
@@ -73,7 +73,7 @@ export class DedimaniaRequest {
       }
       case 'struct': {
         if (typeof value !== 'object' || Array.isArray(value) || value === null) {
-          return new Error(`Received ${type} instead of object while creating XML request.`)
+          return new Error(`Received ${typeof value} instead of object while creating XML request.`)
         }
         let str: string = '<struct>'
         for (const key in value as any) {

@@ -12,7 +12,7 @@ interface TMXMapInfo {
   readonly style: string
   readonly routes: string
   readonly length: string
-  readonly difficulty: string
+  readonly difficulty:'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
   readonly leaderboardRating: number
   readonly game: string
   readonly comment: string
