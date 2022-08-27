@@ -1,0 +1,47 @@
+export default {
+  icon: 'placeholder',
+  title: 'Map Info',
+  navbar: ['mapList'],
+  itemsPerPage: 3,
+  queueCount: 4,
+  historyCount: 4,
+  defaultText: '--',
+  defaultTime: '-:--.--',
+  titles: {
+    previous: 'Previous',
+    current: 'Ongoing',
+    next: 'Next'
+  },
+  noScreenshot: 'placeholder',
+  notLoaded: `Press DEL if the image\n      doesn't appear`,
+  screenshotMargin: 0.5,
+  margin: 0.15,
+  icons: {
+    header: 'placeholder',
+    name: 'placeholder',
+    download: 'placeholder'
+  },
+  infoIcons: [
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+    'placeholder',
+  ],
+  iconBackground: "222C",
+  contentBackground: "777C",
+  gridBackground: '444A',
+  infosBackground: "FFFA",
+  iconWidth: 2.1,
+  infoIconWidth: 2,
+  textscale: 0.67,
+  infoTextscale: 0.6,
+  screenshotWidth: 18,
+  tmxRecordCount: 3,
+  recordTextScale: 0.6
+}

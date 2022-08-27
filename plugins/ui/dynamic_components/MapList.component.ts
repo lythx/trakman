@@ -93,16 +93,26 @@ export default class MapList extends PopupWindow {
       privilege: 0
     })
     tm.addListener('Controller.MapRemoved', (map) => {
-      const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
+      this.updateList(map.id)
+    })
+    tm.addListener('Controller.MapAdded', (map) => {
+      this.updateList(map.id)
+    })
+    tm.addListener('Controller.BeginMap', (map) => {
+      this.reRender()
+    })
+  }
+
+  private updateList(id: string) {
+    const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
       this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
       let pageCount = Math.ceil(this.sortedList.length / (this.rows * this.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
       for (const e of this.playerQueries) {
-        e.list.splice(e.list.findIndex(a => a.id === map.id), 1)
+        e.list.splice(e.list.findIndex(a => a.id === id), 1)
       }
       this.reRender()
-    })
   }
 
   async openWithOption(login: string, option: 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'bestkarma') {
