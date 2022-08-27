@@ -1,5 +1,6 @@
 import config from './Config.js'
 import { trakman as tm } from '../../src/Trakman.js'
+import { TMXMapChangedInfo } from './TmxTypes.js'
 
 // fill with empty strings at start to avoid undefined error on startup
 const history: (TMXMapInfo | string)[] = []
@@ -7,12 +8,6 @@ let current: TMXMapInfo | string = ''
 const queueSize: number = config.queueSize
 const historySize: number = config.historyCount
 const queue: (TMXMapInfo | string)[] = new Array(queueSize).fill('')
-
-interface TMXMapChangedInfo {
-  history: (TMXMapInfo | null)[]
-  current: TMXMapInfo | null
-  queue: (TMXMapInfo | null)[]
-}
 
 const queueListeners: ((queue: (TMXMapInfo | null)[]) => void)[] = []
 const mapListeners: ((info: TMXMapChangedInfo) => void)[] = []
@@ -166,3 +161,5 @@ export const tmx = {
   }
 
 }
+
+export { TMXMapChangedInfo }
