@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import { CONFIG, IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject } from '../UiUtils.js'
+import { CONFIG, IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject, ICONS } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js";
@@ -66,15 +66,14 @@ export default class TMXWindow extends PopupWindow<number> {
     const cell: GridCellFunction = (i, j, w, h) => {
       const map = maps[j]
       if (map === undefined) { return '' }
-      const grid = new Grid(w, h, [1], [1.1, 4.7, 1.1, 1.1, 4.2, 3.8, 1.8],
+      const grid = new Grid(w, h, [1], [1.2, 6.7, 1.2, 1.2, 4.5, 4.5],
         { background: config.infosBackground, margin: CONFIG.grid.margin })
       const tmxMap = tmxMaps[j] ?? undefined
-      const header: GridCellFunction = (ii, jj, ww, hh) => this.constructEntry(titles[j], config.icons.header, ww, hh, config.iconWidth)
-      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(ww, hh, tmxMap)
+      const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, tmxMap)
+      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, tm.records.local, tmxMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructEntry(tm.utils.safeString(tm.utils.strip(map.name, false)), config.icons.name, ww, hh, config.iconWidth)
-      const author: GridCellFunction = (ii, jj, ww, hh) =>
-        this.constructEntry(tm.utils.safeString(map.author), config.icons.name, ww, hh, config.iconWidth)
+      const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) => this.constructInfoXml(ww, hh, map, tmxMap)
       const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, tmxMap?.replays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
@@ -86,21 +85,91 @@ export default class TMXWindow extends PopupWindow<number> {
     return this.paginator.constructXml(page) + closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 
-  private constructEntry(text: string, image: string, width: number, height: number, iconWidth: number): string {
+  private constructHeader(width: number, height: number, title: string, map: TMMap, tmxMap?: TMXMapInfo): string {
+    const icon = (x: number, y: number, image: string, url: string): string => {
+      return `<quad posn="${x + config.margin} ${-(y + config.margin)} 3" 
+       sizen="${config.iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}" url="${url}"/>
+      <quad posn="${x + config.margin * 2} ${-(y + config.margin * 2)} 5" 
+       sizen="${config.iconWidth - config.margin * 2} ${height - config.margin * 4}" 
+       image="${image}" url="${url}"/>`
+    }
+    if (tmxMap === undefined) {
+      return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin), height, config.iconWidth)}
+        <frame posn="${width - (config.iconWidth + config.margin * 2)} 0 4">
+          ${icon(0, 0, '', tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
+        </frame>`
+    }
+    return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin) * 3, height, config.iconWidth)}
+    <frame posn="${width - ((config.iconWidth + config.margin) * 3 + config.margin)} 0 4">
+      ${icon(0, 0, '', tmxMap.pageUrl.replace(/^https:\/\//, ''))}
+      ${icon(config.iconWidth + config.margin, 0, '', tmxMap.downloadUrl.replace(/^https:\/\//, ''))}
+      ${icon((config.iconWidth + config.margin) * 2, 0, '', tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
+    </frame>`
+  }
+
+  private constructEntry(text: string, image: string, width: number, height: number, iconWidth: number, useCenteredText?: true): string {
     return `<quad posn="${config.margin} ${-config.margin} 4" sizen="${iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}"/>
       <quad posn="${config.margin * 2} ${-config.margin * 2} 6" sizen="${iconWidth - config.margin * 2} ${height - config.margin * 4}" image="${image}"/>
       <frame posn="${iconWidth + config.margin * 2} ${-config.margin} 4">
         <quad posn="0 0 3" sizen="${width - (iconWidth + config.margin * 3)} ${height - config.margin * 2}" bgcolor="${config.gridBackground}"/>
-        ${verticallyCenteredText(text, width - (iconWidth + config.margin), height, { textScale: config.textscale })}
+        ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin), height, { textScale: config.textscale }) :
+        verticallyCenteredText(text, width - (iconWidth + config.margin), height, { textScale: config.textscale, yOffset: -0.2 })}
       </frame>`
   }
 
-  protected constructScreenshot(width: number, height: number, tmxMap?: TMXMapInfo) {
+  protected constructScreenshot(login: string, width: number, height: number, records: TMRecord[], tmxMap?: TMXMapInfo) {
+    const rightW = width - (config.screenshotWidth + config.margin)
+    const count = 5
+    const grid = new Grid(rightW, height, [1, 2, 3], new Array(count + 1).fill(1),
+      { headerBg: config.iconBackground, background: config.gridBackground, margin: config.margin })
+    const options = { textScale: config.recordTextScale }
+    const index = records.findIndex(a => a.login === login)
+    let personalIndex: number | undefined
+    const personalRecord = records[index]
+    records = records.slice(0, count)
+    if (personalRecord !== undefined && index >= count) {
+      records[count - 1] = personalRecord
+      personalIndex = count
+    }
+    const indexCell: GridCellObject = {
+      callback: (i, j, w, h) => {
+        return centeredText(personalIndex === i ? (index + 1).toString() : (records[i - 1] === undefined ? '-' : i.toString()), w, h, options)
+      },
+      background: config.iconBackground
+    }
+    const nameCell: GridCellFunction = (i, j, w, h) => {
+      let nickname: string | undefined = records[i - 1]?.nickname
+      if ((records[i - 1] === undefined && i === 1) || (records[i - 1] === undefined && records[i - 2] !== undefined)) {
+        nickname = tm.players.get(login)?.nickname
+      }
+      return verticallyCenteredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultText, false)), w, h, options)
+    }
+    const timeCell: GridCellFunction = (i, j, w, h) => centeredText(records[i - 1] !== undefined ?
+      tm.utils.getTimeString(records[i - 1]?.time) : config.defaultTime, w, h, options)
+    const arr: (GridCellFunction | GridCellObject)[] = [
+      (i, j, w, h) => centeredText('Lp.', w, h, options),
+      (i, j, w, h) => centeredText('Time', w, h, options),
+      (i, j, w, h) => centeredText('Name', w, h, options)
+    ]
+    for (let i = 0; i < count; i++) {
+      arr.push(indexCell, timeCell, nameCell)
+    }
     const image = tmxMap === undefined
       ? config.noScreenshot
       : tm.utils.safeString(tmxMap.thumbnailUrl + `&.jpeg`)
-    return `<quad posn="${config.margin} ${-config.margin} 8" sizen="${config.screenshotWidth} ${height - config.margin * 2}" image="${image}"/>`
-      + centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: config.textscale })
+    return `<quad posn="${config.margin} ${-config.margin} 8" sizen="${config.screenshotWidth} ${height - config.margin * 2}" image="${image}"/>
+      ${centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: 0.5, yOffset: -1 })}
+      <frame posn="${config.margin + config.screenshotWidth} 0">
+        ${grid.constructXml(arr)}
+      </frame>`
+  }
+
+  protected constructAuthor(width: number, height: number, map: TMMap): string {
+    const rightW = 8
+    return `${this.constructEntry(tm.utils.safeString(map.author), config.icons.author, width - rightW, height, config.iconWidth)}
+    <frame posn="${width - (rightW + config.margin)} 0 4">
+      ${this.constructEntry(tm.utils.getTimeString(map.authorTime), config.icons.authorTime, rightW + config.margin, height, config.iconWidth, true)}
+    </frame>`
   }
 
   private constructInfoXml(width: number, height: number, map: TMMap, tmxMap?: TMXMapInfo): string {
@@ -139,31 +208,31 @@ export default class TMXWindow extends PopupWindow<number> {
   }
 
   private counstructTmxRecordsXml(width: number, height: number, replays: TMXReplay[] = []): string {
-    const grid = new Grid(width, height, [1, 3, 2, 3, 1], new Array(config.tmxRecordCount + 1).fill(1),
+    const grid = new Grid(width, height, [1, 2, 3, 3, 1], new Array(config.tmxRecordCount + 1).fill(1),
       { margin: CONFIG.grid.margin, background: config.gridBackground, headerBg: config.iconBackground })
     const options = { textScale: config.recordTextScale }
     const arr: (GridCellFunction | GridCellObject)[] = [
       (i, j, w, h) => centeredText('Lp.', w, h, options),
-      (i, j, w, h) => centeredText('Name', w, h, options),
       (i, j, w, h) => centeredText('Time', w, h, options),
+      (i, j, w, h) => centeredText('Name', w, h, options),
       (i, j, w, h) => centeredText('Date', w, h, options),
       (i, j, w, h) => centeredText('Dl.', w, h, options),
     ]
     const indexCell: GridCellObject = {
-      callback: (i, j, w, h) => centeredText(tm.utils.getPositionString(i), w, h, options),
+      callback: (i, j, w, h) => centeredText(i.toString(), w, h, options),
       background: config.iconBackground
     }
-    const nameCell: GridCellFunction = (i, j, w, h) =>
-      verticallyCenteredText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultText), w, h, options)
     const timeCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
+    const nameCell: GridCellFunction = (i, j, w, h) =>
+      verticallyCenteredText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultText), w, h, options)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultText, w, h, options)
     const downloadCell: GridCellFunction = (i, j, w, h) => replays[i - 1] !== undefined ?
       `<quad posn="0 0 5" sizen="${w} ${h}" image="${config.icons.download}" url="${replays[i - 1].url.replace(/^https:\/\//, '')}"/>` :
       ''
     for (let i = 0; i < config.tmxRecordCount; i++) {
-      arr.push(indexCell, nameCell, timeCell, dateCell, downloadCell)
+      arr.push(indexCell, timeCell, nameCell, dateCell, downloadCell)
     }
     return grid.constructXml(arr)
   }
@@ -224,47 +293,5 @@ export default class TMXWindow extends PopupWindow<number> {
   //                image="${ICN.MX}"
   //                url="${tmxInfo.pageUrl.replace(/^https:\/\//, '')}"/>`
   // }
-
-  // private getPositionString(login: string, challengeId: string): string {
-  //   const recordIndex = tm.records.filter(a => a.challenge === challengeId).sort((a, b) => a.time - b.time).findIndex(a => a.login === login) + 1
-  //   if (recordIndex === 0) { return "--." }
-  //   else { return tm.utils.getPositionString(recordIndex) }
-  // }
-
-  // private getReplaysXml(tmxInfo: TMXTrackInfo | null): string {
-  //   let replaysXml = `<quad posn="0.4 -39 2" sizen="24.2 9.8" style="BgsPlayerCard" substyle="BgCardSystem"/>
-  //           <quad posn="5.55 -39.5 3" sizen="1.9 1.9"
-  //            image="${ICN.account}"/>
-  //           <quad posn="11.55 -39.5 3" sizen="1.9 1.9"
-  //            image="${ICN.timer}"/>
-  //           <quad posn="17.55 -39.5 3" sizen="1.9 1.9"
-  //            image="${ICN.calendar}"/>`
-  //   const positionIcons = [ICN.one, ICN.two, ICN.three]
-  //   for (let i = 0; i < 3; i++) {
-  //     const imgPos = -(41.7 + (2.3 * i))
-  //     const txtPos = -(41.9 + (2.3 * i))
-  //     if (tmxInfo !== null && tmxInfo.replays[i] !== undefined) {
-  //       replaysXml += `
-  //         <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
-  //         <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1"
-  //          text="${CFG.widgetStyleRace.formattingCodes + tm.utils.safeString(tmxInfo.replays[i].name)}"/>
-  //         <label posn="12.5 ${txtPos} 3" sizen="4 2" scale="1" halign="center"
-  //          text="${CFG.widgetStyleRace.formattingCodes + tm.utils.getTimeString(tmxInfo.replays[i].time)}"/>
-  //         <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1"
-  //          text="${CFG.widgetStyleRace.formattingCodes}${tmxInfo.replays[i].recordDate.getDate().toString().padStart(2, '0')}/${(tmxInfo.replays[i].recordDate.getMonth() + 1).toString().padStart(2, '0')}/${tmxInfo.replays[i].recordDate.getFullYear()}"/>
-  //         <quad posn="22.15 ${imgPos + 0.2} 3" sizen="1.9 1.9"
-  //          image="${ICN.download}"
-  //          url="${}"/>`
-  //     }
-  //     else {
-  //       replaysXml += `
-  //         <quad posn="0.9 ${imgPos} 3" sizen="1.9 1.9" image="${positionIcons[i]}"/>
-  //         <label posn="3 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}N/A"/>
-  //         <label posn="10 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}-:--.--"/>
-  //         <label posn="15.5 ${txtPos} 3" sizen="6.4 2" scale="1" text="${CFG.widgetStyleRace.formattingCodes}--/--/----"/>`
-  //     }
-  //   }
-  //   return replaysXml
-  //}
 
 } 
