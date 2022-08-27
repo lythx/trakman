@@ -128,7 +128,7 @@ const events: TMListener[] = [
   }
 ]
 
-for (const event of events) { tm.addListener(event.event, event.callback) }
+for (const event of events) { tm.addListener(event.event, event.callback, true) }
 
 dedimania.onRecord((record) => {
   const rs = tm.utils.getRankingString(record.previousPosition, record.position, record.previousTime, record.time)
