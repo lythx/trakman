@@ -208,9 +208,9 @@ export class MapService {
    * Puts current map into history array, changes current map and updates the queue
    */
   static async update(): Promise<void> {
-    await this.setCurrent()
     this._history.unshift(this._current)
     this._history.length = Math.min(this.historySize, this._history.length)
+    await this.setCurrent()
     if (this._current.id === this._queue[0].map.id) {
       this._queue.shift()
       this.fillQueue()
@@ -515,14 +515,14 @@ export class MapService {
   /**
    * @returns All maps from queue
    */
-  static get queue(): TMMap[] {
+  static get queue():  Readonly<TMMap>[] {
     return [...this._queue.map(a => a.map)]
   }
 
   /**
    * @returns All maps from map history
    */
-  static get history(): TMMap[] {
+  static get history(): Readonly<TMMap>[] {
     return [...this._history]
   }
 
