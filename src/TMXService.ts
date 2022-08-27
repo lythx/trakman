@@ -137,7 +137,7 @@ export abstract class TMXService {
       style: s[10],
       routes: s[11],
       length: s[12],
-      difficulty: s[13],
+      difficulty: s[13] as any,
       leaderboardRating: Number(s[14]),
       isClassic: Number(s[14]) === 0,
       isNadeo: Number(s[14]) === 50000,

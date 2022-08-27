@@ -71,12 +71,13 @@ export class AdministrationService {
     }
     for (const e of this._banlist) {
       if (!banlist.some((a: any): boolean => a.Login === e.login)) {
-        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
-          [{ string: e.login }, { string: e.reason }]
-        const res: any[] | Error = await Client.call('BanAndBlackList', params)
-        if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e.login} to banlist`, `Server responded with error:`, res.message)
-        }
+        this._banlist = this._banlist.filter(a=>a.login !== e.login) // TODO FIX
+        // const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: 'No reason specified' }, { boolean: false }] :
+        //   [{ string: e.login }, { string: e.reason }, { boolean: false }]
+        // const res: any[] | Error = await Client.call('BanAndBlackList', params)
+        // if (res instanceof Error) {
+        //   await Logger.fatal(`Failed to add login ${e.login} to banlist`, `Server responded with error:`, res.message)
+        // }
       }
     }
     for (const login of banlist.map((a): string => a.Login)) {
