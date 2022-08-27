@@ -14,12 +14,13 @@ export default {
   },
   noScreenshot: 'placeholder',
   notLoaded: `Press DEL if the image\n      doesn't appear`,
-  screenshotMargin: 0.5,
   margin: 0.15,
   icons: {
     header: 'placeholder',
     name: 'placeholder',
-    download: 'placeholder'
+    download: 'placeholder',
+    author: 'dasda',
+    authorTime: ''
   },
   infoIcons: [
     'placeholder',
@@ -41,7 +42,7 @@ export default {
   infoIconWidth: 2,
   textscale: 0.67,
   infoTextscale: 0.6,
-  screenshotWidth: 18,
+  screenshotWidth: 15,
   tmxRecordCount: 3,
   recordTextScale: 0.6
 }
