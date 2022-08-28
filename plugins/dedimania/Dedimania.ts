@@ -180,7 +180,7 @@ const updateServerPlayers = (): void => {
     const status: any[] | Error = await client.call('dedimania.UpdateServerPlayers',
       [
         { string: 'TMF' },
-        { int: players.length },
+        { int: tm.state.gameConfig.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },
