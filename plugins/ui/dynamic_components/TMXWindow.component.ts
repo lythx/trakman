@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import { CONFIG, IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject, ICONS } from '../UiUtils.js'
+import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject} from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js";
@@ -20,7 +20,7 @@ export default class TMXWindow extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.itemsPerPage).fill(1), [1],
-      { background: config.gridBackground, margin: CONFIG.grid.margin })
+      { background: config.gridBackground, margin: config.margin })
     tmx.onMapChange(() => this.reRender())
     tmx.onQueueChange(() => this.reRender())
     tm.addListener('Controller.BeginMap', () => {
@@ -42,7 +42,7 @@ export default class TMXWindow extends PopupWindow<number> {
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.historyCount + 1
-    this.displayToPlayer(info.login, page,`${page}/${this.paginator.pageCount}`)
+    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
   }
 
   protected async constructContent(login: string, page: number): Promise<string> {
@@ -71,7 +71,7 @@ export default class TMXWindow extends PopupWindow<number> {
       const map = maps[j]
       if (map === undefined) { return '' }
       const grid = new Grid(w, h, [1], config.gridRows,
-        { background: config.info.background, margin: CONFIG.grid.margin })
+        { background: config.info.background, margin: config.margin })
       const tmxMap = tmxMaps[j] ?? undefined
       const mapRecords = allRecords.filter(a => a.map === map.id)
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, tmxMap)
@@ -165,7 +165,7 @@ export default class TMXWindow extends PopupWindow<number> {
       ? config.noScreenshot
       : tm.utils.safeString(tmxMap.thumbnailUrl + `&.jpeg`)
     return `<quad posn="${config.margin} ${-config.margin} 8" sizen="${config.screenshotWidth} ${height - config.margin * 2}" image="${image}"/>
-      ${centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: 0.5, yOffset: -1 })}
+      ${centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: config.notLoadedTextscale, yOffset: -1 })}
       <frame posn="${config.margin + config.screenshotWidth} 0">
         ${grid.constructXml(arr)}
       </frame>`
@@ -180,7 +180,7 @@ export default class TMXWindow extends PopupWindow<number> {
 
   private constructInfoXml(width: number, height: number, map: TMMap, tmxMap?: TMXMapInfo): string {
     const grid = new Grid(width, height, config.info.columnsProportions, new Array(config.info.rows).fill(1),
-      { margin: CONFIG.grid.margin })
+      { margin: config.margin })
     const ic = config.icons
     let lbIcon = ic.leaderboardRating.normal
     let lbRating = (tmxMap?.leaderboardRating?.toString() ?? map?.leaderboardRating?.toString()) ?? config.defaultText
@@ -228,7 +228,7 @@ export default class TMXWindow extends PopupWindow<number> {
 
   private counstructTmxRecordsXml(width: number, height: number, replays: TMXReplay[] = []): string {
     const grid = new Grid(width, height, config.tmxColumns, new Array(config.tmxRecordCount + 1).fill(1),
-      { margin: CONFIG.grid.margin, background: config.gridBackground, headerBg: config.iconBackground })
+      { margin: config.margin, background: config.gridBackground, headerBg: config.iconBackground })
     const options = { textScale: config.recordTextScale }
     const arr: (GridCellFunction | GridCellObject)[] = [
       (i, j, w, h) => centeredText('Lp.', w, h, options),
