@@ -215,7 +215,7 @@ const playerJoin = async (player: { login: string, nickname: string, region: str
       { string: 'TMF' },
       { string: player.login },
       { string: player.nickname },
-      { string: tm.utils.countryToCode(player.region.split('|')[1]) },
+      { string: tm.utils.countryToCode(player.region.split('|')[0]) },
       { string: '' }, // TEAMNAME
       { int: 0 }, // TODO: PLAYER LADDER RANK
       { boolean: player.isSpectator },
