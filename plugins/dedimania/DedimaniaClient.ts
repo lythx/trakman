@@ -35,7 +35,7 @@ export class DedimaniaClient {
         Password: { string: DediConfig.serverPassword },
         Tool: { string: 'Trakman' },
         Version: { string: Config.version },
-        Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone) },
+        Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) },
         Packmask: { string: packmask[0] }
       }
     }])

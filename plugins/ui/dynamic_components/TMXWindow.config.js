@@ -1,7 +1,7 @@
 import icons from '../config/Icons.json' assert { type: 'json' }
 
 export default {
-  icon: 'placeholder',
+  icon: icons.ongoingMap,
   title: 'Map Info',
   navbar: ['mapList'],
   itemsPerPage: 3,
@@ -17,6 +17,7 @@ export default {
   },
   noScreenshot: icons.placeholder,
   notLoaded: `Press DEL if the image\n      doesn't appear`,
+  notLoadedTextscale: 0.5,
   margin: 0.15,
   gridRows: [1.2, 6.7, 1.2, 1.2, 4.5, 4.5],
   icons: {
