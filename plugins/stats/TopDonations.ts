@@ -31,7 +31,7 @@ donations.onDonation((info) => {
     entry.amount = amount
     topList.sort((a, b) => b.amount - a.amount)
   } else {
-    topList.splice(topList.findIndex(a => a.amount < amount), 1)
+    topList.splice(topList.findIndex(a => a.amount < amount), 0, { login, nickname: info.nickname, amount})
     topList.length = config.donationsCount
   }
   for (const e of listeners) {

@@ -21,7 +21,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.EndMap', (info) => {
+tm.addListener('Controller.EndMap', async (info) => {
   const login = info.winnerLogin
   const wins = info.winnerWins
   if (wins === undefined || login === undefined
@@ -31,7 +31,11 @@ tm.addListener('Controller.EndMap', (info) => {
     entry.wins = wins
     topList.sort((a, b) => b.wins - a.wins)
   } else {
-    topList.splice(topList.findIndex(a => a.wins < wins), 1)
+    let nickname = tm.players.get(login)?.nickname
+    if (nickname === undefined) {
+      nickname = (await tm.players.fetch(login))?.nickname
+    }
+    topList.splice(topList.findIndex(a => a.wins < wins), 0, { login, wins, nickname: nickname ?? login })
     topList.length = config.winsCount
   }
   for (const e of updateListeners) {

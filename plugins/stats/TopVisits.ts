@@ -29,7 +29,7 @@ tm.addListener('Controller.PlayerJoin', (info) => {
     entry.visits = visits
     topList.sort((a, b) => b.visits - a.visits)
   } else {
-    topList.splice(topList.findIndex(a => a.visits < visits), 1)
+    topList.splice(topList.findIndex(a => a.visits < visits), 0, { login, visits, nickname: info.nickname })
     topList.length = config.visitsCount
   }
   for (const e of updateListeners) {
