@@ -77,7 +77,7 @@ tm.addListener('Controller.PlayerRecord', info => {
       entry.amount = obj.amount
       topList.sort((a, b) => b.amount - a.amount)
     } else {
-      topList.splice(topList.findIndex(a => a.amount < obj.amount), 1)
+      topList.splice(topList.findIndex(a => a.amount < obj.amount), 0, { ...obj })
       topList.length = config.donationsCount
     }
     for (const e of listeners) {

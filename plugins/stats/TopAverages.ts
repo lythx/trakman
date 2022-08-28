@@ -21,7 +21,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.RanksAndAveragesUpdated', (info) => {
+tm.addListener('Controller.RanksAndAveragesUpdated', async (info) => {
   const updated: string[] = []
   for (const e of info) {
     updated.push(e.login)
@@ -31,7 +31,12 @@ tm.addListener('Controller.RanksAndAveragesUpdated', (info) => {
       entry.average = e.average
       topList.sort((a, b) => a.average - b.average)
     } else {
-      topList.splice(topList.findIndex(a => a.average > e.average), 1)
+      let nickname = tm.players.get(e.login)?.nickname
+      if (nickname === undefined) {
+        nickname = (await tm.players.fetch(e.login))?.nickname
+      }
+      topList.splice(topList.findIndex(a => a.average > e.average), 0, 
+      { login: e.login, nickname: nickname ?? e.login, average: e.average })
       topList.length = config.averagesCount
     }
   }
