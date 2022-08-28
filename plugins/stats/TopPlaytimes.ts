@@ -14,7 +14,7 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top playtimes', res.message, res.stack)
     return
   }
-  topList = res.map(a=>({...a, playtime: a.playtime * 1000}))
+  topList = res.map(a => ({ ...a, playtime: a.playtime * 1000 }))
 }
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
@@ -31,7 +31,7 @@ tm.addListener('Controller.EndMap', (info) => {
       entry.playtime = pt
       topList.sort((a, b) => b.playtime - a.playtime)
     } else {
-      topList.splice(topList.findIndex(a => a.playtime < pt), 1)
+      topList.splice(topList.findIndex(a => a.playtime < pt), 0, { login: e.login, nickname: e.nickname, playtime: pt })
       topList.length = config.playtimesCount
     }
   }
