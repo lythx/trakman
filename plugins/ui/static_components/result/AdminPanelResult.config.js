@@ -1,6 +1,5 @@
 import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
-import header from '../../config/ResultHeader.js'
 
 export default {
     height: 5,
@@ -17,6 +16,5 @@ export default {
       "",
       "",
       ""
-    ],
-    header
+    ]
   }
