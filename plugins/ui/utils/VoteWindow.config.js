@@ -16,5 +16,7 @@ export default {
   headerTextXOffset: 0.2 ,// Check if necesarry
   textScale: 0.7,
   bigTextScale: 1,
-  counterTextScale: 0.4
+  counterTextScale: 0.4,
+  F5Button: icons.F5,
+  F6Button: icons.F6
 }

@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject} from '../UiUtils.js'
+import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js";
@@ -59,12 +59,12 @@ export default class TMXWindow extends PopupWindow<number> {
       const index = Math.ceil((currentPage - (page + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.history[index + 2], tm.jukebox.history?.[index + 1], tm.jukebox.history?.[index]]
       tmxMaps = [tmx.history[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
-      titles = [`${config.titles.previous} #${index + 2}`, `${config.titles.previous} #${index + 1}`, `${config.titles.previous} #${index}`]
+      titles = [`${config.titles.previous} #${index + 3}`, `${config.titles.previous} #${index + 2}`, `${config.titles.previous} #${index + 1}`]
     } else {
       const index = Math.ceil((page - (currentPage + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.queue[index], tm.jukebox.queue?.[index + 1], tm.jukebox.queue?.[index + 2]]
       tmxMaps = [tmx.queue[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
-      titles = [`${config.titles.next} #${index}`, `${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`]
+      titles = [`${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`, `${config.titles.next} #${index + 3}`]
     }
     const allRecords = await tm.records.fetchByMap(...maps.filter(a => a !== undefined).map(a => (a as any).id))
     const cell: GridCellFunction = (i, j, w, h) => {
@@ -118,8 +118,8 @@ export default class TMXWindow extends PopupWindow<number> {
       <quad posn="${config.margin * 2} ${-config.margin * 2} 6" sizen="${iconWidth - config.margin * 2} ${height - config.margin * 4}" image="${image}"/>
       <frame posn="${iconWidth + config.margin * 2} ${-config.margin} 4">
         <quad posn="0 0 3" sizen="${width - (iconWidth + config.margin * 3)} ${height - config.margin * 2}" bgcolor="${config.gridBackground}"/>
-        ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin), height, { textScale: config.textscale }) :
-        verticallyCenteredText(text, width - (iconWidth + config.margin), height, { textScale: config.textscale, yOffset: -0.2 })}
+        ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin * 3),  height - config.margin * 2, { textScale: config.textscale }) :
+        verticallyCenteredText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale })}
       </frame>`
   }
 

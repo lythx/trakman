@@ -1,4 +1,4 @@
-import { CONFIG as CFG } from './UiUtils.js'
+import config from './config/CustomUi.js'
 import { trakman as tm } from '../../src/Trakman.js'
 
 export default class CustomUi {
@@ -6,14 +6,14 @@ export default class CustomUi {
   display(): void {
     tm.sendManialink(
       `<custom_ui>
-          <notice visible="${CFG.customUi.notice}"/>
-          <challenge_info visible="${CFG.customUi.challengeInfo}"/>
-          <net_infos visible="${CFG.customUi.netInfo}"/>
-          <chat visible="${CFG.customUi.chat}"/>
-          <checkpoint_list visible="${CFG.customUi.checkpointList}"/>
-          <round_scores visible="${CFG.customUi.roundScores}"/>
-          <scoretable visible="${CFG.customUi.scoreTable}"/>
-          <global visible="${CFG.customUi.global}"/>
+          <notice visible="${config.notice}"/>
+          <challenge_info visible="${config.challengeInfo}"/>
+          <net_infos visible="${config.netInfo}"/>
+          <chat visible="${config.chat}"/>
+          <checkpoint_list visible="${config.checkpointList}"/>
+          <round_scores visible="${config.roundScores}"/>
+          <scoretable visible="${config.scoreTable}"/>
+          <global visible="${config.global}"/>
         </custom_ui>`
     )
   }
@@ -21,14 +21,14 @@ export default class CustomUi {
   displayToPlayer(login: string): void {
     tm.sendManialink(
       `<custom_ui>
-          <notice visible="${CFG.customUi.notice}"/>
-          <challenge_info visible="${CFG.customUi.challengeInfo}"/>
-          <net_infos visible="${CFG.customUi.netInfo}"/>
-          <chat visible="${CFG.customUi.chat}"/>
-          <checkpoint_list visible="${CFG.customUi.checkpointList}"/>
-          <round_scores visible="${CFG.customUi.roundScores}"/>
-          <scoretable visible="${CFG.customUi.scoreTable}"/>
-          <global visible="${CFG.customUi.global}"/>
+          <notice visible="${config.notice}"/>
+          <challenge_info visible="${config.challengeInfo}"/>
+          <net_infos visible="${config.netInfo}"/>
+          <chat visible="${config.chat}"/>
+          <checkpoint_list visible="${config.checkpointList}"/>
+          <round_scores visible="${config.roundScores}"/>
+          <scoretable visible="${config.scoreTable}"/>
+          <global visible="${config.global}"/>
         </custom_ui>`,
       login
     )

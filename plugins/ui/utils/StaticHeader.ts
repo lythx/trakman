@@ -51,7 +51,7 @@ export default class StaticHeader {
       if (cfg.centerText) {
         label = centeredText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale, padding: cfg.horizontalPadding })
       } else {
-        label = rightAlignedText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale, yOffset: -0.1 }) // TODO FIX RIGHT ALIGNED TEXT
+        label = rightAlignedText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale })
       }
       return `<quad posn="0 0 5" sizen="${cfg.squareWidth + cfg.rectangleWidth + cfg.margin} ${cfg.height}" action="${cfg.actionId}"/>
           <quad posn="0 0 1" sizen="${cfg.rectangleWidth} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
