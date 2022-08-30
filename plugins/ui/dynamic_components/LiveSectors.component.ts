@@ -1,23 +1,24 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
+import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import config from './LiveSectors.config.js'
 
 export default class LiveSectors extends PopupWindow {
 
   private readonly startCellsOnFirstPage: number = 2
   private readonly startCellsOnNextPages: number = 1
-  private readonly startCellWidth: number = CONFIG.liveSectors.startCellWidth
-  private readonly indexCellWidth: number = CONFIG.liveSectors.indexCellWidth
-  private readonly cpsOnFirstPage: number = CONFIG.liveSectors.cpsOnFirstPage
+  private readonly startCellWidth: number = config.startCellWidth
+  private readonly indexCellWidth: number = config.indexCellWidth
+  private readonly cpsOnFirstPage: number = config.cpsOnFirstPage
   private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
-  private readonly entries: number = CONFIG.liveSectors.entries
+  private readonly entries: number = config.entries
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
-  private readonly selfColour: string = CONFIG.liveSectors.selfColour
-  private readonly cpColours = CONFIG.liveSectors.cpColours
+  private readonly selfColour: string = config.selfColour
+  private readonly cpColours = config.cpColours
 
   constructor() {
-    super(IDS.liveSectors, stringToObjectProperty(CONFIG.liveSectors.icon, ICONS), CONFIG.liveSectors.title, CONFIG.liveSectors.navbar)
+    super(IDS.liveSectors, config.icon, config.title, config.navbar)
     const records = tm.records.live
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
@@ -93,7 +94,9 @@ export default class LiveSectors extends PopupWindow {
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
+        ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], 
+        new Array(this.entries + 1).fill(1),config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
@@ -102,7 +105,9 @@ export default class LiveSectors extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
+        ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+         ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1),config.grid)
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
@@ -116,7 +121,7 @@ export default class LiveSectors extends PopupWindow {
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
-    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + CONFIG.liveSectors.cpPaginatorMargin
+    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + config.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth / 2 - w} 0 3">

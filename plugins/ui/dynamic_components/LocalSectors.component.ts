@@ -1,23 +1,24 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import { ICONS, IDS, Paginator, Grid, centeredText, CONFIG, closeButton, getCpTypes, stringToObjectProperty, GridCellFunction } from '../UiUtils.js'
+import {  IDS, Paginator, Grid, centeredText,closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import config from './LocalSectors.config.js'
 
 export default class LocalSectors extends PopupWindow {
 
   private readonly startCellsOnFirstPage: number = 3
   private readonly startCellsOnNextPages: number = 1
-  private readonly startCellWidth: number = CONFIG.localSectors.startCellWidth
-  private readonly indexCellWidth: number = CONFIG.localSectors.indexCellWidth
-  private readonly cpsOnFirstPage: number = CONFIG.localSectors.cpsOnFirstPage
+  private readonly startCellWidth: number = config.startCellWidth
+  private readonly indexCellWidth: number = config.indexCellWidth
+  private readonly cpsOnFirstPage: number = config.cpsOnFirstPage
   private readonly cpsOnNextPages: number = this.cpsOnFirstPage + (this.startCellsOnFirstPage - this.startCellsOnNextPages) * this.startCellWidth
-  private readonly entries: number = CONFIG.localSectors.entries
+  private readonly entries: number = config.entries
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
-  private readonly selfColour: string = CONFIG.localSectors.selfColour
-  private readonly cpColours = CONFIG.localSectors.cpColours
+  private readonly selfColour: string = config.selfColour
+  private readonly cpColours = config.cpColours
 
   constructor() {
-    super(IDS.localSectors, stringToObjectProperty(CONFIG.localSectors.icon, ICONS), CONFIG.localSectors.title, CONFIG.localSectors.navbar)
+    super(IDS.localSectors, config.icon, config.title, config.navbar)
     const records = tm.records.local
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
@@ -54,11 +55,11 @@ export default class LocalSectors extends PopupWindow {
 
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((i + playerIndex + 1).toString(), w, h)
 
-    const nickNameCell = (i: number, j: number, w: number, h: number): string => {
+    const nickNameCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(records[i + playerIndex].nickname, false)), w, h)
     }
 
-    const dateCell = (i: number, j: number, w: number, h: number): string => {
+    const dateCell: GridCellFunction = (i: number, j: number, w: number, h: number): string => {
       return centeredText(tm.utils.formatDate(records[i + playerIndex].date, true), w, h)
     }
 
@@ -80,7 +81,7 @@ export default class LocalSectors extends PopupWindow {
         ${centeredText(tm.utils.getTimeString(cp), w, h)}`
     }
 
-    const finishCell = (i: number, j: number, w: number, h: number): string => {
+    const finishCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(tm.utils.getTimeString(records[i + playerIndex].time), w, h)
     }
 
@@ -98,16 +99,20 @@ export default class LocalSectors extends PopupWindow {
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight,
+        [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), 
+          ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Nickname ', w, h),
         ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
-        (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
+        (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), { background: CONFIG.grid.bg, headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+      grid = new Grid(this.contentWidth, this.contentHeight, 
+        [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), 
+          ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
@@ -121,7 +126,7 @@ export default class LocalSectors extends PopupWindow {
   }
 
   protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
-    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + CONFIG.localSectors.cpPaginatorMargin
+    const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + config.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
     <frame posn="${this.windowWidth / 2 - w} 0 3">

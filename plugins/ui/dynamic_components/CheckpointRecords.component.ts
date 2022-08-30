@@ -1,11 +1,11 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
-import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
+import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
+import config from './CheckpointRecords.config.js'
 
 export default class CheckpointRecords extends PopupWindow {
 
-  private readonly entries = CONFIG.checkpointRecords.entries
   private readonly grid: Grid
   private readonly paginator: Paginator
   private readonly diffColours = {
@@ -15,11 +15,9 @@ export default class CheckpointRecords extends PopupWindow {
   }
 
   constructor() {
-    const iconurl = stringToObjectProperty(CONFIG.checkpointRecords.icon, ICONS)
-    super(IDS.checkpointRecords, iconurl, CONFIG.checkpointRecords.title, CONFIG.checkpointRecords.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.checkpointRecords.columnProportions, new Array(this.entries + 1).fill(1),
-      { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
+    super(IDS.checkpointRecords, config.icon, config.title, config.navbar)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1),config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -33,7 +31,7 @@ export default class CheckpointRecords extends PopupWindow {
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
+      this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
       this.reRender()
     })
     checkpointRecords.addListener('PlayerCheckpoint', (login) => this.reRenderToPlayer(login))
@@ -69,7 +67,7 @@ export default class CheckpointRecords extends PopupWindow {
       (i, j, w, h) => centeredText(' Personal ', w, h)
     ]
     const cps = checkpointRecords.mapCheckpoints
-    const cpIndex = this.entries * (params.page - 1)
+    const cpIndex = config.entries * (params.page - 1)
     const personalCps = checkpointRecords.playerCheckpoints
 
     const indexCell: GridCellFunction = (i, j, w, h) => {
@@ -115,7 +113,7 @@ export default class CheckpointRecords extends PopupWindow {
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)
     }
 
-    const rows = Math.min(this.entries, cps.length - cpIndex)
+    const rows = Math.min(config.entries, cps.length - cpIndex)
     const arr: (GridCellObject | GridCellFunction)[] = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, bestSectorCell, personalSectorCell)

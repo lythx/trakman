@@ -1,6 +1,7 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
-import { CONFIG, Grid, ICONS, IDS, GridCellFunction, stringToObjectProperty, centeredText, closeButton } from '../UiUtils.js'
+import { Grid, IDS, GridCellFunction, centeredText } from '../UiUtils.js'
+import config from './WelcomeWindow.config.js'
 
 export default class WelcomeWindow extends PopupWindow {
 
@@ -8,8 +9,8 @@ export default class WelcomeWindow extends PopupWindow {
   readonly welcomedPlayers: string[] = []
 
   constructor() {
-    super(IDS.welcomeWindow, stringToObjectProperty(CONFIG.welcomeWindow.icon, ICONS), CONFIG.welcomeWindow.title, CONFIG.welcomeWindow.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], { background: CONFIG.grid.bg, margin: 1 })
+    super(IDS.welcomeWindow, config.icon, config.title, config.navbar)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], config.grid)
     tm.addListener('Controller.PlayerJoin', (info) => {
       if (this.welcomedPlayers.includes(info.login) === false) {
         this.welcomedPlayers.push(info.login)
@@ -78,11 +79,13 @@ which was a painstakingly long process, but it sure paid off."/>
   }
 
   closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
-    const width: number = options?.width ?? CONFIG.closeButton.buttonWidth
-    const height: number = options?.height ?? CONFIG.closeButton.buttonHeight
-    const padding: number = options?.padding ?? CONFIG.closeButton.padding
-    return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" valign="center" bgcolor="${CONFIG.closeButton.background}" action="${actionId}"/>
-    <label posn="${parentWidth / 2} -0.5 3" sizen="${width - padding * 2} ${height - padding * 2}" text="X" textsize="4" halign="center"/>`
+    const width: number = options?.width ?? config.closeButtonWidth
+    const height: number = options?.height ?? config.closeButtonHeight
+    const padding: number = options?.padding ?? config.closeButtonPadding
+    return `<quad posn="${parentWidth / 2} ${-parentHeight / 2} 1" sizen="${width} ${height}" halign="center" 
+    valign="center" bgcolor="${config.closeButtonBackground}" action="${actionId}"/>
+    <label posn="${parentWidth / 2} -0.5 3" sizen="${width - padding * 2} ${height - padding * 2}" text="X" 
+    textsize="4" halign="center"/>`
   }
 
   protected constructFooter(): string {

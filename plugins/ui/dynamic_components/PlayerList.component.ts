@@ -1,12 +1,13 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
-import { CONFIG, IDS, stringToObjectProperty, ICONS, Grid, centeredText, closeButton } from '../UiUtils.js'
+import { IDS, Grid, centeredText, closeButton } from '../UiUtils.js'
+import config from './PlayerList.config.js'
 
 export default class PlayerList extends PopupWindow {
   readonly headerGrid: Grid
   readonly grid: Grid
   readonly headerOffset: number
-  readonly entries = CONFIG.playerList.entries
+  readonly entries = config.entries
 
   /* ACTION IDS IN USE
     1000 - Kick
@@ -18,14 +19,13 @@ export default class PlayerList extends PopupWindow {
   */
 
   constructor() {
-    const cProportions = CONFIG.playerList.columnProportions
+    const cProportions = config.columnProportions
     const headerProportions = [cProportions[0], cProportions[1], cProportions[2]]
-    const title = CONFIG.playerList.title
-    const iconer = stringToObjectProperty(CONFIG.playerList.icon, ICONS)
-    super(IDS.playerList, iconer, title, CONFIG.mapList.navbar)
+    const title = config.title
+    super(IDS.playerList, config.icon, title, config.navbar)
     this.headerOffset = this.contentHeight / this.entries
     this.grid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1))
-    this.headerGrid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1), { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin })
+    this.headerGrid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1), config.grid)
 
     //ACTIONS
     tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
@@ -108,33 +108,33 @@ export default class PlayerList extends PopupWindow {
       return centeredText(players[i].privilege.toString(), w, h)
     }
     const kickCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
     }
     const banCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
     }
     const muteCell = (i: number, j: number, w: number, h: number): string => {
       const mutelist = tm.admin.mutelist
-      let iconser = stringToObjectProperty(CONFIG.playerList.mute, ICONS)
+      let iconser = config.mute
       if (mutelist.some(a => a.login === players[i].login)) {
-        iconser = stringToObjectProperty(CONFIG.playerList.ban, ICONS)
+        iconser = config.ban
       }
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2.5" image="${iconser}" halign="center" valign="center" action="${this.openId + i + 3000}"/>`
 
     }
     const blacklistCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
     }
     const guestlistCell = (i: number, j: number, w: number, h: number): string => {
       let guestlist = tm.admin.guestlist
-      let iconser = stringToObjectProperty(CONFIG.playerList.addGuest, ICONS)
+      let iconser = config.addGuest
       if (guestlist.some(a => a.login === players[i].login)) {
-        iconser = stringToObjectProperty(CONFIG.playerList.removeGuest, ICONS)
+        iconser = config.removeGuest
       }
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2.5" image="${iconser}" halign="center" valign="center" action="${this.openId + i + 5000}"/>`
     }
     const forcespecCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${stringToObjectProperty(CONFIG.playerList.ban, ICONS)}" halign="center" valign="center"/>`
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center"/>`
     }
     const arr = []
     const rows = Math.min(this.entries, players.length)
