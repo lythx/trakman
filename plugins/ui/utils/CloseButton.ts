@@ -1,4 +1,3 @@
-import { getIcon } from './GetIcon.js'
 import config from './CloseButton.config.js'
 
 export const closeButton = (actionId: number, parentWidth: number, parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
@@ -9,6 +8,6 @@ export const closeButton = (actionId: number, parentWidth: number, parentHeight:
      valign="center" bgcolor="${config.background}"/>
     <quad posn="${parentWidth / 2} ${-parentHeight / 2} 3" sizen="${width - padding * 2} ${height - padding * 2}"
      halign="center" valign="center" action="${actionId}" 
-    imagefocus="${getIcon(config.icon + 'Hover')}"
-    image="${getIcon(config.icon)}"/>`
+    imagefocus="${config.iconHover}"
+    image="${config.icon}"/>`
 }

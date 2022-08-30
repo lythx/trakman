@@ -1,9 +1,8 @@
 import { trakman as tm } from "../../../src/Trakman.js"
 import IDS from '../config/UtilIds.js'
-import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
-import ICONS from '../config/Icons.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../Vote.js'
+import { StaticHeader } from '../UiUtils.js'
 import config from './VoteWindow.config.js'
 
 export default class VoteWindow {
@@ -90,12 +89,13 @@ export default class VoteWindow {
   }
 
   private constructHeader() {
-    const cfg = CONFIG.staticHeader
+    const header = new StaticHeader('race')
+    const cfg = header.options
     return `
-    <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
+    <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
     ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset:config.headerTextXOffset })}
     <frame posn="${this.width - (cfg.squareWidth + cfg.margin) + cfg.margin} 0 1">
-      <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
+      <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
       <quad posn="${cfg.iconHorizontalPadding} ${-cfg.iconVerticalPadding} 4" sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${this.icon}"/> 
     </frame>`
   }
@@ -138,19 +138,10 @@ export default class VoteWindow {
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
-      <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F6')}"/>
+      <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${config.F6Button}"/>
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.yesId}"/>
-      <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${this.stringToIcon('F5')}"/>
+      <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${config.F5Button}"/>
     </frame>`
-  }
-
-  private stringToIcon = (str: string): any => {
-    const split: string[] = str.split('.')
-    let obj = ICONS
-    for (const e of split) {
-      obj = (obj as any)[e]
-    }
-    return obj
   }
 
 }

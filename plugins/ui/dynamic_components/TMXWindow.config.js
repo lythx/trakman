@@ -7,6 +7,7 @@ export default {
   itemsPerPage: 3,
   queueCount: 4,
   historyCount: 4,
+  nameYOffset: -0.2 ,
   localsCount: 5,
   defaultText: '--',
   defaultTime: '-:--.--',
