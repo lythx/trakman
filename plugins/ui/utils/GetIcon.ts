@@ -1,4 +1,4 @@
-import ICONS from '../config/Icons.json' assert { type: 'json' }
+import ICONS from '../config/Icons.js'
 
 export const getIcon = (iconName: string): string => {
     const split: string[] = iconName.split('.')

@@ -1,4 +1,4 @@
-{
+export default {
     "clock": "https://cdn.discordapp.com/attachments/793464821030322196/1001566056227274834/Clock.png",
     "close": "https://media.discordapp.net/attachments/793464821030322196/1001566103526453419/Close.png",
     "closeHover": "https://cdn.discordapp.com/attachments/793464821030322196/1001566136216850542/CloseHover.png",

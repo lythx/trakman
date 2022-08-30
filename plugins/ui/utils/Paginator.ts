@@ -1,6 +1,6 @@
 import { trakman as tm } from '../../../src/Trakman.js'
-import ICONS from '../config/Icons.json' assert { type: 'json'}
-import IDS from '../config/UtilIds.json' assert { type: 'json'}
+import ICONS from '../config/Icons.js'
+import IDS from '../config/UtilIds.js'
 import { CONFIG } from '../UiUtils.js'
 
 

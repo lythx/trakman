@@ -1,4 +1,4 @@
-import icons from '../config/Icons.json' assert { type: 'json' }
+import icons from '../config/Icons.js'
 
 export default {
   icon: icons.ongoingMap,
