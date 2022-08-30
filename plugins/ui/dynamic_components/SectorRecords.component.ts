@@ -1,25 +1,20 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
-import { closeButton, CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
+import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
+import config from './SectorRecords.config.js'
 
 export default class SectorRecords extends PopupWindow {
 
-  private readonly entries = CONFIG.sectorRecords.entries
   private readonly grid: Grid
   private readonly paginator: Paginator
-  private readonly diffColours = {
-    worse: "$F00",
-    better: "$00F",
-    equal: "$FF0"
-  }
 
   constructor() {
-    const iconurl = stringToObjectProperty(CONFIG.sectorRecords.icon, ICONS)
-    super(IDS.sectorRecords, iconurl, CONFIG.sectorRecords.title, CONFIG.sectorRecords.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.sectorRecords.columnProportions, new Array(this.entries + 2).fill(1),
-      { headerBg: CONFIG.grid.headerBg, margin: CONFIG.grid.margin, background: CONFIG.grid.bg })
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
+    super(IDS.sectorRecords, config.icon, config.title, config.navbar)
+    this.grid = new Grid(this.contentWidth, this.contentHeight,config.columnProportions, 
+      new Array(config.entries + 2).fill(1),config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
+       Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
@@ -33,7 +28,7 @@ export default class SectorRecords extends PopupWindow {
     })
     sectorRecords.addListener('BestSector', () => this.reRender())
     sectorRecords.addListener('SectorsFetch', () => {
-      this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / this.entries))
+      this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
       this.reRender()
     })
     sectorRecords.addListener('PlayerSector', (login) => this.reRenderToPlayer(login))
@@ -69,7 +64,7 @@ export default class SectorRecords extends PopupWindow {
       (i, j, w, h) => centeredText(' Personal ', w, h)
     ]
     const sectors = sectorRecords.mapSectors
-    const sectorIndex = this.entries * (params.page - 1)
+    const sectorIndex = config.entries * (params.page - 1)
     const personalSectors = sectorRecords.playerSectors
 
     const indexCell: GridCellFunction = (i, j, w, h) => {
@@ -105,11 +100,11 @@ export default class SectorRecords extends PopupWindow {
         if (sectors?.[i + sectorIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sector), w, h)
@@ -123,7 +118,7 @@ export default class SectorRecords extends PopupWindow {
 
     const totalTimeHeaderCell: GridCellObject = {
       callback: (i, j, w, h) => centeredText(' Total Time ', w, h),
-      background: CONFIG.grid.headerBg
+      background: config.grid.headerBackground
     }
 
     const totalTime: GridCellFunction = (i, j, w, h) => {
@@ -145,17 +140,17 @@ export default class SectorRecords extends PopupWindow {
         const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
         const difference = bestSum - sum
         if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `(${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `(${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sum), w, h)
     }
 
-    const rows = Math.min(this.entries, sectors.length - sectorIndex)
+    const rows = Math.min(config.entries, sectors.length - sectorIndex)
     const arr: (GridCellObject | GridCellFunction)[] = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, bestSectorCell, personalSectorCell)

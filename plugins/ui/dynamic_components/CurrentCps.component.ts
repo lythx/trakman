@@ -1,6 +1,7 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
-import { CONFIG, ICONS, IDS, stringToObjectProperty, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
+import { IDS, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
+import config from './CurrentCps.config.js'
 
 interface CurrentCheckpoint {
   nickname: string
@@ -12,24 +13,17 @@ interface CurrentCheckpoint {
 
 export default class CurrentCps extends PopupWindow {
 
-  readonly entries = CONFIG.currentCps.entries
+  readonly entries = config.entries
   readonly grid: Grid
-  readonly gridMargin = CONFIG.grid.margin
   readonly currentCheckpoints: CurrentCheckpoint[] = []
-  private readonly colours = {
-    worse: "$F00",
-    better: "$00F",
-    equal: "$FF0"
-  }
   readonly paginator: Paginator
 
   constructor() {
     // Translate icon name to url
-    const iconUrl = stringToObjectProperty(CONFIG.currentCps.icon, ICONS)
-    super(IDS.currentCps, iconUrl, CONFIG.currentCps.title, CONFIG.currentCps.navbar)
+    const iconUrl =config.icon
+    super(IDS.currentCps, iconUrl, config.title, config.navbar)
     // Create grid object to display the table
-    this.grid = new Grid(this.contentWidth, this.contentHeight, CONFIG.currentCps.columnProportions, new Array(this.entries).fill(1),
-      { background: CONFIG.grid.bg, margin: this.gridMargin, headerBg: CONFIG.grid.headerBg })
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1),config.grid)
     tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
       const pb = tm.records.getLocal(info.player.login)
@@ -110,11 +104,11 @@ export default class CurrentCps extends PopupWindow {
         let differenceString: string = ''
         if (difference !== undefined) {
           if (difference > 0) {
-            differenceString = `(${this.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+            differenceString = `(${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
           } else if (difference === 0) {
-            differenceString = `(${this.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+            differenceString = `(${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
           } else {
-            differenceString = `(${this.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+            differenceString = `(${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
           }
         }
         const str = tm.utils.getTimeString(entry.checkpoint) + differenceString
