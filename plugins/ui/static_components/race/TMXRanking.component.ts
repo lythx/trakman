@@ -1,26 +1,26 @@
-import { getStaticPosition, RecordList, centeredText, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
-import { trakman as tm } from '../../../src/Trakman.js'
-import StaticComponent from '../StaticComponent.js'
-import { tmx } from '../../tmx/Tmx.js'
+import { getStaticPosition, RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
+import StaticComponent from '../../StaticComponent.js'
+import { tmx } from '../../../tmx/Tmx.js'
+import config from './TMXRanking.config.js'
 
 export default class TMXRanking extends StaticComponent {
 
-  private readonly height: number
-  private readonly width: number
   private readonly positionX: number
   private readonly positionY: number
+  private readonly side: boolean
   private readonly recordList: RecordList
-  private readonly maxRecords: number = 20
+  private readonly header: StaticHeader
 
   constructor() {
     super(IDS.tmx, 'race')
-    this.height = CONFIG.tmx.height
-    this.width = CONFIG.static.width
-    const side: boolean = CONFIG.tmx.side
-    const pos = getStaticPosition('tmx')
+    const pos = getStaticPosition(this)
     this.positionX = pos.x
     this.positionY = pos.y
-    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.tmx.entries, side, CONFIG.tmx.topCount, this.maxRecords, CONFIG.tmx.displayNoRecordEntry, { getColoursFromPb: true })
+    this.side = pos.side
+    this.header = new StaticHeader()
+    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries, 
+    this.side, config.topCount, config.entries,config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -37,7 +37,6 @@ export default class TMXRanking extends StaticComponent {
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
@@ -53,8 +52,8 @@ export default class TMXRanking extends StaticComponent {
     tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.tmx.title, stringToObjectProperty(CONFIG.tmx.icon, ICONS), true)}
-        <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
+        ${this.header.constructXml(config.title, config.icon, this.side)}
+        <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, replays)}
         </frame>
       </frame>

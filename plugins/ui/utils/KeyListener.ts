@@ -1,4 +1,4 @@
-import UTILIDS from '../config/UtilIds.json' assert { type: 'json' }
+import UTILIDS from '../config/UtilIds.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 
 let keyListeners: { callback: ((info: ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number, id: string }[] = []

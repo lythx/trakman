@@ -1,7 +1,7 @@
 import { trakman as tm } from "../../../src/Trakman.js"
-import IDS from '../config/UtilIds.json' assert { type: 'json' }
+import IDS from '../config/UtilIds.js'
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
-import ICONS from '../config/Icons.json' assert { type: 'json' }
+import ICONS from '../config/Icons.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../Vote.js'
 
@@ -42,7 +42,7 @@ export default class VoteWindow {
    * @param eligibleLogins list of logins of players that can vote
    * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, callerLogin?: string }> | undefined {
+  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean,   caller?: TMPlayer }> | undefined {
     return new Promise((resolve) => {
       this.vote.onUpdate = (votes, seconds) => {
         this.display(votes, seconds)
@@ -65,12 +65,12 @@ export default class VoteWindow {
     })
   }
 
-  pass(callerLogin?: string): void {
-    this.vote.pass(callerLogin)
+  pass(  caller?: TMPlayer): void {
+    this.vote.pass(caller)
   }
 
-  cancel(callerLogin?: string): void {
-    this.vote.cancel(callerLogin)
+  cancel(  caller?: TMPlayer): void {
+    this.vote.cancel(caller)
   }
 
   private display(votes: { login: string; vote: boolean; }[], seconds: number) {

@@ -1,18 +1,17 @@
-import { getStaticPosition, CONFIG, IDS } from '../UiUtils.js'
-import { trakman as tm } from '../../../src/Trakman.js'
-import StaticComponent from '../StaticComponent.js'
+import { getStaticPosition,  IDS } from '../../UiUtils.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
+import StaticComponent from '../../StaticComponent.js'
+import config from './PreviousAndBest.config.js'
 
-export default class RankWidget extends StaticComponent {
+export default class PreviousAndBest extends StaticComponent {
 
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.rank.height
   private readonly positionY: number
   private readonly positionX: number
   private xml: string = ''
 
   constructor() {
-    super(IDS.rank, 'race')
-    const pos = getStaticPosition('rank')
+    super(IDS.previousAndBest, 'race')
+    const pos = getStaticPosition(this)
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()
@@ -29,14 +28,13 @@ export default class RankWidget extends StaticComponent {
   }
 
   private constructXml(): void {
-    // Z posn is set to -37 because the rank text is at around -36 
+    // Z posn is set to -37 because the previous best text is at around -36 
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -37">
-        <quad posn="0 0 0" sizen="${this.width} ${this.height}" bgcolor="${CONFIG.static.bgColor}"/>
+        <quad posn="0 0 0" sizen="${config.width} ${config.height}" bgcolor="${config.background}"/>
       </frame>
     </manialink>`
   }
 
 }
-

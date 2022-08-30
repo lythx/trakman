@@ -1,5 +1,5 @@
 import { trakman as tm } from '../../../src/Trakman.js'
-import ICN from '../config/Icons.json' assert { type: 'json' }
+import ICN from '../config/Icons.js'
 import BG from '../config/Backgrounds.json' assert { type: 'json' }
 
 //TODO THIS IN CONFIG FILE
