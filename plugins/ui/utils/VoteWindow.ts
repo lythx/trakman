@@ -4,45 +4,40 @@ import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import ICONS from '../config/Icons.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../Vote.js'
+import config from './VoteWindow.config.js'
 
 export default class VoteWindow {
 
   private vote: Vote
-  private readonly title = CONFIG.voteWindow.title
+  private readonly title = config.title
   private readonly message: string
   private readonly icon: string
   private readonly id = IDS.VoteWindow.window
-  private readonly width = CONFIG.voteWindow.width
-  private readonly height = CONFIG.voteWindow.height
-  private readonly positionX = CONFIG.static.leftPosition + CONFIG.marginBig + CONFIG.static.width
-  private readonly positionY = CONFIG.static.topBorder - (CONFIG.bestCps.height + CONFIG.marginBig)
-  private readonly headerHeight = CONFIG.staticHeader.height
-  private readonly margin = CONFIG.marginSmall
-  private readonly bg = CONFIG.static.bgColor
-  private readonly buttonW = 2.5
-  private readonly buttonH = 2.5
+  private readonly width = config.width
+  private readonly height = config.height
+  private readonly positionX = config.posX
+  private readonly positionY = config.posY
+  private readonly headerHeight = config.height
+  private readonly margin = config.margin
+  private readonly bg = config.background
+  private readonly buttonW = config.buttonWidth
+  private readonly buttonH = config.buttonHeight
   private readonly rightW = this.buttonW * 2 + 3 * this.margin
   private readonly leftW = this.width - this.rightW
   private readonly chatMessage: string
 
-  constructor(callerLogin: string, goal: number, message: string, chatMessage: string, seconds: number, iconPresetOrUrl: "voteGreen" | "voteRed" | Omit<string, "voteGreen" | "voteRed">) {
+  constructor(callerLogin: string, goal: number, message: string, chatMessage: string, seconds: number, iconUrl: string) {
     this.vote = new Vote(callerLogin, goal, seconds)
     this.chatMessage = chatMessage
     this.message = message
-    if (iconPresetOrUrl === "voteGreen") {
-      this.icon = this.stringToIcon(CONFIG.voteWindow.iconGreen)
-    } else if (iconPresetOrUrl === "voteRed") {
-      this.icon = this.stringToIcon(CONFIG.voteWindow.iconRed)
-    } else {
-      this.icon = iconPresetOrUrl as string
-    }
+    this.icon = iconUrl
   }
 
   /**
    * @param eligibleLogins list of logins of players that can vote
    * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean,   caller?: TMPlayer }> | undefined {
+  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: TMPlayer }> | undefined {
     return new Promise((resolve) => {
       this.vote.onUpdate = (votes, seconds) => {
         this.display(votes, seconds)
@@ -65,11 +60,11 @@ export default class VoteWindow {
     })
   }
 
-  pass(  caller?: TMPlayer): void {
+  pass(caller?: TMPlayer): void {
     this.vote.pass(caller)
   }
 
-  cancel(  caller?: TMPlayer): void {
+  cancel(caller?: TMPlayer): void {
     this.vote.cancel(caller)
   }
 
@@ -98,7 +93,7 @@ export default class VoteWindow {
     const cfg = CONFIG.staticHeader
     return `
     <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
-    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, yOffset: -0.1, xOffset: 0.2 })}
+    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset:config.headerTextXOffset })}
     <frame posn="${this.width - (cfg.squareWidth + cfg.margin) + cfg.margin} 0 1">
       <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.bgColor}"/>
       <quad posn="${cfg.iconHorizontalPadding} ${-cfg.iconVerticalPadding} 4" sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${this.icon}"/> 
@@ -116,10 +111,10 @@ export default class VoteWindow {
     const colour = (neededAmount - (allVotes - noVotes)) <= 0 ? '$0F0' : '$F00'
     return `
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(this.message, w, rowH, { textScale: 1 })}
+    ${centeredText(this.message, w, rowH, { textScale: config.bigTextScale })}
     <frame posn="0 ${-rowH - this.margin} 1">
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(`Votes needed to pass: ${colour}${neededAmount}`, w, rowH, { textScale: 1 })}
+    ${centeredText(`Votes needed to pass: ${colour}${neededAmount}`, w, rowH, { textScale: config.bigTextScale })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
@@ -134,12 +129,12 @@ export default class VoteWindow {
     const rowH = (h - this.buttonH) / 2 - this.margin
     const timeColour = ['$FFF', '$FF0', '$F00'][[20, 5, -1].findIndex(a => a < seconds)]
     return `<quad posn="0 0 1" sizen="${w - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: 0.4, specialFont: true })}
+    ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: config.counterTextScale, specialFont: true })}
     <frame posn="0 ${-rowH - this.margin} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: 1 })}
+      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: config.bigTextScale })}
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: 1 })}
+      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: config.bigTextScale })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>

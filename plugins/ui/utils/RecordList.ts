@@ -1,8 +1,7 @@
-import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
-import RESULTCONFIG from '../config/ResultUIConfig.json' assert { type: 'json' }
-import ICONS from '../config/Icons.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 import IDS from '../config/UtilIds.js'
+import raceConfig from './RecordListRace.config.js'
+import resultConfig from './RecordListResult.config.js'
 
 interface UiRecord {
   readonly time: number
@@ -58,21 +57,19 @@ export default class RecordList {
 
   constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
     options?: { getColoursFromPb?: true, resultMode?: true }) {
-    this.config = options?.resultMode === true ? RESULTCONFIG : CONFIG
-    const CFG = this.config.recordsList
-    const INFO = CFG.info
-    this.colGap = CFG.columnGap
-    this.rowGap = CFG.rowGap
+    this.config = options?.resultMode === true ? resultConfig : raceConfig
+    const INFO =  this.config.info
+    this.colGap =  this.config.columnGap
+    this.rowGap =  this.config.rowGap
     this.iCols = INFO.columns
     this.iColW = INFO.columnWidth
-    this.format = this.config.static.format
     this.iIconW = INFO.iconWidth
     this.iIcon = INFO.icon
-    this.markerWidth = CFG.markerWidth
-    this.iconVPadding = CFG.iconVerticalPadding
-    this.iconHPadding = CFG.iconHorizontalPadding
-    this.downloadIcon = CFG.downloadIcon
-    this.timeColours = CFG.timeColours
+    this.markerWidth =  this.config.markerWidth
+    this.iconVPadding =  this.config.iconVerticalPadding
+    this.iconHPadding =  this.config.iconHorizontalPadding
+    this.downloadIcon =  this.config.downloadIcon
+    this.timeColours =  this.config.timeColours
     this.id = id
     this.rows = rows
     this.rowHeight = (height + this.rowGap) / rows
@@ -80,16 +77,17 @@ export default class RecordList {
     this.side = side
     this.topCount = topCount
     this.maxCount = maxCount
-    this.markers = side ? CFG.markersRight : CFG.markersLeft
-    const columnProportions: number[] = CFG.columnProportions
+    this.markers = side ?  this.config.markersRight :  this.config.markersLeft
+    const columnProportions: number[] =  this.config.columnProportions
     const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
     this.noRecordEntry = noRecordEntry
     this.getColoursFromPb = options?.getColoursFromPb ?? false
     this.setupListeners()
     this.iBg = INFO.bgColor
-    this.bg = this.config.static.bgColor
-    this.headerBg = this.config.staticHeader.bgColor
+    this.bg = this.config.background
+    this.headerBg = this.config.headerBackground
+    this.format =  this.config.format
   }
 
   onClick(callback: Function): void {
@@ -321,7 +319,7 @@ export default class RecordList {
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       ret += `<quad posn="${posX} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
-      <quad posn="${posX + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.stringToIcon(this.iIcon)}"/>`
+      <quad posn="${posX + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.iIcon}"/>`
       if (topInfo.length === 3) {
         ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${this.rowHeight}" bgcolor="${this.headerBg}"/>
         <quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${this.rowHeight}" bgcolor="${this.headerBg}"/>
@@ -330,7 +328,7 @@ export default class RecordList {
         ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${width - ((this.iIconW + this.colGap) * 2)} ${h}" bgcolor="${this.headerBg}"/>
         ${this.centeredText(topInfo[0], width - ((this.iIconW * 2) + this.colGap), h, posX + this.iIconW + this.colGap)}
         <quad posn="${posX + this.iIconW + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
-        <quad posn="${posX + this.iIconW + this.iconHPadding + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.stringToIcon(this.downloadIcon)}"/>`
+        <quad posn="${posX + this.iIconW + this.iconHPadding + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.downloadIcon}"/>`
       } else if (topInfo.length === 2) {
         ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
         ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX + this.iIconW + this.colGap)}
@@ -364,7 +362,7 @@ export default class RecordList {
         ${this.centeredText(topInfo[0], w - this.colGap, h, posX)}`
       }
       ret += `<quad posn="${posX + w} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
-      <quad posn="${posX + w + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.stringToIcon(this.iIcon)}"/>`
+      <quad posn="${posX + w + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.iIcon}"/>`
     }
     const cps: number[] | undefined = record.checkpoints
     const colours = {
@@ -397,11 +395,11 @@ export default class RecordList {
     const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.colGap)
     let icon: string = ''
     if (marker === 'faster') {
-      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.stringToIcon(this.markers.faster)}"/>`
+      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.faster}"/>`
     } if (marker === 'slower') {
-      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.stringToIcon(this.markers.slower)}"/>`
+      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.slower}"/>`
     } if (marker === 'you') {
-      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.stringToIcon(this.markers.you)}"/>`
+      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.you}"/>`
     }
     return `<quad posn="${posX} 0 1" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" bgcolor="${this.bg}"/>
     ${icon}`
@@ -437,28 +435,19 @@ export default class RecordList {
   }
 
   private centeredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number, yOffset: number = 0): string => {
-    const textScale: number = 0.85
-    const padding: number = 0.2
+    const textScale: number = this.config.textScale
+    const padding: number = this.config.padding
     const posX: number = (parentWidth / 2) + xOffset
     const posY: number = (parentHeight / 2) + yOffset
-    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${tm.utils.safeString(text)}" valign="center" halign="center"/>`
+    return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" scale="${textScale}" text="${this.config.format}${tm.utils.safeString(text)}" valign="center" halign="center"/>`
   }
 
   private verticallyCenteredText = (text: string, parentWidth: number, parentHeight: number, xOffset: number): string => {
-    const textScale: number = 0.85
-    const padding: number = 0.2
+    const textScale: number = this.config.textScale
+    const padding: number = this.config.padding
     const posX: number = xOffset + padding
     const posY: number = parentHeight / 2
-    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.config.static.format}${tm.utils.safeString(text)}" valign="center"/>`
-  }
-
-  private stringToIcon = (str: string) => {
-    const split: string[] = str.split('.')
-    let obj = ICONS
-    for (const e of split) {
-      obj = (obj as any)[e]
-    }
-    return obj
+    return `<label posn="${posX} -${posY} 3" sizen="${((parentWidth - (padding * 2)) * (1 / textScale))} ${parentHeight}" scale="${textScale}" text="${this.config.format}${tm.utils.safeString(text)}" valign="center"/>`
   }
 
 }

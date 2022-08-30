@@ -1,6 +1,6 @@
 import { verticallyCenteredText, centeredText, rightAlignedText } from './TextUtils.js'
-import raceConfig from '../config/RaceHeader.js'
-import resultConfig from '../config/ResultHeader.js'
+import raceConfig from './StaticHeaderRace.config.js'
+import resultConfig from './StaticHeaderResult.config.js'
 
 interface StaticHeaderOptions {
   height: number, iconWidth: number, iconHeight: number, actionId?: number
