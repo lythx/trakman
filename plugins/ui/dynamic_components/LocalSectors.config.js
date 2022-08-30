@@ -1,4 +1,5 @@
 import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
 
 export default {
   entries: 15,
@@ -12,11 +13,11 @@ export default {
     equal: "FF0F"
   },
   navbar: [
-    "localCps",
-    "dediCps",
-    "dediSectors",
-    "liveCps",
-    "liveSectors"
+    { name: 'Local Sectors', actionId: ids.localSectors },
+    { name: 'Dedi Sectors', actionId: ids.dediSectors },
+    { name: 'Dedi Checkpoints', actionId: ids.dediCps },
+    { name: 'Live Sectors', actionId: ids.liveSectors },
+    { name: 'Live Checkpoints', actionId: ids.liveCheckpoint }
   ],
   cpPaginatorMargin: 0.25,
   startCellWidth: 2,

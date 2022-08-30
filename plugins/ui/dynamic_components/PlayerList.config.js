@@ -1,6 +1,9 @@
+import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
+
 export default {
   title: "Players ",
-  icon: "playerList",
+  icon: icons.playerList,
   ban: "X",
   mute: "mute",
   addGuest: "addGuest",
@@ -18,8 +21,10 @@ export default {
     2
   ],
   navbar: [
-    "banList",
-    "blacklistList"
+    { name: 'Banlist', actionId: ids.banList },
+    { name: 'Blacklist', actionId: ids.blacklistList },
+    // TODO add mutelist
+    { name: 'Guestlist', actionId: ids.guestlistList }
   ],
   grid: {
     background: "9996",

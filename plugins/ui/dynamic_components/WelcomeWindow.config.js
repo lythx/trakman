@@ -1,9 +1,12 @@
+import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
+
 export default {
   title: "Welcome to Trakman!",
-  icon: "infoCircle",
+  icon: icons.infoCircle,
   navbar: [
-    "commandList",
-    "changelog"
+    { name: "Command List", actionId: ids.commandList },
+    { name: "Changelog", actionId: ids.changelog },
   ],
   grid: {
     background: "9996",

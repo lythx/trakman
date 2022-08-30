@@ -125,6 +125,7 @@ export default class MapWidgetResult extends StaticComponent {
     const arr: any[] = new Array(this.rows).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
+        <quad posn="0 0 8" sizen="${config.width} ${config.height}" action="${IDS.TMXWindow}"/>
         <format textsize="1" textcolor="FFFF"/> 
         ${this.grid.constructXml(arr)}
       </frame>

@@ -1,11 +1,14 @@
+import ids from '../config/ComponentIds.js'
+import icons from '../config/Icons.js'
+
 export default {
   entries: 15,
-  icon: "clock",
+  icon: icons.clock,
   title: "Current Checkpoints",
   navbar: [
-    "liveCps",
-    "localCps",
-    "dediCps"
+    { name: "Live Checkpoints", actionId: ids.liveCps },
+    { name: "Local Checkpoints", actionId: ids.localCps },
+    { name: "Dedi Checkpoints", actionId: ids.dediCps }
   ],
   columnProportions: [
     3,
