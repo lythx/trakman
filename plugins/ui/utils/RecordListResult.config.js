@@ -1,5 +1,5 @@
 import icons from '../config/Icons.js'
-import cfg from '../config/RaceUi.js'
+import cfg from '../config/ResultUi.js'
 
 export default {
   columnProportions: [

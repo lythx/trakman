@@ -1,4 +1,5 @@
 import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
 
 export default {
   title: "Map List",
@@ -15,11 +16,12 @@ export default {
   rows: 5,
   columns: 5,
   grid: {
-    background: 'FFFA', 
+    background: 'FFFA',
     margin: 0.15
   },
   navbar: [
-    "commandList"
+    { name: 'Map Info', actionId: ids.TMXWindow }
+    // TODO add detailed map info here too
   ],
   icons: [
     icons.ongoingMap,

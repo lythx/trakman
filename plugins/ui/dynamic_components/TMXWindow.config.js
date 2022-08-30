@@ -1,9 +1,13 @@
 import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
 
 export default {
   icon: icons.ongoingMap,
   title: 'Map Info',
-  navbar: ['mapList'],
+  navbar: [
+    { name: 'Map List', actionId: ids.mapList }
+    // TODO add detailed map info here too
+  ],
   itemsPerPage: 3,
   queueCount: 4,
   historyCount: 4,

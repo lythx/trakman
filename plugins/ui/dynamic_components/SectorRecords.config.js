@@ -1,4 +1,5 @@
 import icons from '../config/Icons.js'
+import ids from '../config/ComponentIds.js'
 
 export default {
   title: " Sector Records ",
@@ -13,7 +14,11 @@ export default {
       1.5
     ],
     navbar: [
-      "checkpointRecords"
+      { name: 'Checkpoint Records', actionId: ids.checkpointRecords },
+      { name: 'Dedi Checkpoints', actionId: ids.dediCps },
+      { name: 'Dedi Sectors', actionId: ids.dediSectors },
+      { name: 'Local Checkpoints', actionId: ids.localCps },
+      { name: 'Local Sectors', actionId: ids.localSectors },
     ],
     colours: {
       worse: "$F00",
