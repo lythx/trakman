@@ -1,6 +1,6 @@
 import { Logger } from "../Logger.js";
 import { Client } from "../client/Client.js";
-import CONFIG from "../../config.json" assert { type: 'json' }
+import config from "../../config/Config.js"
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
@@ -20,8 +20,8 @@ export class AdministrationService {
   private static _blacklist: TMBlacklistEntry[] = []
   private static _mutelist: TMMutelistEntry[] = []
   private static _guestlist: TMGuestlistEntry[] = []
-  private static readonly blacklistFile: string = CONFIG.blacklistFile
-  private static readonly guestlistFile: string = CONFIG.guestlistFile
+  private static readonly blacklistFile: string = config.blacklistFile
+  private static readonly guestlistFile: string = config.guestlistFile
 
   static async initialize(): Promise<void> {
     await this.privilegeRepo.initialize()

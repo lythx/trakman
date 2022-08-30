@@ -1,4 +1,4 @@
-import colours from './src/data/Colours.json' assert { type: 'json' }
+import colours from '../src/data/Colours.json' assert { type: 'json' }
 
 export default {
   prefixes: {
