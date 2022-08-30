@@ -1,38 +1,41 @@
+import ids from '../config/ComponentIds.js'
+import icons from '../config/Icons.js'
+
 export default {
   title: "Command List",
   entries: 15,
-  icon: "infoList",
+  icon: icons.infoList,
   textScale: 0.7,
   userNavbar: [
     {
       name: "Info",
-      action: 190000
+      actionId: ids.welcomeWindow
     }
   ],
   navbar: [
     {
       name: "All Commands",
-      action: 1000
+      actionId: 1000
     },
     {
       name: "User Commands",
-      action: 1100
+      actionId: 1100
     },
     {
       name: "Operator Commands",
-      action: 1200
+      actionId: 1200
     },
     {
       name: "Admin Commands",
-      action: 1300
+      actionId: 1300
     },
     {
       name: "Masteradmin Commands",
-      action: 1400
+      actionId: 1400
     },
     {
       name: "Server Owner Commands",
-      action: 1500
+      actionId: 1500
     }
   ],
   grid: {

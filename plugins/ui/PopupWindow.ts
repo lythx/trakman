@@ -30,7 +30,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected readonly headerPageWidth: number = 10
   protected static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
 
-  constructor(windowId: number, headerIcon: string, title: string, navbar?: (string | { name: string, action: number })[], windowHeight: number = 60, windowWidth: number = 90) {
+  constructor(windowId: number, headerIcon: string, title: string, navbar?: { name: string, actionId: number }[], windowHeight: number = 60, windowWidth: number = 90) {
     super(IDS.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
@@ -40,8 +40,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.windowWidth = windowWidth;
     this.navbarHeight = -this.margin
     if (navbar !== undefined && navbar.length !== 0) {
-      const buttons: any[] = []//this.getButtons(navbar)
-      this.navbar = new Navbar(buttons, this.windowWidth);
+      this.navbar = new Navbar(navbar, this.windowWidth);
       this.navbarHeight = this.navbar.height
     }
     this.contentWidth = windowWidth
@@ -101,20 +100,6 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       </manialink>`
     ]
   }
-
-  // private getButtons(names: (string | { name: string, action: number })[]): { name: string, action: number }[] {
-  //   const ret: { name: string, action: number }[] = []
-  //   for (const e of names) {
-  //     if (typeof e === 'string') {
-  //       const name = (CONFIG as any)?.[e]?.title ?? e
-  //       const action = (IDS as any)?.[e] ?? ''
-  //       ret.push({ name, action })
-  //     } else {
-  //       ret.push(e)
-  //     }
-  //   }
-  //   return ret
-  // }
 
   protected constructNavbar(login: string, params?: DisplayParams): string {
     return this.navbar?.constructXml() ?? ''

@@ -13,7 +13,7 @@ export default {
   rightSideOrder: [
     { name: "MapWidgetResult", height: 11.4 },
     { name: "NextMapRecords", height: 12.92 },
-    { name: "TimerWidgetResult", height: 6.45 },
+    { name: "TimerWidgetResult", height: 6.1 },
     { name: "KarmaRanking", height: 12.92 },
     { name: "VotersRanking", height: 12.92 },
     { name: "VisitorsRanking", height: 12.92 },
