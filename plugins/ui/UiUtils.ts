@@ -6,27 +6,30 @@ import RecordList from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
 import CONFIG from './config/UIConfig.json' assert { type: 'json' }
 import RESULTCONFIG from './config/ResultUIConfig.json' assert { type: 'json' }
-import ICONS from './config/Icons.json' assert { type: 'json' }
+import ICONS from './config/Icons.js'
 import BACKGROUNDS from './config/Backgrounds.json' assert { type: 'json' }
-import IDS from './config/ComponentIds.json' assert { type: 'json' }
+import IDS from './config/ComponentIds.js'
 import { centeredText, horizontallyCenteredText, verticallyCenteredText, rightAlignedText } from './utils/TextUtils.js'
-import { staticHeader, resultStaticHeader } from './utils/StaticHeader.js'
+import { staticHeader, resultStaticHeader } from './utils/StaticHeaderOld.js'
 import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { getIcon } from './utils/GetIcon.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
-import {List } from './utils/List.js'
+import { List } from './utils/List.js'
+import raceUi from './config/RaceUi.js'
+import StaticHeader from './utils/StaticHeader.js'
 
-
-const getStaticPosition = (widgetName: string): { x: number, y: number } => {
-  const side = (CONFIG as any)[widgetName].side === true
-  const order: string[] = side ? CONFIG.static.rightSideOrder : CONFIG.static.leftSideOrder
+const getStaticPosition = (context: { constructor: { name: string}}): { x: number, y: number, side: boolean } => {
+  const widgetName = context.constructor.name
+  let side = false
+  if (raceUi.rightSideOrder.some(a => a.name === widgetName)) { side = true }
+  const order: { name: string; height: number; }[] = side ? raceUi.rightSideOrder : raceUi.leftSideOrder
   let positionSum: number = 0
-  for (const [k, v] of order.entries()) {
-    if (v === widgetName) { break }
-    positionSum += (CONFIG as any)?.[v]?.height + CONFIG.marginBig
+  for (const e of order) {
+    if (e.name === widgetName) { break }
+    positionSum += e.height + raceUi.marginBig
   }
-  return { y: CONFIG.static.topBorder - positionSum, x: side ? CONFIG.static.rightPosition : CONFIG.static.leftPosition }
+  return { y: raceUi.topBorder - positionSum, x: side === true? raceUi.rightPosition : raceUi.leftPosition, side }
 }
 
 const getResultPosition = (widgetName: string): { x: number, y: number } => {
@@ -66,8 +69,8 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
 }
 
 export {
-  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject,List,
-  CONFIG, ICONS, BACKGROUNDS, IDS,RESULTCONFIG,
+  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
+  CONFIG, ICONS, BACKGROUNDS, IDS, RESULTCONFIG,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition,
   verticallyCenteredText, getIcon, getResultPosition, resultStaticHeader

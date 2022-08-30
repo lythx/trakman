@@ -1,6 +1,6 @@
 import { trakman as tm } from "../src/Trakman.js"
 import { addKeyListener } from "./ui/utils/KeyListener.js"
-import IDS from './ui/config/UtilIds.json' assert { type: 'json' }
+import IDS from './ui/config/UtilIds.js'
 
 export class Vote {
 
@@ -16,21 +16,21 @@ export class Vote {
   static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onInterrupt: ((info: {
-    callerLogin?: string;
+    caller?:TMPlayer;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onInterrupt: ((info: {
-    callerLogin?: string;
+    caller?:TMPlayer;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   loginList: string[] = []
   private isActive: boolean = false
   private seconds: number
-  private interrupted: { callerLogin?: string, result: boolean } | undefined
+  private interrupted: { caller?: TMPlayer, result: boolean } | undefined
   private readonly cancelOnRoundEnd: boolean
   private readonly cancelOnRoundStart: boolean
 
@@ -124,14 +124,14 @@ export class Vote {
     return (yesVotes / allVotes) > this.goal
   }
 
-  pass(callerLogin?: string): void {
+  pass( caller?: TMPlayer): void {
     if (this.isActive === false) { return }
-    this.interrupted = { callerLogin, result: true }
+    this.interrupted = { caller, result: true }
   }
 
-  cancel(callerLogin?: string): void {
+  cancel( caller?: TMPlayer): void {
     if (this.isActive === false) { return }
-    this.interrupted = { callerLogin, result: false }
+    this.interrupted = { caller, result: false }
   }
 
   clearListeners(): void {

@@ -1,7 +1,7 @@
 import { trakman as tm } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
 import { CONFIG, IDS } from './UiUtils.js'
-import UTILIDS from './config/UtilIds.json' assert { type: 'json' }
+import UTILIDS from './config/UtilIds.js'
 import Navbar from './utils/Navbar.js'
 
 export default abstract class PopupWindow<DisplayParams = any> extends DynamicComponent {

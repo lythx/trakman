@@ -1,24 +1,26 @@
-import { getStaticPosition, centeredText, RecordList, CONFIG as CFG, CONFIG, ICONS, IDS, staticHeader, Grid, verticallyCenteredText, fullScreenListener, stringToObjectProperty } from '../UiUtils.js'
-import { trakman as tm } from '../../../src/Trakman.js'
-import StaticComponent from '../StaticComponent.js'
-import 'dotenv/config'
+import { getStaticPosition, RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { trakman as tm } from '../../../../src/Trakman.js'
+import StaticComponent from '../../StaticComponent.js'
+import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {
 
-  private readonly height = CONFIG.live.height
-  private readonly width = CONFIG.static.width
   private readonly positionX: number
   private readonly positionY: number
+  private readonly side: boolean
+  private readonly header: StaticHeader
   private readonly recordList: RecordList
-  private readonly maxRecords: number = 250
+  private readonly maxRecords: number = 1000 // TODO FIX
 
   constructor() {
     super(IDS.live, 'race')
-    const side: boolean = CONFIG.live.side
-    const pos = getStaticPosition('live')
+    const pos = getStaticPosition(this)
     this.positionX = pos.x
     this.positionY = pos.y
-    this.recordList = new RecordList(this.id, this.width, this.height - (CONFIG.staticHeader.height + CONFIG.marginSmall), CONFIG.live.entries, side, CONFIG.live.topCount, this.maxRecords, CONFIG.live.displayNoRecordEntry)
+    this.side = pos.side
+    this.header = new StaticHeader()
+    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), 
+    config.entries, this.side, config.topCount, this.maxRecords, config.displayNoRecordEntry)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -35,7 +37,6 @@ export default class LiveRanking extends StaticComponent {
 
   display(): void {
     if (this.isDisplayed === false) { return }
-    // Here all manialinks have to be constructed separately because they are different for every player
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
@@ -46,8 +47,8 @@ export default class LiveRanking extends StaticComponent {
     tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
-        ${staticHeader(CONFIG.live.title, stringToObjectProperty(CONFIG.live.icon, ICONS), true, { actionId: IDS.liveCps })}
-        <frame posn="0 -${CONFIG.staticHeader.height + CONFIG.marginSmall} 1">
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: IDS.liveCps })}
+        <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, tm.records.live.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
         </frame>
       </frame>

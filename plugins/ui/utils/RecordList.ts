@@ -1,8 +1,8 @@
 import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
 import RESULTCONFIG from '../config/ResultUIConfig.json' assert { type: 'json' }
-import ICONS from '../config/Icons.json' assert { type: 'json' }
+import ICONS from '../config/Icons.js'
 import { trakman as tm } from '../../../src/Trakman.js'
-import IDS from '../config/UtilIds.json' assert { type: 'json' }
+import IDS from '../config/UtilIds.js'
 
 interface UiRecord {
   readonly time: number

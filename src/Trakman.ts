@@ -10,7 +10,7 @@ import { Database } from './database/DB.js'
 import { TMXService } from './TMXService.js'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import _UIIDS from '../plugins/ui/config/ComponentIds.json' assert { type: 'json' }
+import _UIIDS from '../plugins/ui/config/ComponentIds.js'
 import { VoteService } from './services/VoteService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
