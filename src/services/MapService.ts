@@ -3,7 +3,7 @@ import { Client } from '../client/Client.js'
 import { MapRepository } from '../database/MapRepository.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
-import CONFIG from "../../config.json" assert { type: 'json' }
+import config from "../../config/Config.js"
 
 interface JukeboxMap {
   readonly map: TMMap
@@ -21,8 +21,8 @@ export class MapService {
   private static readonly repo = new MapRepository()
   private static readonly _queue: JukeboxMap[] = []
   private static readonly _history: TMMap[] = []
-  static readonly queueSize: number = CONFIG.jukeboxQueueSize
-  static readonly historySize: number = CONFIG.jukeboxPreviousMapsInRuntime
+  static readonly queueSize: number = config.jukeboxQueueSize
+  static readonly historySize: number = config.jukeboxPreviousMapsInRuntime
 
   /**
    * Creates maplist, sets current map and adds a proxy for Match Settings update

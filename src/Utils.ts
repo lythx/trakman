@@ -6,7 +6,7 @@ import { Events } from './Events.js'
 import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { PlayerService } from "./services/PlayerService.js";
 import colours from './data/Colours.json' assert { type: 'json' }
-import config from '../Config.js'
+import config from '../config/Prefixes.js'
 
 const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []

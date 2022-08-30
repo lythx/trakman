@@ -17,7 +17,7 @@ import { Logger } from './Logger.js'
 import http from 'http'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
-import config from '../Config.js'
+import config from '../config/Prefixes.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
