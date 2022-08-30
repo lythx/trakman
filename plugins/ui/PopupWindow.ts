@@ -1,8 +1,9 @@
 import { trakman as tm } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
-import { CONFIG, IDS } from './UiUtils.js'
+import {IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.js'
 import Navbar from './utils/Navbar.js'
+import config from './config/PopupWindow.js'
 
 export default abstract class PopupWindow<DisplayParams = any> extends DynamicComponent {
 
@@ -22,9 +23,9 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected readonly contentWidth: number
   protected readonly contentHeight: number
   protected readonly headerHeight: number = 4
-  protected readonly headerBg: string = CONFIG.popup.headerBg
-  protected readonly bg: string = CONFIG.popup.bg
-  protected readonly margin: number = CONFIG.popup.margin
+  protected readonly headerBg: string = config.headerBg
+  protected readonly bg: string = config.bg
+  protected readonly margin: number = config.margin
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
   protected static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
@@ -39,7 +40,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.windowWidth = windowWidth;
     this.navbarHeight = -this.margin
     if (navbar !== undefined && navbar.length !== 0) {
-      const buttons = this.getButtons(navbar)
+      const buttons: any[] = []//this.getButtons(navbar)
       this.navbar = new Navbar(buttons, this.windowWidth);
       this.navbarHeight = this.navbar.height
     }
@@ -101,19 +102,19 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     ]
   }
 
-  private getButtons(names: (string | { name: string, action: number })[]): { name: string, action: number }[] {
-    const ret: { name: string, action: number }[] = []
-    for (const e of names) {
-      if (typeof e === 'string') {
-        const name = (CONFIG as any)?.[e]?.title ?? e
-        const action = (IDS as any)?.[e] ?? ''
-        ret.push({ name, action })
-      } else {
-        ret.push(e)
-      }
-    }
-    return ret
-  }
+  // private getButtons(names: (string | { name: string, action: number })[]): { name: string, action: number }[] {
+  //   const ret: { name: string, action: number }[] = []
+  //   for (const e of names) {
+  //     if (typeof e === 'string') {
+  //       const name = (CONFIG as any)?.[e]?.title ?? e
+  //       const action = (IDS as any)?.[e] ?? ''
+  //       ret.push({ name, action })
+  //     } else {
+  //       ret.push(e)
+  //     }
+  //   }
+  //   return ret
+  // }
 
   protected constructNavbar(login: string, params?: DisplayParams): string {
     return this.navbar?.constructXml() ?? ''

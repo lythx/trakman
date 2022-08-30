@@ -1,4 +1,4 @@
-import { IDS, Grid, constuctButton, GridCellFunction } from '../../../UiUtils.js'
+import { IDS, Grid, staticButton, GridCellFunction } from '../../../UiUtils.js'
 import { trakman as tm } from '../../../../../src/Trakman.js'
 import StaticComponent from '../../../StaticComponent.js'
 import { VisitCounter } from './VisitCounter.js'
@@ -76,7 +76,7 @@ export default class ButtonsWidget extends StaticComponent {
     for (const e of this.buttons) {
       const data = e.buttonData
       arr.push((i, j, w, h) =>
-        constuctButton(data.icon, data.text1, data.text2, w - config.margin,
+        staticButton(data.icon, data.text1, data.text2, w - config.margin,
           h - config.margin, data.iconWidth, data.iconHeight, data.padding, {
           equalTexts: data.equalTexts === true ? true : undefined,
           actionId: data.actionId, link: data.link
