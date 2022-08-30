@@ -4,14 +4,15 @@ import { PlayerService } from './PlayerService.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
-import CONFIG from '../../config.json' assert { type: 'json' }
+import config from '../../config/Config.js'
+import messages from '../../config/Messages.js'
 
 /**
  * This service manages chat table and chat commands
  */
 export abstract class ChatService {
 
-  private static readonly messagesArraySize: number = CONFIG.messagesInRuntimeMemory
+  private static readonly messagesArraySize: number = config.messagesInRuntimeMemory
   static readonly _messages: TMMessage[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
@@ -39,7 +40,8 @@ export abstract class ChatService {
         return
       }
       if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}»${Utils.palette.error} You have no permission to use this command.` }, { string: info.login }])
+        Client.callNoRes('ChatSendServerMessageToLogin',
+          [{ string: messages.noPermission }, { string: info.login }])
         return
       }
       const [val, ...params] = input.split(' ').filter(a => a !== '')
@@ -49,28 +51,38 @@ export abstract class ChatService {
         for (const [i, param] of command.params.entries()) {
           if (params[i] === undefined && param.optional === true) { continue }
           if (params[i] === undefined && param.optional === undefined) {
-            Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Required param ${param.name} not specified.` }, { string: info.login }])
+            Client.call('ChatSendServerMessageToLogin',
+              [{ string: Utils.strVar(messages.noParam, { param: param.name }) }, { string: info.login }])
             return
           }
           if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
           switch (param.type) {
             case 'int':
               if (!Number.isInteger(Number(params[i]))) {
-                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: int.` }, { string: info.login }])
+                Client.call('ChatSendServerMessageToLogin', [{
+                  string:
+                    Utils.strVar(messages.notInt, { param: param.name })
+                }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'double':
               if (isNaN(Number(params[i]))) {
-                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: double.` }, { string: info.login }])
+                Client.call('ChatSendServerMessageToLogin', [{
+                  string:
+                    Utils.strVar(messages.notDouble, { param: param.name })
+                }, { string: info.login }])
                 return
               }
               parsedParams.push(Number(params[i]))
               break
             case 'boolean':
               if (!['true', 'yes', 'y', '1', 'false', 'no', 'n', '0'].includes(params[i].toLowerCase())) {
-                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for parameter <${param.name}>: boolean.` }, { string: info.login }])
+                Client.call('ChatSendServerMessageToLogin', [{
+                  string:
+                    Utils.strVar(messages.notBoolean, { param: param.name })
+                }, { string: info.login }])
                 return
               }
               parsedParams.push(['true', 'yes', 'y', '1',].includes(params[i].toLowerCase()))
@@ -83,7 +95,10 @@ export abstract class ChatService {
               const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
               const time: number = Number(params[i].substring(0, params[i].length - 1))
               if (isNaN(time)) {
-                Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time parameter <${param.name}>: time.` }, { string: info.login }])
+                Client.call('ChatSendServerMessageToLogin', [{
+                  string:
+                    Utils.strVar(messages.notTime, { param: param.name })
+                }, { string: info.login }])
                 return
               }
               switch (unit) {
@@ -100,7 +115,10 @@ export abstract class ChatService {
                   parsedParams.push(time * 1000 * 60 * 60 * 24)
                   break
                 default:
-                  Client.call('ChatSendServerMessageToLogin', [{ string: `${Utils.palette.server}» ${Utils.palette.error}Provided wrong argument type for time <${param.name}>: time.` }, { string: info.login }])
+                  Client.call('ChatSendServerMessageToLogin', [{
+                    string:
+                      Utils.strVar(messages.notTime, { param: param.name })
+                  }, { string: info.login }])
               }
               break
             case 'multiword':
