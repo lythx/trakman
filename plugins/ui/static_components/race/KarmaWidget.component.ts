@@ -1,4 +1,4 @@
-import { getStaticPosition, centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
+import { centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
@@ -15,17 +15,14 @@ export default class KarmaWidget extends StaticComponent {
 
   constructor() {
     super(IDS.karma, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
       new Array(3).fill(1), new Array(3).fill(1), { background: config.background, margin: config.margin })
     tm.addListener('Controller.KarmaVote', (): void => {
-      this.display()
-    })
-    tm.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
     maniakarma.onMapFetch(this.display.bind(this))
@@ -54,7 +51,7 @@ export default class KarmaWidget extends StaticComponent {
   private constructXml(login: string): string {
     const votes: TMVote[] = tm.karma.current
     const voteAmounts: number[] = []
-    for(let i = this.options.length - 1; i >=0; i--) {
+    for (let i = this.options.length - 1; i >= 0; i--) {
       voteAmounts.unshift(votes.filter(a => a.vote === this.options[i]).length)
     }
     const totalVotes: number = votes.length
@@ -83,7 +80,7 @@ export default class KarmaWidget extends StaticComponent {
     </manialink>`
   }
 
-  private constructGraph(max: number,  voteAmounts: number[],mkVotes: {
+  private constructGraph(max: number, voteAmounts: number[], mkVotes: {
     fantastic: number;
     beautiful: number;
     good: number;
@@ -100,7 +97,7 @@ export default class KarmaWidget extends StaticComponent {
       const barW: number = max === 0 ? 0 : (e / max) * w
       const mkBarW: number = max === 0 ? 0 : (mkVotes[mkArr[i] as keyof typeof mkVotes] / max) * w
       ret += `<quad posn="${config.margin} -${config.margin + h * i} 3" sizen="${barW} ${h - config.margin}" bgcolor="${config.colours[i]}"/>`
-      ret += `<quad posn="${config.margin + barW } -${config.margin + h * i} 3" sizen="${mkBarW } ${h - config.margin}" bgcolor="${config.mkColours[i]}"/>`
+      ret += `<quad posn="${config.margin + barW} -${config.margin + h * i} 3" sizen="${mkBarW} ${h - config.margin}" bgcolor="${config.mkColours[i]}"/>`
     }
     return ret
   }

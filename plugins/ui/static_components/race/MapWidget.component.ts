@@ -1,4 +1,4 @@
-import { IDS, Grid, StaticHeader,  getStaticPosition } from '../../UiUtils.js'
+import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
 import flags from '../../config/FlagIcons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
@@ -18,11 +18,11 @@ export default class MapWidget extends StaticComponent {
 
   constructor() {
     super(IDS.map, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
       MapAuthorData.onCurrentAuthorChange(() => {
@@ -32,11 +32,13 @@ export default class MapWidget extends StaticComponent {
   }
 
   display(): void {
+    if (this.isDisplayed === false) { return }
     this.updateXML()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
+    if (this.isDisplayed === false) { return }
     tm.sendManialink(this.xml, login)
   }
 
@@ -81,7 +83,7 @@ export default class MapWidget extends StaticComponent {
       }
       return `
       <frame posn="0 0 1">
-        ${i === 0 ? this.header.constructXml(infos[i][0], infos[i][1], true) :
+        ${i === 0 ? this.header.constructXml(infos[i][0], infos[i][1], this.side) :
           this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
             textScale: config.textScale,
             textBackground: config.background,

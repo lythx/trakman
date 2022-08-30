@@ -1,5 +1,6 @@
 import { verticallyCenteredText, centeredText, rightAlignedText } from './TextUtils.js'
-import config from '../config/RaceHeader.js'
+import raceConfig from '../config/RaceHeader.js'
+import resultConfig from '../config/ResultHeader.js'
 
 interface StaticHeaderOptions {
   height: number, iconWidth: number, iconHeight: number, actionId?: number
@@ -11,9 +12,14 @@ interface StaticHeaderOptions {
 
 export default class StaticHeader {
 
-  options: StaticHeaderOptions = config
+  options: StaticHeaderOptions 
 
-  constructor(defaultOptions: Partial<StaticHeaderOptions> = {}) {
+  constructor(preset: 'race' | 'result', defaultOptions: Partial<StaticHeaderOptions> = {}) {
+    if(preset === 'result') {
+      this.options = resultConfig
+    } else {
+      this.options = raceConfig
+    }
     for (const [k, v] of Object.entries(defaultOptions)) {
       (this.options as any)[k] = v
     }
@@ -22,7 +28,7 @@ export default class StaticHeader {
   constructXml(text: string, icon: string, side: boolean, options: Partial<StaticHeaderOptions> = {}): string {
     const cfg = { ...this.options }
     for (const [k, v] of Object.entries(options)) {
-        (cfg as any)[k] = v
+      (cfg as any)[k] = v
     }
     if (side === true) {
       let label: string = ''
