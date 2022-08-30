@@ -1,6 +1,7 @@
 import { Grid, GridCellFunction, GridCellObject } from './Grid.js'
 import { centeredText, verticallyCenteredText } from './TextUtils.js'
-import CONFIG from '../config/UIConfig.json' assert { type: 'json' }
+
+const margin = 0.15 // TODO config file
 
 export class List {
 
@@ -8,15 +9,15 @@ export class List {
   readonly height: number
   readonly width: number
   readonly columnProportions: [number, number, number]
-  readonly margin = CONFIG.list.margin
   readonly background: string | undefined
   readonly headerBg: string | undefined
 
-  constructor(entries: number, width: number, height: number, columnProportions: [number, number, number], options?: { background?: string, headerBg?: string }) {
+  constructor(entries: number, width: number, height: number, columnProportions: number[], options?: { background?: string, headerBg?: string }) {
     this.entries = entries
     this.height = height
     this.width = width
-    this.columnProportions = columnProportions
+    if(columnProportions.length < 3) { throw new Error('Column proportions needs to have 3 elements')}
+    this.columnProportions = columnProportions as any
     this.background = options?.background
     this.headerBg = options?.headerBg
   }
@@ -38,8 +39,8 @@ export class List {
       arr.push(index, col1Function, col2Function)
     }
 
-    const grid = new Grid(this.width + this.margin * 2, this.height + this.margin * 2, this.columnProportions, new Array(this.entries).fill(1), { background: this.background, margin: CONFIG.grid.margin })
-    return `<frame posn="${-this.margin} ${this.margin} 2">
+    const grid = new Grid(this.width + margin * 2, this.height + margin * 2, this.columnProportions, new Array(this.entries).fill(1), { background: this.background, margin: margin })
+    return `<frame posn="${-margin} ${margin} 2">
       ${grid.constructXml(arr)}
     </frame>`
   }

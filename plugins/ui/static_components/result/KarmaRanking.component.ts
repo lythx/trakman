@@ -1,27 +1,26 @@
-import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
+import { IDS, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
-
-const MIN_AMOUNT = 5 // TODO: this in config file
+import config from './KarmaRanking.config.js'
 
 export default class KarmaRanking extends StaticComponent {
 
-  private readonly width = CFG.static.width
-  private readonly height = CFG.karmaRanking.height
-  private readonly entries: number
   private readonly posX: number
   private readonly posY: number
-  private readonly side = CFG.karmaRanking.side
+  private readonly side: boolean
   private readonly list: List
+  private readonly header: StaticHeader
   private xml = ''
 
   constructor() {
     super(IDS.karmaRanking, 'result')
-    const pos = getResultPosition('karmaRanking')
+    const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y
-    this.entries = CFG.karmaRanking.entries
-    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.karmaRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
+    this.side = pos.side
+    this.header = new StaticHeader('result')
+    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     tm.addListener('Controller.KarmaVote', () => {
       this.display()
     })
@@ -39,12 +38,12 @@ export default class KarmaRanking extends StaticComponent {
   }
 
   constructXml() {
-    const list = tm.maps.list.sort((a, b) => b.voteRatio - a.voteRatio).filter(a => a.voteCount > MIN_AMOUNT).slice(0, this.entries)
+    const list = tm.maps.list.sort((a, b) => b.voteRatio - a.voteRatio).filter(a => a.voteCount > config.minimumVotes).slice(0, config.entries)
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
-      ${resultStaticHeader(CFG.karmaRanking.title, CFG.karmaRanking.icon, this.side)}
-      <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
+      ${this.header.constructXml(config.title, config.icon, this.side)}
+      <frame posn="0 ${-this.header.options.height - config.margin} 2">
         ${this.list.constructXml(list.map(a => Math.round(a.voteRatio).toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.name, false))))}
       </frame>
       </frame>

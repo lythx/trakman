@@ -1,29 +1,34 @@
-import { RESULTCONFIG as RCFG, IDS, Grid, resultStaticHeader, ICONS, stringToObjectProperty, GridCellFunction, getResultPosition } from '../../UiUtils.js'
-import flags from '../../config/FlagIcons.json' assert {type: 'json'}
-import { tmx } from '../../../tmx/Tmx.js'
+import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
+import flags from '../../config/FlagIcons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
+import { tmx } from '../../../tmx/Tmx.js'
 import { MapAuthorData } from '../../../MapAuthorData.js'
+import config from './MapWidgetResult.config.js'
 
 export default class MapWidgetResult extends StaticComponent {
 
-  private width = RCFG.static.width
-  private height: number
-  private positionX: number
-  private positionY: number
-  private xml: string = ''
+  private readonly rows = 5
+  private readonly positionX: number
+  private readonly positionY: number
+  private readonly side: boolean
+  private readonly header: StaticHeader
+  private readonly grid: Grid
   private isRestart = false
+  private xml: string = ''
 
   constructor() {
-    super(IDS.mapResult, 'result')
-    // Here height is  5  headers instead of config height
-    // To set correct height in config after changing header height copy this.height from debbuger / console.log()
-    this.height = (RCFG.staticHeader.height + RCFG.marginSmall) * 5 + RCFG.marginSmall
-    const pos = getResultPosition('map')
+    super(IDS.map, 'result')
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
-    if (process.env.USE_WEBSERVICES === "YES") {
-      MapAuthorData.onNextAuthorChange(() => this.display())
+    this.side = pos.side
+    this.header = new StaticHeader('result')
+    this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
+    if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
+      MapAuthorData.onCurrentAuthorChange(() => {
+        void this.display()
+      })
     }
     tm.addListener('Controller.JukeboxChanged', () => {
       void this.display()
@@ -35,101 +40,115 @@ export default class MapWidgetResult extends StaticComponent {
     }, true)
   }
 
-  async display(): Promise<void> {
-    if (!this.isDisplayed) { return }
+  display(): void {
+    if (this.isDisplayed === false) { return }
     this.updateXML()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (!this.isDisplayed) { return }
+    if (this.isDisplayed === false) { return }
     tm.sendManialink(this.xml, login)
   }
 
   private updateXML(): void {
-    const rows = 5
-    this.height = (RCFG.staticHeader.height + RCFG.marginSmall) * rows + RCFG.marginSmall
     const map = this.isRestart ? tm.jukebox.current : tm.jukebox.queue[0]
     const authorData = this.isRestart ? MapAuthorData.currentAuthor : MapAuthorData.nextAuthor
     const author: string = authorData?.nickname ?? map.author
-    const cfg = RCFG.map
-    const tmxmap = this.isRestart ? tmx.current : tmx.queue[0]
-    const date: Date | undefined = tmxmap?.lastUpdateDate
-    const tmxwr = tmxmap?.replays?.[0]?.time
-    const grid = new Grid(this.width, this.height - RCFG.marginSmall, [1], new Array(rows).fill(1))
-    const texts: (string | undefined)[] = [
-      cfg.title,
-      tm.utils.safeString(map.name),
-      tm.utils.safeString(author),
-      tm.utils.getTimeString(map.authorTime),
-      date === undefined ? undefined : tm.utils.formatDate(date),
-      tmxmap?.awards === undefined ? undefined : tmxmap?.awards.toString(),
-      tmxwr === undefined ? undefined : tm.utils.getTimeString(tmxwr)
-    ]
-    const icons: string[] = cfg.icons.map(a => stringToObjectProperty(a, ICONS))
+    const tmxMap = this.isRestart ? tmx.current : tmx.queue[0]
+    const date: Date | undefined = tmxMap?.lastUpdateDate
+    const ic = config.icons
+    let authorIcon = ic.author
     if (authorData?.country !== undefined) {
-      icons[2] = flags[authorData?.country as keyof typeof flags] // cope typescript
+      authorIcon = (flags as any)[authorData.country] // cope typescript
     }
-    const headerCFG = RCFG.staticHeader
+    const obj = this.getTagAndAward(map, tmxMap ?? undefined)
+    const infos: [string, string][] = [
+      [config.title, ic.header],
+      [tm.utils.safeString(map.name), obj.tag],
+      [tm.utils.safeString(author), authorIcon],
+      [tm.utils.getTimeString(map.authorTime), ic.authorTime],
+      [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
+      [tmxMap?.awards === undefined ? config.noAwardsText : tmxMap.awards.toString(), obj.award],
+      [tmxMap?.replays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(tmxMap.replays[0].time), ic.tmxWr]
+    ]
+    const headerCfg = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
-      if (i === 3) {
+      if (i === 4) {
+        return `<frame posn="0 0 1">
+        ${this.header.constructXml(infos[i + 1][0], infos[i + 1][1], this.side, {
+          rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
+          textScale: config.textScale,
+          centerText: true,
+          textBackground: config.background
+        })}
+      </frame>
+      <frame posn="${(headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)) +
+          headerCfg.squareWidth + (headerCfg.margin * 2)} 0 1">
+        ${this.header.constructXml(infos[i + 2][0], infos[i + 2][1], this.side, {
+            rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
+            textScale: config.textScale,
+            centerText: true,
+            textBackground: config.background
+          })}
+      </frame>`
+      } else if (i === 3) {
         return `
         <frame posn="0 0 1">
-          ${resultStaticHeader(texts[i] ?? '', icons[i] ?? '', true, {
-          rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-          textScale: cfg.textScale,
+          ${this.header.constructXml(infos[i][0], infos[i][1], this.side, {
+          rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
+          textScale: config.textScale,
           centerText: true,
-          textBackgrund: RCFG.static.bgColor
+          textBackground: config.background
         })}
         </frame>
-        <frame posn="${(headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)) +
-          headerCFG.squareWidth + (headerCFG.margin * 2)} 0 1">
-          ${resultStaticHeader(texts[i + 1] ?? cfg.noDateText, icons[i + 1] ?? '', true, {
-            rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-            textScale: cfg.textScale,
+        <frame posn="${(headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)) +
+          headerCfg.squareWidth + (headerCfg.margin * 2)} 0 1">
+          ${this.header.constructXml(infos[i + 1][0], infos[i + 1][1], this.side, {
+            rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
+            textScale: config.textScale,
             centerText: true,
-            textBackgrund: RCFG.static.bgColor
+            textBackground: config.background
           })}
         </frame>`
       }
       return `
       <frame posn="0 0 1">
-        ${i === 0 ? resultStaticHeader(texts[i] ?? '', icons[i] ?? '', true) :
-          resultStaticHeader(tm.utils.strip(texts[i] ?? '', false), icons[i] ?? '', true, {
-            textScale: cfg.textScale,
-            textBackgrund: RCFG.static.bgColor,
-            centerVertically: true,
-            horizontalPadding: 0.3
+        ${i === 0 ? this.header.constructXml(infos[i][0], infos[i][1], this.side) :
+          this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
+            textScale: config.textScale,
+            textBackground: config.background,
+            horizontalPadding: config.mapPadding
           })}
       </frame>`
     }
-    const resultCell: GridCellFunction = (i, j, w, h) => {
-      return `<frame posn="0 0 1">
-      ${resultStaticHeader(texts[i + 1] ?? cfg.noDateText, icons[i + 1] ?? '', true, {
-        rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-        textScale: cfg.textScale,
-        centerText: true,
-        textBackgrund: RCFG.static.bgColor
-      })}
-    </frame>
-    <frame posn="${(headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)) +
-        headerCFG.squareWidth + (headerCFG.margin * 2)} 0 1">
-      ${resultStaticHeader(texts[i + 2] ?? cfg.noDateText, icons[i + 2] ?? '', true, {
-          rectangleWidth: (headerCFG.rectangleWidth / 2) - (headerCFG.margin + (headerCFG.squareWidth / 2)),
-          textScale: cfg.textScale,
-          centerText: true,
-          textBackgrund: RCFG.static.bgColor
-        })}
-    </frame>`
-    }
-    const arr: any[] = new Array(4).fill(cell)
-    arr.push(resultCell)
+    const arr: any[] = new Array(this.rows).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${grid.constructXml(arr)}
+        ${this.grid.constructXml(arr)}
       </frame>
       </manialink>`
   }
 
+  private getTagAndAward(map: TMMap, tmxMap?: TMXMapInfo): { tag: string, award: string } {
+    let tag = config.icons.tags.normal
+    let award = config.icons.awards.normal
+    if (map.leaderboardRating === 50000 || tmxMap?.isNadeo === true) { // TODO implement isNadeo on map
+      tag = config.icons.tags.nadeo
+      award = config.icons.awards.nadeo
+    }
+    if (map.leaderboardRating === 0 || tmxMap?.isClassic === true) {
+      tag = config.icons.tags.classic
+      award = config.icons.awards.classic
+    }
+    for (const e of config.customTags) {
+      if (e?.authors?.some(a => a === map.author || a === tmxMap?.author) ||
+        e?.names?.some(a => a.test(map.name) || a.test(tm.utils.strip(map.name)) ||
+          (tmxMap !== undefined ? (a.test(tmxMap.name) || a.test(tm.utils.strip(tmxMap.name))) : false))) {
+        tag = e.icon
+      }
+    }
+    return { tag, award }
+  }
 }

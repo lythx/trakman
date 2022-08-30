@@ -8,12 +8,6 @@ export default {
   icon: icons.chartLocal,
   margin: cfg.margin,
   entries: 15,
-  columnProportions: [
-    1,
-    1,
-    2.8,
-    4
-  ],
   topCount: 5,
   displayNoRecordEntry: true
 }

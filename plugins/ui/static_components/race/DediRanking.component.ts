@@ -1,4 +1,4 @@
-import { getStaticPosition, RecordList, IDS, StaticHeader,} from '../../UiUtils.js'
+import { RecordList, IDS, StaticHeader, } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
@@ -15,13 +15,13 @@ export default class DediRanking extends StaticComponent {
 
   constructor() {
     super(IDS.dedis, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-    config.entries, this.side,config.topCount, this.maxDedis, config.displayNoRecordEntry)
+      config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

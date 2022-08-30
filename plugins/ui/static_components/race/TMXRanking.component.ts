@@ -1,4 +1,4 @@
-import { getStaticPosition, RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
@@ -14,13 +14,13 @@ export default class TMXRanking extends StaticComponent {
 
   constructor() {
     super(IDS.tmx, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries, 
-    this.side, config.topCount, config.entries,config.displayNoRecordEntry, { getColoursFromPb: true })
+    this.header = new StaticHeader('race')
+    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+      this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

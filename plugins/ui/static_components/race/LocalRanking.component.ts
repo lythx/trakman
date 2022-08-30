@@ -1,4 +1,4 @@
-import { getStaticPosition,  RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './LocalRanking.config.js'
@@ -12,24 +12,24 @@ export default class LocalRanking extends StaticComponent {
 
   constructor() {
     super(IDS.locals, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), 
-    config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+    this.header = new StaticHeader('race')
+    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('Controller.PlayerRecord', (): void =>  this.display())
+    tm.addListener('Controller.PlayerRecord', (): void => this.display())
     tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('Controller.LocalRecords', (): void =>  this.display())
+    tm.addListener('Controller.LocalRecords', (): void => this.display())
   }
 
   display(): void {
@@ -47,8 +47,8 @@ export default class LocalRanking extends StaticComponent {
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: IDS.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, tm.records.local
-            .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
-            .slice(0, tm.records.maxLocalsAmount))}
+      .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
+      .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,

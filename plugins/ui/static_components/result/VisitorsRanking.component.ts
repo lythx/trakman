@@ -1,26 +1,27 @@
-import { getResultPosition, IDS, RESULTCONFIG as CFG, List, resultStaticHeader, CONFIG } from '../../UiUtils.js'
+import { IDS,List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import { stats } from '../../../stats/Stats.js'
+import config from './VisitorsRanking.config.js'
 
 export default class VisitorsRanking extends StaticComponent {
 
-  private readonly width = CFG.static.width
-  private readonly height = CFG.visitorsRanking.height
-  private readonly entries: number
   private readonly posX: number
   private readonly posY: number
-  private readonly side = CFG.visitorsRanking.side
+  private readonly side : boolean
+  private readonly header: StaticHeader
   private readonly list: List
   private xml = ''
 
   constructor() {
     super(IDS.visitorsRanking, 'result')
-    const pos = getResultPosition('visitorsRanking')
+    const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y
-    this.entries = CFG.visitorsRanking.entries
-    this.list = new List(this.entries, this.width, this.height - (CFG.staticHeader.height + CFG.marginSmall), CFG.visitorsRanking.columnProportions as any, { background: CFG.static.bgColor, headerBg: CFG.staticHeader.bgColor })
+    this.side = pos.side
+    this.header = new StaticHeader('result')
+    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin), 
+    config.columnProportions, { background:config.background, headerBg: this.header.options.textBackground })
     stats.visits.onUpdate(() => this.display())
   }
 
@@ -40,8 +41,8 @@ export default class VisitorsRanking extends StaticComponent {
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">
-      ${resultStaticHeader(CFG.visitorsRanking.title, CFG.visitorsRanking.icon, this.side)}
-      <frame posn="0 ${-CONFIG.staticHeader.height - CONFIG.marginSmall} 2">
+      ${this.header.constructXml(config.title, config.icon, this.side)}
+      <frame posn="0 ${-this.header.options.height - config.margin} 2">
         ${this.list.constructXml(list.map(a => a.visits.toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
       </frame>
       </frame>

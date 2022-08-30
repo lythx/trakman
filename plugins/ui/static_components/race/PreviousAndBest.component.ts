@@ -1,4 +1,4 @@
-import { getStaticPosition,  IDS } from '../../UiUtils.js'
+import { IDS } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './PreviousAndBest.config.js'
@@ -11,7 +11,7 @@ export default class PreviousAndBest extends StaticComponent {
 
   constructor() {
     super(IDS.previousAndBest, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.constructXml()

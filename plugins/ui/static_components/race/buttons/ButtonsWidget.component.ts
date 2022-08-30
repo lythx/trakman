@@ -1,4 +1,4 @@
-import { getStaticPosition, IDS, Grid, constuctButton, GridCellFunction } from '../../../UiUtils.js'
+import { IDS, Grid, constuctButton, GridCellFunction } from '../../../UiUtils.js'
 import { trakman as tm } from '../../../../../src/Trakman.js'
 import StaticComponent from '../../../StaticComponent.js'
 import { VisitCounter } from './VisitCounter.js'
@@ -28,7 +28,7 @@ export default class ButtonsWidget extends StaticComponent {
 
   constructor() {
     super(IDS.buttons, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.grid = new Grid(this.width + config.margin, this.height + config.margin,

@@ -1,33 +1,28 @@
-import { centeredText, Grid, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon, getResultPosition } from '../../UiUtils.js'
+import { centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
+import config from './KarmaWidgetResult.config.js'
 
 export default class KarmaWidgetResult extends StaticComponent {
 
-  private readonly width: number = CONFIG.static.width
-  private readonly height: number = CONFIG.karma.height
   private readonly positionX: number
   private readonly positionY: number
-  private readonly headerH: number = CONFIG.staticHeader.height
-  private readonly margin: number = CONFIG.marginSmall
-  private readonly buttonW: number = 1.7
-  private readonly options: number[] = [-3, -2, -1, 1, 2, 3]
-  private readonly icons: string[] = CONFIG.karma.icons
+  private readonly header: StaticHeader
+  private readonly headerH: number
+  private readonly options: number[] = [3, 2, 1, -1, -2, -3]
+  private readonly grid: Grid
 
   constructor() {
-    super(IDS.karmaResult, 'result')
-    const pos = getResultPosition('karma')
+    super(IDS.karma, 'result')
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
-    // setInterval(() => {
-    //   this.updateXML()
-    //   this.display()
-    // }, 100)
+    this.header = new StaticHeader('result')
+    this.headerH = this.header.options.height
+    this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
+      new Array(3).fill(1), new Array(3).fill(1), { background: config.background, margin: config.margin })
     tm.addListener('Controller.KarmaVote', (): void => {
-      this.display()
-    })
-    tm.addListener('Controller.BeginMap', (): void => {
       this.display()
     })
     maniakarma.onMapFetch(this.display.bind(this))
@@ -56,104 +51,91 @@ export default class KarmaWidgetResult extends StaticComponent {
   private constructXml(login: string): string {
     const votes: TMVote[] = tm.karma.current
     const voteAmounts: number[] = []
-    for (const e of this.options) {
-      voteAmounts.unshift(votes.filter(a => a.vote === e).length)
+    for (let i = this.options.length - 1; i >= 0; i--) {
+      voteAmounts.unshift(votes.filter(a => a.vote === this.options[i]).length)
     }
-    const max: number = Math.max(...voteAmounts)
     const totalVotes: number = votes.length
     const karma: number = tm.maps.current.voteRatio
     const mkVotes = maniakarma.mapKarma
     const mkKarmaValue: number = maniakarma.mapKarmaRatio
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
-    const maxMkAmount: number = Math.max(...Object.values(mkVotes))
+    const combined = Object.values(mkVotes).map((a: number, i) => a + voteAmounts[i])
+    const max: number = Math.max(...combined)
+    const maxLocalAmount = Math.max(...voteAmounts)
     const personalVote = votes.find(a => a.login === login)?.vote
     return `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${resultStaticHeader(CONFIG.karma.title, getIcon(CONFIG.karma.icon), false)}
-        <frame posn="0 -${this.headerH + this.margin} 1">
-          ${this.constructGraph(max, voteAmounts, totalVotes, maxMkAmount, mkVotes, totalMkVotes)}
+        ${this.header.constructXml(config.title, config.icon, false)}
+        <frame posn="0 -${this.headerH + config.margin} 1">
+          ${this.constructGraph(max, voteAmounts, mkVotes)}
         </frame>
-        <frame posn="${(this.width - this.buttonW) / 2 + this.margin / 2} -${this.headerH + this.margin} 1">
+        <frame posn="${(config.width - config.buttonWidth) / 2 - config.margin / 2} -${this.headerH} 1">
           ${this.constructInfo(totalVotes, karma, totalMkVotes, mkKarmaValue)}
         </frame>
-        <frame posn="${this.width - this.buttonW} -${this.headerH + this.margin} 1">
+        <frame posn="${config.width - config.buttonWidth} -${this.headerH + config.margin} 1">
           ${this.constructButtons(personalVote)}
         </frame>
       </frame>
     </manialink>`
   }
 
-  private constructGraph(maxAmount: number, voteAmounts: number[], totalVotes: number, maxMkAmount: number, mkVotes: {
+  private constructGraph(max: number, voteAmounts: number[], mkVotes: {
     fantastic: number;
     beautiful: number;
     good: number;
     bad: number;
     poor: number;
     waste: number;
-  }, totalMkVotes: number): string {
-    const width: number = (this.width + this.margin - this.buttonW) / 2 - this.margin
-    const colours: string[] = ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A']
-    let ret: string = `<quad posn="0 0 1" sizen="${width} ${this.height - (this.headerH + this.margin)}" bgcolor="${CONFIG.static.bgColor}"/>`
-    const w: number = width - (this.margin * 2)
-    const h: number = (this.height - (this.headerH + this.margin * 2)) / this.options.length
+  }): string {
+    const width: number = (config.width + config.margin - config.buttonWidth) / 2 - config.margin
+    let ret: string = `<quad posn="0 0 1" sizen="${width} ${config.height - (this.headerH + config.margin)}" bgcolor="${config.background}"/>`
+    const w: number = width - (config.margin * 2)
+    const h: number = (config.height - (this.headerH + config.margin * 2)) / this.options.length
     const mkArr = ['fantastic', 'beautiful', 'good', 'bad', 'poor', 'waste']
     for (const [i, e] of voteAmounts.entries()) {
-      if (totalVotes >= totalMkVotes) {
-        const barW: number = maxAmount === 0 ? 0 : (e / maxAmount) * w
-        ret += `<quad posn="${this.margin} -${this.margin + h * i} 3" sizen="${barW} ${h - this.margin}" bgcolor="${colours[i]}"/>`
-      } else {
-        const mkBarW: number = maxMkAmount === 0 ? 0 : ((mkVotes as any)[mkArr[i]] / maxMkAmount) * w
-        ret += `<quad posn="${this.margin} -${this.margin + h * i} 3" sizen="${mkBarW} ${h - this.margin}" bgcolor="${colours[i]}"/>`
-      }
+      const barW: number = max === 0 ? 0 : (e / max) * w
+      const mkBarW: number = max === 0 ? 0 : (mkVotes[mkArr[i] as keyof typeof mkVotes] / max) * w
+      ret += `<quad posn="${config.margin} -${config.margin + h * i} 3" sizen="${barW} ${h - config.margin}" bgcolor="${config.colours[i]}"/>`
+      ret += `<quad posn="${config.margin + barW} -${config.margin + h * i} 3" sizen="${mkBarW} ${h - config.margin}" bgcolor="${config.mkColours[i]}"/>`
     }
     return ret
   }
 
   private constructInfo(totalVotes: number, karma: number, totalMkVotes: number, mkKarmaValue: number): string {
-    const height: number = this.height - this.headerH
-    const width: number = (this.width + this.margin - this.buttonW) / 2 - this.margin
-    const colour: string = karma > 0 ? '$F00' : '$0F0' //TODO
-    const mkKarma: string =maniakarma.isEnabled ? Math.round(mkKarmaValue).toString() : '-'
-    const mkAmount: string = maniakarma.isEnabled ? totalMkVotes.toString() : '-'
-    const grid: Grid = new Grid(width, height, new Array(3).fill(1), new Array(3).fill(1))
-    const arr: ((i: number, j: number, w: number, h: number) => string)[] = [
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${getIcon(this.icons[0])}"/>`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${getIcon(this.icons[1])}"/>`,
+    const mkKarma: string = maniakarma.isEnabled ? Math.round(mkKarmaValue).toString() : config.defaultText
+    const mkAmount: string = maniakarma.isEnabled ? totalMkVotes.toString() : config.defaultText
+    const options = { padding: config.textPadding, textScale: config.textScale }
+    const arr: GridCellFunction[] = [
+      (i, j, w, h) => ``,
+      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
+      sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[0]}"/>`,
+      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4"
+       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[1]}"/>`,
 
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${getIcon(this.icons[2])}"/>`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(Math.round(karma).toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(mkKarma, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
+      sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[2]}"/>`,
+      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h, options),
+      (i, j, w, h) => centeredText(mkKarma, w, h, options),
 
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${w - this.margin * 3} ${h - this.margin * 3}" image="${getIcon(this.icons[3])}"/>`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(totalVotes.toString(), w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
-      (i: number, j: number, w: number, h: number): string => `<quad posn="0 0 2" sizen="${w - this.margin} ${h - this.margin}" bgcolor="${CONFIG.static.bgColor}"/>
-      ${centeredText(mkAmount, w - this.margin, h - this.margin, { padding: 0.1, textScale: 0.65 })}`,
+      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,
+      (i, j, w, h) => centeredText(totalVotes.toString(), w, h, options),
+      (i, j, w, h) => centeredText(mkAmount, w, h, options),
     ]
-    return grid.constructXml(arr)
+    return this.grid.constructXml(arr)
   }
 
   private constructButtons(personalVote?: -3 | -2 | -1 | 1 | 2 | 3): string {
-    let ret: string = `<quad posn="0 0 1" sizen="${this.buttonW} ${this.height - (this.headerH + this.margin)}" bgcolor="${CONFIG.static.bgColor}"/>`
-    const selfColour = 'FF0A'
-    const values: number[] = [3, 2, 1, -1, -2, -3]
-    const options: string[] = ['+++', '++', '+', '-', '--', '---']
-    const colours: string[] = ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A']
-    const h: number = (this.height - (this.headerH + this.margin * 2)) / options.length
-    for (const [i, e] of options.entries()) {
-      const offsetFix: number = i > 2 ? -0.3 : 0
-      const textScale: number = i > 2 ? 1 : 0.6
-      const colour: string = values[i] === personalVote ? selfColour : colours[i]
-      ret += `<quad posn="${this.margin} -${this.margin + h * i} 2" sizen="${this.buttonW - (this.margin * 2)} ${h - this.margin}" bgcolor="${colour}" action="${this.id + i + 1}"/>
-      ${centeredText(e, this.buttonW - (this.margin * 2), h - this.margin, { xOffset: this.margin, yOffset: this.margin + h * i + offsetFix, padding: 0, textScale })}`
+    let ret: string = `<quad posn="0 0 1" sizen="${config.buttonWidth} ${config.height - (this.headerH + config.margin)}" bgcolor="${config.background}"/>`
+    const h: number = (config.height - (this.headerH + config.margin * 2)) / config.options.length
+    for (const [i, e] of config.options.entries()) {
+      const offsetFix: number = i > 2 ? config.minus.offset : config.plus.offset
+      const textScale: number = i > 2 ? config.minus.scale : config.plus.scale
+      const colour: string = this.options[i] === personalVote ? config.selfColour : config.colours[i]
+      ret += `<quad posn="${config.margin} -${config.margin + h * i} 2" 
+      sizen="${config.buttonWidth - (config.margin * 2)} ${h - config.margin}" bgcolor="${colour}" action="${this.id + i + 1}"/>
+      ${centeredText(e, config.buttonWidth - (config.margin * 2), h - config.margin,
+        { xOffset: config.margin, yOffset: config.margin + h * i + offsetFix, padding: 0, textScale })}`
     }
     return ret
   }

@@ -16,32 +16,7 @@ import { closeButton } from './utils/CloseButton.js'
 import { getIcon } from './utils/GetIcon.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
 import { List } from './utils/List.js'
-import raceUi from './config/RaceUi.js'
 import StaticHeader from './utils/StaticHeader.js'
-
-const getStaticPosition = (context: { constructor: { name: string}}): { x: number, y: number, side: boolean } => {
-  const widgetName = context.constructor.name
-  let side = false
-  if (raceUi.rightSideOrder.some(a => a.name === widgetName)) { side = true }
-  const order: { name: string; height: number; }[] = side ? raceUi.rightSideOrder : raceUi.leftSideOrder
-  let positionSum: number = 0
-  for (const e of order) {
-    if (e.name === widgetName) { break }
-    positionSum += e.height + raceUi.marginBig
-  }
-  return { y: raceUi.topBorder - positionSum, x: side === true? raceUi.rightPosition : raceUi.leftPosition, side }
-}
-
-const getResultPosition = (widgetName: string): { x: number, y: number } => {
-  const side = (RESULTCONFIG as any)[widgetName].side === true
-  const order: string[] = side ? RESULTCONFIG.static.rightSideOrder : RESULTCONFIG.static.leftSideOrder
-  let positionSum: number = 0
-  for (const [k, v] of order.entries()) {
-    if (v === widgetName) { break }
-    positionSum += (RESULTCONFIG as any)?.[v]?.height + RESULTCONFIG.marginBig
-  }
-  return { y: RESULTCONFIG.static.topBorder - positionSum, x: side ? RESULTCONFIG.static.rightPosition : RESULTCONFIG.static.leftPosition }
-}
 
 const fullScreenListener = (actionId: number, zIndex: number = -100): string => {
   return `<quad posn="-70 50 ${zIndex}" sizen="140 100" action="${actionId}"/>`
@@ -72,6 +47,6 @@ export {
   Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
   CONFIG, ICONS, BACKGROUNDS, IDS, RESULTCONFIG,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
-  constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText, getStaticPosition,
-  verticallyCenteredText, getIcon, getResultPosition, resultStaticHeader
+  constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText,
+  verticallyCenteredText, getIcon, resultStaticHeader
 }
