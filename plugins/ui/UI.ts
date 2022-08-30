@@ -102,7 +102,7 @@ let staticComponents: {
   readonly donationPanel: DonationPanel
   readonly bestCps: BestCps
   readonly bestFinishes: BestFinishes
-  //readonly cpCounter: CpCounter
+  readonly cpCounter: CpCounter
   readonly nextMapRecords: NextMapRecords
   readonly mapWidgetResult: MapWidgetResult
   readonly timerWidgetResult: TimerWidgetResult
@@ -167,7 +167,7 @@ const events: TMListener[] = [
         donationPanel: new DonationPanel(),
         bestCps: new BestCps(),
         bestFinishes: new BestFinishes(),
-        //cpCounter: new CpCounter(),
+        cpCounter: new CpCounter(),
         nextMapRecords: new NextMapRecords(),
         mapWidgetResult: new MapWidgetResult(),
         timerWidgetResult: new TimerWidgetResult(),
@@ -207,7 +207,7 @@ const events: TMListener[] = [
         checkpointRecords: new CheckpointRecords(),
         welcomeWindow: new WelcomeWindow(),
         changelog: new Changelog(),
-        TMXWindow: new TMXWindow()
+        TMXWindow: new TMXWindow(),
       }
       // const testWindow = new TestWindow()
       // setInterval(() => {
