@@ -1,57 +1,56 @@
-import { getResultPosition, RESULTCONFIG as CONFIG, IDS, resultStaticHeader, getIcon } from '../../UiUtils.js'
+import { IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
+import config from './AdminPanelResult.config.js'
 
 export default class AdminPanelResult extends StaticComponent {
 
-  private readonly width = CONFIG.static.width
-  private readonly height = CONFIG.admin.height
   private readonly positionX: number
   private readonly positionY: number
+  private readonly side: boolean
+  private readonly header: StaticHeader
   private xml: string = ''
 
   constructor() {
     super(IDS.adminResult, 'result')
-    const pos = getResultPosition('admin')
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
+    this.side = pos.side
+    this.header = new StaticHeader('result')
     this.constructXml()
-    tm.addListener('Controller.PrivilegeChanged', (info) => {
-      this.displayToPlayer(info.login)
-    })
+    tm.addListener('Controller.PrivilegeChanged', (info) => this.displayToPlayer(info.login))
   }
 
   display(): void {
+    if (this.isDisplayed === false) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
+    if (this.isDisplayed === false) { return }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
-    if (this.isDisplayed) {
-      if (privilege > 0) {
-        tm.sendManialink(this.xml, login)
-      }
+    if (privilege >= config.requiredPrivilege) {
+      tm.sendManialink(this.xml, login)
     }
   }
 
   private constructXml(): void {
-    const headerHeight: number = CONFIG.staticHeader.height
-    const margin: number = CONFIG.marginSmall
-    const icons: string[] = CONFIG.admin.icons
     let iconsXml: string = ''
-    const iconWidth: number = this.width / icons.length
-    for (const [i, e] of icons.entries()) {
+    const headerH = this.header.options.height
+    const iconWidth: number = config.width / config.icons.length
+    for (const [i, e] of config.icons.entries()) {
       iconsXml += `
-      <quad posn="${iconWidth * i} -${CONFIG.staticHeader.height + margin} 1" sizen="${iconWidth - margin} ${this.height - (headerHeight + margin)}" bgcolor="${CONFIG.static.bgColor}"/>
-      <quad posn="${iconWidth * i + margin} -${CONFIG.staticHeader.height + margin * 2} 2" sizen="${iconWidth - margin * 3} ${this.height - (headerHeight + margin * 3)}" image="${getIcon(e)}"/>`
+      <quad posn="${iconWidth * i} -${headerH + config.margin} 1" sizen="${iconWidth - config.margin} ${config.height - (headerH + config.margin)}" bgcolor="${config.background}"/>
+      <quad posn="${iconWidth * i + config.margin} -${headerH + config.margin * 2} 2" sizen="${iconWidth - config.margin * 3} ${config.height - (headerH + config.margin * 3)}" image="${e}"/>`
     }
     this.xml = `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 
-        ${resultStaticHeader(CONFIG.admin.title, getIcon(CONFIG.admin.icon), false)}
+        ${this.header.constructXml(config.title, config.icon, this.side)}
         ${iconsXml}
       </frame>
     </manialink>`

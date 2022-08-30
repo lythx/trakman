@@ -1,7 +1,7 @@
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { donations } from '../../../Donations.js'
-import { IDS, getStaticPosition, StaticHeader, centeredText } from '../../UiUtils.js'
+import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
 import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {
@@ -14,11 +14,11 @@ export default class DonationPanel extends StaticComponent {
 
   constructor() {
     super(IDS.liveCheckpoint, 'race')
-    const pos = getStaticPosition(this)
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + config.amounts.length) {

@@ -8,8 +8,8 @@ export default class BestCps extends StaticComponent {
   private readonly bestCps: { login: string, time: number, nickname: string }[] = []
   private readonly header: StaticHeader
   private readonly headerBg: string
-  private readonly headerHeight : number
-  private readonly contentHeight : number
+  private readonly headerHeight: number
+  private readonly contentHeight: number
   private readonly paginator: Paginator
   private newestCp: number = -1
   private cpAmount: number
@@ -17,7 +17,7 @@ export default class BestCps extends StaticComponent {
 
   constructor() {
     super(IDS.bestCps, 'race')
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
     this.contentHeight = config.height - (config.margin + this.headerHeight)

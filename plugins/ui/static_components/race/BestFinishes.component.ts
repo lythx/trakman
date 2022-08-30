@@ -8,14 +8,14 @@ export default class BestFinishes extends StaticComponent {
   private readonly bestFinishes: { login: string, time: number, nickname: string }[] = []
   private readonly header: StaticHeader
   private readonly headerBg: string
-  private readonly headerHeight : number
-  private readonly contentHeight : number
+  private readonly headerHeight: number
+  private readonly contentHeight: number
   private readonly grid: Grid
   private newestFinish: number = -1
 
   constructor() {
     super(IDS.bestFinishes, 'race')
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
     this.contentHeight = config.height - (config.margin + this.headerHeight)

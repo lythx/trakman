@@ -22,7 +22,7 @@ import AdminPanel from './static_components/race/AdminPanel.component.js'
 //import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/race/BestCps.component.js'
 import BestFinishes from './static_components/race/BestFinishes.component.js'
-//import CpCounter from './static_components/CpCounter.component.js'
+import CpCounter from './static_components/race/CpCounter.component.js'
 
 import MapWidgetResult from './static_components/result/MapWidgetResult.component.js'
 import NextMapRecords from './static_components/result/NextMapRecords.component.js'

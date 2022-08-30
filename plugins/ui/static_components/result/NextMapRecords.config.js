@@ -1,13 +1,18 @@
-import cfg from '../../config/RaceUi.js'
+import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  height: 15.07,
+  height: 12.92,
   width: cfg.width,
-  title: "Live Records",
+  title: "Next Map Records",
   icon: icons.chartLive,
   margin: cfg.margin,
-  entries: 6,
+  entries: 5,
+  columnProportions: [
+    1,
+    2.9,
+    4.1
+  ],
   topCount: 5,
   displayNoRecordEntry: true
 }

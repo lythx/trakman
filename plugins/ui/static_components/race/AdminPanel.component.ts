@@ -1,4 +1,4 @@
-import { getStaticPosition, IDS, StaticHeader} from '../../UiUtils.js'
+import { IDS, StaticHeader } from '../../UiUtils.js'
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanel.config.js'
@@ -13,11 +13,11 @@ export default class AdminPanel extends StaticComponent {
 
   constructor() {
     super(IDS.admin, 'race')
-    const pos = getStaticPosition(this) // TODO MAKE STATIC POSITION A CLASS METHOD
+    const pos = this.getRelativePosition() // TODO MAKE STATIC POSITION A CLASS METHOD
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
-    this.header = new StaticHeader()
+    this.header = new StaticHeader('race')
     this.constructXml()
     tm.addListener('Controller.PrivilegeChanged', (info) => {
       this.displayToPlayer(info.login)

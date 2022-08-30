@@ -1,4 +1,6 @@
 import { trakman as tm } from "../../src/Trakman.js"
+import RaceUi from "./config/RaceUi.js"
+import ResultUi from "./config/ResultUi.js"
 
 export default abstract class StaticComponent {
 
@@ -36,6 +38,25 @@ export default abstract class StaticComponent {
     if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {
       this._isDisplayed = false
     }
+  }
+
+  protected getRelativePosition(): { x: number, y: number, side: boolean } {
+    const widgetName = this.constructor.name
+    let cfg: typeof RaceUi | typeof ResultUi
+    if (this.displayMode === 'result') {
+      cfg = ResultUi
+    } else {
+      cfg = RaceUi
+    }
+    let side = false
+    if (cfg.rightSideOrder.some(a => a.name === widgetName)) { side = true }
+    const order: { name: string; height: number; }[] = side ? cfg.rightSideOrder : cfg.leftSideOrder
+    let positionSum: number = 0
+    for (const e of order) {
+      if (e.name === widgetName) { break }
+      positionSum += e.height + cfg.marginBig
+    }
+    return { y: cfg.topBorder - positionSum, x: side === true ? cfg.rightPosition : cfg.leftPosition, side }
   }
 
   get isDisplayed(): boolean {

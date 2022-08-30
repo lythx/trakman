@@ -1,6 +1,6 @@
 // import StaticComponent from '../StaticComponent.js'
 // import { trakman as tm } from '../../../src/Trakman.js'
-// import { IDS, CONFIG, getStaticPosition, staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
+// import { IDS, CONFIG,  staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 
  //export default class LiveCheckpoint extends StaticComponent {
 
@@ -43,7 +43,7 @@
 //     tm.sendManialink(`
 //     <manialink id="${this.id}">
 //       <frame posn="${this.positionX} ${this.positionY} 1">
-//         <quad posn="0 0 6" sizen="${this.width} ${this.height}" action="${IDS.currentCps}"/> 
+//         <quad posn="0 0 6" sizen="${this.width} ${this.height}" action="${IDS.currentCps}"/>
 //         <format textsize="1"/>
 //         ${staticHeader(this.title, iconUrl, this.side)}
 //         <frame posn="0 ${-(this.headerHeight + this.margin)} 1">
