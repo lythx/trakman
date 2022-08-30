@@ -1,7 +1,6 @@
 import { Grid, GridCellFunction, GridCellObject } from './Grid.js'
 import { centeredText, verticallyCenteredText } from './TextUtils.js'
-
-const margin = 0.15 // TODO config file
+import config from './List.config.js'
 
 export class List {
 
@@ -26,21 +25,22 @@ export class List {
 
     const index: GridCellObject = {
       callback: (i, j, w, h) =>
-        centeredText((col1[i] === undefined || col2[i] === undefined) ? '' : (i + 1).toString(), w, h, { textScale: 0.85 }),
+        centeredText((col1[i] === undefined || col2[i] === undefined) ? '' : (i + 1).toString(), w, h, { textScale:  config.textScale}),
       background: this.headerBg
     }
 
-    const col1Function: GridCellFunction = (i, j, w, h) => centeredText(col1[i] ?? '', w, h, { textScale: 0.85 })
+    const col1Function: GridCellFunction = (i, j, w, h) => centeredText(col1[i] ?? '', w, h, { textScale: config.textScale })
 
-    const col2Function: GridCellFunction = (i, j, w, h) => verticallyCenteredText(col2[i] ?? '', w, h, { textScale: 0.85 })
+    const col2Function: GridCellFunction = (i, j, w, h) => verticallyCenteredText(col2[i] ?? '', w, h, { textScale:  config.textScale })
 
     const arr: (GridCellFunction | GridCellObject)[] = []
     for (let i = 0; i < this.entries; i++) {
       arr.push(index, col1Function, col2Function)
     }
 
-    const grid = new Grid(this.width + margin * 2, this.height + margin * 2, this.columnProportions, new Array(this.entries).fill(1), { background: this.background, margin: margin })
-    return `<frame posn="${-margin} ${margin} 2">
+    const grid = new Grid(this.width + config.margin * 2, this.height + config.margin * 2, this.columnProportions, 
+      new Array(this.entries).fill(1), { background: this.background, margin: config.margin })
+    return `<frame posn="${-config.margin} ${config.margin} 2">
       ${grid.constructXml(arr)}
     </frame>`
   }

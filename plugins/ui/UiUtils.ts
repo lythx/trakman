@@ -1,16 +1,13 @@
 import Paginator from './utils/Paginator.js'
 import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
 import Navbar from './utils/Navbar.js'
-import DropdownMenu from './utils/DropdownMenu.js'
 import RecordList from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
 import CONFIG from './config/UIConfig.json' assert { type: 'json' }
-import RESULTCONFIG from './config/ResultUIConfig.json' assert { type: 'json' }
 import ICONS from './config/Icons.js'
 import BACKGROUNDS from './config/Backgrounds.json' assert { type: 'json' }
 import IDS from './config/ComponentIds.js'
 import { centeredText, horizontallyCenteredText, verticallyCenteredText, rightAlignedText } from './utils/TextUtils.js'
-import { staticHeader, resultStaticHeader } from './utils/StaticHeaderOld.js'
 import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { getIcon } from './utils/GetIcon.js'
@@ -44,9 +41,9 @@ const constuctButton = (iconUrl: string, text1: string, text2: string, width: nu
 }
 
 export {
-  Paginator, Grid, Navbar, DropdownMenu, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  CONFIG, ICONS, BACKGROUNDS, IDS, RESULTCONFIG,
+  Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
+  CONFIG, ICONS, BACKGROUNDS, IDS,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
-  constuctButton, stringToObjectProperty, fullScreenListener, staticHeader, centeredText,
-  verticallyCenteredText, getIcon, resultStaticHeader
+  constuctButton, stringToObjectProperty, fullScreenListener, centeredText,
+  verticallyCenteredText, getIcon
 }

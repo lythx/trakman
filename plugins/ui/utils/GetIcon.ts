@@ -8,3 +8,5 @@ export const getIcon = (iconName: string): string => {
     }
     return obj as any
 }
+
+// TODO DELETE

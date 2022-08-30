@@ -1,8 +1,6 @@
 import { trakman as tm } from '../../../src/Trakman.js'
-import ICONS from '../config/Icons.js'
+import config from './Paginator.config.js'
 import IDS from '../config/UtilIds.js'
-import { CONFIG } from '../UiUtils.js'
-
 
 const ID = IDS.Paginator
 
@@ -12,18 +10,15 @@ export default class Paginator {
   readonly parentId: number
   readonly loginPages: { readonly login: string, page: number }[] = []
   readonly defaultPage: number
-  readonly buttonW: number = CONFIG.paginator.buttonWidth
-  readonly buttonH: number = CONFIG.paginator.buttonHeight
-  readonly padding: number = CONFIG.paginator.padding
+  readonly buttonW = config.buttonWidth
+  readonly buttonH = config.buttonHeight
+  readonly padding = config.padding
+  readonly margin = config.margin
   readonly iconW: number = this.buttonW - this.padding * 2
   readonly iconH: number = this.buttonH - this.padding * 2
   readonly ids: number[] = []
   readonly width: number
   readonly height: number
-  readonly margin: number = CONFIG.paginator.margin
-  readonly emptyBg: string = CONFIG.paginator.background
-  readonly icons: string[]
-  readonly iconsHover: string[]
   private _onPageChange: (login: string, page: number) => void = () => undefined
   pageCount: number
   yPos: number
@@ -33,8 +28,6 @@ export default class Paginator {
   constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
     this.parentId = parentId
     this.width = parentWidth
-    this.icons = CONFIG.paginator.icons.map(a => this.stringToIcon(a))
-    this.iconsHover = CONFIG.paginator.icons.map(a => this.stringToIcon(a + 'Hover'))
     this.height = parentHeight
     this.pageCount = pageCount
     this.defaultPage = defaultPage
@@ -158,64 +151,55 @@ export default class Paginator {
     let xml: string = ''
     if (page !== 1) {
       xml += `<quad posn="${this.xPos[2]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.previous}" 
-        imagefocus="${this.iconsHover[2]}"
-        image="${this.icons[2]}"/>`
+        imagefocus="${config.iconsHover[2]}"
+        image="${config.icons[2]}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="${this.xPos[0]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
-            imagefocus="${this.iconsHover[0]}"
-            image="${this.icons[0]}"/>
+            imagefocus="${config.iconsHover[0]}"
+            image="${config.icons[0]}"/>
             <quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpBackwards}" 
-            imagefocus="${this.iconsHover[1]}"
-            image="${this.icons[1]}"/>`
+            imagefocus="${config.iconsHover[1]}"
+            image="${config.icons[1]}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
-        imagefocus="${this.iconsHover[0]}"
-        image="${this.icons[0]}"/>`
+        imagefocus="${config.iconsHover[0]}"
+        image="${config.icons[0]}"/>`
       }
     }
-    xml += `<quad posn="${this.xPos[2]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
+    xml += `<quad posn="${this.xPos[2]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     if (this.buttonCount > 1) {
-      xml += `<quad posn="${this.xPos[1]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
+      xml += `<quad posn="${this.xPos[1]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
     if (this.buttonCount > 2) {
-      xml += `<quad posn="${this.xPos[0]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
+      xml += `<quad posn="${this.xPos[0]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
     if (page !== this.pageCount) {
       xml += `<quad posn="${this.xPos[3]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.next}" 
-      imagefocus="${this.iconsHover[3]}"
-      image="${this.icons[3]}"/>`
+      imagefocus="${config.iconsHover[3]}"
+      image="${config.icons[3]}"/>`
       if (this.buttonCount > 2) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpForwards}" 
-          imagefocus="${this.iconsHover[4]}"
-          image="${this.icons[4]}"/>
+          imagefocus="${config.iconsHover[4]}"
+          image="${config.icons[4]}"/>
           <quad posn="${this.xPos[5]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${this.iconsHover[5]}"
-          image="${this.icons[5]}"/>`
+          imagefocus="${config.iconsHover[5]}"
+          image="${config.icons[5]}"/>`
       }
       else if (this.buttonCount > 1) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
-          imagefocus="${this.iconsHover[5]}"
-          image="${this.icons[5]}"/>`
+          imagefocus="${config.iconsHover[5]}"
+          image="${config.icons[5]}"/>`
       }
     }
-    xml += `<quad posn="${this.xPos[3]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
+    xml += `<quad posn="${this.xPos[3]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     if (this.buttonCount > 1) {
-      xml += `<quad posn="${this.xPos[4]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/>`
+      xml += `<quad posn="${this.xPos[4]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
     if (this.buttonCount > 2) {
-      xml += `<quad posn="${this.xPos[5]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${this.emptyBg}"/> `
+      xml += `<quad posn="${this.xPos[5]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/> `
     }
     return xml
-  }
-
-  private stringToIcon = (str: string): any => {
-    const split: string[] = str.split('.')
-    let obj = ICONS
-    for (const e of split) {
-      obj = (obj as any)[e]
-    }
-    return obj
   }
 
 }
