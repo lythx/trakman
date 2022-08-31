@@ -28,7 +28,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
       REFERENCES map_ids(id)
 );`]
 
-const DB = new tm.DatabaseClient()
+const DB = new tm.DatabaseClient() // TODO implement client
 
 DB.initialize()
 for (const e of createQueries) {
@@ -37,18 +37,20 @@ for (const e of createQueries) {
 
 export const allCpsDB = {
 
-  async get(mapDBId: number, ...playerLogins: string[]): Promise<{ checkpoints: (number | undefined)[], login: string }[] | Error> {
+  async get(mapDBId: number, ...playerLogins: string[]):
+    Promise<{ checkpoints: (number | undefined)[], login: string, nickname: string }[] | Error> {
     if (playerLogins.length === 0) { return [] }
     const playerDBIds = await tm.getPlayerDBId(playerLogins)
-    const query = `SELECT checkpoints, login FROM checkpoint_records
+    const query = `SELECT checkpoints, login, nickname FROM checkpoint_records
     JOIN players ON players.id=checkpoint_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
-    const res: { checkpoints: number[], login: string }[] | Error = (await DB.query(query, mapDBId, ...playerDBIds.map(a => a.id))).rows
+    const res: { checkpoints: number[], login: string, nickname: string }[] | Error =
+      (await DB.query(query, mapDBId, ...playerDBIds.map(a => a.id))).rows
     if (res instanceof Error) {
       tm.log.error(`Error when fetching checkpoints records of players ${playerDBIds} on map ${mapDBId}`, res.message)
       return []
     }
-    return res.map(a => ({ login: a.login, checkpoints: a.checkpoints.map(b => b === -1 ? undefined : b) }))
+    return res.map(a => ({ login: a.login, nickname: a.nickname, checkpoints: a.checkpoints.map(b => b === -1 ? undefined : b) }))
   },
 
   async add(mapId: number, login: string, checkpoints: number[]): Promise<void> {
@@ -67,7 +69,7 @@ export const allCpsDB = {
 
 }
 
-export const bestSecsDB = {
+export const bestCpsDB = {
 
   async get(mapId: string | number): Promise<{ checkpoint: number, date: Date, login: string, nickname: string }[] | Error> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
@@ -117,7 +119,7 @@ async function fetchMapCheckpoints(...mapId: string[]): Promise<BestCheckpoints[
 async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheckpoints | void | BestCheckpoints[]> {
   if (Array.isArray(mapIds)) {
     const str = mapIds.map((a, i) => `mapId=$${i} OR `).join('')
-    const res: BestCheckpoints[] | Error = await tm.db.query(`SELECT * FROM secrecs WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
+    const res: BestCheckpoints[] | Error = await tm.db.query(`SELECT * FROM best_checkpoint_records WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
     if (res instanceof Error) {
       tm.log.error(`Error when fetching checkpoint records for maps ${mapIds.join(',')}`, res.message)
       return
@@ -126,7 +128,7 @@ async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheck
     }
     return
   }
-  const res: BestCheckpoints[] | Error = await tm.db.query('SELECT * FROM secrecs WHERE mapId=$1;', [mapIds])
+  const res: BestCheckpoints[] | Error = await tm.db.query('SELECT * FROM best_checkpoint_records WHERE mapId=$1;', [mapIds])
   if (res instanceof Error) {
     tm.log.error(`Error when fetching checkpoint records for map ${mapIds}`, res.message)
     return

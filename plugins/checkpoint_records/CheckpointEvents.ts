@@ -1,13 +1,9 @@
 import { BestCheckpoints, PlayerCheckpoints, CheckpointEventFunctions as CheckpointEventFunctions } from './CheckpointTypes.js'
 
 const fetchListeners: ((mapCheckpoints: BestCheckpoints, playerCheckpoints: PlayerCheckpoints[]) => void)[] = []
-
 const bestDeleteListeners: ((bestCheckpoints: BestCheckpoints) => void)[] = []
-
 const bestCheckpointListeners: ((login: string, nickname: string, index: number, date: Date) => void)[] = []
-
 const playerCheckpointListeners: ((login: string, nickname: string, index: number) => void)[] = []
-
 const playerDeleteListeners: ((login: string) => void)[] = []
 
 const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callback: CheckpointEventFunctions[T]): void => {

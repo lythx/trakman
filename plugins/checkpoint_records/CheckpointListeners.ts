@@ -1,14 +1,12 @@
 import { trakman as tm } from '../../src/Trakman.js'
 import { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
-import { bestSecsDB, allCpsDB } from './CheckpointDB.js'
+import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
 import config from './Config.js'
 
-let currentBestSecs: BestCheckpoints
-
+let currentBestCps: BestCheckpoints
 let currentMapDBId: number
-
-const currentPlayerSecs: PlayerCheckpoints[] = []
+const currentPlayerCps: PlayerCheckpoints[] = []
 
 const onMapStart = async (): Promise<void> => {
   const DBId = await tm.db.getMapId(tm.maps.current.id)
@@ -17,20 +15,20 @@ const onMapStart = async (): Promise<void> => {
     return
   }
   currentMapDBId = DBId
-  const res = await bestSecsDB.get(currentMapDBId)
+  const res = await bestCpsDB.get(currentMapDBId)
   if (res instanceof Error) {
     await tm.log.fatal(`Failed to fetch best checkpoints for map ${tm.maps.current.id}`, res.message)
     return
   }
-  currentBestSecs = res
-  const playerSecs = await allCpsDB.get(currentMapDBId, ...tm.players.list.map(a => a.login))
-  if (playerSecs instanceof Error) {
-    await tm.log.fatal(`Failed to fetch player checkpoints for map ${tm.maps.current.id}`, playerSecs.message)
+  currentBestCps = res
+  const playerCps = await allCpsDB.get(currentMapDBId, ...tm.players.list.map(a => a.login))
+  if (playerCps instanceof Error) {
+    await tm.log.fatal(`Failed to fetch player checkpoints for map ${tm.maps.current.id}`, playerCps.message)
     return
   }
-  currentPlayerSecs.length = 0
-  currentPlayerSecs.push(...playerSecs)
-  emitEvent('CheckpointsFetch', currentBestSecs)
+  currentPlayerCps.length = 0
+  currentPlayerCps.push(...playerCps)
+  emitEvent('CheckpointsFetch', currentBestCps)
 }
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
@@ -43,9 +41,9 @@ tm.addListener('Controller.BeginMap', async (): Promise<void> => {
 
 tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
   const date = new Date()
-  const playerCheckpoints = currentPlayerSecs.find(a => a.login === info.player.login)
+  const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)
   if (playerCheckpoints === undefined) {
-    currentPlayerSecs.push({ login: info.player.login, checkpoints: [info.time] })
+    currentPlayerCps.push({ login: info.player.login, nickname: info.player.nickname, checkpoints: [info.time] })
     void allCpsDB.add(currentMapDBId, info.player.login, [info.time])
     emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
   } else if ((playerCheckpoints.checkpoints[info.index] ?? Infinity) > info.time) {
@@ -53,27 +51,27 @@ tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
     void allCpsDB.update(currentMapDBId, info.player.login, playerCheckpoints.checkpoints.map(a => a === undefined ? -1 : a))
     emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
   }
-  const cp = currentBestSecs[info.index]?.checkpoint
+  const cp = currentBestCps[info.index]?.checkpoint
   if (cp === undefined || cp > info.time) {
-    currentBestSecs[info.index] = {
+    currentBestCps[info.index] = {
       login: info.player.login,
       nickname: info.player.nickname,
       checkpoint: info.time,
       date: date
     }
-    cp === undefined ? void bestSecsDB.add(currentMapDBId, info.player.login, info.index, info.time, date)
-      : void bestSecsDB.update(currentMapDBId, info.player.login, info.index, info.time, date)
+    cp === undefined ? void bestCpsDB.add(currentMapDBId, info.player.login, info.index, info.time, date)
+      : void bestCpsDB.update(currentMapDBId, info.player.login, info.index, info.time, date)
     emitEvent('BestCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index, date })
   }
 })
 
 tm.addListener('Controller.PlayerJoin', async (info) => {
-  const playerSecs = await allCpsDB.get(currentMapDBId, info.login)
-  if (playerSecs instanceof Error) {
-    await tm.log.fatal(`Failed to fetch player ${info.login} sectors for map ${tm.maps.current.id}`, playerSecs.message)
+  const playerCps = await allCpsDB.get(currentMapDBId, info.login)
+  if (playerCps instanceof Error) {
+    await tm.log.fatal(`Failed to fetch player ${info.login} checkpoint records for map ${tm.maps.current.id}`, playerCps.message)
     return
   }
-  currentPlayerSecs.push(...playerSecs)
+  currentPlayerCps.push(...playerCps)
 })
 
 tm.commands.add({
@@ -81,25 +79,25 @@ tm.commands.add({
   help: 'Delete personal cp records or one cp on the current map. Index is 1 based',
   params: [{ name: 'cpIndex', type: 'int', optional: true }],
   callback(info, cpIndex?: number) {
-    const secs = currentPlayerSecs.find(a => a.login === info.login)
-    if (secs === undefined) {
+    const cps = currentPlayerCps.find(a => a.login === info.login)
+    if (cps === undefined) {
       tm.sendMessage(config.noCpRecords, info.login)
       return
     }
     if (cpIndex === undefined) {
-      secs.checkpoints.length = 0
+      cps.checkpoints.length = 0
       tm.sendMessage(config.allPlayerCpsRemoved, info.login)
-      void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
+      void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
         tm.sendMessage(config.outOfRange, info.login)
         return
       }
-      secs.checkpoints[cpIndex - 1] = undefined
+      cps.checkpoints[cpIndex - 1] = undefined
       tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
-      void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
+      void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
     }
-    emitEvent('DeletePlayerCheckpoint', info.login)
+    emitEvent('DeletePlayerCheckpoint', info)
   },
   privilege: 0
 })
@@ -110,30 +108,30 @@ tm.commands.add({
   params: [{ name: 'cpIndex', type: 'int', optional: true }],
   callback(info, cpIndex?: number) {
     if (cpIndex === undefined) {
-      currentBestSecs.length = 0
+      currentBestCps.length = 0
       tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved, { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
-      void bestSecsDB.delete(currentMapDBId)
+      void bestCpsDB.delete(currentMapDBId)
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
         tm.sendMessage(config.outOfRange, info.login)
         return
       }
-      currentBestSecs[cpIndex - 1] = undefined
+      currentBestCps[cpIndex - 1] = undefined
       tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
         title: tm.utils.getTitle(info),
         nickname: tm.utils.strip(info.nickname, true),
         index: tm.utils.getPositionString(cpIndex)
       }))
-      void bestSecsDB.delete(currentMapDBId, cpIndex - 1)
+      void bestCpsDB.delete(currentMapDBId, cpIndex - 1)
     }
-    emitEvent('DeleteBestCheckpoint', currentBestSecs)
+    emitEvent('DeleteBestCheckpoint', currentBestCps)
   },
   privilege: 2
 })
 
 const getMapCheckpoints = (): ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] => {
   const arr: ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] = new Array(tm.maps.current.checkpointsAmount - 1).fill(null)
-  for (const [i, e] of currentBestSecs.entries()) {
+  for (const [i, e] of currentBestCps.entries()) {
     arr[i] = e ?? null
   }
   return arr
@@ -144,7 +142,7 @@ const getPlayerCheckpoints = (): ({ login: string, checkpoints: (number | null)[
   for (const [i, e] of tm.players.list.entries()) {
     arr[i] = {
       login: e.login,
-      checkpoints: new Array(tm.maps.current.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.checkpoints[i] ?? null)
+      checkpoints: new Array(tm.maps.current.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerCps.find(a => a.login === e.login)?.checkpoints[i] ?? null)
     }
   }
   return arr
