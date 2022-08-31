@@ -1,25 +1,15 @@
-import { Logger } from '../src/Logger.js'
-import { ServerConfig } from '../src/ServerConfig.js'
-import 'dotenv/config'
+import { Logger } from '../../src/Logger.js'
+import { ServerConfig } from '../../src/ServerConfig.js'
 import http, { ClientRequest } from 'http'
+import config from './Config.js'
 
 export class Freezone {
 
-  // Manialive hash, static value that never changes
-  private static readonly manialiveHash: string = '6f116833b419fe7cb9c912fdaefb774845f60e79'
-  // Last Manialive (for TMF at least) version release
-  private static readonly manialiveVersion: number = 239
-  // Freezone WS password, received on 'freezone:servers' manialink in-game
-  private static freezonePassword: string
-  // Freezone Manialive URL (aka Trackmania Webservices)
-  private static readonly manialiveUrl: string = 'ws.trackmania.com'
-
   static async initialize(): Promise<true | Error> {
-    if (process.env.FREEZONE_PASSWORD === undefined) {
-      Logger.fatal('FREEZONE_PASSWORD is not defined')
-      return new Error()
-    }
-    this.freezonePassword = process.env.FREEZONE_PASSWORD
+    // if (process.env.FREEZONE_PASSWORD === undefined) { TODO delete if pw not in env
+    //   Logger.fatal('FREEZONE_PASSWORD is not defined')
+    //   return new Error()
+    // }
     const status: true | Error = await this.sendLive()
     if (status instanceof Error) {
       Logger.fatal(`Couldn't connect to ManiaLive`)
@@ -32,7 +22,7 @@ export class Freezone {
 
   static async sendLive(): Promise<true | Error> {
     // Request URL
-    const url: string = this.manialiveUrl
+    const url: string = config.manialiveUrl
     const cfg: ServerInfo = ServerConfig.config
     // Data object in any because TS coping language
     const data = {
@@ -40,11 +30,11 @@ export class Freezone {
       // Remove the if below for shorthand here?
       serverName: cfg.name,
       serverVersion: [cfg.game, cfg.version, cfg.build].join(),
-      manialiveVersion: this.manialiveVersion,
+      manialiveVersion: config.manialiveVersion,
       // Check if > 40 and set to 40 in that case
       maxPlayers: cfg.currentMaxPlayers,
       visibility: cfg.password.length === 0 ? 1 : 0, // Maybe reversed statement
-      classHash: this.manialiveHash
+      classHash: config.manialiveHash
     }
     // Append freezone to the server name if it isn't there already
     if (!cfg.name.toLowerCase().includes('freezone')) {
@@ -52,7 +42,7 @@ export class Freezone {
       data.serverName = ('Freezone|' + data.serverName).substring(0, 80)
     }
     // Get authentication string
-    const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${this.freezonePassword}`).toString('base64')
+    const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${config.freezonePassword}`).toString('base64')
     const options = {
       host: url,
       path: `/freezone/live/`,

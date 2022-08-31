@@ -1,6 +1,7 @@
-import { trakman as tm } from "../src/Trakman.js"
-import { addKeyListener } from "./ui/utils/KeyListener.js"
-import IDS from './ui/config/UtilIds.js'
+import { trakman as tm } from "../../src/Trakman.js"
+import { addKeyListener } from "../ui/utils/KeyListener.js"
+import IDS from '../ui/config/UtilIds.js'
+import config from './Config.js'
 
 export class Vote {
 
@@ -16,14 +17,14 @@ export class Vote {
   static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onInterrupt: ((info: {
-    caller?:TMPlayer;
+    caller?: TMPlayer;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onInterrupt: ((info: {
-    caller?:TMPlayer;
+    caller?: TMPlayer;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
@@ -43,8 +44,13 @@ export class Vote {
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
       tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
-      addKeyListener('F5', (info): void => Vote.listener({ ...info, answer: this.yesId }), 1, 'voteYes')
-      addKeyListener('F6', (info): void => Vote.listener({ ...info, answer: this.noId }), 1, 'voteNo')
+      if (!['F5', 'F6', 'F7'].includes(config.yesKey)) {
+        throw new Error(`Vote yesKey needs to be either F5, F6 or F7, received${config.yesKey}. Fix your vote config`)
+      } else if (!['F5', 'F6', 'F7'].includes(config.noKey)) {
+        throw new Error(`Vote noKey needs to be either F5, F6 or F7, received${config.noKey}. Fix your vote config`)
+      }
+      addKeyListener(config.yesKey as any, (info): void => Vote.listener({ ...info, answer: this.yesId }), config.keyListenerImportance, 'voteYes')
+      addKeyListener(config.noKey as any, (info): void => Vote.listener({ ...info, answer: this.noId }), config.keyListenerImportance, 'voteNo')
       tm.commands.add({
         aliases: ['y', 'yes'],
         callback: (info): void => tm.openManialink(this.yesId, info.login),
@@ -62,9 +68,9 @@ export class Vote {
 
   /**
    * @param eligibleLogins list of logins of players that can vote
-   * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
+   * @returns false if there is another vote running, true if vote gets started successfully
    */
-  start(eligibleLogins: string[]): true | false {
+  start(eligibleLogins: string[]): boolean {
     if (Vote.isDisplayed === true) { return false }
     Vote.onUpdate = this.onUpdate
     Vote.onEnd = this.onEnd
@@ -124,12 +130,12 @@ export class Vote {
     return (yesVotes / allVotes) > this.goal
   }
 
-  pass( caller?: TMPlayer): void {
+  pass(caller?: TMPlayer): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: true }
   }
 
-  cancel( caller?: TMPlayer): void {
+  cancel(caller?: TMPlayer): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: false }
   }
