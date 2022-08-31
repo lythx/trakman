@@ -313,7 +313,7 @@ export const dedimania = {
    * Adds a callback function to execute on a dedimania record
    * @param callback Function to execute on event. It takes new record object as a parameter
    */
-  onRecord(callback: ((record: NewDediRecord) => void)) {
+  onRecord(callback: ((record: NewDediRecord) => void)): void {
     recordListeners.push(callback)
   },
 
@@ -321,7 +321,7 @@ export const dedimania = {
    * Adds a callback function to execute when dedimania records get fetched
    * @param callback Function to execute on event. It takes record objects array as a parameter
    */
-  onFetch(callback: ((dedis: DediRecord[]) => void)) {
+  onFetch(callback: ((dedis: DediRecord[]) => void)): void {
     fetchListeners.push(callback)
   },
 

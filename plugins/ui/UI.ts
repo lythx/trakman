@@ -62,28 +62,33 @@ import DonationPanel from './static_components/race/DonationPanel.component.js'
 import PlayerList from './dynamic_components/PlayerList.component.js'
 import BanList from './dynamic_components/BanList.component.js'
 import BlackListList from './dynamic_components/BlacklistList.component.js'
-import TestWindow from './test_widgets/TestWindow.js'
-import PopupWindow from './PopupWindow.js'
 import GuestListList from './dynamic_components/GuestlistList.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
+import modConfig from './config/Mod.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
+  const mods: {
+    struct: {
+      Env: { string: string },
+      Url: { string: string }
+    }
+  }[] = modConfig.map(a => ({
+    struct: {
+      Env: { string: a.environment },
+      Url: { string: a.modUrl }
+    }
+  }))
   tm.client.callNoRes('SetForcedMods',
     [{
       boolean: true
     },
     {
-      array: [{
-        struct: {
-          Env: { string: 'Stadium' },
-          Url: { string: 'https://cdn.discordapp.com/attachments/599381118633902080/1001923942249934990/TrakmanDefaultNoGanyu.zip' }
-        }
-      }]
+      array: mods
     }])
 }
 
@@ -187,7 +192,7 @@ const events: TMListener[] = [
         mostRecordsRanking: new MostRecordsRanking()
       }
       for (const c of Object.values(staticComponents)) {
-        if (c.displayMode === status || c.displayMode === 'always') { await c.display() }
+        if (c.displayMode === status || c.displayMode === 'always') { c.display() }
       }
       dynamicComponents = {
         mapList: new MapList(),
@@ -218,127 +223,18 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.PlayerJoin',
-    callback: async (info: JoinInfo) => {
-      customUi.displayToPlayer(info.login)
-      // TODO: Fetch the connecting player info //its all in the passed object
-
-      // TODO: Fetch player records on the current challenge
-      // TODO: Display all the widgets for the new player
-      // Preferably with an indicator if they have a record
-    }
-  },
-  {
-    event: 'Controller.PlayerLeave',
-    callback: async (playerInfo: LeaveInfo) => {
-      // TODO: Update the widgets to no more indicate the disconnectee's presence
-      // That is, if they had any records
-
-      // TODO: Update miscellaneous widgets:
-      // Ranking, players/specs...
-    }
-  },
-  {
-    event: 'Controller.PlayerFinish',
-    callback: async (info: FinishInfo) => {
-      // TODO: Update cpcounter to indicate finish
-    }
-  },
-  {
-    event: 'Controller.PlayerInfoChanged',
-    callback: async (info: InfoChangedInfo) => {
-      // TODO: Remove cpcounter if player switched to specmode
-      // PlayerInfo['SpectatorStatus'] % 10 !== 0
-
-      // TODO: Update miscellaneous widgets:
-      // Ranking, players/specs...
-    }
-  },
-  {
-    event: 'Controller.ManialinkClick',
-    callback: async (info: ManialinkClickInfo) => {
-      // This will basically handle every widget click
-      // If I were to write every TODO I'd kill myself, so..
-      // TODO: Everything about players <-> widgets interaction
-    }
-  },
-  {
-    event: 'Controller.PlayerDediRecord', // Not a thing yet
-    callback: async (params: any[]) => { // Should return TMRecord (TMDedi?)
-      // TODO: Update the Dedimania widget
-    }
-  },
-  {
-    event: 'Controller.PlayerRecord',
-    callback: async (info: RecordInfo) => {
-      // for (const player of tm.players.list) {
-      //     tm.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
-      // }
-    }
-  },
-  {
-    event: 'TrackMania.ChallengeListModified', // Need a Controller event for better handling 
-    callback: async (params: any[]) => {
-      // TODO: Re-fetch the next challenge info 
-      // calling next challenge info should probably be done in challenge service tho
-      // maybe we should always fetch next 5 maps and keep last 5 or somethign idk
-      // TODO: Update miscellaneous widgets:
-      // Trackcount...
-    }
-  },
-  {
-    event: 'Controller.PlayerCheckpoint',
-    callback: async (info: CheckpointInfo) => {
-      // TODO: Update cpcounter to indicate current cp
-    }
-  },
-  {
-    event: 'TrackMania.EndChallenge', // Need a Controller event for better handling
-    callback: async (params: any[]) => {
-      // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-
-      // This can be improved after queue/jukebox, as we can get next challenge from there also
-      // const info = await tm.client.call('GetNextChallengeInfo')
-      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIScore.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
-
-      // TODO: Display all the podium/score widgets
-    }
-  },
-  {
     event: 'Controller.BeginMap',
-    callback: async (info: BeginMapInfo) => {
-      customUi.display()
+    callback: async () => {
       loadMod()
-      // Using a function instead of SendCloseManialinkPage because we only want to close stuff that belongs to this plugin
-      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.closeManialinks(false) }, { int: 0 }, { boolean: false }])
-      // console.log(tm.challengeQueue)
-      // console.log(tm.previousChallenges)
-      // TODO: Fetch the next challenge info
-      // Temporarily moved to EndChallenge
-      // We'd need to store the nextchallenge in a variable
-      // This is easier achievable with queue/jukebox
-
-      // TODO: Display current challenge widget
-      //tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIRace.buildChallengeWidget(info) }, { int: 0 }, { boolean: false }])
-
-      // TODO: Display current challenge record widgets
-      // for (const player of tm.players.list) {
-      //     tm.client.callNoRes('SendDisplayManialinkPageToLogin', [{ string: player.login }, { string: UIRace.buildLocalRecordsWidget(player) }, { int: 0 }, { boolean: false }])
-      // }
-
-      // // testing only
-      // tm.client.callNoRes('SendDisplayManialinkPage', [{ string: UIGeneral.buildTempWindows() }, { int: 0 }, { boolean: false }])
-
-      // TODO: Display the miscellaneous widgets:
-      // Clock, addfav, cpcounter, gamemode, visitors,
-      // TMX info, trackcount, ranking, players/specs..
     }
   },
 ]
 
 for (const event of events) { tm.addListener(event.event, event.callback) }
 
-export const UI = {
+// TODO comments
+
+export const ui = {
 
   get staticComponents() {
     return staticComponents
