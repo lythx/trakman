@@ -2,6 +2,8 @@ import config from './Config.js'
 import { trakman as tm } from '../../src/Trakman.js'
 import { TMXMapChangedInfo } from './TmxTypes.js'
 
+// TODO comments
+
 // fill with empty strings at start to avoid undefined error on startup
 const history: (TMXMapInfo | string)[] = []
 let current: TMXMapInfo | string = ''

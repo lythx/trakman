@@ -1,4 +1,5 @@
-import { trakman as tm } from '../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
+import config from './Config.js'
 
 interface DonationInfo {
   readonly login: string
@@ -90,12 +91,14 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
   const date: Date = new Date()
   if (status instanceof Error) {
     tm.log.error(`Failed to receive ${amount} coppers donation from player ${payerLogin}`, status.message)
-    tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`, payerLogin)
+    tm.sendMessage(config.paymentFail, payerLogin)
     return status
   } else if (status === true) {
     void addToDB(payerLogin, amount, date)
-    tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(payerNickname)}${tm.utils.palette.donation} `
-      + `donated ${tm.utils.palette.highlight}${amount}C${tm.utils.palette.donation} to the server.`)
+    tm.sendMessage(tm.utils.strVar(config.paymentSuccess, {
+      nickname: tm.utils.strip(payerNickname),
+      amount
+    }))
     const info = onlineDonators.find(a => a.login === payerLogin)
     if (info === undefined) { return true }
     info.history.push({ amount, date })

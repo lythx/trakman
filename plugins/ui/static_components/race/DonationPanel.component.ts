@@ -1,6 +1,6 @@
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
-import { donations } from '../../../Donations.js'
+import { donations } from '../../../donations/Donations.js'
 import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
 import config from './DonationPanel.config.js'
 
