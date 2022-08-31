@@ -1,5 +1,5 @@
 import { trakman as tm } from '../../src/Trakman.js'
-import { donations } from '../Donations.js'
+import { donations } from '../donations/Donations.js'
 import config from './Config.js'
 
 const listeners: ((updatedLogin: string, list: { login: string, nickname: string, amount: number }[]) => void)[] = []
