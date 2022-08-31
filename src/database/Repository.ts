@@ -5,7 +5,6 @@ export abstract class Repository {
   private db: Database = new Database()
 
   async initialize(createQuery: string): Promise<void> {
-    await this.db.initialize()
     await this.query(createQuery)
   }
 

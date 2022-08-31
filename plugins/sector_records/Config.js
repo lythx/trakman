@@ -1,6 +1,10 @@
 import { palette as p } from "../../config/Prefixes.js"
 
 export default {
+  isEnabled: true,
+  // Using DB client makes the plugin a bit faster due to high amount of database queries
+  // Program can run only few clients tho // TODO exact number
+  useDBClient: true, 
   noSectorRecords: `${p.error}You have no sector records on the ongoing map.`,
   allPlayerSectorsRemoved: `${p.servermsg}Your sectors on the ongoing map were removed.`,
   outOfRange: `${p.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`,

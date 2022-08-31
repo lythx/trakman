@@ -31,133 +31,137 @@ const onMapStart = async (): Promise<void> => {
   emitEvent('SectorsFetch', currentBestSecs, currentPlayerSecs)
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
-  await onMapStart()
-}, true)
+if (config.isEnabled === true) {
 
-tm.addListener('Controller.BeginMap', async (): Promise<void> => {
-  await onMapStart()
-}, true)
+  tm.addListener('Controller.Ready', async (): Promise<void> => {
+    await onMapStart()
+  }, true)
 
-tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
-  const date = new Date()
-  const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
-  const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
-  if (playerSectors === undefined) {
-    currentPlayerSecs.push({ login: info.player.login, sectors: [time] })
-    void allSecsDB.add(currentMapDBId, info.player.login, [time])
-    emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
-  } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
-    playerSectors.sectors[info.index] = time
-    void allSecsDB.update(currentMapDBId, info.player.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
-    emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
-  }
-  const sector = currentBestSecs[info.index]?.sector
-  if (sector === undefined || sector > time) {
-    currentBestSecs[info.index] = {
-      login: info.player.login,
-      nickname: info.player.nickname,
-      sector: time,
-      date: date
+  tm.addListener('Controller.BeginMap', async (): Promise<void> => {
+    await onMapStart()
+  }, true)
+
+  tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+    const date = new Date()
+    const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
+    const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
+    if (playerSectors === undefined) {
+      currentPlayerSecs.push({ login: info.player.login, sectors: [time] })
+      void allSecsDB.add(currentMapDBId, info.player.login, [time])
+      emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
+    } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
+      playerSectors.sectors[info.index] = time
+      void allSecsDB.update(currentMapDBId, info.player.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
+      emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
     }
-    sector === undefined ? void bestSecsDB.add(currentMapDBId, info.player.login, info.index, time, date)
-      : void bestSecsDB.update(currentMapDBId, info.player.login, info.index, time, date)
-    emitEvent('BestSector', info.player.login, info.player.nickname, info.index, date)
-  }
-})
-
-tm.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
-  const date = new Date()
-  const index = info.checkpoints.length
-  const playerSectors = currentPlayerSecs.find(a => a.login === info.login)
-  const time = info.time - (info.checkpoints[index - 1] ?? 0)
-  if (playerSectors === undefined) {
-    currentPlayerSecs.push({ login: info.login, sectors: [time] })
-    void allSecsDB.add(currentMapDBId, info.login, [time])
-    emitEvent('PlayerSector', info.login, info.nickname, index)
-  } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
-    playerSectors.sectors[index] = time
-    void allSecsDB.update(currentMapDBId, info.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
-    emitEvent('PlayerSector', info.login, info.nickname, index)
-  }
-  const sector = currentBestSecs[index]?.sector
-  if (sector === undefined || sector > time) {
-    currentBestSecs[index] = {
-      login: info.login,
-      nickname: info.nickname,
-      sector: time,
-      date: date
+    const sector = currentBestSecs[info.index]?.sector
+    if (sector === undefined || sector > time) {
+      currentBestSecs[info.index] = {
+        login: info.player.login,
+        nickname: info.player.nickname,
+        sector: time,
+        date: date
+      }
+      sector === undefined ? void bestSecsDB.add(currentMapDBId, info.player.login, info.index, time, date)
+        : void bestSecsDB.update(currentMapDBId, info.player.login, info.index, time, date)
+      emitEvent('BestSector', info.player.login, info.player.nickname, info.index, date)
     }
-    sector === undefined ? void bestSecsDB.add(currentMapDBId, info.login, index, time, date)
-      : void bestSecsDB.update(currentMapDBId, info.login, index, time, date)
-    emitEvent('BestSector', info.login, info.nickname, index, date)
-  }
-})
+  })
 
-tm.addListener('Controller.PlayerJoin', async (info) => {
-  const playerSecs = await allSecsDB.get(currentMapDBId, info.login)
-  if (playerSecs instanceof Error) {
-    await tm.log.fatal(`Failed to fetch player ${info.login} sectors for map ${tm.maps.current.id}`, playerSecs.message)
-    return
-  }
-  currentPlayerSecs.push(...playerSecs)
-})
+  tm.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+    const date = new Date()
+    const index = info.checkpoints.length
+    const playerSectors = currentPlayerSecs.find(a => a.login === info.login)
+    const time = info.time - (info.checkpoints[index - 1] ?? 0)
+    if (playerSectors === undefined) {
+      currentPlayerSecs.push({ login: info.login, sectors: [time] })
+      void allSecsDB.add(currentMapDBId, info.login, [time])
+      emitEvent('PlayerSector', info.login, info.nickname, index)
+    } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
+      playerSectors.sectors[index] = time
+      void allSecsDB.update(currentMapDBId, info.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
+      emitEvent('PlayerSector', info.login, info.nickname, index)
+    }
+    const sector = currentBestSecs[index]?.sector
+    if (sector === undefined || sector > time) {
+      currentBestSecs[index] = {
+        login: info.login,
+        nickname: info.nickname,
+        sector: time,
+        date: date
+      }
+      sector === undefined ? void bestSecsDB.add(currentMapDBId, info.login, index, time, date)
+        : void bestSecsDB.update(currentMapDBId, info.login, index, time, date)
+      emitEvent('BestSector', info.login, info.nickname, index, date)
+    }
+  })
 
-tm.commands.add({
-  aliases: ['delmysec', 'deletemysector'],
-  help: 'Delete player personal sectors or one sector on the current map. Index is 1 based.',
-  params: [{ name: 'sectorIndex', type: 'int', optional: true }],
-  callback(info, sectorIndex?: number) {
-    const secs = currentPlayerSecs.find(a => a.login === info.login)
-    if (secs === undefined) {
-      tm.sendMessage(config.noSectorRecords, info.login)
+  tm.addListener('Controller.PlayerJoin', async (info) => {
+    const playerSecs = await allSecsDB.get(currentMapDBId, info.login)
+    if (playerSecs instanceof Error) {
+      await tm.log.fatal(`Failed to fetch player ${info.login} sectors for map ${tm.maps.current.id}`, playerSecs.message)
       return
     }
-    if (sectorIndex === undefined) {
-      secs.sectors.length = 0
-      tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
-      void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
-    } else {
-      if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
-        tm.sendMessage(config.outOfRange, info.login)
-        return
-      }
-      secs.sectors[sectorIndex - 1] = undefined
-      tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
-      void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
-    }
-    emitEvent('DeletePlayerSector', info.login)
-  },
-  privilege: 0
-})
+    currentPlayerSecs.push(...playerSecs)
+  })
 
-tm.commands.add({
-  aliases: ['delsec', 'deletesector'],
-  help: 'Delete all sector records or one sector record on current map. Index is 1 based.',
-  params: [{ name: 'sectorIndex', type: 'int', optional: true }],
-  callback(info, sectorIndex?: number) {
-    if (sectorIndex === undefined) {
-      currentBestSecs.length = 0
-      tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
-        { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
-      void bestSecsDB.delete(currentMapDBId)
-    } else {
-      if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
-        tm.sendMessage(config.outOfRange, info.login)
+  tm.commands.add({
+    aliases: ['delmysec', 'deletemysector'],
+    help: 'Delete player personal sectors or one sector on the current map. Index is 1 based.',
+    params: [{ name: 'sectorIndex', type: 'int', optional: true }],
+    callback(info, sectorIndex?: number) {
+      const secs = currentPlayerSecs.find(a => a.login === info.login)
+      if (secs === undefined) {
+        tm.sendMessage(config.noSectorRecords, info.login)
         return
       }
-      currentBestSecs[sectorIndex - 1] = undefined
-      tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
-        title: tm.utils.getTitle(info),
-        nickname: tm.utils.strip(info.nickname, true),
-        index: tm.utils.getPositionString(sectorIndex)
-      }))
-      void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
-    }
-    emitEvent('DeleteBestSector', currentBestSecs, currentPlayerSecs)
-  },
-  privilege: 2
-})
+      if (sectorIndex === undefined) {
+        secs.sectors.length = 0
+        tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
+        void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
+      } else {
+        if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
+          tm.sendMessage(config.outOfRange, info.login)
+          return
+        }
+        secs.sectors[sectorIndex - 1] = undefined
+        tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
+        void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
+      }
+      emitEvent('DeletePlayerSector', info.login)
+    },
+    privilege: 0
+  })
+
+  tm.commands.add({
+    aliases: ['delsec', 'deletesector'],
+    help: 'Delete all sector records or one sector record on current map. Index is 1 based.',
+    params: [{ name: 'sectorIndex', type: 'int', optional: true }],
+    callback(info, sectorIndex?: number) {
+      if (sectorIndex === undefined) {
+        currentBestSecs.length = 0
+        tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
+          { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+        void bestSecsDB.delete(currentMapDBId)
+      } else {
+        if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
+          tm.sendMessage(config.outOfRange, info.login)
+          return
+        }
+        currentBestSecs[sectorIndex - 1] = undefined
+        tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
+          title: tm.utils.getTitle(info),
+          nickname: tm.utils.strip(info.nickname, true),
+          index: tm.utils.getPositionString(sectorIndex)
+        }))
+        void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
+      }
+      emitEvent('DeleteBestSector', currentBestSecs, currentPlayerSecs)
+    },
+    privilege: 2
+  })
+
+}
 
 const getMapSectors = (): ({ login: string, nickname: string, sector: number, date: Date } | null)[] => {
   const arr: ({ login: string, nickname: string, sector: number, date: Date } | null)[] = new Array(tm.maps.current.checkpointsAmount).fill(null)
