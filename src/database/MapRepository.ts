@@ -228,7 +228,9 @@ export class MapRepository extends Repository {
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,
-      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100
+      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100,
+      isClassic: entry.leaderboard_rating === 0,
+      isNadeo: entry.leaderboard_rating === 50000
     }
   }
 

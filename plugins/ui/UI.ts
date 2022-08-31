@@ -69,6 +69,7 @@ import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
+import TestWindow from './test_widgets/TestWindow.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -214,12 +215,7 @@ const events: TMListener[] = [
         changelog: new Changelog(),
         TMXWindow: new TMXWindow(),
       }
-      // const testWindow = new TestWindow()
-      // setInterval(() => {
-      //   testWindow.displayToPlayer('ciekma_czakwal')
-      //   testWindow.displayToPlayer('creamsoda')
-      //   testWindow.displayToPlayer('wiksonek10')
-      // }, 1000)
+      new TestWindow()
     }
   },
   {
