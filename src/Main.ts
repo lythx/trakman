@@ -14,7 +14,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { TMXService } from './TMXService.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
-import { Freezone } from '../plugins/Freezone.js'
+import { Freezone } from '../plugins/freezone/Freezone.js'
 import { fixCoherence } from './FixRankCoherence.js'
 
 async function main(): Promise<void> {

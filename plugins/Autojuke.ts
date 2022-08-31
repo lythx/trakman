@@ -1,5 +1,7 @@
 import { trakman as tm } from "../src/Trakman.js";
 
+// TODO MAKE IT USE MAPLIST AFTER FINISHING MAPLIST
+
 tm.commands.add({
   aliases: ['aj', 'autojuke'],
   help: 'Juke a random map. Options: nofinish(nofin), norank, noauthor',
