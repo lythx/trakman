@@ -1,5 +1,7 @@
 import { trakman as tm } from '../src/Trakman.js'
 
+// TODO fix after moving entire webservice thing here (?)
+
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 
 const fetchPlayerData = async (login: string): Promise<{ nickname: string, country: string } | Error | false> => {
