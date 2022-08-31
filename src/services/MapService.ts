@@ -362,7 +362,9 @@ export class MapService {
       isLapRace: info.LapRace,
       lapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
       checkpointsAmount: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
-      addDate: new Date()
+      addDate: new Date(),
+      isNadeo: false,
+      isClassic: false
     }
   }
 
