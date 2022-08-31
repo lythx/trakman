@@ -36,7 +36,7 @@ export default class CheckpointRecords extends PopupWindow {
     })
     checkpointRecords.addListener('PlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
     checkpointRecords.addListener('DeleteBestCheckpoint', () => this.reRender())
-    checkpointRecords.addListener('DeletePlayerCheckpoint', (login) => this.reRenderToPlayer(login))
+    checkpointRecords.addListener('DeletePlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
