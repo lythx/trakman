@@ -139,7 +139,6 @@ export const Utils = {
       status: ``,
       difference: undefined
     }
-    // TODO: Limit this according to the RecordService.localsAmount
     if (prevPos === -1) {
       obj.status = 'acquired'
       calc = false

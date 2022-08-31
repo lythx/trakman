@@ -9,6 +9,7 @@ import { MapService } from './services/MapService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
+import config from '../config/Config.js'
 
 let isRestart: boolean = false
 
@@ -266,7 +267,7 @@ export class Listeners {
       callback: (params: any[]): void => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         // TODO: Make this not hardcoded?
-        Client.callNoRes('SaveMatchSettings', [{ string: 'MatchSettings/MatchSettings.txt' }])
+        Client.callNoRes('SaveMatchSettings', [{ string:   config.matchSettingsFile }])
       }
     },
     {
