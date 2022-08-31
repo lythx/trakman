@@ -40,6 +40,7 @@ const initialize = async (): Promise<void> => {
     queue[i] = map instanceof Error ? e.id : map
   }
   emitMapChangeEvent()
+  tm.log.trace('TMX plugin instantiated')
 }
 
 const updateQueue = async (jukeboxQueue: TMMap[]): Promise<void> => {
@@ -75,7 +76,10 @@ const nextMap = async (): Promise<void> => {
 }
 
 if (config.isEnabled === true) {
-  tm.addListener('Controller.Ready', () => void initialize(), true)
+  tm.addListener('Controller.Ready', () => {
+    tm.log.trace('Initializing TMX...')
+    void initialize()
+  }, true)
   tm.addListener('Controller.BeginMap', (info) => {
     if (info.isRestart === false) { void nextMap() }
   }, true)

@@ -82,7 +82,7 @@ const emitEvent = async <T extends keyof EventWithCallbackInterface | TMEvent>(e
     callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams) => void | Promise<void>)
   }[] = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
-    await listener.callback(params)
+    await listener.callback(params) // TODO make not await if poss
   }
 }
 
