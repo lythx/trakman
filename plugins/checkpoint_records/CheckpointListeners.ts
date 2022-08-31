@@ -28,7 +28,7 @@ const onMapStart = async (): Promise<void> => {
   }
   currentPlayerCps.length = 0
   currentPlayerCps.push(...playerCps)
-  emitEvent('CheckpointsFetch', currentBestCps)
+  emitEvent('CheckpointsFetch', currentBestCps, playerCps)
 }
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
@@ -85,19 +85,24 @@ tm.commands.add({
       return
     }
     if (cpIndex === undefined) {
+      const arr: number[] = cps.checkpoints.filter(a => a !== undefined) as any
       cps.checkpoints.length = 0
       tm.sendMessage(config.allPlayerCpsRemoved, info.login)
+      emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: arr.map((a, i) => ({ time: a, index: i })) })
       void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
         tm.sendMessage(config.outOfRange, info.login)
         return
       }
+      const deleted = cps.checkpoints[cpIndex - 1]
       cps.checkpoints[cpIndex - 1] = undefined
       tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
+      if (deleted !== undefined) {
+        emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: [{ time: deleted, index: cpIndex }] })
+      }
       void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
     }
-    emitEvent('DeletePlayerCheckpoint', info)
   },
   privilege: 0
 })
@@ -108,23 +113,34 @@ tm.commands.add({
   params: [{ name: 'cpIndex', type: 'int', optional: true }],
   callback(info, cpIndex?: number) {
     if (cpIndex === undefined) {
+      const arr: {
+        login: string;
+        nickname: string;
+        checkpoint: number;
+        date: Date;
+      }[] = currentBestCps.filter(a => a !== undefined) as any
       currentBestCps.length = 0
-      tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved, { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+      tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved, 
+        { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+      emitEvent('DeleteBestCheckpoint', arr.map((a, i) => ({ ...a, index: i })))
       void bestCpsDB.delete(currentMapDBId)
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
         tm.sendMessage(config.outOfRange, info.login)
         return
       }
+      const deleted = currentBestCps[cpIndex - 1]
       currentBestCps[cpIndex - 1] = undefined
       tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
         title: tm.utils.getTitle(info),
         nickname: tm.utils.strip(info.nickname, true),
         index: tm.utils.getPositionString(cpIndex)
       }))
+      if (deleted !== undefined) {
+        emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])
+      }
       void bestCpsDB.delete(currentMapDBId, cpIndex - 1)
     }
-    emitEvent('DeleteBestCheckpoint', currentBestCps)
   },
   privilege: 2
 })

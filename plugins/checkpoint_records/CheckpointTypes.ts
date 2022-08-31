@@ -12,9 +12,12 @@ export interface PlayerCheckpoints {
 }
 
 export interface CheckpointEventFunctions {
-  'BestCheckpoint': ((bestCheckpoint: {login: string, nickname: string, index: number, date: Date}) => void)
-  'CheckpointsFetch': ((checkpoints: BestCheckpoints) => void)
-  'DeleteBestCheckpoint': ((checkpoints: BestCheckpoints) => void)
-  'DeletePlayerCheckpoint': ((player: {login: string, nickname: string}) => void)
-  'PlayerCheckpoint': ((playerCheckpoint: {login: string, nickname: string, index: number}) => void)
+  'BestCheckpoint': ((bestCheckpoint: Readonly<{ login: string, nickname: string, index: number, date: Date }>) => void)
+  'CheckpointsFetch': ((bestCheckpoints: Readonly<BestCheckpoints>, playerCheckpoints: readonly Readonly<PlayerCheckpoints>[]) => void)
+  'DeleteBestCheckpoint': ((deletedCheckpoints: readonly Readonly<{ index: number, login: string, checkpoint: number, date: Date }>[]) => void)
+  'DeletePlayerCheckpoint': ((player: Readonly<{
+    login: string, nickname: string,
+    deletedCheckpoints: readonly Readonly<{ index: number, time: number }>[]
+  }>) => void)
+  'PlayerCheckpoint': ((playerCheckpoint: Readonly<{ login: string, nickname: string, index: number }>) => void)
 }
