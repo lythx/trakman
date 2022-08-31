@@ -1,7 +1,10 @@
+import config from './Config.js'
 import { addListener } from './SectorEvents.js'
 import { getMapSectors, getPlayerSectors } from './SectorListeners.js'
 
 /**
+ * Registers and stores sector records for every player.
+ * Provides utilities for accessing sector records related data
  * @author Ciekma
  * @since 0.3
  */
@@ -26,6 +29,11 @@ export const sectorRecords = {
    * @param event Event name
    * @param callback Callback function to execute
   */
-  addListener
+  addListener,
+
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled
 
 }
