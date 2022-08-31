@@ -26,7 +26,6 @@ const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
 await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
-await DB.initialize()
 
 export const trakman = {
 
@@ -47,6 +46,26 @@ export const trakman = {
         return res
       }
       return res.rows
+    },
+
+    /**
+     * Initializes a database client and returns a function which executes database queries using the client.
+     * Client queries are handled by a separate thread which makes them a bit faster
+     * Use this only if your plugin needs to execute database queries very frequently
+     * Only a few //TODO exact amount// clients can be active at the same time, if there
+     * is too many program will hang
+     * @returns Function to execute database queries using the client
+     */
+    async getClient(): Promise<(query: string, ...params: any[])=> Promise<any[] | Error>> {
+      const db = new Database()
+      await db.initializeClient()
+      return  async (query: string, ...params: any[]): Promise<any[] | Error> => {
+          const res = await db.query(query, ...params).catch((err: Error) => err)
+          if (res instanceof Error) {
+            return res
+          }
+          return res.rows
+        }
     }
 
   },
@@ -368,10 +387,6 @@ export const trakman = {
 
   // TO BE REMOVED
   getPlayerDBId: playerIdsRepo.getId.bind(playerIdsRepo),
-
-  // Implement client idk
-  DatabaseClient: Database,
-
 
   //CHANGE LATER
   /**

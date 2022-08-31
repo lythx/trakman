@@ -12,8 +12,6 @@ const playerRepo = new PlayerRepository()
 playerRepo.initialize()
 const db = new Database()
 
-db.initialize()
-
 export const fixCoherence = async () => {
     const maps = await mapRepo.getAll()
     const players = await db.query(`SELECT login, nickname, region, wins, time_played, visits, is_united, last_online, average FROM players`)
