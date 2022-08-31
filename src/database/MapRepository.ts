@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS maps(
 	    REFERENCES map_ids(id)
 );`
 
-// fix this later probably
+// TODO fix this later probably
 const voteCreateQuery = `CREATE TABLE IF NOT EXISTS votes(
   map_id INT4 NOT NULL,
   player_id INT4 NOT NULL,
