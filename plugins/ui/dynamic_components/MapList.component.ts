@@ -2,7 +2,7 @@ import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
 import { centeredText, closeButton, Grid, IDS, verticallyCenteredText } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
-import { MAPLIST as ML } from '../../Maplist.js'
+import { maplist } from '../../maplist/Maplist.js'
 import config from './MapList.config.js'
 
 export default class MapList extends PopupWindow {
@@ -14,7 +14,7 @@ export default class MapList extends PopupWindow {
   private readonly contentBg = config.contentBackground
   private readonly iconBg = config.iconBackground
   private readonly icons = config.icons
-  private readonly playerQueries: { paginator: Paginator, list: TMMap[], login: string }[] = []
+  private readonly playerQueries: { paginator: Paginator, list: readonly TMMap[], login: string }[] = []
   private readonly iconW = config.iconWidth
   private readonly queueW = config.queueWidth
   private readonly queueNumberW = config.queueNumberWidth
@@ -103,7 +103,9 @@ export default class MapList extends PopupWindow {
     if (pageCount === 0) { pageCount++ }
     this.paginator.setPageCount(pageCount)
     for (const e of this.playerQueries) {
-      e.list.splice(e.list.findIndex(a => a.id === id), 1)
+      const newList = [...e.list]
+      newList.splice(e.list.findIndex(a => a.id === id), 1)
+      e.list = newList
     }
     this.reRender()
   }
@@ -111,9 +113,9 @@ export default class MapList extends PopupWindow {
   async openWithOption(login: string, option: 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'bestkarma') {
     let list: TMMap[] = []
     if (option === 'best' || option === 'worst') {
-      list = await ML.getByPosition(login, option)
+      list = await maplist.getByPosition(login, option)
     } else {
-      list = ML.get(option)
+      list = [...maplist.get(option)]
     }
     const pageCount = Math.ceil(list.length / (config.rows * config.columns))
     const index = this.playerQueries.findIndex(a => a.login === login)
@@ -125,7 +127,7 @@ export default class MapList extends PopupWindow {
   }
 
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
-    const list = searchByAuthor === true ? ML.searchByAuthor(query) : ML.searchByName(query)
+    const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const pageCount = Math.ceil(list.length / (config.rows * config.columns))
     const index = this.playerQueries.findIndex(a => a.login === login)
     if (index !== -1) {
@@ -135,7 +137,7 @@ export default class MapList extends PopupWindow {
     this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
   }
 
-  private getPaginator(login: string, list: TMMap[], pageCount: number) {
+  private getPaginator(login: string, list: readonly TMMap[], pageCount: number) {
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
     if (playerQuery !== undefined) {
@@ -164,7 +166,7 @@ export default class MapList extends PopupWindow {
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list = this.sortedList
+      let list: readonly TMMap[] = this.sortedList
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
@@ -250,7 +252,7 @@ export default class MapList extends PopupWindow {
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.timeW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(tm.utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin,
-          { textScale: config.textScale, padding:config.padding })}
+          { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
           <frame posn="${this.timeW + this.iconW + this.margin * 2} ${-rowH * 3} 2">
@@ -259,7 +261,7 @@ export default class MapList extends PopupWindow {
              image="${this.icons[4]}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${this.positionW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(` ${recordIndexString} `, this.positionW, rowH - this.margin, { textScale: config.textScale, padding: config.padding  })}
+              ${centeredText(` ${recordIndexString} `, this.positionW, rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
           <frame posn="${this.timeW + this.positionW + this.margin * 4 + this.iconW * 2} ${-rowH * 3} 2">
@@ -269,7 +271,7 @@ export default class MapList extends PopupWindow {
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
               ${centeredText(Math.round(maps[index].voteRatio).toString(), karmaW,
-            rowH - this.margin, { textScale: config.textScale, padding: config.padding  })}
+            rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
         </frame>`
@@ -373,10 +375,10 @@ export default class MapList extends PopupWindow {
           </frame>
           <frame posn="${this.iconW + width - (this.queueW + this.queueNumberW)} 0 1">
             <quad posn="0 0 3" sizen="${this.queueW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`${config.colour}${config.texts.queued}`, this.queueW, height / 4 - this.margin, { padding: config.padding , textScale: config.textScale })}
+            ${centeredText(`${config.colour}${config.texts.queued}`, this.queueW, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           <frame posn="${this.queueW + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${this.queueNumberW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: config.padding , textScale: config.textScale })}
+            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           </frame>
           </frame>`
     }

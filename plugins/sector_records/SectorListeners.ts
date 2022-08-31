@@ -2,6 +2,7 @@ import { trakman as tm } from '../../src/Trakman.js'
 import { BestSectors, PlayerSectors } from './SectorTypes.js'
 import { bestSecsDB, allSecsDB } from './SectorDB.js'
 import { emitEvent } from './SectorEvents.js'
+import config from './Config.js'
 
 let currentBestSecs: BestSectors
 let currentMapDBId: number
@@ -109,21 +110,20 @@ tm.commands.add({
   callback(info, sectorIndex?: number) {
     const secs = currentPlayerSecs.find(a => a.login === info.login)
     if (secs === undefined) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You have no sector records on the ongoing map.`, info.login)
+      tm.sendMessage(config.noSectorRecords, info.login)
       return
     }
     if (sectorIndex === undefined) {
       secs.sectors.length = 0
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.servermsg}Your sectors on the ongoing map were removed.`, info.login)
+      tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
       void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
     } else {
       if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
+        tm.sendMessage(config.outOfRange, info.login)
         return
       }
       secs.sectors[sectorIndex - 1] = undefined
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.servermsg}Your ${tm.utils.palette.highlight + tm.utils.getPositionString(sectorIndex)}`
-        + `${tm.utils.palette.servermsg} sector was removed.`, info.login)
+      tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
       void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
     }
     emitEvent('DeletePlayerSector', info.login)
@@ -138,19 +138,20 @@ tm.commands.add({
   callback(info, sectorIndex?: number) {
     if (sectorIndex === undefined) {
       currentBestSecs.length = 0
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
-        + `${tm.utils.palette.highlight + 'all sector records'}${tm.utils.palette.admin} on the ongoing map.`)
+      tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
+        { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
       void bestSecsDB.delete(currentMapDBId)
     } else {
       if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Sector index needs to be > 0 and <= to the ongoing map's sector count.`, info.login)
+        tm.sendMessage(config.outOfRange, info.login)
         return
       }
       currentBestSecs[sectorIndex - 1] = undefined
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed the `
-        + `${tm.utils.palette.highlight + tm.utils.getPositionString(sectorIndex)}${tm.utils.palette.admin} sector on the ongoing map.`)
+      tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
+        title: tm.utils.getTitle(info),
+        nickname: tm.utils.strip(info.nickname, true),
+        index: tm.utils.getPositionString(sectorIndex)
+      }))
       void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
     }
     emitEvent('DeleteBestSector', currentBestSecs, currentPlayerSecs)

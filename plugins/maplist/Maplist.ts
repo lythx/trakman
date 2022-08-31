@@ -1,9 +1,11 @@
-import { trakman as tm } from "../src/Trakman.js"
+import { trakman as tm } from "../../src/Trakman.js"
 
 const authorSort: TMMap[] = []
 const nameSort: TMMap[] = []
 const karmaSort: TMMap[] = []
+const worstKarmaSort: TMMap[] = []
 const atSort: TMMap[] = []
+const worstAtSort: TMMap[] = []
 const positionSorts: { login: string, list: TMMap[] }[] = []
 const cachedSearches: { query: string, list: TMMap[] }[] = []
 
@@ -17,7 +19,9 @@ tm.addListener('Controller.Ready', (): void => {
     const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
     return bKarma - aKarma
   }))
+  worstKarmaSort.push(...[...karmaSort].reverse())
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
+  worstAtSort.push(...[...atSort].reverse())
 })
 
 tm.addListener('Controller.MapAdded', (map) => {
@@ -37,26 +41,26 @@ tm.addListener('Controller.MapRemoved', (map) => {
   atSort.splice(atSort.findIndex(a => a.id === map.id), 1)
 })
 
-export const MAPLIST = {
+export const maplist = {
 
-  get: (sort?: 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'bestkarma'): TMMap[] => {
+  get: (sort?: 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'bestkarma'): readonly Readonly<TMMap>[] => {
     switch (sort) {
       case 'name':
         return nameSort
       case 'karma': case 'bestkarma':
         return karmaSort
       case 'worstkarma':
-        return [...karmaSort].reverse()
+        return worstKarmaSort
       case 'short':
         return atSort
       case 'long':
-        return [...atSort].reverse()
+        return worstAtSort
       default:
         return authorSort
     }
   },
 
-  getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<TMMap[]> => {
+  getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<Readonly<TMMap>[]> => {
     if (sort === 'best') {
       const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
       const list: TMMap[] = [...authorSort]
@@ -81,27 +85,27 @@ export const MAPLIST = {
     }
   },
 
-  searchByName: (query: string): TMMap[] => {
+  searchByName: (query: string): Readonly<TMMap>[] => {
     return (tm.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
-  searchByAuthor: (query: string): TMMap[] => {
+  searchByAuthor: (query: string): Readonly<TMMap>[] => {
     return (tm.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
   },
 
-  filterNoFinish: async (login: string): Promise<TMMap[]> => {
+  filterNoFinish: async (login: string): Promise<Readonly<TMMap>[]> => {
     const mapsWithRec: string[] = (await tm.records.fetchByLogin(login)).map(a => a.map)
     return authorSort.filter(a => !mapsWithRec.includes(a.id))
   },
 
-  filterNoRank: async (login: string): Promise<TMMap[]> => {
+  filterNoRank: async (login: string): Promise<Readonly<TMMap>[]> => {
     const mapsWithAuthor: string[] = (await tm.records.fetchByLogin(login))
       .filter(a => authorSort.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time)
       .map(a => a.map)
     return authorSort.filter(a => !mapsWithAuthor.includes(a.id))
   },
 
-  filterNoAuthor: async (login: string): Promise<TMMap[]> => {
+  filterNoAuthor: async (login: string): Promise<Readonly<TMMap>[]> => {
     const ranks: { mapId: string; rank: number; }[] = []
     let i: number = -1
     const fetchSize: number = 300
