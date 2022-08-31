@@ -34,7 +34,7 @@ export default class CheckpointRecords extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
       this.reRender()
     })
-    checkpointRecords.addListener('PlayerCheckpoint', (login) => this.reRenderToPlayer(login))
+    checkpointRecords.addListener('PlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
     checkpointRecords.addListener('DeleteBestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('DeletePlayerCheckpoint', (login) => this.reRenderToPlayer(login))
   }

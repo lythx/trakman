@@ -2,6 +2,7 @@ import { trakman as tm } from '../../src/Trakman.js'
 import { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
 import { bestSecsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
+import config from './Config.js'
 
 let currentBestSecs: BestCheckpoints
 
@@ -29,7 +30,7 @@ const onMapStart = async (): Promise<void> => {
   }
   currentPlayerSecs.length = 0
   currentPlayerSecs.push(...playerSecs)
-  emitEvent('CheckpointsFetch', currentBestSecs, currentPlayerSecs)
+  emitEvent('CheckpointsFetch', currentBestSecs)
 }
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
@@ -46,11 +47,11 @@ tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
   if (playerCheckpoints === undefined) {
     currentPlayerSecs.push({ login: info.player.login, checkpoints: [info.time] })
     void allCpsDB.add(currentMapDBId, info.player.login, [info.time])
-    emitEvent('PlayerCheckpoint', info.player.login, info.player.nickname, info.index)
+    emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
   } else if ((playerCheckpoints.checkpoints[info.index] ?? Infinity) > info.time) {
     playerCheckpoints.checkpoints[info.index] = info.time
     void allCpsDB.update(currentMapDBId, info.player.login, playerCheckpoints.checkpoints.map(a => a === undefined ? -1 : a))
-    emitEvent('PlayerCheckpoint', info.player.login, info.player.nickname, info.index)
+    emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
   }
   const cp = currentBestSecs[info.index]?.checkpoint
   if (cp === undefined || cp > info.time) {
@@ -62,7 +63,7 @@ tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
     }
     cp === undefined ? void bestSecsDB.add(currentMapDBId, info.player.login, info.index, info.time, date)
       : void bestSecsDB.update(currentMapDBId, info.player.login, info.index, info.time, date)
-    emitEvent('BestCheckpoint', info.player.login, info.player.nickname, info.index, date)
+    emitEvent('BestCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index, date })
   }
 })
 
@@ -82,21 +83,20 @@ tm.commands.add({
   callback(info, cpIndex?: number) {
     const secs = currentPlayerSecs.find(a => a.login === info.login)
     if (secs === undefined) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You have no checkpoint records on the ongoing map.`, info.login)
+      tm.sendMessage(config.noCpRecords, info.login)
       return
     }
     if (cpIndex === undefined) {
       secs.checkpoints.length = 0
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.servermsg}Your checkpoints on the ongoing map were removed.`, info.login)
+      tm.sendMessage(config.allPlayerCpsRemoved, info.login)
       void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
+        tm.sendMessage(config.outOfRange, info.login)
         return
       }
       secs.checkpoints[cpIndex - 1] = undefined
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.servermsg}Your ${tm.utils.palette.highlight + tm.utils.getPositionString(cpIndex)}`
-        + `${tm.utils.palette.servermsg} checkpoint was removed.`, info.login)
+      tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
       void allCpsDB.update(currentMapDBId, info.login, secs.checkpoints.map(a => a === undefined ? -1 : a))
     }
     emitEvent('DeletePlayerCheckpoint', info.login)
@@ -111,22 +111,22 @@ tm.commands.add({
   callback(info, cpIndex?: number) {
     if (cpIndex === undefined) {
       currentBestSecs.length = 0
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
-        + `${tm.utils.palette.highlight + 'all checkpoint records'}${tm.utils.palette.admin} on the ongoing map.`)
+      tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved, { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
       void bestSecsDB.delete(currentMapDBId)
     } else {
       if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Checkpoint index needs to be > 0 and <= to the ongoing map's checkpoint count.`, info.login)
+        tm.sendMessage(config.outOfRange, info.login)
         return
       }
       currentBestSecs[cpIndex - 1] = undefined
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-        + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed the `
-        + `${tm.utils.palette.highlight + tm.utils.getPositionString(cpIndex)}${tm.utils.palette.admin} checkpoint record on the ongoing map.`)
+      tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
+        title: tm.utils.getTitle(info),
+        nickname: tm.utils.strip(info.nickname, true),
+        index: tm.utils.getPositionString(cpIndex)
+      }))
       void bestSecsDB.delete(currentMapDBId, cpIndex - 1)
     }
-    emitEvent('DeleteBestCheckpoint', currentBestSecs, currentPlayerSecs)
+    emitEvent('DeleteBestCheckpoint', currentBestSecs)
   },
   privilege: 2
 })

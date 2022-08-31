@@ -2,7 +2,7 @@ import { BestCheckpoints, PlayerCheckpoints, CheckpointEventFunctions as Checkpo
 
 const fetchListeners: ((mapCheckpoints: BestCheckpoints, playerCheckpoints: PlayerCheckpoints[]) => void)[] = []
 
-const bestDeleteListeners: ((bestCheckpoints: BestCheckpoints, playerCheckpoints: PlayerCheckpoints[]) => void)[] = []
+const bestDeleteListeners: ((bestCheckpoints: BestCheckpoints) => void)[] = []
 
 const bestCheckpointListeners: ((login: string, nickname: string, index: number, date: Date) => void)[] = []
 
@@ -29,7 +29,7 @@ const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callbac
   }
 }
 
-const emitEvent = async (event: keyof CheckpointEventFunctions, ...params: any[]) => {
+const emitEvent = async <T extends keyof CheckpointEventFunctions>(event: T, ...params: Parameters<CheckpointEventFunctions[T]>) => {
   let listeners: any
   switch (event) {
     case 'BestCheckpoint':

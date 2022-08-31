@@ -4,16 +4,16 @@ import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.j
 
 export const checkpointRecords = {
 
-    get mapCheckpoints(): ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] {
-        return getMapCheckpoints()
-    },
+  get mapCheckpoints(): ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] {
+    return getMapCheckpoints()
+  },
 
-    get playerCheckpoints(): ({ login: string, checkpoints: (number | null)[] })[] {
-        return getPlayerCheckpoints()
-    },
+  get playerCheckpoints(): ({ login: string, checkpoints: (number | null)[] })[] {
+    return getPlayerCheckpoints()
+  },
 
-    addListener,
+  addListener,
 
-    fetchMapCheckpoints
+  fetchMapCheckpoints
 
 }
