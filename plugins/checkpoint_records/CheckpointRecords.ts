@@ -1,5 +1,4 @@
 import { addListener } from './CheckpointEvents.js'
-import { fetchMapCheckpoints } from './CheckpointDB.js'
 import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.js'
 
 /**
@@ -15,22 +14,19 @@ export const checkpointRecords = {
     return getMapCheckpoints()
   },
 
-  
+
   /**
    * @returns an array of current map online players and their checkpoint records
    */
-  get playerCheckpoints(): ({ login: string, checkpoints: (number | null)[] })[] {
+  get playerCheckpoints(): ({ login: string, nickname: string, checkpoints: (number | null)[] })[] {
     return getPlayerCheckpoints()
   },
 
   /**
    * Registers a callback to execute on a given event
+   * @param event Event name
+   * @param callback Callback function to execute
    */
   addListener,
-
-  /**
-   * Fetches best checkpoint records for a given map
-   */
-  fetchMapCheckpoints
 
 }

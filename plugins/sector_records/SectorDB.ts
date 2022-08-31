@@ -1,5 +1,4 @@
 import { trakman as tm } from '../../src/Trakman.js'
-import { BestSectors } from './SectorTypes.js'
 import config from './Config.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
@@ -118,28 +117,3 @@ export const bestSecsDB = {
   }
 
 }
-
-async function fetchMapSectors(mapId: string): Promise<BestSectors | void>
-async function fetchMapSectors(...mapId: string[]): Promise<BestSectors[]>
-async function fetchMapSectors(mapIds: string | string[]): Promise<BestSectors | void | BestSectors[]> {
-  if (Array.isArray(mapIds)) {
-    const str = mapIds.map((a, i) => `mapId=$${i} OR `).join('')
-    const res: BestSectors[] | Error = await queryDB(`SELECT * FROM secrecs WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
-    if (res instanceof Error) {
-      tm.log.error(`Error when fetching sector records for maps ${mapIds.join(',')}`, res.message)
-      return
-    } else if (res.length === 1) {
-      return res
-    }
-    return
-  }
-  const res: BestSectors[] | Error = await queryDB('SELECT * FROM secrecs WHERE mapId=$1;', [mapIds])
-  if (res instanceof Error) {
-    tm.log.error(`Error when fetching sector records for map ${mapIds}`, res.message)
-    return
-  } else if (res.length === 1) {
-    return res[0]
-  }
-}
-
-export { fetchMapSectors }

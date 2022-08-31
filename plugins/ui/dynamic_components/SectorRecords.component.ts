@@ -31,9 +31,9 @@ export default class SectorRecords extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
       this.reRender()
     })
-    sectorRecords.addListener('PlayerSector', (login) => this.reRenderToPlayer(login))
+    sectorRecords.addListener('PlayerSector', (info) => this.reRenderToPlayer(info.login))
     sectorRecords.addListener('DeleteBestSector', () => this.reRender())
-    sectorRecords.addListener('DeletePlayerSector', (login) => this.reRenderToPlayer(login))
+    sectorRecords.addListener('DeletePlayerSector', (info) => this.reRenderToPlayer(info.login))
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
