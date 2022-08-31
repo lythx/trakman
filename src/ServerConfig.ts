@@ -29,9 +29,14 @@ export class ServerConfig {
   }
 
   static async update(): Promise<void> {
+    const systemRes = await Client.call('GetSystemInfo')
+    if (systemRes instanceof Error) {
+      Logger.error(`Failed to fetch system info.`, systemRes.message)
+      return
+    }
     const res = await Utils.multiCall(
       { method: 'GetServerOptions' },
-      { method: 'GetDetailedPlayerInfo', params: [{ string: 'ciekma_test' }] }, //TODO FETCH THE LOGIN FIRST
+      { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes[0].ServerLogin }] },
       { method: 'GetVersion' }
     )
     if (res instanceof Error) {
@@ -54,6 +59,7 @@ export class ServerConfig {
       return
     }
     this._config = {
+      // server options
       name: options[0].Name,
       comment: options[0].Comment,
       password: options[0].Password,
