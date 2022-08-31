@@ -5,7 +5,7 @@ import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.j
 /**
  * Registers and stores checkpoint records for every player.
  * Provides utilities for accessing checkpoint records related data.
- * @author Ciekma
+ * @author lythx
  * @since 0.3
  */
 export const checkpointRecords = {
