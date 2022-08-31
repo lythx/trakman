@@ -135,11 +135,11 @@ export default class MapWidgetResult extends StaticComponent {
   private getTagAndAward(map: TMMap, tmxMap?: TMXMapInfo): { tag: string, award: string } {
     let tag = config.icons.tags.normal
     let award = config.icons.awards.normal
-    if (map.leaderboardRating === 50000 || tmxMap?.isNadeo === true) { // TODO implement isNadeo on map
+    if (map.isNadeo === true || tmxMap?.isNadeo === true) {
       tag = config.icons.tags.nadeo
       award = config.icons.awards.nadeo
     }
-    if (map.leaderboardRating === 0 || tmxMap?.isClassic === true) {
+    if (map.isClassic === true || tmxMap?.isClassic === true) {
       tag = config.icons.tags.classic
       award = config.icons.awards.classic
     }

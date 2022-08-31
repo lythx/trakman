@@ -109,10 +109,10 @@ export default class MapWidget extends StaticComponent {
         return e.icon
       }
     }
-    if (map.leaderboardRating === 50000 || tmxMap?.isNadeo === true) { // TODO implement isNadeo on map
+    if (map.isNadeo === true || tmxMap?.isNadeo === true) {
       return config.icons.tags.nadeo
     }
-    if (map.leaderboardRating === 0 || tmxMap?.isClassic === true) {
+    if (map.isClassic === true || tmxMap?.isClassic === true) {
       return config.icons.tags.classic
     }
     return config.icons.tags.normal
