@@ -11,9 +11,12 @@ export interface PlayerSectors {
 }
 
 export interface SectorEventFunctions {
-  'BestSector': ((login: string, nickname: string, index: number, date: Date) => void)
-  'SectorsFetch': ((sectors: BestSectors) => void)
-  'DeleteBestSector': ((sectors: BestSectors) => void)
-  'DeletePlayerSector': ((login: string) => void)
-  'PlayerSector': ((login: string, nickname: string, index: number) => void)
+  'BestSector': ((bestSector: Readonly<{ login: string, nickname: string, index: number, date: Date }>) => void)
+  'SectorsFetch': ((bestSectors: Readonly<BestSectors>, playerSectors: readonly Readonly<PlayerSectors>[]) => void)
+  'DeleteBestSector': ((deletedSectors: readonly Readonly<{ index: number, login: string, sector: number, date: Date }>[]) => void)
+  'DeletePlayerSector': ((player: Readonly<{
+    login: string, nickname: string,
+    deletedSectors: readonly Readonly<{ index: number, time: number }>[]
+  }>) => void)
+  'PlayerSector': ((playerSector: Readonly<{ login: string, nickname: string, index: number }>) => void)
 }

@@ -48,11 +48,11 @@ if (config.isEnabled === true) {
     if (playerSectors === undefined) {
       currentPlayerSecs.push({ login: info.player.login, sectors: [time] })
       void allSecsDB.add(currentMapDBId, info.player.login, [time])
-      emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
+      emitEvent('PlayerSector', { login: info.player.login, nickname: info.player.nickname, index: info.index })
     } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
       playerSectors.sectors[info.index] = time
       void allSecsDB.update(currentMapDBId, info.player.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
-      emitEvent('PlayerSector', info.player.login, info.player.nickname, info.index)
+      emitEvent('PlayerSector', { login: info.player.login, nickname: info.player.nickname, index: info.index })
     }
     const sector = currentBestSecs[info.index]?.sector
     if (sector === undefined || sector > time) {
@@ -64,7 +64,7 @@ if (config.isEnabled === true) {
       }
       sector === undefined ? void bestSecsDB.add(currentMapDBId, info.player.login, info.index, time, date)
         : void bestSecsDB.update(currentMapDBId, info.player.login, info.index, time, date)
-      emitEvent('BestSector', info.player.login, info.player.nickname, info.index, date)
+      emitEvent('BestSector', { login: info.player.login, nickname: info.player.nickname, index: info.index, date })
     }
   })
 
@@ -76,11 +76,11 @@ if (config.isEnabled === true) {
     if (playerSectors === undefined) {
       currentPlayerSecs.push({ login: info.login, sectors: [time] })
       void allSecsDB.add(currentMapDBId, info.login, [time])
-      emitEvent('PlayerSector', info.login, info.nickname, index)
+      emitEvent('PlayerSector', { login: info.login, nickname: info.nickname, index: index })
     } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
       playerSectors.sectors[index] = time
       void allSecsDB.update(currentMapDBId, info.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
-      emitEvent('PlayerSector', info.login, info.nickname, index)
+      emitEvent('PlayerSector', { login: info.login, nickname: info.nickname, index: index })
     }
     const sector = currentBestSecs[index]?.sector
     if (sector === undefined || sector > time) {
@@ -92,7 +92,7 @@ if (config.isEnabled === true) {
       }
       sector === undefined ? void bestSecsDB.add(currentMapDBId, info.login, index, time, date)
         : void bestSecsDB.update(currentMapDBId, info.login, index, time, date)
-      emitEvent('BestSector', info.login, info.nickname, index, date)
+      emitEvent('BestSector', { login: info.login, nickname: info.nickname, index: index, date })
     }
   })
 
@@ -116,19 +116,24 @@ if (config.isEnabled === true) {
         return
       }
       if (sectorIndex === undefined) {
+        const arr: number[] = secs.sectors.filter(a => a !== undefined) as any
         secs.sectors.length = 0
         tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
+        emitEvent('DeletePlayerSector', { ...info, deletedSectors: arr.map((a, i) => ({ time: a, index: i })) })
         void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
       } else {
         if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
           tm.sendMessage(config.outOfRange, info.login)
           return
         }
+        const deleted = secs.sectors[sectorIndex - 1]
         secs.sectors[sectorIndex - 1] = undefined
         tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
+        if (deleted !== undefined) {
+          emitEvent('DeletePlayerSector', { ...info, deletedSectors: [{ time: deleted, index: sectorIndex }] })
+        }
         void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
       }
-      emitEvent('DeletePlayerSector', info.login)
     },
     privilege: 0
   })
@@ -139,24 +144,34 @@ if (config.isEnabled === true) {
     params: [{ name: 'sectorIndex', type: 'int', optional: true }],
     callback(info, sectorIndex?: number) {
       if (sectorIndex === undefined) {
+        const arr: {
+          login: string;
+          nickname: string;
+          sector: number;
+          date: Date;
+        }[] = currentBestSecs.filter(a => a !== undefined) as any
         currentBestSecs.length = 0
         tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
           { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+        emitEvent('DeleteBestSector', arr.map((a, i) => ({ ...a, index: i })))
         void bestSecsDB.delete(currentMapDBId)
       } else {
         if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
           tm.sendMessage(config.outOfRange, info.login)
           return
         }
+        const deleted =    currentBestSecs[sectorIndex - 1]
         currentBestSecs[sectorIndex - 1] = undefined
         tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
           title: tm.utils.getTitle(info),
           nickname: tm.utils.strip(info.nickname, true),
           index: tm.utils.getPositionString(sectorIndex)
         }))
+        if (deleted !== undefined) {
+          emitEvent('DeleteBestSector', [{ ...deleted, index: sectorIndex }])
+        }
         void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
       }
-      emitEvent('DeleteBestSector', currentBestSecs, currentPlayerSecs)
     },
     privilege: 2
   })
@@ -171,11 +186,12 @@ const getMapSectors = (): ({ login: string, nickname: string, sector: number, da
   return arr
 }
 
-const getPlayerSectors = (): ({ login: string, sectors: (number | null)[] })[] => {
-  const arr: ({ login: string, sectors: (number | null)[] })[] = []
+const getPlayerSectors = (): ({ login: string, nickname: string, sectors: (number | null)[] })[] => {
+  const arr: ({ login: string, nickname: string, sectors: (number | null)[] })[] = []
   for (const [i, e] of tm.players.list.entries()) {
     arr[i] = {
       login: e.login,
+      nickname: e.nickname,
       sectors: new Array(tm.maps.current.checkpointsAmount).fill(null).map((a, i) => currentPlayerSecs.find(a => a.login === e.login)?.sectors[i] ?? null)
     }
   }

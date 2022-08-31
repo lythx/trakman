@@ -1,15 +1,16 @@
-import { BestSectors, PlayerSectors, SectorEventFunctions } from './SectorTypes.js'
+import { SectorEventFunctions } from './SectorTypes.js'
 
-const fetchListeners: ((mapSectors: BestSectors, playerSectors: PlayerSectors[]) => void)[] = []
+const fetchListeners: Function[] = []
+const bestDeleteListeners: Function[] = []
+const bestSectorListeners: Function[] = []
+const playerSectorListeners: Function[] = []
+const playerDeleteListeners: Function[] = []
 
-const bestDeleteListeners: ((mapSectors: BestSectors, playerSectors: PlayerSectors[]) => void)[] = []
-
-const bestSectorListeners: ((login: string, nickname: string, index: number, date: Date) => void)[] = []
-
-const playerSectorListeners: ((login: string, nickname: string, index: number) => void)[] = []
-
-const playerDeleteListeners: ((login: string) => void)[] = []
-
+/**
+ * Registers a callback to execute on a given event
+ * @param event Event name
+ * @param callback Callback function to execute
+ */
 const addListener = <T extends keyof SectorEventFunctions>(event: T, callback: SectorEventFunctions[T]): void => {
   switch (event) {
     case 'BestSector':
@@ -29,7 +30,7 @@ const addListener = <T extends keyof SectorEventFunctions>(event: T, callback: S
   }
 }
 
-const emitEvent = async <T extends keyof SectorEventFunctions>(event: T, ...params: any[]) => {
+const emitEvent = async <T extends keyof SectorEventFunctions>(event: T, ...params: Parameters<SectorEventFunctions[T]>) => {
   let listeners: any
   switch (event) {
     case 'BestSector':

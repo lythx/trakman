@@ -1,5 +1,4 @@
 import { trakman as tm } from '../../src/Trakman.js'
-import { BestCheckpoints } from './CheckpointTypes.js'
 import config from './Config.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
@@ -121,28 +120,3 @@ export const bestCpsDB = {
   }
 
 }
-
-async function fetchMapCheckpoints(mapId: string): Promise<BestCheckpoints | void>
-async function fetchMapCheckpoints(...mapId: string[]): Promise<BestCheckpoints[]>
-async function fetchMapCheckpoints(mapIds: string | string[]): Promise<BestCheckpoints | void | BestCheckpoints[]> {
-  if (Array.isArray(mapIds)) {
-    const str = mapIds.map((a, i) => `mapId=$${i} OR `).join('')
-    const res: BestCheckpoints[] | Error = await queryDB(`SELECT * FROM best_checkpoint_records WHERE ${str.substring(0, str.length - 3)};`, [mapIds])
-    if (res instanceof Error) {
-      tm.log.error(`Error when fetching checkpoint records for maps ${mapIds.join(',')}`, res.message)
-      return
-    } else if (res.length === 1) {
-      return res
-    }
-    return
-  }
-  const res: BestCheckpoints[] | Error = await queryDB('SELECT * FROM best_checkpoint_records WHERE mapId=$1;', [mapIds])
-  if (res instanceof Error) {
-    tm.log.error(`Error when fetching checkpoint records for map ${mapIds}`, res.message)
-    return
-  } else if (res.length === 1) {
-    return res[0]
-  }
-}
-
-export { fetchMapCheckpoints }

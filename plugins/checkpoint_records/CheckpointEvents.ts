@@ -1,11 +1,16 @@
-import {  CheckpointEventFunctions } from './CheckpointTypes.js'
+import { CheckpointEventFunctions } from './CheckpointTypes.js'
 
 const fetchListeners: Function[] = []
-const bestDeleteListeners:  Function[] = []
+const bestDeleteListeners: Function[] = []
 const bestCheckpointListeners: Function[] = []
-const playerCheckpointListeners:  Function[] = []
+const playerCheckpointListeners: Function[] = []
 const playerDeleteListeners: Function[] = []
 
+/**
+ * Registers a callback to execute on a given event
+ * @param event Event name
+ * @param callback Callback function to execute
+ */
 const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callback: CheckpointEventFunctions[T]): void => {
   switch (event) {
     case 'BestCheckpoint':
