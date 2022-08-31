@@ -43,6 +43,7 @@ const initialize = async (): Promise<void> => {
   }
   isConnected = true
   await fetchVotes(...tm.players.list.map(a => a.login))
+  tm.log.trace('Connected to Maniakarma') 
 }
 
 const reinitialize = async (): Promise<void> => {
@@ -80,7 +81,7 @@ const authenticate = async (): Promise<true | Error> => {
 const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   newVotes.length = 0
   playerVotes.length = 0
-  if(logins.length === 0) { return []}
+  if (logins.length === 0) { return [] }
   const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({ // TODO check what happens if bs data
     login: tm.state.serverConfig.login,
     authcode: authCode,
@@ -234,6 +235,7 @@ const onPlayerJoin = async (login: string) => {
 
 if (config.isEnabled === true) {
   tm.addListener('Controller.Ready', () => {
+    tm.log.trace('Connecting to Maniakarma...')
     void initialize()
     setInterval(() => {
       if (isConnected === false) { void initialize() }

@@ -4,6 +4,7 @@ import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
 // TODO overloads and comments
+// TODO detect authentication error and then dont reconnect
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
@@ -35,6 +36,7 @@ const initialize = async (): Promise<void> => {
   updateServerPlayers()
   const current = tm.maps.current
   await getRecords(current.id, current.name, current.environment, current.author)
+  tm.log.trace('Connected to Dedimania')
 }
 
 const reinitialize = async (): Promise<void> => {
@@ -282,6 +284,7 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
 if (config.isEnabled === true) {
 
   tm.addListener('Controller.Ready', () => {
+    tm.log.trace('Connecting to Dedimania...')
     void initialize()
   }, true)
 
