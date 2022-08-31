@@ -5,7 +5,7 @@ import { getMapSectors, getPlayerSectors } from './SectorListeners.js'
 /**
  * Registers and stores sector records for every player.
  * Provides utilities for accessing sector records related data
- * @author Ciekma
+ * @author lythx
  * @since 0.3
  */
 export const sectorRecords = {
