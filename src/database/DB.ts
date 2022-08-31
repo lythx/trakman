@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
+import { Logger } from '../Logger'
 
 const { Pool } = postgres
 
@@ -12,12 +13,11 @@ export class Database {
     host: process.env.DB_SERVER,
     port: Number(process.env.DB_PORT)
   })
-  private client: any | undefined
+  private client: postgres.Pool | postgres.PoolClient = Database.pool
 
-  async initialize(): Promise<void> {
-    // const client = await Database.pool.connect().catch(err => Logger.fatal('Cannot connect to database', err))
-    // if (!client) { throw new Error() }
-    this.client = Database.pool
+  async initializeClient(): Promise<void> {
+    const client = await Database.pool.connect()
+    this.client = client
   }
 
   /**
@@ -29,7 +29,6 @@ export class Database {
    * @throws a database error if something goes wrong with the query
    */
   async query(q: string, ...params: any[]): Promise<postgres.QueryResult> {
-    if (this.client === undefined) { throw Error('Database client is not initialized') }
     return await this.client.query(q, params).catch((err: any) => {
       throw Error(`Database error on query ${q}: ${err.message}`)
     })
