@@ -157,11 +157,12 @@ const getMapCheckpoints = (): ({ login: string, nickname: string, checkpoint: nu
   return arr
 }
 
-const getPlayerCheckpoints = (): ({ login: string, checkpoints: (number | null)[] })[] => {
-  const arr: ({ login: string, checkpoints: (number | null)[] })[] = []
+const getPlayerCheckpoints = (): ({ login: string, nickname: string, checkpoints: (number | null)[] })[] => {
+  const arr: ({ login: string, nickname: string, checkpoints: (number | null)[] })[] = []
   for (const [i, e] of tm.players.list.entries()) {
     arr[i] = {
       login: e.login,
+      nickname: e.nickname,
       checkpoints: new Array(tm.maps.current.checkpointsAmount - 1).fill(null).map((a, i) => currentPlayerCps.find(a => a.login === e.login)?.checkpoints[i] ?? null)
     }
   }
