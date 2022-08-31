@@ -1,7 +1,10 @@
+import config from './Config.js'
 import { addListener } from './CheckpointEvents.js'
 import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.js'
 
 /**
+ * Registers and stores checkpoint records for every player.
+ * Provides utilities for accessing checkpoint records related data.
  * @author Ciekma
  * @since 0.3
  */
@@ -28,5 +31,10 @@ export const checkpointRecords = {
    * @param callback Callback function to execute
    */
   addListener,
+
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled
 
 }
