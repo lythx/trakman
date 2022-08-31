@@ -10,7 +10,6 @@ export default class LiveRanking extends StaticComponent {
   private readonly side: boolean
   private readonly header: StaticHeader
   private readonly recordList: RecordList
-  private readonly maxRecords: number = 1000 // TODO FIX
 
   constructor() {
     super(IDS.live, 'race')
@@ -20,7 +19,7 @@ export default class LiveRanking extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, this.maxRecords, config.displayNoRecordEntry)
+      config.entries, this.side, config.topCount,  config.maxRecordsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
