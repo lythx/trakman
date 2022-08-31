@@ -57,7 +57,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const authenticate = async (): Promise<true | Error> => {
-  const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({ // TODO check what happens if bs data
+  const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({
     login: tm.state.serverConfig.login,
     name: Buffer.from(tm.state.serverConfig.name).toString('base64'),
     game: tm.state.serverConfig.game,
