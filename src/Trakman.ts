@@ -360,13 +360,13 @@ export const trakman = {
   * @param message Message to be sent
   * @param login Optional player login (or comma-joined list of logins)
   */
-  sendMessage(message: string, login?: string): void {
+  sendMessage(message: string, login?: string, prefix: boolean = true): void {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: config.prefixes.serverToPlayer + message }, { string: login }])
+        [{ string: (prefix ? config.prefixes.serverToPlayer : '') + message }, { string: login }])
       return
     }
-    Client.callNoRes('ChatSendServerMessage', [{ string: config.prefixes.serverToAll + message }])
+    Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? config.prefixes.serverToAll : '') + message }])
   },
 
   /**
