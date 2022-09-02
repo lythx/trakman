@@ -6,7 +6,7 @@ const karmaSort: TMMap[] = []
 const worstKarmaSort: TMMap[] = []
 const atSort: TMMap[] = []
 const worstAtSort: TMMap[] = []
-const positionSorts: { login: string, list: TMMap[] }[] = []
+const positionSorts: { login: string, list: TMMap[] }[] = [] // TODO cache or delete
 const cachedSearches: { query: string, list: TMMap[] }[] = []
 
 tm.addListener('Controller.Ready', (): void => {
