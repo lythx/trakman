@@ -56,16 +56,16 @@ export const trakman = {
      * is too many program will hang
      * @returns Function to execute database queries using the client
      */
-    async getClient(): Promise<(query: string, ...params: any[])=> Promise<any[] | Error>> {
+    async getClient(): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> {
       const db = new Database()
       await db.initializeClient()
-      return  async (query: string, ...params: any[]): Promise<any[] | Error> => {
-          const res = await db.query(query, ...params).catch((err: Error) => err)
-          if (res instanceof Error) {
-            return res
-          }
-          return res.rows
+      return async (query: string, ...params: any[]): Promise<any[] | Error> => {
+        const res = await db.query(query, ...params).catch((err: Error) => err)
+        if (res instanceof Error) {
+          return res
         }
+        return res.rows
+      }
     }
 
   },
@@ -147,7 +147,7 @@ export const trakman = {
 
     fetchRecordCount: RecordService.fetchRecordCount.bind(RecordService),
 
-    fetchRank: RecordService.fetchRank.bind(RecordService),
+    fetchRank: RecordService.getRank.bind(RecordService),
 
     get local() { return RecordService.localRecords },
 
@@ -438,7 +438,7 @@ export const trakman = {
   },
 
   // TO BE REMOVED
-  fetchMapRank: RecordService.fetchRank.bind(RecordService),
+  fetchMapRank: RecordService.getRank.bind(RecordService),
 
   // REMOVE LATER
   get UIIDS() {

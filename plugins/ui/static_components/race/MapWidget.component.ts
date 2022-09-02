@@ -3,7 +3,7 @@ import flags from '../../config/FlagIcons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import { MapAuthorData } from '../../../MapAuthorData.js'
+import { webservices } from '../../../webservices/Webservices.js'
 import config from './MapWidget.config.js'
 
 export default class MapWidget extends StaticComponent {
@@ -25,7 +25,7 @@ export default class MapWidget extends StaticComponent {
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
-      MapAuthorData.onCurrentAuthorChange(() => {
+      webservices.onCurrentAuthorChange(() => {
         void this.display()
       })
     }
@@ -44,13 +44,13 @@ export default class MapWidget extends StaticComponent {
 
   private updateXML(): void {
     const map = tm.maps.current
-    const author: string = MapAuthorData.currentAuthor?.nickname ?? map.author
+    const author: string = webservices.currentAuthor?.nickname ?? map.author
     const tmxMap = tmx.current
     const date: Date | undefined = tmxMap?.lastUpdateDate
     const ic = config.icons
     let authorIcon = ic.author
-    if (MapAuthorData.currentAuthor?.country !== undefined) {
-      authorIcon = (flags as any)[MapAuthorData.currentAuthor.country] // cope typescript
+    if (webservices.currentAuthor?.country !== undefined) {
+      authorIcon = (flags as any)[webservices.currentAuthor.country] // cope typescript
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
