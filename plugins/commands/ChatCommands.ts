@@ -7,7 +7,7 @@ const commands: TMCommand[] = [
         help: 'Greet a certain someone.',
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.hi.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.hi.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.hi.public ? undefined : info.login, false)
         },
         privilege: config.hi.privilege
     },
@@ -15,7 +15,7 @@ const commands: TMCommand[] = [
         aliases: ['bb', 'bye'],
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.bye.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.bye.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.bye.public ? undefined : info.login, false)
         },
         privilege: config.bye.privilege
     },
@@ -24,7 +24,7 @@ const commands: TMCommand[] = [
         help: 'Express your gratitude.',
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.thx.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.thx.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.thx.public ? undefined : info.login, false)
         },
         privilege: config.thx.privilege
     },
@@ -33,7 +33,7 @@ const commands: TMCommand[] = [
         help: 'Inform others that you\'ve enjoyed the race.',
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.gg.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.gg.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.gg.public ? undefined : info.login, false)
         },
         privilege: config.gg.privilege
     },
@@ -42,7 +42,7 @@ const commands: TMCommand[] = [
         help: 'Allow others to find out about your disenjoyment of the round.',
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.bg.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.bg.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.bg.public ? undefined : info.login, false)
         },
         privilege: config.bg.privilege
     },
@@ -51,7 +51,7 @@ const commands: TMCommand[] = [
         help: 'Rain your blessings upon the few selected by thy divine ritual.',
         params: [{ name: 'name', type: 'multiword' }],
         callback: (info: MessageInfo, name: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.n1.text, { nickname: info.nickname, name: name }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.n1.text, { nickname: info.nickname, name: name }), config.n1.public ? undefined : info.login, false)
         },
         privilege: config.n1.privilege
     },
@@ -60,7 +60,7 @@ const commands: TMCommand[] = [
         help: 'Mention that you\'ve had a great time racing just now.',
         params: [{ name: 'name', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, name?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.gr.text, { nickname: info.nickname, name: name ?? 'everyone' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.gr.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.gr.public ? undefined : info.login, false)
         },
         privilege: config.gr.privilege
     },
@@ -68,7 +68,7 @@ const commands: TMCommand[] = [
         aliases: ['bgm'],
         help: 'Let others know you didn\'t do your best.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.bgm.text, { nickname: info.nickname }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.bgm.text, { nickname: info.nickname }), config.bgm.public ? undefined : info.login, false)
         },
         privilege: config.bgm.privilege
     },
@@ -76,7 +76,7 @@ const commands: TMCommand[] = [
         aliases: ['brb'],
         help: 'Notify people of your potential absence.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.brb.text, { nickname: info.nickname }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.brb.text, { nickname: info.nickname }), config.brb.public ? undefined : info.login, false)
         },
         privilege: config.brb.privilege
     },
@@ -84,6 +84,7 @@ const commands: TMCommand[] = [
         aliases: ['afk', 'imstupid'],
         help: 'Update the server players on your position relative to the keyboard.',
         callback: async (info: MessageInfo): Promise<void> => {
+            tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
             await tm.multiCall(
                 {
                     method: 'ForceSpectator',
@@ -92,12 +93,6 @@ const commands: TMCommand[] = [
                 {
                     method: 'ForceSpectator',
                     params: [{ string: info.login }, { int: 0 }]
-                },
-                {
-                    method: 'ChatSendServerMessage',
-                    params: [{
-                        string: tm.utils.strVar(config.afk.text, { nickname: info.nickname })
-                    }]
                 })
             await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
             tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
@@ -109,7 +104,7 @@ const commands: TMCommand[] = [
         help: 'Express the deep emotions hidden within your sinful soul.',
         params: [{ name: 'thoughts', type: 'multiword', optional: true }],
         callback: (info: MessageInfo, thoughts?: string): void => {
-            tm.sendMessage(tm.utils.strVar(config.me.text, { nickname: info.nickname, message: thoughts ?? '' }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.me.text, { nickname: info.nickname, message: thoughts ?? '' }), config.me.public ? undefined : info.login, false)
         },
         privilege: config.me.privilege
     },
@@ -117,7 +112,7 @@ const commands: TMCommand[] = [
         aliases: ['lol'],
         help: 'Indicate your amusement.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.lol.text, { nickname: info.nickname }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.lol.text, { nickname: info.nickname }), config.lol.public ? undefined : info.login, false)
         },
         privilege: config.lol.privilege
     },
@@ -125,7 +120,7 @@ const commands: TMCommand[] = [
         aliases: ['lool'],
         help: 'Indicate your excess amusement.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.lool.text, { nickname: info.nickname }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.lool.text, { nickname: info.nickname }), config.lool.public ? undefined : info.login, false)
         },
         privilege: config.lool.privilege
     },
@@ -133,7 +128,7 @@ const commands: TMCommand[] = [
         aliases: ['loool'],
         help: 'I understand, saying "sussy petya" for the 53726th time must be hilarious enough.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.loool.text, { nickname: info.nickname }), undefined, false)
+            tm.sendMessage(tm.utils.strVar(config.loool.text, { nickname: info.nickname }), config.loool.public ? undefined : info.login, false)
         },
         privilege: config.loool.privilege
     },
@@ -149,7 +144,7 @@ const commands: TMCommand[] = [
         aliases: ['bm', 'bootme', 'dienow'],
         help: 'Part your ways with life.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.bootme.text, { nickname: tm.utils.strip(info.nickname, false) }), undefined)
+            tm.sendMessage(tm.utils.strVar(config.bootme.text, { nickname: tm.utils.strip(info.nickname, false) }), config.bootme.public ? undefined : info.login)
             tm.client.callNoRes('Kick', [{ string: info.login }, { string: config.bootme.leaveText }])
         },
         privilege: config.bootme.privilege
@@ -158,7 +153,7 @@ const commands: TMCommand[] = [
         aliases: ['rq', 'ragequit'],
         help: 'Signal your dissatisfaction with whatever is happening right now.',
         callback: (info: MessageInfo): void => {
-            tm.sendMessage(tm.utils.strVar(config.bootme.text, { nickname: tm.utils.strip(info.nickname, false) }), undefined)
+            tm.sendMessage(tm.utils.strVar(config.bootme.text, { nickname: tm.utils.strip(info.nickname, false) }), config.rq.public ? undefined : info.login)
             tm.client.callNoRes('Kick', [{ string: info.login }, { string: config.rq.leaveText }])
         },
         privilege: config.rq.privilege
