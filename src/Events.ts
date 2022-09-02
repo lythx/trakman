@@ -59,7 +59,8 @@ const initialize = async () => {
  * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
 const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event: T | TMEvent[],
-  callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : any) => void | Promise<void>), prepend?: true): void => {
+  callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : any)
+    => void | Promise<void>), prepend?: true): void => {
   const arr: { event: TMEvent, callback: ((params: any) => void) }[] = []
   if (Array.isArray(event)) {
     arr.push(...event.map(a => ({ event: a, callback })))
