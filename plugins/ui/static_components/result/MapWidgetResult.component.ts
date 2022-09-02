@@ -3,7 +3,7 @@ import flags from '../../config/FlagIcons.json' assert { type: 'json' }
 import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import { MapAuthorData } from '../../../MapAuthorData.js'
+import { webservices } from '../../../webservices/Webservices.js'
 import config from './MapWidgetResult.config.js'
 
 export default class MapWidgetResult extends StaticComponent {
@@ -26,7 +26,7 @@ export default class MapWidgetResult extends StaticComponent {
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
-      MapAuthorData.onCurrentAuthorChange(() => {
+      webservices.onCurrentAuthorChange(() => {
         void this.display()
       })
     }
@@ -53,7 +53,7 @@ export default class MapWidgetResult extends StaticComponent {
 
   private updateXML(): void {
     const map = this.isRestart ? tm.jukebox.current : tm.jukebox.queue[0]
-    const authorData = this.isRestart ? MapAuthorData.currentAuthor : MapAuthorData.nextAuthor
+    const authorData = this.isRestart ? webservices.currentAuthor : webservices.nextAuthor
     const author: string = authorData?.nickname ?? map.author
     const tmxMap = this.isRestart ? tmx.current : tmx.queue[0]
     const date: Date | undefined = tmxMap?.lastUpdateDate
