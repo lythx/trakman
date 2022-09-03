@@ -57,7 +57,7 @@ export class Listeners {
         if (params[0] === 0) {
           return
         }
-        const messageInfo: MessageInfo | Error = ChatService.add(params[1], params[2])
+        const messageInfo: TMMessageInfo | Error = ChatService.add(params[1], params[2])
         if (!(messageInfo instanceof Error)) {
           Events.emitEvent('Controller.PlayerChat', messageInfo)
         }
@@ -267,7 +267,7 @@ export class Listeners {
       callback: (params: any[]): void => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         // TODO: Make this not hardcoded?
-        Client.callNoRes('SaveMatchSettings', [{ string:   config.matchSettingsFile }])
+        Client.callNoRes('SaveMatchSettings', [{ string: config.matchSettingsFile }])
       }
     },
     {

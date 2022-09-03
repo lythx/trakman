@@ -114,6 +114,12 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
     })
+    tm.commands.add({
+      aliases: ['h', 'help', 'helpall'],
+      help: 'Display the commands list.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

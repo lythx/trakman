@@ -41,6 +41,12 @@ export default class BlacklistList extends PopupWindow {
 
       this.displayToPlayer(login, { page }, `${page}/${pageCount}`)
     }
+    tm.commands.add({
+      aliases: ['bll, blacklists'],
+      help: 'Display list of blackisted players.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 1
+    })
   }
 
   private reRender(): void {

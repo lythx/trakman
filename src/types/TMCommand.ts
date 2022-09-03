@@ -3,9 +3,9 @@ interface TMCommand {
   readonly help?: string
   readonly params?: {
     readonly name: string,
-    readonly type?: 'int' | 'double' | 'boolean' | 'time' | 'multiword',
+    readonly type?: 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword',
     readonly optional?: true
   }[]
-  readonly callback: (info: MessageInfo, ...params: any[]) => void
+  readonly callback: (info: TMMessageInfo & { aliasUsed: string }, ...params: any[]) => void
   readonly privilege: number
 }

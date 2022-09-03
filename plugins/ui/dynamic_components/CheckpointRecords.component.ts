@@ -16,7 +16,7 @@ export default class CheckpointRecords extends PopupWindow {
 
   constructor() {
     super(IDS.checkpointRecords, config.icon, config.title, config.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1),config.grid)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
@@ -24,7 +24,7 @@ export default class CheckpointRecords extends PopupWindow {
     tm.commands.add({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
-      callback: (info: MessageInfo) => {
+      callback: (info: TMMessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0

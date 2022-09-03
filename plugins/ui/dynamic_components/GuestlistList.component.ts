@@ -27,6 +27,12 @@ export default class GuestlistList extends PopupWindow {
       } // 
 
     })
+    tm.commands.add({
+      aliases: ['gl', 'guestlist'],
+      help: 'Display list of players in the guestlist.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 1
+    },)
   }
 
   private reRender(): void {

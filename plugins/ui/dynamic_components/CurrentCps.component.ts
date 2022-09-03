@@ -20,10 +20,10 @@ export default class CurrentCps extends PopupWindow {
 
   constructor() {
     // Translate icon name to url
-    const iconUrl =config.icon
+    const iconUrl = config.icon
     super(IDS.currentCps, iconUrl, config.title, config.navbar)
     // Create grid object to display the table
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1),config.grid)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1), config.grid)
     tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
       const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
       const pb = tm.records.getLocal(info.player.login)
@@ -62,6 +62,12 @@ export default class CurrentCps extends PopupWindow {
         pbCheckpoint: 12500 + (i * 900)
       })
     }
+    tm.commands.add({
+      aliases: ['ccp', 'currentcps'],
+      help: 'Display each online players current cp.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   // Override onOpen method to add page count to params and display it
