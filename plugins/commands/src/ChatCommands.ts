@@ -185,8 +185,10 @@ const commands: TMCommand[] = [
     aliases: ['ccs', 'coppers', 'checkcoppers'],
     help: 'Check the amount of coppers the server account currently has.',
     callback: async (info: TMMessageInfo): Promise<void> => {
-      // TODO: Return immediately if the server isn't united.
-      // TODO: Put isUnited to ServerConfig since we do DetailedPlayerInfo for server login on init
+      if(tm.state.serverConfig.isUnited === false) {
+        tm.sendMessage(config.coppers.notUnited, info.login)
+        return
+      }
       const coppers: any[] | Error = await tm.client.call('GetServerCoppers')
       if (coppers instanceof Error) {
         tm.log.error(`Couldn't retrieve the coppers amount.`, coppers.message)
