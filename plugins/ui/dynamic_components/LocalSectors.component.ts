@@ -37,6 +37,12 @@ export default class LocalSectors extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
     })
+    tm.commands.add(  {
+      aliases: ['sc', 'sectms'],
+      help: 'Display current map local sectors.',
+      callback: (info: TMMessageInfo): void =>     tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

@@ -38,6 +38,12 @@ export default class DediCps extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(dedimania.recordCount / this.entries))
       this.reRender()
     })
+    tm.commands.add({
+      aliases: ['dcp', 'dedicptms', 'dedirecs'],
+      help: 'Display current map dedimania checkpoints.',
+      callback: (info: TMMessageInfo): void =>    tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -92,9 +98,9 @@ export default class DediCps extends PopupWindow {
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
-        ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), 
-        ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1),config.grid)
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
+      ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
+      ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
@@ -103,9 +109,9 @@ export default class DediCps extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
-        ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), 
-        ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
+      ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+      ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {

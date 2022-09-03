@@ -82,6 +82,13 @@ export default class PlayerList extends PopupWindow {
       } // Add to Guestlist
 
       //TODO: add ForceSpec :3 :v :D
+
+      tm.commands.add( {
+        aliases: ['players', 'playerlist'],
+        help: 'Display list of players.',
+        callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+        privilege: 1
+      },)
     })
   }
 

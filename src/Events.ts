@@ -4,7 +4,7 @@ import { GameService } from './services/GameService.js'
 
 interface EventWithCallbackInterface {
   "Controller.Ready": 'result' | 'race'
-  "Controller.PlayerChat": MessageInfo
+  "Controller.PlayerChat": TMMessageInfo
   "Controller.PlayerJoin": JoinInfo
   "Controller.PlayerLeave": LeaveInfo
   "Controller.PlayerRecord": RecordInfo

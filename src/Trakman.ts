@@ -10,7 +10,6 @@ import { Database } from './database/DB.js'
 import { TMXService } from './TMXService.js'
 import 'dotenv/config'
 import { AdministrationService } from './services/AdministrationService.js'
-import _UIIDS from '../plugins/ui/config/ComponentIds.js'
 import { VoteService } from './services/VoteService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
@@ -440,10 +439,6 @@ export const trakman = {
   // TO BE REMOVED
   fetchMapRank: RecordService.getRank.bind(RecordService),
 
-  // REMOVE LATER
-  get UIIDS() {
-    return { ..._UIIDS }
-  }
 
 }
 

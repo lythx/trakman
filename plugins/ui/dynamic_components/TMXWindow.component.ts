@@ -30,6 +30,12 @@ export default class TMXWindow extends PopupWindow<number> {
       this.reRender()
     })
     tm.addListener('Controller.JukeboxChanged', () => this.reRender())
+    tm.commands.add({
+      aliases: ['tmxinfo'],
+      help: 'Display TMX info.',
+      callback: (info: TMMessageInfo): void =>  tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   private reRender(): void {
@@ -118,7 +124,7 @@ export default class TMXWindow extends PopupWindow<number> {
       <quad posn="${config.margin * 2} ${-config.margin * 2} 6" sizen="${iconWidth - config.margin * 2} ${height - config.margin * 4}" image="${image}"/>
       <frame posn="${iconWidth + config.margin * 2} ${-config.margin} 4">
         <quad posn="0 0 3" sizen="${width - (iconWidth + config.margin * 3)} ${height - config.margin * 2}" bgcolor="${config.gridBackground}"/>
-        ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin * 3),  height - config.margin * 2, { textScale: config.textscale }) :
+        ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale }) :
         verticallyCenteredText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale })}
       </frame>`
   }

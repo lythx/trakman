@@ -26,126 +26,141 @@ export abstract class ChatService {
   }
 
   /**
-   * Adds a chat command to the server
-   * @param command Chat command to register
+   * Adds chat commands to the server
+   * @param commands Chat commands to register
    */
-  static addCommand(command: TMCommand): void { // TODO CHANGE AFTER IMPLEMENTING LOGIN TYPE
-    const prefix: string = command.privilege === 0 ? '/' : '//'
-    this._commandList.push(command)
+  static addCommand(...commands: TMCommand[]): void { // TODO CHANGE AFTER IMPLEMENTING LOGIN TYPE
+    this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
-    Events.addListener('Controller.PlayerChat', async (info: MessageInfo): Promise<void> => {
-      const input: string = info.text?.trim()
-      const usedAlias: string | undefined = input.split(' ').shift()?.toLowerCase()
-      if (!command.aliases.some((alias: string): boolean => usedAlias === (prefix + alias))) {
-        return
-      }
-      if (info.privilege < command.privilege) {
-        Client.callNoRes('ChatSendServerMessageToLogin',
-          [{ string: messages.noPermission }, { string: info.login }])
-        return
-      }
-      const [val, ...params] = input.split(' ').filter(a => a !== '')
-      Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${usedAlias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
-      const parsedParams: (string | number | boolean | undefined)[] = []
-      if (command.params) {
-        for (const [i, param] of command.params.entries()) {
-          if (params[i] === undefined && param.optional === true) { continue }
-          if (params[i] === undefined && param.optional === undefined) {
-            Client.call('ChatSendServerMessageToLogin',
-              [{ string: Utils.strVar(messages.noParam, { param: param.name }) }, { string: info.login }])
-            return
-          }
-          if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
-          switch (param.type) {
-            case 'int':
-              if (!Number.isInteger(Number(params[i]))) {
-                Client.call('ChatSendServerMessageToLogin', [{
-                  string:
-                    Utils.strVar(messages.notInt, { param: param.name })
-                }, { string: info.login }])
-                return
-              }
-              parsedParams.push(Number(params[i]))
+    for (const command of commands) {
+      Events.addListener('Controller.PlayerChat', (info): void => void this.commandCallback(command, info))
+    }
+  }
+
+  private static async commandCallback(command: TMCommand, info: TMMessageInfo): Promise<void> {
+    const prefix: string = command.privilege === 0 ? '/' : '//'
+    const input: string = info.text?.trim()
+    const [alias, ...params] = input.split(' ').filter(a => a !== '')
+    const aliasUsed: string | undefined = alias?.toLowerCase()
+    if (!command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))) { return }
+    if (info.privilege < command.privilege) {
+      this.sendErrorMessage(messages.noPermission, info.login)
+      return
+    }
+    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${aliasUsed}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+    const parsedParams: (string | number | boolean | undefined | TMPlayer | TMOfflinePlayer)[] = []
+    if (command.params !== undefined) {
+      for (const [i, param] of command.params.entries()) {
+        if (params[i] === undefined && param.optional === true) { continue }
+        if (params[i] === undefined && param.optional === undefined) {
+          this.sendErrorMessage(Utils.strVar(messages.noParam, { name: param.name }), info.login)
+          return
+        }
+        if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
+        switch (param.type) {
+          case 'int':
+            if (!Number.isInteger(Number(params[i]))) {
+              this.sendErrorMessage(Utils.strVar(messages.notInt, { name: param.name }), info.login)
+              return
+            }
+            parsedParams.push(Number(params[i]))
+            break
+          case 'double':
+            if (isNaN(Number(params[i]))) {
+              this.sendErrorMessage(Utils.strVar(messages.notDouble, { name: param.name }), info.login)
+              return
+            }
+            parsedParams.push(Number(params[i]))
+            break
+          case 'boolean':
+            if (![...config.truthyParams, ...config.falsyParams].includes(params[i].toLowerCase())) {
+              this.sendErrorMessage(Utils.strVar(messages.notBoolean, { name: param.name }), info.login)
+              return
+            }
+            parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
+            break
+          case 'time':
+            if (!isNaN(Number(params[i]))) {
+              parsedParams.push(Number(params[i]) * 1000 * 60)
               break
-            case 'double':
-              if (isNaN(Number(params[i]))) {
-                Client.call('ChatSendServerMessageToLogin', [{
-                  string:
-                    Utils.strVar(messages.notDouble, { param: param.name })
-                }, { string: info.login }])
-                return
-              }
-              parsedParams.push(Number(params[i]))
-              break
-            case 'boolean':
-              if (!['true', 'yes', 'y', '1', 'false', 'no', 'n', '0'].includes(params[i].toLowerCase())) {
-                Client.call('ChatSendServerMessageToLogin', [{
-                  string:
-                    Utils.strVar(messages.notBoolean, { param: param.name })
-                }, { string: info.login }])
-                return
-              }
-              parsedParams.push(['true', 'yes', 'y', '1',].includes(params[i].toLowerCase()))
-              break
-            case 'time':
-              if (!isNaN(Number(params[i]))) {
-                parsedParams.push(Number(params[i]) * 1000 * 60)
+            } // If there's no modifier then time is treated as minutes
+            const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
+            const time: number = Number(params[i].substring(0, params[i].length - 1))
+            if (isNaN(time)) {
+              this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
+              return
+            }
+            switch (unit) {
+              case 's':
+                parsedParams.push(time * 1000)
                 break
-              } // If there's no modifier then time is treated as minutes
-              const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
-              const time: number = Number(params[i].substring(0, params[i].length - 1))
-              if (isNaN(time)) {
-                Client.call('ChatSendServerMessageToLogin', [{
-                  string:
-                    Utils.strVar(messages.notTime, { param: param.name })
-                }, { string: info.login }])
+              case 'm':
+                parsedParams.push(time * 1000 * 60)
+                break
+              case 'h':
+                parsedParams.push(time * 1000 * 60 * 60)
+                break
+              case 'd':
+                parsedParams.push(time * 1000 * 60 * 60 * 24)
+                break
+              default:
+                this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
+                return
+            }
+            break
+          case 'player': {
+            let player = PlayerService.get(params[i])
+            if (player === undefined) {
+              player = Utils.nicknameToPlayer(params[i])
+              if (player === undefined) {
+                this.sendErrorMessage(Utils.strVar(messages.noPlayer, { name: params[i] }), info.login)
                 return
               }
-              switch (unit) {
-                case 's':
-                  parsedParams.push(time * 1000)
-                  break
-                case 'm':
-                  parsedParams.push(time * 1000 * 60)
-                  break
-                case 'h':
-                  parsedParams.push(time * 1000 * 60 * 60)
-                  break
-                case 'd':
-                  parsedParams.push(time * 1000 * 60 * 60 * 24)
-                  break
-                default:
-                  Client.call('ChatSendServerMessageToLogin', [{
-                    string:
-                      Utils.strVar(messages.notTime, { param: param.name })
-                  }, { string: info.login }])
-              }
-              break
-            case 'multiword':
-              const split: string[] = input.split(' ')
-              let n: number = 0
-              while (true) {
-                const chunk: string | undefined = split.shift()
-                if (params[n] === chunk) {
-                  if (n === i) {
-                    parsedParams.push([chunk, ...split].join(' '))
-                    break
-                  }
-                  n++
-                }
-              }
-              break
-            default:
-              parsedParams.push(params[i])
+            }
+            parsedParams.push(player)
+            break
           }
+          case 'offlinePlayer': {
+            let player: TMOfflinePlayer | undefined = PlayerService.get(params[i])
+            if (player === undefined) {
+              player = await PlayerService.fetch(params[i])
+              if (player === undefined) {
+                this.sendErrorMessage(Utils.strVar(messages.unknownPlayer, { name: params[i] }), info.login)
+                return
+              }
+            }
+            parsedParams.push(player)
+            break
+          }
+          case 'multiword':
+            const split: string[] = input.split(' ')
+            let n: number = 0
+            while (true) {
+              const chunk: string | undefined = split.shift()
+              if (params[n] === chunk) {
+                if (n === i) {
+                  parsedParams.push([chunk, ...split].join(' '))
+                  break
+                }
+                n++
+              }
+            }
+            break
+          default:
+            parsedParams.push(params[i])
         }
       }
-      const messageInfo: MessageInfo = {
-        ...info,
-        text: input.split(' ').splice(1).join(' ')
-      }
-      command.callback(messageInfo, ...parsedParams)
-    })
+    }
+    const messageInfo: TMMessageInfo & { aliasUsed: string } = {
+      ...info,
+      text: input.split(' ').splice(1).join(' '),
+      aliasUsed
+    }
+    command.callback(messageInfo, ...parsedParams)
+  }
+
+  private static sendErrorMessage(message: string, login: string): void {
+    Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
   }
 
   /**
@@ -154,7 +169,7 @@ export abstract class ChatService {
    * @param text Message text
    * @returns Message object or Error if unsuccessfull
    */
-  static add(login: string, text: string): MessageInfo | Error {
+  static add(login: string, text: string): TMMessageInfo | Error {
     const player: TMPlayer | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
@@ -167,7 +182,7 @@ export abstract class ChatService {
       text,
       date: new Date()
     }
-    const messageInfo: MessageInfo = {
+    const messageInfo: TMMessageInfo = {
       text,
       date: message.date,
       ...player
