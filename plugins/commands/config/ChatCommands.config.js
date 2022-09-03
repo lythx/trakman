@@ -100,6 +100,7 @@ export default {
   },
   coppers: {
     text: `${p.admin}Current server coppers amount is ${p.highlight}#{value}C${p.admin}.`,
+    notUnited: `${p.error}Server account is not united.`,
     error: `${p.error}Could not retrieve the coppers amount.`,
     public: false,
     privilege: 3
