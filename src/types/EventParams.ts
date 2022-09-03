@@ -1,5 +1,5 @@
 type EventParams =
-  MessageInfo |
+  TMMessageInfo |
   JoinInfo |
   LeaveInfo |
   RecordInfo |

@@ -55,7 +55,7 @@ export default class MapList extends PopupWindow {
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: async (info: MessageInfo, query?: string): Promise<void> => {
+      callback: async (info: TMMessageInfo, query?: string): Promise<void> => {
         if (query === undefined) {
           tm.openManialink(this.openId, info.login)
           return
@@ -78,7 +78,7 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
-      callback: async (info: MessageInfo): Promise<void> => {
+      callback: async (info: TMMessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'best')
       },
       privilege: 0
@@ -86,7 +86,7 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
-      callback: async (info: MessageInfo): Promise<void> => {
+      callback: async (info: TMMessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'worst')
       },
       privilege: 0

@@ -37,6 +37,12 @@ export default class LiveCps extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
+    tm.commands.add(  {
+      aliases: ['lcp', 'livecptms', 'liverecs'],
+      help: 'Display current map live checkpoints.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

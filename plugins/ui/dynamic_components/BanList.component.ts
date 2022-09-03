@@ -29,6 +29,12 @@ export default class BanList extends PopupWindow {
       } // 
 
     })
+    tm.commands.add(  {
+      aliases: ['banlist'],
+      help: 'Display list of banned players.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 1
+    },)
   }
 
   private reRender(): void {

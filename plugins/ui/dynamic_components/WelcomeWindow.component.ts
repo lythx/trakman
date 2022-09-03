@@ -19,6 +19,12 @@ export default class WelcomeWindow extends PopupWindow {
       }
     })
     void this.initializeDb()
+    tm.commands.add({
+      aliases: ['info'],
+      help: 'Display info about the controller.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: 0
+    },)
   }
 
   async initializeDb() {

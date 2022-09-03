@@ -11,17 +11,17 @@ export default class SectorRecords extends PopupWindow {
 
   constructor() {
     super(IDS.sectorRecords, config.icon, config.title, config.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight,config.columnProportions, 
-      new Array(config.entries + 2).fill(1),config.grid)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+      new Array(config.entries + 2).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-       Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
+      Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
       aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
-      callback: (info: MessageInfo) => {
+      callback: (info: TMMessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0

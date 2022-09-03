@@ -6,7 +6,8 @@ import { Events } from './Events.js'
 import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { PlayerService } from "./services/PlayerService.js";
 import colours from './data/Colours.json' assert { type: 'json' }
-import config from '../config/Prefixes.js'
+import { palette } from '../config/Prefixes.js'
+import config from '../config/Config.js'
 
 const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
@@ -249,30 +250,37 @@ export const Utils = {
 
   /**
  * Attempts to convert the player nickname to their login via charmap
- * @param nickName Player nickname
+ * @param nickname Player nickname
+ * @param options Options to modify search similarity goals
  * @returns Possibly matching login or undefined if unsuccessful
  */
-  nicknameToLogin(nickName: string): string | undefined {
-    const nicknames = PlayerService.players.map(a => ({ login: a.login, nickname: Utils.strip(a.nickname).toLowerCase() }))
-    const strippedNicknames: { nickname: string, login: string }[] = []
-    for (const e of nicknames) {
-      strippedNicknames.push({ nickname: this.stripSpecialChars(e.nickname), login: e.login })
+  nicknameToPlayer(nickname: string, options: {
+    similarityGoal: number,
+    minimumDifferenceBetweenMatches: number
+  } = {
+      similarityGoal: config.nicknameToLoginSimilarityGoal,
+      minimumDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
+    }): TMPlayer | undefined {
+    const players = PlayerService.players
+    const strippedNicknames: { strippedNickname: string, player: TMPlayer }[] = []
+    for (const e of players) {
+      strippedNicknames.push({ strippedNickname: this.stripSpecialChars(Utils.strip(e.nickname).toLowerCase()), player: e })
     }
-    const matches: { login: string, value: number }[] = []
+    const matches: { player: TMPlayer, value: number }[] = []
     for (const e of strippedNicknames) {
-      const value = dsc.twoStrings(e.nickname, nickName.toLowerCase())
-      if (value > 0.4) {
-        matches.push({ login: e.login, value })
+      const value = dsc.twoStrings(e.strippedNickname, nickname.toLowerCase())
+      if (value > options.similarityGoal) {
+        matches.push({ player: e.player, value })
       }
     }
     if (matches.length === 0) {
       return undefined
     }
     const s = matches.sort((a, b): number => b.value - a.value)
-    if (s[0].value - s?.[1]?.value ?? 0 < 0.15) {
+    if (s[0].value - s?.[1]?.value ?? 0 < options.minimumDifferenceBetweenMatches) {
       return undefined
     }
-    return s[0].login
+    return s[0].player
   },
 
   /**
@@ -294,7 +302,7 @@ export const Utils = {
     return colours
   },
 
-  palette: config.palette,
+  palette,
 
   get countries() {
     return countries
