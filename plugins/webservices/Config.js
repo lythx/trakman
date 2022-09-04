@@ -1,5 +1,5 @@
 export default {
-  enabled: false,
-  login: 'login',
-  password: 'password'
+  enabled: true,
+  login: 'tmf_gay1_1',
+  password: 'gay12'
 }
