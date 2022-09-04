@@ -131,7 +131,7 @@ export default class KarmaWidget extends StaticComponent {
     for (const [i, e] of config.options.entries()) {
       const offsetFix: number = i > 2 ? config.minus.offset : config.plus.offset
       const textScale: number = i > 2 ? config.minus.scale : config.plus.scale
-      const colour: string = this.options[i] === personalVote ? config.selfColour : config.colours[i]
+      const colour: string = this.options[i] === personalVote ? config.selfColour : config.mkColours[i]
       ret += `<quad posn="${config.margin} -${config.margin + h * i} 2" 
       sizen="${config.buttonWidth - (config.margin * 2)} ${h - config.margin}" bgcolor="${colour}" action="${this.id + i + 1}"/>
       ${centeredText(e, config.buttonWidth - (config.margin * 2), h - config.margin,
