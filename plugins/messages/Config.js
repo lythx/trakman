@@ -2,7 +2,7 @@ import { palette as p } from '../../src/Trakman.js'
 
 export default {
   startup: `${p.highlight}Trakman`
-    + `v#{version}${p.servermsg} startup sequence successful.`,
+    + ` v#{version}${p.servermsg} startup sequence successful.`,
   changelog: `${p.error}You can see the recent changes with` +
     ` the ${p.highlight}/changes ${p.error}command.`,
   noPb: `${p.error}You don't have a personal best on this map.`,
