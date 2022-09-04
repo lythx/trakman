@@ -112,7 +112,7 @@ export default class RecordList {
       } else {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id + 2 + i}"/>`
       }
-      if (info !== undefined && records?.[i] !== undefined) {
+      if (info !== undefined && records?.[i] !== undefined && records?.[i]?.record?.time !== -1) {
         ret += this.constructInfo(info.offset, records?.[i]?.record, cpTypes?.[i])
       } else {
         ret += this.constructMarker(markers?.[i])
