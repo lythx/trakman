@@ -83,45 +83,6 @@ export const trakman = {
 
     fetch: PlayerService.fetch.bind(PlayerService),
 
-    /**
-     * Fetches Trackmania Webservices for player information
-     * @param login Player login
-     * @returns Player information in JSON or error if unsuccessful
-     */
-    async fetchWebservices(login: string): Promise<{
-      id: number
-      login: string
-      nickname: string
-      united: boolean
-      path: string
-      idZone: number
-    } | Error> {
-      if (process.env.USE_WEBSERVICES !== "YES") {
-        return new Error('Use webservices set to false')
-      }
-      const au: string = "Basic " + Buffer.from(`${process.env.WEBSERVICES_LOGIN}:${process.env.WEBSERVICES_PASSWORD}`).toString('base64')
-      const options = {
-        host: `ws.trackmania.com`,
-        path: `/tmf/players/${login}/`,
-        headers: {
-          'Authorization': au,
-        }
-      }
-      return new Promise((resolve): void => {
-        http.request(options, function (res): void {
-          let data: string = ''
-          res.on('data', function (chunk): void {
-            data += chunk
-          })
-          if (res.statusCode === 200) {
-            res.on('end', (): void => resolve(JSON.parse(data)))
-            return
-          }
-          res.on('end', (): void => resolve(new Error(data)))
-        }).end()
-      })
-    },
-
     get list() { return PlayerService.players },
 
     get count() { return PlayerService.playerCount }
