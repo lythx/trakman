@@ -1,6 +1,5 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/PrivilegesCommands.config.js'
-// TODO config
 
 const commands: TMCommand[] = [
   {
@@ -13,19 +12,23 @@ const commands: TMCommand[] = [
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
+        tm.sendMessage(config.noPrivilege, callerLogin)
         return
       }
       if (prevPrivilege < 3) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has promoted ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin} to Masteradmin.`)
+        tm.sendMessage(tm.utils.strVar(config.masteradmin.promote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.masteradmin.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 3, info)
       } else if (prevPrivilege === 3) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} is already Masteradmin.`, callerLogin)
+        tm.sendMessage(tm.utils.strVar(config.masteradmin.alreadyIs, {
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), callerLogin)
       }
     },
-    privilege: 4
+    privilege: config.masteradmin.privilege
   },
   {
     aliases: ['ad', 'admin'],
@@ -37,20 +40,26 @@ const commands: TMCommand[] = [
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
+        tm.sendMessage(config.noPrivilege, callerLogin)
         return
       }
       if (prevPrivilege < 2) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has promoted ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin} to Admin.`)
+        tm.sendMessage(tm.utils.strVar(config.admin.promote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.admin.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 2, info)
       } else if (prevPrivilege === 2) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} is already Admin.`, callerLogin)
-      } else if (prevPrivilege > 2) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has demoted ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin} to Admin.`)
+        tm.sendMessage(tm.utils.strVar(config.admin.alreadyIs, {
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), callerLogin)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.admin.demote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.admin.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 2, info)
       }
     },
@@ -66,20 +75,26 @@ const commands: TMCommand[] = [
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
+        tm.sendMessage(config.noPrivilege, callerLogin)
         return
       }
       if (prevPrivilege < 1) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has promoted ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin} to Operator.`)
+        tm.sendMessage(tm.utils.strVar(config.operator.promote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.operator.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 1, info)
       } else if (prevPrivilege === 1) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} is already Operator.`, callerLogin)
-      } else if (prevPrivilege > 1) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has demoted ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin} to Operator.`)
+        tm.sendMessage(tm.utils.strVar(config.operator.alreadyIs, {
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), callerLogin)
+      } else  {
+        tm.sendMessage(tm.utils.strVar(config.operator.demote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.operator.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 1, info)
       }
     },
@@ -95,45 +110,20 @@ const commands: TMCommand[] = [
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
+        tm.sendMessage(config.noPrivilege, callerLogin)
         return
       }
       if (prevPrivilege >= 1) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed ` +
-          `permissions of ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin}.`)
-        await tm.admin.setPrivilege(targetLogin, 0, info)
-      } else if (prevPrivilege === -1) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has enabled ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)} ${tm.utils.palette.admin}commands.`)
+        tm.sendMessage(tm.utils.strVar(config.user.demote, {
+          title: tm.utils.getTitle(info),
+          adminNickname: tm.utils.strip(info.nickname, true),
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), config.user.public ? undefined : info.login)
         await tm.admin.setPrivilege(targetLogin, 0, info)
       } else if (prevPrivilege === 0) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} has no priveleges.`, callerLogin)
-      }
-    },
-    privilege: 2
-  },
-  {
-    aliases: ['dcmds', 'disablecommands'],
-    help: 'Disable player commands.',
-    params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      const targetLogin: string = login
-      const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
-      const prevPrivilege: number = targetInfo?.privilege ?? 0
-      if (prevPrivilege >= info.privilege) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
-        return
-      }
-      if (prevPrivilege === -1) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} already can't use commands.`, callerLogin)
-      } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
-          `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
-          `commands for ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin}.`)
-        await tm.admin.setPrivilege(targetLogin, -1, info)
+        tm.sendMessage(tm.utils.strVar(config.user.alreadyIs, {
+          nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
+        }), callerLogin)
       }
     },
     privilege: 2
