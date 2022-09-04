@@ -13,8 +13,8 @@ export default {
     icons.karmaPulse,
     icons.peopleKarma
   ],
-  colours: ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A'],
-  mkColours: ['0FFA', '0DDA', '0BBA', 'BOBA', 'D0DA', 'F0FA'],
+  colours: ['0F8A', '0D6A', '0B4A', 'BO4A', 'D06A', 'F08A'],
+  mkColours: ['0F0A', '0D0A', '0B0A', 'BOOA', 'D00A', 'F00A'],
   options: ['+++', '++', '+', '-', '--', '---'],
   buttonWidth: 1.7,
   background: cfg.background,

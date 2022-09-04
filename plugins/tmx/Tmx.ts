@@ -79,10 +79,10 @@ if (config.isEnabled === true) {
   tm.addListener('Controller.Ready', () => {
     tm.log.trace('Initializing TMX...')
     void initialize()
-  }, true)
+  })
   tm.addListener('Controller.BeginMap', (info) => {
     if (info.isRestart === false) { void nextMap() }
-  }, true)
+  })
   tm.addListener('Controller.JukeboxChanged', (queue) => void updateQueue(queue))
 }
 

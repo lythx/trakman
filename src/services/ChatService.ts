@@ -6,6 +6,7 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
+import {prefixes} from '../../config/Prefixes.js'
 
 /**
  * This service manages chat table and chat commands
@@ -160,7 +161,7 @@ export abstract class ChatService {
   }
 
   private static sendErrorMessage(message: string, login: string): void {
-    Client.callNoRes('ChatSendServerMessageToLogin', [{ string: message }, { string: login }])
+    Client.callNoRes('ChatSendServerMessageToLogin', [{ string: prefixes.serverToPlayer +  message }, { string: login }])
   }
 
   /**
