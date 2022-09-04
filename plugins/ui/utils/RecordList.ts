@@ -58,18 +58,18 @@ export default class RecordList {
   constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
     options?: { getColoursFromPb?: true, resultMode?: true }) {
     this.config = options?.resultMode === true ? resultConfig : raceConfig
-    const INFO =  this.config.info
-    this.colGap =  this.config.columnGap
-    this.rowGap =  this.config.rowGap
+    const INFO = this.config.info
+    this.colGap = this.config.columnGap
+    this.rowGap = this.config.rowGap
     this.iCols = INFO.columns
     this.iColW = INFO.columnWidth
     this.iIconW = INFO.iconWidth
     this.iIcon = INFO.icon
-    this.markerWidth =  this.config.markerWidth
-    this.iconVPadding =  this.config.iconVerticalPadding
-    this.iconHPadding =  this.config.iconHorizontalPadding
-    this.downloadIcon =  this.config.downloadIcon
-    this.timeColours =  this.config.timeColours
+    this.markerWidth = this.config.markerWidth
+    this.iconVPadding = this.config.iconVerticalPadding
+    this.iconHPadding = this.config.iconHorizontalPadding
+    this.downloadIcon = this.config.downloadIcon
+    this.timeColours = this.config.timeColours
     this.id = id
     this.rows = rows
     this.rowHeight = (height + this.rowGap) / rows
@@ -77,8 +77,8 @@ export default class RecordList {
     this.side = side
     this.topCount = topCount
     this.maxCount = maxCount
-    this.markers = side ?  this.config.markersRight :  this.config.markersLeft
-    const columnProportions: number[] =  this.config.columnProportions
+    this.markers = side ? this.config.markersRight : this.config.markersLeft
+    const columnProportions: number[] = this.config.columnProportions
     const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
     this.noRecordEntry = noRecordEntry
@@ -87,7 +87,7 @@ export default class RecordList {
     this.iBg = INFO.bgColor
     this.bg = this.config.background
     this.headerBg = this.config.headerBackground
-    this.format =  this.config.format
+    this.format = this.config.format
   }
 
   onClick(callback: Function): void {
@@ -112,9 +112,9 @@ export default class RecordList {
       } else {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id + 2 + i}"/>`
       }
-      if (info !== undefined)
+      if (info !== undefined && records?.[i] !== undefined) {
         ret += this.constructInfo(info.offset, records?.[i]?.record, cpTypes?.[i])
-      else {
+      } else {
         ret += this.constructMarker(markers?.[i])
       }
       ret += this.constructIndex(records?.[i]?.index) +
