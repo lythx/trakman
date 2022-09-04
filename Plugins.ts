@@ -1,6 +1,6 @@
 import './plugins/commands/Commands.js'
 import './plugins/messages/Messages.js'
-import './plugins/ui/Ui.js'
+import './plugins/ui/UI.js'
 import './plugins/sector_records/SectorRecords.js'
 import './plugins/checkpoint_records/CheckpointRecords.js'
 import './plugins/freezone/Freezone.js'
