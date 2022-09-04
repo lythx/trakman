@@ -31,7 +31,7 @@ export default class Changelog extends PopupWindow {
         `- Added changelog\n- Added sector records\n- Added checkpoint records\n- Implemented player ranks\n- Implemented reconnect on\n  dedimania server restart\n- Fixed a ton of bugs`, w, h),
       (i, j, w, h) => this.constructEntry('0.4', '10/08/2022',
         `- Added map list utilites\n- Added autojuke\n- Added endscreen ui\n- Implemented donations table\n- Fixed a ton ton ton of bugs`, w, h),
-        (i, j, w, h) => this.constructEntry('0.5', '04/09/2022',
+      (i, j, w, h) => this.constructEntry('0.5', '04/09/2022',
         `- Added map info window\n- Fixed tmx and karma bugs\n- Fixed endscreen ui bugs\n- Fixed dedimania info bugs`, w, h)
     ]
     return grid.constructXml(entries)
@@ -45,10 +45,10 @@ export default class Changelog extends PopupWindow {
       `<quad posn="${config.marginBig} ${config.marginBig - imageHeight} 6" sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + imageHeight)}" image="${imageUrl}"/>`
     return `<format textsize="1"/>
       <quad posn="0 0 3" sizen="${versioW} ${headerH}" bgcolor="${this.headerBg}"/>
-      ${centeredText(`$s${tm.utils.palette.tmGreen}${title}`, versioW, headerH, { padding: this.margin, textScale:  config.textScale})}
+      ${centeredText(`$s${tm.utils.palette.tmGreen}${title}`, versioW, headerH, { padding: this.margin, textScale: config.textScale })}
       <frame posn="${versioW + this.margin} 0 2">
         <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBg}"/>
-        ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale})}
+        ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale })}
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
         <quad posn="0 0 2" sizen="${w} ${h - (headerH + this.margin)}" bgcolor="${config.tileBackground}"/>
