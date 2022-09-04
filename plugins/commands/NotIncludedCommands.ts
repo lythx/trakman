@@ -193,3 +193,27 @@
 //       privilege: 0
 //   },
 // ]
+// {
+//   aliases: ['dcmds', 'disablecommands'],
+//   help: 'Disable player commands.',
+//   params: [{ name: 'login' }],
+//   callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+//     const targetLogin: string = login
+//     const callerLogin: string = info.login
+//     const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+//     const prevPrivilege: number = targetInfo?.privilege ?? 0
+//     if (prevPrivilege >= info.privilege) {
+//       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
+//       return
+//     }
+//     if (prevPrivilege === -1) {
+//       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} already can't use commands.`, callerLogin)
+//     } else {
+//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+//         `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
+//         `commands for ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin}.`)
+//       await tm.admin.setPrivilege(targetLogin, -1, info)
+//     }
+//   },
+//   privilege: 2
+// },
