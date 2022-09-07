@@ -17,5 +17,5 @@ export default {
   jukeboxPreviousMapsInRuntime: 30,
   tmxMapPrefetch: 4,
   tmxPreviousMapsInRuntime: 4,
-  version: "0.5"
+  version: "0.6"
 }
