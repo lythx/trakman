@@ -4,7 +4,8 @@ import ids from '../config/ComponentIds.js'
 export default {
   title: "Top Ranks",
   icon: icons.chartLocal,
-  gridColumns:  [0.8, 4, 3, 3, 0.8, 4, 3, 3],
+  gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
+  headers: ['Lp.', 'Nickname', 'Login', 'AverageRank', 'Lp.', 'Nickname', 'Login', 'AverageRank'],
   entries: 30, // Has to be even number
   precision: 4,
   navbar: [
