@@ -12,6 +12,7 @@ export default {
     { name: "Top Playtimes", actionId: ids.topPlaytimes },
     { name: "Top Ranks", actionId: ids.topRanks },
     { name: "Top Records", actionId: ids.topRecords },
+    { name: "Top Sums", actionId: ids.topSums },
     { name: "Top Votes", actionId: ids.topVotes },
     { name: "Top Wins", actionId: ids.topWins }
   ],

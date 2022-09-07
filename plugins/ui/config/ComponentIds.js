@@ -58,5 +58,6 @@ export default {
   topRecords: 260000,
   topVisits: 270000,
   topVotes: 280000,
-  topWins: 290000
+  topWins: 290000,
+  topSums: 300000
 }

@@ -133,7 +133,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const rightW = width - (config.screenshotWidth + config.margin)
     const count = config.localsCount
     const grid = new Grid(rightW, height, [1, 2, 3], new Array(count + 1).fill(1),
-      { headerBg: config.iconBackground, background: config.gridBackground, margin: config.margin })
+      { headerBackground: config.iconBackground, background: config.gridBackground, margin: config.margin })
     const options = { textScale: config.recordTextScale }
     const index = records.findIndex(a => a.login === login)
     let personalIndex: number | undefined
@@ -234,7 +234,7 @@ export default class TMXWindow extends PopupWindow<number> {
 
   private counstructTmxRecordsXml(width: number, height: number, replays: TMXReplay[] = []): string {
     const grid = new Grid(width, height, config.tmxColumns, new Array(config.tmxRecordCount + 1).fill(1),
-      { margin: config.margin, background: config.gridBackground, headerBg: config.iconBackground })
+      { margin: config.margin, background: config.gridBackground, headerBackground: config.iconBackground })
     const options = { textScale: config.recordTextScale }
     const arr: (GridCellFunction | GridCellObject)[] = [
       (i, j, w, h) => centeredText('Lp.', w, h, options),

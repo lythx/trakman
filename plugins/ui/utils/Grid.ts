@@ -19,7 +19,7 @@ export class Grid {
   readonly margin: number
   readonly headerBg: string | undefined
 
-  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBg?: string }) {
+  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBackground?: string }) {
     this.width = width
     this.height = height
     this.margin = options?.margin ?? 0
@@ -30,7 +30,7 @@ export class Grid {
     this.columns = columnProportions.length
     this.rows = rowProportions.length
     this.background = options?.background
-    this.headerBg = options?.headerBg
+    this.headerBg = options?.headerBackground
   }
 
   constructXml(objectsOrFunctions: (GridCellFunction | GridCellObject)[]): string {
