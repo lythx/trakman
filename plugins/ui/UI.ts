@@ -49,7 +49,7 @@ DYNAMIC COMPONENTS
 */
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/CommandList.component.js'
-import TMXWindow from './dynamic_components/TMXWindow.component.js'
+import TMXWindow from './dynamic_components/MapInfoWindow.component.js'
 import LocalCps from './dynamic_components/LocalCps.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
 import LiveCps from './dynamic_components/LiveSectors.component.js'

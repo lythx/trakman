@@ -26,7 +26,8 @@ export default class TopRanks extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['topranks'], // TODO aliases etc
+      aliases: ['ranks','topranks', 'top100', 'top10'],
+      help: 'Display top ranking.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
@@ -52,16 +53,8 @@ export default class TopRanks extends PopupWindow<number> {
     const leftColumns = 3
     const offset = (((page ?? 1) - 1) * config.entries) - 1
     const getIndex = (i: number, j: number) => i + offset + (j > leftColumns ? (config.entries / columns) : 0)
-    const arr: (GridCellFunction | GridCellObject)[] = [
-      (i, j, w, h) => centeredText('Lp.', w, h),
-      (i, j, w, h) => centeredText('Nickname', w, h),
-      (i, j, w, h) => centeredText('Login', w, h),
-      (i, j, w, h) => centeredText('Average Rank', w, h),
-      (i, j, w, h) => centeredText('Lp.', w, h),
-      (i, j, w, h) => centeredText('Nickname', w, h),
-      (i, j, w, h) => centeredText('Login', w, h),
-      (i, j, w, h) => centeredText('Average Rank', w, h)
-    ]
+    const arr: (GridCellFunction | GridCellObject)[] = config.headers.map((a) =>
+      (i: number, j: number, w: number, h: number) => centeredText(a, w, h))
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((getIndex(i, j) + 1).toString(), w, h)
     const nicknameCell: GridCellFunction = (i, j, w, h) =>
       centeredText(tm.utils.safeString(tm.utils.strip(this.ranks[getIndex(i, j)].nickname, false)), w, h)
