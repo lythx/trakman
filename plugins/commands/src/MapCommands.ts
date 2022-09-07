@@ -19,7 +19,6 @@ const commands: TMCommand[] = [
         }
       }
       if (file instanceof Error) {
-        console.log('penis')
         tm.sendMessage(config.add.fetchError, info.login)
         return
       }
