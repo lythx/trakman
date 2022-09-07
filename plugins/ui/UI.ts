@@ -74,7 +74,7 @@ import TopRecords from './dynamic_components/TopRecords.component.js'
 import TopVisits from './dynamic_components/TopVisits.component.js'
 import TopVotes from './dynamic_components/TopVotes.component.js'
 import TopWins from './dynamic_components/TopWins.component.js'
-
+import TopSums from './dynamic_components/TopSums.component.js'
 
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
@@ -163,6 +163,7 @@ let dynamicComponents: {
   readonly topVisits: TopVisits
   readonly topVotes: TopVotes
   readonly topWins: TopWins
+  readonly topSums: TopSums
 }
 
 const events: TMListener[] = [
@@ -236,7 +237,8 @@ const events: TMListener[] = [
         topRecords: new TopRecords(),
         topVisits: new TopVisits(),
         topVotes: new TopVotes(),
-        topWins: new TopWins()
+        topWins: new TopWins(),
+        topSums: new TopSums()
       }
       new TestWindow()
     }

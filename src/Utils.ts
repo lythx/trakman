@@ -53,7 +53,7 @@ export const Utils = {
    */
   getPositionString(pos: number): string {
     if (pos < 1 || pos % 1 !== 0) {
-      console.log(`asdsdasdasd`)
+      console.log(`asdsdasdasd`) // TODO
     }
     return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   },

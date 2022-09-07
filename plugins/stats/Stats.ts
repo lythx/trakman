@@ -5,6 +5,7 @@ import { topWins } from './TopWins.js'
 import { topDonations } from './TopDonations.js'
 import { topRecords } from './TopRecords.js'
 import { topPlaytimes } from './TopPlaytimes.js'
+import { topSums } from './TopSums.js'
 
 export const stats = {
     votes: topVotes,
@@ -13,5 +14,6 @@ export const stats = {
     averages: topAverages,
     donations: topDonations,
     records: topRecords,
-    playtimes: topPlaytimes
+    playtimes: topPlaytimes,
+    sums: topSums
 }
