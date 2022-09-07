@@ -1,8 +1,8 @@
 export default {
-  winsCount: 10,
-  visitsCount: 10,
-  averagesCount: 10,
-  donationsCount: 10,
-  recordsCount: 10,
-  playtimesCount: 10
+  winsCount: 100000,
+  visitsCount: 100000,
+  averagesCount: 100000,
+  donationsCount: 100000,
+  recordsCount: 100000,
+  playtimesCount: 100000
 }

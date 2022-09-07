@@ -54,7 +54,7 @@ export default class SectorRecords extends PopupWindow {
     this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected async constructContent(login: string, params: { page: number }): Promise<string> {
+  protected constructContent(login: string, params: { page: number }): string {
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),

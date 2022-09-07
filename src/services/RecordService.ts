@@ -13,7 +13,7 @@ export class RecordService {
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: TMLocalRecord[] = []
   private static _liveRecords: FinishInfo[] = []
-  static readonly maxLocalsAmount: number = Number(process.env.LOCALS_AMOUNT)
+  static readonly maxLocalsAmount: number = Number(process.env.LOCALS_AMOUNT) // TODO eeeeeeeeeee
   private static _initialLocals: TMLocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
 

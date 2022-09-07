@@ -107,7 +107,7 @@ export const trakman = {
 
     fetchRecordCount: RecordService.fetchRecordCount.bind(RecordService),
 
-    fetchRank: RecordService.getRank.bind(RecordService),
+    getRank: RecordService.getRank.bind(RecordService),
 
     get local() { return RecordService.localRecords },
 
@@ -395,11 +395,7 @@ export const trakman = {
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
-  },
-
-  // TO BE REMOVED
-  fetchMapRank: RecordService.getRank.bind(RecordService),
-
+  }
 
 }
 

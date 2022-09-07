@@ -62,7 +62,7 @@ export const maplist = {
 
   getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<Readonly<TMMap>[]> => {
     if (sort === 'best') {
-      const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
+      const ranks: { mapId: string, rank: number }[] = (await tm.records.getRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < ranks.length; i++) {
@@ -72,7 +72,7 @@ export const maplist = {
       return ranked
     }
     else {
-      const ranks: { mapId: string, rank: number }[] = (await tm.fetchMapRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
+      const ranks: { mapId: string, rank: number }[] = (await tm.records.getRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
       const list: TMMap[] = [...authorSort]
       const ranked: TMMap[] = []
       for (let i: number = 0; i < list.length; i++) {
@@ -112,7 +112,7 @@ export const maplist = {
     do {
       i++
       if (i * fetchSize > authorSort.length) { break }
-      ranks.push(...(await tm.fetchMapRank(login, authorSort
+      ranks.push(...(await tm.records.getRank(login, authorSort
         .slice(i * fetchSize, (i + 1) * fetchSize).map(a => a.id)))
         .filter(a => a.rank <= tm.records.maxLocalsAmount))
     } while (((i + 1) * fetchSize) - ranks.length < fetchSize)
