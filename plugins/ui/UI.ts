@@ -67,6 +67,8 @@ import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
+import TopRanks from './dynamic_components/TopRanks.component.js'
+
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
 import TestWindow from './test_widgets/TestWindow.js'
@@ -147,6 +149,7 @@ let dynamicComponents: {
   readonly welcomeWindow: WelcomeWindow
   readonly changelog: Changelog
   readonly TMXWindow: TMXWindow
+  readonly topRanks: TopRanks
 }
 
 const events: TMListener[] = [
@@ -214,6 +217,7 @@ const events: TMListener[] = [
         welcomeWindow: new WelcomeWindow(),
         changelog: new Changelog(),
         TMXWindow: new TMXWindow(),
+        topRanks: new TopRanks()
       }
       new TestWindow()
     }

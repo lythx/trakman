@@ -1,4 +1,4 @@
-export default{
+export default {
     PopupWindow: 0,
     rank: 40,
     timerResult: 60,
@@ -51,5 +51,6 @@ export default{
     welcomeWindow: 190000,
     changelog: 200000,
     cpCounter: 210000,
-    commandList: 220000
+    commandList: 220000,
+    topRanks: 230000
 }

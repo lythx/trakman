@@ -6,7 +6,8 @@ let topList: { login: string, nickname: string, average: number }[] = []
 const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, average: number }[]) => void)[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await tm.db.query(`SELECT login, nickname, average FROM players
+  const res: { login: string, nickname: string, average: number }[] | Error =
+    await tm.db.query(`SELECT login, nickname, average FROM players
   ORDER BY average ASC,
   last_online DESC
   LIMIT ${config.averagesCount}`)
@@ -14,7 +15,7 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top averages', res.message, res.stack)
     return
   }
-  topList = res
+  topList = res.filter(a => a.average !== tm.records.maxLocalsAmount)
 }
 
 tm.addListener('Controller.Ready', async (): Promise<void> => {
@@ -35,8 +36,8 @@ tm.addListener('Controller.RanksAndAveragesUpdated', async (info) => {
       if (nickname === undefined) {
         nickname = (await tm.players.fetch(e.login))?.nickname
       }
-      topList.splice(topList.findIndex(a => a.average > e.average), 0, 
-      { login: e.login, nickname: nickname ?? e.login, average: e.average })
+      topList.splice(topList.findIndex(a => a.average > e.average), 0,
+        { login: e.login, nickname: nickname ?? e.login, average: e.average })
       topList.length = config.averagesCount
     }
   }
