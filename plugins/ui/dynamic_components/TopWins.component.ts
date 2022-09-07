@@ -3,20 +3,20 @@ import { trakman as tm } from "../../../src/Trakman.js";
 import { stats } from "../../stats/Stats.js";
 import { IDS, centeredText } from '../UiUtils.js'
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";
-import config from './TopRanks.config.js'
+import config from './TopWins.config.js'
 
-export default class TopRanks extends PopupWindow<number> {
+export default class TopWins extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, average: number }[]
+  private ranks: { login: string, nickname: string, wins: number }[]
 
   constructor() {
-    super(IDS.topRanks, config.icon, config.title, config.navbar)
-    this.ranks = stats.averages.list
+    super(IDS.topWins, config.icon, config.title, config.navbar)
+    this.ranks = stats.wins.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.averages.onUpdate((_, list) => {
+    stats.wins.onUpdate((_, list) => {
       this.ranks = list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
@@ -26,8 +26,8 @@ export default class TopRanks extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['ranks','topranks', 'top100', 'top10'],
-      help: 'Display top average ranks.',
+      aliases: ['wins','topwins'],
+      help: 'Display top wins.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
@@ -63,7 +63,7 @@ export default class TopRanks extends PopupWindow<number> {
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
     const averageCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(this.ranks[getIndex(i, j)].average.toFixed(config.precision), w, h)
+      centeredText(this.ranks[getIndex(i, j)].wins.toString(), w, h)
     const emptyCell: GridCellObject = {
       callback: (i, j, w, h) => '',
       background: undefined
