@@ -68,6 +68,13 @@ import CheckpointRecords from './dynamic_components/CheckpointRecords.component.
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
 import TopRanks from './dynamic_components/TopRanks.component.js'
+import TopDonations from './dynamic_components/TopDonations.component.js'
+import TopPlaytimes from './dynamic_components/TopPlaytimes.component.js'
+import TopRecords from './dynamic_components/TopRecords.component.js'
+import TopVisits from './dynamic_components/TopVisits.component.js'
+import TopVotes from './dynamic_components/TopVotes.component.js'
+import TopWins from './dynamic_components/TopWins.component.js'
+
 
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
@@ -150,6 +157,12 @@ let dynamicComponents: {
   readonly changelog: Changelog
   readonly TMXWindow: TMXWindow
   readonly topRanks: TopRanks
+  readonly topDonations: TopDonations
+  readonly topPlaytimes: TopPlaytimes
+  readonly topRecords: TopRecords
+  readonly topVisits: TopVisits
+  readonly topVotes: TopVotes
+  readonly topWins: TopWins
 }
 
 const events: TMListener[] = [
@@ -217,7 +230,13 @@ const events: TMListener[] = [
         welcomeWindow: new WelcomeWindow(),
         changelog: new Changelog(),
         TMXWindow: new TMXWindow(),
-        topRanks: new TopRanks()
+        topRanks: new TopRanks(),
+        topDonations: new TopDonations(),
+        topPlaytimes: new TopPlaytimes(),
+        topRecords: new TopRecords(),
+        topVisits: new TopVisits(),
+        topVotes: new TopVotes(),
+        topWins: new TopWins()
       }
       new TestWindow()
     }

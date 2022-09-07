@@ -1,4 +1,5 @@
 import { trakman as tm } from "../../src/Trakman.js";
+import config from './Config.js'
 
 let onlineList: { login: string, nickname: string, count: number }[] = []
 let initialVotes: TMVote[] = []
@@ -11,7 +12,7 @@ const initialize = async () => {
   JOIN players ON votes.player_id=players.id
   GROUP BY (login, nickname)
   ORDER BY count DESC
-  LIMIT 10;`)
+  LIMIT ${config.votesCount};`)
   if (res instanceof Error) { 
     await tm.log.fatal('Failed to fetch top votes', res.message, res.stack)
     return 

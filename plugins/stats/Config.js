@@ -4,5 +4,6 @@ export default {
   averagesCount: 100000,
   donationsCount: 100000,
   recordsCount: 100000,
-  playtimesCount: 100000
+  playtimesCount: 100000,
+  votesCount: 100000
 }
