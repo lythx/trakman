@@ -43,7 +43,7 @@ const initialize = async (): Promise<void> => {
   }
   isConnected = true
   await fetchVotes(...tm.players.list.map(a => a.login))
-  tm.log.trace('Connected to Maniakarma') 
+  tm.log.trace('Connected to Maniakarma')
 }
 
 const reinitialize = async (): Promise<void> => {
@@ -101,7 +101,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
     tm.log.error(`Failed to fetch maniakarma votes, received response:`, JSON.stringify(json, null, 2))
     return new Error(`Failed to fetch maniakarma votes`)
   }
-  mapKarmaValue = Number(json?.result?.votes?.[0]?.karma?.[0]) // TODO check if its a number
+  mapKarmaValue = Number(json?.result?.votes?.[0]?.karma?.[0])
   for (const key of Object.keys(mapKarma)) {
     mapKarma[key as keyof typeof mapKarma] = Number(json?.result?.votes?.[0]?.[key]?.[0]?.$?.count)
   }
@@ -308,9 +308,10 @@ export const maniakarma = {
     return newVotes.length
   },
 
-  get isEnabled(): boolean {
-    return config.isEnabled
-  },
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled,
 
   get mapKarmaRatio(): number {
     return mapKarmaValue

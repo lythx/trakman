@@ -13,7 +13,7 @@ export default class AdminPanel extends StaticComponent {
 
   constructor() {
     super(IDS.admin, 'race')
-    const pos = this.getRelativePosition() // TODO MAKE STATIC POSITION A CLASS METHOD
+    const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
     this.side = pos.side
