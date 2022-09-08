@@ -31,12 +31,12 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
-        const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1],
-          playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3, playerInfo[0].LadderRank) // TODO test if right name
+        const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, 
+          playerInfo[0].Path, params[1],  playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3, 
+          playerInfo[0].PlayerRankings[0].Score, playerInfo[0].PlayerRankings[0].Ranking)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
-
       }
     },
     {
