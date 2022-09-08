@@ -24,7 +24,7 @@ export default class MapWidget extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
-    if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
+    if (webservices.isEnabled === true) { // TODO FIX
       webservices.onCurrentAuthorChange(() => {
         void this.display()
       })
@@ -109,10 +109,10 @@ export default class MapWidget extends StaticComponent {
         return e.icon
       }
     }
-    if (map.isNadeo === true || tmxMap?.isNadeo === true) {
+    if (map.isNadeo === true) {
       return config.icons.tags.nadeo
     }
-    if (map.isClassic === true || tmxMap?.isClassic === true) {
+    if (map.isClassic === true) {
       return config.icons.tags.classic
     }
     return config.icons.tags.normal

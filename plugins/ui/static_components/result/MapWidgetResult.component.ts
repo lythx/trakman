@@ -25,7 +25,7 @@ export default class MapWidgetResult extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
-    if (process.env.USE_WEBSERVICES === "YES") { // TODO FIX
+    if (webservices.isEnabled === true) { 
       webservices.onCurrentAuthorChange(() => {
         void this.display()
       })
@@ -135,11 +135,11 @@ export default class MapWidgetResult extends StaticComponent {
   private getTagAndAward(map: TMMap, tmxMap?: TMXMapInfo): { tag: string, award: string } {
     let tag = config.icons.tags.normal
     let award = config.icons.awards.normal
-    if (map.isNadeo === true || tmxMap?.isNadeo === true) {
+    if (map.isNadeo === true) {
       tag = config.icons.tags.nadeo
       award = config.icons.awards.nadeo
     }
-    if (map.isClassic === true || tmxMap?.isClassic === true) {
+    if (map.isClassic === true) {
       tag = config.icons.tags.classic
       award = config.icons.awards.classic
     }

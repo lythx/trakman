@@ -33,9 +33,9 @@ export default class TMXWindow extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['tmxinfo'],
       help: 'Display TMX info.',
-      callback: (info: TMMessageInfo): void =>  tm.openManialink(this.openId, info.login),
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
   }
 
   private reRender(): void {
@@ -194,7 +194,7 @@ export default class TMXWindow extends PopupWindow<number> {
       lbRating = 'Nadeo'
       lbIcon = ic.leaderboardRating.nadeo
     }
-    else if (tmxMap?.isClassic ?? map?.leaderboardRating === 0) { // TODO add isclassic and isnadeo to map obj perhaps
+    else if (map.isClassic === true) {
       lbRating = 'Classic'
       lbIcon = ic.leaderboardRating.classic
     }

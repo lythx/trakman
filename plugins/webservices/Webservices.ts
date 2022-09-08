@@ -21,7 +21,7 @@ const fetchPlayer = async (login: string): Promise<{ //  TODO fix return type wh
   path: string
   idZone: number
 } | Error> => {
-  if (config.enabled === false) {
+  if (config.isEnabled === false) {
     return new Error('Use webservices is set to false')
   }
   const au: string = "Basic " + Buffer.from(`${config.login}:${config.password}`).toString('base64')
@@ -152,7 +152,12 @@ export const webservices = {
    */
   get nextAuthor() {
     return nextAuthorData
-  }
+  },
+
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled
 
 }
 
