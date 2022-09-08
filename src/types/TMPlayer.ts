@@ -11,6 +11,7 @@ interface TMPlayer {
   readonly visits: number
   readonly ip: string
   readonly isUnited: boolean
+  readonly ladderPoints: number
   readonly ladderRank: number
   readonly lastOnline?: Date
   wins: number
