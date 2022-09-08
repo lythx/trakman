@@ -49,14 +49,15 @@ export class PlayerService {
       return
     }
     for (const player of playerList) {
-      const detailedPlayerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
-      if (detailedPlayerInfo instanceof Error) {
-        Logger.fatal(`Error when fetching player information from the server for ${Utils.strip(player.NickName)} (${player.Login})`, detailedPlayerInfo.message)
+      const info: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      if (info instanceof Error) {
+        Logger.fatal(`Error when fetching player information from the server for ${Utils.strip(player.NickName)} (${player.Login})`, info.message)
         return
       }
       // OnlineRights is 0 for nations and 3 for united ?XD
-      await this.join(player.Login, player.NickName, detailedPlayerInfo[0].Path, detailedPlayerInfo[0].IsSpectator,
-        detailedPlayerInfo[0].PlayerId, detailedPlayerInfo[0].IPAddress.split(':')[0], detailedPlayerInfo[0].OnlineRights === 3, true)
+      await this.join(player.Login, player.NickName, info[0].Path, info[0].IsSpectator,
+        info[0].PlayerId, info[0].IPAddress.split(':')[0],
+        info[0].OnlineRights === 3, info[0].LadderRank, true) // TODO test if right property
     }
   }
 
@@ -71,7 +72,9 @@ export class PlayerService {
    * @param isUnited True if player has united version of game
    * @param serverStart True if executed on server start
    */
-  static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string, isUnited: boolean, serverStart?: true): Promise<JoinInfo> {
+  static async join(login: string, nickname: string, fullRegion: string,
+    isSpectator: boolean, id: number, ip: string, isUnited: boolean,
+    ladderRank: number, serverStart?: true): Promise<JoinInfo> {
     let s: string[] = fullRegion.split('|').slice(1)
     const region: string = s.join('|')
     const country: string = s[0]
@@ -103,6 +106,7 @@ export class PlayerService {
         region,
         isUnited,
         average: RecordService.maxLocalsAmount,
+        ladderRank,
         rank: index === -1 ? undefined : (index + 1)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
@@ -125,7 +129,8 @@ export class PlayerService {
         isUnited,
         lastOnline: playerData.lastOnline,
         rank: index === -1 ? undefined : (index + 1),
-        average: playerData.average
+        average: playerData.average,
+        ladderRank
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }

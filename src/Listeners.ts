@@ -32,7 +32,7 @@ export class Listeners {
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, playerInfo[0].Path, params[1],
-          playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3)
+          playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3, playerInfo[0].LadderRank) // TODO test if right name
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
@@ -206,7 +206,7 @@ export class Listeners {
         // Get winner login from the callback
         const login: string | undefined = params[0].Login
         // Only update wins if the player is not alone on the server and exists
-        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1 
+        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1
           || params[0].BestTime === -1) ? undefined : await PlayerService.addWin(login)
         const endMapInfo: EndMapInfo = {
           ...MapService.current,
