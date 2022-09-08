@@ -30,7 +30,7 @@ export abstract class ChatService {
    * Adds chat commands to the server
    * @param commands Chat commands to register
    */
-  static addCommand(...commands: TMCommand[]): void { // TODO CHANGE AFTER IMPLEMENTING LOGIN TYPE
+  static addCommand(...commands: TMCommand[]): void {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     for (const command of commands) {

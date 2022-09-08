@@ -3,7 +3,7 @@ import { palette as p } from "../../config/Prefixes.js"
 export default {
   isEnabled: true,
   // Using DB client makes the plugin a bit faster due to high amount of database queries
-  // Program can run only few clients tho // TODO exact number
+  // Program can run only run limited amount of clients, the process will hang otherwise
   useDBClient: true,
   noCpRecords: `${p.error}You have no checkpoint records on the ongoing map.`,
   allPlayerCpsRemoved: `${p.servermsg}Your checkpoints on the ongoing map were removed.`,
