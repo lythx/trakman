@@ -52,10 +52,15 @@ export const Utils = {
    * @returns Number with the suffix
    */
   getPositionString(pos: number): string {
-    if (pos < 1 || pos % 1 !== 0) {
-      console.log(`asdsdasdasd`) // TODO
+    if (Number.isInteger(pos) === false || pos === 0) {
+      return pos.toString()
     }
-    return pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
+    let prefix = ''
+    if (pos < 0) {
+      prefix = '-'
+      pos = -pos
+    }
+    return prefix + pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   },
 
   /**
