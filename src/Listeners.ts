@@ -31,6 +31,7 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
+        console.log(playerInfo)
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName, 
           playerInfo[0].Path, params[1],  playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3, 
           playerInfo[0].PlayerRankings[0].Score, playerInfo[0].PlayerRankings[0].Ranking)

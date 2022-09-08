@@ -5,9 +5,12 @@ const commands: TMCommand[] = [
   {
     aliases: ['sgm', 'setgamemode'],
     help: 'Change the gamemode.',
-    params: [{ name: 'mode' }],
-    callback: (info: TMMessageInfo, mode: string): void => { // TODO maybe implement enums
-      let modeInt: number
+    params: [{
+      name: 'mode', validValues: ['round', 'ta', 'team', 'lap', 'stunt', 'cup',
+        'rounds', 'timeattack', 'teams', 'laps', 'stunts']
+    }],
+    callback: (info: TMMessageInfo, mode: string): void => {
+      let modeInt = 1
       switch (mode.toLowerCase()) {
         case 'rounds': case 'round': modeInt = 0
           break
@@ -20,9 +23,6 @@ const commands: TMCommand[] = [
         case 'stunts': case 'stunt': modeInt = 4
           break
         case 'cup': modeInt = 5
-          break
-        default: tm.sendMessage(config.setgamemode.error, info.login)
-          return
       }
       tm.sendMessage(tm.utils.strVar(config.setgamemode.text, {
         title: tm.utils.getTitle(info),
