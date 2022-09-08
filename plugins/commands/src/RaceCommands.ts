@@ -70,7 +70,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['fpt', 'forceteam', 'forceplayerteam'],
     help: 'Force a player into the specified team.',
-    params: [{ name: 'player' }, { name: 'team' }],
+    params: [{ name: 'player' }, { name: 'team', validValues: ['blue', 'red'] }],
     callback: async (info: TMMessageInfo, player: string, team: string): Promise<void> => {
       if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.forceteam.notRounds, info.login)
@@ -81,8 +81,8 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.forceteam.playerOffline, info.login)
         return
       }
-      let teamInt: number
-      let teamColour: string
+      let teamInt = 0
+      let teamColour = ''
       switch (team.toLowerCase()) {
         case 'blue':
           teamInt = 0
@@ -91,12 +91,12 @@ const commands: TMCommand[] = [
         case 'red':
           teamInt = 1
           teamColour = `${tm.utils.colours.red}`
-          break
-        default:
-          tm.sendMessage(config.forceteam.error, info.login)
-          return
       }
-      tm.sendMessage(tm.utils.strVar(config.forceteam.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(playerInfo.nickname), team: (teamColour + team.toUpperCase()) }), config.forceteam.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forceteam.text, {
+        title: tm.utils.getTitle(info),
+        adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(playerInfo.nickname),
+        team: (teamColour + team.toUpperCase())
+      }), config.forceteam.public ? undefined : info.login)
       tm.client.callNoRes(`ForcePlayerTeam`, [{ string: player }, { int: teamInt }])
     },
     privilege: config.forceteam.privilege

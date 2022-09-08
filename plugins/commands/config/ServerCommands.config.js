@@ -61,7 +61,11 @@ export default {
   },
   sethideserver: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has updated server visibility to ${p.highlight}#{status}${p.admin}.`,
-    error: `${p.error}Invalid input. Possible values are 0, 1 & 2.`,
+    status: {
+      visible: 'visible',
+      hidden: 'hidden',
+      noTmnf: 'hidden for TMNF players'
+    },
     public: true,
     privilege: 3
   },

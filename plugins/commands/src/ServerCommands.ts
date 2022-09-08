@@ -7,26 +7,26 @@ const commands: TMCommand[] = [
     help: 'Set the referee password.',
     params: [{ name: 'password', type: 'multiword', optional: true }],
     callback: (info: TMMessageInfo, password?: string): void => {
-        const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
-        if (password !== undefined && !regex.test(password)) {
-            tm.sendMessage(config.setrefpwd.error, info.login)
-            return
-        }
-        tm.sendMessage(tm.utils.strVar(config.setrefpwd.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), password: password !== undefined ? password : 'none (disabled)' }), config.setrefpwd.public ? undefined : info.login)
-        tm.client.callNoRes(`SetRefereePassword`, [{ string: password === undefined ? '' : password }])
+      const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
+      if (password !== undefined && !regex.test(password)) {
+        tm.sendMessage(config.setrefpwd.error, info.login)
+        return
+      }
+      tm.sendMessage(tm.utils.strVar(config.setrefpwd.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), password: password !== undefined ? password : 'none (disabled)' }), config.setrefpwd.public ? undefined : info.login)
+      tm.client.callNoRes(`SetRefereePassword`, [{ string: password === undefined ? '' : password }])
     },
     privilege: config.setrefpwd.privilege
-},
-{
+  },
+  {
     aliases: ['srm', 'setrefmode', 'setrefereemode'],
     help: 'Set the referee mode.',
     params: [{ name: 'mode', type: 'boolean' }],
     callback: (info: TMMessageInfo, mode: boolean): void => {
-        tm.sendMessage(tm.utils.strVar(config.setrefmode.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), mode: mode ? 'ALL' : 'TOP3' }), config.setrefmode.public ? undefined : info.login)
-        tm.client.call(`SetRefereeMode`, [{ int: mode ? 1 : 0 }])
+      tm.sendMessage(tm.utils.strVar(config.setrefmode.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), mode: mode ? 'ALL' : 'TOP3' }), config.setrefmode.public ? undefined : info.login)
+      tm.client.call(`SetRefereeMode`, [{ int: mode ? 1 : 0 }])
     },
     privilege: config.setrefmode.privilege
-},
+  },
   {
     aliases: ['ssn', 'setservername'],
     help: 'Set the server name.',
@@ -131,22 +131,28 @@ const commands: TMCommand[] = [
   {
     aliases: ['shs', 'sethideserver'],
     help: 'Set whether the server is hidden.',
-    params: [{ name: 'value', type: 'int' }],
-    callback: (info: TMMessageInfo, value: number): void => {
-      if (![0, 1, 2].includes(value)) {
-        tm.sendMessage(config.sethideserver.error, info.login)
-        return
-      }
-      let status: string
+    params: [{ name: 'value', validValues: ['hidden', 'visible', 'notmnf'] }],
+    callback: (info: TMMessageInfo, value: string): void => {
+      let status = ''
+      let hideInt = 0
       switch (value) {
-        case 1: status = 'hidden'
+        case 'visible':
+          status =config.sethideserver.status.visible
+          hideInt = 0
           break
-        case 2: status = 'hidden for TMNF players'
+        case 'hidden':
+          status = config.sethideserver.status.hidden
+          hideInt = 1
           break
-        default: status = 'visible'
+        case 'notmnf':
+          status = config.sethideserver.status.noTmnf
+          hideInt = 2
       }
-      tm.sendMessage(tm.utils.strVar(config.sethideserver.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), status: status }), config.sethideserver.public ? undefined : info.login)
-      tm.client.callNoRes(`SetHideServer`, [{ int: value }])
+      tm.sendMessage(tm.utils.strVar(config.sethideserver.text, {
+        title: tm.utils.getTitle(info),
+        adminName: tm.utils.strip(info.nickname), status: status
+      }), config.sethideserver.public ? undefined : info.login)
+      tm.client.callNoRes(`SetHideServer`, [{ int: hideInt }])
     },
     privilege: config.sethideserver.privilege
   },
@@ -174,20 +180,20 @@ const commands: TMCommand[] = [
     aliases: ['kc', 'killcontroller'],
     help: 'Kill the server controller.',
     callback: (info: TMMessageInfo): never => {
-        tm.sendMessage(tm.utils.strVar(config.killcontroller.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.killcontroller.public ? undefined : info.login)
-        process.exit(0)
+      tm.sendMessage(tm.utils.strVar(config.killcontroller.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.killcontroller.public ? undefined : info.login)
+      process.exit(0)
     },
     privilege: config.killcontroller.privilege
-},
-{
+  },
+  {
     aliases: ['sd', 'shutdown'],
     help: 'Stop the dedicated server.',
     callback: (info: TMMessageInfo): void => {
-        tm.sendMessage(tm.utils.strVar(config.shutdown.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.shutdown.public ? undefined : info.login)
-        tm.client.callNoRes(`StopServer`)
+      tm.sendMessage(tm.utils.strVar(config.shutdown.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.shutdown.public ? undefined : info.login)
+      tm.client.callNoRes(`StopServer`)
     },
     privilege: config.shutdown.privilege
-},
+  },
 ]
 
 tm.commands.add(...commands)

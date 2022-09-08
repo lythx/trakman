@@ -6,7 +6,7 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
-import {prefixes} from '../../config/Prefixes.js'
+import { prefixes } from '../../config/Prefixes.js'
 
 /**
  * This service manages chat table and chat commands
@@ -57,7 +57,20 @@ export abstract class ChatService {
           this.sendErrorMessage(Utils.strVar(messages.noParam, { name: param.name }), info.login)
           return
         }
-        if (params[i].toLowerCase() === '$u' && param.optional === undefined) { parsedParams.push(undefined) }
+        if (params[i].toLowerCase() === '$u' && param.optional === undefined) {  // todo make work
+          parsedParams.push(undefined)
+          continue
+        }
+        if (param.validValues !== undefined) {
+          const enumVal = param.validValues.find(a => a.toString().toLowerCase() === params[i].toLowerCase())
+          if (enumVal === undefined) {
+            this.sendErrorMessage(Utils.strVar(messages.invalidValue, 
+              { name: param.name, values: param.validValues.join(', ') }), info.login)
+            return
+          }
+          parsedParams.push(enumVal)
+          continue
+        }
         switch (param.type) {
           case 'int':
             if (!Number.isInteger(Number(params[i]))) {
@@ -161,7 +174,7 @@ export abstract class ChatService {
   }
 
   private static sendErrorMessage(message: string, login: string): void {
-    Client.callNoRes('ChatSendServerMessageToLogin', [{ string: prefixes.serverToPlayer +  message }, { string: login }])
+    Client.callNoRes('ChatSendServerMessageToLogin', [{ string: prefixes.serverToPlayer + message }, { string: login }])
   }
 
   /**
