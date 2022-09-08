@@ -274,7 +274,8 @@ export class RecordService {
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited,
-      average: player.average
+      average: player.average,
+      ladderRank: player.ladderRank
     }
   }
 

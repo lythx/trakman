@@ -36,7 +36,7 @@ export class GameService {
         array: [{
           struct: {
             Command: { string: `*` },
-            Ratio: { double: -1.0 }
+            Ratio: { double: -1 }
           }
         }]
       }]
