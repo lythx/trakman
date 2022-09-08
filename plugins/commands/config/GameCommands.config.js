@@ -3,7 +3,6 @@ import { palette as p } from '../../../src/Trakman.js'
 export default {
   setgamemode: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the gamemode to ${p.highlight}#{mode}${p.admin}.`,
-    error: `${p.error}Invalid gamemode.`,
     public: true,
     privilege: 2
   },

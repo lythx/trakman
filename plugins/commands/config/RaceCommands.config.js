@@ -30,7 +30,6 @@ export default {
   },
   forceteam: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced ${p.highlight}#{name} ${p.admin}into the #{team} ${p.admin}team.`,
-    error: `${p.error}Invalid team.`,
     notRounds: `${p.error}Server is not in teams mode.`,
     playerOffline: `${p.error}Player is not on the server`,
     public: true,
