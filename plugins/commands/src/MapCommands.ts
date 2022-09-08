@@ -11,7 +11,7 @@ const commands: TMCommand[] = [
       const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
       const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite)
       let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
-      if (file instanceof Error) { // TODO test
+      if (file instanceof Error) {
         const remainingSites = tmxSites.filter(a => a !== tmxSite)
         for (const e of remainingSites) {
           file = await tm.tmx.fetchMapFile(id, e).catch((err: Error) => err)
