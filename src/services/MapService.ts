@@ -171,7 +171,7 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
-    const status: void | Error = this.addToJukebox(obj.id, caller, true)
+    const status: void | Error = await this.addToJukebox(obj.id, caller, true)
     if (status instanceof Error) {
       Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
       this.clearJukebox()
@@ -222,14 +222,20 @@ export class MapService {
    * Sends a dedicated server call to set next map to first map in queue
    * @returns True if map gets set, Error if it fails
    */
-  static async updateNextMap(): Promise<true | Error> {
+  private static async updateNextMap(): Promise<void> {
     const id: string = this._queue[0].map.id
     const map: TMMap | undefined = this._maps.find(a => a.id === id)
-    if (map === undefined) { return new Error(`Cant find map with id ${id} in memory`) }
-    const res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
-    if (res instanceof Error) { return new Error(`Failed to queue map ${map.name}`) }
+    if (map === undefined) { throw new Error(`Cant find map with id ${id} in memory`) }
+    let res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+    let i = 1
+    while (res instanceof Error) {
+      if (i === 4) {
+        await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
+      }
+      Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
+      res = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+    }
     Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author}`)
-    return true
   }
 
   /**
@@ -238,13 +244,13 @@ export class MapService {
    * @param caller Object containing login and nickname of player adding the map
    * @param setAsNextMap If true map is going to be placed in front of the queue
    */
-  static addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): void | Error {
+  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<void | Error> {
     const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
-    this.updateNextMap()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
     } else {
@@ -257,7 +263,7 @@ export class MapService {
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
    */
-  static removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): boolean {
+  static async removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): Promise<boolean> {
     if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
     if (caller !== undefined) {
@@ -267,8 +273,8 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    this.updateNextMap()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    await this.updateNextMap()
     return true
   }
 
@@ -276,7 +282,7 @@ export class MapService {
    * Removes all maps from jukebox
    * @param caller Object containing login and nickname of player clearing the jukebox
    */
-  static clearJukebox(caller?: { login: string, nickname: string }): void {
+  static async clearJukebox(caller?: { login: string, nickname: string }): Promise<void> {
     let n: number = this._queue.length
     for (let i: number = 0; i < n; i++) {
       if (this._queue[i].isForced) {
@@ -285,8 +291,8 @@ export class MapService {
       }
     }
     this.fillQueue()
-    this.updateNextMap()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
     } else {
@@ -298,12 +304,12 @@ export class MapService {
    * Randomly changes the order of maps in the maplist
    * @param caller Object containing login and nickname of player who called the method
    */
-  static shuffle(caller?: { login: string, nickname: string }): void {
+  static async shuffle(caller?: { login: string, nickname: string }): Promise<void> {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
-    this.updateNextMap()
     Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    await this.updateNextMap()
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
     } else {
@@ -517,7 +523,7 @@ export class MapService {
   /**
    * @returns All maps from queue
    */
-  static get queue():  Readonly<TMMap>[] {
+  static get queue(): Readonly<TMMap>[] {
     return [...this._queue.map(a => a.map)]
   }
 

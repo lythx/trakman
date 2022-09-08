@@ -38,8 +38,7 @@ const commands: TMCommand[] = [
         title: tm.utils.getTitle(info),
         adminName: tm.utils.strip(info.nickname)
       }), config.prev.public ? undefined : info.login)
-      tm.jukebox.add(tm.jukebox.history[0].id, info)
-      await new Promise((r) => setTimeout(r, 5)) // Let the server think first // TODO test if needed
+      await tm.jukebox.add(tm.jukebox.history[0].id, info)
       tm.client.callNoRes(`NextChallenge`)
     },
     privilege: config.prev.privilege
