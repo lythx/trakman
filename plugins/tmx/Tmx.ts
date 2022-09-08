@@ -162,9 +162,10 @@ export const tmx = {
     return config.historyCount
   },
 
-  get isEnabled(): boolean {
-    return config.isEnabled
-  }
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled
 
 }
 

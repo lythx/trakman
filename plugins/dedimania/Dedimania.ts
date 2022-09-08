@@ -210,7 +210,7 @@ const updateServerPlayers = (): void => {
  * Updates the player information and server player list on the dedimania website
  * @param player Player object
  */
-const playerJoin = async (player: 
+const playerJoin = async (player:
   { login: string, nickname: string, region: string, isSpectator: boolean, ladderRank: number }): Promise<void> => {
   if (client.connected === false) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
@@ -255,7 +255,7 @@ const getPlayersArray = (): any[] => {
             TeamName: { string: '' },
             TeamId: { int: -1 },
             IsSpec: { boolean: player.isSpectator },
-            Ranking: { int:  player.ladderRank }, 
+            Ranking: { int: player.ladderRank },
             IsOff: { boolean: false } // OFFICIAL MODE ALWAYS FALSE
           }
         }
@@ -359,9 +359,10 @@ export const dedimania = {
     return newDedis.length
   },
 
-  get isEnabled(): boolean {
-    return config.isEnabled
-  },
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled,
 
   get isConnected(): boolean {
     return client.connected
