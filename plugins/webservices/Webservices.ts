@@ -47,14 +47,12 @@ const fetchPlayer = async (login: string): Promise<{ //  TODO fix return type wh
   })
 }
 
-// TODO fix after moving entire webservice thing here (?)
 const fetchPlayerData = async (login: string): Promise<{ nickname: string, country: string } | Error | false> => {
   if (regex.test(login) === true) { return false }
   const json: any = await fetchPlayer(login)
   if (json instanceof Error) { // UNKOWN PLAYER MOMENT
     return json
   } else {
-    // No error check, nation cannot be undefined
     return { nickname: json?.nickname, country: (tm.utils.countryToCode(json?.path?.split('|')[1]) as any) }
   }
 }

@@ -267,7 +267,6 @@ export class Listeners {
       event: 'TrackMania.ChallengeListModified',
       callback: (params: any[]): void => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
-        // TODO: Make this not hardcoded?
         Client.callNoRes('SaveMatchSettings', [{ string: config.matchSettingsFile }])
       }
     },
