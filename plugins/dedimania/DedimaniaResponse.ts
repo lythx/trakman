@@ -14,7 +14,6 @@ export class DedimaniaResponse {
   private _sessionId: string | null = null
 
   addData(data: string): void {
-    console.log(data)
     this._data += data
     const split: string[] = this._data.split('\n')
     if (split[split.length - 1] === '</methodResponse>' && split[0] === 'HTTP/1.1 200 OK\r') {

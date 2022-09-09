@@ -82,7 +82,6 @@ export class DedimaniaClient {
 
   setupListeners(): void {
     this.socket.on('data', async buffer => {
-      console.log(buffer.toString())
       this.response.addData(buffer.toString())
     })
     this.socket.on('error', async err => {
