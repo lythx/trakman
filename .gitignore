@@ -115,5 +115,4 @@ dist
 .vscode
 
 # Config files
-*config.js
-*Config.js
+**/[Cc]onfig*
