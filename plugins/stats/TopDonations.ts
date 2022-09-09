@@ -10,7 +10,7 @@ const initialize = async () => {
   JOIN players ON players.id=donations.player_id
   GROUP BY (login, nickname)
   ORDER BY amount DESC
-  LIMIT 10`)
+  LIMIT ${config.donationsCount}`)
   if (res instanceof Error) {
     await tm.log.fatal(res)
     return
@@ -31,7 +31,7 @@ donations.onDonation((info) => {
     entry.amount = amount
     topList.sort((a, b) => b.amount - a.amount)
   } else {
-    topList.splice(topList.findIndex(a => a.amount < amount), 0, { login, nickname: info.nickname, amount})
+    topList.splice(topList.findIndex(a => a.amount < amount), 0, { login, nickname: info.nickname, amount })
     topList.length = config.donationsCount
   }
   for (const e of listeners) {

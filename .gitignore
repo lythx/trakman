@@ -113,3 +113,7 @@ dist
 
 # Debugger
 .vscode
+
+# Config files
+*config.js
+*Config.js
