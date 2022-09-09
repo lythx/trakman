@@ -39,6 +39,7 @@ export class DedimaniaClient {
         Packmask: { string: packmask[0] }
       }
     }])
+    await request.initialize()
     this.receivingResponse = true
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
@@ -81,6 +82,7 @@ export class DedimaniaClient {
 
   setupListeners(): void {
     this.socket.on('data', async buffer => {
+      console.log(buffer.toString())
       this.response.addData(buffer.toString())
     })
     this.socket.on('error', async err => {
@@ -94,6 +96,7 @@ export class DedimaniaClient {
     if (!this._connected) { return new Error('Not connected to dedimania') }
     this.receivingResponse = true
     const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)
+    await request.initialize()
     this.socket.write(request.buffer)
     this.response = new DedimaniaResponse()
     const startDate: number = Date.now()

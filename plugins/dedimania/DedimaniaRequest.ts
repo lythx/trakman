@@ -1,11 +1,19 @@
+import zlib from 'node:zlib'
+import util from 'util'
+
 export class DedimaniaRequest {
 
-  readonly buffer: Buffer = Buffer.from(
+  private isInitialized = false
+  private sessionKey?: string
+  private xmlBuffer: Buffer
+  private toGzip = util.promisify(zlib.gzip)
+  private _buffer: Buffer = Buffer.from(
     'POST /Dedimania HTTP/1.1\r\n' +
     'Host: dedimania.net\r\n' +
     'User-Agent: XMLaccess\r\n' +
     'Cache-Control: no-cache\r\n' +
     'Accept-Encoding: text\r\n' +
+    'Content-Encoding: gzip\r\n' +
     'Content-type: text/xml; charset=UTF-8\r\n'
   )
 
@@ -23,20 +31,26 @@ export class DedimaniaRequest {
       xml += `<param><value>${str}</value></param>`
     }
     xml += '</params></methodCall>'
-    const xmlBuffer: Buffer = Buffer.from(xml)
-    if (sessionKey === undefined) {
-      this.buffer = Buffer.concat([
-        this.buffer,
-        Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
-        xmlBuffer
+    this.xmlBuffer = Buffer.from(xml)
+    this.sessionKey = sessionKey
+  }
+
+  async initialize() {
+    const gzip = await this.toGzip(this.xmlBuffer)
+    if (this.sessionKey === undefined) {
+      this._buffer = Buffer.concat([
+        this._buffer,
+        Buffer.from(`Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
+        gzip
       ])
     } else {
-      this.buffer = Buffer.concat([
-        this.buffer,
-        Buffer.from(`Content-length: ${xmlBuffer.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${sessionKey}\r\n\r\n`),
-        xmlBuffer
+      this._buffer = Buffer.concat([
+        this._buffer,
+        Buffer.from(`Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${this.sessionKey}\r\n\r\n`),
+        gzip
       ])
     }
+    this.isInitialized = true
   }
 
   private handleParamType(param: CallParams): string | Error {
@@ -95,4 +109,12 @@ export class DedimaniaRequest {
     }
     return str.replace(/[&<>"']/g, (m): string => { return map[m as keyof typeof map] })
   }
+
+  get buffer(): Buffer {
+    if (this.isInitialized === false) {
+      throw new Error(`Cannot get the buffer before initializing the dedmiania request`)
+    }
+    return this._buffer
+  }
+
 }
