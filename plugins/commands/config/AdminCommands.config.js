@@ -10,7 +10,6 @@ export default {
   },
   mute: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has muted ${p.highlight}#{name}${p.admin}#{duration}.`,
-    error: `${p.error}Could not mute #{login}.`,
     reason: `${p.admin}Reason${p.highlight}: #{reason}${p.admin}.`,
     public: true,
     privilege: 1

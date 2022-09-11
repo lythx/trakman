@@ -31,11 +31,8 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
-        const ban = AdministrationService.banlist.find(a => a.login === login || a.ip === ip)
-        if (ban !== undefined) {
-          void AdministrationService.handleBanOnJoin(ban)
-          return
-        }
+        const canJoin = await AdministrationService.handleJoin(login, ip)
+        if (canJoin === false) { return }
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
           playerInfo[0].Path, isSpectator, playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
           playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
