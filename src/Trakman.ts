@@ -49,10 +49,10 @@ export const trakman = {
 
     /**
      * Initializes a database client and returns a function which executes database queries using the client.
-     * Client queries are handled by a separate thread which makes them a bit faster
-     * Use this only if your plugin needs to execute database queries very frequently
-     * Only a few //TODO exact amount// clients can be active at the same time, if there
-     * is too many program will hang
+     * Client queries are handled by a separate thread which makes them a bit faster.
+     * Use this only if your plugin needs to execute database queries very frequently.
+     * Only a few clients can be active at the same time, if there
+     * is too many the program might hang
      * @returns Function to execute database queries using the client
      */
     async getClient(): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> {
