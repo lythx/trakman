@@ -4,10 +4,10 @@ import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
 // TODO overloads and comments
-// TODO detect authentication error and then dont reconnect
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
+let isFailedAuthentication = false
 const client: DedimaniaClient = new DedimaniaClient()
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
@@ -26,9 +26,10 @@ const initialize = async (): Promise<void> => {
   if (status instanceof Error) {
     if (status.message !== 'No response from dedimania server') {
       tm.log.error('Failed to connect to dedimania', status.message)
+      isFailedAuthentication = true
     }
     else {
-      tm.log.error(`${status.message}. Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
+      tm.log.error(`${status.message}.`, `Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
       void reinitialize()
     }
     return
@@ -52,6 +53,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
+  if(isFailedAuthentication === true) { return }
   currentDedis.length = 0
   newDedis.length = 0
   if (client.connected === false) {
