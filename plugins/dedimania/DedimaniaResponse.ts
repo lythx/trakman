@@ -1,6 +1,5 @@
 import { trakman as tm } from '../../src/Trakman.js'
 import xml2js from 'xml2js'
-import zlib from 'node:zlib'
 
 export class DedimaniaResponse {
 
