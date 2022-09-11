@@ -116,11 +116,8 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
       storePlayerVotes(login, v)
     }
   }
+  await fixCoherence()
   return ret
-  // TODO remove this when works
-  //Logger.debug(`curr. map maniakarma stats`, `mk api url: ` + apiUrl, `mk api authcode: ` + authCode, `mk karma value: ` + _mapKarmaValue.toString(), `mk vote stats: ` + JSON.stringify(_mapKarma))
-  // TODO enable after voteservice is fixed
-  // await fixCoherence()
 }
 
 const sendVotes = async (): Promise<void> => {
@@ -201,21 +198,22 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
   emitVote({ mapId, login, vote })
 }
 
-// TODO enable when voteservice is fixed
-// const fixCoherence = async (): Promise<void> => {
-//   const localVotes: TMVote[] = tm.karma.current
-//   const mkVotes: MKVote[] = playerVotes
-//   for (const e of mkVotes) {
-//     if (!localVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-//       //  await VoteService.add( e.login, e.vote)
-//     }
-//   }
-//   for (const e of localVotes) {
-//     if (!mkVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-//       addVote(e.mapId, e.login, e.vote)
-//     }
-//   }
-// }
+const fixCoherence = async (): Promise<void> => {
+  const localVotes: TMVote[] = tm.karma.current
+  const mkVotes: MKVote[] = playerVotes
+  for (const e of mkVotes) {
+    const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)
+    if (v === undefined) {
+      const nickname = tm.players.get(e.login)?.nickname
+      await tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
+    }
+  }
+  for (const e of localVotes) {
+    if (!mkVotes.some(a => a.login === e.login && a.vote === e.vote)) {
+      addVote(e.mapId, e.login, e.vote)
+    }
+  }
+}
 
 const onBeginMap = async (isRestart: boolean) => {
   await sendVotes()
