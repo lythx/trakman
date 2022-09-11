@@ -2,7 +2,9 @@ import { RecordRepository } from "./database/RecordRepository.js"
 import { MapRepository } from "./database/MapRepository.js"
 import { PlayerRepository } from "./database/PlayerRepository.js"
 import { Database } from './database/DB.js'
-import 'dotenv/config'
+import config  from '../config/Config.js'
+
+// TODO FIX THIS FILE
 
 const repo = new RecordRepository()
 await repo.initialize()
@@ -21,12 +23,12 @@ export const fixCoherence = async () => {
         const indexes = []
         for (const rec of recs) {
             let index = records.filter(a => a.map === rec.map).findIndex(a => a.login === rec.login) + 1
-            if (index === 0 || index > Number(process.env.LOCALS_AMOUNT)) {
-                index = Number(process.env.LOCALS_AMOUNT)
+            if (index === 0 || index > config.localRecordsLimit) {
+                index = config.localRecordsLimit
             }
             indexes.push(index)
         }
-        const arr = [...indexes, ...Array.from({ length: maps.length - recs.length }).fill(Number(process.env.LOCALS_AMOUNT))]
+        const arr = [...indexes, ...Array.from({ length: maps.length - recs.length }).fill(config.localRecordsLimit)]
         const sum: any = arr.reduce((acc: any, cur: any) => acc + cur, 0)
         await playerRepo.updateAverage(e.login, sum / maps.length)
     }

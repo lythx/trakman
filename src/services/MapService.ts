@@ -22,7 +22,7 @@ export class MapService {
   private static readonly _queue: JukeboxMap[] = []
   private static readonly _history: TMMap[] = []
   static readonly queueSize: number = config.jukeboxQueueSize
-  static readonly historySize: number = config.jukeboxPreviousMapsInRuntime
+  static readonly historySize: number = config.jukeboxHistorySize
 
   /**
    * Creates maplist, sets current map and adds a proxy for Match Settings update
