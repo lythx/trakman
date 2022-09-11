@@ -16,7 +16,8 @@ export class AdministrationService {
   private static readonly blacklistRepo = new BlacklistRepository()
   private static readonly mutelistRepo = new MutelistRepository()
   private static readonly guestlistRepo = new GuestlistRepository()
-  private static _banlist: TMBanlistEntry[] = []
+  private static serverBanlist: TMBanlistEntry[] = []
+  private static banOnJoin: TMBanlistEntry[] = []
   private static _blacklist: TMBlacklistEntry[] = []
   private static _mutelist: TMMutelistEntry[] = []
   private static _guestlist: TMGuestlistEntry[] = []
@@ -30,7 +31,7 @@ export class AdministrationService {
     await this.blacklistRepo.initialize()
     await this.mutelistRepo.initialize()
     await this.guestlistRepo.initialize()
-    this._banlist = await this.banlistRepo.get()
+    this.banOnJoin = await this.banlistRepo.get()
     this._blacklist = await this.blacklistRepo.get()
     this._mutelist = await this.mutelistRepo.get()
     this._guestlist = await this.guestlistRepo.get()
@@ -39,6 +40,18 @@ export class AdministrationService {
     await this.fixMutelistCoherence()
     await this.fixGuestlistCoherence()
     this.pollExpireDates()
+  }
+
+  static async handleBanOnJoin(ban: TMBanlistEntry) {
+    const res = await Client.call('BanAndBlackList',
+      [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }, { boolean: true }])
+    if (res instanceof Error) {
+      Logger.error(`Error while server banning player ${ban.login} on join`)
+    } else {
+      this.banOnJoin = this.banOnJoin.filter(a => a.login !== ban.login)
+      this.serverBanlist.push(ban)
+    }
+    Client.callNoRes('Kick', [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }]) // TODO make no reason thingy a var
   }
 
   /**
@@ -69,19 +82,19 @@ export class AdministrationService {
       await Logger.fatal('Failed to fetch banlist', 'Server responded with error:', banlist.message)
       return
     }
-    for (const e of this._banlist) {
+    for (const e of this.banOnJoin) {
       if (!banlist.some((a: any): boolean => a.Login === e.login)) {
-        this._banlist = this._banlist.filter(a=>a.login !== e.login) // TODO FIX
-        // const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: 'No reason specified' }, { boolean: false }] :
-        //   [{ string: e.login }, { string: e.reason }, { boolean: false }]
-        // const res: any[] | Error = await Client.call('BanAndBlackList', params)
-        // if (res instanceof Error) {
-        //   await Logger.fatal(`Failed to add login ${e.login} to banlist`, `Server responded with error:`, res.message)
-        // }
+        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: 'No reason specified' }, { boolean: false }] :
+          [{ string: e.login }, { string: e.reason }, { boolean: false }]
+        const res = await Client.call('BanAndBlackList', params)
+        if (!(res instanceof Error)) {
+          this.banOnJoin = this.banOnJoin.filter(a => a.login !== e.login)
+          this.serverBanlist.push(e)
+        }
       }
     }
     for (const login of banlist.map((a): string => a.Login)) {
-      if (!this._banlist.some((a: any): boolean => a.login === login)) {
+      if (!this.banlist.some((a: any): boolean => a.login === login)) {
         const res: any[] | Error = await Client.call('UnBan', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from banlist`, `Server responded with error:`, res.message)
@@ -89,8 +102,8 @@ export class AdministrationService {
       }
     }
     for (const e of PlayerService.players) {
-      if (this._banlist.some(a => a.login === e.login)) {
-        Client.call('Kick', [{ string: e.login }])
+      if (this.banlist.some(a => a.login === e.login)) {
+        Client.callNoRes('Kick', [{ string: e.login }])
       }
     }
   }
@@ -120,7 +133,7 @@ export class AdministrationService {
     }
     for (const login of blacklist.map((a): string => a.Login)) {
       if (!this._blacklist.some((a: any): boolean => a.login === login) &&
-        !this._banlist.some((a: any): boolean => a.login === login)) {
+        !this.serverBanlist.some((a: any): boolean => a.login === login)) {
         const res: any[] | Error = await Client.call('UnBlackList', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from blacklist`, `Server responded with error:`, res.message)
@@ -133,7 +146,7 @@ export class AdministrationService {
     }
     for (const e of PlayerService.players) {
       if (this._blacklist.some(a => a.login === e.login)) {
-        Client.call('Kick', [{ string: e.login }])
+        Client.callNoRes('Kick', [{ string: e.login }])
       }
     }
   }
@@ -204,7 +217,7 @@ export class AdministrationService {
   private static pollExpireDates(): void {
     setInterval((): void => {
       const date: Date = new Date()
-      for (const e of this._banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
+      for (const e of this.banlist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
         this.unban(e.login)
       }
       for (const e of this._blacklist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
@@ -253,18 +266,21 @@ export class AdministrationService {
   }
 
   /**
-   * Bans, blacklists and kicks a player. Adds him to banlist table
+   * Bans, blacklists and kicks a player. If player is not on the server adds him to banOnJoin array. Adds him to banlist table
    * @param ip Player IP address
    * @param login Player login
    * @param caller Caller player object
    * @param nickname Optional player nickname
    * @param reason Optional ban reason
    * @param expireDate Optional ban expire date
-   * @returns True if successfull, Error if server call fails
    */
-  static async ban(ip: string, login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
+  static async ban(ip: string, login: string, caller: { login: string, nickname: string },
+    nickname?: string, reason?: string, expireDate?: Date): Promise<void> {
     const date: Date = new Date()
-    const entry = this._banlist.find(a => a.login === login && a.ip === ip)
+    let entry = this.banOnJoin.find(a => a.login === login)
+    if (entry === undefined) {
+      entry = this.serverBanlist.find(a => a.login === login && a.ip === ip)
+    }
     const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
@@ -275,19 +291,24 @@ export class AdministrationService {
       entry.date = date
       void this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
       Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
-      return true
+      return
     }
     const res = await Client.call('BanAndBlackList',
       [{ string: login }, { string: reason ?? 'No reason specified' }, { boolean: true }])
-    if (res instanceof Error) { return res }
-    this._banlist.push({
-      ip, login, nickname, date, callerNickname: caller.nickname,
-      callerLogin: caller.login, reason, expireDate
-    })
+    if (res instanceof Error) {
+      this.banOnJoin.push({
+        ip, login, nickname, date, callerNickname: caller.nickname,
+        callerLogin: caller.login, reason, expireDate
+      })
+    } else {
+      this.serverBanlist.push({
+        ip, login, nickname, date, callerNickname: caller.nickname,
+        callerLogin: caller.login, reason, expireDate
+      })
+    }
     void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
     Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
-    return true
   }
 
   /**
@@ -298,14 +319,19 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not banned, Error if dedicated server call fails
    */
   static async unban(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    if (!this._banlist.some(a => a.login === login)) { return false }
-    const res = await Client.call('UnBan', [{ string: login }])
-    if (res instanceof Error) { return res }
-    if (!this._blacklist.some(a => a.login === login)) {
-      const res = await Client.call('UnBlackList', [{ string: login }])
+    const serverBan = this.serverBanlist.find(a => a.login === login)
+    if (serverBan === undefined && !this.banOnJoin.some(a => a.login === login)) { return false }
+    if (serverBan !== undefined) {
+      const res = await Client.call('UnBan', [{ string: login }])
       if (res instanceof Error) { return res }
+      if (!this._blacklist.some(a => a.login === login)) {
+        const res = await Client.call('UnBlackList', [{ string: login }])
+        if (res instanceof Error) { return res }
+      }
+      this.serverBanlist = this.serverBanlist.filter(a => a.login !== login)
+    } else {
+      this.banOnJoin = this.banOnJoin.filter(a => a.login !== login)
     }
-    this._banlist = this._banlist.filter(a => a.login !== login)
     void this.banlistRepo.remove(login)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unbanned ${login}`)
@@ -339,7 +365,7 @@ export class AdministrationService {
       Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
       return true
     }
-    if (!this._banlist.some(a => a.login === login)) {
+    if (!this.serverBanlist.some(a => a.login === login)) {
       const res = await Client.call('BlackList', [{ string: login }])
       if (res instanceof Error) { return res }
     }
@@ -362,7 +388,7 @@ export class AdministrationService {
    */
   static async unblacklist(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
     if (!this._blacklist.some(a => a.login === login)) { return false }
-    if (!this._banlist.some(a => a.login === login)) {
+    if (!this.serverBanlist.some(a => a.login === login)) {
       const res = await Client.call('UnBlackList', [{ string: login }])
       if (res instanceof Error) { return res }
     }
@@ -490,9 +516,9 @@ export class AdministrationService {
   static getBan(logins: string[]): Readonly<TMBanlistEntry>[]
   static getBan(logins: string | string[]): Readonly<TMBanlistEntry> | Readonly<TMBanlistEntry>[] | undefined {
     if (typeof logins === 'string') {
-      return this._banlist.find(a => a.login === logins)
+      return this.banlist.find(a => a.login === logins)
     }
-    return this._banlist.filter(a => logins.includes(a.login))
+    return this.banlist.filter(a => logins.includes(a.login))
   }
 
   /**
@@ -556,7 +582,7 @@ export class AdministrationService {
    * @returns Array of all ban objects
    */
   static get banlist(): Readonly<TMBanlistEntry>[] {
-    return [...this._banlist]
+    return [...this.serverBanlist, ...this.banOnJoin]
   }
 
   /**
@@ -584,7 +610,7 @@ export class AdministrationService {
    * @returns Number of banned players
    */
   static get banCount(): number {
-    return this._banlist.length
+    return this.serverBanlist.length + this.banOnJoin.length
   }
 
   /**

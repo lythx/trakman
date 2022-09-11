@@ -8,6 +8,7 @@ import { MapService } from './services/MapService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
+import { AdministrationService } from './services/AdministrationService.js'
 import config from '../config/Config.js'
 
 let isRestart: boolean = false
@@ -16,22 +17,27 @@ export class Listeners {
   private static readonly listeners: TMListener[] = [
     {
       event: 'TrackMania.PlayerConnect',
-      callback: async (params: any[]): Promise<void> => {
+      callback: async ([login, isSpectator]: [string, boolean]): Promise<void> => {
         // [0] = Login, [1] = IsSpectator
-        if (params[0] === undefined) {
+        if (login === undefined) {
           // Me on my way to kick that pesky undefined
-          Client.callNoRes('Kick', [{ string: params[0] }])
+          Client.callNoRes('Kick', [{ string: login }])
           return
         }
-        const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: params[0] }])
+        const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: login }])
         if (playerInfo instanceof Error) {
-          Logger.error(`Failed to get player info for login ${params[0]}`, playerInfo.message)
-          Client.callNoRes('Kick', [{ string: params[0] }])
+          Logger.error(`Failed to get player info for login ${login}`, playerInfo.message)
+          Client.callNoRes('Kick', [{ string: login }])
           return
         }
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
+        const ban = AdministrationService.banlist.find(a => a.login === login || a.ip === ip)
+        if (ban !== undefined) {
+          void AdministrationService.handleBanOnJoin(ban)
+          return
+        }
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
-          playerInfo[0].Path, params[1], playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
+          playerInfo[0].Path, isSpectator, playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
           playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
         Events.emitEvent('Controller.PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
@@ -40,9 +46,12 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerDisconnect',
-      callback: (params: any[]): void => {
+      callback: ([login]: [string]): void => {
         // [0] = Login
-        const leaveInfo: LeaveInfo | Error = PlayerService.leave(params[0])
+        if (AdministrationService.banlist.some(a => a.login === login)) {
+          return
+        }
+        const leaveInfo: LeaveInfo | Error = PlayerService.leave(login)
         if (!(leaveInfo instanceof Error)) {
           Events.emitEvent('Controller.PlayerLeave', leaveInfo)
         }
