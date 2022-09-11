@@ -4,16 +4,16 @@ import { MapService } from './MapService.js'
 import { Events } from '../Events.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
-import 'dotenv/config'
 import { Utils } from '../Utils.js'
 import { Client } from '../client/Client.js'
+import config from '../../config/Config.js'
 
 export class RecordService {
 
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: TMLocalRecord[] = []
   private static _liveRecords: FinishInfo[] = []
-  static readonly maxLocalsAmount: number = Number(process.env.LOCALS_AMOUNT) // TODO eeeeeeeeeee
+  static readonly maxLocalsAmount: number = config.localRecordsLimit
   private static _initialLocals: TMLocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
 
@@ -21,9 +21,6 @@ export class RecordService {
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
-    if (this.maxLocalsAmount === NaN) {
-      await Logger.fatal('LOCALS_AMOUNT is undefined or not a number. Check your .env file')
-    }
     await this.repo.initialize()
     await this.fetchAndStoreRecords(MapService.current.id)
     await this.fetchAndStoreRanks()

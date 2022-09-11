@@ -2,7 +2,6 @@ import { trakman as tm} from '../../src/Trakman.js'
 import { dedimania } from '../dedimania/Dedimania.js'
 import config from '../../config/Config.js' // TODO PUT IN TRAKMAN 
 import { Logger } from '../../src/Logger.js'
-import 'dotenv/config'
 import c from './Config.js'
 
 const events: TMListener[] = [

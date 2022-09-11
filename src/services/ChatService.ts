@@ -13,7 +13,7 @@ import { prefixes } from '../../config/Prefixes.js'
  */
 export abstract class ChatService {
 
-  private static readonly messagesArraySize: number = config.messagesInRuntimeMemory
+  private static readonly messagesArraySize: number = config.chatMessagesInRuntime
   static readonly _messages: TMMessage[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: TMCommand[] = []
@@ -64,7 +64,7 @@ export abstract class ChatService {
         if (param.validValues !== undefined) {
           const enumVal = param.validValues.find(a => a.toString().toLowerCase() === params[i].toLowerCase())
           if (enumVal === undefined) {
-            this.sendErrorMessage(Utils.strVar(messages.invalidValue, 
+            this.sendErrorMessage(Utils.strVar(messages.invalidValue,
               { name: param.name, values: param.validValues.join(', ') }), info.login)
             return
           }
