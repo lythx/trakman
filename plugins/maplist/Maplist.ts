@@ -49,7 +49,6 @@ tm.addListener('Controller.MapRemoved', (map) => {
 export const maplist = {
 
   get: (sort?: 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'bestkarma'): readonly Readonly<TMMap>[] => {
-    console.log(cache)
     switch (sort) {
       case 'name':
         return nameSort
