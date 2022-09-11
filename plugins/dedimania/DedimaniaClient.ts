@@ -47,16 +47,12 @@ export class DedimaniaClient {
         if (this.response.status === 'completed') {
           this.receivingResponse = false
           if (this.response.isError !== null) {
-            tm.log.error('Dedimania server responded with an error',
-              `${this.response.errorString} Code: ${this.response.errorCode}`)
-            resolve(new Error(this.response.errorString?.toString()))
+            resolve(new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`))
           } else {
             if (this.response.sessionId === null) {
-              tm.log.error(`Dedimania server didn't send sessionId`, `Received: ${this.response.data}`)
-              resolve(new Error(`Dedimania server didn't send sessionId`))
+              resolve(new Error(`Dedimania server didn't send sessionId. Received: ${this.response.data}`))
               return
             } else if (this.response.json[0] === false) {
-              tm.log.error(`Dedimania authentication failed`)
               resolve(new Error(`Dedimania authentication failed`))
               return
             }
@@ -68,7 +64,6 @@ export class DedimaniaClient {
         }
         if (Date.now() - 10000 > startDate) { // stop polling after 10 seconds
           this.receivingResponse = false
-          tm.log.error('No response from dedimania server')
           resolve(new Error('No response from dedimania server'))
           return
         }
@@ -100,9 +95,7 @@ export class DedimaniaClient {
       const poll = (): void => {
         if (this.response.status === 'completed') {
           if (this.response.isError === true) {
-            tm.log.error('Dedimania server responded with an error',
-              `${this.response.errorString} Code: ${this.response.errorCode}`)
-            resolve(new Error(this.response.errorString?.toString()))
+            resolve(new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`))
           } else {
             resolve(this.response.json)
           }
@@ -110,7 +103,6 @@ export class DedimaniaClient {
           return
         }
         if (Date.now() - 10000 > startDate) { // stop polling after 10 seconds
-          tm.log.error('No response from dedimania server')
           this._connected = false
           this.receivingResponse = false
           resolve(new Error('No response from dedimania server'))
