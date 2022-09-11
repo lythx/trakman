@@ -1,6 +1,7 @@
 import { palette as p } from "../../src/Trakman.js"
 
-export default { // CHeck if colours good
+export default { // TODO CHeck if colours good
+  cacheSize: 10, // Max number of map arrays stored in cache
   added: `${p.highlight}#{nickname} ${p.vote}added ${p.highlight}#{map}${p.vote} to the queue.`,
   noPermission: `${p.error}You can't add more than one map to the queue.`,
   noFinishError: `${p.error}No unfinished maps available.`,

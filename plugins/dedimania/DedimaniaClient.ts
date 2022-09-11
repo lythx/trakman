@@ -22,7 +22,6 @@ export class DedimaniaClient {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
-    // TODO do this call in serverconfig maybe?
     const packmask: [string] | Error = await tm.client.call('GetServerPackMask') as any
     if (packmask instanceof Error) {
       tm.log.error('Failed to fetch server packmask', packmask.message)
