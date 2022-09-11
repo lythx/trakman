@@ -1,7 +1,6 @@
 import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import { PrivilegeRepository } from '../database/PrivilegeRepository.js'
-import 'dotenv/config'
 import { MapService } from './MapService.js'
 import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
