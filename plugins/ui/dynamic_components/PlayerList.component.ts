@@ -46,14 +46,11 @@ export default class PlayerList extends PopupWindow {
 
       if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
         const targetPlayer = tm.players.list[info.answer - this.openId - 3000]
-        const status = await tm.admin.mute(targetPlayer.login, info)
-        if (status instanceof Error) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while muting the player.`, info.login)
-        } else {
-          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has muted `
-            + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
-        }
+        await tm.admin.mute(targetPlayer.login, info)
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+          + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has muted `
+          + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
+
       } // Mute
 
       if (info.answer >= this.openId + 4000 && info.answer < this.openId + 6000) {
@@ -83,7 +80,7 @@ export default class PlayerList extends PopupWindow {
 
       //TODO: add ForceSpec :3 :v :D
 
-      tm.commands.add( {
+      tm.commands.add({
         aliases: ['players', 'playerlist'],
         help: 'Display list of players.',
         callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),

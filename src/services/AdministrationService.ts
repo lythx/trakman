@@ -19,7 +19,8 @@ export class AdministrationService {
   private static serverBanlist: TMBanlistEntry[] = []
   private static banOnJoin: TMBanlistEntry[] = []
   private static _blacklist: TMBlacklistEntry[] = []
-  private static _mutelist: TMMutelistEntry[] = []
+  private static serverMutelist: TMMutelistEntry[] = []
+  private static muteOnJoin: TMMutelistEntry[] = []
   private static _guestlist: TMGuestlistEntry[] = []
   private static readonly blacklistFile: string = config.blacklistFile
   private static readonly guestlistFile: string = config.guestlistFile
@@ -33,7 +34,7 @@ export class AdministrationService {
     await this.guestlistRepo.initialize()
     this.banOnJoin = await this.banlistRepo.get()
     this._blacklist = await this.blacklistRepo.get()
-    this._mutelist = await this.mutelistRepo.get()
+    this.muteOnJoin = await this.mutelistRepo.get()
     this._guestlist = await this.guestlistRepo.get()
     await this.fixBanlistCoherence()
     await this.fixBlacklistCoherence()
@@ -42,16 +43,31 @@ export class AdministrationService {
     this.pollExpireDates()
   }
 
-  static async handleBanOnJoin(ban: TMBanlistEntry) {
-    const res = await Client.call('BanAndBlackList',
-      [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }, { boolean: true }])
-    if (res instanceof Error) {
-      Logger.error(`Error while server banning player ${ban.login} on join`)
-    } else {
-      this.banOnJoin = this.banOnJoin.filter(a => a.login !== ban.login)
-      this.serverBanlist.push(ban)
+  static async handleJoin(login: string, ip: string): Promise<boolean> {
+    const mute = this.muteOnJoin.find(a => a.login === login)
+    if (mute !== undefined) {
+      const res = await Client.call('Ignore', [{ string: mute.login }])
+      if (res instanceof Error) {
+        Logger.error(`Error while server muting player ${mute.login} on join`)
+      } else {
+        this.muteOnJoin = this.muteOnJoin.filter(a => a.login !== mute.login)
+        this.serverMutelist.push(mute)
+      }
     }
-    Client.callNoRes('Kick', [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }]) // TODO make no reason thingy a var
+    const ban = this.banOnJoin.find(a => a.login === login || a.ip === ip)
+    if (ban !== undefined) {
+      const res = await Client.call('BanAndBlackList',
+        [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }, { boolean: true }])
+      if (res instanceof Error) {
+        Logger.error(`Error while server banning player ${ban.login} on join`)
+      } else {
+        this.banOnJoin = this.banOnJoin.filter(a => a.login !== ban.login)
+        this.serverBanlist.push(ban)
+      }
+      Client.callNoRes('Kick', [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }]) // TODO make no reason thingy a var
+      return false
+    }
+    return true
   }
 
   /**
@@ -161,16 +177,17 @@ export class AdministrationService {
       await Logger.fatal('Failed to fetch mutelist', 'Server responded with error:', mutelist.message)
       return
     }
-    for (const e of this._mutelist) {
+    for (const e of this.muteOnJoin) {
       if (!mutelist.some((a: any): boolean => a.Login === e.login)) {
         const res: any[] | Error = await Client.call('Ignore', [{ string: e.login }])
-        if (res instanceof Error) {
-          await Logger.fatal(`Failed to add login ${e.login} to mutelist`, `Server responded with error:`, res.message)
+        if (!(res instanceof Error)) {
+          this.muteOnJoin = this.muteOnJoin.filter(a => a.login !== e.login)
+          this.serverMutelist.push(e)
         }
       }
     }
     for (const login of mutelist.map((a): string => a.Login)) {
-      if (!this._mutelist.some((a: any): boolean => a.login === login)) {
+      if (!this.mutelist.some((a: any): boolean => a.login === login)) {
         const res: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from mutelist`, `Server responded with error:`, res.message)
@@ -223,7 +240,7 @@ export class AdministrationService {
       for (const e of this._blacklist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
         this.unblacklist(e.login)
       }
-      for (const e of this._mutelist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
+      for (const e of this.mutelist.filter(a => a.expireDate !== undefined && a.expireDate < date)) {
         this.unmute(e.login)
       }
     }, 5000)
@@ -410,11 +427,14 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
-   * @returns True if successfull, Error if server call fails
    */
-  static async mute(login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
+  static async mute(login: string, caller: { login: string, nickname: string },
+    nickname?: string, reason?: string, expireDate?: Date): Promise<void> {
     const date: Date = new Date()
-    const entry = this._mutelist.find(a => a.login === login)
+    let entry = this.muteOnJoin.find(a => a.login === login)
+    if (entry === undefined) {
+      entry = this.serverMutelist.find(a => a.login === login)
+    }
     const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
@@ -425,17 +445,22 @@ export class AdministrationService {
       entry.date = date
       void this.mutelistRepo.update(login, date, caller.login, reason, expireDate)
       Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
-      return true
+      return
     }
     const res = await Client.call('Ignore', [{ string: login }])
-    if (res instanceof Error) { return res }
-    this._mutelist.push({
-      login, nickname, date, callerNickname: caller.nickname,
-      callerLogin: caller.login, reason, expireDate
-    })
+    if (res instanceof Error) {
+      this.muteOnJoin.push({
+        login, nickname, date, callerNickname: caller.nickname,
+        callerLogin: caller.login, reason, expireDate
+      })
+    } else {
+      this.serverMutelist.push({
+        login, nickname, date, callerNickname: caller.nickname,
+        callerLogin: caller.login, reason, expireDate
+      })
+    }
     void this.mutelistRepo.add(login, date, caller.login, reason, expireDate)
     Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
-    return true
   }
 
   /**
@@ -445,10 +470,15 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not muted, Error if dedicated server call fails
    */
   static async unmute(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    if (!this._mutelist.some(a => a.login === login)) { return false }
-    const res = await Client.call('UnIgnore', [{ string: login }])
-    if (res instanceof Error) { return res }
-    this._mutelist = this._mutelist.filter(a => a.login !== login)
+    const serverMute = this.serverMutelist.find(a => a.login === login)
+    if (serverMute === undefined && !this.muteOnJoin.some(a => a.login === login)) { return false }
+    if (serverMute !== undefined) {
+      const res = await Client.call('UnIgnore', [{ string: login }])
+      if (res instanceof Error) { return res }
+      this.serverMutelist = this.serverMutelist.filter(a => a.login !== login)
+    } else {
+      this.muteOnJoin = this.muteOnJoin.filter(a => a.login !== login)
+    }
     void this.mutelistRepo.remove(login)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unmuted ${login}`)
@@ -554,9 +584,9 @@ export class AdministrationService {
   static getMute(logins: string[]): Readonly<TMMutelistEntry>[]
   static getMute(logins: string | string[]): Readonly<TMMutelistEntry> | Readonly<TMMutelistEntry>[] | undefined {
     if (typeof logins === 'string') {
-      return this._mutelist.find(a => a.login === logins)
+      return this.mutelist.find(a => a.login === logins)
     }
-    return this._mutelist.filter(a => logins.includes(a.login))
+    return this.mutelist.filter(a => logins.includes(a.login))
   }
 
   /**
@@ -596,7 +626,7 @@ export class AdministrationService {
    * @returns Array of all mute objects
    */
   static get mutelist(): Readonly<TMMutelistEntry>[] {
-    return [...this._mutelist]
+    return [...this.serverMutelist, ...this.muteOnJoin]
   }
 
   /**
@@ -624,7 +654,7 @@ export class AdministrationService {
    * @returns Number of muted players
    */
   static get muteCount(): number {
-    return this._mutelist.length
+    return this.serverMutelist.length + this.muteOnJoin.length
   }
 
   /**

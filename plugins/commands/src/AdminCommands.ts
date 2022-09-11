@@ -28,13 +28,7 @@ const commands: TMCommand[] = [
         targetInfo = await tm.players.fetch(login)
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      const result: true | Error = await tm.admin.mute(login, info, targetInfo?.nickname, reason, expireDate)
-      let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
-      if (result instanceof Error) {
-        tm.log.error(`Error while muting player ${logStr}`, result.message)
-        tm.sendMessage(tm.utils.strVar(config.mute.error, { login: login }), info.login)
-        return
-      }
+      await tm.admin.mute(login, info, targetInfo?.nickname, reason, expireDate)
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}.`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(tm.utils.strVar(config.mute.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.mute.public ? undefined : info.login)
