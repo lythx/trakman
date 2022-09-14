@@ -28,6 +28,21 @@ const commands: TMCommand[] = [
     privilege: config.setrefmode.privilege
   },
   {
+    aliases: ['pay'],
+    help: 'Pay coppers from server account.',
+    params: [{ name: 'amount', type: 'int' }, { name: 'login', optional: true }, { name: 'message', optional: true }],
+    callback: async (info: TMMessageInfo, amount: number, login?: string, message?: string): Promise<void> => {
+      const status = await tm.utils.payCoppers(login ?? info.login, amount,
+        message ?? tm.utils.strVar(config.pay.defaultMessage, { coppers: amount, server: tm.state.serverConfig.name }))
+      if (status instanceof Error) {
+        tm.sendMessage(tm.utils.strVar(config.pay.error, { login: login ?? info.login }))
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.pay.text, {}), config.pay.public === true ? undefined : info.login) // todo
+      }
+    },
+    privilege: config.pay.privilege
+  },
+  {
     aliases: ['ssn', 'setservername'],
     help: 'Set the server name.',
     params: [{ name: 'name', type: 'multiword' }],
@@ -137,7 +152,7 @@ const commands: TMCommand[] = [
       let hideInt = 0
       switch (value) {
         case 'visible':
-          status =config.sethideserver.status.visible
+          status = config.sethideserver.status.visible
           hideInt = 0
           break
         case 'hidden':

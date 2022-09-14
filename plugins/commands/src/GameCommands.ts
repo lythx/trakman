@@ -87,7 +87,7 @@ const commands: TMCommand[] = [
     privilege: config.setlapsamount.privilege
   },
   {
-    aliases: ['srla', 'setroundslapsamount'], // TODO this is probably rounds not laps amount
+    aliases: ['srla', 'setroundslapsamount'],
     help: 'Set the laps amount in rounds mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: TMMessageInfo, amount: number): void => {
