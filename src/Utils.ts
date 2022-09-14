@@ -199,6 +199,26 @@ export const Utils = {
     })
   },
 
+  async payCoppers(targetLogin: string, amount: number, message: string): Promise<true | Error> {
+    const billId: any[] | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
+    if (billId instanceof Error) { return billId }
+    return await new Promise((resolve): void => {
+      const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
+        switch (status) {
+          case 'accepted':
+            resolve(true)
+            break
+          case 'refused':
+            resolve(new Error(`Transaction refused`))
+            break
+          case 'error':
+            resolve(new Error(errorString ?? 'error'))
+        }
+      }
+      bills.push({ id: billId[0], callback })
+    })
+  },
+
   /**
  * Determines the player title on join/actions
  * @param player Object of the player to get the title for
