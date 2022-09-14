@@ -37,7 +37,22 @@ const commands: TMCommand[] = [
       if (status instanceof Error) {
         tm.sendMessage(tm.utils.strVar(config.pay.error, { login: login ?? info.login }))
       } else {
-        tm.sendMessage(tm.utils.strVar(config.pay.text, {}), config.pay.public === true ? undefined : info.login) // todo
+        if (login === undefined) {
+          tm.sendMessage(tm.utils.strVar(config.pay.selfText, {
+            coppers: amount,
+          }), info.login)
+        } else {
+          let player: TMPlayer | TMOfflinePlayer | undefined = tm.players.get(login)
+          if (player === undefined) {
+            player = await tm.players.fetch(login)
+          }
+          tm.sendMessage(tm.utils.strVar(config.pay.text, {
+            title: tm.utils.getTitle(info),
+            adminName: info.nickname,
+            coppers: amount,
+            target: player?.nickname ?? login
+          }), config.pay.public === true ? undefined : info.login)
+        }
       }
     },
     privilege: config.pay.privilege

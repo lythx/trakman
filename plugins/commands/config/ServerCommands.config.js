@@ -13,7 +13,10 @@ export default {
     privilege: 2
   },
   pay: {
-    text: ``, // todo
+    selfText: `${p.admin}You withdrew ${p.highlight}#{coppers}` +
+    ` ${p.admin}coppers from the server.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}paid ${p.highlight}#{coppers}` +
+      ` ${p.admin}coppers to ${p.highlight}#{target}${p.admin}.`,
     defaultMessage: `You received #{coppers} coppers from #{server}$z$s.`,
     error: `${p.error}Failed to pay coppers to ${p.highlight}#{login}${p.error}.`,
     public: false,
