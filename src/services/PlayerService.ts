@@ -178,10 +178,8 @@ export class PlayerService {
     let laps
     if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
-    } else if (GameService.config.gameMode === 3) { // laps gamemode
+    } else { // TODO TEST ROUNDS MODE
       laps = GameService.config.lapsNo
-    } else { // rounds, cup, teams and lap map
-      laps = MapService.current.lapsAmount
     }
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map

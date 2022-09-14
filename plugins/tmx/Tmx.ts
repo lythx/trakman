@@ -29,7 +29,7 @@ const emitMapChangeEvent = () => {
 }
 
 const initialize = async (): Promise<void> => {
-  if (queueSize > tm.jukebox.queueCount) { // TODO change message after config changes
+  if (queueSize > tm.jukebox.queueCount) {
     await tm.log.fatal(`jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
   }
   const res: TMXMapInfo | Error = await tm.tmx.fetchMapInfo(tm.maps.current.id)

@@ -1,7 +1,7 @@
 import { Logger } from '../../src/Logger.js'
 import { ServerConfig } from '../../src/ServerConfig.js'
 import http, { ClientRequest } from 'http'
-import config from './Config.js'
+import config from './Config.js' // FIX IMPORTS AND DELETE CALL FROM MAIN
 
 export class Freezone {
 

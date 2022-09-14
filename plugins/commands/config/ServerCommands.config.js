@@ -12,6 +12,13 @@ export default {
     public: true,
     privilege: 2
   },
+  pay: {
+    text: ``, // todo
+    defaultMessage: `You received #{coppers} coppers from #{server}$z$s.`,
+    error: `${p.error}Failed to pay coppers to ${p.highlight}#{login}${p.error}.`,
+    public: false,
+    privilege: 3
+  },
   setservername: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the server name to ${p.highlight}#{value}$z$s${p.admin}.`,
     public: true,
