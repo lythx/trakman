@@ -14,7 +14,8 @@ import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
-import config from '../config/Prefixes.js'
+import prefixes from '../config/Prefixes.js'
+import config from '../config/Config.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -321,10 +322,10 @@ export const trakman = {
   sendMessage(message: string, login?: string, prefix: boolean = true): void {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: (prefix ? config.prefixes.serverToPlayer : '') + message }, { string: login }])
+        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message }, { string: login }])
       return
     }
-    Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? config.prefixes.serverToAll : '') + message }])
+    Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
   },
 
   /**
@@ -393,7 +394,12 @@ export const trakman = {
     temp.answer = id
     const info: ManialinkClickInfo = temp
     Events.emitEvent('Controller.ManialinkClick', info)
-  }
+  },
+
+  /**
+   * Controller config
+   */
+  config
 
 }
 

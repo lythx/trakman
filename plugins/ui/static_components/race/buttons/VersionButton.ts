@@ -3,7 +3,6 @@ import { UiButton } from "./UiButton.js";
 import config from "./ButtonsWidget.config.js"
 import { IDS } from '../../../UiUtils.js'
 import { trakman as tm } from "../../../../../src/Trakman.js";
-import mainCfg from '../../../../../config/Config.js' // TODO PUT IN TRAKMAN 
 
 const cfg = config.versionButton
 
@@ -15,7 +14,7 @@ export class VersionButton extends UiButton {
     super()
     this.buttonData = {
       icon: cfg.icon,
-      text1: tm.utils.strVar(cfg.texts[0], { version: mainCfg.version }),
+      text1: tm.utils.strVar(cfg.texts[0], { version: tm.config.version }),
       text2: cfg.texts[1],
       iconWidth: cfg.width,
       iconHeight: cfg.height,

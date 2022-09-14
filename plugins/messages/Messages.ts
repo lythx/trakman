@@ -1,6 +1,5 @@
 import { trakman as tm} from '../../src/Trakman.js'
 import { dedimania } from '../dedimania/Dedimania.js'
-import config from '../../config/Config.js' // TODO PUT IN TRAKMAN 
 import { Logger } from '../../src/Logger.js'
 import c from './Config.js'
 
@@ -8,7 +7,7 @@ const events: TMListener[] = [
   {
     event: 'Controller.Ready',
     callback: (): void => {
-      tm.sendMessage(tm.utils.strVar(c.startup, { version: config.version }))
+      tm.sendMessage(tm.utils.strVar(c.startup, { version: tm.config.version }))
       tm.sendMessage(c.changelog)
     }
   },
@@ -48,7 +47,7 @@ const events: TMListener[] = [
     callback: async (player: JoinInfo): Promise<void> => {
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.state.serverConfig.name),
-        version: config.version
+        version: tm.config.version
       }), player.login)
       tm.sendMessage(c.changelog, player.login)
       const index: number = tm.records.local.findIndex(a => a.login === player.login)
