@@ -3,7 +3,6 @@ import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
 import { trakman as tm } from '../../src/Trakman.js'
 import DediConfig from './Config.js'
-import config from '../../config/Config.js' // TODO PUT IN TRAKMAN 
 
 export class DedimaniaClient {
 
@@ -33,7 +32,7 @@ export class DedimaniaClient {
         Login: { string: tm.state.serverConfig.login },
         Password: { string: DediConfig.serverPassword },
         Tool: { string: 'Trakman' },
-        Version: { string: config.version },
+        Version: { string: tm.config.version },
         Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) },
         Packmask: { string: packmask[0] }
       }

@@ -6,6 +6,7 @@ export default {
   blacklistFile: "blacklist.txt",
   guestlistFile: "guestlist.txt",
   matchSettingsFile: "MatchSettings/MatchSettings.txt",
+  defaultReasonMessage: 'No reason specified',
   truthyParams: ['true', 'yes', 'y', '1'],
   falsyParams: ['false', 'no', 'n', '0'],
   // Used in nickname to login translation in commands. 
