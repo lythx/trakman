@@ -35,7 +35,7 @@ const commands: TMCommand[] = [
       const status = await tm.utils.payCoppers(login ?? info.login, amount,
         message ?? tm.utils.strVar(config.pay.defaultMessage, { coppers: amount, server: tm.state.serverConfig.name }))
       if (status instanceof Error) {
-        tm.sendMessage(tm.utils.strVar(config.pay.error, { login: login ?? info.login }))
+        tm.sendMessage(tm.utils.strVar(config.pay.error, { login: login ?? info.login }), info.login)
       } else {
         if (login === undefined) {
           tm.sendMessage(tm.utils.strVar(config.pay.selfText, {

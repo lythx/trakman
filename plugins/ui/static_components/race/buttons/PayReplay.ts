@@ -48,9 +48,13 @@ export class PayReplay extends UiButton {
       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`, login)
     } else if (res === true) {
       if ((this.isReplay as boolean) === true || (this.isSkip as boolean) === true) {
+        let returnMessage = '.'
+        if (cost >= 75) { // Its not worth to return under 75 due to nadeo tax growing exponentially
+          returnMessage = ', coppers will be returned.'
+          void tm.utils.payCoppers(login, cost * 0.85, 'ad')
+        }
         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}The map got` +
-          ` ${this.isReplay ? 'replayed' : 'skipped'} while processing the payment, coppers will be returned.`, login)
-        //await tm.utils.sendCoppers(login, cost, 'Pay to restart the ongoing map') // TODO server pay to player
+          ` ${this.isReplay ? 'replayed' : 'skipped'} while processing the payment${returnMessage}`, login)
         return
       }
       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(nickname)}${tm.utils.palette.donation}` +

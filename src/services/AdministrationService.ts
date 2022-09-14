@@ -57,14 +57,14 @@ export class AdministrationService {
     const ban = this.banOnJoin.find(a => a.login === login || a.ip === ip)
     if (ban !== undefined) {
       const res = await Client.call('BanAndBlackList',
-        [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }, { boolean: true }])
+        [{ string: ban.login }, { string: ban?.reason ?? config.defaultReasonMessage }, { boolean: true }])
       if (res instanceof Error) {
         Logger.error(`Error while server banning player ${ban.login} on join`)
       } else {
         this.banOnJoin = this.banOnJoin.filter(a => a.login !== ban.login)
         this.serverBanlist.push(ban)
       }
-      Client.callNoRes('Kick', [{ string: ban.login }, { string: ban?.reason ?? 'No reason specified' }]) // TODO make no reason thingy a var
+      Client.callNoRes('Kick', [{ string: ban.login }, { string: ban?.reason ?? config.defaultReasonMessage }])
       return false
     }
     return true
@@ -100,7 +100,7 @@ export class AdministrationService {
     }
     for (const e of this.banOnJoin) {
       if (!banlist.some((a: any): boolean => a.Login === e.login)) {
-        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: 'No reason specified' }, { boolean: false }] :
+        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: config.defaultReasonMessage }, { boolean: false }] :
           [{ string: e.login }, { string: e.reason }, { boolean: false }]
         const res = await Client.call('BanAndBlackList', params)
         if (!(res instanceof Error)) {
@@ -298,7 +298,7 @@ export class AdministrationService {
     if (entry === undefined) {
       entry = this.serverBanlist.find(a => a.login === login && a.ip === ip)
     }
-    const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
+    const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
@@ -311,7 +311,7 @@ export class AdministrationService {
       return
     }
     const res = await Client.call('BanAndBlackList',
-      [{ string: login }, { string: reason ?? 'No reason specified' }, { boolean: true }])
+      [{ string: login }, { string: reason ?? config.defaultReasonMessage }, { boolean: true }])
     if (res instanceof Error) {
       this.banOnJoin.push({
         ip, login, nickname, date, callerNickname: caller.nickname,
@@ -370,7 +370,7 @@ export class AdministrationService {
   static async addToBlacklist(login: string, caller: { login: string, nickname: string }, nickname?: string, reason?: string, expireDate?: Date): Promise<true | Error> {
     const date: Date = new Date()
     const entry = this._blacklist.find(a => a.login === login)
-    const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
+    const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
@@ -435,7 +435,7 @@ export class AdministrationService {
     if (entry === undefined) {
       entry = this.serverMutelist.find(a => a.login === login)
     }
-    const reasonString: string = reason === undefined ? 'No reason specified' : ` Reason: ${reason}`
+    const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
     const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
