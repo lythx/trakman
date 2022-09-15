@@ -2,8 +2,6 @@ import { trakman as tm } from "../../src/Trakman.js";
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 
-// TODO  TEST
-
 const chooseAndAddMap = (maps: TMMap[], info: { nickname: string, login: string }, errorMsg: string) => {
   const eligibleMaps: TMMap[] = maps.filter(a =>
     !tm.jukebox.juked.some(b => b.map.id === a.id) &&

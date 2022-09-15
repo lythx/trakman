@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS votes(
       FOREIGN KEY(map_id)
         REFERENCES map_ids(id)
 );`
-
+// TODO fix vote 0 calculation
 interface TableEntry {
   readonly uid: string
   readonly login: string

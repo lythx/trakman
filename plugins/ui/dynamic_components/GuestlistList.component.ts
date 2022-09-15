@@ -1,88 +1,108 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
-import { closeButton, IDS, Grid, centeredText } from '../UiUtils.js'
+import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './GuestlistList.config.js'
 
-export default class GuestlistList extends PopupWindow {
+export default class GuestlistList extends PopupWindow<number> {
 
   readonly grid: Grid
+  readonly paginator: Paginator
 
   constructor() {
     super(IDS.guestlistList, config.icon, config.title, config.navbar)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries).fill(1), config.grid)
-
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
+      Math.ceil(tm.players.count / config.entries))
+    this.paginator.onPageChange = (login, page) => {
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
+    }
     tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-
-        const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
-        const targetInfo = tm.players.get(targetPlayer.login)
-        if (targetInfo === undefined) {
-          return
+        if (info.privilege < config.privilege) { return }
+        const target = tm.players.list[info.answer - this.openId - 1000]
+        if (target === undefined) { return }
+        const status = await tm.admin.removeGuest(target.login, info)
+        if (status instanceof Error) {
+          tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
+        } else if (status === false) {
+          tm.sendMessage(tm.utils.strVar(config.messages.alreadyGuest, { login: target.login }), info.login)
         } else {
-          tm.admin.removeGuest(targetPlayer.login, info)
-          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has removed `
-            + `${tm.utils.palette.highlight + targetPlayer.nickname}${tm.utils.palette.admin} from guestlist.`)
+          tm.sendMessage(tm.utils.strVar(config.messages.text, {
+            title: tm.utils.getTitle(info),
+            adminName: tm.utils.strip(info.nickname, true),
+            name: target.nickname
+          }))
         }
-      } // 
-
+      }
+    })
+    tm.addListener(['Controller.PlayerJoin', 'Controller.PlayerLeave'], () => {
+      this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
+      this.reRender()
+    })
+    tm.addListener('Controller.PrivilegeChanged', (info) => { // TODO guestlistchanged event
+      if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
+      this.reRender()
     })
     tm.commands.add({
       aliases: ['gl', 'guestlist'],
-      help: 'Display list of players in the guestlist.',
+      help: 'Display guestlist.',
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 1
-    },)
+      privilege: config.privilege
+    })
+  }
+
+  protected onOpen(info: ManialinkClickInfo): void {
+    const page = this.paginator.getPageByLogin(info.login)
+    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
   }
 
   private reRender(): void {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
-      this.displayToPlayer(login)
+      const page = this.paginator.getPageByLogin(login)
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
   }
 
-  protected async constructContent(login: string, params: any): Promise<string> {
-    const headers = [
-      (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Date ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Admin ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Remove ', w, h, { padding: 0.2 }),
-
+  protected async constructContent(login: string, page: number = 1): Promise<string> {
+    const index = (page - 1) * config.entries - 1
+    const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' Index ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h),
+      (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Date ', w, h),
+      (i, j, w, h) => centeredText(' Admin ', w, h),
+      (i, j, w, h) => centeredText(' Remove ', w, h),
     ]
-    const guestlisted = tm.admin.guestlist
-    const cancer: (TMOfflinePlayer | undefined)[] = []
-
-    for (const player of guestlisted) {
-      cancer.push(await tm.players.fetch(player.login))
+    const guestlist = tm.admin.guestlist
+    const fetchedPlayers = await tm.players.fetch(guestlist.map(a => a.login))
+    const indexCell: GridCellFunction = (i, j, w, h) => {
+      return centeredText((i + index + 1).toString(), w, h)
     }
-    const nicknameCell = (i: number, j: number, w: number, h: number) => {
-      return centeredText(tm.utils.safeString(tm.utils.strip(cancer[i - 1]?.nickname ?? '', false)), w, h)
+    const nicknameCell: GridCellFunction = (i, j, w, h) => {
+      const nickname = fetchedPlayers.find(a => a.login === guestlist[i + index].login)?.nickname
+      return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell = (i: number, j: number, w: number, h: number) => {
-      return centeredText(guestlisted[i - 1].login, w, h)
+    const loginCell: GridCellFunction = (i, j, w, h) => guestlist[i + index].login === login ?
+      centeredText('$' + config.selfColour + guestlist[i + index].login, w, h) : centeredText(guestlist[i + index].login, w, h)
+    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(guestlist[i + index].date, true), w, h)
+    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(guestlist[i + index].callerLogin, w, h)
+    const unglButton: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unGuestListIcon}" halign="center" 
+      valign="center" action="${this.openId + i + 1000 + index}"/>`
     }
-    const dateCell = (i: number, j: number, w: number, h: number) => {
-      return centeredText(guestlisted[i - 1].date.toUTCString(), w, h)
-    }
-    const adminCell = (i: number, j: number, w: number, h: number) => {
-      return centeredText(guestlisted[i - 1].callerLogin, w, h)
-    }
-    const unglButton = (i: number, j: number, w: number, h: number) => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.icon}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
-    }
-
-    const players = tm.admin.guestlist
-    const rows = Math.min(config.entries, players.length)
+    const rows = Math.min(config.entries, guestlist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
-      arr.push(nicknameCell, loginCell, dateCell, adminCell, unglButton)
+      arr.push(indexCell, nicknameCell, loginCell, dateCell, adminCell, unglButton)
     }
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: any): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+  protected constructFooter(login: string): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) +
+      this.paginator.constructXml(login)
   }
+
 }
