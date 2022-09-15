@@ -85,7 +85,9 @@ export default class CheckpointRecords extends PopupWindow {
     }
 
     const dateCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(cps[i + cpIndex - 1]?.date?.toUTCString() ?? '-', w, h)
+      const cp = cps[i + cpIndex - 1]
+      return centeredText((cp === undefined || cp === null) ? '' :
+        tm.utils.formatDate(cp.date, true), w, h)
     }
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {

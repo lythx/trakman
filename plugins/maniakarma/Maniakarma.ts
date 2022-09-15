@@ -82,7 +82,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   newVotes.length = 0
   playerVotes.length = 0
   if (logins.length === 0) { return [] }
-  const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({ // TODO check what happens if bs data
+  const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({
     login: tm.state.serverConfig.login,
     authcode: authCode,
     uid: tm.maps.current.id,
