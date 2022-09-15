@@ -82,7 +82,9 @@ export default class SectorRecords extends PopupWindow {
     }
 
     const dateCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(sectors[i + sectorIndex - 1]?.date?.toUTCString() ?? '-', w, h)
+      const sector = sectors[i + sectorIndex - 1]
+      return centeredText((sector === undefined || sector === null) ? '' :
+        tm.utils.formatDate(sector.date, true), w, h)
     }
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
