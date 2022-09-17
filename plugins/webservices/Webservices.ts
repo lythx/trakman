@@ -69,7 +69,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   }
 })
 
-tm.addListener('Controller.EndMap', async (info): Promise<void> => {
+tm.addListener('EndMap', async (info): Promise<void> => {
   if (info.isRestart === true) {
     nextAuthorData === currentAuthorData
     for (const e of nextAuthorListeners) {
@@ -88,7 +88,7 @@ tm.addListener('Controller.EndMap', async (info): Promise<void> => {
   }
 })
 
-tm.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
+tm.addListener('JukeboxChanged', async (): Promise<void> => {
   if (tm.state.current === 'result') {
     const res = await fetchPlayerData(tm.jukebox.queue[0].author)
     if (res instanceof Error || res === false) {
@@ -102,7 +102,7 @@ tm.addListener('Controller.JukeboxChanged', async (): Promise<void> => {
   }
 })
 
-tm.addListener('Controller.BeginMap', (): void => {
+tm.addListener('BeginMap', (): void => {
   currentAuthorData = nextAuthorData
   nextAuthorData = undefined
   for (const e of currentAuthorListeners) {

@@ -38,18 +38,18 @@ export class VoteReplay extends UiButton {
       },
       privilege: 0
     })
-    tm.addListener('Controller.ManialinkClick', (info) => {
+    tm.addListener('ManialinkClick', (info) => {
       if (info.answer === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })
-    tm.addListener('Controller.BeginMap', () => this.handleMapStart())
+    tm.addListener('BeginMap', () => this.handleMapStart())
     this.onReplay(() => this.handleMapReplay())
     this.onSkip(() => this.handleMapSkip())
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if(this.isReplay === true || this.isSkip === true) { return }
+    if (this.isReplay === true || this.isSkip === true) { return }
     if (tm.state.remainingMapTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(`${tm.utils.palette.error}It's too late for replay vote.`, login)
       return
@@ -83,8 +83,8 @@ export class VoteReplay extends UiButton {
       this.handleMapReplay()
       this.emitReplay()
       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}replay `
-      + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}has passed${tm.utils.palette.vote}.`)
-    tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
+        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}has passed${tm.utils.palette.vote}.`)
+      tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
     } else if (result.result === true) {
       this.replayCount++
       this.isReplay = true

@@ -239,13 +239,13 @@ if (config.isEnabled === true) {
       if (isConnected === false) { void initialize() }
     }, config.reconnectTimeout * 1000)
   }, true)
-  tm.addListener('Controller.PlayerJoin', (info): void => {
+  tm.addListener('PlayerJoin', (info): void => {
     void onPlayerJoin(info.login)
   }, true)
-  tm.addListener('Controller.BeginMap', (info): void => {
+  tm.addListener('BeginMap', (info): void => {
     void onBeginMap(info.isRestart)
   }, true)
-  tm.addListener('Controller.KarmaVote', (info): void => {
+  tm.addListener('KarmaVote', (info): void => {
     addVote(tm.maps.current.id, info.login, info.vote)
   })
 }

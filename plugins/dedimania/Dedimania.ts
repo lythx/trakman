@@ -53,7 +53,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
-  if(isFailedAuthentication === true) { return }
+  if (isFailedAuthentication === true) { return }
   currentDedis.length = 0
   newDedis.length = 0
   if (client.connected === false) {
@@ -291,23 +291,23 @@ if (config.isEnabled === true) {
     void initialize()
   }, true)
 
-  tm.addListener('Controller.BeginMap', (info) => {
+  tm.addListener('BeginMap', (info) => {
     void getRecords(info.id, info.name, info.environment, info.author)
   }, true)
 
-  tm.addListener('Controller.EndMap', (info) => {
+  tm.addListener('EndMap', (info) => {
     void sendRecords(info.id, info.name, info.environment, info.author, info.checkpointsAmount)
   })
 
-  tm.addListener('Controller.PlayerJoin', (info) => {
+  tm.addListener('PlayerJoin', (info) => {
     void playerJoin(info)
   })
 
-  tm.addListener('Controller.PlayerLeave', (info) => {
+  tm.addListener('PlayerLeave', (info) => {
     void playerLeave(info)
   })
 
-  tm.addListener('Controller.PlayerFinish', (info) => {
+  tm.addListener('PlayerFinish', (info) => {
     void addRecord(info, info.time, info.checkpoints)
   }, true)
 

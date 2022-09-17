@@ -2,33 +2,7 @@ import { Client } from "./client/Client.js"
 import { Logger } from "./Logger.js"
 import { GameService } from './services/GameService.js'
 
-interface EventWithCallbackInterface {
-  "Controller.Ready": 'result' | 'race'
-  "Controller.PlayerChat": TMMessageInfo
-  "Controller.PlayerJoin": JoinInfo
-  "Controller.PlayerLeave": LeaveInfo
-  "Controller.PlayerRecord": RecordInfo
-  "Controller.PlayerFinish": FinishInfo
-  "Controller.LiveRecord": FinishInfo
-  "Controller.PlayerInfoChanged": InfoChangedInfo
-  "Controller.ManialinkClick": ManialinkClickInfo
-  "Controller.PlayerCheckpoint": CheckpointInfo
-  "Controller.BeginMap": BeginMapInfo
-  "Controller.EndMap": EndMapInfo
-  "Controller.KarmaVote": KarmaVoteInfo
-  "Controller.VotesPrefetch": Readonly<TMVote>[]
-  "Controller.MapAdded": MapAddedInfo
-  "Controller.MapRemoved": MapRemovedInfo
-  "Controller.BillUpdated": BillUpdatedInfo
-  "Controller.MatchSettingsUpdated": TMMap[]
-  "Controller.PrivilegeChanged": PrivilegeChangedInfo
-  "Controller.LocalRecords": TMRecord[]
-  "Controller.JukeboxChanged": TMMap[]
-  "Controller.RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
-}
-
-
-const eventListeners: { event: TMEvent, callback: ((params: any) => void | Promise<void>) }[] = []
+const eventListeners: { event: keyof TMEvents, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
 const initialize = async () => {
@@ -58,10 +32,10 @@ const initialize = async () => {
  * @param callback function to execute on event
  * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
-const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event: T | TMEvent[],
-  callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : any)
+const addListener = <T extends keyof TMEvents>(event: T | (keyof TMEvents)[],
+  callback: ((params: T extends keyof TMEvents ? TMEvents[T] : any)
     => void | Promise<void>), prepend?: true): void => {
-  const arr: { event: TMEvent, callback: ((params: any) => void) }[] = []
+  const arr: { event: keyof TMEvents, callback: ((params: any) => void) }[] = []
   if (Array.isArray(event)) {
     arr.push(...event.map(a => ({ event: a, callback })))
   } else {
@@ -75,13 +49,10 @@ const addListener = <T extends keyof EventWithCallbackInterface | TMEvent>(event
  * @param event callback event name
  * @param params callback params
  */
-const emitEvent = async <T extends keyof EventWithCallbackInterface | TMEvent>(event: T,
-  params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams): Promise<void> => {
+const emitEvent = async <T extends keyof TMEvents>(event: T,
+  params: TMEvents[T]): Promise<void> => {
   if (controllerReady === false) { return }
-  const matchingEvents: {
-    event: TMEvent,
-    callback: ((params: T extends keyof EventWithCallbackInterface ? EventWithCallbackInterface[T] : EventParams) => void | Promise<void>)
-  }[] = eventListeners.filter(a => a.event === event)
+  const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
     await listener.callback(params) // TODO make not await if poss
   }

@@ -32,7 +32,7 @@ export class PlayerService {
         this.newLocalsAmount++
       }
     })
-    Events.addListener('Controller.BeginMap', (): void => {
+    Events.addListener('BeginMap', (): void => {
       this.newLocalsAmount = 0
     })
   }
@@ -55,7 +55,7 @@ export class PlayerService {
       }
       // OnlineRights is 0 for nations and 3 for united ?XD
       await this.join(player.Login, player.NickName, info[0].Path, info[0].IsSpectator,
-        info[0].PlayerId, info[0].IPAddress.split(':')[0], info[0].OnlineRights === 3, 
+        info[0].PlayerId, info[0].IPAddress.split(':')[0], info[0].OnlineRights === 3,
         info[0].LadderStats.PlayerRankings[0].Score, info[0].LadderStats.PlayerRankings[0].Ranking, true)
     }
   }
@@ -255,7 +255,7 @@ export class PlayerService {
     }
     // Get ranks for all players
     this.ranks = await this.repo.getRanks()
-    Events.emitEvent("Controller.RanksAndAveragesUpdated", arr)
+    Events.emitEvent("RanksAndAveragesUpdated", arr)
   }
 
   /**

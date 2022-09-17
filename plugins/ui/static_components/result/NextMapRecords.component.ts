@@ -24,7 +24,7 @@ export default class NextMapRecords extends StaticComponent {
     this.list.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('Controller.EndMap', async (info) => {
+    tm.addListener('EndMap', async (info) => {
       if (info.isRestart === true) {
         this.records = tm.records.local
         this.display()
@@ -34,12 +34,12 @@ export default class NextMapRecords extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('Controller.JukeboxChanged', async () => {
+    tm.addListener('JukeboxChanged', async () => {
       const mapId = tm.jukebox.queue[0].id
       this.records = await tm.records.fetchByMap(mapId) // TODO fix after prefetch in source
       this.display()
     })
-    tm.addListener('Controller.BeginMap', () => {
+    tm.addListener('BeginMap', () => {
       this.records.length = 0
     })
   }

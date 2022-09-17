@@ -11,7 +11,7 @@ import config from '../config/Config.js'
 
 const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
-Events.addListener('Controller.BillUpdated', (info: BillUpdatedInfo): void => {
+Events.addListener('BillUpdated', (info: BillUpdatedInfo): void => {
   const billIndex: number = bills.findIndex(a => a.id === info.id)
   if (billIndex !== -1) {
     switch (info.state) {

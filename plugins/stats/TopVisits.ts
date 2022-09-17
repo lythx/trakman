@@ -20,7 +20,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.PlayerJoin', (info) => {
+tm.addListener('PlayerJoin', (info) => {
   const login = info.login
   const visits = info.visits
   if (visits <= topList[topList.length - 1].visits) { return }

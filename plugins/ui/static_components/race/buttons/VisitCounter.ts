@@ -32,7 +32,7 @@ export class VisitCounter extends UiButton {
     this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], { count: res[0].count.toString() })
     this.buttonData.text2 = tm.utils.strVar(cfg.texts[1], { plural: res[0].count > 1 ? 'S' : '' })
     void this.emitUpdate()
-    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('PlayerJoin', (info: JoinInfo): void => {
       if (info.visits === 0) {
         const prevAmount: number = Number(this.buttonData.text1)
         this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], { count: (prevAmount + 1).toString() })

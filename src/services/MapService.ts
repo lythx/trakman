@@ -38,7 +38,7 @@ export class MapService {
       this._maps.length = 0
       await this.createList()
       this.clearJukebox()
-      Events.emitEvent('Controller.MatchSettingsUpdated', this._maps)
+      Events.emitEvent('MatchSettingsUpdated', this._maps)
     })
   }
 
@@ -176,7 +176,7 @@ export class MapService {
       Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
       this.clearJukebox()
     }
-    Events.emitEvent('Controller.MapAdded', { ...obj, callerLogin: caller?.login })
+    Events.emitEvent('MapAdded', { ...obj, callerLogin: caller?.login })
     return obj
   }
 
@@ -199,7 +199,7 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
-    Events.emitEvent('Controller.MapRemoved', { ...map, callerLogin: caller?.login })
+    Events.emitEvent('MapRemoved', { ...map, callerLogin: caller?.login })
     this.removeFromJukebox(id, caller)
     return true
   }
@@ -249,7 +249,7 @@ export class MapService {
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
-    Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    Events.emitEvent('JukeboxChanged', this.queue)
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -273,7 +273,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    Events.emitEvent('JukeboxChanged', this.queue)
     await this.updateNextMap()
     return true
   }
@@ -291,7 +291,7 @@ export class MapService {
       }
     }
     this.fillQueue()
-    Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    Events.emitEvent('JukeboxChanged', this.queue)
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -308,7 +308,7 @@ export class MapService {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
-    Events.emitEvent('Controller.JukeboxChanged', this.queue)
+    Events.emitEvent('JukeboxChanged', this.queue)
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)

@@ -37,11 +37,11 @@ if (config.isEnabled === true) {
     await onMapStart()
   }, true)
 
-  tm.addListener('Controller.BeginMap', async (): Promise<void> => {
+  tm.addListener('BeginMap', async (): Promise<void> => {
     await onMapStart()
   }, true)
 
-  tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+  tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
     const date = new Date()
     const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
     const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
@@ -68,7 +68,7 @@ if (config.isEnabled === true) {
     }
   })
 
-  tm.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+  tm.addListener('PlayerFinish', (info: FinishInfo) => {
     const date = new Date()
     const index = info.checkpoints.length
     const playerSectors = currentPlayerSecs.find(a => a.login === info.login)
@@ -96,7 +96,7 @@ if (config.isEnabled === true) {
     }
   })
 
-  tm.addListener('Controller.PlayerJoin', async (info) => {
+  tm.addListener('PlayerJoin', async (info) => {
     const playerSecs = await allSecsDB.get(currentMapDBId, info.login)
     if (playerSecs instanceof Error) {
       await tm.log.fatal(`Failed to fetch player ${info.login} sectors for map ${tm.maps.current.id}`, playerSecs.message)
@@ -160,7 +160,7 @@ if (config.isEnabled === true) {
           tm.sendMessage(config.outOfRange, info.login)
           return
         }
-        const deleted =    currentBestSecs[sectorIndex - 1]
+        const deleted = currentBestSecs[sectorIndex - 1]
         currentBestSecs[sectorIndex - 1] = undefined
         tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
           title: tm.utils.getTitle(info),

@@ -1,4 +1,4 @@
-import { trakman as tm} from '../../src/Trakman.js'
+import { trakman as tm } from '../../src/Trakman.js'
 import { dedimania } from '../dedimania/Dedimania.js'
 import { Logger } from '../../src/Logger.js'
 import c from './Config.js'
@@ -12,7 +12,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: ['Controller.BeginMap', 'Controller.Ready'],
+    event: ['BeginMap', 'Controller.Ready'],
     callback: async (): Promise<void> => {
       const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`) //FIX
       for (const player of tm.players.list) {
@@ -43,7 +43,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.PlayerJoin',
+    event: 'PlayerJoin',
     callback: async (player: JoinInfo): Promise<void> => {
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.state.serverConfig.name),
@@ -83,7 +83,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.EndMap',
+    event: 'EndMap',
     callback: (info: EndMapInfo): void => {
       if (info.winnerLogin === undefined || info.winnerWins === undefined) {
         return
@@ -94,7 +94,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.PlayerLeave',
+    event: 'PlayerLeave',
     callback: (player: LeaveInfo): void => {
       tm.sendMessage(tm.utils.strVar(c.leave, {
         nickname: tm.utils.strip(player.nickname, true),

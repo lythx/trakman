@@ -13,26 +13,26 @@ export default abstract class StaticComponent {
     this.displayMode = displayMode
     switch (displayMode) {
       case 'race':
-        tm.addListener('Controller.BeginMap', async () => {
+        tm.addListener('BeginMap', async () => {
           this._isDisplayed = true
           await this.display()
         })
-        tm.addListener('Controller.EndMap', () => {
+        tm.addListener('EndMap', () => {
           this._isDisplayed = false
           this.hide()
         }, true)
         break
       case 'result':
-        tm.addListener('Controller.EndMap', async () => {
+        tm.addListener('EndMap', async () => {
           this._isDisplayed = true
           await this.display()
         })
-        tm.addListener('Controller.BeginMap', () => {
+        tm.addListener('BeginMap', () => {
           this._isDisplayed = false
           this.hide()
         }, true)
     }
-    tm.addListener('Controller.PlayerJoin', async (info: JoinInfo) => {
+    tm.addListener('PlayerJoin', async (info: JoinInfo) => {
       if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
     if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {

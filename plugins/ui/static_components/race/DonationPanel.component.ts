@@ -20,7 +20,7 @@ export default class DonationPanel extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.constructXML()
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer > this.id && info.answer <= this.id + config.amounts.length) {
         const amount = config.amounts[info.answer - (this.id + 1)]
         void donations.donate(info.login, info.nickname, amount)

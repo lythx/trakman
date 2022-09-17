@@ -23,13 +23,13 @@ export default class TMXWindow extends PopupWindow<number> {
       { background: config.gridBackground, margin: config.margin })
     tmx.onMapChange(() => this.reRender())
     tmx.onQueueChange(() => this.reRender())
-    tm.addListener('Controller.BeginMap', () => {
+    tm.addListener('BeginMap', () => {
       this.historyCount = Math.ceil((Math.min(config.historyCount, tm.jukebox.historyCount) - 1) / config.itemsPerPage)
       const nextCount = Math.ceil((config.queueCount - 1) / config.itemsPerPage)
       this.paginator.setPageCount(this.historyCount + 1 + nextCount)
       this.reRender()
     })
-    tm.addListener('Controller.JukeboxChanged', () => this.reRender())
+    tm.addListener('JukeboxChanged', () => this.reRender())
     tm.commands.add({
       aliases: ['tmxinfo'],
       help: 'Display TMX info.',

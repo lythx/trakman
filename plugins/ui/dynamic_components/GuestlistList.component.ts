@@ -17,7 +17,7 @@ export default class GuestlistList extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
-    tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
         if (info.privilege < config.privilege) { return }
         const target = tm.players.list[info.answer - this.openId - 1000]
@@ -36,11 +36,11 @@ export default class GuestlistList extends PopupWindow<number> {
         }
       }
     })
-    tm.addListener(['Controller.PlayerJoin', 'Controller.PlayerLeave'], () => {
+    tm.addListener(['PlayerJoin', 'PlayerLeave'], () => {
       this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
-    tm.addListener('Controller.PrivilegeChanged', (info) => { // TODO guestlistchanged event
+    tm.addListener('PrivilegeChanged', (info) => { // TODO guestlistchanged event
       if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
       this.reRender()
     })

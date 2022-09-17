@@ -9,7 +9,7 @@ export default class CpCounter extends StaticComponent {
 
   constructor() {
     super(IDS.cpCounter, 'race')
-    tm.addListener('Controller.PlayerCheckpoint', (info) => {
+    tm.addListener('PlayerCheckpoint', (info) => {
       this.displayToPlayer(info.player.login, info.index + 1)
     })
     tm.addListener('TrackMania.PlayerFinish', (params: [any, any, number]) => {

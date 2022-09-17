@@ -57,12 +57,12 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.PlayerJoin', async info => {
+tm.addListener('PlayerJoin', async info => {
   const data = await getFromDB(info.login)
   if (data !== undefined) { onlineList.push(data) }
 })
 
-tm.addListener('Controller.PlayerLeave', async info => {
+tm.addListener('PlayerLeave', async info => {
   onlineList = onlineList.filter(a => a.login !== info.login)
 })
 

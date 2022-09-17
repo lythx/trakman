@@ -126,7 +126,7 @@ export default class RecordList {
   }
 
   private setupListeners(): void {
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === IDS.ClearAlerts) {
         const index: number = this.infos.findIndex(a => a.login === info.login)
         if (index !== -1) {

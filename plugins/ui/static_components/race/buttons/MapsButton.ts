@@ -23,7 +23,7 @@ export class MapsButton extends UiButton {
       actionId: IDS.mapList,
       equalTexts: cfg.texts.equal
     }
-    tm.addListener(['Controller.MapAdded', 'Controller.MapRemoved'], (): void => {
+    tm.addListener(['MapAdded', 'MapRemoved'], (): void => {
       this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], { count: tm.maps.count.toString() })
       this.emitUpdate()
     })
