@@ -16,7 +16,7 @@ export default {
   },
   unmute: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unmuted ${p.highlight}#{name}${p.admin}.`,
-    error: `${p.error}Could not unmute #{login}.`,
+    error: `${p.error}Could not unmute #{login}.`, // todo highlighht login mayube?
     notMuted: `${p.error}#{login} is not muted.`,
     public: true,
     privilege: 1
