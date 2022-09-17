@@ -139,12 +139,19 @@ const commands: TMCommand[] = [
   },
   {
     aliases: ['sn', 'sendnotice'],
-    help: 'Send a notice.',
-    // TODO: FiX tHiS THiNgY XxX
-    params: [{ name: 'time', type: 'time' }, /*{name: 'loginAvatar', optional: true},*/ { name: 'notice', type: 'multiword' }],
-    callback: (info: TMMessageInfo, time: number, /*loginAvatar?: string,*/  notice: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.sendnotice.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), value: notice }), config.sendnotice.public ? undefined : info.login)
-      tm.client.callNoRes(`SendNotice`, [{ string: notice }, { string: /*loginAvatar*/ '' }, { int: time }])
+    help: 'Send a notice. If the last word in notice is a login players avatar will be displayed.',
+    params: [{ name: 'time', type: 'time' }, { name: 'notice', type: 'multiword' }],
+    callback: (info: TMMessageInfo, time: number, notice: string): void => {
+      const s = notice.split(' ').filter(a => a !== '')
+      const player = tm.players.get(s[s.length - 1])
+      let loginAvatar = ''
+      if (player !== undefined) {
+        notice = s.slice(0, -1).join(' ')
+        loginAvatar = player.login
+      }
+      tm.sendMessage(tm.utils.strVar(config.sendnotice.text, { title: tm.utils.getTitle(info),
+         adminName: tm.utils.strip(info.nickname), value: notice }), config.sendnotice.public ? undefined : info.login)
+      tm.client.callNoRes(`SendNotice`, [{ string: notice }, { string: loginAvatar }, { int: time }])
     },
     privilege: config.sendnotice.privilege
   },
