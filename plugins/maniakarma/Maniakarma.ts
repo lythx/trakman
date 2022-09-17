@@ -129,7 +129,7 @@ const sendVotes = async (): Promise<void> => {
     map: Buffer.from(lastMap.name).toString('base64'),
     author: lastMap.author,
     atime: lastMap.authorTime.toString(),
-    ascore: '0', // TODO STUNTS MODE IDC
+    ascore: '0', // STUNTS MODE IDC
     nblaps: lastMap.lapsAmount.toString(),
     nbchecks: lastMap.checkpointsAmount.toString(),
     mood: lastMap.mood,
