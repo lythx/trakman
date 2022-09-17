@@ -23,7 +23,7 @@ const initialize = async () => {
   }
   GameService.state = status
   controllerReady = true
-  emitEvent('Controller.Ready', status)
+  emit('Controller.Ready', status)
 }
 
 /**
@@ -49,7 +49,7 @@ const addListener = <T extends keyof TMEvents>(event: T | (keyof TMEvents)[],
  * @param event callback event name
  * @param params callback params
  */
-const emitEvent = async <T extends keyof TMEvents>(event: T,
+const emit = async <T extends keyof TMEvents>(event: T,
   params: TMEvents[T]): Promise<void> => {
   if (controllerReady === false) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
@@ -58,4 +58,4 @@ const emitEvent = async <T extends keyof TMEvents>(event: T,
   }
 }
 
-export const Events = { initialize, addListener, emitEvent }
+export const Events = { initialize, addListener, emit }

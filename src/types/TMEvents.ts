@@ -21,6 +21,14 @@ interface TMEvents {
   "LocalRecordsRemoved": TMRecord[]
   "JukeboxChanged": TMMap[]
   "RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
+  "Ban": Readonly<TMBanlistEntry>
+  "Unban" : Readonly<TMBanlistEntry>
+  "Blacklist": Readonly<TMBlacklistEntry>
+  "Unblacklist": Readonly<TMBlacklistEntry>
+  "Mute": Readonly<TMMutelistEntry>
+  "Unmute" : Readonly<TMMutelistEntry>
+  "AddGuest": Readonly<TMGuestlistEntry>
+  "RemoveGuest": Readonly<TMGuestlistEntry>
   "TrackMania.PlayerConnect": [string, boolean]
   "TrackMania.PlayerDisconnect": [string]
   "TrackMania.PlayerChat": [number, string, string, any] // todo

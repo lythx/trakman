@@ -36,7 +36,7 @@ export class Listeners {
         const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
           playerInfo[0].Path, isSpectator, playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
           playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
-        Events.emitEvent('PlayerJoin', joinInfo)
+        Events.emit('PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
       }
@@ -50,7 +50,7 @@ export class Listeners {
         }
         const leaveInfo: LeaveInfo | Error = PlayerService.leave(login)
         if (!(leaveInfo instanceof Error)) {
-          Events.emitEvent('PlayerLeave', leaveInfo)
+          Events.emit('PlayerLeave', leaveInfo)
         }
       }
     },
@@ -64,7 +64,7 @@ export class Listeners {
         }
         const messageInfo: TMMessageInfo | Error = ChatService.add(login, text)
         if (!(messageInfo instanceof Error)) {
-          Events.emitEvent('PlayerChat', messageInfo)
+          Events.emit('PlayerChat', messageInfo)
         }
       }
     },
@@ -90,14 +90,14 @@ export class Listeners {
           if (obj !== false) {
             if (obj.localRecord !== undefined) {
               // Register player local record
-              Events.emitEvent('Controller.PlayerRecord', obj.localRecord)
+              Events.emit('Controller.PlayerRecord', obj.localRecord)
             }
             if (obj.liveRecord !== undefined) {
               // Register player live record
-              Events.emitEvent('LiveRecord', obj.liveRecord)
+              Events.emit('LiveRecord', obj.liveRecord)
             }
             // Register player finish
-            Events.emitEvent('PlayerFinish', obj.finishInfo)
+            Events.emit('PlayerFinish', obj.finishInfo)
           }
           return
           // Real CP
@@ -109,7 +109,7 @@ export class Listeners {
             player
           }
           // Register player checkpoint
-          Events.emitEvent('PlayerCheckpoint', info)
+          Events.emit('PlayerCheckpoint', info)
         }
       }
     },
@@ -197,7 +197,7 @@ export class Listeners {
         // Update server config
         ServerConfig.update()
         // Register map update
-        Events.emitEvent('BeginMap', info)
+        Events.emit('BeginMap', info)
       }
     },
     {
@@ -227,7 +227,7 @@ export class Listeners {
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
-        Events.emitEvent('EndMap', endMapInfo)
+        Events.emit('EndMap', endMapInfo)
       }
     },
     {
@@ -252,7 +252,7 @@ export class Listeners {
         const temp: any = PlayerService.get(login)
         temp.answer = answer
         const info: ManialinkClickInfo = temp
-        Events.emitEvent('ManialinkClick', info)
+        Events.emit('ManialinkClick', info)
       }
     },
     {
@@ -260,7 +260,7 @@ export class Listeners {
       callback: ([id, state, stateName, transactionId]: TMEvents['TrackMania.BillUpdated']): void => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
         const bill: BillUpdatedInfo = { id, state, stateName, transactionId }
-        Events.emitEvent('BillUpdated', bill)
+        Events.emit('BillUpdated', bill)
       }
     },
     {
@@ -301,7 +301,7 @@ export class Listeners {
         } else {
           PlayerService.setPlayerSpectatorStatus(info.login, false)
         }
-        Events.emitEvent('PlayerInfoChanged', info)
+        Events.emit('PlayerInfoChanged', info)
       }
     },
     {

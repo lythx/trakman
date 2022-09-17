@@ -212,10 +212,10 @@ export class RecordService {
       Logger.info(`The record of ${player.nickname} (${player.login}) on map ${mapId} has been removed`)
     }
     const index = this._localRecords.findIndex(a => a.login === player.login && a.map === mapId)
-    if(index !== -1) {
+    if (index !== -1) {
       const record = this._localRecords[index]
       this._localRecords.splice(index, 1)
-      Events.emitEvent('LocalRecordsRemoved', [record])
+      Events.emit('LocalRecordsRemoved', [record])
       void this.repo.remove(player.login, mapId)
     }
   }
@@ -232,9 +232,9 @@ export class RecordService {
     } else {
       Logger.info(`Records on map ${mapId} have been removed`)
     }
-    const records= this._localRecords
+    const records = this._localRecords
     this._localRecords.length = 0
-    Events.emitEvent('LocalRecordsRemoved', records)
+    Events.emit('LocalRecordsRemoved', records)
     void this.repo.removeAll(mapId)
   }
 
