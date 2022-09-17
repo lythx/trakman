@@ -24,12 +24,12 @@ tm.addListener("Controller.Ready", async () => {
   onlineDonators = await getFromDB(tm.players.list.map(a => a.login))
 })
 
-tm.addListener("Controller.PlayerJoin", async (info) => {
+tm.addListener("PlayerJoin", async (info) => {
   const res = await getFromDB(info.login)
   if (res !== undefined) { onlineDonators.push(res) }
 })
 
-tm.addListener('Controller.PlayerLeave', (info) => {
+tm.addListener('PlayerLeave', (info) => {
   onlineDonators = onlineDonators.filter(a => a.login !== info.login)
 })
 

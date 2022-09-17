@@ -28,12 +28,12 @@ export default class LiveSectors extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    tm.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
-    tm.addListener('Controller.LiveRecord', (): void => {
+    tm.addListener('LiveRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })

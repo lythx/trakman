@@ -22,12 +22,12 @@ export default class KarmaWidgetResult extends StaticComponent {
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
       new Array(3).fill(1), new Array(3).fill(1), { background: config.background, margin: config.margin })
-    tm.addListener('Controller.KarmaVote', (): void => {
+    tm.addListener('KarmaVote', (): void => {
       this.display()
     })
     maniakarma.onMapFetch(this.display.bind(this))
     maniakarma.onVote(this.display.bind(this))
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer > this.id && info.answer <= this.id + 6) {
         const index: number = info.answer - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]

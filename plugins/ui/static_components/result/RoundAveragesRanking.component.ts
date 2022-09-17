@@ -1,5 +1,5 @@
 import { trakman as tm } from '../../../../src/Trakman.js'
-import {  List, IDS, StaticHeader } from '../../UiUtils.js'
+import { List, IDS, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './RoundAveragesRanking.config.js'
 
@@ -21,8 +21,8 @@ export default class RoundAveragesRanking extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
-     config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    tm.addListener('Controller.PlayerFinish', async (info) => {
+      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+    tm.addListener('PlayerFinish', async (info) => {
       const entry = this.averages.find(a => a.login === info.login)
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
@@ -31,7 +31,7 @@ export default class RoundAveragesRanking extends StaticComponent {
         entry.finishcount++
       }
     })
-    tm.addListener('Controller.BeginMap', () => {
+    tm.addListener('BeginMap', () => {
       this.averages.length = 0
     })
   }

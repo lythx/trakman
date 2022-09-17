@@ -28,7 +28,7 @@ export default class PlayerList extends PopupWindow {
     this.headerGrid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1), config.grid)
 
     //ACTIONS
-    tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 2000 && info.answer < this.openId + 3000) {
 
         const targetPlayer = tm.players.list[info.answer - this.openId - 2000]

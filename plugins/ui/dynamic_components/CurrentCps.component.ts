@@ -24,7 +24,7 @@ export default class CurrentCps extends PopupWindow {
     super(IDS.currentCps, iconUrl, config.title, config.navbar)
     // Create grid object to display the table
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1), config.grid)
-    tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+    tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
       const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
       const pb = tm.records.getLocal(info.player.login)
       if (currentCp === undefined) { // Add a player to array if he wasn't there

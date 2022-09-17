@@ -25,7 +25,7 @@ export const initialize = () => {
 </manialinks>`)
 }
 
-tm.addListener('Controller.PlayerJoin', (info) => {
+tm.addListener('PlayerJoin', (info) => {
   tm.sendManialink(`<manialinks>
   <manialink id="${utilIds.F5}">
     <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${utilIds.F5}"/>
@@ -41,7 +41,7 @@ tm.addListener('Controller.PlayerJoin', (info) => {
 
 
 
-tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
   switch (info.answer) {
     case utilIds.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)

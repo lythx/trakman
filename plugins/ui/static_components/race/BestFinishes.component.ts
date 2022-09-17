@@ -21,7 +21,7 @@ export default class BestFinishes extends StaticComponent {
     this.contentHeight = config.height - (config.margin + this.headerHeight)
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
-    tm.addListener('Controller.PlayerFinish', (info: FinishInfo) => {
+    tm.addListener('PlayerFinish', (info: FinishInfo) => {
       let index = this.bestFinishes.findIndex(a => a.time > info.time)
       if (index === -1) { index = this.bestFinishes.length }
       if (index < config.entries) {
@@ -31,7 +31,7 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('Controller.BeginMap', () => {
+    tm.addListener('BeginMap', () => {
       this.newestFinish = -1
       this.bestFinishes.length = 0
       this.display()

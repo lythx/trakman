@@ -19,17 +19,17 @@ export default class LiveRanking extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount,  config.maxRecordsAmount, config.displayNoRecordEntry)
+      config.entries, this.side, config.topCount, config.maxRecordsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('Controller.LiveRecord', (): void => {
+    tm.addListener('LiveRecord', (): void => {
       this.display()
     })
-    tm.addListener('Controller.PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('PlayerJoin', (info: JoinInfo): void => {
       if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo): void => {
+    tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
       if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
   }

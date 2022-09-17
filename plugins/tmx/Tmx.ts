@@ -80,10 +80,10 @@ if (config.isEnabled === true) {
     tm.log.trace('Initializing TMX...')
     void initialize()
   })
-  tm.addListener('Controller.BeginMap', (info) => {
+  tm.addListener('BeginMap', (info) => {
     if (info.isRestart === false) { void nextMap() }
   })
-  tm.addListener('Controller.JukeboxChanged', (queue) => void updateQueue(queue))
+  tm.addListener('JukeboxChanged', (queue) => void updateQueue(queue))
 }
 
 /**

@@ -1,6 +1,6 @@
 import { trakman as tm } from "../../src/Trakman.js";
 import DynamicComponent from "./DynamicComponent.js";
-import {IDS } from './UiUtils.js'
+import { IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.js'
 import Navbar from './utils/Navbar.js'
 import config from './config/PopupWindow.js'
@@ -46,11 +46,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.navbarBottom, this.frameMidBottom, this.frameBottom] = this.constructFrame()
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.answer === this.openId) { this.onOpen(info) }
       else if (info.answer === this.closeId) { this.onClose(info) }
     })
-    tm.addListener('Controller.PlayerLeave', (info: LeaveInfo) => {
+    tm.addListener('PlayerLeave', (info: LeaveInfo) => {
       const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)

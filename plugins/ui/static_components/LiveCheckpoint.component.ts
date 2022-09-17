@@ -25,7 +25,7 @@
 //     const pos = getStaticPosition('liveCheckpoint')
 //     this.positionX = pos.x
 //     this.positionY = pos.y
-//     tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo): void => {
+//     tm.addListener('PlayerCheckpoint', (info: CheckpointInfo): void => {
 //       const pb: TMRecord | undefined = tm.records.getLocal(info.player.login)
 //       if (pb !== undefined) {
 //         const cpIndex: number = info.index

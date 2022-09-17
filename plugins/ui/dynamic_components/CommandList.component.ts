@@ -61,7 +61,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       this.paginators.push(paginator)
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
-    tm.addListener("Controller.ManialinkClick", (info) => {
+    tm.addListener("ManialinkClick", (info) => {
       if (info.answer >= this.openId + 100 && info.answer <= this.openId + 500) {
         switch (info.answer - this.openId) {
           case 100: {
@@ -101,7 +101,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
     })
-    tm.addListener("Controller.PrivilegeChanged", (info) => {
+    tm.addListener("PrivilegeChanged", (info) => {
       const p: { login: string, params: DisplayParams } | undefined = this.getPlayersWithWindowOpen(true).find(a => a.login === info.login)
       if (p !== undefined) {
         if (info.newPrivilege < p.params.privilege || p.params.singleType === undefined) {

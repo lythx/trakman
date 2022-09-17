@@ -11,7 +11,7 @@ export default class WelcomeWindow extends PopupWindow {
   constructor() {
     super(IDS.welcomeWindow, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], config.grid)
-    tm.addListener('Controller.PlayerJoin', (info) => {
+    tm.addListener('PlayerJoin', (info) => {
       if (this.welcomedPlayers.includes(info.login) === false) {
         this.welcomedPlayers.push(info.login)
         tm.openManialink(this.openId, info.login)

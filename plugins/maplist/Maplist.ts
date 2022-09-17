@@ -27,7 +27,7 @@ tm.addListener('Controller.Ready', (): void => {
   worstAtSort.push(...[...atSort].reverse())
 })
 
-tm.addListener('Controller.MapAdded', (map) => {
+tm.addListener('MapAdded', (map) => {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   const ratio = map.voteRatio
@@ -38,7 +38,7 @@ tm.addListener('Controller.MapAdded', (map) => {
   cache.length = 0
 })
 
-tm.addListener('Controller.MapRemoved', (map) => {
+tm.addListener('MapRemoved', (map) => {
   authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
   nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
   karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)

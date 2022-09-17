@@ -25,17 +25,17 @@ export default class MapWidgetResult extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
-    if (webservices.isEnabled === true) { 
+    if (webservices.isEnabled === true) {
       webservices.onCurrentAuthorChange(() => {
         void this.display()
       })
     }
-    tm.addListener('Controller.JukeboxChanged', () => {
+    tm.addListener('JukeboxChanged', () => {
       void this.display()
     })
     tmx.onMapChange(() => this.display())
     tmx.onQueueChange(() => this.display())
-    tm.addListener('Controller.EndMap', (info) => {
+    tm.addListener('EndMap', (info) => {
       this.isRestart = info.isRestart
     }, true)
   }

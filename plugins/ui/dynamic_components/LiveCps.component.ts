@@ -15,7 +15,7 @@ export default class LiveCps extends PopupWindow {
   private readonly paginator: Paginator
   private readonly cpPaginator: Paginator
   private readonly selfColour: string = config.selfColour
-  private readonly cpColours =config.cpColours
+  private readonly cpColours = config.cpColours
 
   constructor() {
     super(IDS.liveCps, config.icon, config.title, config.navbar)
@@ -28,16 +28,16 @@ export default class LiveCps extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    tm.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
-    tm.addListener('Controller.LiveRecord', (): void => {
+    tm.addListener('LiveRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(tm.records.live.length / this.entries))
       this.reRender()
     })
-    tm.commands.add(  {
+    tm.commands.add({
       aliases: ['lcp', 'livecptms', 'liverecs'],
       help: 'Display current map live checkpoints.',
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
@@ -97,9 +97,9 @@ export default class LiveCps extends PopupWindow {
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
-        ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
-         ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
+      ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
+      ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
@@ -108,15 +108,15 @@ export default class LiveCps extends PopupWindow {
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth, 
-        ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), 
-        ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
+      ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+      ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, 
-        ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell,
+          ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
         arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }

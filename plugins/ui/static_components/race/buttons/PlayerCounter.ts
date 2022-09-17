@@ -28,7 +28,7 @@ export class PlayerCounter extends UiButton {
       padding: cfg.padding,
       equalTexts: cfg.texts.equal
     }
-    tm.addListener(['Controller.PlayerJoin', 'Controller.PlayerLeave', 'Controller.PlayerInfoChanged'], (): void => {
+    tm.addListener(['PlayerJoin', 'PlayerLeave', 'PlayerInfoChanged'], (): void => {
       const all: TMPlayer[] = tm.players.list
       const players: number = all.filter(a => !a.isSpectator).length
       this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], {
