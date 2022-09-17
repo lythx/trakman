@@ -81,7 +81,7 @@ export class ClientSocket extends net.Socket {
     this.handshakeHeader += buffer.toString()
     if (this.handshakeHeader.slice(-11) === 'GBXRemote 2') {
       this.handshakeStatus = true
-    } else if(this.handshakeHeader.length > 15) {
+    } else if (this.handshakeHeader.length > 15) {
       this.handshakeStatus = new Error('Server uses wrong protocol')
     }
   }
@@ -115,14 +115,14 @@ export class ClientSocket extends net.Socket {
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer: Buffer = this.response.extractOverload()
       if (this.response.isEvent) {
-        Events.emitEvent(this.response.eventName as keyof TMEvents, this.response.json)
+        Events.emit(this.response.eventName as keyof TMEvents, this.response.json)
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array
       }
       this.handleResponseStart(nextResponseBuffer) // start new response if buffer was overloaded
     } else if (this.response.status === 'completed') {
       if (this.response.isEvent) {
-        Events.emitEvent(this.response.eventName as keyof TMEvents, this.response.json)
+        Events.emit(this.response.eventName as keyof TMEvents, this.response.json)
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array
       }

@@ -393,7 +393,7 @@ export const trakman = {
     const temp: any = PlayerService.get(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
-    Events.emitEvent('ManialinkClick', info)
+    Events.emit('ManialinkClick', info)
   },
 
   /**

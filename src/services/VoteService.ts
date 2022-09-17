@@ -57,14 +57,14 @@ export abstract class VoteService {
       v.vote = vote
       void this.repo.update(map.id, player.login, vote, date)
       this.updateMapVoteData(map.id, voteArr)
-      Events.emitEvent('KarmaVote', v)
+      Events.emit('KarmaVote', v)
       return
     }
     const obj = { login: player.login, mapId: map.id, date, vote }
     voteArr.push(obj)
     void this.repo.add(obj)
     this.updateMapVoteData(map.id, voteArr)
-    Events.emitEvent('KarmaVote', obj)
+    Events.emit('KarmaVote', obj)
   }
 
   static async updatePrefetch(): Promise<void> {
@@ -88,7 +88,7 @@ export abstract class VoteService {
       if (entry !== undefined) { entry.votes = res.filter(a => a.mapId === e) }
     }
     this._votes = arr.concat(notQueueMaps)
-    Events.emitEvent('VotesPrefetch', res)
+    Events.emit('VotesPrefetch', res)
   }
 
   private static updateMapVoteData(uid: string, arr: TMVote[]) {
