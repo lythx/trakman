@@ -5,10 +5,11 @@ import { palette as p } from '../../../src/Trakman.js'
 export default {
   privilege: 2,
   title: " Banned Players ",
-  icon: icons.banList,
+  icon: icons.banlist,
   iconWidth: 2,
   iconHeight: 2,
   unbanIcon: icons.unban,
+  unbanIconHover: icons.unbanHover,
   entries: 15,
   selfColour: "0F0",
   defaultNickname: 'N/A',
@@ -23,8 +24,8 @@ export default {
   ],
   navbar: [
     { name: 'Playerlist', actionId: ids.playerList },
-    { name: 'Blacklist', actionId: ids.blacklistList },
-    { name: 'Guestlist', actionId: ids.guestList }
+    { name: 'Blacklist', actionId: ids.blacklist },
+    { name: 'Guestlist', actionId: ids.guestlist }
 
     // TODO add mutelist
   ],

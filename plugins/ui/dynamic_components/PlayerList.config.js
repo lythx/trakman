@@ -21,10 +21,10 @@ export default {
     2
   ],
   navbar: [
-    { name: 'Banlist', actionId: ids.banList },
-    { name: 'Blacklist', actionId: ids.blacklistList },
+    { name: 'Banlist', actionId: ids.banlist },
+    { name: 'Blacklist', actionId: ids.blacklist },
     // TODO add mutelist
-    { name: 'Guestlist', actionId: ids.guestList }
+    { name: 'Guestlist', actionId: ids.guestlist }
   ],
   grid: {
     background: "9996",

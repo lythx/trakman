@@ -53,7 +53,7 @@ export default {
     privilege: 2
   },
   blacklist: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has muted ${p.highlight}#{name}${p.admin}#{duration}.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has blacklisted ${p.highlight}#{name}${p.admin}#{duration}.`,
     error: `${p.error}Could not blacklist #{login}.`,
     reason: `${p.admin}Reason${p.highlight}: #{reason}${p.admin}.`,
     public: true,
