@@ -255,7 +255,7 @@ export class PlayerService {
     }
     // Get ranks for all players
     this.ranks = await this.repo.getRanks()
-    Events.emitEvent("RanksAndAveragesUpdated", arr)
+    Events.emit("RanksAndAveragesUpdated", arr)
   }
 
   /**

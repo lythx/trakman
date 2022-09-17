@@ -2,7 +2,7 @@ import { Logger } from "../Logger.js";
 import { Client } from "../client/Client.js";
 import config from "../../config/Config.js"
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
-import { BanlistRepository } from '../database/BanlistRepository.js'
+import { BanlistRepository } from '../database/BanlistRepository.js' // TODO FIX MUTE BUG
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
 import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
@@ -262,7 +262,7 @@ export class AdministrationService {
     }
     if (player === undefined) {
       const player = await PlayerService.fetch(login)
-      Events.emitEvent('PrivilegeChanged', {
+      Events.emit('PrivilegeChanged', {
         player: player === undefined ? undefined : { ...player, privilege },
         login,
         previousPrivilege: player?.privilege ?? 0,
@@ -272,7 +272,7 @@ export class AdministrationService {
       void this.privilegeRepo.set(login, privilege)
       return
     }
-    Events.emitEvent('PrivilegeChanged', {
+    Events.emit('PrivilegeChanged', {
       player: player === undefined ? undefined : { ...player, privilege },
       login,
       previousPrivilege: player.privilege ?? 0,
@@ -307,23 +307,23 @@ export class AdministrationService {
       entry.expireDate = expireDate
       entry.date = date
       void this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
+      Events.emit('Ban', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
       return
     }
     const res = await Client.call('BanAndBlackList',
       [{ string: login }, { string: reason ?? config.defaultReasonMessage }, { boolean: true }])
+    const obj = {
+      ip, login, nickname, date, callerNickname: caller.nickname,
+      callerLogin: caller.login, reason, expireDate
+    }
     if (res instanceof Error) {
-      this.banOnJoin.push({
-        ip, login, nickname, date, callerNickname: caller.nickname,
-        callerLogin: caller.login, reason, expireDate
-      })
+      this.banOnJoin.push(obj)
     } else {
-      this.serverBanlist.push({
-        ip, login, nickname, date, callerNickname: caller.nickname,
-        callerLogin: caller.login, reason, expireDate
-      })
+      this.serverBanlist.push(obj)
     }
     void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
+    Events.emit('Ban', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
   }
@@ -336,20 +336,25 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not banned, Error if dedicated server call fails
    */
   static async unban(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    const serverBan = this.serverBanlist.find(a => a.login === login)
-    if (serverBan === undefined && !this.banOnJoin.some(a => a.login === login)) { return false }
-    if (serverBan !== undefined) {
+    const serverBanIndex = this.serverBanlist.findIndex(a => a.login === login)
+    const banOnJoinIndex = this.banOnJoin.findIndex(a => a.login === login)
+    if (serverBanIndex === -1 && banOnJoinIndex === -1) { return false }
+    let obj: TMBanlistEntry | undefined
+    if (serverBanIndex !== -1) {
       const res = await Client.call('UnBan', [{ string: login }])
       if (res instanceof Error) { return res }
       if (!this._blacklist.some(a => a.login === login)) {
         const res = await Client.call('UnBlackList', [{ string: login }])
         if (res instanceof Error) { return res }
       }
-      this.serverBanlist = this.serverBanlist.filter(a => a.login !== login)
+      obj = this.serverBanlist[serverBanIndex]
+      this.serverBanlist.splice(serverBanIndex, 1)
     } else {
-      this.banOnJoin = this.banOnJoin.filter(a => a.login !== login)
+      obj = this.banOnJoin[banOnJoinIndex]
+      this.banOnJoin.splice(banOnJoinIndex, 1)
     }
     void this.banlistRepo.remove(login)
+    Events.emit('Unban', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unbanned ${login}`)
     } else {
@@ -379,6 +384,7 @@ export class AdministrationService {
       entry.expireDate = expireDate
       entry.date = date
       void this.blacklistRepo.update(login, date, caller.login, reason, expireDate)
+      Events.emit('Blacklist', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
       return true
     }
@@ -386,11 +392,13 @@ export class AdministrationService {
       const res = await Client.call('BlackList', [{ string: login }])
       if (res instanceof Error) { return res }
     }
-    this._blacklist.push({
+    const obj = {
       login, nickname, date, callerNickname: caller.nickname,
       callerLogin: caller.login, reason, expireDate
-    })
+    }
+    this._blacklist.push(obj)
     void this.blacklistRepo.add(login, date, caller.login, reason, expireDate)
+    Events.emit('Blacklist', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
     Client.callNoRes('SaveBlackList', [{ string: this.blacklistFile }])
@@ -404,13 +412,16 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not blacklisted, Error if dedicated server call fails
    */
   static async unblacklist(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    if (!this._blacklist.some(a => a.login === login)) { return false }
+    const blIndex = this._blacklist.findIndex(a => a.login === login)
+    if (blIndex === -1) { return false }
     if (!this.serverBanlist.some(a => a.login === login)) {
       const res = await Client.call('UnBlackList', [{ string: login }])
       if (res instanceof Error) { return res }
     }
-    this._blacklist = this._blacklist.filter(a => a.login !== login)
+    const obj = this._blacklist[blIndex]
+    this._blacklist.splice(blIndex, 1)
     void this.blacklistRepo.remove(login)
+    Events.emit('Unblacklist', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unblacklisted ${login}`)
     } else {
@@ -444,22 +455,22 @@ export class AdministrationService {
       entry.expireDate = expireDate
       entry.date = date
       void this.mutelistRepo.update(login, date, caller.login, reason, expireDate)
+      Events.emit('Mute', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
       return
     }
     const res = await Client.call('Ignore', [{ string: login }])
+    const obj = {
+      login, nickname, date, callerNickname: caller.nickname,
+      callerLogin: caller.login, reason, expireDate
+    }
     if (res instanceof Error) {
-      this.muteOnJoin.push({
-        login, nickname, date, callerNickname: caller.nickname,
-        callerLogin: caller.login, reason, expireDate
-      })
+      this.muteOnJoin.push(obj)
     } else {
-      this.serverMutelist.push({
-        login, nickname, date, callerNickname: caller.nickname,
-        callerLogin: caller.login, reason, expireDate
-      })
+      this.serverMutelist.push(obj)
     }
     void this.mutelistRepo.add(login, date, caller.login, reason, expireDate)
+    Events.emit('Mute', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
   }
 
@@ -470,16 +481,21 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not muted, Error if dedicated server call fails
    */
   static async unmute(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    const serverMute = this.serverMutelist.find(a => a.login === login)
-    if (serverMute === undefined && !this.muteOnJoin.some(a => a.login === login)) { return false }
-    if (serverMute !== undefined) {
+    const serverMuteIndex = this.serverMutelist.findIndex(a => a.login === login)
+    const muteOnJoinIndex = this.muteOnJoin.findIndex(a => a.login === login)
+    if (serverMuteIndex === -1 && muteOnJoinIndex === -1) { return false }
+    let obj: TMMutelistEntry | undefined
+    if (serverMuteIndex !== -1) {
       const res = await Client.call('UnIgnore', [{ string: login }])
       if (res instanceof Error) { return res }
-      this.serverMutelist = this.serverMutelist.filter(a => a.login !== login)
+      obj = this.serverMutelist[serverMuteIndex]
+      this.serverMutelist.splice(serverMuteIndex, 1)
     } else {
-      this.muteOnJoin = this.muteOnJoin.filter(a => a.login !== login)
+      obj = this.muteOnJoin[muteOnJoinIndex]
+      this.muteOnJoin.splice(muteOnJoinIndex, 1)
     }
     void this.mutelistRepo.remove(login)
+    Events.emit('Unmute', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unmuted ${login}`)
     } else {
@@ -501,11 +517,13 @@ export class AdministrationService {
     if (entry !== undefined) { return false }
     const res = await Client.call('AddGuest', [{ string: login }])
     if (res instanceof Error) { return res }
-    this._guestlist.push({
+    const obj = {
       login, nickname, date, callerNickname: caller.nickname,
       callerLogin: caller.login
-    })
+    }
+    this._guestlist.push(obj)
     void this.guestlistRepo.add(login, date, caller.login)
+    Events.emit('AddGuest', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has added ${login} to guestlist`)
     Client.callNoRes('SaveGuestList', [{ string: this.guestlistFile }])
     return true
@@ -518,11 +536,14 @@ export class AdministrationService {
    * @returns True if successfull, false if player was not in the guestlist, Error if dedicated server call fails
    */
   static async removeGuest(login: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    if (!this._guestlist.some(a => a.login === login)) { return false }
+    const guestIndex = this._guestlist.findIndex(a => a.login === login)
+    if (guestIndex === -1) { return false }
     const res = await Client.call('RemoveGuest', [{ string: login }])
     if (res instanceof Error) { return res }
-    this._guestlist = this._guestlist.filter(a => a.login !== login)
+    const obj = this._guestlist[guestIndex]
+    this._guestlist.splice(guestIndex, 1)
     void this.guestlistRepo.remove(login)
+    Events.emit('RemoveGuest', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has removed ${login} from guestlist`)
     } else {

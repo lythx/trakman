@@ -3,7 +3,6 @@
 // const commands: TMCommand[] = [{
 //   aliases: ['hm', 'hardmute'],
 //   help: 'Mute a player and disable their commands.',
-//   // TODO params
 //   callback: async (info: MessageInfo): Promise<void> => {
 //       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
 //       if (targetInfo === undefined) {
@@ -49,7 +48,6 @@
 // {
 //   aliases: ['hfs', 'hardforcespec'],
 //   help: 'Force player into specmode without ability to disable it.',
-//   // TODO params
 //   callback: async (info: MessageInfo): Promise<void> => {
 //       if (info.text.length === 0) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}No login specified.`, info.login)
@@ -98,7 +96,6 @@
 // {
 //   aliases: ['uhfs', 'undohardforcespec'],
 //   help: 'Undo hardforcespec.',
-//   // TODO params
 //   callback: async (info: MessageInfo): Promise<void> => {
 //       if (info.text.length === 0) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}No login specified.`, info.login)
