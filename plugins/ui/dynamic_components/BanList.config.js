@@ -1,28 +1,42 @@
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
+import { palette as p } from '../../../src/Trakman.js'
 
-export default
-  {
-    title: " Banned Players ",
-    icon: icons.banList,
-    entries: 15,
-    columnProportions: [
-      2,
-      2,
-      2,
-      3,
-      1
-    ],
-    navbar: [
-      { name: 'Playerlist', actionId: ids.playerList },
-      { name: 'Blacklist', actionId: ids.blacklistList },
-      // TODO add mutelist
-      { name: 'Guestlist', actionId: ids.guestList }
-    ],
-    grid: {
-      background: "9996",
-      margin: 0.15,
-      headerBackground: "333C"
-    },
-    padding: 0.2
+export default {
+  privilege: 2,
+  title: " Banned Players ",
+  icon: icons.banList,
+  iconWidth: 2,
+  iconHeight: 2,
+  unbanIcon: icons.unban,
+  entries: 15,
+  selfColour: "0F0",
+  defaultNickname: 'N/A',
+  columnProportions: [
+    0.8,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1
+  ],
+  navbar: [
+    { name: 'Playerlist', actionId: ids.playerList },
+    { name: 'Blacklist', actionId: ids.blacklistList },
+    { name: 'Guestlist', actionId: ids.guestList }
+
+    // TODO add mutelist
+  ],
+  grid: {
+    background: "9996",
+    margin: 0.15,
+    headerBackground: "333C"
+  },
+  messages: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unbanned ${p.highlight}#{name}${p.admin}.`,
+    error: `${p.error}Could not unban ${p.highlight}#{login}${p.error}.`,
+    notBanned: `${p.highlight}#{login}${p.error} is not banned.`,
+    public: true
   }
+}

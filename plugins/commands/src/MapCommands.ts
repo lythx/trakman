@@ -44,7 +44,7 @@ const commands: TMCommand[] = [
                 return
               }
               tm.sendMessage(tm.utils.strVar(config.add.alreadyAdded, {
-                map: map.name,
+                map: tm.utils.strip(map.name, false),
                 nickname: tm.utils.strip(info.nickname, true)
               }), config.add.public ? undefined : info.login)
               tm.jukebox.add(id, info)
@@ -58,7 +58,7 @@ const commands: TMCommand[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.add.added, {
         title: tm.utils.getTitle(info),
-        map: map.name,
+        map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.add.public ? undefined : info.login)
     },
@@ -76,7 +76,7 @@ const commands: TMCommand[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.addlocal.added, {
         title: tm.utils.getTitle(info),
-        map: map.name,
+        map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.add.public ? undefined : info.login)
     },
@@ -117,7 +117,7 @@ const commands: TMCommand[] = [
                 return
               }
               tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
-                map: map.name,
+                map: tm.utils.strip(map.name, false),
                 nickname: tm.utils.strip(info.nickname, true)
               }), config.addfromurl.public ? undefined : info.login)
               tm.jukebox.add(id, info)
@@ -131,7 +131,7 @@ const commands: TMCommand[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
         title: tm.utils.getTitle(info),
-        map: map.name,
+        map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.addfromurl.public ? undefined : info.login)
     },
