@@ -13,9 +13,9 @@ const initialize = async () => {
   GROUP BY (login, nickname)
   ORDER BY count DESC
   LIMIT ${config.votesCount};`)
-  if (res instanceof Error) { 
+  if (res instanceof Error) {
     await tm.log.fatal('Failed to fetch top votes', res.message, res.stack)
-    return 
+    return
   }
   topList.push(...res)
 }
@@ -25,12 +25,12 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   initialVotes = tm.karma.current
 })
 
-tm.addListener('Controller.BeginMap', (): void => {
+tm.addListener('BeginMap', (): void => {
   initialVotes.length = 0
   initialVotes = tm.karma.current
 })
 
-tm.addListener('Controller.KarmaVote', (info): void => {
+tm.addListener('KarmaVote', (info): void => {
   if (!initialVotes.some(a => a.login === info.login)) {
     initialVotes.push(info)
     const count = onlineList.find(a => a.login === info.login)
@@ -58,7 +58,7 @@ tm.addListener('Controller.KarmaVote', (info): void => {
   }
 })
 
-tm.addListener('Controller.PlayerJoin', async (info): Promise<void> => {
+tm.addListener('PlayerJoin', async (info): Promise<void> => {
   const id: number | undefined = await tm.getPlayerDBId(info.login)
   const res: any[] | Error = await tm.db.query(`SELECT count(*) FROM VOTES
       WHERE player_id=$1`, id)
@@ -69,7 +69,7 @@ tm.addListener('Controller.PlayerJoin', async (info): Promise<void> => {
   onlineList.push({ login: info.login, nickname: info.nickname, count: Number(res[0].count) })
 })
 
-tm.addListener('Controller.PlayerLeave', async (info): Promise<void> => {
+tm.addListener('PlayerLeave', async (info): Promise<void> => {
   onlineList.splice(onlineList.findIndex(a => a.login === info.login), 1)
 })
 

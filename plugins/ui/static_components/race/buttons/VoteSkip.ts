@@ -38,12 +38,12 @@ export class VoteSkip extends UiButton {
       },
       privilege: 0
     })
-    tm.addListener('Controller.ManialinkClick', (info) => {
+    tm.addListener('ManialinkClick', (info) => {
       if (info.answer === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })
-    tm.addListener('Controller.BeginMap', () => this.handleMapStart())
+    tm.addListener('BeginMap', () => this.handleMapStart())
     this.onSkip(() => this.handleSkipNoCountdown())
     this.onReplay(() => this.handleReplay())
   }

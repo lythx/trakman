@@ -19,7 +19,7 @@ export default class AdminPanel extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.constructXml()
-    tm.addListener('Controller.PrivilegeChanged', (info) => {
+    tm.addListener('PrivilegeChanged', (info) => {
       this.displayToPlayer(info.login)
     })
   }

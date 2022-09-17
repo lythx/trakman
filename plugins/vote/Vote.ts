@@ -43,7 +43,7 @@ export class Vote {
     this.cancelOnRoundStart = dontCancelOnRoundStart === undefined
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
-      tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
+      tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
       if (!['F5', 'F6', 'F7'].includes(config.yesKey)) {
         throw new Error(`Vote yesKey needs to be either F5, F6 or F7, received${config.yesKey}. Fix your vote config`)
       } else if (!['F5', 'F6', 'F7'].includes(config.noKey)) {
@@ -61,8 +61,8 @@ export class Vote {
         callback: (info): void => tm.openManialink(this.noId, info.login),
         privilege: 0
       })
-      tm.addListener("Controller.EndMap", (): void => Vote.endMapListener())
-      tm.addListener('Controller.BeginMap', (): void => Vote.startMapListener())
+      tm.addListener("EndMap", (): void => Vote.endMapListener())
+      tm.addListener('BeginMap', (): void => Vote.startMapListener())
     }
   }
 

@@ -38,7 +38,7 @@ export default class MapList extends PopupWindow {
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + this.mapAddId && info.answer <= this.openId + this.mapAddId + 5000) {
         const mapId = this.challengeActionIds[info.answer - (this.openId + this.mapAddId)]
         if (mapId === undefined) {
@@ -91,9 +91,9 @@ export default class MapList extends PopupWindow {
       },
       privilege: 0
     })
-    tm.addListener('Controller.MapRemoved', (map) => this.updateList(map.id))
-    tm.addListener('Controller.MapAdded', (map) => this.updateList(map.id))
-    tm.addListener('Controller.BeginMap', () => this.reRender())
+    tm.addListener('MapRemoved', (map) => this.updateList(map.id))
+    tm.addListener('MapAdded', (map) => this.updateList(map.id))
+    tm.addListener('BeginMap', () => this.reRender())
   }
 
   private updateList(id: string) {

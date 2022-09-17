@@ -28,7 +28,7 @@ export default class LocalCps extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    tm.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
@@ -40,7 +40,7 @@ export default class LocalCps extends PopupWindow {
     tm.commands.add({
       aliases: ['cp', 'cptms', 'recs'],
       help: 'Display current map local checkpoints.',
-      callback: (info: TMMessageInfo): void =>    tm.openManialink(this.openId, info.login),
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     },)
   }

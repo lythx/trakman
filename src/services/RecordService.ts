@@ -40,7 +40,6 @@ export class RecordService {
     this._localRecords = await this.repo.getLocalRecords(mapId)
     this._initialLocals.length = 0
     this._initialLocals.push(...this._localRecords)
-    Events.emitEvent('Controller.LocalRecords', this._localRecords)
   }
 
   /**
@@ -212,9 +211,13 @@ export class RecordService {
     } else {
       Logger.info(`The record of ${player.nickname} (${player.login}) on map ${mapId} has been removed`)
     }
-    this._localRecords.splice(this._localRecords.findIndex(a => a.login === player.login && a.map === mapId), 1)
-    Events.emitEvent('Controller.LocalRecords', this.localRecords)
-    void this.repo.remove(player.login, mapId)
+    const index = this._localRecords.findIndex(a => a.login === player.login && a.map === mapId)
+    if(index !== -1) {
+      const record = this._localRecords[index]
+      this._localRecords.splice(index, 1)
+      Events.emitEvent('LocalRecordsRemoved', [record])
+      void this.repo.remove(player.login, mapId)
+    }
   }
 
   /**
@@ -229,10 +232,9 @@ export class RecordService {
     } else {
       Logger.info(`Records on map ${mapId} have been removed`)
     }
-    while (this._localRecords.some(a => a.map === mapId)) {
-      this._localRecords.splice(this._localRecords.findIndex(a => a.map === mapId), 1)
-    }
-    Events.emitEvent('Controller.LocalRecords', this.localRecords)
+    const records= this._localRecords
+    this._localRecords.length = 0
+    Events.emitEvent('LocalRecordsRemoved', records)
     void this.repo.removeAll(mapId)
   }
 

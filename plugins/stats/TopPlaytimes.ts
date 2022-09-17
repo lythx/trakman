@@ -21,7 +21,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.EndMap', (info) => {
+tm.addListener('EndMap', (info) => {
   const players = tm.players.list
   for (const e of players) {
     const pt = e.timePlayed + Date.now() - e.joinTimestamp

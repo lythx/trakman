@@ -262,7 +262,7 @@ export class AdministrationService {
     }
     if (player === undefined) {
       const player = await PlayerService.fetch(login)
-      Events.emitEvent('Controller.PrivilegeChanged', {
+      Events.emitEvent('PrivilegeChanged', {
         player: player === undefined ? undefined : { ...player, privilege },
         login,
         previousPrivilege: player?.privilege ?? 0,
@@ -272,7 +272,7 @@ export class AdministrationService {
       void this.privilegeRepo.set(login, privilege)
       return
     }
-    Events.emitEvent('Controller.PrivilegeChanged', {
+    Events.emitEvent('PrivilegeChanged', {
       player: player === undefined ? undefined : { ...player, privilege },
       login,
       previousPrivilege: player.privilege ?? 0,

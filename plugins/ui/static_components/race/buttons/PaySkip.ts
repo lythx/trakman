@@ -24,15 +24,15 @@ export class PaySkip extends UiButton {
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
-      actionId:cfg.actionId + this.parentId,
+      actionId: cfg.actionId + this.parentId,
       equalTexts: cfg.texts[0].equal
     }
-    tm.addListener('Controller.ManialinkClick', (info) => {
+    tm.addListener('ManialinkClick', (info) => {
       if (info.answer === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })
-    tm.addListener('Controller.BeginMap', () => this.handleMapStart())
+    tm.addListener('BeginMap', () => this.handleMapStart())
     this.onSkip(() => this.handleSkipNoCountdown())
     this.onReplay(() => this.handleReplay())
   }
@@ -82,7 +82,7 @@ export class PaySkip extends UiButton {
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        actionId:cfg.actionId + this.parentId,
+        actionId: cfg.actionId + this.parentId,
         equalTexts: cfg.texts[0].equal
       }
       this.isLastMapReplay = false

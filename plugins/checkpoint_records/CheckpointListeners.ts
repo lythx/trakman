@@ -37,11 +37,11 @@ if (config.isEnabled === true) {
     await onMapStart()
   }, true)
 
-  tm.addListener('Controller.BeginMap', async (): Promise<void> => {
+  tm.addListener('BeginMap', async (): Promise<void> => {
     await onMapStart()
   }, true)
 
-  tm.addListener('Controller.PlayerCheckpoint', (info: CheckpointInfo) => {
+  tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
     const date = new Date()
     const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)
     if (playerCheckpoints === undefined) {
@@ -67,7 +67,7 @@ if (config.isEnabled === true) {
     }
   })
 
-  tm.addListener('Controller.PlayerJoin', async (info) => {
+  tm.addListener('PlayerJoin', async (info) => {
     const playerCps = await allCpsDB.get(currentMapDBId, info.login)
     if (playerCps instanceof Error) {
       await tm.log.fatal(`Failed to fetch player ${info.login} checkpoint records for map ${tm.maps.current.id}`, playerCps.message)

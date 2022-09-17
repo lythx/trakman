@@ -21,7 +21,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.EndMap', async (info) => {
+tm.addListener('EndMap', async (info) => {
   const login = info.winnerLogin
   const wins = info.winnerWins
   if (wins === undefined || login === undefined

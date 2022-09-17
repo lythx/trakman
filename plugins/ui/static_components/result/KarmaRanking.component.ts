@@ -21,7 +21,7 @@ export default class KarmaRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    tm.addListener('Controller.KarmaVote', () => {
+    tm.addListener('KarmaVote', () => {
       this.display()
     })
   }

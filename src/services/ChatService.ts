@@ -34,7 +34,7 @@ export abstract class ChatService {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     for (const command of commands) {
-      Events.addListener('Controller.PlayerChat', (info): void => void this.commandCallback(command, info))
+      Events.addListener('PlayerChat', (info): void => void this.commandCallback(command, info))
     }
   }
 

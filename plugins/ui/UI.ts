@@ -244,7 +244,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.BeginMap',
+    event: 'BeginMap',
     callback: async () => {
       loadMod()
     }

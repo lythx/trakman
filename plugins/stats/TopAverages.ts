@@ -22,7 +22,7 @@ tm.addListener('Controller.Ready', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('Controller.RanksAndAveragesUpdated', async (info) => {
+tm.addListener('RanksAndAveragesUpdated', async (info) => {
   const updated: string[] = []
   for (const e of info) {
     updated.push(e.login)

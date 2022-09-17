@@ -225,8 +225,8 @@ export const trakman = {
      * @param player Player object containing login and nickname
      * @param vote Player vote
      */
-    async add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): Promise<void> {
-      await VoteService.add(player, vote)
+    add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
+      VoteService.add(player, vote)
     },
 
     fetch: VoteService.fetch.bind(VoteService),
@@ -393,7 +393,7 @@ export const trakman = {
     const temp: any = PlayerService.get(login)
     temp.answer = id
     const info: ManialinkClickInfo = temp
-    Events.emitEvent('Controller.ManialinkClick', info)
+    Events.emitEvent('ManialinkClick', info)
   },
 
   /**

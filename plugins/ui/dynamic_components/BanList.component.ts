@@ -12,7 +12,7 @@ export default class BanList extends PopupWindow {
     super(IDS.banList, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1), config.grid)
 
-    tm.addListener('Controller.ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
 
         const targetPlayer = tm.players.list[info.answer - this.openId - 1000]
@@ -29,7 +29,7 @@ export default class BanList extends PopupWindow {
       } // 
 
     })
-    tm.commands.add(  {
+    tm.commands.add({
       aliases: ['banlist'],
       help: 'Display list of banned players.',
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),

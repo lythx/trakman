@@ -56,7 +56,7 @@ export default class Paginator {
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }
-    tm.addListener('Controller.ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
       if (this.ids.includes(info.answer)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)
         if (playerPage === undefined) { // Should never happen

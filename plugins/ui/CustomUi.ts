@@ -4,7 +4,7 @@ import { trakman as tm } from '../../src/Trakman.js'
 export default class CustomUi {
 
   constructor() {
-    tm.addListener('Controller.PlayerJoin', (info) => this.displayToPlayer(info.login))
+    tm.addListener('PlayerJoin', (info) => this.displayToPlayer(info.login))
   }
 
   display(): void {

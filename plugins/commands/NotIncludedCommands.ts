@@ -79,12 +79,12 @@
 //               }]
 //           }
 //       )
-//       tm.addListener('Controller.PlayerJoin', (i: JoinInfo): void => {
+//       tm.addListener('PlayerJoin', (i: JoinInfo): void => {
 //           if (hfsList.some(a => a === i.login)) {
 //               tm.client.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
 //           }
 //       })
-//       tm.addListener('Controller.PlayerInfoChanged', async (i: InfoChangedInfo): Promise<void> => {
+//       tm.addListener('PlayerInfoChanged', async (i: InfoChangedInfo): Promise<void> => {
 //           if (hfsList.some(a => a === i.login)) {
 //               await new Promise((r) => setTimeout(r, (Math.random() * 6800) + 200))
 //               tm.client.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])

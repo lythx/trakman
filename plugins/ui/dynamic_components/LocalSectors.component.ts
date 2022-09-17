@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js";
 import { trakman as tm } from "../../../src/Trakman.js";
-import {  IDS, Paginator, Grid, centeredText,closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './LocalSectors.config.js'
 
 export default class LocalSectors extends PopupWindow {
@@ -28,7 +28,7 @@ export default class LocalSectors extends PopupWindow {
     this.cpPaginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
-    tm.addListener('Controller.BeginMap', (): void => {
+    tm.addListener('BeginMap', (): void => {
       this.cpPaginator.setPageCount(this.calculateCpPages())
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
@@ -37,10 +37,10 @@ export default class LocalSectors extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
     })
-    tm.commands.add(  {
+    tm.commands.add({
       aliases: ['sc', 'sectms'],
       help: 'Display current map local sectors.',
-      callback: (info: TMMessageInfo): void =>     tm.openManialink(this.openId, info.login),
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     },)
   }
@@ -106,8 +106,8 @@ export default class LocalSectors extends PopupWindow {
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight,
-        [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), 
-          ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+        [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
+        ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
@@ -116,9 +116,9 @@ export default class LocalSectors extends PopupWindow {
         (i, j, w, h) => centeredText(' Finish ', w, h),
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
-      grid = new Grid(this.contentWidth, this.contentHeight, 
-        [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), 
-          ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+      grid = new Grid(this.contentWidth, this.contentHeight,
+        [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+        ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
     for (let i: number = 0; i < entriesToDisplay; i++) {

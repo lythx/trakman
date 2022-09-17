@@ -29,12 +29,12 @@ export class PayReplay extends UiButton {
       actionId: cfg.actionId + this.parentId,
       equalTexts: cfg.texts[0].equal
     }
-    tm.addListener('Controller.ManialinkClick', (info) => {
+    tm.addListener('ManialinkClick', (info) => {
       if (info.answer === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })
-    tm.addListener('Controller.BeginMap', () => this.handleMapStart())
+    tm.addListener('BeginMap', () => this.handleMapStart())
     this.onReplay(() => this.handleMapReplay())
     this.onSkip(() => this.handleMapSkip())
   }
