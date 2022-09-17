@@ -60,8 +60,8 @@ import CurrentCps from './dynamic_components/CurrentCps.component.js'
 import MapList from './dynamic_components/MapList.component.js'
 import DonationPanel from './static_components/race/DonationPanel.component.js'
 import PlayerList from './dynamic_components/PlayerList.component.js'
-import BanList from './dynamic_components/Banlist.component.js'
-import BlackListList from './dynamic_components/BlacklistList.component.js'
+import Banlist from './dynamic_components/Banlist.component.js'
+import Blacklist from './dynamic_components/Blacklist.component.js'
 import Guestlist from './dynamic_components/Guestlist.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
@@ -148,8 +148,8 @@ let dynamicComponents: {
   readonly liveSectors: LiveSectors
   readonly currentCps: CurrentCps
   readonly playerList: PlayerList
-  readonly banList: BanList
-  readonly blacklistList: BlackListList
+  readonly banlist: Banlist
+  readonly blacklist: Blacklist
   readonly guestlist: Guestlist
   readonly sectorRecords: SectorRecords
   readonly checkpointRecords: CheckpointRecords
@@ -223,8 +223,8 @@ const events: TMListener[] = [
         liveSectors: new LiveSectors(),
         currentCps: new CurrentCps(),
         playerList: new PlayerList(),
-        banList: new BanList(),
-        blacklistList: new BlackListList(),
+        banlist: new Banlist(),
+        blacklist: new Blacklist(),
         guestlist: new Guestlist(),
         sectorRecords: new SectorRecords(),
         checkpointRecords: new CheckpointRecords(),

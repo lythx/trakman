@@ -9,7 +9,7 @@ export default class Banlist extends PopupWindow<number> {
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.banList, config.icon, config.title, config.navbar)
+    super(IDS.banlist, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -93,8 +93,8 @@ export default class Banlist extends PopupWindow<number> {
       return centeredText(tm.utils.safeString(tm.utils.strip(banlist[i - 1]?.reason ?? 'No reason specified')), w, h)
     }
     const unbanButton: GridCellFunction = (i, j, w, h) => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unbanIcon}" halign="center" 
-      valign="center" action="${this.openId + i + 1000 + index}"/>`
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unbanIcon}" 
+      imagefocus="${config.unbanIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
     }
     const rows = Math.min(config.entries, banlist.length - (index + 1))
     const arr = headers
