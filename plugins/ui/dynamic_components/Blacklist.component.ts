@@ -1,15 +1,15 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
-import config from './Guestlist.config.js'
+import config from './Blacklist.config.js'
 
-export default class Guestlist extends PopupWindow<number> {
+export default class Blacklist extends PopupWindow<number> {
 
   readonly grid: Grid
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.guestlist, config.icon, config.title, config.navbar)
+    super(IDS.blacklist, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -20,13 +20,13 @@ export default class Guestlist extends PopupWindow<number> {
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
         if (info.privilege < config.privilege) { return }
-        const target = tm.admin.guestlist[info.answer - this.openId - 1000]
+        const target = tm.admin.blacklist[info.answer - this.openId - 1000]
         if (target === undefined) { return }
-        const status = await tm.admin.removeGuest(target.login, info)
+        const status = await tm.admin.unblacklist(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
         } else if (status === false) {
-          tm.sendMessage(tm.utils.strVar(config.messages.notInGuestlist, { login: target.login }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.messages.notBlacklisted, { login: target.login }), info.login)
         } else {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
             title: tm.utils.getTitle(info),
@@ -36,7 +36,7 @@ export default class Guestlist extends PopupWindow<number> {
         }
       }
     })
-    tm.addListener(['AddGuest', 'RemoveGuest'], () => {
+    tm.addListener(['Blacklist', 'Unblacklist'], () => {
       this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
@@ -45,8 +45,8 @@ export default class Guestlist extends PopupWindow<number> {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['guestl', 'guestlist'],
-      help: 'Display guestlist.',
+      aliases: ['blackl', 'blacklist'],
+      help: 'Display blacklist.',
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
@@ -73,29 +73,33 @@ export default class Guestlist extends PopupWindow<number> {
       (i, j, w, h) => centeredText(' Login ', w, h),
       (i, j, w, h) => centeredText(' Date ', w, h),
       (i, j, w, h) => centeredText(' Admin ', w, h),
-      (i, j, w, h) => centeredText(' Remove ', w, h),
+      (i, j, w, h) => centeredText(' Reason ', w, h),
+      (i, j, w, h) => centeredText(' Unblacklist ', w, h),
     ]
-    const guestlist = tm.admin.guestlist
-    const fetchedPlayers = await tm.players.fetch(guestlist.map(a => a.login))
+    const blacklist = tm.admin.blacklist
+    const fetchedPlayers = await tm.players.fetch(blacklist.map(a => a.login))
     const indexCell: GridCellFunction = (i, j, w, h) => {
       return centeredText((i + index + 1).toString(), w, h)
     }
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      const nickname = fetchedPlayers.find(a => a.login === guestlist[i + index].login)?.nickname
+      const nickname = fetchedPlayers.find(a => a.login === blacklist[i + index].login)?.nickname
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell: GridCellFunction = (i, j, w, h) => guestlist[i + index].login === login ?
-      centeredText('$' + config.selfColour + guestlist[i + index].login, w, h) : centeredText(guestlist[i + index].login, w, h)
-    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(guestlist[i + index].date, true), w, h)
-    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(guestlist[i + index].callerLogin, w, h)
-    const removeGuestbutton: GridCellFunction = (i, j, w, h) => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.removeGuestIcon}"
-      imagefocus="${config.removeGuestIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+    const loginCell: GridCellFunction = (i, j, w, h) => blacklist[i + index].login === login ?
+      centeredText('$' + config.selfColour + blacklist[i + index].login, w, h) : centeredText(blacklist[i + index].login, w, h)
+    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(blacklist[i + index].date, true), w, h)
+    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i + index].callerNickname, false)), w, h)
+    const reasonCell = (i: number, j: number, w: number, h: number) => {
+      return centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i - 1]?.reason ?? 'No reason specified')), w, h)
     }
-    const rows = Math.min(config.entries, guestlist.length - (index + 1))
+    const unblacklistButton: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unblacklistIcon}"
+      imagefocus="${config.unblacklistIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+    }
+    const rows = Math.min(config.entries, blacklist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
-      arr.push(indexCell, nicknameCell, loginCell, dateCell, adminCell, removeGuestbutton)
+      arr.push(indexCell, nicknameCell, loginCell, dateCell, adminCell, reasonCell, unblacklistButton)
     }
     return this.grid.constructXml(arr)
   }
