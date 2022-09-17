@@ -1,15 +1,15 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
-import config from './GuestlistList.config.js'
+import config from './Guestlist.config.js'
 
-export default class GuestlistList extends PopupWindow<number> {
+export default class Guestlist extends PopupWindow<number> {
 
   readonly grid: Grid
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.guestlistList, config.icon, config.title, config.navbar)
+    super(IDS.guestList, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -20,27 +20,27 @@ export default class GuestlistList extends PopupWindow<number> {
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
         if (info.privilege < config.privilege) { return }
-        const target = tm.players.list[info.answer - this.openId - 1000]
+        const target = tm.admin.guestlist[info.answer - this.openId - 1000]
         if (target === undefined) { return }
         const status = await tm.admin.removeGuest(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
         } else if (status === false) {
-          tm.sendMessage(tm.utils.strVar(config.messages.alreadyGuest, { login: target.login }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.messages.notInGuestlist, { login: target.login }), info.login)
         } else {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname, true),
-            name: target.nickname
+            name: tm.utils.strip(target.nickname ?? target.login, true)
           }))
         }
       }
     })
-    tm.addListener(['PlayerJoin', 'PlayerLeave'], () => {
+    tm.addListener(['AddGuest', 'RemoveGuest'], () => {
       this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
-    tm.addListener('PrivilegeChanged', (info) => { // TODO guestlistchanged event
+    tm.addListener('PrivilegeChanged', (info) => {
       if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
       this.reRender()
     })

@@ -16,7 +16,7 @@ export default {
     { name: 'Playerlist', actionId: ids.playerList },
     { name: 'Banlist', actionId: ids.banList },
     // TODO add mutelist
-    { name: 'Guestlist', actionId: ids.guestlistList }
+    { name: 'Guestlist', actionId: ids.guestList }
   ],
   grid: {
     background: "9996",

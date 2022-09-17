@@ -45,7 +45,7 @@ export default {
   playerList: 130000,
   banList: 140000,
   blacklistList: 150000,
-  guestlistList: 160000,
+  guestList: 160000,
   sectorRecords: 170000,
   checkpointRecords: 180000,
   welcomeWindow: 190000,
