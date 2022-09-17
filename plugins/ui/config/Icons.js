@@ -40,7 +40,7 @@ export default {
     "banList": "https://cdn.discordapp.com/attachments/793464821030322196/1001610845375181032/BanList.png",
     "blacklistList": "https://cdn.discordapp.com/attachments/793464821030322196/1001610845693939712/BlacklistList.png",
     "muteList": "https://cdn.discordapp.com/attachments/793464821030322196/1001619350442233866/MuteList.png",
-    "guestlistList": "https://cdn.discordapp.com/attachments/793464821030322196/1001610846260178944/GuestlistList.png",
+    "guestlist": "https://cdn.discordapp.com/attachments/793464821030322196/1001610846260178944/GuestlistList.png",
     "infoCircle": "https://cdn.discordapp.com/attachments/793464821030322196/1001610965646843984/InfoCircle.png",
     "tools": "https://cdn.discordapp.com/attachments/793464821030322196/1001611092964950056/Tools.png",
     "ban": "https://cdn.discordapp.com/attachments/793464821030322196/1001617612293296169/Ban.png",

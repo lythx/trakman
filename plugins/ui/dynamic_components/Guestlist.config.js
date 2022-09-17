@@ -5,10 +5,10 @@ import { palette as p } from '../../../src/Trakman.js'
 export default {
   privilege: 1,
   title: " Guests ",
-  icon: icons.guestlistList,
+  icon: icons.guestlist,
   iconWidth: 2,
   iconHeight: 2,
-  unGuestListIcon: '', // TODO
+  unGuestListIcon: icons.placeholder, // TODO
   entries: 15,
   selfColour: "0F0",
   defaultNickname: 'N/A',
@@ -31,11 +31,10 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  padding: 0.2,
   messages: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has added ${p.highlight}#{name} ${p.admin}to the guestlist.`,
-    error: `${p.error}Could not add #{login} to the guestlist.`,
-    alreadyGuest: `${p.error}#{login} is already in the guestlist.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name} ${p.admin}from the guestlist.`,
+    error: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the guestlist.`,
+    notInGuestlist: `${p.highlight}#{login}${p.error} is not in the guestlist.`,
     public: true
   }
 }
