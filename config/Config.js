@@ -3,6 +3,12 @@ export default {
   chatMessagesInRuntime: 250,
   jukeboxQueueSize: 30,
   jukeboxHistorySize: 30,
+  privileges: {
+    ban: 2,
+    blacklist: 2,
+    mute: 1,
+    addGuest: 1
+  },
   blacklistFile: "blacklist.txt",
   guestlistFile: "guestlist.txt",
   matchSettingsFile: "MatchSettings/MatchSettings.txt",
