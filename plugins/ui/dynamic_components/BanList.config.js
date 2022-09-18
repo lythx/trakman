@@ -1,9 +1,9 @@
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
-import { palette as p } from '../../../src/Trakman.js'
+import { trakman as tm, palette as p } from '../../../src/Trakman.js'
 
 export default {
-  privilege: 2,
+  privilege: tm.config.privileges.ban,
   title: " Banned Players ",
   icon: icons.banlist,
   iconWidth: 2,
@@ -23,12 +23,10 @@ export default {
     1.1
   ],
   navbar: [
-    { name: 'Playerlist', actionId: ids.playerList },
-    { name: 'Blacklist', actionId: ids.blacklist },
-    { name: 'Mutelist', actionId: ids.mutelist },
-    { name: 'Guestlist', actionId: ids.guestlist }
-
-    // TODO add mutelist
+    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.privileges)) },
+    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.privileges.blacklist },
+    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute },
+    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest },
   ],
   grid: {
     background: "9996",

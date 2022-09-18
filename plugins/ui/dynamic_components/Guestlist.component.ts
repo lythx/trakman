@@ -14,8 +14,8 @@ export default class Guestlist extends PopupWindow<number> {
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
       Math.ceil(tm.players.count / config.entries))
-    this.paginator.onPageChange = (login, page) => {
-      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
+    this.paginator.onPageChange = (login, page, info) => {
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
@@ -51,14 +51,14 @@ export default class Guestlist extends PopupWindow<number> {
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
+    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
   }
 
   private reRender(): void {
-    const players = this.getPlayersWithWindowOpen()
-    for (const login of players) {
-      const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
+    const players = this.getPlayersWithWindowOpen(true)
+    for (const player of players) {
+      const page = this.paginator.getPageByLogin(player.login)
+      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount}`, tm.players.get(player.login)?.privilege ?? 0)
     }
   }
 
