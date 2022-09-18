@@ -36,7 +36,6 @@ export default {
   messages: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name}${p.admin} from the blacklist.`,
     error: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the blacklist.`,
-    notBlacklisted: `${p.highlight}#{login}${p.error} is not blacklisted.`,
     public: true
   }
 }

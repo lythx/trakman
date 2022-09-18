@@ -19,15 +19,12 @@ export default class Banlist extends PopupWindow<number> {
     }
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-        if (info.privilege < config.privilege) { return }
         const target = tm.admin.banlist[info.answer - this.openId - 1000]
         if (target === undefined) { return }
         const status = await tm.admin.unban(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
-        } else if (status === false) {
-          tm.sendMessage(tm.utils.strVar(config.messages.notBanned, { login: target.login }), info.login)
-        } else {
+        } else if(status === true) {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname, true),

@@ -35,7 +35,6 @@ export default {
   messages: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name} ${p.admin}from the guestlist.`,
     error: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the guestlist.`,
-    notInGuestlist: `${p.highlight}#{login}${p.error} is not in the guestlist.`,
     public: true
   }
 }
