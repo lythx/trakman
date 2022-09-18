@@ -13,7 +13,7 @@ export default class Banlist extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.players.count / config.entries))
+      Math.ceil(tm.admin.banCount / config.entries))
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
@@ -34,7 +34,7 @@ export default class Banlist extends PopupWindow<number> {
       }
     })
     tm.addListener(['Ban', 'Unban'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.admin.banCount / config.entries))
       this.reRender()
     })
     tm.addListener('PrivilegeChanged', (info) => {
