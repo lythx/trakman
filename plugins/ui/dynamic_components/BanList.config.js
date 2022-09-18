@@ -38,7 +38,6 @@ export default {
   messages: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unbanned ${p.highlight}#{name}${p.admin}.`,
     error: `${p.error}Could not unban ${p.highlight}#{login}${p.error}.`,
-    notBanned: `${p.highlight}#{login}${p.error} is not banned.`,
     public: true
   }
 }
