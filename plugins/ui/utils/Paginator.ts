@@ -19,7 +19,7 @@ export default class Paginator {
   readonly ids: number[] = []
   readonly width: number
   readonly height: number
-  private _onPageChange: (login: string, page: number) => void = () => undefined
+  private _onPageChange: (login: string, page: number, info: ManialinkClickInfo) => void = () => undefined
   pageCount: number
   yPos: number
   xPos: number[]
@@ -62,17 +62,17 @@ export default class Paginator {
         if (playerPage === undefined) { // Should never happen
           const page: number = this.getPageFromClick(info.answer, this.defaultPage)
           this.loginPages.push({ login: info.login, page: page })
-          this._onPageChange(info.login, page)
+          this._onPageChange(info.login, page, info)
           return
         }
         const page: number = this.getPageFromClick(info.answer, playerPage.page)
         playerPage.page = page
-        this._onPageChange(info.login, page)
+        this._onPageChange(info.login, page, info)
       }
     })
   }
 
-  set onPageChange(callback: (login: string, page: number) => void) {
+  set onPageChange(callback: (login: string, page: number, info: ManialinkClickInfo) => void) {
     this._onPageChange = callback
   }
 

@@ -5,30 +5,28 @@ export default class Navbar {
 
   readonly width: number
   readonly height: number
-  buttons: { name: string, actionId: number }[]
-  buttonWidth: number
+  private buttons: { name: string, actionId: number, privilege: number }[]
   readonly hoverImage: string
   readonly bg: string
 
-  constructor(buttons: { name: string, actionId: number }[], width: number, height: number | null = config.height,
-     background: string = config.background, hoverImgUrl: string = config.hoverImage) {
+  constructor(buttons: { name: string, actionId: number, privilege?: number }[], width: number, height: number | null = config.height,
+    background: string = config.background, hoverImgUrl: string = config.hoverImage) {
     this.width = width
     this.height = height ?? config.height
-    this.buttons = buttons
-    this.buttonWidth = this.width / buttons.length
+    this.buttons = buttons.map(a => ({ ...a, privilege: a.privilege ?? 0 }))
     this.hoverImage = hoverImgUrl
     this.bg = background
   }
 
-  setButtons(buttons: { name: string, actionId: number }[]) {
-    this.buttons = buttons
-    this.buttonWidth = this.width / buttons.length
+  getButtonCount(privilege: number = 0): number {
+    return this.buttons.filter(a => a.privilege <= privilege).length
   }
 
-  constructXml(): string {
+  constructXml(privilege: number = 0): string {
     let xml: string = ``
-    const w = (this.width + config.margin) / this.buttons.length
-    for (const [i, e] of this.buttons.entries()) {
+    const arr = this.buttons.filter(a => a.privilege <= privilege)
+    const w = (this.width + config.margin) / arr.length
+    for (const [i, e] of arr.entries()) {
       xml += `<frame posn="${w * i} 0 1">
             <quad posn="0 0 3" sizen="${w - config.margin} ${this.height}" image="f" imagefocus="${this.hoverImage}" action="${e.actionId}"/>
             <quad posn="0 0 2" sizen="${w - config.margin} ${this.height}" bgcolor="${this.bg}"/>
