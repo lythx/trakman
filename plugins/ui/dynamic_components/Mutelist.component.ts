@@ -58,7 +58,7 @@ export default class Mutelist extends PopupWindow<number> {
     const players = this.getPlayersWithWindowOpen(true)
     for (const player of players) {
       const page = this.paginator.getPageByLogin(player.login)
-      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount}`, player.privilege)
+      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount}`,tm.players.get(player.login)?.privilege ?? 0)
     }
   }
 

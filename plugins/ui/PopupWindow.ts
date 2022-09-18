@@ -30,7 +30,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected readonly margin: number = config.margin
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
-  protected static readonly playersWithWindowOpen: { login: string, id: number, params: any, privilege: number }[] = []
+  protected static readonly playersWithWindowOpen: { login: string, id: number, params: any}[] = []
 
   constructor(windowId: number, headerIcon: string, title: string,
     navbar: { name: string, actionId: number, privilege?: number }[] = [],
@@ -113,7 +113,6 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   protected constructNavbar(login: string, params?: DisplayParams, privilege?: number): string {
-    console.log(privilege)
     return this.navbar.constructXml(privilege)
   }
 
@@ -129,7 +128,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
     const noNavbar = this.navbar.getButtonCount(privilege) === 0
-    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params, privilege: privilege ?? 0 })
+    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
     tm.sendManialink(`${this.headerLeft}
     <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" valign="center" halign="center"/>
     ${this.headerRight}
@@ -142,11 +141,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   protected getPlayersWithWindowOpen(): string[]
-  protected getPlayersWithWindowOpen(getParams: true): { login: string, params: DisplayParams, privilege: number }[]
-  protected getPlayersWithWindowOpen(getParams?: true): string[] | { login: string, params: DisplayParams, privilege: number }[] {
+  protected getPlayersWithWindowOpen(getParams: true): { login: string, params: DisplayParams }[]
+  protected getPlayersWithWindowOpen(getParams?: true): string[] | { login: string, params: DisplayParams }[] {
     if (getParams === true) {
       return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId)
-        .map(a => ({ login: a.login, params: a.params, privilege: a.privilege }))
+        .map(a => ({ login: a.login, params: a.params }))
     }
     return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId).map(a => a.login)
   }

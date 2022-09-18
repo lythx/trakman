@@ -3,7 +3,7 @@ import icons from '../config/Icons.js'
 import { trakman as tm, palette as p } from '../../../src/Trakman.js'
 
 export default {
-  privilege: 1,
+  privilege: tm.config.privileges.mute,
   title: " Muted Players ",
   icon: icons.mutelist,
   iconWidth: 2,
@@ -23,7 +23,7 @@ export default {
     1.1
   ],
   navbar: [
-    { name: 'Playerlist', actionId: ids.playerList },
+    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.privileges)) },
     { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.privileges.ban },
     { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.privileges.blacklist },
     { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest }
