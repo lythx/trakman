@@ -72,8 +72,8 @@ export default class Blacklist extends PopupWindow<number> {
       (i, j, w, h) => centeredText(' Nickname ', w, h),
       (i, j, w, h) => centeredText(' Login ', w, h),
       (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Admin ', w, h),
       (i, j, w, h) => centeredText(' Reason ', w, h),
+      (i, j, w, h) => centeredText(' Admin ', w, h),
       (i, j, w, h) => centeredText(' Unblacklist ', w, h),
     ]
     const blacklist = tm.admin.blacklist
@@ -88,10 +88,10 @@ export default class Blacklist extends PopupWindow<number> {
     const loginCell: GridCellFunction = (i, j, w, h) => blacklist[i + index].login === login ?
       centeredText('$' + config.selfColour + blacklist[i + index].login, w, h) : centeredText(blacklist[i + index].login, w, h)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(blacklist[i + index].date, true), w, h)
-    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i + index].callerNickname, false)), w, h)
     const reasonCell = (i: number, j: number, w: number, h: number) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i - 1]?.reason ?? 'No reason specified')), w, h)
     }
+    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i + index].callerNickname, false)), w, h)
     const unblacklistButton: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unblacklistIcon}"
       imagefocus="${config.unblacklistIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
@@ -99,7 +99,7 @@ export default class Blacklist extends PopupWindow<number> {
     const rows = Math.min(config.entries, blacklist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
-      arr.push(indexCell, nicknameCell, loginCell, dateCell, adminCell, reasonCell, unblacklistButton)
+      arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unblacklistButton)
     }
     return this.grid.constructXml(arr)
   }

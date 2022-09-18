@@ -14,20 +14,19 @@ export default {
   selfColour: "0F0",
   defaultNickname: 'N/A',
   columnProportions: [
-    0.8,
+    0.6,
     2,
     2,
+    1,
+    2.6,
     2,
-    2,
-    2,
-    1
+    1.1
   ],
   navbar: [
     { name: 'Playerlist', actionId: ids.playerList },
     { name: 'Banlist', actionId: ids.banlist },
+    { name: 'Mutelist', actionId: ids.mutelist },
     { name: 'Guestlist', actionId: ids.guestlist }
-
-    // TODO add mutelist
   ],
   grid: {
     background: "9996",
@@ -36,7 +35,7 @@ export default {
   },
   messages: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name}${p.admin} from the blacklist.`,
-    error: `${p.error}Could not removed ${p.highlight}#{login}${p.error} from the blacklist.`,
+    error: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the blacklist.`,
     notBlacklisted: `${p.highlight}#{login}${p.error} is not blacklisted.`,
     public: true
   }
