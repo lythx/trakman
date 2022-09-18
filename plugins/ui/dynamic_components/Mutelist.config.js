@@ -4,12 +4,12 @@ import { palette as p } from '../../../src/Trakman.js'
 
 export default {
   privilege: 2,
-  title: " Banned Players ",
-  icon: icons.banlist,
+  title: " Muted Players ",
+  icon: icons.mutelist,
   iconWidth: 2,
   iconHeight: 2,
-  unbanIcon: icons.unban,
-  unbanIconHover: icons.unbanHover,
+  unmuteIcon: icons.unmute, 
+  unmuteIconHover: icons.unmuteHover,
   entries: 15,
   selfColour: "0F0",
   defaultNickname: 'N/A',
@@ -24,11 +24,9 @@ export default {
   ],
   navbar: [
     { name: 'Playerlist', actionId: ids.playerList },
+    { name: 'Banlist', actionId: ids.banlist },
     { name: 'Blacklist', actionId: ids.blacklist },
-    { name: 'Mutelist', actionId: ids.mutelist },
     { name: 'Guestlist', actionId: ids.guestlist }
-
-    // TODO add mutelist
   ],
   grid: {
     background: "9996",
@@ -36,9 +34,9 @@ export default {
     headerBackground: "333C"
   },
   messages: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unbanned ${p.highlight}#{name}${p.admin}.`,
-    error: `${p.error}Could not unban ${p.highlight}#{login}${p.error}.`,
-    notBanned: `${p.highlight}#{login}${p.error} is not banned.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unmuted ${p.highlight}#{name}${p.admin}.`,
+    error: `${p.error}Could not unmuted ${p.highlight}#{login}${p.error}.`,
+    notMuted: `${p.highlight}#{login}${p.error} is not muted.`,
     public: true
   }
 }

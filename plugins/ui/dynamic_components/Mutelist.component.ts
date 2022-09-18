@@ -1,15 +1,15 @@
 import PopupWindow from '../PopupWindow.js'
 import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
-import config from './Banlist.config.js'
+import config from './Mutelist.config.js'
 
-export default class Banlist extends PopupWindow<number> {
+export default class Mutelist extends PopupWindow<number> {
 
   readonly grid: Grid
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.banlist, config.icon, config.title, config.navbar)
+    super(IDS.mutelist, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -20,13 +20,13 @@ export default class Banlist extends PopupWindow<number> {
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
         if (info.privilege < config.privilege) { return }
-        const target = tm.admin.banlist[info.answer - this.openId - 1000]
+        const target = tm.admin.mutelist[info.answer - this.openId - 1000]
         if (target === undefined) { return }
-        const status = await tm.admin.unban(target.login, info)
+        const status = await tm.admin.unmute(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
         } else if (status === false) {
-          tm.sendMessage(tm.utils.strVar(config.messages.notBanned, { login: target.login }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.messages.notMuted, { login: target.login }), info.login)
         } else {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
             title: tm.utils.getTitle(info),
@@ -36,7 +36,7 @@ export default class Banlist extends PopupWindow<number> {
         }
       }
     })
-    tm.addListener(['Ban', 'Unban'], () => {
+    tm.addListener(['Mute', 'Unmute'], () => {
       this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
@@ -45,8 +45,8 @@ export default class Banlist extends PopupWindow<number> {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['banl', 'banlist'],
-      help: 'Display banlist.',
+      aliases: ['mutel', 'mutelist'],
+      help: 'Display mutelist.',
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
@@ -74,32 +74,32 @@ export default class Banlist extends PopupWindow<number> {
       (i, j, w, h) => centeredText(' Date ', w, h),
       (i, j, w, h) => centeredText(' Reason ', w, h),
       (i, j, w, h) => centeredText(' Admin ', w, h),
-      (i, j, w, h) => centeredText(' Unban ', w, h),
+      (i, j, w, h) => centeredText(' Unmute ', w, h),
     ]
-    const banlist = tm.admin.banlist
-    const fetchedPlayers = await tm.players.fetch(banlist.map(a => a.login))
+    const mutelist = tm.admin.mutelist
+    const fetchedPlayers = await tm.players.fetch(mutelist.map(a => a.login))
     const indexCell: GridCellFunction = (i, j, w, h) => {
       return centeredText((i + index + 1).toString(), w, h)
     }
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      const nickname = fetchedPlayers.find(a => a.login === banlist[i + index].login)?.nickname
+      const nickname = fetchedPlayers.find(a => a.login === mutelist[i + index].login)?.nickname
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell: GridCellFunction = (i, j, w, h) => banlist[i + index].login === login ?
-      centeredText('$' + config.selfColour + banlist[i + index].login, w, h) : centeredText(banlist[i + index].login, w, h)
-    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(banlist[i + index].date, true), w, h)
+    const loginCell: GridCellFunction = (i, j, w, h) => mutelist[i + index].login === login ?
+      centeredText('$' + config.selfColour + mutelist[i + index].login, w, h) : centeredText(mutelist[i + index].login, w, h)
+    const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(mutelist[i + index].date, true), w, h)
     const reasonCell = (i: number, j: number, w: number, h: number) => {
-      return centeredText(tm.utils.safeString(tm.utils.strip(banlist[i - 1]?.reason ?? 'No reason specified')), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(mutelist[i - 1]?.reason ?? 'No reason specified')), w, h)
     }
-    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(banlist[i + index].callerNickname, false)), w, h)
-    const unbanButton: GridCellFunction = (i, j, w, h) => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unbanIcon}" 
-      imagefocus="${config.unbanIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+    const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(mutelist[i + index].callerNickname, false)), w, h)
+    const unmuteButton: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unmuteIcon}"
+      imagefocus="${config.unmuteIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
     }
-    const rows = Math.min(config.entries, banlist.length - (index + 1))
+    const rows = Math.min(config.entries, mutelist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
-      arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unbanButton)
+      arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unmuteButton)
     }
     return this.grid.constructXml(arr)
   }

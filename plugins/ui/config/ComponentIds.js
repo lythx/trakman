@@ -59,5 +59,6 @@ export default {
   topVisits: 270000,
   topVotes: 280000,
   topWins: 290000,
-  topSums: 300000
+  topSums: 300000,
+  mutelist: 310000
 }

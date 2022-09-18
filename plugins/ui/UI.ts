@@ -63,6 +63,7 @@ import PlayerList from './dynamic_components/PlayerList.component.js'
 import Banlist from './dynamic_components/Banlist.component.js'
 import Blacklist from './dynamic_components/Blacklist.component.js'
 import Guestlist from './dynamic_components/Guestlist.component.js'
+import Mutelist from './dynamic_components/Mutelist.component.js'
 import SectorRecords from './dynamic_components/SectorRecords.component.js'
 import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
 import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
@@ -150,6 +151,7 @@ let dynamicComponents: {
   readonly playerList: PlayerList
   readonly banlist: Banlist
   readonly blacklist: Blacklist
+  readonly mutelist: Mutelist
   readonly guestlist: Guestlist
   readonly sectorRecords: SectorRecords
   readonly checkpointRecords: CheckpointRecords
@@ -226,6 +228,7 @@ const events: TMListener[] = [
         banlist: new Banlist(),
         blacklist: new Blacklist(),
         guestlist: new Guestlist(),
+        mutelist: new Mutelist(),
         sectorRecords: new SectorRecords(),
         checkpointRecords: new CheckpointRecords(),
         welcomeWindow: new WelcomeWindow(),

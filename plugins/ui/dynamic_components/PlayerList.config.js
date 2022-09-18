@@ -23,7 +23,7 @@ export default {
   navbar: [
     { name: 'Banlist', actionId: ids.banlist },
     { name: 'Blacklist', actionId: ids.blacklist },
-    // TODO add mutelist
+    { name: 'Mutelist', actionId: ids.mutelist },
     { name: 'Guestlist', actionId: ids.guestlist }
   ],
   grid: {
