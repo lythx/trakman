@@ -29,9 +29,13 @@ const commands: TMCommand[] = [
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
       await tm.admin.mute(login, info, targetInfo?.nickname, reason, expireDate)
-      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}.`
+      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.sendMessage(tm.utils.strVar(config.mute.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.mute.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.mute.text, {
+        title: tm.utils.getTitle(info),
+        adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login),
+        duration: durationString
+      }) + `${reasonString}`, config.mute.public ? undefined : info.login)
     },
     privilege: config.mute.privilege
   },
@@ -44,14 +48,14 @@ const commands: TMCommand[] = [
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
-      const result: boolean | Error = await tm.admin.unmute(login, info)
+      const result = await tm.admin.unmute(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while unmuting player ${logStr}`, result.message)
         tm.sendMessage(tm.utils.strVar(config.unmute.error, { login: login }), info.login)
         return
       }
-      if (result === false) {
+      if (result === 'Player not muted') {
         tm.sendMessage(tm.utils.strVar(config.unmute.notMuted, { login: login }), info.login)
         return
       }
@@ -129,7 +133,7 @@ const commands: TMCommand[] = [
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
       await tm.admin.ban(targetInfo.ip, targetInfo.login, info, targetInfo.nickname, reason, expireDate)
-      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}.`
+      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(tm.utils.strVar(config.ban.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
     },
@@ -141,14 +145,14 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }],
     callback: async (info: TMMessageInfo, login: string): Promise<void> => {
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(login)
-      const result: boolean | Error = await tm.admin.unban(login, info)
+      const result = await tm.admin.unban(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while unmuting player ${logStr}`, result.message)
-        tm.sendMessage(tm.utils.strVar(config.unmute.error, { login: login }), info.login)
+        tm.sendMessage(tm.utils.strVar(config.unban.error, { login: login }), info.login)
         return
       }
-      if (result === false) {
+      if (result === 'Player not banned') {
         tm.sendMessage(tm.utils.strVar(config.unban.notBanned, { login: login }), info.login)
         return
       }
@@ -166,14 +170,14 @@ const commands: TMCommand[] = [
         targetInfo = await tm.players.fetch(login)
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
-      const result: true | Error = await tm.admin.addToBlacklist(login, info, targetInfo?.nickname, reason, expireDate)
+      const result = await tm.admin.addToBlacklist(login, info, targetInfo?.nickname, reason, expireDate)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while blacklisting player ${logStr}`, result.message)
         tm.sendMessage(tm.utils.strVar(config.blacklist.error, { login: login }), info.login)
         return
       }
-      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}.`
+      const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
     },
@@ -185,14 +189,14 @@ const commands: TMCommand[] = [
     params: [{ name: 'login' }],
     callback: async (info: TMMessageInfo, login: string): Promise<void> => {
       const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(login)
-      const result: boolean | Error = await tm.admin.unblacklist(login, info)
+      const result = await tm.admin.unblacklist(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while removing player ${logStr} from the blacklist`, result.message)
         tm.sendMessage(tm.utils.strVar(config.unblacklist.error, { login: login }), info.login)
         return
       }
-      if (result === false) {
+      if (result === 'Player not blacklisted') {
         tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: login }), info.login)
         return
       }
@@ -209,14 +213,14 @@ const commands: TMCommand[] = [
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
-      const result: boolean | Error = await tm.admin.addGuest(login, info, targetInfo?.nickname)
+      const result = await tm.admin.addGuest(login, info, targetInfo?.nickname)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while adding player ${logStr} to the guestlist`, result.message)
         tm.sendMessage(tm.utils.strVar(config.addguest.error, { login: login }), info.login)
         return
       }
-      if (result === false) {
+      if (result === 'Already guest') {
         tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: login }), info.login)
         return
       }
@@ -233,14 +237,14 @@ const commands: TMCommand[] = [
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
-      const result: boolean | Error = await tm.admin.removeGuest(login, info)
+      const result= await tm.admin.removeGuest(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while removing player ${logStr} from the guestlist`, result.message)
         tm.sendMessage(tm.utils.strVar(config.rmguest.error, { login: login }), info.login)
         return
       }
-      if (result === false) {
+      if (result === 'Player not in guestlist') {
         tm.sendMessage(tm.utils.strVar(config.rmguest.notGuest, { login: login }), info.login)
         return
       }
