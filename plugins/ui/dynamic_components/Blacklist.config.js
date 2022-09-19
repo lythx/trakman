@@ -8,7 +8,7 @@ export default {
   icon: icons.blacklist,
   iconWidth: 2,
   iconHeight: 2,
-  unblacklistIcon: icons.unblacklistHover, // todo
+  unblacklistIcon: icons.unblacklist,
   unblacklistIconHover: icons.unblacklistHover,
   entries: 15,
   selfColour: "0F0",

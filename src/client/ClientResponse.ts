@@ -175,6 +175,7 @@ export class ClientResponse {
         if (Object.keys(value)[0] === 'array') {
           for (const el of value.array) {
             if (el?.data[0]?.value === undefined) { // some methods dont return value here too
+              arr.push([])
               continue
             }
             for (const val of el.data[0].value) {
@@ -203,6 +204,7 @@ export class ClientResponse {
         }
       }
     }
+    if(Array.isArray(arr[0]) && arr.length === 1 && arr[0].length === 0){ return []}
     return arr
   }
 
