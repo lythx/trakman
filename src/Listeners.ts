@@ -295,8 +295,7 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        // TODO: Need to check which of these are actually "spectator"
-        if (info.isSpectator /*|| info.isTemporarySpectator*/ || info.isPureSpectator) {
+        if (info.isSpectator || info.isPureSpectator) {
           PlayerService.setPlayerSpectatorStatus(info.login, true)
         } else {
           PlayerService.setPlayerSpectatorStatus(info.login, false)

@@ -97,7 +97,11 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.forceplay.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.forceplay.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.forceplay.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forceplay.text, {
+        title: tm.utils.getTitle(info),
+        adminName: tm.utils.strip(info.nickname),
+        name: tm.utils.strip(targetInfo.nickname)
+      }), config.forceplay.public ? undefined : info.login)
       tm.multiCallNoRes(
         {
           method: 'ForceSpectator',
@@ -237,7 +241,7 @@ const commands: TMCommand[] = [
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
-      const result= await tm.admin.removeGuest(login, info)
+      const result = await tm.admin.removeGuest(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
         tm.log.error(`Error while removing player ${logStr} from the guestlist`, result.message)

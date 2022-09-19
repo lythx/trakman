@@ -109,31 +109,88 @@ export default class PlayerList extends PopupWindow<number> {
   }
 
   protected constructContent(login: string, page: number): string {
+    const index = (page - 1) * config.entries - 1
     const players = tm.players.list
+    const mutelist = tm.admin.mutelist
+    const guestlist = tm.admin.guestlist
     const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),
       (i, j, w, h) => centeredText(' Login ', w, h),
       (i, j, w, h) => centeredText(' Privilege ', w, h),
       (i, j, w, h) => centeredText(' Kick ', w, h),
-      (i, j, w, h) => centeredText(' Ban ', w, h),
       (i, j, w, h) => centeredText(' Mute ', w, h),
       (i, j, w, h) => centeredText(' Blacklist ', w, h),
-      (i, j, w, h) => centeredText(' Guestlist ', w, h),
+      (i, j, w, h) => centeredText(' Ban ', w, h),
+      (i, j, w, h) => centeredText(' Guest ', w, h),
       (i, j, w, h) => centeredText(' Forcespec ', w, h),
     ]
-    const nickNameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(tm.utils.safeString(tm.utils.strip(players[i].nickname, false)), w, h)
+    const indexCell: GridCellFunction = (i, j, w, h) => {
+      return centeredText((i + index + 1).toString(), w, h)
+    }
+    const nicknameCell: GridCellFunction = (i, j, w, h) => {
+      return centeredText(tm.utils.safeString(tm.utils.strip(players[i + index].nickname, false)), w, h)
     }
     const loginCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(players[i].login, w, h)
+      let colour = ''
+      if (players[i + index].login === login) { colour = '$' + config.selfColour }
+      return centeredText(colour + players[i + index].login, w, h)
     }
     const privilegeCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(players[i].privilege.toString(), w, h)
+      return centeredText(players[i + index].privilege.toString(), w, h)
     }
-    return ''
+    const kickCell: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.kick}"
+      imagefocus="${config.hoverIcons.kick}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+    }
+    const muteCell: GridCellFunction = (i, j, w, h) => {
+      let icon = config.icons.mute
+      let hoverIcon = config.hoverIcons.mute
+      if (mutelist.some(a => a.login === players[i + index].login)) {
+        icon = config.icons.unmute
+        hoverIcon = config.hoverIcons.unmute
+      }
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 2000 + index}"/>`
+    }
+    const blacklistCell: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.blacklist}"
+      imagefocus="${config.hoverIcons.blacklist}" halign="center" valign="center" action="${this.openId + i + 3000 + index}"/>`
+    }
+    const banCell: GridCellFunction = (i, j, w, h) => {
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.ban}"
+      imagefocus="${config.hoverIcons.ban}" halign="center" valign="center" action="${this.openId + i + 4000 + index}"/>`
+    }
+    const guestCell: GridCellFunction = (i, j, w, h) => {
+      let icon = config.icons.addGuest
+      let hoverIcon = config.hoverIcons.addGuest
+      if (guestlist.some(a => a.login === players[i + index].login)) {
+        icon = config.icons.removeGuest
+        hoverIcon = config.hoverIcons.removeGuest
+      }
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 5000 + index}"/>`
+    }
+    const forcespecCell: GridCellFunction = (i, j, w, h) => {
+      let icon = config.icons.forceSpec
+      let hoverIcon = config.hoverIcons.forceSpec
+      if (players[i + index].isSpectator === true) {
+        icon = config.icons.forcePlay
+        hoverIcon = config.hoverIcons.forcePlay
+      }
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 6000 + index}"/>`
+    }
+    const rows = Math.min(config.entries, players.length - (index + 1))
+    const arr = headers
+    for (let i = 0; i < rows; i++) {
+      arr.push(indexCell, nicknameCell, loginCell, privilegeCell,
+        kickCell, muteCell, blacklistCell, banCell, guestCell, forcespecCell)
+    }
+    return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: any): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+  protected constructFooter(login: string, page: number): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(page)
   }
 }

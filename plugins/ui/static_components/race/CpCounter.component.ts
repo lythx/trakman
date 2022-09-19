@@ -12,9 +12,9 @@ export default class CpCounter extends StaticComponent {
     tm.addListener('PlayerCheckpoint', (info) => {
       this.displayToPlayer(info.player.login, info.index + 1)
     })
-    tm.addListener('TrackMania.PlayerFinish', (params: [any, any, number]) => {
-      if (params[2] === 0) {
-        this.displayToPlayer(params[1], 0)
+    tm.addListener('TrackMania.PlayerFinish', ([_, login, time]) => {
+      if (time === 0) {
+        this.displayToPlayer(login, 0)
       }
     }, true)
   }
@@ -23,13 +23,11 @@ export default class CpCounter extends StaticComponent {
     if (this.isDisplayed === false) { return }
     const cps = tm.maps.current.checkpointsAmount - 1
     let xml: string = ''
-
     if (cps === 0) {
-      xml += centeredText(`${tm.utils.palette.tmGreen}No CPs`, config.width, config.height)
+      xml += rightAlignedText(`${tm.utils.palette.tmGreen}No CPs`, config.width, config.height)
     } else {
       xml += rightAlignedText('0' + '/' + cps.toString(), config.width, config.height)
     }
-
     tm.sendManialink(`
     <manialink id="${this.id}">
         <frame posn="12 -40 1">
