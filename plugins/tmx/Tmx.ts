@@ -2,8 +2,6 @@ import config from './Config.js'
 import { trakman as tm } from '../../src/Trakman.js'
 import { TMXMapChangedInfo } from './TmxTypes.js'
 
-// TODO comments
-
 // fill with empty strings at start to avoid undefined error on startup
 const history: (TMXMapInfo | string)[] = []
 let current: TMXMapInfo | string = ''
@@ -106,15 +104,15 @@ function getFromHistory(uids: string | string[]): Readonly<TMXMapInfo> | undefin
 }
 
 /**
- * Gets tmx info for a map from the queue
+ * Gets TMX info for a map from the queue
  * @param uid Map uid
- * @returns tmx object if map is in the queue and on tmx, otherwise undefined
+ * @returns TMX object if map is in the queue and on TMX, otherwise undefined
  */
 function getFromQueue(uid: string): Readonly<TMXMapInfo> | undefined
 /**
- * Gets tmx info for multiple maps from the queue
+ * Gets TMX info for multiple maps from the queue
  * @param uids Array of map uids
- * @returns Array of tmx objects
+ * @returns Array of TMX objects
  */
 function getFromQueue(uids: string[]): Readonly<TMXMapInfo>[]
 function getFromQueue(uids: string | string[]): Readonly<TMXMapInfo> | undefined | Readonly<TMXMapInfo>[] {
@@ -126,10 +124,18 @@ function getFromQueue(uids: string | string[]): Readonly<TMXMapInfo> | undefined
 
 export const tmx = {
 
+  /**
+   * Adds a callback function to execute on TMX map queue change
+   * @param callback Function to execute on event. It takes new map queue as a parameter
+   */
   onQueueChange(callback: ((queue: (TMXMapInfo | null)[]) => void)) {
     queueListeners.push(callback)
   },
 
+  /**
+   * Adds a callback function to execute on TMX current map change
+   * @param callback Function to execute on event. It takes new current map as a parameter
+   */
   onMapChange(callback: ((info: TMXMapChangedInfo) => void)) {
     mapListeners.push(callback)
   },
@@ -138,26 +144,44 @@ export const tmx = {
 
   getFromQueue,
 
+  /**
+   * Current map TMX info or null if map is not on tmx 
+   */
   get current(): Readonly<TMXMapInfo> | null {
     return typeof current === 'string' ? null : current
   },
 
+  /**
+   * TMX info for map history
+   */
   get history(): (Readonly<TMXMapInfo> | null)[] {
     return history.map(a => typeof a === 'string' ? null : a)
   },
 
+  /**
+   * Number of maps in TMX map history
+   */
   get historyCount(): number {
     return history.length
   },
 
+  /**
+   * TMX info for map queue
+   */
   get queue(): (Readonly<TMXMapInfo> | null)[] {
     return queue.map(a => typeof a === 'string' ? null : a)
   },
 
+  /**
+   * Number of maps in TMX map queue
+   */
   get queueCount(): number {
     return queue.length
   },
 
+  /**
+   * TMX map history size limit
+   */
   get maxHistoryCount(): number {
     return config.historyCount
   },

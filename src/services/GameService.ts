@@ -67,7 +67,7 @@ export class GameService {
 
   static get remainingResultTime(): number {
     if (this._state === 'race') { return 0 }
-    return Math.round((this.config.chatTime - (Date.now() - this._timerStartTimestamp)) / 1000)
+    return Math.round((this.config.resultTime - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
   static get state(): 'race' | 'result' {
@@ -80,31 +80,30 @@ export class GameService {
       Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
       return
     }
-    const info: any = res[0]
-    // TODO: check what the props of this actually mean if possible (like wtf is timeattacksynchstartperiod) and change names accordingly
+    const [info]: any = res
     this._game = {
       gameMode: info.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
-      chatTime: info.ChatTime,
-      mapNo: info.NbChallenge,
+      resultTime: info.ChatTime,
+      mapIndex: info.NbChallenge,
       roundsPointsLimit: info.RoundsPointsLimit,
-      roundsUseNewRules: info.RoundsUseNewRules,
-      roundsForcedLaps: info.RoundsForcedLaps,
+      roundsPointSystemType: info.RoundsUseNewRules,
+      roundsModeLapsAmount: info.RoundsForcedLaps,
       timeAttackLimit: info.TimeAttackLimit,
-      timeAttackSynchStartPeriod: info.TimeAttackSynchStartPeriod,
+      countdownAdditionalTime: info.TimeAttackSynchStartPeriod,
       teamPointsLimit: info.TeamPointsLimit,
       teamMaxPoints: info.TeamMaxPoints,
-      teamUseNewRules: info.TeamUseNewRules,
-      lapsNo: info.LapsNbLaps,
-      lapsTimeLimit: info.LapsTimeLimit,
-      finishTimeout: info.FinishTimeout,
-      allWarmUpDuration: info.AllWarmUpDuration,
+      teamPointSystemType: info.TeamUseNewRules,
+      lapsModeLapsAmount: info.LapsNbLaps,
+      lapsModeFinishTimeout: info.LapsTimeLimit,
+      roundsModeFinishTimeout: info.FinishTimeout,
+      warmUpDuration: info.AllWarmUpDuration,
       disableRespawn: info.DisableRespawn,
-      forceShowAllOpponents: info.ForceShowAllOpponents,
-      roundsPointsLimitNewRules: info.RoundsPointsLimitNewRules,
-      teamPointsLimitNewRules: info.TeamPointsLimitNewRules,
+      forceShowOpponents: info.ForceShowAllOpponents,
+      roundsPointLimitSystemType: info.RoundsPointsLimitNewRules,
+      teamPointLimitSystemType: info.TeamPointsLimitNewRules,
       cupPointsLimit: info.CupPointsLimit,
       cupRoundsPerMap: info.CupRoundsPerChallenge,
-      cupWinnersNo: info.CupNbWinners,
+      cupWinnersAmount: info.CupNbWinners,
       cupWarmUpDuration: info.CupWarmUpDuration
     }
   }

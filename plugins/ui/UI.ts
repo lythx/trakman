@@ -256,14 +256,18 @@ const events: TMListener[] = [
 
 for (const event of events) { tm.addListener(event.event, event.callback) }
 
-// TODO comments
-
 export const ui = {
 
+  /**
+   * Returns an object containing all static component objects
+   */
   get staticComponents() {
     return staticComponents
   },
 
+  /**
+   * Returns an object containing all dynamic component objects
+   */
   get dynamicComponents() {
     return dynamicComponents
   }

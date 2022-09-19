@@ -64,7 +64,7 @@ export class MapService {
     }
     const DBMapList: TMMap[] = (await this.repo.getAll())
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
-    if (mapsNotInDB.length > 100) { // TODO implement progress bar here perhaps (?)
+    if (mapsNotInDB.length > 100) {
       Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
     }
     const mapsNotInDBObjects: TMMap[] = []

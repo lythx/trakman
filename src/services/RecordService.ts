@@ -97,9 +97,9 @@ export class RecordService {
     if (GameService.config.gameMode === 1 || !MapService.current.isLapRace) { // TA mode or not a lap map
       laps = 1
     } else if (GameService.config.gameMode === 3) { // Laps mode
-      laps = GameService.config.lapsNo
+      laps = GameService.config.lapsModeLapsAmount
     } else if (GameService.config.gameMode === 4) { // Stunts mode
-      return false// TODO STUNTS MODE
+      return false// STUNTS MODE
     } else { // Rounds / Teams / Cup mode
       laps = MapService.current.lapsAmount
     }
