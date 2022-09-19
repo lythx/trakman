@@ -2,7 +2,6 @@
 // import ICN from '../config/Icons.js'
 // import BG from '../config/Backgrounds.json' assert { type: 'json' }
 
-// //TODO THIS IN CONFIG FILE
 // const DEFAULT_OPTION_HEIGHT: number = 2
 // const DEFAULT_PADDING: number = 1
 // const DEFAULT_TEXT_SCALE: number = 1

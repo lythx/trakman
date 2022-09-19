@@ -20,7 +20,7 @@ await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
   PRIMARY KEY(player_id, date)
 );`)
 
-tm.addListener("Controller.Ready", async () => {
+tm.addListener("Startup", async () => {
   onlineDonators = await getFromDB(tm.players.list.map(a => a.login))
 })
 

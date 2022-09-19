@@ -232,7 +232,7 @@ const onPlayerJoin = async (login: string) => {
 }
 
 if (config.isEnabled === true) {
-  tm.addListener('Controller.Ready', () => {
+  tm.addListener('Startup', () => {
     tm.log.trace('Connecting to Maniakarma...')
     void initialize()
     setInterval(() => {

@@ -170,7 +170,7 @@ let dynamicComponents: {
 
 const events: TMListener[] = [
   {
-    event: 'Controller.Ready',
+    event: 'Startup',
     callback: async (status: 'race' | 'result'): Promise<void> => {
       await tm.client.call('SendHideManialinkPage')
       loadMod()

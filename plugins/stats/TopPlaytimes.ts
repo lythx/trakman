@@ -17,7 +17,7 @@ const initialize = async () => {
   topList = res.map(a => ({ ...a, playtime: a.playtime * 1000 }))
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 

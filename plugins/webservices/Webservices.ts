@@ -57,7 +57,7 @@ const fetchPlayerData = async (login: string): Promise<{ nickname: string, count
   }
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   const res = await fetchPlayerData(tm.maps.current.author)
   if (res instanceof Error || res === false) {
     currentAuthorData = undefined

@@ -33,7 +33,7 @@ export default class LocalSectors extends PopupWindow {
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
     })
-    tm.addListener('Controller.PlayerRecord', (): void => {
+    tm.addListener('LocalRecord', (): void => {
       this.paginator.setPageCount(Math.ceil(tm.records.local.length / this.entries))
       this.reRender()
     })

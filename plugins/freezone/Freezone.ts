@@ -1,18 +1,13 @@
-import { Logger } from '../../src/Logger.js'
-import { ServerConfig } from '../../src/ServerConfig.js'
 import http, { ClientRequest } from 'http'
-import config from './Config.js' // FIX IMPORTS AND DELETE CALL FROM MAIN
+import config from './Config.js'
+import { trakman as tm } from '../../src/Trakman.js'
 
 export class Freezone {
 
   static async initialize(): Promise<true | Error> {
-    // if (process.env.FREEZONE_PASSWORD === undefined) { TODO delete if pw not in env
-    //   Logger.fatal('FREEZONE_PASSWORD is not defined')
-    //   return new Error()
-    // }
     const status: true | Error = await this.sendLive()
     if (status instanceof Error) {
-      Logger.fatal(`Couldn't connect to ManiaLive`)
+      return new Error('Failed to authenticate on ManiaLive')
     }
     setInterval(async (): Promise<void> => {
       await this.sendLive()
@@ -23,7 +18,7 @@ export class Freezone {
   static async sendLive(): Promise<true | Error> {
     // Request URL
     const url: string = config.manialiveUrl
-    const cfg: ServerInfo = ServerConfig.config
+    const cfg: ServerInfo = tm.state.serverConfig
     // Data object in any because TS coping language
     const data = {
       serverLogin: cfg.login,
@@ -61,11 +56,29 @@ export class Freezone {
         res.on('data', function (chunk): void {
           data += chunk
         })
-        Logger.error(`Couldn't send Freezone Manialive request`, data)
+        tm.log.error(`Couldn't send Freezone Manialive request`, data)
         res.on('end', (): void => resolve(new Error(data)))
       })
       req.write(JSON.stringify(data))
       req.end()
     })
   }
+}
+
+if (config.isEnabled === true) {
+  tm.addListener('Startup', async () => {
+    tm.log.trace('Connecting to ManiaLive...')
+    const status: true | Error = await Freezone.initialize()
+    if (status instanceof Error) { tm.log.error(status.message) }
+    else { tm.log.trace('Connected to ManiaLive') }
+  })
+}
+
+export const freezone = {
+
+  /**
+   * Plugin status
+   */
+  enabled: config.isEnabled
+  
 }

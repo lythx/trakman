@@ -62,7 +62,7 @@ const initialize = async () => {
   }
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 

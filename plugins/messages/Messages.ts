@@ -5,14 +5,14 @@ import c from './Config.js'
 
 const events: TMListener[] = [
   {
-    event: 'Controller.Ready',
+    event: 'Startup',
     callback: (): void => {
       tm.sendMessage(tm.utils.strVar(c.startup, { version: tm.config.version }))
       tm.sendMessage(c.changelog)
     }
   },
   {
-    event: ['BeginMap', 'Controller.Ready'],
+    event: ['BeginMap', 'Startup'],
     callback: async (): Promise<void> => {
       const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`) //FIX
       for (const player of tm.players.list) {
@@ -103,7 +103,7 @@ const events: TMListener[] = [
     }
   },
   {
-    event: 'Controller.PlayerRecord',
+    event: 'LocalRecord',
     callback: (info: RecordInfo): void => {
       let prevPos: number = info.previousPosition
       let prevTime: number = info.previousTime
