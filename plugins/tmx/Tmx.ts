@@ -76,7 +76,7 @@ const nextMap = async (): Promise<void> => {
 }
 
 if (config.isEnabled === true) {
-  tm.addListener('Controller.Ready', () => {
+  tm.addListener('Startup', () => {
     tm.log.trace('Initializing TMX...')
     void initialize()
   })

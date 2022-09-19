@@ -1,9 +1,9 @@
 interface TMEvents {
-  "Controller.Ready": 'result' | 'race'
+  "Startup": 'result' | 'race'
   "PlayerChat": TMMessageInfo
   "PlayerJoin": JoinInfo
   "PlayerLeave": LeaveInfo
-  "Controller.PlayerRecord": RecordInfo
+  "LocalRecord": RecordInfo
   "PlayerFinish": FinishInfo
   "LiveRecord": FinishInfo
   "PlayerInfoChanged": InfoChangedInfo
@@ -22,11 +22,11 @@ interface TMEvents {
   "JukeboxChanged": TMMap[]
   "RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
   "Ban": Readonly<TMBanlistEntry>
-  "Unban" : Readonly<TMBanlistEntry>
+  "Unban": Readonly<TMBanlistEntry>
   "Blacklist": Readonly<TMBlacklistEntry>
   "Unblacklist": Readonly<TMBlacklistEntry>
   "Mute": Readonly<TMMutelistEntry>
-  "Unmute" : Readonly<TMMutelistEntry>
+  "Unmute": Readonly<TMMutelistEntry>
   "AddGuest": Readonly<TMGuestlistEntry>
   "RemoveGuest": Readonly<TMGuestlistEntry>
   "TrackMania.PlayerConnect": [string, boolean]
@@ -39,7 +39,7 @@ interface TMEvents {
   "TrackMania.BeginRound": []
   "TrackMania.EndRound": []
   "TrackMania.BeginChallenge": [any, any, any]
-  "TrackMania.EndChallenge": [any, any, any, any, any]
+  "TrackMania.EndChallenge": [any, any, boolean, boolean, boolean]
   "TrackMania.StatusChanged": [number, string]
   "TrackMania.PlayerManialinkPageAnswer": [number, string, any]
   "TrackMania.BillUpdated": [number, number, string, number]

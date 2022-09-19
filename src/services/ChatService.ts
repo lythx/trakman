@@ -57,7 +57,7 @@ export abstract class ChatService {
           this.sendErrorMessage(Utils.strVar(messages.noParam, { name: param.name }), info.login)
           return
         }
-        if (params[i].toLowerCase() === '$u' && param.optional === undefined) {  // todo make work
+        if (params[i].toLowerCase() === '$u' && param.optional === true) {
           parsedParams.push(undefined)
           continue
         }

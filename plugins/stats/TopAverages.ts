@@ -18,7 +18,7 @@ const initialize = async () => {
   topList = res.filter(a => a.average !== tm.records.maxLocalsAmount)
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 

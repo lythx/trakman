@@ -1,31 +1,37 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
-import { IDS, Grid, centeredText, closeButton } from '../UiUtils.js'
+import { IDS, Grid, centeredText, closeButton, Paginator, GridCellFunction } from '../UiUtils.js'
 import config from './PlayerList.config.js'
 
-export default class PlayerList extends PopupWindow {
-  readonly headerGrid: Grid
-  readonly grid: Grid
-  readonly headerOffset: number
-  readonly entries = config.entries
+export default class PlayerList extends PopupWindow<number> {
 
-  /* ACTION IDS IN USE
-    1000 - Kick
-    2000 - Ban
-    3000 - Mute
-    4000 - Blacklist
-    5000 - Guestlist
-    6000 - ForceSpec
-  */
+  readonly grid: Grid
+  readonly paginator: Paginator
 
   constructor() {
-    const cProportions = config.columnProportions
-    const headerProportions = [cProportions[0], cProportions[1], cProportions[2]]
-    const title = config.title
-    super(IDS.playerList, config.icon, title, config.navbar)
-    this.headerOffset = this.contentHeight / this.entries
-    this.grid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1))
-    this.headerGrid = new Grid(this.contentWidth, this.contentHeight - this.headerOffset, cProportions, new Array(this.entries).fill(1), config.grid)
+    super(IDS.playerList, config.icon, config.title, config.navbar)
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
+      Math.ceil(tm.players.count / config.entries))
+    this.paginator.onPageChange = (login, page, info) => {
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
+    }
+    tm.addListener(['PlayerLeave', 'PlayerJoin', 'PlayerInfoChanged', 'Mute', 'Unmute', 'AddGuest', 'RemoveGuest'], () => {
+      this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / config.entries))
+      this.reRender()
+    })
+    tm.addListener('PrivilegeChanged', (info) => {
+      if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
+      this.reRender()
+    })
+    tm.commands.add({
+      aliases: ['players', 'playerl', 'playerlist'],
+      help: 'Display playerlist.',
+      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      privilege: config.privilege
+    })
+
 
     //ACTIONS
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
@@ -89,63 +95,42 @@ export default class PlayerList extends PopupWindow {
     })
   }
 
-  protected constructContent(login: string, params: any): string {
+  protected onOpen(info: ManialinkClickInfo): void {
+    const page = this.paginator.getPageByLogin(info.login)
+    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
+  }
+
+  private reRender(): void {
+    const players = this.getPlayersWithWindowOpen(true)
+    for (const player of players) {
+      const page = this.paginator.getPageByLogin(player.login)
+      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount}`, tm.players.get(player.login)?.privilege ?? 0)
+    }
+  }
+
+  protected constructContent(login: string, page: number): string {
     const players = tm.players.list
-    const headers = [
-      (i: number, j: number, w: number, h: number) => centeredText(' Nickname ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Login ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Privilege ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Kick ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Ban ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Mute ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Blacklist ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Guestlist ', w, h),
-      (i: number, j: number, w: number, h: number) => centeredText(' Forcespec ', w, h),
+    const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' Nickname ', w, h),
+      (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Privilege ', w, h),
+      (i, j, w, h) => centeredText(' Kick ', w, h),
+      (i, j, w, h) => centeredText(' Ban ', w, h),
+      (i, j, w, h) => centeredText(' Mute ', w, h),
+      (i, j, w, h) => centeredText(' Blacklist ', w, h),
+      (i, j, w, h) => centeredText(' Guestlist ', w, h),
+      (i, j, w, h) => centeredText(' Forcespec ', w, h),
     ]
-    const nickNameCell = (i: number, j: number, w: number, h: number): string => {
+    const nickNameCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(players[i].nickname, false)), w, h)
     }
-    const loginCell = (i: number, j: number, w: number, h: number): string => {
+    const loginCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(players[i].login, w, h)
     }
-    const privilegeCell = (i: number, j: number, w: number, h: number): string => {
+    const privilegeCell: GridCellFunction = (i, j, w, h) => {
       return centeredText(players[i].privilege.toString(), w, h)
     }
-    const kickCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 1000}"/>`
-    }
-    const banCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 2000}"/>`
-    }
-    const muteCell = (i: number, j: number, w: number, h: number): string => {
-      const mutelist = tm.admin.mutelist
-      let iconser = config.mute
-      if (mutelist.some(a => a.login === players[i].login)) {
-        iconser = config.ban
-      }
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2.5" image="${iconser}" halign="center" valign="center" action="${this.openId + i + 3000}"/>`
-
-    }
-    const blacklistCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center" action="${this.openId + i + 4000}"/>`
-    }
-    const guestlistCell = (i: number, j: number, w: number, h: number): string => {
-      let guestlist = tm.admin.guestlist
-      let iconser = config.addGuest
-      if (guestlist.some(a => a.login === players[i].login)) {
-        iconser = config.removeGuest
-      }
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2.5" image="${iconser}" halign="center" valign="center" action="${this.openId + i + 5000}"/>`
-    }
-    const forcespecCell = (i: number, j: number, w: number, h: number): string => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="2 2" image="${config.ban}" halign="center" valign="center"/>`
-    }
-    const arr = []
-    const rows = Math.min(this.entries, players.length)
-    for (let i = 0; i < rows; i++) {
-      arr.push(nickNameCell, loginCell, privilegeCell, kickCell, banCell, muteCell, blacklistCell, guestlistCell, forcespecCell)
-    }
-    return this.headerGrid.constructXml(headers) + `<frame posn="0 ${-this.headerOffset} 1">` + this.grid.constructXml(arr) + `</frame>`
+    return ''
   }
 
   protected constructFooter(login: string, params: any): string {

@@ -18,7 +18,7 @@ const initialize = async () => {
   topList.push(...res)
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 }, true)
 

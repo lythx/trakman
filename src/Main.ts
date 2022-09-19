@@ -12,7 +12,6 @@ import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
-import { Freezone } from '../plugins/freezone/Freezone.js'
 import { fixCoherence } from './FixRankCoherence.js'
 
 async function main(): Promise<void> {
@@ -57,12 +56,6 @@ async function main(): Promise<void> {
   Logger.trace('Loading server config...')
   await ServerConfig.initialize()
   Logger.trace('Server config loaded')
-  if (process.env.USE_FREEZONE === 'YES') {
-    Logger.trace('Connecting to ManiaLive...')
-    const status: true | Error = await Freezone.initialize()
-    if (status instanceof Error) { Logger.error('Failed to authenticate on ManiaLive') }
-    else { Logger.trace('Connected to ManiaLive') }
-  }
   Logger.trace('Enabling callbacks...')
   const cb: true | Error = await Listeners.initialize()
   if (cb instanceof Error) {

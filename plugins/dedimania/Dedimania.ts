@@ -286,7 +286,7 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
 
 if (config.isEnabled === true) {
 
-  tm.addListener('Controller.Ready', () => {
+  tm.addListener('Startup', () => {
     tm.log.trace('Connecting to Dedimania...')
     void initialize()
   }, true)
