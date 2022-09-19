@@ -2,7 +2,7 @@ import { Logger } from "../Logger.js";
 import { Client } from "../client/Client.js";
 import config from "../../config/Config.js"
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
-import { BanlistRepository } from '../database/BanlistRepository.js' // TODO FIX MUTE BUG
+import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
 import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
@@ -25,7 +25,7 @@ export class AdministrationService {
   private static readonly blacklistFile: string = config.blacklistFile
   private static readonly guestlistFile: string = config.guestlistFile
   static readonly banPrivilege = config.privileges.ban
-  static readonly blacklistPrivilege = config.privileges.blacklist // todo put in trackman
+  static readonly blacklistPrivilege = config.privileges.blacklist
   static readonly mutePrivilege = config.privileges.mute
   static readonly addGuestPrivilege = config.privileges.addGuest
 

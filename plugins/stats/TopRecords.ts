@@ -53,7 +53,7 @@ async function getFromDB(logins: string | string[]):
   return res.map(a => ({ login: a.login, nickname: a.nickname, amount: a.amount }))
 }
 
-tm.addListener('Controller.Ready', async (): Promise<void> => {
+tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 
@@ -66,7 +66,7 @@ tm.addListener('PlayerLeave', async info => {
   onlineList = onlineList.filter(a => a.login !== info.login)
 })
 
-tm.addListener('Controller.PlayerRecord', info => {
+tm.addListener('LocalRecord', info => {
   if (info.previousPosition === -1) {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }

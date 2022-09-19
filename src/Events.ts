@@ -23,7 +23,7 @@ const initialize = async () => {
   }
   GameService.state = status
   controllerReady = true
-  emit('Controller.Ready', status)
+  emit('Startup', status)
 }
 
 /**

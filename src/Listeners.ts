@@ -54,9 +54,9 @@ export class Listeners {
         }
       }
     },
-    { // TODO FIX PARAMS PARSER NO PARAM ERROR
+    {
       event: 'TrackMania.PlayerChat',
-      callback: ([playerId, login, text]: TMEvents['TrackMania.PlayerChat']): void => { // todo
+      callback: ([playerId, login, text]: TMEvents['TrackMania.PlayerChat']): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCommand
         // Ignore server messages (PID 0 = Server)
         if (playerId === 0) {
@@ -90,7 +90,7 @@ export class Listeners {
           if (obj !== false) {
             if (obj.localRecord !== undefined) {
               // Register player local record
-              Events.emit('Controller.PlayerRecord', obj.localRecord)
+              Events.emit('LocalRecord', obj.localRecord)
             }
             if (obj.liveRecord !== undefined) {
               // Register player live record
@@ -114,7 +114,7 @@ export class Listeners {
       }
     },
     {
-      event: 'TrackMania.PlayerFinish', // todo
+      event: 'TrackMania.PlayerFinish',
       callback: async (params: TMEvents['TrackMania.PlayerFinish']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
         // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
@@ -162,7 +162,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BeginChallenge',
-      callback: async ([map]: TMEvents['TrackMania.BeginChallenge']): Promise<void> => { // todo typer
+      callback: async ([map]: TMEvents['TrackMania.BeginChallenge']): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         // Set game state to 'race'
         GameService.state = 'race'
@@ -202,22 +202,22 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async (params: TMEvents['TrackMania.EndChallenge']): Promise<void> => { // todo fix after socket fix
+      callback: async ([winner, map, wasWarmUp, continuesOnNextMap, isRestart]:
+        TMEvents['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
-        isRestart = params[params.length - 1] // NADEO HQ BE LIKE HOW ABOUT WE PUT AN OPTIONAL PARAMETER AS THE FIRST ONE
         // Set game state to 'result'
         GameService.state = 'result'
         // Get winner login from the callback
-        const login: string | undefined = params[0].Login
+        const login: string | undefined = winner.Login
         // Only update wins if the player is not alone on the server and exists
         const wins: number | undefined = (login === undefined || PlayerService.players.length === 1
-          || params[0].BestTime === -1) ? undefined : await PlayerService.addWin(login)
+          || winner.BestTime === -1) ? undefined : await PlayerService.addWin(login)
         const endMapInfo: EndMapInfo = {
           ...MapService.current,
-          isRestarted: params[4],
-          wasWarmUp: params[2],
-          continuesOnNextMap: params[3],
+          isRestarted: isRestart,
+          wasWarmUp: wasWarmUp,
+          continuesOnNextMap: continuesOnNextMap,
           localRecords: RecordService.localRecords,
           liveRecords: RecordService.liveRecords,
           winnerLogin: login,

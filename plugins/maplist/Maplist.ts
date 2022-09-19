@@ -12,7 +12,7 @@ const cache: {
   query: string, list: TMMap[]
 }[] = []
 
-tm.addListener('Controller.Ready', (): void => {
+tm.addListener('Startup', (): void => {
   const arr1: TMMap[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
   authorSort.push(...arr1.sort((a, b): number => a.author.localeCompare(b.author)))
   nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))

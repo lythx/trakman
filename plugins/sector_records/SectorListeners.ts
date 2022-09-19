@@ -33,7 +33,7 @@ const onMapStart = async (): Promise<void> => {
 
 if (config.isEnabled === true) {
 
-  tm.addListener('Controller.Ready', async (): Promise<void> => {
+  tm.addListener('Startup', async (): Promise<void> => {
     await onMapStart()
   }, true)
 

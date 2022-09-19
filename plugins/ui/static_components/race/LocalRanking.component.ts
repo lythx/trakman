@@ -22,7 +22,7 @@ export default class LocalRanking extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('Controller.PlayerRecord', (): void => this.display())
+    tm.addListener('LocalRecord', (): void => this.display())
     tm.addListener('PlayerJoin', (info: JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
