@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import postgres from 'pg'
-import { Logger } from '../Logger'
 
 const { Pool } = postgres
 

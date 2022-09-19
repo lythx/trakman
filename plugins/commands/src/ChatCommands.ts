@@ -94,7 +94,6 @@ const commands: TMCommand[] = [
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]
         })
-      await new Promise((r) => setTimeout(r, 5)) // Need a timeout for server to register that player is a spectator
       tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: config.afk.privilege
@@ -185,7 +184,7 @@ const commands: TMCommand[] = [
     aliases: ['ccs', 'coppers', 'checkcoppers'],
     help: 'Check the amount of coppers the server account currently has.',
     callback: async (info: TMMessageInfo): Promise<void> => {
-      if(tm.state.serverConfig.isUnited === false) {
+      if (tm.state.serverConfig.isUnited === false) {
         tm.sendMessage(config.coppers.notUnited, info.login)
         return
       }

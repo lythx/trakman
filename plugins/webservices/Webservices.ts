@@ -13,7 +13,7 @@ let nextAuthorData: { nickname: string, country: string } | undefined
  * @param login Player login
  * @returns Player information in JSON or error if unsuccessful
  */
-const fetchPlayer = async (login: string): Promise<{ //  TODO fix return type when error
+const fetchPlayer = async (login: string): Promise<{
   id: number
   login: string
   nickname: string

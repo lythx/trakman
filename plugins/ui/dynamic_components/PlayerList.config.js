@@ -6,6 +6,8 @@ export default {
   title: " Players ",
   privilege: Math.min(...Object.values(tm.config.privileges)),
   icon: icons.playerList,
+  iconWidth: 2,
+  iconHeight: 2,
   icons: {
     kick: icons.ban, // todo
     ban: icons.ban,
@@ -30,6 +32,7 @@ export default {
   },
   entries: 15,
   columnProportions: [
+    1.5,
     3,
     3,
     3,

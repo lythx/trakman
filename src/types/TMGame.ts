@@ -1,25 +1,25 @@
 interface TMGame {
   gameMode: number
-  chatTime: number // what the fuck is this
-  mapNo: number
+  resultTime: number // what the fuck is this
+  mapIndex: number
   roundsPointsLimit: number
-  roundsUseNewRules: boolean // or this
-  roundsForcedLaps: number
+  roundsPointSystemType: boolean // or this
+  roundsModeLapsAmount: number
   timeAttackLimit: number
-  timeAttackSynchStartPeriod: number
+  countdownAdditionalTime: number
   teamPointsLimit: number
   teamMaxPoints: number
-  teamUseNewRules: boolean // or this
-  lapsNo: number // or this
-  lapsTimeLimit: number
-  finishTimeout: number
-  allWarmUpDuration: number
+  teamPointSystemType: boolean // or this
+  lapsModeLapsAmount: number // or this
+  lapsModeFinishTimeout: number
+  roundsModeFinishTimeout: number
+  warmUpDuration: number
   disableRespawn: boolean
-  forceShowAllOpponents: boolean
-  roundsPointsLimitNewRules: number
-  teamPointsLimitNewRules: number
+  forceShowOpponents: boolean
+  roundsPointLimitSystemType: number
+  teamPointLimitSystemType: number
   cupPointsLimit: number
   cupRoundsPerMap: number
-  cupWinnersNo: number
+  cupWinnersAmount: number
   cupWarmUpDuration: number
 } 

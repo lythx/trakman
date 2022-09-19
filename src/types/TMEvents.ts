@@ -31,11 +31,11 @@ interface TMEvents {
   "RemoveGuest": Readonly<TMGuestlistEntry>
   "TrackMania.PlayerConnect": [string, boolean]
   "TrackMania.PlayerDisconnect": [string]
-  "TrackMania.PlayerChat": [number, string, string, any] // todo
+  "TrackMania.PlayerChat": [number, string, string, boolean]
   "TrackMania.PlayerCheckpoint": [number, string, number, number, number]
   "TrackMania.PlayerFinish": [number, string, number]
   "TrackMania.BeginRace": [any]
-  "TrackMania.EndRace": [any[], any] //todo
+  "TrackMania.EndRace": [any[], any]
   "TrackMania.BeginRound": []
   "TrackMania.EndRound": []
   "TrackMania.BeginChallenge": [any, any, any]
