@@ -313,6 +313,46 @@ if (config.isEnabled === true) {
 
 }
 
+/**
+ * Gets the players dedimania record
+ * @param login Player login
+ * @returns Dedimania record object or undefined if the player doesn't have a dedimania record
+ */
+function getRecord(login: string): DediRecord | undefined
+/**
+ * Gets multiple dedimania records
+ * Returned array is sorted by position
+ * @param logins Array of player logins
+ * @returns Array of dedimania record objects
+ */
+function getRecord(logins: string[]): DediRecord[]
+function getRecord(logins: string | string[]): DediRecord | DediRecord[] | undefined {
+  if (typeof logins === 'string') {
+    return currentDedis.find(a => a.login === logins)
+  }
+  return currentDedis.filter(a => logins.includes(a.login))
+}
+
+/**
+ * Gets the players new dedimania record
+ * @param login Player login
+ * @returns Dedimania record object or undefined if the player didn't get a new dedimania record
+ */
+function getNewRecord(login: string): DediRecord | undefined
+/**
+ * Gets multiple new dedimania records
+ * Returned array is sorted by position
+ * @param logins Array of player logins
+ * @returns Array of dedimania record objects
+ */
+function getNewRecord(logins: string[]): DediRecord[]
+function getNewRecord(logins: string | string[]): DediRecord | DediRecord[] | undefined {
+  if (typeof logins === 'string') {
+    return newDedis.find(a => a.login === logins)
+  }
+  return newDedis.filter(a => logins.includes(a.login))
+}
+
 export const dedimania = {
 
   /**
@@ -331,32 +371,34 @@ export const dedimania = {
     fetchListeners.push(callback)
   },
 
-  getRecord(logins: string | string[]) {
-    if (typeof logins === 'string') {
-      return currentDedis.find(a => a.login === logins)
-    }
-    return currentDedis.filter(a => logins.includes(a.login))
-  },
+  getRecord,
 
-  getNewRecord(logins: string | string[]) {
-    if (typeof logins === 'string') {
-      return newDedis.find(a => a.login === logins)
-    }
-    return newDedis.filter(a => logins.includes(a.login))
-  },
+  getNewRecord,
 
+  /**
+   * Current map dedimania records sorted by position
+   */
   get records(): Readonly<DediRecord>[] {
     return [...currentDedis]
   },
 
+  /**
+   * New dedimania records sorted by position
+   */
   get newRecords(): Readonly<DediRecord>[] {
     return [...newDedis]
   },
 
+  /**
+   * Number of dedimania records
+   */
   get recordCount(): number {
     return currentDedis.length
   },
 
+  /**
+   * Number of new dedimania records
+   */
   get newRecordCount(): number {
     return newDedis.length
   },
@@ -366,13 +408,17 @@ export const dedimania = {
    */
   isEnabled: config.isEnabled,
 
+  /**
+   * True if controller is connected to dedimania server
+   */
   get isConnected(): boolean {
     return client.connected
   },
 
-  get maxRecordCount(): number {
-    return config.dediCount
-  }
+  /**
+   * Maximum amount of dedimania records
+   */
+  recordCountLimit: config.dediCount
 
 }
 
