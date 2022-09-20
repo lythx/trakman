@@ -33,7 +33,17 @@ tm.addListener('PlayerLeave', (info) => {
   onlineDonators = onlineDonators.filter(a => a.login !== info.login)
 })
 
+/**
+ * Fetches donation info for the player
+ * @param login Player login
+ * @returns Donation object if successfull, undefined if player is not in the donators database
+ */
 async function getFromDB(login: string): Promise<DonationInfo | undefined>
+/**
+ * Fetches donation info for multiple players
+ * @param logins Array of player logins
+ * @returns Array of donation objects
+ */
 async function getFromDB(logins: string[]): Promise<DonationInfo[]>
 async function getFromDB(logins: string | string[]): Promise<DonationInfo | undefined | DonationInfo[]> {
   if (typeof logins === 'string') {
@@ -86,6 +96,13 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
   await tm.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
 }
 
+/**
+ * Donate coppers to server
+ * @param payerLogin Login of the player 
+ * @param payerNickname Nickname of the player
+ * @param amount Amount of coppers to donate
+ * @returns True if successfull, false if player refuses payment, Error if dedicated server call fails
+ */
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<boolean | Error> => {
   const status: boolean | Error = await tm.utils.sendCoppers(payerLogin, amount, 'Donation')
   const date: Date = new Date()
@@ -111,16 +128,37 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
   return false
 }
 
+/**
+ * Gets donation info for the player
+ * @param login Player login
+ * @returns Donation object if successfull, undefined if player is not in the donators database or is offline
+ */
+function getDonation(login: string): DonationInfo | undefined
+/**
+ * Gets donation info for multiple online players
+ * @param logins Array of player logins
+ * @returns Array of donation objects
+ */
+function getDonation(logins: string[]): DonationInfo[]
+function getDonation(logins: string | string[]): DonationInfo | DonationInfo[] | undefined {
+  if (typeof logins === 'string') {
+    return onlineDonators.find(a => a.login === logins)
+  }
+  return onlineDonators.filter(a => logins.includes(a.login))
+}
+
 export const donations = {
 
   donate,
 
   fetch: getFromDB,
 
-  get(login: string) {
-    return onlineDonators.find(a => a.login === login)
-  },
+  getOnline: getDonation,
 
+  /**
+   * Add a callback function to execute on donation
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
   onDonation(callback: (info: DonationInfo & { readonly amount: number }) => void) {
     listeners.push(callback)
   },
@@ -128,7 +166,7 @@ export const donations = {
   /**
    * @returns Donators who are currently online
    */
-  get list() {
+  get onlineList() {
     return [...onlineDonators]
   }
 
