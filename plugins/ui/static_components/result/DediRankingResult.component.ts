@@ -11,7 +11,7 @@ export default class DediRankingResult extends StaticComponent {
   private readonly side: boolean
   private readonly header: StaticHeader
   private readonly recordList: RecordList
-  private readonly maxDedis: number = dedimania.maxRecordCount
+  private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
     super(IDS.dedisResult, 'result')
