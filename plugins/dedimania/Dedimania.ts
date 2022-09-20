@@ -3,8 +3,6 @@ import { trakman as tm } from '../../src/Trakman.js'
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
-// TODO overloads and comments
-
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
 let isFailedAuthentication = false
