@@ -30,7 +30,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected readonly margin: number = config.margin
   protected readonly footerHeight = 4
   protected readonly headerPageWidth: number = 10
-  protected static readonly playersWithWindowOpen: { login: string, id: number, params: any}[] = []
+  protected static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
 
   constructor(windowId: number, headerIcon: string, title: string,
     navbar: { name: string, actionId: number, privilege?: number }[] = [],
@@ -49,8 +49,8 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     [this.headerLeft, this.headerRight, this.frameMidTop,
     this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
-      if (info.answer === this.openId) { this.onOpen(info) }
-      else if (info.answer === this.closeId) { this.onClose(info) }
+      if (info.actionId === this.openId) { this.onOpen(info) }
+      else if (info.actionId === this.closeId) { this.onClose(info) }
     })
     tm.addListener('PlayerLeave', (info: LeaveInfo) => {
       const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)

@@ -39,7 +39,7 @@ export class VoteSkip extends UiButton {
       privilege: 0
     })
     tm.addListener('ManialinkClick', (info) => {
-      if (info.answer === cfg.actionId + this.parentId) {
+      if (info.actionId === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })

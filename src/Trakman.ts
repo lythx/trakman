@@ -391,7 +391,7 @@ export const trakman = {
    */
   openManialink(id: number, login: string): void {
     const temp: any = PlayerService.get(login)
-    temp.answer = id
+    temp.actionId = id
     const info: ManialinkClickInfo = temp
     Events.emit('ManialinkClick', info)
   },

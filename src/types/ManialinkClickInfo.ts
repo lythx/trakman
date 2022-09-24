@@ -1,5 +1,5 @@
 interface ManialinkClickInfo {
-  readonly answer: number
+  readonly actionId: number
   readonly login: string
   readonly nickname: string
   readonly country: string

@@ -62,8 +62,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
     tm.addListener("ManialinkClick", (info) => {
-      if (info.answer >= this.openId + 100 && info.answer <= this.openId + 500) {
-        switch (info.answer - this.openId) {
+      if (info.actionId >= this.openId + 100 && info.actionId <= this.openId + 500) {
+        switch (info.actionId - this.openId) {
           case 100: {
             const paginator = this.userPaginator
             const commands = this.userCommands
