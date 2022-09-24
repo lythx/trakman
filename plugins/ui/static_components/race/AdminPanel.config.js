@@ -13,7 +13,7 @@ export default {
   disabledColour: '333C',
   public: true,
   icons: {
-    players: icons.placeholder,
+    players: icons.playerList,
     restart: icons.placeholder,
     previous: icons.pageLeft,
     requeue: icons.payReplay,
