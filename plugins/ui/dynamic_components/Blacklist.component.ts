@@ -18,13 +18,13 @@ export default class Blacklist extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
-      if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-        const target = tm.admin.blacklist[info.answer - this.openId - 1000]
+      if (info.actionId >= this.openId + 1000 && info.actionId < this.openId + 2000) {
+        const target = tm.admin.blacklist[info.actionId - this.openId - 1000]
         if (target === undefined) { return }
         const status = await tm.admin.unblacklist(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
-        } else if(status === true) {
+        } else if (status === true) {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname, true),

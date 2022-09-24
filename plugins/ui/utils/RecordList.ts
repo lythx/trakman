@@ -127,7 +127,7 @@ export default class RecordList {
 
   private setupListeners(): void {
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
-      if (info.answer === IDS.ClearAlerts) {
+      if (info.actionId === IDS.ClearAlerts) {
         const index: number = this.infos.findIndex(a => a.login === info.login)
         if (index !== -1) {
           this.infos.splice(index, 1)
@@ -136,15 +136,15 @@ export default class RecordList {
           e(info)
         }
       }
-      if (info.answer > this.id + 1 && info.answer <= this.id + this.maxCount + 1) {
-        const index: number = info.answer - this.id - 2
+      if (info.actionId > this.id + 1 && info.actionId <= this.id + this.maxCount + 1) {
+        const index: number = info.actionId - this.id - 2
         const i = this.infos.find(a => a.login === info.login)
         if (i === undefined) {
           this.infos.push({ login: info.login, indexes: [index] })
         } else if (!i.indexes.includes(index)) {
           i.indexes.push(index)
         } else {
-          const index: number = i.indexes.indexOf(info.answer - this.id - 2)
+          const index: number = i.indexes.indexOf(info.actionId - this.id - 2)
           if (index !== -1) {
             i.indexes.splice(index, 1)
           }

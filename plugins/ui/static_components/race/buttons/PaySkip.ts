@@ -28,7 +28,7 @@ export class PaySkip extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.addListener('ManialinkClick', (info) => {
-      if (info.answer === cfg.actionId + this.parentId) {
+      if (info.actionId === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })

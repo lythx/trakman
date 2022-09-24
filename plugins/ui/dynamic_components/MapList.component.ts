@@ -39,8 +39,8 @@ export default class MapList extends PopupWindow {
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.answer >= this.openId + this.mapAddId && info.answer <= this.openId + this.mapAddId + 5000) {
-        const mapId = this.challengeActionIds[info.answer - (this.openId + this.mapAddId)]
+      if (info.actionId >= this.openId + this.mapAddId && info.actionId <= this.openId + this.mapAddId + 5000) {
+        const mapId = this.challengeActionIds[info.actionId - (this.openId + this.mapAddId)]
         if (mapId === undefined) {
           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding the map to queue.`, info.login)
           tm.log.error('Error while adding map to queue from jukebox', `Challenge index out of range`)

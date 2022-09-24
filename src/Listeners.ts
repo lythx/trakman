@@ -250,7 +250,7 @@ export class Listeners {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
-        temp.answer = answer
+        temp.actionId = answer
         const info: ManialinkClickInfo = temp
         Events.emit('ManialinkClick', info)
       }
