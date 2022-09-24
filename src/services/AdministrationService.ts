@@ -465,7 +465,7 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
-   * @returns True if successfull, false if caller privilege is too low, Error if dedicated server call fails
+   * @returns True if successfull, false if caller privilege is too low
    */
   static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
