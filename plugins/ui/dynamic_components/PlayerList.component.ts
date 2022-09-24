@@ -7,6 +7,14 @@ export default class PlayerList extends PopupWindow<number> {
 
   readonly grid: Grid
   readonly paginator: Paginator
+  readonly actions = {
+    forceSpec: 1000,
+    kick: 2000,
+    mute: 3000,
+    addGuest: 4000,
+    blacklist: 5000,
+    ban: 6000,
+  }
 
   constructor() {
     super(IDS.playerList, config.icon, config.title, config.navbar)
@@ -31,67 +39,128 @@ export default class PlayerList extends PopupWindow<number> {
       callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
-
-
-    //ACTIONS
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
-      if (info.answer >= this.openId + 2000 && info.answer < this.openId + 3000) {
-
-        const targetPlayer = tm.players.list[info.answer - this.openId - 2000]
-        const targetInfo = tm.players.get(targetPlayer.login)
-        if (targetInfo === undefined) {
-          return
-        } else {
-          tm.admin.ban(targetInfo.ip, targetPlayer.login, info, targetInfo.nickname)
-          tm.client.call('Kick', [{ string: targetPlayer.login }])
-          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has banned `
-            + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin}.`)
+      if (info.answer >= this.openId + this.actions.kick
+        && info.answer < this.openId + this.actions.kick + 1000) { // Kick
+        const target = tm.players.list[info.answer - this.openId - this.actions.kick]
+        if (target === undefined) { return }
+        tm.client.callNoRes('Kick', [{ string: info.login }])
+        tm.sendMessage(tm.utils.strVar(config.messages.kick, {
+          title: tm.utils.getTitle(info),
+          adminName: tm.utils.strip(info.nickname),
+          name: tm.utils.strip(target.nickname)
+        }))
+      } else if (info.answer >= this.openId + this.actions.forceSpec
+        && info.answer < this.openId + this.actions.forceSpec + 1000) { // ForceSpec and ForcePlay
+        const target = tm.players.list[info.answer - this.openId - this.actions.forceSpec]
+        if (target === undefined) { return }
+        if (target.isSpectator === true) { // ForcePlay
+          tm.multiCallNoRes(
+            {
+              method: 'ForceSpectator',
+              params: [{ string: target.login }, { int: 2 }]
+            },
+            {
+              method: 'ForceSpectator',
+              params: [{ string: target.login }, { int: 0 }]
+            })
+          tm.sendMessage(tm.utils.strVar(config.messages.forcePlay, {
+            title: tm.utils.getTitle(info),
+            adminName: tm.utils.strip(info.nickname),
+            name: tm.utils.strip(target.nickname)
+          }))
+        } else { // ForceSpec
+          await tm.multiCall(
+            {
+              method: 'ForceSpectator',
+              params: [{ string: target.login }, { int: 1 }]
+            },
+            {
+              method: 'ForceSpectator',
+              params: [{ string: target.login }, { int: 0 }]
+            })
+          tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: target.login }])
+          tm.sendMessage(tm.utils.strVar(config.messages.forceSpec, {
+            title: tm.utils.getTitle(info),
+            adminName: tm.utils.strip(info.nickname),
+            name: tm.utils.strip(target.nickname)
+          }))
         }
-      } // Ban
-
-      if (info.answer >= this.openId + 3000 && info.answer < this.openId + 4000) {
-        const targetPlayer = tm.players.list[info.answer - this.openId - 3000]
-        await tm.admin.mute(targetPlayer.login, info)
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has muted `
-          + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
-
-      } // Mute
-
-      if (info.answer >= this.openId + 4000 && info.answer < this.openId + 6000) {
-        const targetPlayer = tm.players.list[info.answer - this.openId - 4000]
-        if (targetPlayer.login === undefined) {
-          return
-        } else {
-          tm.admin.addToBlacklist(targetPlayer.login, info)
-          tm.client.call('Kick', [{ string: targetPlayer.login }])
-          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has blacklisted `
-            + `${tm.utils.palette.highlight + tm.utils.strip(targetPlayer.nickname)}${tm.utils.palette.admin}.`)
+      } else if (info.answer >= this.openId + this.actions.mute
+        && info.answer < this.openId + this.actions.mute + 1000) { // Mute
+        const target = tm.players.list[info.answer - this.openId - this.actions.mute]
+        if (target === undefined) { return }
+        if (tm.admin.getMute(target.login) === undefined) { // Mute
+          await tm.admin.mute(target.login, info, target.nickname)
+          tm.sendMessage(tm.utils.strVar(config.messages.mute, {
+            title: tm.utils.getTitle(info),
+            adminName: tm.utils.strip(info.nickname),
+            name: tm.utils.strip(target.nickname)
+          })) // todo public option
+        } else { // Unmute
+          const status = await tm.admin.unmute(target.login, info)
+          if (status instanceof Error) {
+            tm.sendMessage(tm.utils.strVar(config.messages.unmuteError, { login: info.login }), info.login)
+          } else {
+            tm.sendMessage(tm.utils.strVar(config.messages.unmute, {
+              title: tm.utils.getTitle(info),
+              adminName: tm.utils.strip(info.nickname),
+              name: tm.utils.strip(target.nickname)
+            }))
+          }
         }
-      } // Blacklist
-
-      if (info.answer >= this.openId + 5000 && info.answer < this.openId + 6000) {
-        const targetPlayer = tm.players.list[info.answer - this.openId - 5000]
-        const status = await tm.admin.addGuest(targetPlayer.login, info)
+      } else if (info.answer >= this.openId + this.actions.addGuest
+        && info.answer < this.openId + this.actions.addGuest + 1000) { // AddGuest and RemoveGuest
+        const target = tm.players.list[info.answer - this.openId - this.actions.addGuest]
+        if (target === undefined) { return }
+        if (tm.admin.getGuest(target.login) === undefined) { // Add Guest
+          const status = await tm.admin.addGuest(target.login, info, target.nickname)
+          if (status instanceof Error) {
+            tm.sendMessage(tm.utils.strVar(config.messages.addGuestError, { login: info.login }), info.login)
+          } else {
+            tm.sendMessage(tm.utils.strVar(config.messages.addGuest, {
+              title: tm.utils.getTitle(info),
+              adminName: tm.utils.strip(info.nickname),
+              name: tm.utils.strip(target.nickname)
+            }))
+          }
+        } else { // Remove Guest
+          const status = await tm.admin.removeGuest(target.login, info)
+          if (status instanceof Error) {
+            tm.sendMessage(tm.utils.strVar(config.messages.removeGuestError, { login: info.login }), info.login)
+          } else {
+            tm.sendMessage(tm.utils.strVar(config.messages.removeGuest, {
+              title: tm.utils.getTitle(info),
+              adminName: tm.utils.strip(info.nickname),
+              name: tm.utils.strip(target.nickname)
+            }))
+          }
+        }
+      } else if (info.answer >= this.openId + this.actions.blacklist
+        && info.answer < this.openId + this.actions.blacklist + 1000) { // Blacklist
+        const target = tm.players.list[info.answer - this.openId - this.actions.blacklist]
+        if (target === undefined) { return }
+        const status = await tm.admin.addToBlacklist(target.login, info)
         if (status instanceof Error) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}An error occured while adding player to the guestlist.`, info.login)
+          tm.sendMessage(tm.utils.strVar(config.messages.blacklistError, { login: info.login }), info.login)
         } else {
-          tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
-            + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added `
-            + `${tm.utils.palette.highlight + targetPlayer.nickname}${tm.utils.palette.admin} to guestlist.`)
+          tm.sendMessage(tm.utils.strVar(config.messages.blacklist, {
+            title: tm.utils.getTitle(info),
+            adminName: tm.utils.strip(info.nickname),
+            name: tm.utils.strip(target.nickname)
+          }))
         }
-      } // Add to Guestlist
-
-      //TODO: add ForceSpec :3 :v :D
-
-      tm.commands.add({
-        aliases: ['players', 'playerlist'],
-        help: 'Display list of players.',
-        callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
-        privilege: 1
-      },)
+      } else if (info.answer >= this.openId + this.actions.ban
+        && info.answer < this.openId + this.actions.ban + 1000) { // Ban
+        const target = tm.players.list[info.answer - this.openId - this.actions.ban]
+        if (target === undefined) { return }
+        await tm.admin.ban(target.ip, target.login, info)
+        tm.sendMessage(tm.utils.strVar(config.messages.ban, {
+          title: tm.utils.getTitle(info),
+          adminName: tm.utils.strip(info.nickname),
+          name: tm.utils.strip(target.nickname)
+        }))
+      }
     })
   }
 
@@ -141,7 +210,7 @@ export default class PlayerList extends PopupWindow<number> {
     }
     const kickCell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.kick}"
-      imagefocus="${config.hoverIcons.kick}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+      imagefocus="${config.hoverIcons.kick}" halign="center" valign="center" action="${this.openId + i + this.actions.kick + index}"/>`
     }
     const muteCell: GridCellFunction = (i, j, w, h) => {
       let icon = config.icons.mute
@@ -151,15 +220,15 @@ export default class PlayerList extends PopupWindow<number> {
         hoverIcon = config.hoverIcons.unmute
       }
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
-      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 2000 + index}"/>`
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + this.actions.mute + index}"/>`
     }
     const blacklistCell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.blacklist}"
-      imagefocus="${config.hoverIcons.blacklist}" halign="center" valign="center" action="${this.openId + i + 3000 + index}"/>`
+      imagefocus="${config.hoverIcons.blacklist}" halign="center" valign="center" action="${this.openId + i + this.actions.blacklist + index}"/>`
     }
     const banCell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.ban}"
-      imagefocus="${config.hoverIcons.ban}" halign="center" valign="center" action="${this.openId + i + 4000 + index}"/>`
+      imagefocus="${config.hoverIcons.ban}" halign="center" valign="center" action="${this.openId + i + this.actions.ban + index}"/>`
     }
     const guestCell: GridCellFunction = (i, j, w, h) => {
       let icon = config.icons.addGuest
@@ -169,7 +238,7 @@ export default class PlayerList extends PopupWindow<number> {
         hoverIcon = config.hoverIcons.removeGuest
       }
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
-      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 5000 + index}"/>`
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + this.actions.addGuest + index}"/>`
     }
     const forcespecCell: GridCellFunction = (i, j, w, h) => {
       let icon = config.icons.forceSpec
@@ -179,7 +248,7 @@ export default class PlayerList extends PopupWindow<number> {
         hoverIcon = config.hoverIcons.forcePlay
       }
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
-      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + 6000 + index}"/>`
+      imagefocus="${hoverIcon}" halign="center" valign="center" action="${this.openId + i + this.actions.forceSpec + index}"/>`
     }
     const rows = Math.min(config.entries, players.length - (index + 1))
     const arr = headers

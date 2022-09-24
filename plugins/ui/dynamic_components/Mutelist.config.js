@@ -35,7 +35,7 @@ export default {
   },
   messages: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unmuted ${p.highlight}#{name}${p.admin}.`,
-    error: `${p.error}Could not unmuted ${p.highlight}#{login}${p.error}.`,
+    error: `${p.error}Could not unmute ${p.highlight}#{login}${p.error}.`,
     public: true
   }
 }
