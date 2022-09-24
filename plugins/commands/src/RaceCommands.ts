@@ -63,6 +63,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.endround.error, info.login)
         return
       }
+      tm.client.callNoRes('ForceEndRound')
       tm.sendMessage(tm.utils.strVar(config.endround.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.endround.public ? undefined : info.login)
     },
     privilege: config.endround.privilege

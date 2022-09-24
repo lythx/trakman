@@ -18,8 +18,8 @@ export default class Guestlist extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
-      if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-        const target = tm.admin.guestlist[info.answer - this.openId - 1000]
+      if (info.actionId >= this.openId + 1000 && info.actionId < this.openId + 2000) {
+        const target = tm.admin.guestlist[info.actionId - this.openId - 1000]
         if (target === undefined) { return }
         const status = await tm.admin.removeGuest(target.login, info)
         if (status instanceof Error) {

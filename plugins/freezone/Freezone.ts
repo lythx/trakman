@@ -20,7 +20,6 @@ const sendLive = async (): Promise<true | Error> => {
     visibility: cfg.password.length === 0 ? 1 : 0, // Maybe reversed statement
     classHash: config.manialiveHash
   }
-  console.log(data)
   // Append freezone to the server name if it isn't there already
   if (!cfg.name.toLowerCase().includes('freezone')) {
     // If the resulting name is too long, trim it to (presumably) max value
