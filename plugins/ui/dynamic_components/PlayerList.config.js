@@ -4,11 +4,21 @@ import { trakman as tm, palette as p } from '../../../src/Trakman.js'
 
 export default {
   title: " Players ",
-  privilege: Math.min(...Object.values(tm.config.privileges)),
+  kickPrivilege: 1,
+  forceSpecPrivilege: 1,
+  privilege: 1, // Privilege required to open the window
   icon: icons.playerList,
   iconWidth: 2,
   iconHeight: 2,
   public: true,
+  disabledColour: '333C',
+  privilegeColours: {
+    0: 'FFF',
+    1: '0F0',
+    2: '00F',
+    3: 'F00', // todo colours
+    4: 'FF0'
+  },
   icons: {
     kick: icons.ban, // todo
     ban: icons.ban,
@@ -67,8 +77,8 @@ export default {
     addGuestError: `${p.error}Could not add ${p.highlight}#{login}${p.error} to the guestlist.`,
     removeGuest: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name} ${p.admin}from the guestlist.`,
     removeGuestError: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the guestlist.`,
-    blacklist: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has blacklisted ${p.highlight}#{name}${p.admin}#{duration}.`,
+    blacklist: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has blacklisted ${p.highlight}#{name}${p.admin}.`,
     blacklistError: `${p.error}Could not blacklist ${p.highlight}#{login}${p.error}.`,
-    ban: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has banned ${p.highlight}#{name}${p.admin}#{duration}.`
+    ban: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has banned ${p.highlight}#{name}${p.admin}.`
   }
 }
