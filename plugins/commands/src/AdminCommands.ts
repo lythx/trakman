@@ -132,7 +132,7 @@ const commands: TMCommand[] = [
     callback: async (info: TMMessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const targetInfo: TMPlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
-        tm.sendMessage(config.ban.error, info.login)
+        tm.sendMessage(tm.utils.strVar(config.ban.error, { login }), info.login)
         return
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)

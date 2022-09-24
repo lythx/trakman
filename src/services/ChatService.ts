@@ -94,33 +94,43 @@ export abstract class ChatService {
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
           case 'time':
-            if (!isNaN(Number(params[i]))) {
+            if (!isNaN(Number(params[i])) && Number(params[i]) > 0) {
+              if (isNaN(new Date(Number(params[i])).getTime())) {
+                this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
+                return
+              }
               parsedParams.push(Number(params[i]) * 1000 * 60)
               break
             } // If there's no modifier then time is treated as minutes
             const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
             const time: number = Number(params[i].substring(0, params[i].length - 1))
-            if (isNaN(time)) {
+            if (isNaN(time) || time < 0) {
               this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
               return
             }
+            let parsedTime: number
             switch (unit) {
               case 's':
-                parsedParams.push(time * 1000)
+                parsedTime = time * 1000
                 break
               case 'm':
-                parsedParams.push(time * 1000 * 60)
+                parsedTime = time * 1000 * 60
                 break
               case 'h':
-                parsedParams.push(time * 1000 * 60 * 60)
+                parsedTime = time * 1000 * 60 * 60
                 break
               case 'd':
-                parsedParams.push(time * 1000 * 60 * 60 * 24)
+                parsedTime = time * 1000 * 60 * 60 * 24
                 break
               default:
                 this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
                 return
             }
+            if (isNaN(new Date(parsedTime).getTime())) {
+              this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
+              return
+            }
+            parsedParams.push(parsedTime)
             break
           case 'player': {
             let player = PlayerService.get(params[i])
