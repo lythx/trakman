@@ -49,7 +49,7 @@ export default class PlayerList extends PopupWindow<number> {
           title: tm.utils.getTitle(info),
           adminName: tm.utils.strip(info.nickname),
           name: tm.utils.strip(target.nickname)
-        }))
+        }), config.public === true ? undefined : info.login)
       } else if (info.answer >= this.openId + this.actions.forceSpec
         && info.answer < this.openId + this.actions.forceSpec + 1000) { // ForceSpec and ForcePlay
         const target = tm.players.list[info.answer - this.openId - this.actions.forceSpec]
@@ -68,7 +68,7 @@ export default class PlayerList extends PopupWindow<number> {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
-          }))
+          }), config.public === true ? undefined : info.login)
         } else { // ForceSpec
           await tm.multiCall(
             {
@@ -84,7 +84,7 @@ export default class PlayerList extends PopupWindow<number> {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
-          }))
+          }), config.public === true ? undefined : info.login)
         }
       } else if (info.answer >= this.openId + this.actions.mute
         && info.answer < this.openId + this.actions.mute + 1000) { // Mute
@@ -96,7 +96,7 @@ export default class PlayerList extends PopupWindow<number> {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
-          })) // todo public option
+          }), config.public === true ? undefined : info.login)
         } else { // Unmute
           const status = await tm.admin.unmute(target.login, info)
           if (status instanceof Error) {
@@ -106,7 +106,7 @@ export default class PlayerList extends PopupWindow<number> {
               title: tm.utils.getTitle(info),
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
-            }))
+            }), config.public === true ? undefined : info.login)
           }
         }
       } else if (info.answer >= this.openId + this.actions.addGuest
@@ -122,7 +122,7 @@ export default class PlayerList extends PopupWindow<number> {
               title: tm.utils.getTitle(info),
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
-            }))
+            }), config.public === true ? undefined : info.login)
           }
         } else { // Remove Guest
           const status = await tm.admin.removeGuest(target.login, info)
@@ -133,7 +133,7 @@ export default class PlayerList extends PopupWindow<number> {
               title: tm.utils.getTitle(info),
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
-            }))
+            }), config.public === true ? undefined : info.login)
           }
         }
       } else if (info.answer >= this.openId + this.actions.blacklist
@@ -148,7 +148,7 @@ export default class PlayerList extends PopupWindow<number> {
             title: tm.utils.getTitle(info),
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
-          }))
+          }), config.public === true ? undefined : info.login)
         }
       } else if (info.answer >= this.openId + this.actions.ban
         && info.answer < this.openId + this.actions.ban + 1000) { // Ban
