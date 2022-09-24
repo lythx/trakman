@@ -8,6 +8,7 @@ export default {
   icon: icons.playerList,
   iconWidth: 2,
   iconHeight: 2,
+  public: true,
   icons: {
     kick: icons.ban, // todo
     ban: icons.ban,
