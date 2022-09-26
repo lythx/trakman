@@ -1,4 +1,4 @@
-interface TMMutelistEntry {
+export interface TMMutelistEntry {
   readonly login: string
   readonly nickname: string | undefined
   date: Date

@@ -2,12 +2,12 @@ import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 
-const commands: TMCommand[] = [
+const commands: TM.Command[] = [
   {
     aliases: ['add'],
     help: 'Add a map from TMX.',
     params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
-    callback: async (info: TMMessageInfo, id: number, tmxSite?: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
       const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
       const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
       let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
@@ -29,7 +29,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.add.writeError, info.login)
         return
       }
-      const map: TMMap | Error = await tm.maps.add(file.name, info)
+      const map: TM.Map | Error = await tm.maps.add(file.name, info)
       if (map instanceof Error) {
         // Yes we actually need to do this in order to juke a map if it was on the server already
         if (map.message.trim() === 'Challenge already added. Code: -1000') {
@@ -38,7 +38,7 @@ const commands: TMCommand[] = [
           while (i < content.length) {
             if (content.substring(i, i + 12) === `<ident uid="`) {
               const id: string = content.substring(i + 12, i + 12 + 27)
-              const map: TMMap | undefined = tm.maps.list.find(a => a.id === id)
+              const map: TM.Map | undefined = tm.maps.list.find(a => a.id === id)
               if (map === undefined) {
                 tm.sendMessage(config.add.queueError, info.login)
                 return
@@ -68,8 +68,8 @@ const commands: TMCommand[] = [
     aliases: ['addlocal'],
     help: 'Add a map from local files.',
     params: [{ name: 'filename' }],
-    callback: async (info: TMMessageInfo, filename: string): Promise<void> => {
-      const map: TMMap | Error = await tm.maps.add(filename, info)
+    callback: async (info: TM.MessageInfo, filename: string): Promise<void> => {
+      const map: TM.Map | Error = await tm.maps.add(filename, info)
       if (map instanceof Error) {
         tm.sendMessage(config.addlocal.addError, info.login)
         return
@@ -86,7 +86,7 @@ const commands: TMCommand[] = [
     aliases: ['afu', 'addfromurl'],
     help: 'Add a map from url.',
     params: [{ name: 'url' }, { name: 'filename', optional: true }],
-    callback: async (info: TMMessageInfo, url: string, filename?: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, url: string, filename?: string): Promise<void> => {
       const file = await fetch(url).catch((err: Error) => err)
       if (file instanceof Error) {
         tm.sendMessage(config.addfromurl.fetchError, info.login)
@@ -102,7 +102,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.addfromurl.writeError, info.login)
         return
       }
-      const map: TMMap | Error = await tm.maps.add(finalFilename, info)
+      const map: TM.Map | Error = await tm.maps.add(finalFilename, info)
       if (map instanceof Error) {
         // Yes we actually need to do this in order to juke a map if it was on the server already
         if (map.message.trim() === 'Challenge already added. Code: -1000') {
@@ -111,7 +111,7 @@ const commands: TMCommand[] = [
           while (i < content.length) {
             if (content.substring(i, i + 12) === `<ident uid="`) {
               const id: string = content.substring(i + 12, i + 12 + 27)
-              const map: TMMap | undefined = tm.maps.list.find(a => a.id === id)
+              const map: TM.Map | undefined = tm.maps.list.find(a => a.id === id)
               if (map === undefined) {
                 tm.sendMessage(config.addfromurl.queueError, info.login)
                 return
@@ -140,7 +140,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['aadb', 'addallfromdb'],
     help: 'Adds all the maps present in database if they are on the server based on filename.',
-    callback: async (info: TMMessageInfo): Promise<void> => {
+    callback: async (info: TM.MessageInfo): Promise<void> => {
       const res: any[] | Error = await tm.db.query('SELECT * FROM maps;')
       if (res instanceof Error) {
         tm.sendMessage(config.addallfromdb.error, info.login)

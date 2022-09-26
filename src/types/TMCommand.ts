@@ -1,4 +1,6 @@
-interface TMCommand {
+import { MessageInfo } from "./TMMessageInfo"
+
+export interface TMCommand {
   readonly aliases: string[]
   readonly help?: string
   readonly params?: {
@@ -7,6 +9,6 @@ interface TMCommand {
     readonly validValues?: (string | number)[]
     readonly optional?: true
   }[]
-  readonly callback: (info: TMMessageInfo & { aliasUsed: string }, ...params: any[]) => void
+  readonly callback: (info: MessageInfo & { aliasUsed: string }, ...params: any[]) => void
   readonly privilege: number
 }

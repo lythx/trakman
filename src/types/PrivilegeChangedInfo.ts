@@ -1,5 +1,5 @@
 interface PrivilegeChangedInfo {
-  readonly player?: TMOfflinePlayer
+  readonly player?: TM.OfflinePlayer
   readonly login: string
   readonly newPrivilege: number
   readonly previousPrivilege: number

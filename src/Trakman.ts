@@ -258,11 +258,11 @@ export const trakman = {
       return GameService.state
     },
 
-    get gameConfig(): TMGame {
+    get gameConfig(): TM.Game {
       return GameService.config
     },
 
-    get serverConfig(): ServerInfo {
+    get serverConfig(): TM.ServerInfo {
       return ServerConfig.config
     }
 
@@ -353,7 +353,7 @@ export const trakman = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+  async multiCall(...calls: TM.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
     return Utils.multiCall(...calls)
   },
 
@@ -362,7 +362,7 @@ export const trakman = {
    * Calls multiple dedicated server methods simultaneously without caring for the response
    * @param calls Array of dedicated server calls
    */
-  multiCallNoRes(...calls: TMCall[]): void {
+  multiCallNoRes(...calls: TM.Call[]): void {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params

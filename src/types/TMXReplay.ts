@@ -1,4 +1,4 @@
-interface TMXReplay {
+export interface TMXReplay {
   readonly id: number
   readonly userId: number
   readonly name: string

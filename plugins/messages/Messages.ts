@@ -20,7 +20,7 @@ const events: TMListener[] = [
         if (index === -1) {
           tm.sendMessage(c.noPb, player.login)
         } else {
-          const rec: TMLocalRecord = tm.records.local[index]
+          const rec: TM.LocalRecord = tm.records.local[index]
           tm.sendMessage(tm.utils.strVar(c.pb, {
             time: tm.utils.getTimeString(rec.time),
             rank: tm.utils.getPositionString(index + 1)
@@ -54,7 +54,7 @@ const events: TMListener[] = [
       if (index === -1) {
         tm.sendMessage(c.noPb, player.login)
       } else {
-        const rec: TMLocalRecord = tm.records.local[index]
+        const rec: TM.LocalRecord = tm.records.local[index]
         tm.sendMessage(tm.utils.strVar(c.pb, {
           time: tm.utils.getTimeString(rec.time),
           rank: tm.utils.getPositionString(index + 1)

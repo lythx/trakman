@@ -91,7 +91,7 @@ export class MapRepository extends Repository {
     await this.query(voteCreateQuery)
   }
 
-  async add(...maps: TMMap[]): Promise<void> {
+  async add(...maps: TM.Map[]): Promise<void> {
     if (maps.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
@@ -107,7 +107,7 @@ export class MapRepository extends Repository {
     await this.query(query, ...values)
   }
 
-  async getAll(): Promise<TMMap[]> {
+  async getAll(): Promise<TM.Map[]> {
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
     count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
@@ -118,9 +118,9 @@ export class MapRepository extends Repository {
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
-  async get(mapId: string): Promise<TMMap | undefined>
-  async get(mapIds: string[]): Promise<TMMap[]>
-  async get(mapIds: string | string[]): Promise<TMMap | TMMap[] | undefined> {
+  async get(mapId: string): Promise<TM.Map | undefined>
+  async get(mapIds: string[]): Promise<TM.Map[]>
+  async get(mapIds: string | string[]): Promise<TM.Map | TM.Map[] | undefined> {
     let isArr = true
     if (typeof mapIds === 'string') {
       isArr = false
@@ -142,9 +142,9 @@ export class MapRepository extends Repository {
     return res.map(a => this.constructMapObject(a))
   }
 
-  async getByFilename(fileName: string): Promise<TMMap | undefined>
-  async getByFilename(fileNames: string[]): Promise<TMMap[]>
-  async getByFilename(fileNames: string | string[]): Promise<TMMap | TMMap[] | undefined> {
+  async getByFilename(fileName: string): Promise<TM.Map | undefined>
+  async getByFilename(fileNames: string[]): Promise<TM.Map[]>
+  async getByFilename(fileNames: string | string[]): Promise<TM.Map | TM.Map[] | undefined> {
     let isArr = true
     if (typeof fileNames === 'string') {
       isArr = false
@@ -208,7 +208,7 @@ export class MapRepository extends Repository {
     await this.query(query, awards, lbRating, id)
   }
 
-  private constructMapObject(entry: TableEntry): TMMap {
+  private constructMapObject(entry: TableEntry): TM.Map {
     return {
       id: entry.uid,
       name: entry.name,

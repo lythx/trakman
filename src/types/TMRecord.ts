@@ -1,4 +1,4 @@
-interface TMRecord {
+export interface TMRecord {
   readonly map: string
   readonly login: string
   readonly time: number

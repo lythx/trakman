@@ -1,4 +1,4 @@
-interface TMMap {
+export interface TMMap {
   readonly id: string
   readonly name: string
   readonly fileName: string
@@ -16,8 +16,8 @@ interface TMMap {
   isClassic: boolean
   voteCount: number
   voteRatio: number
-  lapsAmount?: number
-  checkpointsAmount?: number
-  leaderboardRating?: number
-  awards?: number
+  lapsAmount ?: number
+  checkpointsAmount ?: number
+  leaderboardRating ?: number
+  awards ?: number
 }

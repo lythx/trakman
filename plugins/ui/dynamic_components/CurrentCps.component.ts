@@ -65,7 +65,7 @@ export default class CurrentCps extends PopupWindow {
     tm.commands.add({
       aliases: ['ccp', 'currentcps'],
       help: 'Display each online players current cp.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     },)
   }

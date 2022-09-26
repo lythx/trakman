@@ -1,4 +1,4 @@
-interface TMPlayer {
+export interface TMPlayer {
   readonly id: number
   readonly login: string
   readonly nickname: string
@@ -7,7 +7,7 @@ interface TMPlayer {
   readonly region: string
   readonly timePlayed: number
   readonly joinTimestamp: number
-  readonly currentCheckpoints: TMCheckpoint[]
+  readonly currentCheckpoints: TM.Checkpoint[]
   readonly visits: number
   readonly ip: string
   readonly isUnited: boolean
