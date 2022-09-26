@@ -9,7 +9,7 @@ export class DedimaniaRequest {
     'Host: dedimania.net\r\n' +
     'User-Agent: XMLaccess\r\n' +
     'Cache-Control: no-cache\r\n' +
-    'Accept-Encoding: text\n' +
+    'Accept-Encoding: gzip\n' +
     'Content-Encoding: gzip\r\n' +
     'Content-type: text/xml; charset=UTF-8\r\n'
   )
