@@ -89,7 +89,7 @@ export class VoteSkip extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map passed.`)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(result.caller)} `
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
           + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has passed the vote to skip the ongoing map.`)
       }
     } else {
@@ -98,7 +98,7 @@ export class VoteSkip extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to skip the ongoing map was cancelled.`)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(result.caller)} `
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
           + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to skip the ongoing map.`)
       }
     }

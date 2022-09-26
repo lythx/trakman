@@ -15,4 +15,5 @@ interface ManialinkClickInfo {
   readonly ip: string
   readonly region: string
   readonly isUnited: boolean
+  readonly title: string
 }

@@ -9,7 +9,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
     callback: async (info: TMMessageInfo, id: number, tmxSite?: string): Promise<void> => {
       const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
-      const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite)
+      const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
       let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
       if (file instanceof Error) {
         const remainingSites = tmxSites.filter(a => a !== tmxSite)
@@ -57,7 +57,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.add.added, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.add.public ? undefined : info.login)
@@ -75,7 +75,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.addlocal.added, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.add.public ? undefined : info.login)
@@ -130,7 +130,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
       }), config.addfromurl.public ? undefined : info.login)

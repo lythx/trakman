@@ -26,7 +26,7 @@ export default class Banlist extends PopupWindow<number> {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
         } else if (status === true) {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname, true),
             name: tm.utils.strip(target.nickname ?? target.login, true)
           }))

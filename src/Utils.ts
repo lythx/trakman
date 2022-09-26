@@ -220,24 +220,10 @@ export const Utils = {
   },
 
   /**
- * Determines the player title on join/actions
- * @param player Object of the player to get the title for
- * @returns The title string
- */
-  getTitle(player: { login: string, privilege: number, country: string }): string {
-    // Apparently this is a thing
-    const specialTitle: string | undefined = specialTitles[player?.login as keyof typeof specialTitles]
-    if (specialTitle !== undefined) {
-      return specialTitle
-    }
-    return titles[player.privilege]
-  },
-
-  /**
- * Converts milliseconds to humanly readable time
- * @param ms Time to convert (in milliseconds)
- * @returns Humanly readable time string
- */
+   * Converts milliseconds to humanly readable time
+   * @param ms Time to convert (in milliseconds)
+   * @returns Humanly readable time string
+   */
   msToTime(ms: number): string {
     const d: Date = new Date(ms)
     let str: string = ''

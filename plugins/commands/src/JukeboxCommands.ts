@@ -11,7 +11,7 @@ const commands: TMCommand[] = [{
       tm.sendMessage(config.dropjukebox.error, info.login)
       return
     }
-    tm.sendMessage(tm.utils.strVar(config.dropjukebox.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(map.name) }), config.dropjukebox.public ? undefined : info.login)
+    tm.sendMessage(tm.utils.strVar(config.dropjukebox.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(map.name) }), config.dropjukebox.public ? undefined : info.login)
     tm.jukebox.remove(map.id, info)
   },
   privilege: config.dropjukebox.privilege
@@ -24,7 +24,7 @@ const commands: TMCommand[] = [{
       tm.sendMessage(config.clearjukebox.error, info.login)
       return
     }
-    tm.sendMessage(tm.utils.strVar(config.clearjukebox.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.clearjukebox.public ? undefined : info.login)
+    tm.sendMessage(tm.utils.strVar(config.clearjukebox.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.clearjukebox.public ? undefined : info.login)
     for (const map of tm.jukebox.juked) {
       tm.jukebox.remove(map.map.id, info)
     }
@@ -35,7 +35,7 @@ const commands: TMCommand[] = [{
   aliases: ['shuf', 'shuffle'],
   help: 'Shuffle the map queue.',
   callback: async (info: TMMessageInfo): Promise<void> => {
-    tm.sendMessage(tm.utils.strVar(config.shuffle.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.shuffle.public ? undefined : info.login)
+    tm.sendMessage(tm.utils.strVar(config.shuffle.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.shuffle.public ? undefined : info.login)
     tm.jukebox.shuffle(info)
   },
   privilege: config.shuffle.privilege
