@@ -13,7 +13,7 @@ export default {
     equal: "FF0F"
   },
   navbar: [
-    { name: 'Local Sectors', actionId: ids.localSectors },
+    { name: 'Local Checkpoints', actionId: ids.localCps },
     { name: 'Dedi Sectors', actionId: ids.dediSectors },
     { name: 'Dedi Checkpoints', actionId: ids.dediCps },
     { name: 'Live Sectors', actionId: ids.liveSectors },

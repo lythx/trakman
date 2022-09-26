@@ -93,11 +93,11 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { array: getPlayersArray() }
     ])
   if (rawDedis instanceof Error) {
-    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), reveived error:`, rawDedis.message)
+    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`, rawDedis.message)
     return
   }
   else if (rawDedis?.[0]?.Records === undefined) {
-    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), received empty response`)
+    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received empty response`)
     return
   }
   currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>

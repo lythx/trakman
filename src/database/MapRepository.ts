@@ -184,9 +184,9 @@ export class MapRepository extends Repository {
     }
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
-      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) + 3) / 6) * 100, count: res[0].count }
+      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count }
     }
-    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) + 3) / 6) * 100, count: a.count }))
+    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
   async remove(...mapIds: string[]): Promise<void> {
@@ -228,7 +228,7 @@ export class MapRepository extends Repository {
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,
-      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100,
+      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) - 1) / 6) * 100,
       isClassic: entry.leaderboard_rating === 0,
       isNadeo: entry.leaderboard_rating === 50000
     }
