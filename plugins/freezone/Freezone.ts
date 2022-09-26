@@ -7,7 +7,7 @@ let isConnected = false
 const sendLive = async (): Promise<true | Error> => {
   // Request URL
   const url: string = config.manialiveUrl
-  const cfg: ServerInfo = tm.state.serverConfig
+  const cfg: TM.ServerInfo = tm.state.serverConfig
   // Data object in any because TS coping language
   const data = {
     serverLogin: cfg.login,

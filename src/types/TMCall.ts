@@ -1,5 +1,5 @@
-interface TMCall {
+export interface TMCall {
   readonly method: string
-  readonly params?: CallParams[]
-  readonly expectsResponse?: boolean
+  readonly params ?: TM.CallParams[]
+  readonly expectsResponse ?: boolean
 }

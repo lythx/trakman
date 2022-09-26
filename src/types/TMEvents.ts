@@ -1,6 +1,8 @@
-interface TMEvents {
+import { MessageInfo } from "./TMMessageInfo"
+
+export interface TMEvents {
   "Startup": 'result' | 'race'
-  "PlayerChat": TMMessageInfo
+  "PlayerChat": MessageInfo
   "PlayerJoin": JoinInfo
   "PlayerLeave": LeaveInfo
   "LocalRecord": RecordInfo
@@ -12,23 +14,23 @@ interface TMEvents {
   "BeginMap": BeginMapInfo
   "EndMap": EndMapInfo
   "KarmaVote": KarmaVoteInfo
-  "VotesPrefetch": Readonly<TMVote>[]
+  "VotesPrefetch": Readonly<TM.Vote>[]
   "MapAdded": MapAddedInfo
   "MapRemoved": MapRemovedInfo
   "BillUpdated": BillUpdatedInfo
-  "MatchSettingsUpdated": TMMap[]
+  "MatchSettingsUpdated": TM.Map[]
   "PrivilegeChanged": PrivilegeChangedInfo
-  "LocalRecordsRemoved": TMRecord[]
-  "JukeboxChanged": TMMap[]
+  "LocalRecordsRemoved": TM.Record[]
+  "JukeboxChanged": TM.Map[]
   "RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
-  "Ban": Readonly<TMBanlistEntry>
-  "Unban": Readonly<TMBanlistEntry>
-  "Blacklist": Readonly<TMBlacklistEntry>
-  "Unblacklist": Readonly<TMBlacklistEntry>
-  "Mute": Readonly<TMMutelistEntry>
-  "Unmute": Readonly<TMMutelistEntry>
-  "AddGuest": Readonly<TMGuestlistEntry>
-  "RemoveGuest": Readonly<TMGuestlistEntry>
+  "Ban": Readonly<TM.BanlistEntry>
+  "Unban": Readonly<TM.BanlistEntry>
+  "Blacklist": Readonly<TM.BlacklistEntry>
+  "Unblacklist": Readonly<TM.BlacklistEntry>
+  "Mute": Readonly<TM.MutelistEntry>
+  "Unmute": Readonly<TM.MutelistEntry>
+  "AddGuest": Readonly<TM.GuestlistEntry>
+  "RemoveGuest": Readonly<TM.GuestlistEntry>
   "TrackMania.PlayerConnect": [string, boolean]
   "TrackMania.PlayerDisconnect": [string]
   "TrackMania.PlayerChat": [number, string, string, boolean]

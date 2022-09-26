@@ -45,8 +45,8 @@ export default class MapWidget extends StaticComponent {
   private updateXML(): void {
     const map = tm.maps.current
     const author: string = webservices.currentAuthor?.nickname ?? map.author
-    const tmxMap = tmx.current
-    const date: Date | undefined = tmxMap?.lastUpdateDate
+    const TMXMap = tmx.current
+    const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
     let authorIcon = ic.author
     if (webservices.currentAuthor?.country !== undefined) {
@@ -54,7 +54,7 @@ export default class MapWidget extends StaticComponent {
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
-      [tm.utils.safeString(map.name), this.getTag(map, tmxMap ?? undefined)],
+      [tm.utils.safeString(map.name), this.getTag(map, TMXMap ?? undefined)],
       [tm.utils.safeString(author), authorIcon],
       [tm.utils.getTimeString(map.authorTime), ic.authorTime],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]
@@ -101,11 +101,11 @@ export default class MapWidget extends StaticComponent {
       </manialink>`
   }
 
-  private getTag(map: TMMap, tmxMap?: TMXMapInfo): string {
+  private getTag(map: TM.Map, TMXMap?: TM.TMXMap): string {
     for (const e of config.customTags) {
-      if (e?.authors?.some(a => a === map.author || a === tmxMap?.author) ||
+      if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) ||
         e?.names?.some(a => a.test(map.name) || a.test(tm.utils.strip(map.name)) ||
-          (tmxMap !== undefined ? (a.test(tmxMap.name) || a.test(tm.utils.strip(tmxMap.name))) : false))) {
+          (TMXMap !== undefined ? (a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name))) : false))) {
         return e.icon
       }
     }

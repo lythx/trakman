@@ -1,4 +1,4 @@
-interface TMBlacklistEntry {
+export interface TMBlacklistEntry {
   readonly login: string
   readonly nickname: string | undefined
   date: Date

@@ -1,6 +1,6 @@
-type EndMapInfo = Readonly<TMCurrentMap> & {
-    readonly localRecords: Readonly<TMLocalRecord[]>
-    readonly liveRecords: Readonly<FinishInfo[]>
+type EndMapInfo = Readonly<TM.CurrentMap> & {
+    readonly localRecords: Readonly<Readonly<TM.LocalRecord>[]>
+    readonly liveRecords: Readonly<Readonly<FinishInfo>[]>
     readonly isRestarted: boolean
     readonly wasWarmUp: boolean
     readonly continuesOnNextMap: boolean

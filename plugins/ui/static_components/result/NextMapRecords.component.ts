@@ -9,7 +9,7 @@ export default class NextMapRecords extends StaticComponent {
   private readonly posY: number
   private readonly side: boolean
   private readonly header: StaticHeader
-  private records: TMRecord[] = []
+  private records: TM.Record[] = []
   private readonly list: RecordList
 
   constructor() {

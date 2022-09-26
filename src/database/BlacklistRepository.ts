@@ -32,7 +32,7 @@ export class BlacklistRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(): Promise<TMBlacklistEntry[]> {
+  async get(): Promise<TM.BlacklistEntry[]> {
     const query: string = `SELECT blacklist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM blacklist
     JOIN players AS caller ON caller.id=blacklist.caller_id
@@ -58,7 +58,7 @@ export class BlacklistRepository extends Repository {
     await this.query(query, login)
   }
 
-  private constructBlacklistObject(entry: TableEntry): TMBlacklistEntry {
+  private constructBlacklistObject(entry: TableEntry): TM.BlacklistEntry {
     return {
       login: entry.login,
       nickname: entry.nickname ?? undefined,

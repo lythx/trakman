@@ -33,7 +33,7 @@ export default class TMXWindow extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['tmxinfo'],
       help: 'Display TMX info.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
   }
@@ -53,23 +53,23 @@ export default class TMXWindow extends PopupWindow<number> {
 
   protected async constructContent(login: string, page: number): Promise<string> {
     const historyCount = Math.min(config.historyCount, tm.jukebox.historyCount)
-    let maps: (TMMap | undefined)[]
-    let tmxMaps: (TMXMapInfo | null | undefined)[]
+    let maps: (TM.Map | undefined)[]
+    let TMXMaps: (TM.TMXMap | null | undefined)[]
     let titles: string[]
     const currentPage = Math.ceil((historyCount - 1) / config.itemsPerPage) + 1
     if (currentPage === page) {
       maps = [tm.jukebox?.history[0], tm.maps.current, tm.jukebox?.queue[0]]
-      tmxMaps = [tmx.history[0], tmx.current, tmx.queue[0]]
+      TMXMaps = [tmx.history[0], tmx.current, tmx.queue[0]]
       titles = [`${config.titles.previous} #1`, config.titles.current, `${config.titles.next} #1`]
     } else if (currentPage > page) {
       const index = Math.ceil((currentPage - (page + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.history[index + 2], tm.jukebox.history?.[index + 1], tm.jukebox.history?.[index]]
-      tmxMaps = [tmx.history[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
+      TMXMaps = [tmx.history[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
       titles = [`${config.titles.previous} #${index + 3}`, `${config.titles.previous} #${index + 2}`, `${config.titles.previous} #${index + 1}`]
     } else {
       const index = Math.ceil((page - (currentPage + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.queue[index], tm.jukebox.queue?.[index + 1], tm.jukebox.queue?.[index + 2]]
-      tmxMaps = [tmx.queue[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
+      TMXMaps = [tmx.queue[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
       titles = [`${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`, `${config.titles.next} #${index + 3}`]
     }
     const allRecords = await tm.records.fetchByMap(...maps.filter(a => a !== undefined).map(a => (a as any).id))
@@ -78,16 +78,16 @@ export default class TMXWindow extends PopupWindow<number> {
       if (map === undefined) { return '' }
       const grid = new Grid(w, h, [1], config.gridRows,
         { background: config.info.background, margin: config.margin })
-      const tmxMap = tmxMaps[j] ?? undefined
+      const TMXMap = TMXMaps[j] ?? undefined
       const mapRecords = allRecords.filter(a => a.map === map.id)
-      const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, tmxMap)
-      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, tmxMap)
+      const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, TMXMap)
+      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords,TMXMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructEntry(tm.utils.safeString(tm.utils.strip(map.name, false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) =>
-        this.constructInfoXml(ww, hh, map, tmxMap)
-      const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, tmxMap?.replays)
+        this.constructInfoXml(ww, hh, map, TMXMap)
+      const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, TMXMap?.replays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
     }
     return `<format textsize="3"/>` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))
@@ -97,7 +97,7 @@ export default class TMXWindow extends PopupWindow<number> {
     return this.paginator.constructXml(page) + closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 
-  private constructHeader(width: number, height: number, title: string, map: TMMap, tmxMap?: TMXMapInfo): string {
+  private constructHeader(width: number, height: number, title: string, map: TM.Map, TMXMap?: TM.TMXMap): string {
     const icon = (x: number, y: number, image: string, url: string): string => {
       return `<quad posn="${x + config.margin} ${-(y + config.margin)} 3" 
        sizen="${config.iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}" url="${url}"/>
@@ -105,7 +105,7 @@ export default class TMXWindow extends PopupWindow<number> {
        sizen="${config.iconWidth - config.margin * 2} ${height - config.margin * 4}" 
        image="${image}" url="${url}"/>`
     }
-    if (tmxMap === undefined) {
+    if (TMXMap === undefined) {
       return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin), height, config.iconWidth)}
         <frame posn="${width - (config.iconWidth + config.margin * 2)} 0 4">
           ${icon(0, 0, config.icons.dedimania, tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
@@ -113,8 +113,8 @@ export default class TMXWindow extends PopupWindow<number> {
     }
     return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin) * 3, height, config.iconWidth)}
     <frame posn="${width - ((config.iconWidth + config.margin) * 3 + config.margin)} 0 4">
-      ${icon(0, 0, config.icons.maniaExchange, tmxMap.pageUrl.replace(/^https:\/\//, ''))}
-      ${icon(config.iconWidth + config.margin, 0, config.icons.downloadGreen, tmxMap.downloadUrl.replace(/^https:\/\//, ''))}
+      ${icon(0, 0, config.icons.maniaExchange, TMXMap.pageUrl.replace(/^https:\/\//, ''))}
+      ${icon(config.iconWidth + config.margin, 0, config.icons.downloadGreen, TMXMap.downloadUrl.replace(/^https:\/\//, ''))}
       ${icon((config.iconWidth + config.margin) * 2, 0, config.icons.dedimania, tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
     </frame>`
   }
@@ -129,7 +129,7 @@ export default class TMXWindow extends PopupWindow<number> {
       </frame>`
   }
 
-  protected constructScreenshot(login: string, width: number, height: number, records: TMRecord[], tmxMap?: TMXMapInfo) {
+  protected constructScreenshot(login: string, width: number, height: number, records: TM.Record[], TMXMap?: TM.TMXMap) {
     const rightW = width - (config.screenshotWidth + config.margin)
     const count = config.localsCount
     const grid = new Grid(rightW, height, [1, 2, 3], new Array(count + 1).fill(1),
@@ -167,9 +167,9 @@ export default class TMXWindow extends PopupWindow<number> {
     for (let i = 0; i < count; i++) {
       arr.push(indexCell, timeCell, nameCell)
     }
-    const image = tmxMap === undefined
+    const image = TMXMap === undefined
       ? config.noScreenshot
-      : tm.utils.safeString(tmxMap.thumbnailUrl + `&.jpeg`)
+      : tm.utils.safeString(TMXMap.thumbnailUrl + `&.jpeg`)
     return `<quad posn="${config.margin} ${-config.margin} 8" sizen="${config.screenshotWidth} ${height - config.margin * 2}" image="${image}"/>
       ${centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: config.notLoadedTextscale, yOffset: -1 })}
       <frame posn="${config.margin + config.screenshotWidth} 0">
@@ -177,20 +177,20 @@ export default class TMXWindow extends PopupWindow<number> {
       </frame>`
   }
 
-  protected constructAuthor(width: number, height: number, map: TMMap): string {
+  protected constructAuthor(width: number, height: number, map: TM.Map): string {
     return `${this.constructEntry(tm.utils.safeString(map.author), config.icons.author, width - config.authorTimeWidth, height, config.iconWidth)}
     <frame posn="${width - (config.authorTimeWidth + config.margin)} 0 4">
       ${this.constructEntry(tm.utils.getTimeString(map.authorTime), config.icons.authorTime, config.authorTimeWidth + config.margin, height, config.iconWidth, true)}
     </frame>`
   }
 
-  private constructInfoXml(width: number, height: number, map: TMMap, tmxMap?: TMXMapInfo): string {
+  private constructInfoXml(width: number, height: number, map: TM.Map,TMXMap?: TM.TMXMap): string {
     const grid = new Grid(width, height, config.info.columnsProportions, new Array(config.info.rows).fill(1),
       { margin: config.margin })
     const ic = config.icons
     let lbIcon = ic.leaderboardRating.normal
-    let lbRating = (tmxMap?.leaderboardRating?.toString() ?? map?.leaderboardRating?.toString()) ?? config.defaultText
-    if (tmxMap?.isNadeo ?? map?.leaderboardRating === 50000) {
+    let lbRating = (TMXMap?.leaderboardRating?.toString() ?? map?.leaderboardRating?.toString()) ?? config.defaultText
+    if (TMXMap?.isNadeo ?? map?.leaderboardRating === 50000) {
       lbRating = 'Nadeo'
       lbIcon = ic.leaderboardRating.nadeo
     }
@@ -209,15 +209,15 @@ export default class TMXWindow extends PopupWindow<number> {
       [map.environment, ic.environment],
       [map?.checkpointsAmount !== undefined ? `${map.checkpointsAmount} CPs` : config.defaultText, ic.checkpointsAmount],
       [map.voteCount.toString(), ic.voteCount],
-      [(tmxMap?.awards?.toString() ?? map?.awards?.toString()) ?? config.defaultText, awardsIcon],
-      [tmxMap?.author ?? config.defaultText, ic.tmxAuthor],
-      [tmxMap !== undefined ? tm.utils.formatDate(tmxMap.lastUpdateDate, true) : config.defaultText, ic.buildDate],
-      [tmxMap?.style ?? config.defaultText, ic.style],
+      [(TMXMap?.awards?.toString() ?? map?.awards?.toString()) ?? config.defaultText, awardsIcon],
+      [TMXMap?.author ?? config.defaultText, ic.tmxAuthor],
+      [TMXMap !== undefined ? tm.utils.formatDate(TMXMap.lastUpdateDate, true) : config.defaultText, ic.buildDate],
+      [TMXMap?.style ?? config.defaultText, ic.style],
       [lbRating, lbIcon],
-      [tmxMap?.difficulty ?? config.defaultText, ic.difficulty[(tmxMap?.difficulty?.toLowerCase() as keyof typeof ic.difficulty) ?? 'beginner']],
-      [tmxMap?.routes ?? config.defaultText, ic.routes],
-      [tmxMap?.type ?? config.defaultText, ic.type],
-      [tmxMap?.game ?? config.defaultText, ic.game]
+      [TMXMap?.difficulty ?? config.defaultText, ic.difficulty[(TMXMap?.difficulty?.toLowerCase() as keyof typeof ic.difficulty) ?? 'beginner']],
+      [TMXMap?.routes ?? config.defaultText, ic.routes],
+      [TMXMap?.type ?? config.defaultText, ic.type],
+      [TMXMap?.game ?? config.defaultText, ic.game]
     ]
     const cell: GridCellFunction = (i, j, w, h) => {
       const index = (i * grid.columns) + j
@@ -232,7 +232,7 @@ export default class TMXWindow extends PopupWindow<number> {
     return grid.constructXml(new Array(config.info.columnsProportions.length * config.info.rows).fill(null).map(() => cell))
   }
 
-  private counstructTmxRecordsXml(width: number, height: number, replays: TMXReplay[] = []): string {
+  private counstructTmxRecordsXml(width: number, height: number, replays: TM.TMXReplay[] = []): string {
     const grid = new Grid(width, height, config.tmxColumns, new Array(config.tmxRecordCount + 1).fill(1),
       { margin: config.margin, background: config.gridBackground, headerBackground: config.iconBackground })
     const options = { textScale: config.recordTextScale }

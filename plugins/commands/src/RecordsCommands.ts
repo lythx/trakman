@@ -1,13 +1,13 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/RecordsCommands.config.js'
 
-const commands: TMCommand[] = [{
+const commands: TM.Command[] = [{
   aliases: ['dr', 'delrec', 'deleterecord'],
   help: 'Remove a player\'s record on the ongoing map.',
   params: [{ name: 'login' }],
-  callback: (info: TMMessageInfo, login: string): void => {
+  callback: (info: TM.MessageInfo, login: string): void => {
     // Can also be done with tm.getPlayerRecord, however we need the player nickname
-    const playerRecord: TMLocalRecord | undefined = tm.records.getLocal(login)
+    const playerRecord: TM.LocalRecord | undefined = tm.records.getLocal(login)
     if (playerRecord === undefined) {
       tm.sendMessage(tm.utils.strVar(config.delrec.error, { login: login }), info.login)
       return
@@ -20,7 +20,7 @@ const commands: TMCommand[] = [{
 {
   aliases: ['pr', 'prunerecs', 'prunerecords'],
   help: 'Remove all records on the ongoing map.',
-  callback: (info: TMMessageInfo): void => {
+  callback: (info: TM.MessageInfo): void => {
     tm.sendMessage(tm.utils.strVar(config.prunerecs.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.prunerecs.public ? undefined : info.login)
     tm.records.removeAll(tm.maps.current.id, info)
   },

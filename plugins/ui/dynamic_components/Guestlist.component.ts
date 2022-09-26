@@ -44,7 +44,7 @@ export default class Guestlist extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['guestl', 'guestlist'],
       help: 'Display guestlist.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
   }

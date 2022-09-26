@@ -68,7 +68,7 @@ export const Utils = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+  async multiCall(...calls: TM.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -271,13 +271,13 @@ export const Utils = {
   } = {
       similarityGoal: config.nicknameToLoginSimilarityGoal,
       minimumDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
-    }): TMPlayer | undefined {
+    }): TM.Player | undefined {
     const players = PlayerService.players
-    const strippedNicknames: { strippedNickname: string, player: TMPlayer }[] = []
+    const strippedNicknames: { strippedNickname: string, player: TM.Player }[] = []
     for (const e of players) {
       strippedNicknames.push({ strippedNickname: this.stripSpecialChars(Utils.strip(e.nickname).toLowerCase()), player: e })
     }
-    const matches: { player: TMPlayer, value: number }[] = []
+    const matches: { player: TM.Player, value: number }[] = []
     for (const e of strippedNicknames) {
       const value = dsc.twoStrings(e.strippedNickname, nickname.toLowerCase())
       if (value > options.similarityGoal) {

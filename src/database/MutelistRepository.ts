@@ -32,7 +32,7 @@ export class MutelistRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(): Promise<TMMutelistEntry[]> {
+  async get(): Promise<TM.MutelistEntry[]> {
     const query: string = `SELECT mutelist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM mutelist
     JOIN players AS caller ON caller.id=mutelist.caller_id
@@ -58,7 +58,7 @@ export class MutelistRepository extends Repository {
     await this.query(query, login)
   }
 
-  private constructMutelistObject(entry: TableEntry): TMMutelistEntry {
+  private constructMutelistObject(entry: TableEntry): TM.MutelistEntry {
     return {
       login: entry.login,
       nickname: entry.nickname ?? undefined,

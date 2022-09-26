@@ -1,4 +1,4 @@
-interface TMXMapInfo {
+export interface TMXMapInfo {
   readonly id: string
   readonly TMXId: number
   readonly name: string
@@ -12,7 +12,7 @@ interface TMXMapInfo {
   readonly style: string
   readonly routes: string
   readonly length: string
-  readonly difficulty:'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+  readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
   readonly leaderboardRating: number
   readonly game: string
   readonly comment: string
@@ -24,5 +24,5 @@ interface TMXMapInfo {
   readonly downloadUrl: string
   readonly isClassic: boolean
   readonly isNadeo: boolean
-  readonly replays: TMXReplay[]
+  readonly replays: TM.TMXReplay[]
 }

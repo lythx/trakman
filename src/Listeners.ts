@@ -17,7 +17,7 @@ export class Listeners {
   private static readonly listeners: TMListener[] = [
     {
       event: 'TrackMania.PlayerConnect',
-      callback: async ([login, isSpectator]: TMEvents['TrackMania.PlayerConnect']): Promise<void> => {
+      callback: async ([login, isSpectator]: TM.Events['TrackMania.PlayerConnect']): Promise<void> => {
         // [0] = Login, [1] = IsSpectator
         if (login === undefined) {
           // Me on my way to kick that pesky undefined
@@ -43,7 +43,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerDisconnect',
-      callback: ([login]: TMEvents['TrackMania.PlayerDisconnect']): void => {
+      callback: ([login]: TM.Events['TrackMania.PlayerDisconnect']): void => {
         // [0] = Login
         if (AdministrationService.banlist.some(a => a.login === login)) {
           return
@@ -56,13 +56,13 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerChat',
-      callback: ([playerId, login, text]: TMEvents['TrackMania.PlayerChat']): void => {
+      callback: ([playerId, login, text]: TM.Events['TrackMania.PlayerChat']): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCommand
         // Ignore server messages (PID 0 = Server)
         if (playerId === 0) {
           return
         }
-        const messageInfo: TMMessageInfo | Error = ChatService.add(login, text)
+        const messageInfo: TM.MessageInfo | Error = ChatService.add(login, text)
         if (!(messageInfo instanceof Error)) {
           Events.emit('PlayerChat', messageInfo)
         }
@@ -71,18 +71,18 @@ export class Listeners {
     {
       event: 'TrackMania.PlayerCheckpoint',
       callback: async ([playerId, login, timeOrScore, currentLap, checkpointIndex]:
-        TMEvents['TrackMania.PlayerCheckpoint']): Promise<void> => {
+        TM.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
         if (playerId === 0) {
           return
         }
-        const player: TMPlayer | undefined = PlayerService.get(login)
+        const player: TM.Player | undefined = PlayerService.get(login)
         if (player === undefined) {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
           return
         }
-        const checkpoint: TMCheckpoint = { index: checkpointIndex, time: timeOrScore, lap: currentLap }
+        const checkpoint: TM.Checkpoint = { index: checkpointIndex, time: timeOrScore, lap: currentLap }
         const cpStatus: boolean | Error = PlayerService.addCP(player, checkpoint)
         // Last CP = Finish
         if (cpStatus === true) {
@@ -115,7 +115,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params: TMEvents['TrackMania.PlayerFinish']): Promise<void> => {
+      callback: async (params: TM.Events['TrackMania.PlayerFinish']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
         // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
         //   return
@@ -138,13 +138,13 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BeginRace',
-      callback: (params: TMEvents['TrackMania.BeginRace']): void => {
+      callback: (params: TM.Events['TrackMania.BeginRace']): void => {
         // [0] = Challenge
       }
     },
     {
       event: 'TrackMania.EndRace',
-      callback: (params: TMEvents['TrackMania.EndRace']): void => {
+      callback: (params: TM.Events['TrackMania.EndRace']): void => {
         // [0] = Rankings[arr], [1] = Challenge
       }
     },
@@ -162,7 +162,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BeginChallenge',
-      callback: async ([map]: TMEvents['TrackMania.BeginChallenge']): Promise<void> => {
+      callback: async ([map]: TM.Events['TrackMania.BeginChallenge']): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         // Set game state to 'race'
         GameService.state = 'race'
@@ -170,24 +170,6 @@ export class Listeners {
         await GameService.update()
         // Get records for current map
         await RecordService.fetchAndStoreRecords(map.UId)
-        const info: BeginMapInfo = {
-          id: map.UId,
-          name: map.Name,
-          fileName: map.FileName,
-          author: map.Author,
-          environment: map.Environnement,
-          mood: map.Mood,
-          bronzeTime: map.BronzeTime,
-          silverTime: map.SilverTime,
-          goldTime: map.GoldTime,
-          authorTime: map.AuthorTime,
-          copperPrice: map.CopperPrice,
-          lapRace: map.LapRace,
-          lapsAmount: map.NbLaps,
-          checkpointsAmount: map.NbCheckpoints,
-          records: RecordService.localRecords,
-          isRestart
-        }
         // Check whether the map was restarted
         if (isRestart == false) {
           // In case it wasn't, update the ongoing map
@@ -197,13 +179,13 @@ export class Listeners {
         // Update server config
         ServerConfig.update()
         // Register map update
-        Events.emit('BeginMap', info)
+        Events.emit('BeginMap', { ...MapService.current, isRestart })
       }
     },
     {
       event: 'TrackMania.EndChallenge',
       callback: async ([winner, map, wasWarmUp, continuesOnNextMap, isRestart]:
-        TMEvents['TrackMania.EndChallenge']): Promise<void> => {
+        TM.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         // Set game state to 'result'
@@ -232,7 +214,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.StatusChanged',
-      callback: (params: TMEvents['TrackMania.StatusChanged']): void => {
+      callback: (params: TM.Events['TrackMania.StatusChanged']): void => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
         if (params[0] === 4 || params[0] === 5) {
@@ -246,7 +228,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerManialinkPageAnswer',
-      callback: ([playerId, login, answer]: TMEvents['TrackMania.PlayerManialinkPageAnswer']): void => {
+      callback: ([playerId, login, answer]: TM.Events['TrackMania.PlayerManialinkPageAnswer']): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
@@ -257,7 +239,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.BillUpdated',
-      callback: ([id, state, stateName, transactionId]: TMEvents['TrackMania.BillUpdated']): void => {
+      callback: ([id, state, stateName, transactionId]: TM.Events['TrackMania.BillUpdated']): void => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
         const bill: BillUpdatedInfo = { id, state, stateName, transactionId }
         Events.emit('BillUpdated', bill)
@@ -272,7 +254,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
-      callback: ([playerInfo]: TMEvents['TrackMania.PlayerInfoChanged']): void => {
+      callback: ([playerInfo]: TM.Events['TrackMania.PlayerInfoChanged']): void => {
         // [0] = PlayerInfo
         const spec: any = playerInfo.SpectatorStatus.toString()
         const flags: any = playerInfo.Flags.toString()

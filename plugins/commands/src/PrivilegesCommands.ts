@@ -1,15 +1,15 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/PrivilegesCommands.config.js'
 
-const commands: TMCommand[] = [
+const commands: TM.Command[] = [
   {
     aliases: ['mad', 'masteradmin'],
     help: 'Change player privilege to Masteradmin.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         tm.sendMessage(config.noPrivilege, callerLogin)
@@ -34,10 +34,10 @@ const commands: TMCommand[] = [
     aliases: ['ad', 'admin'],
     help: 'Change player privilege to Admin.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         tm.sendMessage(config.noPrivilege, callerLogin)
@@ -69,10 +69,10 @@ const commands: TMCommand[] = [
     aliases: ['op', 'operator'],
     help: 'Change player privilege to Operator.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         tm.sendMessage(config.noPrivilege, callerLogin)
@@ -104,10 +104,10 @@ const commands: TMCommand[] = [
     aliases: ['rp', 'user'],
     help: 'Remove player priveleges.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
       const callerLogin: string = info.login
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
       const prevPrivilege: number = targetInfo?.privilege ?? 0
       if (prevPrivilege >= info.privilege) {
         tm.sendMessage(config.noPrivilege, callerLogin)
