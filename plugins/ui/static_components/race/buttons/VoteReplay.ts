@@ -93,7 +93,7 @@ export class VoteReplay extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map passed.`)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(result.caller)} `
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
           + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has passed the vote to replay the ongoing map.`)
         tm.jukebox.add(tm.maps.current.id, undefined, true)
       }
@@ -103,7 +103,7 @@ export class VoteReplay extends UiButton {
       if (result.caller === undefined) {
         tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map was cancelled.`)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(result.caller)} `
+        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
           + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to replay the ongoing map.`)
       }
     }

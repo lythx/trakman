@@ -7,6 +7,7 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
+import { titles } from '../../config/Titles.js'
 
 /**
  * This service manages online players on the server and players table in the database
@@ -61,6 +62,22 @@ export class PlayerService {
   }
 
   /**
+   * Gets player title based on config
+   * @param login Player login
+   * @param country Player nation
+   * @param countryCode Player nation code
+   */
+  private static getPlayerTitle(login: string, privilege: number, country: string, countryCode: string): string {
+    const loginTitle = titles.logins[login as keyof typeof titles.logins]
+    if (loginTitle !== undefined) { return loginTitle }
+    const countryTitle = titles.countries[country as keyof typeof titles.countries]
+    if (countryTitle !== undefined) { return countryTitle }
+    const countryCodeTitle = titles.countries[countryCode as keyof typeof titles.countries]
+    if (countryCodeTitle !== undefined) { return countryCodeTitle }
+    return titles.privileges[privilege as keyof typeof titles.privileges]
+  }
+
+  /**
    * Adds a player into the list and database
    * @param login Player login
    * @param nickname Player nickname
@@ -107,7 +124,8 @@ export class PlayerService {
         average: RecordService.maxLocalsAmount,
         ladderPoints,
         ladderRank,
-        rank: index === -1 ? undefined : (index + 1)
+        rank: index === -1 ? undefined : (index + 1),
+        title: this.getPlayerTitle(login, privilege, country, countryCode)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -131,7 +149,8 @@ export class PlayerService {
         rank: index === -1 ? undefined : (index + 1),
         average: playerData.average,
         ladderPoints,
-        ladderRank
+        ladderRank,
+        title: this.getPlayerTitle(login, privilege, country, countryCode)
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }

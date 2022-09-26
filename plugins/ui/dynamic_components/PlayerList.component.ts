@@ -46,7 +46,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         if (target === undefined) { return }
         tm.client.callNoRes('Kick', [{ string: info.login }])
         tm.sendMessage(tm.utils.strVar(config.messages.kick, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminName: tm.utils.strip(info.nickname),
           name: tm.utils.strip(target.nickname)
         }), config.public === true ? undefined : info.login)
@@ -65,7 +65,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
               params: [{ string: target.login }, { int: 0 }]
             })
           tm.sendMessage(tm.utils.strVar(config.messages.forcePlay, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
           }), config.public === true ? undefined : info.login)
@@ -81,7 +81,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
             })
           tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: target.login }])
           tm.sendMessage(tm.utils.strVar(config.messages.forceSpec, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
           }), config.public === true ? undefined : info.login)
@@ -93,7 +93,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         if (tm.admin.getMute(target.login) === undefined) { // Mute
           await tm.admin.mute(target.login, info, target.nickname)
           tm.sendMessage(tm.utils.strVar(config.messages.mute, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
           }), config.public === true ? undefined : info.login)
@@ -103,7 +103,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
             tm.sendMessage(tm.utils.strVar(config.messages.unmuteError, { login: info.login }), info.login)
           } else {
             tm.sendMessage(tm.utils.strVar(config.messages.unmute, {
-              title: tm.utils.getTitle(info),
+              title: info.title,
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
             }), config.public === true ? undefined : info.login)
@@ -119,7 +119,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
             tm.sendMessage(tm.utils.strVar(config.messages.addGuestError, { login: info.login }), info.login)
           } else {
             tm.sendMessage(tm.utils.strVar(config.messages.addGuest, {
-              title: tm.utils.getTitle(info),
+              title: info.title,
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
             }), config.public === true ? undefined : info.login)
@@ -130,7 +130,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
             tm.sendMessage(tm.utils.strVar(config.messages.removeGuestError, { login: info.login }), info.login)
           } else {
             tm.sendMessage(tm.utils.strVar(config.messages.removeGuest, {
-              title: tm.utils.getTitle(info),
+              title: info.title,
               adminName: tm.utils.strip(info.nickname),
               name: tm.utils.strip(target.nickname)
             }), config.public === true ? undefined : info.login)
@@ -145,7 +145,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
           tm.sendMessage(tm.utils.strVar(config.messages.blacklistError, { login: info.login }), info.login)
         } else {
           tm.sendMessage(tm.utils.strVar(config.messages.blacklist, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
           }), config.public === true ? undefined : info.login)
@@ -156,7 +156,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         if (target === undefined) { return }
         await tm.admin.ban(target.ip, target.login, info)
         tm.sendMessage(tm.utils.strVar(config.messages.ban, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminName: tm.utils.strip(info.nickname),
           name: tm.utils.strip(target.nickname)
         }))

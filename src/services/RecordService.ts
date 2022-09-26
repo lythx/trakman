@@ -275,7 +275,8 @@ export class RecordService {
       isUnited: player.isUnited,
       average: player.average,
       ladderPoints: player.ladderPoints,
-      ladderRank: player.ladderRank
+      ladderRank: player.ladderRank,
+      title: player.title
     }
   }
 

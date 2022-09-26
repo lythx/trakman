@@ -152,7 +152,7 @@ if (config.isEnabled === true) {
         }[] = currentBestSecs.filter(a => a !== undefined) as any
         currentBestSecs.length = 0
         tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
-          { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+          { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
         emitEvent('DeleteBestSector', arr.map((a, i) => ({ ...a, index: i })))
         void bestSecsDB.delete(currentMapDBId)
       } else {
@@ -163,7 +163,7 @@ if (config.isEnabled === true) {
         const deleted = currentBestSecs[sectorIndex - 1]
         currentBestSecs[sectorIndex - 1] = undefined
         tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           nickname: tm.utils.strip(info.nickname, true),
           index: tm.utils.getPositionString(sectorIndex)
         }))
