@@ -16,16 +16,23 @@ CREATE TABLE IF NOT EXISTS votes(
       FOREIGN KEY(map_id)
         REFERENCES map_ids(id)
 );`
-// TODO fix vote 0 calculation
 interface TableEntry {
   readonly uid: string
   readonly login: string
-  readonly vote: -3 | -2 | -1 | 1 | 2 | 3
+  readonly vote: 1 | 2 | 3 | 4 | 5 | 6
   readonly date: Date
 }
 
 const mapIdsRepo = new MapIdsRepository()
 const playerRepo = new PlayerRepository()
+const tableVotes = {
+  1: -3,
+  2: -2,
+  3: -1,
+  4: 1,
+  5: 2,
+  6: 3
+} as const
 
 export class VoteRepository extends Repository {
 
@@ -43,7 +50,8 @@ export class VoteRepository extends Repository {
     const playerIds = await playerRepo.getId(votes.map(a => a.login))
     const values: any[] = []
     for (const [i, vote] of votes.entries()) {
-      values.push(mapIds[i].id, playerIds[i].id, vote.vote, vote.date)
+      const parsedVote = Number(Object.entries(tableVotes).find(a=> a[1] === vote.vote)?.[0])
+      values.push(mapIds[i].id, playerIds[i].id, parsedVote, vote.date)
     }
     await this.query(query, ...values)
   }
@@ -52,7 +60,8 @@ export class VoteRepository extends Repository {
     const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
-    await this.query(query, vote, date, mapId, playerId)
+    const parsedVote = Number(Object.entries(tableVotes).find(a=> a[1] === vote)?.[0])
+    await this.query(query, parsedVote, date, mapId, playerId)
   }
 
   async getOne(mapUid: string, login: string): Promise<TM.Vote | undefined> {
@@ -88,7 +97,7 @@ export class VoteRepository extends Repository {
     return {
       login: entry.login,
       mapId: entry.uid,
-      vote: entry.vote,
+      vote: tableVotes[entry.vote],
       date: entry.date
     }
   }

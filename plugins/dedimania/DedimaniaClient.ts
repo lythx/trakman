@@ -74,7 +74,7 @@ export class DedimaniaClient {
 
   setupListeners(): void {
     this.socket.on('data', async buffer => {
-      this.response.addData(buffer.toString())
+      this.response.addData(buffer)
     })
     this.socket.on('error', async err => {
       tm.log.error('Dedimania socket error:', err.message)
