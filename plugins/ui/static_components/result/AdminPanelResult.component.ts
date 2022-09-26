@@ -34,21 +34,21 @@ export default class AdminPanelResult extends StaticComponent {
     })
     addManialinkListener(this.id + this.actions.skip, async info => {
       tm.sendMessage(tm.utils.strVar(config.messages.skip, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       tm.client.callNoRes(`NextChallenge`)
     })
     addManialinkListener(this.id + this.actions.requeue, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.requeue, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       tm.jukebox.add(tm.maps.current.id, info)
     })
     addManialinkListener(this.id + this.actions.previous, async info => {
       tm.sendMessage(tm.utils.strVar(config.messages.previous, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
@@ -59,7 +59,7 @@ export default class AdminPanelResult extends StaticComponent {
     })
     addManialinkListener(this.id + this.actions.restart, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.restart, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       tm.client.callNoRes(`RestartChallenge`)
@@ -67,7 +67,7 @@ export default class AdminPanelResult extends StaticComponent {
     addManialinkListener(this.id + this.actions.endRound, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.endRound,
         {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminName: tm.utils.strip(info.nickname)
         }),
         config.public ? undefined : info.login)

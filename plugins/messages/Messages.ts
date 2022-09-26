@@ -75,7 +75,7 @@ const events: TMListener[] = [
         }), player.login)
       }
       tm.sendMessage(tm.utils.strVar(c.join, {
-        title: tm.utils.getTitle(player),
+        title: player.title,
         nickname: tm.utils.strip(player.nickname, true),
         country: player.country,
         visits: player.visits

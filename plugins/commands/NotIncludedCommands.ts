@@ -33,7 +33,7 @@
 //       tm.multiCallNoRes({
 //           method: 'ChatSendServerMessage',
 //           params: [{
-//               string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+//               string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} ` +
 //                   `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
 //                   `commands and muted ${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname, true)}${tm.utils.palette.admin}.`
 //           }]
@@ -71,7 +71,7 @@
 //           {
 //               method: 'ChatSendServerMessage',
 //               params: [{
-//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has hardforced `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin} into specmode.`
 //               }]
@@ -115,7 +115,7 @@
 //           {
 //               method: 'ChatSendServerMessage',
 //               params: [{
-//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has released `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname || info.login)}${tm.utils.palette.admin} out of specmode.`
 //               }]
@@ -156,7 +156,7 @@
 //         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to insert the map ${tm.utils.palette.highlight + tm.utils.strip(map.uid, false)}$z$s ${tm.utils.palette.error}into queue.`, info.login)
 //         continue
 //       }
-//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added and queued `
 //         + `${tm.utils.palette.highlight + tm.utils.strip(map.uid, true)}${tm.utils.palette.admin} from TMX.`)
 //     }
@@ -206,7 +206,7 @@
 //     if (prevPrivilege === -1) {
 //       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} already can't use commands.`, callerLogin)
 //     } else {
-//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} ` +
 //         `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
 //         `commands for ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin}.`)
 //       await tm.admin.setPrivilege(targetLogin, -1, info)

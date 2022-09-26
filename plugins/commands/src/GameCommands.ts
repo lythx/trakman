@@ -25,7 +25,7 @@ const commands: TMCommand[] = [
         case 'cup': modeInt = 5
       }
       tm.sendMessage(tm.utils.strVar(config.setgamemode.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), mode: mode.toUpperCase()
       }),
         config.setgamemode.public ? undefined : info.login)
@@ -39,7 +39,7 @@ const commands: TMCommand[] = [
     params: [{ name: 'time', type: 'int' }],
     callback: (info: TMMessageInfo, time: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setchattime.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), value: time
       }), config.setchattime.public ? undefined : info.login)
       tm.client.callNoRes(`SetChatTime`, [{ int: time }])
@@ -56,7 +56,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setwarmup.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), state: enabled ? 'enabled' : 'disabled'
       }),
         config.setwarmup.public ? undefined : info.login)
@@ -78,7 +78,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setlapsamount.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setlapsamount.public ? undefined : info.login)
@@ -100,7 +100,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setroundslapsamount.public ? undefined : info.login)
@@ -122,7 +122,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setroundspointlimit.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setroundspointlimit.public ? undefined : info.login)
@@ -144,7 +144,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setteamspointlimit.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setteamspointlimit.public ? undefined : info.login)
@@ -166,7 +166,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setteamsmaxpoints.text,
-        { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), amount: amount }),
+        { title: info.title, adminName: tm.utils.strip(info.nickname), amount: amount }),
         config.setteamsmaxpoints.public ? undefined : info.login)
       tm.client.callNoRes(`SetTeamMaxPoints`, [{ int: amount }])
     },
@@ -186,7 +186,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcuppointlimit.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setcuppointlimit.public ? undefined : info.login)
@@ -208,7 +208,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcuproundspermap.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setcuproundspermap.public ? undefined : info.login)
@@ -230,7 +230,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcupwarmuptime.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setcupwarmuptime.public ? undefined : info.login)
@@ -252,7 +252,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcupwinnersamount.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
       }),
         config.setcupwinnersamount.public ? undefined : info.login)
@@ -267,7 +267,7 @@ const commands: TMCommand[] = [
     callback: (info: TMMessageInfo, status: boolean, amount?: number): void => {
       let n: number
       if (!status) { n = 0 } else if (amount !== undefined) { n = amount } else { n = 1 }
-      tm.sendMessage(tm.utils.strVar(config.forceshowopp.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), value: status ? 'enabled' : 'disabled' }), config.forceshowopp.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forceshowopp.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'enabled' : 'disabled' }), config.forceshowopp.public ? undefined : info.login)
       tm.client.callNoRes(`SetForceShowAllOpponents`, [{ int: n }])
     },
     privilege: config.forceshowopp.privilege
@@ -277,7 +277,7 @@ const commands: TMCommand[] = [
     help: 'Set whether checkpoint respawning is enabled.',
     params: [{ name: 'status', type: 'boolean' }],
     callback: (info: TMMessageInfo, status: boolean): void => {
-      tm.sendMessage(tm.utils.strVar(config.disablerespawn.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), value: status ? 'disabled' : 'enabled' }), config.disablerespawn.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.disablerespawn.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'disabled' : 'enabled' }), config.disablerespawn.public ? undefined : info.login)
       tm.client.callNoRes(`SetDisableRespawn`, [{ boolean: status }])
     },
     privilege: config.disablerespawn.privilege

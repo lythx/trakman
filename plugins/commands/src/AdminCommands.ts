@@ -13,7 +13,7 @@ const commands: TMCommand[] = [
         return
       }
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.kick.reason, { reason: reason })}.`
-      tm.sendMessage(tm.utils.strVar(config.kick.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo.nickname) }) + `${reasonString}`, config.kick.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.kick.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo.nickname) }) + `${reasonString}`, config.kick.public ? undefined : info.login)
       tm.client.callNoRes(`Kick`, [{ string: login }, { string: reason === undefined ? 'No reason specified' : reason }])
     },
     privilege: config.kick.privilege
@@ -32,7 +32,7 @@ const commands: TMCommand[] = [
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(tm.utils.strVar(config.mute.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login),
         duration: durationString
       }) + `${reasonString}`, config.mute.public ? undefined : info.login)
@@ -59,7 +59,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unmute.notMuted, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unmute.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unmute.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unmute.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unmute.public ? undefined : info.login)
     },
     privilege: config.unmute.privilege
   },
@@ -73,7 +73,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(config.forcespec.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
       tm.multiCallNoRes(
         {
           method: 'ForceSpectator',
@@ -98,7 +98,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.forceplay.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname),
         name: tm.utils.strip(targetInfo.nickname)
       }), config.forceplay.public ? undefined : info.login)
@@ -120,7 +120,7 @@ const commands: TMCommand[] = [
     help: 'Manipulate every soul on the server that you kicked someone.',
     params: [{ name: 'login' }],
     callback: (info: TMMessageInfo, login: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
       tm.client.callNoRes(`Kick`, [{ string: login }])
     },
     privilege: config.kickghost.privilege
@@ -139,7 +139,7 @@ const commands: TMCommand[] = [
       await tm.admin.ban(targetInfo.ip, targetInfo.login, info, targetInfo.nickname, reason, expireDate)
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.sendMessage(tm.utils.strVar(config.ban.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.ban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
     },
     privilege: config.ban.privilege
   },
@@ -160,7 +160,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unban.notBanned, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unban.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unban.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unban.public ? undefined : info.login)
     },
     privilege: config.unban.privilege
   },
@@ -183,7 +183,7 @@ const commands: TMCommand[] = [
       }
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
     },
     privilege: config.blacklist.privilege
   },
@@ -204,7 +204,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unblacklist.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unblacklist.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unblacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unblacklist.public ? undefined : info.login)
     },
     privilege: config.unblacklist.privilege
   },
@@ -228,7 +228,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.addguest.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.addguest.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.addguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.addguest.public ? undefined : info.login)
     },
     privilege: config.addguest.privilege
   },
@@ -252,7 +252,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.rmguest.notGuest, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
     },
     privilege: config.rmguest.privilege
   }

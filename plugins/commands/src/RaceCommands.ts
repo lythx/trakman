@@ -7,7 +7,7 @@ const commands: TMCommand[] = [
     help: 'Skip to the next map.',
     callback: (info: TMMessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.skip.public ? undefined : info.login)
       tm.client.callNoRes(`NextChallenge`)
@@ -19,7 +19,7 @@ const commands: TMCommand[] = [
     help: 'Restart the current map.',
     callback: (info: TMMessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.res.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.res.public ? undefined : info.login)
       tm.client.callNoRes(`RestartChallenge`)
@@ -35,7 +35,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.prev.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.prev.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
@@ -48,7 +48,7 @@ const commands: TMCommand[] = [
     help: 'Requeue the ongoing map.',
     callback: (info: TMMessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.replay.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.replay.public ? undefined : info.login)
       tm.jukebox.add(tm.maps.current.id, info)
@@ -64,7 +64,7 @@ const commands: TMCommand[] = [
         return
       }
       tm.client.callNoRes('ForceEndRound')
-      tm.sendMessage(tm.utils.strVar(config.endround.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.endround.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.endround.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.endround.public ? undefined : info.login)
     },
     privilege: config.endround.privilege
   },
@@ -94,7 +94,7 @@ const commands: TMCommand[] = [
           teamColour = `${tm.utils.colours.red}`
       }
       tm.sendMessage(tm.utils.strVar(config.forceteam.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(playerInfo.nickname),
         team: (teamColour + team.toUpperCase())
       }), config.forceteam.public ? undefined : info.login)

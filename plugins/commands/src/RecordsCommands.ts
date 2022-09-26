@@ -12,7 +12,7 @@ const commands: TMCommand[] = [{
       tm.sendMessage(tm.utils.strVar(config.delrec.error, { login: login }), info.login)
       return
     }
-    tm.sendMessage(tm.utils.strVar(config.delrec.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), nickname: tm.utils.strip(playerRecord.nickname) }), config.delrec.public ? undefined : info.login)
+    tm.sendMessage(tm.utils.strVar(config.delrec.text, { title: info.title, adminName: tm.utils.strip(info.nickname), nickname: tm.utils.strip(playerRecord.nickname) }), config.delrec.public ? undefined : info.login)
     tm.records.remove(playerRecord, tm.maps.current.id, info)
   },
   privilege: config.delrec.privilege
@@ -21,7 +21,7 @@ const commands: TMCommand[] = [{
   aliases: ['pr', 'prunerecs', 'prunerecords'],
   help: 'Remove all records on the ongoing map.',
   callback: (info: TMMessageInfo): void => {
-    tm.sendMessage(tm.utils.strVar(config.prunerecs.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.prunerecs.public ? undefined : info.login)
+    tm.sendMessage(tm.utils.strVar(config.prunerecs.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.prunerecs.public ? undefined : info.login)
     tm.records.removeAll(tm.maps.current.id, info)
   },
   privilege: config.prunerecs.privilege

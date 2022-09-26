@@ -17,7 +17,7 @@ const commands: TMCommand[] = [
       }
       if (prevPrivilege < 3) {
         tm.sendMessage(tm.utils.strVar(config.masteradmin.promote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.masteradmin.public ? undefined : info.login)
@@ -45,7 +45,7 @@ const commands: TMCommand[] = [
       }
       if (prevPrivilege < 2) {
         tm.sendMessage(tm.utils.strVar(config.admin.promote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.admin.public ? undefined : info.login)
@@ -56,7 +56,7 @@ const commands: TMCommand[] = [
         }), callerLogin)
       } else {
         tm.sendMessage(tm.utils.strVar(config.admin.demote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.admin.public ? undefined : info.login)
@@ -80,7 +80,7 @@ const commands: TMCommand[] = [
       }
       if (prevPrivilege < 1) {
         tm.sendMessage(tm.utils.strVar(config.operator.promote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.operator.public ? undefined : info.login)
@@ -89,9 +89,9 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.operator.alreadyIs, {
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), callerLogin)
-      } else  {
+      } else {
         tm.sendMessage(tm.utils.strVar(config.operator.demote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.operator.public ? undefined : info.login)
@@ -115,7 +115,7 @@ const commands: TMCommand[] = [
       }
       if (prevPrivilege >= 1) {
         tm.sendMessage(tm.utils.strVar(config.user.demote, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           adminNickname: tm.utils.strip(info.nickname, true),
           nickname: tm.utils.strip(targetInfo?.nickname ?? login, true)
         }), config.user.public ? undefined : info.login)
