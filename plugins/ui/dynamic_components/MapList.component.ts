@@ -14,7 +14,7 @@ export default class MapList extends PopupWindow {
   private readonly contentBg = config.contentBackground
   private readonly iconBg = config.iconBackground
   private readonly icons = config.icons
-  private readonly playerQueries: { paginator: Paginator, list: readonly TMMap[], login: string }[] = []
+  private readonly playerQueries: { paginator: Paginator, list: readonly TM.Map[], login: string }[] = []
   private readonly iconW = config.iconWidth
   private readonly queueW = config.queueWidth
   private readonly queueNumberW = config.queueNumberWidth
@@ -22,7 +22,7 @@ export default class MapList extends PopupWindow {
   private readonly positionW = config.positionWidth
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
-  private sortedList: TMMap[]
+  private sortedList: TM.Map[]
 
   constructor() {
     super(IDS.mapList, config.icon, config.title, config.navbar)
@@ -55,7 +55,7 @@ export default class MapList extends PopupWindow {
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: async (info: TMMessageInfo, query?: string): Promise<void> => {
+      callback: async (info: TM.MessageInfo, query?: string): Promise<void> => {
         if (query === undefined) {
           tm.openManialink(this.openId, info.login)
           return
@@ -78,7 +78,7 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
-      callback: async (info: TMMessageInfo): Promise<void> => {
+      callback: async (info: TM.MessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'best')
       },
       privilege: 0
@@ -86,7 +86,7 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
-      callback: async (info: TMMessageInfo): Promise<void> => {
+      callback: async (info: TM.MessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'worst')
       },
       privilege: 0
@@ -111,7 +111,7 @@ export default class MapList extends PopupWindow {
   }
 
   async openWithOption(login: string, option: 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'bestkarma') {
-    let list: TMMap[] = []
+    let list: TM.Map[] = []
     if (option === 'best' || option === 'worst') {
       list = await maplist.getByPosition(login, option)
     } else {
@@ -137,7 +137,7 @@ export default class MapList extends PopupWindow {
     this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
   }
 
-  private getPaginator(login: string, list: readonly TMMap[], pageCount: number) {
+  private getPaginator(login: string, list: readonly TM.Map[], pageCount: number) {
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
     if (playerQuery !== undefined) {
@@ -166,7 +166,7 @@ export default class MapList extends PopupWindow {
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list: readonly TMMap[] = this.sortedList
+      let list: readonly TM.Map[] = this.sortedList
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
@@ -207,7 +207,7 @@ export default class MapList extends PopupWindow {
     this.hideToPlayer(info.login)
   }
 
-  protected async constructContent(login: string, params: { page: number, list: TMMap[] }): Promise<string> {
+  protected async constructContent(login: string, params: { page: number, list: TM.Map[] }): Promise<string> {
     const maps = params.list
     const startIndex = (config.rows * config.columns) * (params.page - 1)
     const mapsToDisplay = Math.min(maps.length - startIndex, config.rows * config.columns)

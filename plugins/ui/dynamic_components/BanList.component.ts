@@ -44,7 +44,7 @@ export default class Banlist extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['banl', 'banlist'],
       help: 'Display banlist.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
   }

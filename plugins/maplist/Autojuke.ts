@@ -2,8 +2,8 @@ import { trakman as tm } from "../../src/Trakman.js";
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 
-const chooseAndAddMap = (maps: TMMap[], info: { nickname: string, login: string }, errorMsg: string) => {
-  const eligibleMaps: TMMap[] = maps.filter(a =>
+const chooseAndAddMap = (maps: TM.Map[], info: { nickname: string, login: string }, errorMsg: string) => {
+  const eligibleMaps: TM.Map[] = maps.filter(a =>
     !tm.jukebox.juked.some(b => b.map.id === a.id) &&
     !tm.jukebox.history.some(b => b.id === a.id) &&
     tm.maps.current.id !== a.id)
@@ -11,7 +11,7 @@ const chooseAndAddMap = (maps: TMMap[], info: { nickname: string, login: string 
     tm.sendMessage(errorMsg, info.login)
     return
   }
-  const map: TMMap = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
+  const map: TM.Map = eligibleMaps[Math.floor(Math.random() * eligibleMaps.length)]
   tm.jukebox.add(map.id, info)
   tm.sendMessage(tm.utils.strVar(config.added, {
     nickname: tm.utils.strip(info.nickname, true),

@@ -1,11 +1,11 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/RaceCommands.config.js'
 
-const commands: TMCommand[] = [
+const commands: TM.Command[] = [
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: TM.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -17,7 +17,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['r', 'res', 'restart'],
     help: 'Restart the current map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: TM.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.res.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -29,7 +29,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['pt', 'prev', 'previous'],
     help: 'Requeue the previously played map.',
-    callback: async (info: TMMessageInfo): Promise<void> => {
+    callback: async (info: TM.MessageInfo): Promise<void> => {
       if (tm.jukebox.history[0] === undefined) {
         tm.sendMessage(config.prev.error, info.login)
         return
@@ -46,7 +46,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['rq', 'requeue', 'replay'],
     help: 'Requeue the ongoing map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: TM.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.replay.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -58,7 +58,7 @@ const commands: TMCommand[] = [
   {
     aliases: ['er', 'endround'],
     help: 'End the ongoing round in rounds-based gamemodes.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: TM.MessageInfo): void => {
       if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.endround.error, info.login)
         return
@@ -72,12 +72,12 @@ const commands: TMCommand[] = [
     aliases: ['fpt', 'forceteam', 'forceplayerteam'],
     help: 'Force a player into the specified team.',
     params: [{ name: 'player' }, { name: 'team', validValues: ['blue', 'red'] }],
-    callback: async (info: TMMessageInfo, player: string, team: string): Promise<void> => {
+    callback: async (info: TM.MessageInfo, player: string, team: string): Promise<void> => {
       if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.forceteam.notRounds, info.login)
         return
       }
-      const playerInfo: TMPlayer | undefined = tm.players.get(player)
+      const playerInfo: TM.Player | undefined = tm.players.get(player)
       if (playerInfo === undefined) {
         tm.sendMessage(config.forceteam.playerOffline, info.login)
         return

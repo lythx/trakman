@@ -35,7 +35,7 @@ export class VoteRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async add(...votes: TMVote[]): Promise<void> {
+  async add(...votes: TM.Vote[]): Promise<void> {
     if (votes.length === 0) { return }
     const query = `INSERT INTO votes(map_id, player_id, vote, date) 
     ${this.getInsertValuesString(4, votes.length)}`
@@ -55,7 +55,7 @@ export class VoteRepository extends Repository {
     await this.query(query, vote, date, mapId, playerId)
   }
 
-  async getOne(mapUid: string, login: string): Promise<TMVote | undefined> {
+  async getOne(mapUid: string, login: string): Promise<TM.Vote | undefined> {
     const query: string = `SELECT login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
     WHERE map_id=$1 AND player_id=$2;`
@@ -65,18 +65,18 @@ export class VoteRepository extends Repository {
     return res[0] === undefined ? undefined : this.constructVoteObject({ ...res[0], uid: mapUid })
   }
 
-  async get(...mapUids: string[]): Promise<TMVote[]> {
+  async get(...mapUids: string[]): Promise<TM.Vote[]> {
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
     JOIN map_ids ON map_ids.id=votes.map_id
     WHERE ${mapUids.map((a, i) => `votes.map_id=$${i + 1} OR `).join('').slice(0, -3)}`
     const ids = await mapIdsRepo.get(mapUids)
-    if(ids.length === 0) { return [] }
+    if (ids.length === 0) { return [] }
     const res = await this.query(query, ...ids.map(a => a.id))
     return res.map(a => this.constructVoteObject(a))
   }
 
-  async getAll(): Promise<TMVote[]> {
+  async getAll(): Promise<TM.Vote[]> {
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN map_ids ON map_ids.id=votes.map_id
     JOIN players ON players.id=votes.player_id;`
@@ -84,7 +84,7 @@ export class VoteRepository extends Repository {
     return res.map(a => this.constructVoteObject(a))
   }
 
-  constructVoteObject(entry: TableEntry): TMVote {
+  constructVoteObject(entry: TableEntry): TM.Vote {
     return {
       login: entry.login,
       mapId: entry.uid,

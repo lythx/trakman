@@ -1,1 +1,1 @@
-type TMLocalRecord = TMRecord & TMOfflinePlayer
+export type TMLocalRecord = TM.Record & TM.OfflinePlayer

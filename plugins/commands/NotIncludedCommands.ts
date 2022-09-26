@@ -1,10 +1,10 @@
 
 
-// const commands: TMCommand[] = [{
+// const commands: TM.Command[] = [{
 //   aliases: ['hm', 'hardmute'],
 //   help: 'Mute a player and disable their commands.',
 //   callback: async (info: MessageInfo): Promise<void> => {
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: TM.Player | undefined = tm.players.get(info.text)
 //       if (targetInfo === undefined) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player or no login specified.`, info.login)
 //           return
@@ -53,7 +53,7 @@
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}No login specified.`, info.login)
 //           return
 //       }
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: TM.Player | undefined = tm.players.get(info.text)
 //       if (targetInfo === undefined) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Player is not on the server.`, info.login)
 //           return
@@ -106,7 +106,7 @@
 //           return
 //       }
 //       hfsList.splice(hfsList.indexOf(info.login), 1)
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: TM.Player | undefined = tm.players.get(info.text)
 //       tm.multiCallNoRes(
 //           {
 //               method: 'ForceSpectator',
@@ -127,7 +127,7 @@
 // {
 //   aliases: ['ffdb', 'fetchallfromdb'],
 //   help: 'Adds all the maps present in database if they are on TMX based on id',
-//   callback: async (info: TMMessageInfo): Promise<void> => {
+//   callback: async (info: TM.MessageInfo): Promise<void> => {
 //     const res: { uid: string, id: number }[] | Error = await tm.db.query(`SELECT uid, id FROM map_ids`)
 //     const filenames: { filename: string }[] | Error = await tm.db.query(`SELECT filename FROM maps`)
 //     if (res instanceof Error || filenames instanceof Error) {
@@ -194,10 +194,10 @@
 //   aliases: ['dcmds', 'disablecommands'],
 //   help: 'Disable player commands.',
 //   params: [{ name: 'login' }],
-//   callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+//   callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
 //     const targetLogin: string = login
 //     const callerLogin: string = info.login
-//     const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+//     const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
 //     const prevPrivilege: number = targetInfo?.privilege ?? 0
 //     if (prevPrivilege >= info.privilege) {
 //       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)

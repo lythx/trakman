@@ -11,7 +11,7 @@ let mapKarmaValue: number = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
 let playerVotes: MKVote[] = []
 let newVotes: MKVote[] = []
-let lastMap: Readonly<TMCurrentMap>
+let lastMap: Readonly<TM.CurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
 const voteListeners: ((vote: MKVote) => void)[] = []
@@ -199,7 +199,7 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
 }
 
 const fixCoherence = async (): Promise<void> => {
-  const localVotes: TMVote[] = tm.karma.current
+  const localVotes: TM.Vote[] = tm.karma.current
   const mkVotes: MKVote[] = playerVotes
   for (const e of mkVotes) {
     const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)

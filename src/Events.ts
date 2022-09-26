@@ -2,7 +2,7 @@ import { Client } from "./client/Client.js"
 import { Logger } from "./Logger.js"
 import { GameService } from './services/GameService.js'
 
-const eventListeners: { event: keyof TMEvents, callback: ((params: any) => void | Promise<void>) }[] = []
+const eventListeners: { event: keyof TM.Events, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
 const initialize = async () => {
@@ -32,10 +32,10 @@ const initialize = async () => {
  * @param callback function to execute on event
  * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
-const addListener = <T extends keyof TMEvents>(event: T | (keyof TMEvents)[],
-  callback: ((params: T extends keyof TMEvents ? TMEvents[T] : any)
+const addListener = <T extends keyof TM.Events>(event: T | (keyof TM.Events)[],
+  callback: ((params: T extends keyof TM.Events ? TM.Events[T] : any)
     => void | Promise<void>), prepend?: true): void => {
-  const arr: { event: keyof TMEvents, callback: ((params: any) => void) }[] = []
+  const arr: { event: keyof TM.Events, callback: ((params: any) => void) }[] = []
   if (Array.isArray(event)) {
     arr.push(...event.map(a => ({ event: a, callback })))
   } else {
@@ -49,8 +49,8 @@ const addListener = <T extends keyof TMEvents>(event: T | (keyof TMEvents)[],
  * @param event callback event name
  * @param params callback params
  */
-const emit = async <T extends keyof TMEvents>(event: T,
-  params: TMEvents[T]): Promise<void> => {
+const emit = async <T extends keyof TM.Events>(event: T,
+  params: TM.Events[T]): Promise<void> => {
   if (controllerReady === false) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {

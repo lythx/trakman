@@ -49,7 +49,7 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    const votes: TMVote[] = tm.karma.current
+    const votes: TM.Vote[] = tm.karma.current
     const voteAmounts: number[] = []
     for (let i = this.options.length - 1; i >= 0; i--) {
       voteAmounts.unshift(votes.filter(a => a.vote === this.options[i]).length)

@@ -1,12 +1,12 @@
 import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/JukeboxCommands.config.js'
 
-const commands: TMCommand[] = [{
+const commands: TM.Command[] = [{
   aliases: ['dq', 'djb', 'dropqueue', 'dropjukebox'],
   help: 'Drop the specified track from the map queue',
   params: [{ name: 'index', type: 'int' }],
-  callback: (info: TMMessageInfo, index: number): void => {
-    const map: TMMap | undefined = tm.jukebox.juked[index + 1]?.map
+  callback: (info: TM.MessageInfo, index: number): void => {
+    const map: TM.Map | undefined = tm.jukebox.juked[index + 1]?.map
     if (map === undefined) {
       tm.sendMessage(config.dropjukebox.error, info.login)
       return
@@ -19,7 +19,7 @@ const commands: TMCommand[] = [{
 {
   aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
   help: 'Clear the entirety of the current map queue',
-  callback: (info: TMMessageInfo): void => {
+  callback: (info: TM.MessageInfo): void => {
     if (tm.jukebox.juked.length === 0) {
       tm.sendMessage(config.clearjukebox.error, info.login)
       return
@@ -34,7 +34,7 @@ const commands: TMCommand[] = [{
 {
   aliases: ['shuf', 'shuffle'],
   help: 'Shuffle the map queue.',
-  callback: async (info: TMMessageInfo): Promise<void> => {
+  callback: async (info: TM.MessageInfo): Promise<void> => {
     tm.sendMessage(tm.utils.strVar(config.shuffle.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.shuffle.public ? undefined : info.login)
     tm.jukebox.shuffle(info)
   },
