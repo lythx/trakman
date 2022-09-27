@@ -287,12 +287,10 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
 
 const fixNicknameCoherence = async (): Promise<void> => {
   for (const record of currentDedis) {
-    const player = tm.records.local.find(a => a.login === record.login)
-    if (player === undefined) {
-      return
-    }
+    const player = tm.records.getLocal(record.login)
+    if (player === undefined) { return }
     (player.nickname as any) = record.nickname
-    await tm.db.query(`update players set nickname=$1 where login=$2`, record.nickname, record.login)
+    await tm.db.query(`UPDATE players SET nickname=$1 WHERE login=$2`, record.nickname, record.login)
   }
 }
 

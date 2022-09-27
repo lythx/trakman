@@ -122,6 +122,21 @@ export class RecordService {
   }
 
   /**
+   * Updates the player nickname in runtime memory
+   * @param players Objects containing player logins and nicknames
+   */
+  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+    for (const p of players) {
+      const obj1 = this._liveRecords.find(a => a.login === p.login)
+      if (obj1 !== undefined) { obj1.nickname = p.nickname }
+      const obj2 = this._localRecords.find(a => a.login === p.login)
+      if (obj2 !== undefined) { obj2.nickname = p.nickname }
+      const obj3 = this._initialLocals.find(a => a.login === p.login)
+      if (obj3 !== undefined) { obj3.nickname = p.nickname }
+    }
+  }
+
+  /**
    * Checks if record is good enough to be a new local record, then adds it to runtime 
    * memory and the database
    * @param mapId Map uid

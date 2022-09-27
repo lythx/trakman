@@ -47,6 +47,12 @@ export class AdministrationService {
     this.pollExpireDates()
   }
 
+  /**
+   * Handle ban and mute on join
+   * @param login Player login
+   * @param ip Player ip address
+   * @returns True if player can join, false otherwise
+   */
   static async handleJoin(login: string, ip: string): Promise<boolean> {
     const mute = this.muteOnJoin.find(a => a.login === login)
     if (mute !== undefined) {
@@ -72,6 +78,27 @@ export class AdministrationService {
       return false
     }
     return true
+  }
+
+  /**
+   * Updates the player nickname in runtime memory
+   * @param players Objects containing player logins and nicknames
+   */
+  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+    const replaceNickname = (arr: { nickname?: string, login: string, callerLogin: string, callerNickname: string }[]) => {
+      for (const p of players) {
+        const obj = arr.find(a => a.login === p.login)
+        if (obj !== undefined) { obj.nickname = p.nickname }
+        const obj2 = arr.find(a => a.callerLogin === p.login)
+        if (obj2 !== undefined) { obj2.callerNickname = p.nickname }
+      }
+    }
+    replaceNickname(this.banOnJoin)
+    replaceNickname(this.serverBanlist)
+    replaceNickname(this._blacklist)
+    replaceNickname(this.muteOnJoin)
+    replaceNickname(this.serverMutelist)
+    replaceNickname(this._guestlist)
   }
 
   /**
