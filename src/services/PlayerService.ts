@@ -163,6 +163,20 @@ export class PlayerService {
   }
 
   /**
+   * Updates the player nickname in runtime memory and the database
+   * @param players Objects containing player logins and nicknames
+   */
+  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+    for (const p of players) {
+      const obj = this._players.find(a => a.login === p.login)
+      if (obj !== undefined) {
+        obj.nickname = p.nickname
+      }
+      await this.repo.updateNickname(p.login, p.nickname)
+    }
+  }
+
+  /**
    * Remove the player from local memory, save timePlayed and lastOnline in database
    * @param login Player login
    */

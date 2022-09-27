@@ -71,6 +71,11 @@ export class PlayerRepository extends Repository {
     await this.query(query, average, login)
   }
 
+  async updateNickname(login: string, nickname: string): Promise<void> {
+    const query: string = `UPDATE players SET nickname=$1 WHERE login=$2;`
+    await this.query(query, nickname, login)
+  }
+
   async updateOnWin(login: string, wins: number): Promise<void> {
     const query: string = `UPDATE players SET wins=$1 WHERE login=$2;`
     await this.query(query, wins, login)
