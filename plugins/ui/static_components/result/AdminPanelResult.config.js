@@ -3,7 +3,7 @@ import icons from '../../config/Icons.js'
 const p = tm.utils.palette
 
 export default {
-  height: 5,
+  height: 7,
   width: cfg.width,
   privilege: 1,
   margin: cfg.margin,
@@ -14,19 +14,15 @@ export default {
   public: true,
   icons: {
     players: icons.playerList,
-    restart: icons.placeholder,
     previous: icons.pageLeft,
     requeue: icons.payReplay,
-    skip: icons.pageRight,
-    endRound: icons.pageLast
+    jukebox: icons.mapList
   },
   iconsHover: {
     players: icons.placeholder,
-    restart: icons.placeholder,
     previous: icons.pageLeftHover,
     requeue: icons.placeholder, // todon icons
-    skip: icons.pageRightHover,
-    endRound: icons.pageLastHover
+    jukebox: icons.mapList
   },
   messages: {
     skip: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,
