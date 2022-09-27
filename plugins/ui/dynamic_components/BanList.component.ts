@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './Banlist.config.js'
 

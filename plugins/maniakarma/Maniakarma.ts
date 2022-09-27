@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-import { trakman as tm } from '../../src/Trakman.js'
+
 import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 
@@ -199,7 +199,7 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
 }
 
 const fixCoherence = async (): Promise<void> => {
-  const localVotes: TM.Vote[] = tm.karma.current
+  const localVotes: tm.Vote[] = tm.karma.current
   const mkVotes: MKVote[] = playerVotes
   for (const e of mkVotes) {
     const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)

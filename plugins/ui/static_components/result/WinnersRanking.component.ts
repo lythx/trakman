@@ -1,6 +1,6 @@
 import { IDS, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import { topWins } from '../../../stats/TopWins.js'
 import config from './WinnersRanking.config.js'
 
@@ -13,8 +13,8 @@ export default class WinnersRanking extends StaticComponent {
   constructor() {
     super(IDS.winnersRanking, 'result')
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin), 
-    config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     topWins.onUpdate(() => this.display())
   }
 

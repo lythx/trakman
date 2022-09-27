@@ -1,7 +1,7 @@
 import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
-import { trakman as tm } from '../../src/Trakman.js'
+
 import DediConfig from './Config.js'
 
 export class DedimaniaClient {

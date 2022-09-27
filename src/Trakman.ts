@@ -15,7 +15,29 @@ import { Logger } from './Logger.js'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/Prefixes.js'
-import config from '../config/Config.js'
+import controllerConfig from '../config/Config.js'
+import { TMCallParams } from './types/TMCallParams.js'
+import { TMServerInfo } from './types/TMServerInfo.js'
+import { TMBanlistEntry } from './types/TMBanlistEntry.js'
+import { TMBlacklistEntry } from './types/TMBlacklistEntry.js'
+import { TMCall } from './types/TMCall.js'
+import { TMCheckpoint } from './types/TMCheckpoint.js'
+import { TMCommand } from './types/TMCommand.js'
+import { TMEvents } from './types/TMEvents.js'
+import { TMGame } from './types/TMGame.js'
+import { TMGuestlistEntry } from './types/TMGuestlistEntry.js'
+import { TMOfflinePlayer } from './types/TMOfflinePlayer.js'
+import { TMLocalRecord } from './types/TMLocalRecord.js'
+import { TMPlayer } from './types/TMPlayer.js'
+import { TMRecord } from './types/TMRecord.js'
+import { TMVote } from './types/TMVote.js'
+import { TMCurrentMap } from './types/TMCurrentMap.js'
+import { TMMap } from './types/TMMap.js'
+import { TMMessage } from './types/TMMessage.js'
+import { TMMutelistEntry } from './types/TMMutelistEntry.js'
+import { TMXMapInfo } from './types/TMXMapInfo.js'
+import { TMXReplay as TMTMXReplay } from './types/TMXReplay.js'
+import { MessageInfo as TMMessageInfo } from './types/TMMessageInfo.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -25,11 +47,11 @@ await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 
-export const trakman = {
+namespace trakman {
 
-  utils: Utils,
+  export const utils = Utils
 
-  db: {
+  export const db = {
 
     getMapId: mapIdsRepo.get.bind(mapIdsRepo),
 
@@ -66,17 +88,17 @@ export const trakman = {
       }
     }
 
-  },
+  }
 
-  tmx: {
+  export const tmx = {
 
     fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
 
     fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
 
-  },
+  }
 
-  players: {
+  export const players = {
 
     get: PlayerService.get.bind(PlayerService),
 
@@ -86,9 +108,9 @@ export const trakman = {
 
     get count() { return PlayerService.playerCount }
 
-  },
+  }
 
-  records: {
+  export const records = {
 
     getLocal: RecordService.getLocal.bind(RecordService),
 
@@ -118,9 +140,9 @@ export const trakman = {
 
     get maxLocalsAmount() { return RecordService.maxLocalsAmount }
 
-  },
+  }
 
-  messages: {
+  export const messages = {
 
     fetch: ChatService.fetch.bind(ChatService),
 
@@ -130,17 +152,17 @@ export const trakman = {
 
     get list() { return ChatService._messages }
 
-  },
+  }
 
-  commands: {
+  export const commands = {
 
     add: ChatService.addCommand.bind(ChatService),
 
     get list() { return ChatService.commandList }
 
-  },
+  }
 
-  client: {
+  export const client = {
 
     call: Client.call.bind(Client),
 
@@ -148,9 +170,9 @@ export const trakman = {
 
     addProxy: Client.addProxy.bind(Client),
 
-  },
+  }
 
-  maps: {
+  export const maps = {
 
     get: MapService.get.bind(MapService),
 
@@ -166,9 +188,9 @@ export const trakman = {
 
     get count() { return MapService.mapCount }
 
-  },
+  }
 
-  log: {
+  export const log = {
 
     fatal: Logger.fatal.bind(Logger),
 
@@ -182,9 +204,9 @@ export const trakman = {
 
     trace: Logger.trace.bind(Logger)
 
-  },
+  }
 
-  jukebox: {
+  export const jukebox = {
 
     add: MapService.addToJukebox.bind(MapService),
 
@@ -216,9 +238,9 @@ export const trakman = {
 
     get juked() { return MapService.jukebox }
 
-  },
+  }
 
-  karma: {
+  export const karma = {
 
     /**
      * Adds a player vote to the database and to Maniakarma service if its running
@@ -239,9 +261,9 @@ export const trakman = {
 
     get list() { return VoteService.votes }
 
-  },
+  }
 
-  state: {
+  export const state = {
 
     /**
      * @returns remaining map time in seconds
@@ -258,17 +280,17 @@ export const trakman = {
       return GameService.state
     },
 
-    get gameConfig(): TM.Game {
+    get gameConfig(): tm.Game {
       return GameService.config
     },
 
-    get serverConfig(): TM.ServerInfo {
+    get serverConfig(): tm.ServerInfo {
       return ServerConfig.config
     }
 
-  },
+  }
 
-  admin: {
+  export const admin = {
 
     setPrivilege: AdministrationService.setPrivilege.bind(AdministrationService),
 
@@ -312,21 +334,21 @@ export const trakman = {
 
     get guestCount() { return AdministrationService.guestCount }
 
-  },
+  }
 
   /**
   * Sends a server message
   * @param message Message to be sent
   * @param login Optional player login (or comma-joined list of logins)
   */
-  sendMessage(message: string, login?: string, prefix: boolean = true): void {
+  export const sendMessage = (message: string, login?: string, prefix: boolean = true): void => {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin',
         [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message }, { string: login }])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
-  },
+  }
 
   /**
    * Sends a server manialink
@@ -335,17 +357,17 @@ export const trakman = {
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void {
+  export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
     }
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
-  },
+  }
 
   // TO BE REMOVED
-  getPlayerDBId: playerIdsRepo.getId.bind(playerIdsRepo),
+  export const getPlayerDBId = playerIdsRepo.getId.bind(playerIdsRepo)
 
   //CHANGE LATER
   /**
@@ -353,16 +375,16 @@ export const trakman = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TM.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+  export const multiCall = async (...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> => {
     return Utils.multiCall(...calls)
-  },
+  }
 
   //CHANGE LATER
   /**
    * Calls multiple dedicated server methods simultaneously without caring for the response
    * @param calls Array of dedicated server calls
    */
-  multiCallNoRes(...calls: TM.Call[]): void {
+  export const multiCallNoRes = (...calls: tm.Call[]): void => {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -374,7 +396,7 @@ export const trakman = {
       })
     }
     Client.callNoRes('system.multicall', [{ array: arr }])
-  },
+  }
 
   /**
    * Adds a listener to an event to execute callbacks
@@ -382,25 +404,52 @@ export const trakman = {
    * @param callback Callback to register on given event
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
-  addListener: Events.addListener,
+  export const addListener = Events.addListener
 
   /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
    */
-  openManialink(id: number, login: string): void {
+  export const openManialink = (id: number, login: string): void => {
     const temp: any = PlayerService.get(login)
     temp.actionId = id
     const info: ManialinkClickInfo = temp
     Events.emit('ManialinkClick', info)
-  },
+  }
 
   /**
    * Controller config
    */
-  config
-
+  export const config = controllerConfig
 }
 
-export const palette = Utils.palette 
+declare global {
+  const tm: typeof trakman
+  namespace tm {
+    export type Player = TMPlayer
+    export type CallParams = TMCallParams
+    export type ServerInfo = TMServerInfo
+    export type BanlistEntry = TMBanlistEntry
+    export type BlacklistEntry = TMBlacklistEntry
+    export type Call = TMCall
+    export type Checkpoint = TMCheckpoint
+    export type Command = TMCommand
+    export type CurrentMap = TMCurrentMap
+    export type Game = TMGame
+    export type GuestlistEntry = TMGuestlistEntry
+    export type LocalRecord = TMLocalRecord
+    export type Map = TMMap
+    export type Message = TMMessage
+    export type MutelistEntry = TMMutelistEntry
+    export type OfflinePlayer = TMOfflinePlayer
+    export type Record = TMRecord
+    export type Vote = TMVote
+    export type TMXMap = TMXMapInfo
+    export type TMXReplay = TMTMXReplay
+    export type Events = TMEvents
+    export type MessageInfo = TMMessageInfo
+  }
+}
+
+(global as any).tm = trakman

@@ -1,6 +1,6 @@
 import { IDS, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import config from './KarmaRanking.config.js'
 
 export default class KarmaRanking extends StaticComponent {

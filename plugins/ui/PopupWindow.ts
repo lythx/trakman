@@ -1,4 +1,4 @@
-import { trakman as tm } from "../../src/Trakman.js";
+
 import DynamicComponent from "./DynamicComponent.js";
 import { IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.js'

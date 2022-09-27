@@ -1,4 +1,4 @@
-import { trakman as tm } from "../../src/Trakman.js";
+
 import config from './Config.js'
 
 let topList: { login: string, nickname: string, sums: [number, number, number, number] }[] = []

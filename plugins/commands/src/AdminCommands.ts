@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import config from '../config/AdminCommands.config.js'
 
 const commands: TM.Command[] = [
@@ -7,7 +7,7 @@ const commands: TM.Command[] = [
     help: 'Kick a specific player.',
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
     callback: (info: TM.MessageInfo, login: string, reason?: string): void => {
-      const targetInfo: TM.Player | undefined = tm.players.get(login)
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.kick.error, info.login)
         return
@@ -22,8 +22,8 @@ const commands: TM.Command[] = [
     aliases: ['m', 'mute'],
     help: 'Mute a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TM.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      let targetInfo: TM.OfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }

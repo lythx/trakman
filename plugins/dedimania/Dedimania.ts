@@ -1,5 +1,5 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
-import { trakman as tm } from '../../src/Trakman.js'
+
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 

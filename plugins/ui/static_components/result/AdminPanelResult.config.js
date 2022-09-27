@@ -1,6 +1,6 @@
 import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
-import { palette as p } from '../../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   height: 5,

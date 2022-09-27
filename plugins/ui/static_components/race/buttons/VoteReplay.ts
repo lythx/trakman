@@ -2,7 +2,7 @@
 import { ButtonData } from "./ButtonData.js";
 import { UiButton } from "./UiButton.js";
 import config from "./ButtonsWidget.config.js"
-import { trakman as tm } from "../../../../../src/Trakman.js";
+
 import { VoteWindow } from "../../../UiUtils.js";
 
 const cfg = config.voteReplay

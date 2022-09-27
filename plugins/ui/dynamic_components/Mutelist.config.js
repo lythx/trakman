@@ -1,6 +1,6 @@
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
-import { trakman as tm, palette as p } from '../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   privilege: tm.config.privileges.mute,
@@ -8,7 +8,7 @@ export default {
   icon: icons.mutelist,
   iconWidth: 2,
   iconHeight: 2,
-  unmuteIcon: icons.unmute, 
+  unmuteIcon: icons.unmute,
   unmuteIconHover: icons.unmuteHover,
   entries: 15,
   selfColour: "0F0",

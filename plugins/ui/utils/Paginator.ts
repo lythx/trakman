@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import config from './Paginator.config.js'
 import IDS from '../config/UtilIds.js'
 

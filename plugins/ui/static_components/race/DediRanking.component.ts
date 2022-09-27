@@ -1,5 +1,5 @@
 import { RecordList, IDS, StaticHeader, } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './DediRanking.config.js'

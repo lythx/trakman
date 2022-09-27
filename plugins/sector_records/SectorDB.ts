@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../src/Trakman.js'
+
 import config from './Config.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
@@ -28,15 +28,15 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
       REFERENCES map_ids(id)
 );`]
 
-const getQueryDBFunction = async ():Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> => {
+const getQueryDBFunction = async (): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> => {
   if (config.useDBClient === true && config.isEnabled) {
-   return await tm.db.getClient()
+    return await tm.db.getClient()
   }
   return tm.db.query
 }
 const queryDB = await getQueryDBFunction()
 
-for(const e of createQueries) {
+for (const e of createQueries) {
   queryDB(e)
 }
 

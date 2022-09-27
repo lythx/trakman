@@ -14,7 +14,7 @@ export interface TMEvents {
   "BeginMap": BeginMapInfo
   "EndMap": EndMapInfo
   "KarmaVote": KarmaVoteInfo
-  "VotesPrefetch": Readonly<TM.Vote>[]
+  "VotesPrefetch": Readonly<tm.Vote>[]
   "MapAdded": MapAddedInfo
   "MapRemoved": MapRemovedInfo
   "BillUpdated": BillUpdatedInfo

@@ -1,5 +1,4 @@
-import { palette as p } from '../../../src/Trakman.js'
-
+const p = tm.utils.palette
 const prefix = `$i` // Prefix all "fake" player messages with this (eg. $i, $t, etc)
 
 export default {

@@ -1,5 +1,5 @@
 import { centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './KarmaWidgetResult.config.js'
@@ -49,7 +49,7 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    const votes: TM.Vote[] = tm.karma.current
+    const votes: tm.Vote[] = tm.karma.current
     const voteAmounts: number[] = []
     for (let i = this.options.length - 1; i >= 0; i--) {
       voteAmounts.unshift(votes.filter(a => a.vote === this.options[i]).length)

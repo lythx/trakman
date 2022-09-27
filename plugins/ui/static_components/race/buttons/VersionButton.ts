@@ -2,7 +2,7 @@ import { ButtonData } from "./ButtonData.js";
 import { UiButton } from "./UiButton.js";
 import config from "./ButtonsWidget.config.js"
 import { IDS } from '../../../UiUtils.js'
-import { trakman as tm } from "../../../../../src/Trakman.js";
+
 
 const cfg = config.versionButton
 
