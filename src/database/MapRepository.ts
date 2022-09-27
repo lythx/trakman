@@ -209,11 +209,6 @@ export class MapRepository extends Repository {
   }
 
   private constructMapObject(entry: TableEntry): TM.Map {
-    if (entry.uid === 'DxUE4rh1DM8iSMDWaDUnGqjd6vj') {
-      console.log(entry.vote_count)
-      console.log(entry.vote_sum)
-      console.log(entry.vote_sum / entry.vote_count)
-    }
     return {
       id: entry.uid,
       name: entry.name,
