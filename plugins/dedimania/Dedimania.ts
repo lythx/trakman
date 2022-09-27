@@ -105,6 +105,9 @@ const getRecords = async (id: string, name: string, environment: string, author:
     login: a.Login, nickname: a.NickName, time: a.Best,
     checkpoints: a.Checks.slice(0, a.Checks.length - 1)
   }))
+  if (config.syncName === true) {
+    fixNicknameCoherence()
+  }
   emitFetchEvent(currentDedis)
 }
 
@@ -280,6 +283,17 @@ const constructRecordObject = (player: Omit<TM.Player, 'currentCheckpoints' | 'i
 const getLogString = (previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }): string[] => {
   const rs = tm.utils.getRankingString(previousPosition, position, previousTime, time)
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+}
+
+const fixNicknameCoherence = async (): Promise<void> => {
+  for (const record of currentDedis) {
+    const player = tm.records.local.find(a => a.login === record.login)
+    if (player === undefined) {
+      return
+    }
+    (player.nickname as any) = record.nickname
+    await tm.db.query(`update players set nickname=$1 where login=$2`, record.nickname, record.login)
+  }
 }
 
 if (config.isEnabled === true) {
