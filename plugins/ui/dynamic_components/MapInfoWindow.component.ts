@@ -81,7 +81,7 @@ export default class TMXWindow extends PopupWindow<number> {
       const TMXMap = TMXMaps[j] ?? undefined
       const mapRecords = allRecords.filter(a => a.map === map.id)
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, TMXMap)
-      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords,TMXMap)
+      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, TMXMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructEntry(tm.utils.safeString(tm.utils.strip(map.name, false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
@@ -184,7 +184,7 @@ export default class TMXWindow extends PopupWindow<number> {
     </frame>`
   }
 
-  private constructInfoXml(width: number, height: number, map: TM.Map,TMXMap?: TM.TMXMap): string {
+  private constructInfoXml(width: number, height: number, map: TM.Map, TMXMap?: TM.TMXMap): string {
     const grid = new Grid(width, height, config.info.columnsProportions, new Array(config.info.rows).fill(1),
       { margin: config.margin })
     const ic = config.icons
@@ -204,7 +204,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const infos: [string, string][] = [
       [map.mood, ic.mood[map.mood.toLowerCase() as keyof typeof ic.mood]],
       [tm.utils.formatDate(map.addDate, true), ic.addDate],
-      [map.voteRatio.toFixed(0), ic.voteRatio],
+      [map.voteRatio === -1 ? config.defaultText : map.voteRatio.toFixed(0), ic.voteRatio],
       [map.copperPrice.toString(), ic.copperPrice],
       [map.environment, ic.environment],
       [map?.checkpointsAmount !== undefined ? `${map.checkpointsAmount} CPs` : config.defaultText, ic.checkpointsAmount],
