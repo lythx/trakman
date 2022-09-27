@@ -94,7 +94,21 @@ export abstract class VoteService {
   private static updateMapVoteData(uid: string, arr: TM.Vote[]) {
     const count = arr.length
     const sum = arr.reduce((acc, cur) => acc += cur.vote, 0)
-    MapService.setVoteData({ uid, count, ratio: count === 0 ? 0 : (((sum / count) + 3) / 6) * 100 })
+    MapService.setVoteData({ uid, count, ratio: this.calculateVoteRatio(arr) })
+  }
+
+  private static calculateVoteRatio(votes: TM.Vote[]): number {
+    const values = {
+      '-3': 0,
+      '-2': 20,
+      '-1': 40,
+      '1': 60,
+      '2': 80,
+      '3': 100
+    }
+    const count = votes.length
+    const sum = votes.map(a => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc += cur, 0)
+    return count === 0 ? 0 : sum / count 
   }
 
   static async fetch(mapId: string): Promise<TM.Vote[] | undefined>

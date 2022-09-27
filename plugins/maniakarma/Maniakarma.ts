@@ -205,7 +205,7 @@ const fixCoherence = async (): Promise<void> => {
     const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)
     if (v === undefined) {
       const nickname = tm.players.get(e.login)?.nickname
-      await tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
+      tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
     }
   }
   for (const e of localVotes) {

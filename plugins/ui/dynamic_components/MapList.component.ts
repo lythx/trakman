@@ -270,7 +270,7 @@ export default class MapList extends PopupWindow {
              image="${this.icons[5]}"/>
             <frame posn="${this.iconW + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(Math.round(maps[index].voteRatio).toString(), karmaW,
+              ${centeredText(maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
             rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>

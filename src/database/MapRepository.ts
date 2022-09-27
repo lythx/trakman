@@ -209,6 +209,11 @@ export class MapRepository extends Repository {
   }
 
   private constructMapObject(entry: TableEntry): TM.Map {
+    if (entry.uid === 'DxUE4rh1DM8iSMDWaDUnGqjd6vj') {
+      console.log(entry.vote_count)
+      console.log(entry.vote_sum)
+      console.log(entry.vote_sum / entry.vote_count)
+    }
     return {
       id: entry.uid,
       name: entry.name,
@@ -228,7 +233,7 @@ export class MapRepository extends Repository {
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,
-      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) - 1) / 6) * 100,
+      voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
       isClassic: entry.leaderboard_rating === 0,
       isNadeo: entry.leaderboard_rating === 50000
     }
