@@ -1,7 +1,7 @@
 export interface TMPlayer {
   readonly id: number
   readonly login: string
-  readonly nickname: string
+  nickname: string
   readonly country: string
   readonly countryCode: string
   readonly region: string
