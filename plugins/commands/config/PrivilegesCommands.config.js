@@ -1,4 +1,4 @@
-import { palette as p } from '../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   noPrivilege: `${p.error}You cannot control privileges of a person who has equal or higher privilege than you.`,

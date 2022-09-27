@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../src/Trakman.js'
+
 import config from './Config.js'
 
 interface DonationInfo {

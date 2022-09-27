@@ -1,6 +1,6 @@
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
-import { trakman as tm, palette as p } from '../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   privilege: tm.config.privileges.addGuest,

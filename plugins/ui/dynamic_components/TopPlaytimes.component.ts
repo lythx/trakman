@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
+
 import { stats } from "../../stats/Stats.js";
 import { IDS, centeredText } from '../UiUtils.js'
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";

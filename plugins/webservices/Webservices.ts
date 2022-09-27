@@ -1,6 +1,6 @@
 import config from './Config.js'
 import http from 'http'
-import { trakman as tm } from '../../src/Trakman.js'
+
 
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 const currentAuthorListeners: ((data?: { nickname: string, country: string }) => void)[] = []

@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
+
 import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import config from './MapInfoWindow.config.js'

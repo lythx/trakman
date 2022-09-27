@@ -1,6 +1,6 @@
 import http, { ClientRequest } from 'http'
 import config from './Config.js'
-import { trakman as tm } from '../../src/Trakman.js'
+
 
 let isConnected = false
 

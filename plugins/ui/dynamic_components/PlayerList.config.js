@@ -1,6 +1,6 @@
 import icons from '../config/Icons.js'
 import ids from '../config/ComponentIds.js'
-import { trakman as tm, palette as p } from '../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   title: " Players ",

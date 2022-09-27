@@ -1,5 +1,5 @@
 // import StaticComponent from '../StaticComponent.js'
-// import { trakman as tm } from '../../../src/Trakman.js'
+//
 // import { IDS, CONFIG,  staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 
  //export default class LiveCheckpoint extends StaticComponent {

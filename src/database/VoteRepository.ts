@@ -42,7 +42,7 @@ export class VoteRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async add(...votes: TM.Vote[]): Promise<void> {
+  async add(...votes: tm.Vote[]): Promise<void> {
     if (votes.length === 0) { return }
     const query = `INSERT INTO votes(map_id, player_id, vote, date) 
     ${this.getInsertValuesString(4, votes.length)}`
@@ -50,7 +50,7 @@ export class VoteRepository extends Repository {
     const playerIds = await playerRepo.getId(votes.map(a => a.login))
     const values: any[] = []
     for (const [i, vote] of votes.entries()) {
-      const parsedVote = Number(Object.entries(tableVotes).find(a=> a[1] === vote.vote)?.[0])
+      const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote.vote)?.[0])
       values.push(mapIds[i].id, playerIds[i].id, parsedVote, vote.date)
     }
     await this.query(query, ...values)
@@ -60,11 +60,11 @@ export class VoteRepository extends Repository {
     const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
-    const parsedVote = Number(Object.entries(tableVotes).find(a=> a[1] === vote)?.[0])
+    const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote)?.[0])
     await this.query(query, parsedVote, date, mapId, playerId)
   }
 
-  async getOne(mapUid: string, login: string): Promise<TM.Vote | undefined> {
+  async getOne(mapUid: string, login: string): Promise<tm.Vote | undefined> {
     const query: string = `SELECT login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
     WHERE map_id=$1 AND player_id=$2;`
@@ -74,7 +74,7 @@ export class VoteRepository extends Repository {
     return res[0] === undefined ? undefined : this.constructVoteObject({ ...res[0], uid: mapUid })
   }
 
-  async get(...mapUids: string[]): Promise<TM.Vote[]> {
+  async get(...mapUids: string[]): Promise<tm.Vote[]> {
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
     JOIN map_ids ON map_ids.id=votes.map_id
@@ -85,7 +85,7 @@ export class VoteRepository extends Repository {
     return res.map(a => this.constructVoteObject(a))
   }
 
-  async getAll(): Promise<TM.Vote[]> {
+  async getAll(): Promise<tm.Vote[]> {
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN map_ids ON map_ids.id=votes.map_id
     JOIN players ON players.id=votes.player_id;`
@@ -93,7 +93,7 @@ export class VoteRepository extends Repository {
     return res.map(a => this.constructVoteObject(a))
   }
 
-  constructVoteObject(entry: TableEntry): TM.Vote {
+  constructVoteObject(entry: TableEntry): tm.Vote {
     return {
       login: entry.login,
       mapId: entry.uid,
