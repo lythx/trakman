@@ -7,6 +7,7 @@ export default {
   textScale: 1,
   padding: 0.1,
   overlayBackground: '7777',
+  defaultText: '-',
   colour: '$0F0',
   texts: {
     map: 'Map #',

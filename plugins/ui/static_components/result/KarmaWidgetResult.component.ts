@@ -61,7 +61,6 @@ export default class KarmaWidgetResult extends StaticComponent {
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const combined = Object.values(mkVotes).map((a: number, i) => a + voteAmounts[i])
     const max: number = Math.max(...combined)
-    const maxLocalAmount = Math.max(...voteAmounts)
     const personalVote = votes.find(a => a.login === login)?.vote
     return `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
@@ -115,7 +114,7 @@ export default class KarmaWidgetResult extends StaticComponent {
 
       (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[2]}"/>`,
-      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h, options),
+      (i, j, w, h) => centeredText(karma === -1 ? config.defaultText : Math.round(karma).toString(), w, h, options),
       (i, j, w, h) => centeredText(mkKarma, w, h, options),
 
       (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,

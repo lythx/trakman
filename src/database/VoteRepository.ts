@@ -19,19 +19,19 @@ CREATE TABLE IF NOT EXISTS votes(
 interface TableEntry {
   readonly uid: string
   readonly login: string
-  readonly vote: 1 | 2 | 3 | 4 | 5 | 6
+  readonly vote: 0 | 20 | 40 | 60 | 80 | 100
   readonly date: Date
 }
 
 const mapIdsRepo = new MapIdsRepository()
 const playerRepo = new PlayerRepository()
 const tableVotes = {
-  1: -3,
-  2: -2,
-  3: -1,
-  4: 1,
-  5: 2,
-  6: 3
+  0: -3,
+  20: -2,
+  40: -1,
+  60: 1,
+  80: 2,
+  100: 3
 } as const
 
 export class VoteRepository extends Repository {
