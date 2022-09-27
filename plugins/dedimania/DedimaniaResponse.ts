@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../src/Trakman.js'
+
 import xml2js from 'xml2js'
 import zlib from 'zlib'
 
@@ -20,6 +20,7 @@ export class DedimaniaResponse {
     const resLength = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
     const index = this._data.indexOf('\r\n\r\n')
     const content = this._data.slice(index + 4)
+    console.log(str, content.length, resLength)
     if (content.length === resLength) {
       for (const row of split) {
         if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }

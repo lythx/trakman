@@ -1,4 +1,4 @@
-import { trakman as tm } from "../../src/Trakman.js";
+
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 

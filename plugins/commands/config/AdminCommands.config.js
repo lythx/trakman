@@ -1,4 +1,4 @@
-import { palette as p } from '../../../src/Trakman.js'
+const p = tm.utils.palette
 
 export default {
   kick: {

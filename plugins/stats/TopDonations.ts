@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../src/Trakman.js'
+
 import { donations } from '../donations/Donations.js'
 import config from './Config.js'
 

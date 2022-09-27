@@ -1,4 +1,4 @@
-import { trakman as tm } from "../../src/Trakman.js"
+
 import RaceUi from "./config/RaceUi.js"
 import ResultUi from "./config/ResultUi.js"
 

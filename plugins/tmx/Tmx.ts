@@ -1,5 +1,5 @@
 import config from './Config.js'
-import { trakman as tm } from '../../src/Trakman.js'
+
 import { TMXMapChangedInfo } from './TmxTypes.js'
 
 // fill with empty strings at start to avoid undefined error on startup

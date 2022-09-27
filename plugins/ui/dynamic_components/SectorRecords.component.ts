@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
 import config from './SectorRecords.config.js'

@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import PopupWindow from '../PopupWindow.js'
 import { IDS, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
 import config from './CurrentCps.config.js'

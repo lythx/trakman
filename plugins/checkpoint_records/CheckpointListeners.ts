@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../src/Trakman.js'
+
 import { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
 import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'

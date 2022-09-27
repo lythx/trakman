@@ -1,6 +1,6 @@
 import { IDS, RecordList, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {

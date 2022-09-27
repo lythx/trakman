@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../../src/Trakman.js'
+
 
 let listeners: { callback: ((info: ManialinkClickInfo) => void), actionId: number, range?: number }[] = []
 

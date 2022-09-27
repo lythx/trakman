@@ -1,8 +1,8 @@
-import { trakman as tm } from "../../src/Trakman.js";
+
 import config from './Config.js'
 
 let onlineList: { login: string, nickname: string, count: number }[] = []
-let initialVotes: TM.Vote[] = []
+let initialVotes: tm.Vote[] = []
 let topList: { login: string, nickname: string, count: number }[] = []
 const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void)[] = []
 

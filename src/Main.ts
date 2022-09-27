@@ -1,3 +1,4 @@
+import './Trakman.js'
 import { Client } from './client/Client.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
@@ -5,7 +6,6 @@ import 'dotenv/config'
 import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ChatService } from './services/ChatService.js'
-import '../Plugins.js'
 import { GameService } from './services/GameService.js'
 import { RecordService } from './services/RecordService.js'
 import { Events } from './Events.js'
@@ -13,6 +13,7 @@ import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { fixCoherence } from './FixRankCoherence.js'
+await import('../Plugins.js')
 
 async function main(): Promise<void> {
   await Logger.initialize()

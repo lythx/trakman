@@ -1,4 +1,4 @@
-import { trakman as tm } from '../../../src/Trakman.js'
+
 import config from '../config/ChatCommands.config.js'
 
 const commands: TM.Command[] = [
