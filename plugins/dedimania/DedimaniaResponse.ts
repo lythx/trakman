@@ -18,12 +18,12 @@ export class DedimaniaResponse {
     const str = this._data.toString()
     const split: string[] = str.split('\n')
     const resLength = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
-    if (str.split('\r\n\r\n')[1].length + 200 >= resLength) { // todo fix
+    const index = this._data.indexOf('\r\n\r\n')
+    const content = this._data.slice(index + 4)
+    if (content.length === resLength) {
       for (const row of split) {
         if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }
       }
-      const index = data.indexOf('\r\n\r\n')
-      const content = data.slice(index + 4)
       this._xml = zlib.gunzipSync(content).toString()
       this.generateJson()
       this._status = 'completed'
