@@ -25,6 +25,7 @@ export default class DediRankingResult extends StaticComponent {
     this.recordList.onClick((info: ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
+    dedimania.onNicknameUpdate((): void => this.display())
     tm.addListener('PlayerJoin', (info: JoinInfo): void => {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })

@@ -1,5 +1,4 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
-
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
@@ -10,6 +9,7 @@ const client: DedimaniaClient = new DedimaniaClient()
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
+const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -17,6 +17,10 @@ const emitRecordEvent = (record: NewDediRecord): void => {
 
 const emitFetchEvent = (dedis: DediRecord[]): void => {
   for (const e of fetchListeners) { e(dedis) }
+}
+
+const emitNicknameUpdateEvent = (updatedRecords: DediRecord[]): void => {
+  for (const e of nicknameUpdateListeners) { e(updatedRecords) }
 }
 
 const initialize = async (): Promise<void> => {
@@ -106,7 +110,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     checkpoints: a.Checks.slice(0, a.Checks.length - 1)
   }))
   if (config.syncName === true) {
-    fixNicknameCoherence()
+    void tm.updatePlayerInfo(...currentDedis)
   }
   emitFetchEvent(currentDedis)
 }
@@ -285,15 +289,6 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
 }
 
-const fixNicknameCoherence = async (): Promise<void> => {
-  for (const record of currentDedis) {
-    const player = tm.records.getLocal(record.login)
-    if (player === undefined) { return }
-    (player.nickname as any) = record.nickname
-    await tm.db.query(`UPDATE players SET nickname=$1 WHERE login=$2`, record.nickname, record.login)
-  }
-}
-
 if (config.isEnabled === true) {
 
   tm.addListener('Startup', () => {
@@ -320,6 +315,20 @@ if (config.isEnabled === true) {
   tm.addListener('PlayerFinish', (info) => {
     void addRecord(info, info.time, info.checkpoints)
   }, true)
+
+  tm.addListener('PlayerInfoUpdated', (info) => {
+    const changedObjects: DediRecord[] = []
+    for (const e of currentDedis) {
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    if (changedObjects.length !== 0) {
+      emitNicknameUpdateEvent(changedObjects)
+    }
+  })
 
 }
 
@@ -369,7 +378,7 @@ export const dedimania = {
    * Add a callback function to execute on a dedimania record
    * @param callback Function to execute on event. It takes new record object as a parameter
    */
-  onRecord(callback: ((record: NewDediRecord) => void)): void {
+  onRecord(callback: ((record: Readonly<NewDediRecord>) => void)): void {
     recordListeners.push(callback)
   },
 
@@ -377,8 +386,16 @@ export const dedimania = {
    * Add a callback function to execute when dedimania records get fetched
    * @param callback Function to execute on event. It takes record objects array as a parameter
    */
-  onFetch(callback: ((dedis: DediRecord[]) => void)): void {
+  onFetch(callback: ((dedis: Readonly<Readonly<DediRecord>[]>) => void)): void {
     fetchListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute when player nickname in dedimania records gets updated
+   * @param callback Function to execute on event. It takes changed record objects array as a parameter
+   */
+  onNicknameUpdate(callback: ((dedis: Readonly<Readonly<DediRecord>[]>) => void)): void {
+    nicknameUpdateListeners.push(callback)
   },
 
   getRecord,

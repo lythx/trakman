@@ -42,18 +42,18 @@ for (const e of createQueries) {
 
 export const allSecsDB = {
 
-  async get(mapDBId: number, ...playerLogins: string[]): Promise<{ sectors: (number | undefined)[], login: string }[] | Error> {
+  async get(mapDBId: number, ...playerLogins: string[]): Promise<{ sectors: (number | undefined)[], login: string, nickname: string }[] | Error> {
     if (playerLogins.length === 0) { return [] }
     const playerDBIds = await tm.getPlayerDBId(playerLogins)
-    const query = `SELECT sectors, login FROM sector_records
+    const query = `SELECT sectors, login, nickname FROM sector_records
     JOIN players ON players.id=sector_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
-    const res: { sectors: number[], login: string }[] | Error = (await queryDB(query, mapDBId, ...playerDBIds.map(a => a.id)))
+    const res: { sectors: number[], login: string, nickname: string }[] | Error = (await queryDB(query, mapDBId, ...playerDBIds.map(a => a.id)))
     if (res instanceof Error) {
       tm.log.error(`Error when fetching sector records of players ${playerDBIds} on map ${mapDBId}`, res.message)
       return []
     }
-    return res.map(a => ({ login: a.login, sectors: a.sectors.map(b => b === -1 ? undefined : b) }))
+    return res.map(a => ({ login: a.login, sectors: a.sectors.map(b => b === -1 ? undefined : b), nickname: a.nickname }))
   },
 
   async add(mapId: number, login: string, sectors: number[]): Promise<void> {

@@ -26,6 +26,7 @@ export default class SectorRecords extends PopupWindow {
       },
       privilege: 0
     })
+   sectorRecords.addListener('NicknameUpdated',()=>this.reRender())
     sectorRecords.addListener('BestSector', () => this.reRender())
     sectorRecords.addListener('SectorsFetch', () => {
       this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))

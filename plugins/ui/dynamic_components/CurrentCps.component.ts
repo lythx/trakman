@@ -67,7 +67,7 @@ export default class CurrentCps extends PopupWindow {
       help: 'Display each online players current cp.',
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
   }
 
   // Override onOpen method to add page count to params and display it

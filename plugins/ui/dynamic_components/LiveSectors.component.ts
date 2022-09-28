@@ -42,7 +42,8 @@ export default class LiveSectors extends PopupWindow {
       help: 'Display current map live sectors.',
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
