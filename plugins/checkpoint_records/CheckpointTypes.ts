@@ -7,7 +7,7 @@ export type BestCheckpoints = ({
 
 export interface PlayerCheckpoints {
   readonly login: string
-  readonly nickname: string
+  nickname: string
   readonly checkpoints: (number | undefined)[]
 }
 
@@ -20,4 +20,5 @@ export interface CheckpointEventFunctions {
     deletedCheckpoints: readonly Readonly<{ index: number, time: number }>[]
   }>) => void)
   'PlayerCheckpoint': ((playerCheckpoint: Readonly<{ login: string, nickname: string, index: number }>) => void)
+  'NicknameUpdated': ((players: Readonly<Readonly<{ login: string, nickname: string }>[]>) => void)
 }

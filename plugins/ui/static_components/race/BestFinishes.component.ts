@@ -31,6 +31,9 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      if (this.bestFinishes.some(a => info.some(b => b.login === a.login))) { this.display() }
+    })
     tm.addListener('BeginMap', () => {
       this.newestFinish = -1
       this.bestFinishes.length = 0

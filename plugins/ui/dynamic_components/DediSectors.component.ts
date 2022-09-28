@@ -44,6 +44,7 @@ export default class DediSectors extends PopupWindow {
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

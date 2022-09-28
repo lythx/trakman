@@ -47,6 +47,7 @@ export default class Mutelist extends PopupWindow<number> {
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
