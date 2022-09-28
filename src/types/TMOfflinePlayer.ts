@@ -9,7 +9,7 @@ export interface TMOfflinePlayer {
   readonly isUnited: boolean
   readonly wins: number
   readonly privilege: number
-  readonly lastOnline ?: Date
-  readonly rank ?: number
+  readonly lastOnline?: Date
+  readonly rank?: number
   readonly average: number
 }

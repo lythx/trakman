@@ -125,14 +125,20 @@ export class RecordService {
    * Updates the player nickname in runtime memory
    * @param players Objects containing player logins and nicknames
    */
-  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+  static updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): void {
+    const replaceInfos = (obj: { nickname: string, region: string, title?: string },
+      replacer: { nickname?: string, region?: string, title?: string }) => {
+      if (replacer.nickname !== undefined) { obj.nickname = replacer.nickname }
+      if (replacer.region !== undefined) { obj.region = replacer.region } // todo country and country code
+      if (replacer.title !== undefined && obj.title !== undefined) { obj.title = replacer.title }
+    }
     for (const p of players) {
       const obj1 = this._liveRecords.find(a => a.login === p.login)
-      if (obj1 !== undefined) { obj1.nickname = p.nickname }
+      if (obj1 !== undefined) { replaceInfos(obj1, p) }
       const obj2 = this._localRecords.find(a => a.login === p.login)
-      if (obj2 !== undefined) { obj2.nickname = p.nickname }
+      if (obj2 !== undefined) { replaceInfos(obj2, p) }
       const obj3 = this._initialLocals.find(a => a.login === p.login)
-      if (obj3 !== undefined) { obj3.nickname = p.nickname }
+      if (obj3 !== undefined) { replaceInfos(obj3, p) }
     }
   }
 

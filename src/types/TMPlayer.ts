@@ -1,7 +1,7 @@
 export interface TMPlayer {
   readonly id: number
   readonly login: string
-  nickname: string
+  readonly nickname: string
   readonly country: string
   readonly countryCode: string
   readonly region: string
@@ -14,7 +14,7 @@ export interface TMPlayer {
   readonly ladderPoints: number
   readonly ladderRank: number
   readonly lastOnline?: Date
-  readonly title: string
+  title: string
   wins: number
   privilege: number
   isSpectator: boolean
