@@ -18,19 +18,23 @@ export interface TMEvents {
   "MapAdded": MapAddedInfo
   "MapRemoved": MapRemovedInfo
   "BillUpdated": BillUpdatedInfo
-  "MatchSettingsUpdated": TM.Map[]
+  "MatchSettingsUpdated": tm.Map[]
   "PrivilegeChanged": PrivilegeChangedInfo
-  "LocalRecordsRemoved": TM.Record[]
-  "JukeboxChanged": TM.Map[]
+  "LocalRecordsRemoved": tm.Record[]
+  "JukeboxChanged": tm.Map[]
   "RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
-  "Ban": Readonly<TM.BanlistEntry>
-  "Unban": Readonly<TM.BanlistEntry>
-  "Blacklist": Readonly<TM.BlacklistEntry>
-  "Unblacklist": Readonly<TM.BlacklistEntry>
-  "Mute": Readonly<TM.MutelistEntry>
-  "Unmute": Readonly<TM.MutelistEntry>
-  "AddGuest": Readonly<TM.GuestlistEntry>
-  "RemoveGuest": Readonly<TM.GuestlistEntry>
+  "Ban": Readonly<tm.BanlistEntry>
+  "Unban": Readonly<tm.BanlistEntry>
+  "Blacklist": Readonly<tm.BlacklistEntry>
+  "Unblacklist": Readonly<tm.BlacklistEntry>
+  "Mute": Readonly<tm.MutelistEntry>
+  "Unmute": Readonly<tm.MutelistEntry>
+  "AddGuest": Readonly<tm.GuestlistEntry>
+  "RemoveGuest": Readonly<tm.GuestlistEntry>
+  "PlayerInfoUpdated": Readonly<{
+    readonly login: string, readonly nickname?: string, readonly title?: string,
+    readonly country?: { readonly name: string, readonly code: string, readonly region: string }
+  }[]>
   "TrackMania.PlayerConnect": [string, boolean]
   "TrackMania.PlayerDisconnect": [string]
   "TrackMania.PlayerChat": [number, string, string, boolean]

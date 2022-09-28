@@ -8,6 +8,7 @@ import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
 import { PlayerService } from "./PlayerService.js";
 import { Events } from "../Events.js";
+import { Utils } from "../Utils.js";
 
 export class AdministrationService {
 
@@ -84,7 +85,7 @@ export class AdministrationService {
    * Updates the player nickname in runtime memory
    * @param players Objects containing player logins and nicknames
    */
-  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+  static updateNickname(...players: { login: string, nickname: string }[]): void {
     const replaceNickname = (arr: { nickname?: string, login: string, callerLogin: string, callerNickname: string }[]) => {
       for (const p of players) {
         const obj = arr.find(a => a.login === p.login)
@@ -310,6 +311,7 @@ export class AdministrationService {
       void this.privilegeRepo.set(login, privilege)
       return
     }
+    PlayerService.updateInfo({ login, title: PlayerService.getTitle(login, privilege, player.country, player.countryCode) })
     Events.emit('PrivilegeChanged', {
       player: player === undefined ? undefined : { ...player, privilege },
       login,

@@ -125,6 +125,22 @@ export const Utils = {
     return strippedStr
   },
 
+  /**
+   * Gets country information from region in Nadeo format
+   * @param region Region in Nadeo format, can start with World but doesn't have to
+   * @returns Object containing parsed region, country and country code if matching one was found
+   */
+  getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
+    let split = region.split('|')
+    if (region.startsWith('World')) { // check if works todo
+      split.shift()
+    }
+    const r: string = split.join('|')
+    const country: string = split[0]
+    const countryCode: string | undefined = this.countryToCode(country)
+    return { region: r, country, countryCode }
+  },
+
   matchString,
 
   countryToCode(country: string): string | undefined {

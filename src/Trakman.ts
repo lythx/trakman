@@ -366,6 +366,18 @@ namespace trakman {
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
   }
 
+  /**
+   * Updates player information in runtime memory and database
+   * @param players Objects containing player login and infos to update
+   */
+  export const updatePlayerInfo = async (...players:
+    { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> => {
+    await PlayerService.updateInfo(...players)
+    RecordService.updateInfo(...players)
+    AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
+    Events.emit('PlayerInfoUpdated', players)
+  }
+
   // TO BE REMOVED
   export const getPlayerDBId = playerIdsRepo.getId.bind(playerIdsRepo)
 
