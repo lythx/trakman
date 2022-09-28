@@ -3,7 +3,7 @@ import config from './Config.js'
 
 interface DonationInfo {
   readonly login: string
-  readonly nickname: string
+  nickname: string
   sum: number,
   readonly history: {
     readonly date: Date,
@@ -12,6 +12,7 @@ interface DonationInfo {
 }
 
 const listeners: ((info: DonationInfo & { readonly amount: number }) => void)[] = []
+const nicknameChangeListeners: ((info: DonationInfo[]) => void)[] = []
 let onlineDonators: DonationInfo[] = []
 await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
   player_id INT4 NOT NULL,
@@ -31,6 +32,22 @@ tm.addListener("PlayerJoin", async (info) => {
 
 tm.addListener('PlayerLeave', (info) => {
   onlineDonators = onlineDonators.filter(a => a.login !== info.login)
+})
+
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: DonationInfo[] = []
+  for (const e of onlineDonators) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for(const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
 })
 
 /**
@@ -161,6 +178,14 @@ export const donations = {
    */
   onDonation(callback: (info: DonationInfo & { readonly amount: number }) => void) {
     listeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (info: DonationInfo[]) => void) {
+    nicknameChangeListeners.push(callback)
   },
 
   /**

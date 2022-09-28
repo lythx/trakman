@@ -5,6 +5,7 @@ let onlineList: { login: string, nickname: string, count: number }[] = []
 let initialVotes: tm.Vote[] = []
 let topList: { login: string, nickname: string, count: number }[] = []
 const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, count(players.id)::int
@@ -23,6 +24,29 @@ const initialize = async () => {
 tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
   initialVotes = tm.karma.current
+})
+
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  for (const e of onlineList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
 })
 
 tm.addListener('BeginMap', (): void => {
@@ -85,6 +109,14 @@ export const topVotes = {
 
   onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void) {
     updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
   }
 
 }
