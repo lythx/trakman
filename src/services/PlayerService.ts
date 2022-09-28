@@ -67,7 +67,7 @@ export class PlayerService {
    * @param country Player nation
    * @param countryCode Player nation code
    */
-  private static getPlayerTitle(login: string, privilege: number, country: string, countryCode: string): string {
+  static getTitle(login: string, privilege: number, country: string, countryCode: string): string {
     const loginTitle = titles.logins[login as keyof typeof titles.logins]
     if (loginTitle !== undefined) { return loginTitle }
     const countryTitle = titles.countries[country as keyof typeof titles.countries]
@@ -91,10 +91,7 @@ export class PlayerService {
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
     ladderPoints: number, ladderRank: number, serverStart?: true): Promise<JoinInfo> {
-    let s: string[] = fullRegion.split('|').slice(1)
-    const region: string = s.join('|')
-    const country: string = s[0]
-    let countryCode: string | undefined = Utils.countryToCode(country)
+    const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
       await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
@@ -125,7 +122,7 @@ export class PlayerService {
         ladderPoints,
         ladderRank,
         rank: index === -1 ? undefined : (index + 1),
-        title: this.getPlayerTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -150,7 +147,7 @@ export class PlayerService {
         average: playerData.average,
         ladderPoints,
         ladderRank,
-        title: this.getPlayerTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode)
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
@@ -163,16 +160,19 @@ export class PlayerService {
   }
 
   /**
-   * Updates the player nickname in runtime memory and the database
-   * @param players Objects containing player logins and nicknames
+   * Updates the player information in runtime memory and the database
+   * @param players Objects containing player login and infos to change
    */
-  static async updateNickname(...players: { login: string, nickname: string }[]): Promise<void> {
+  static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
     for (const p of players) {
       const obj = this._players.find(a => a.login === p.login)
-      if (obj !== undefined) {
-        obj.nickname = p.nickname
+      if (obj === undefined) { continue }
+      if (p.title !== undefined) { obj.title = p.title }
+      const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
+      if (p.nickname !== undefined || countryCode !== undefined) {
+        const r = countryCode === undefined ? obj.region : region // Set only if region is valid
+        await this.repo.updateNicknameAndRegion(p.login, p.nickname ?? obj.nickname, r)
       }
-      await this.repo.updateNickname(p.login, p.nickname)
     }
   }
 

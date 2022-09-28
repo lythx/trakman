@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { Utils } from '../Utils.js'
+import { Logger } from '../Logger.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
@@ -71,9 +72,9 @@ export class PlayerRepository extends Repository {
     await this.query(query, average, login)
   }
 
-  async updateNickname(login: string, nickname: string): Promise<void> {
-    const query: string = `UPDATE players SET nickname=$1 WHERE login=$2;`
-    await this.query(query, nickname, login)
+  async updateNicknameAndRegion(login: string, nickname: string, region: string): Promise<void> {
+    const query: string = `UPDATE players SET nickname=$1, region=$2 WHERE login=$3;`
+    await this.query(query, nickname, region, login)
   }
 
   async updateOnWin(login: string, wins: number): Promise<void> {
@@ -141,12 +142,16 @@ export class PlayerRepository extends Repository {
   }
 
   private constructPlayerObject(entry: TableEntry): TM.OfflinePlayer {
-    const country: string = entry.region.split('|')[0]
+    const { countryCode, country } = Utils.getRegionInfo(entry.region)
+    if (countryCode === undefined) {
+      void Logger.fatal(`Country code for player ${entry.login} is undefined, received region: ${entry.region}. Check your database`)
+      return null as any
+    }
     return {
       login: entry.login,
       nickname: entry.nickname,
       country: country,
-      countryCode: Utils.countryToCode(country) as any,
+      countryCode: countryCode,
       region: entry.region,
       timePlayed: entry.time_played * 1000,
       lastOnline: entry.last_online ?? undefined,
