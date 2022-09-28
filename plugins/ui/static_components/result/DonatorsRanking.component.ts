@@ -15,9 +15,8 @@ export default class DonatorsRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.donations.onUpdate(() => {
-      this.display()
-    })
+    stats.donations.onUpdate(() => this.display())
+    stats.donations.onNicknameChange(() => this.display())
   }
 
   display(): void {

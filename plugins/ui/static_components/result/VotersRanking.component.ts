@@ -23,6 +23,7 @@ export default class VotersRanking extends StaticComponent {
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     stats.votes.onUpdate(() => this.display())
+    stats.votes.onNicknameChange(() => this.display())
   }
 
   display(): void {

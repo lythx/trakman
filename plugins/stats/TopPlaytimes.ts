@@ -2,8 +2,8 @@
 import config from './Config.js'
 
 let topList: { login: string, nickname: string, playtime: number }[] = []
-
 const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, time_played AS playtime FROM players
@@ -17,11 +17,27 @@ const initialize = async () => {
   topList = res.map(a => ({ ...a, playtime: a.playtime * 1000 }))
 }
 
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
+})
+
 tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('EndMap', (info) => {
+tm.addListener('EndMap', () => {
   const players = tm.players.list
   for (const e of players) {
     const pt = e.timePlayed + Date.now() - e.joinTimestamp
@@ -48,6 +64,14 @@ export const topPlaytimes = {
 
   onUpdate(callback: (updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void) {
     updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
   }
 
 }

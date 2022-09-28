@@ -23,6 +23,7 @@ export default class VisitorsRanking extends StaticComponent {
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     stats.visits.onUpdate(() => this.display())
+    stats.visits.onNicknameChange(() => this.display())
   }
 
   display(): void {

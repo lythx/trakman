@@ -24,6 +24,7 @@ export default class AveragesRanking extends StaticComponent {
       config.height - (this.header.options.height + config.margin), config.columnProportions,
       { background: config.background, headerBg: this.header.options.textBackground })
     stats.averages.onUpdate(() => this.display())
+    stats.averages.onNicknameChange(()=>this.display())
   }
 
   display(): void {

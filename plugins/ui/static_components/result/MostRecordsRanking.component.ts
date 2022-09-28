@@ -19,9 +19,8 @@ export default class MostRecordsRanking extends StaticComponent {
     tm.addListener('EndMap', () => {
       this.constructXml()
     })
-    stats.records.onUpdate(() => {
-      this.display()
-    })
+    stats.records.onUpdate(() => this.display())
+    stats.records.onNicknameChange(() => this.display())
   }
 
   display(): void {
