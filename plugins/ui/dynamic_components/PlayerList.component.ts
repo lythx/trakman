@@ -39,6 +39,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
       if (info.actionId >= this.openId + this.actions.kick
         && info.actionId < this.openId + this.actions.kick + 1000) { // Kick

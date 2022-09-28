@@ -42,7 +42,8 @@ export default class LiveCps extends PopupWindow {
       help: 'Display current map live checkpoints.',
       callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

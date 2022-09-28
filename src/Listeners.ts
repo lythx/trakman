@@ -38,6 +38,13 @@ export class Listeners {
           playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
         AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
         RecordService.updateInfo({ login, nickname: joinInfo.nickname, region: joinInfo.region, title: joinInfo.title })
+        Events.emit('PlayerInfoUpdated', [{
+          login, nickname: joinInfo.nickname, country: {
+            name: joinInfo.country,
+            code: joinInfo.countryCode,
+            region: joinInfo.region
+          }, title: joinInfo.title
+        }])
         Events.emit('PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo[0].Login)

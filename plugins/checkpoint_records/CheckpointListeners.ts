@@ -41,6 +41,29 @@ if (config.isEnabled === true) {
     await onMapStart()
   }, true)
 
+  tm.addListener('PlayerInfoUpdated', (info) => {
+    const changedObjects: { login: string; nickname: string; }[] = []
+    for (const e of currentBestCps) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    for (const e of currentPlayerCps) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    if (changedObjects.length !== 0) {
+      emitEvent('NicknameUpdated', changedObjects)
+    }
+  }, true)
+
   tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
     const date = new Date()
     const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)

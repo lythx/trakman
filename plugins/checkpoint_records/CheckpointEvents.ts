@@ -5,6 +5,7 @@ const bestDeleteListeners: Function[] = []
 const bestCheckpointListeners: Function[] = []
 const playerCheckpointListeners: Function[] = []
 const playerDeleteListeners: Function[] = []
+const nicknameUpdateListeners: Function[] = []
 
 /**
  * Registers a callback to execute on a given event
@@ -27,6 +28,9 @@ const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callbac
       return
     case 'PlayerCheckpoint':
       playerCheckpointListeners.push(callback as any)
+      return
+    case 'NicknameUpdated':
+      nicknameUpdateListeners.push(callback as any)
   }
 }
 
@@ -47,6 +51,9 @@ const emitEvent = async <T extends keyof CheckpointEventFunctions>(event: T, ...
       break
     case 'PlayerCheckpoint':
       listeners = playerCheckpointListeners
+      break
+    case 'NicknameUpdated':
+      listeners = nicknameUpdateListeners
   }
   for (const e of listeners) {
     await e(...params)

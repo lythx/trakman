@@ -43,6 +43,9 @@ export default class BestCps extends StaticComponent {
       this.bestCps.length = 0
       this.display()
     })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      if (this.bestCps.some(a => info.some(b => b.login === a.login))) { this.display() }
+    })
     this.paginator.onPageChange = (login: string) => {
       this.displayToPlayer(login)
     }

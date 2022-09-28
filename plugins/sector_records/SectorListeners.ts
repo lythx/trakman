@@ -41,12 +41,35 @@ if (config.isEnabled === true) {
     await onMapStart()
   }, true)
 
+  tm.addListener('PlayerInfoUpdated', (info) => {
+    const changedObjects: { login: string; nickname: string; }[] = []
+    for (const e of currentBestSecs) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    for (const e of currentPlayerSecs) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    if (changedObjects.length !== 0) {
+      emitEvent('NicknameUpdated', changedObjects)
+    }
+  }, true)
+
   tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
     const date = new Date()
     const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
     const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
     if (playerSectors === undefined) {
-      currentPlayerSecs.push({ login: info.player.login, sectors: [time] })
+      currentPlayerSecs.push({ login: info.player.login, sectors: [time], nickname: info.player.nickname })
       void allSecsDB.add(currentMapDBId, info.player.login, [time])
       emitEvent('PlayerSector', { login: info.player.login, nickname: info.player.nickname, index: info.index })
     } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
@@ -74,7 +97,7 @@ if (config.isEnabled === true) {
     const playerSectors = currentPlayerSecs.find(a => a.login === info.login)
     const time = info.time - (info.checkpoints[index - 1] ?? 0)
     if (playerSectors === undefined) {
-      currentPlayerSecs.push({ login: info.login, sectors: [time] })
+      currentPlayerSecs.push({ login: info.login, sectors: [time], nickname: info.nickname })
       void allSecsDB.add(currentMapDBId, info.login, [time])
       emitEvent('PlayerSector', { login: info.login, nickname: info.nickname, index: index })
     } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
