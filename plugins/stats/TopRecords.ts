@@ -1,9 +1,10 @@
 
 import config from './Config.js'
 
-let topList: { readonly login: string, readonly nickname: string, amount: number }[] = []
-let onlineList: { readonly login: string, readonly nickname: string, amount: number }[] = []
+let topList: { readonly login: string, nickname: string, amount: number }[] = []
+let onlineList: { readonly login: string, nickname: string, amount: number }[] = []
 const listeners: ((updatedLogin: string, list: Readonly<{ login: string, nickname: string, amount: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
@@ -19,6 +20,29 @@ const initialize = async () => {
   topList = res
   onlineList = await getFromDB(tm.players.list.map(a => a.login))
 }
+
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  for (const e of onlineList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
+})
 
 async function getFromDB(login: string): Promise<{ login: string, nickname: string, amount: number } | undefined>
 async function getFromDB(logins: string[]): Promise<{ login: string, nickname: string, amount: number }[]>
@@ -95,5 +119,13 @@ export const topRecords = {
   onUpdate(callback: (updatedLogin: string, list: Readonly<{ login: string, nickname: string, amount: number }>[]) => void) {
     listeners.push(callback)
   },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
+  }
 
 }

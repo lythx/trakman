@@ -1,7 +1,7 @@
 import { IDS, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 
-import { topWins } from '../../../stats/TopWins.js'
+import { stats } from '../../../stats/Stats.js'
 import config from './WinnersRanking.config.js'
 
 export default class WinnersRanking extends StaticComponent {
@@ -15,7 +15,8 @@ export default class WinnersRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    topWins.onUpdate(() => this.display())
+    stats.wins.onUpdate(() => this.display())
+    stats.wins.onNicknameChange(() => this.display())
   }
 
   display(): void {
@@ -30,7 +31,7 @@ export default class WinnersRanking extends StaticComponent {
   }
 
   constructXml() {
-    const list = topWins.list
+    const list = stats.wins.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${config.posX} ${config.posY} 2">

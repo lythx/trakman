@@ -21,6 +21,11 @@ export default class TopWins extends PopupWindow<number> {
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
+    stats.wins.onNicknameChange(() => {
+      this.ranks = stats.wins.list
+      this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
+      this.reRender()
+    })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(this.ranks.length / config.entries))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)

@@ -21,6 +21,11 @@ export default class TopVisits extends PopupWindow<number> {
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
+    stats.visits.onNicknameChange(() => {
+      this.ranks = stats.visits.list
+      this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
+      this.reRender()
+    })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(this.ranks.length / config.entries))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
