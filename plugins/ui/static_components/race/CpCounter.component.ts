@@ -95,6 +95,7 @@ export default class CpCounter extends StaticComponent {
     let counter = `${colour}${params?.index ?? 0}/${cpAmount}`
     if (params?.isFinish === true) {
       counter = config.finishText
+      setTimeout(() => this.displayToPlayer(login), config.finishTextDuration)
     }
     let counterXml = `
     <frame posn="${h.squareWidth + h.margin * 2 + h.rectangleWidth} 0 3">
@@ -113,7 +114,7 @@ export default class CpCounter extends StaticComponent {
               ${this.header.constructXml(config.colours.default + text, config.icon, config.side, { rectangleWidth })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
-                ${this.constructTimeXml(login, params?.isFinish, params?.current, params?.best)}
+                ${cpAmount === 0 ? '' : this.constructTimeXml(login, params?.isFinish, params?.current, params?.best)}
               </frame>
             </frame>
         </manialink>`, login)
