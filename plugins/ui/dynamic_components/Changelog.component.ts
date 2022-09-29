@@ -32,7 +32,9 @@ export default class Changelog extends PopupWindow {
       (i, j, w, h) => this.constructEntry('0.4', '10/08/2022',
         `- Added map list utilites\n- Added autojuke\n- Added endscreen ui\n- Implemented donations table\n- Fixed a ton ton ton of bugs`, w, h),
       (i, j, w, h) => this.constructEntry('0.5', '04/09/2022',
-        `- Added map info window\n- Fixed tmx and karma bugs\n- Fixed endscreen ui bugs\n- Fixed dedimania info bugs`, w, h)
+        `- Added map info window\n- Fixed tmx and karma bugs\n- Fixed endscreen ui bugs\n- Fixed dedimania info bugs`, w, h),
+      (i, j, w, h) => this.constructEntry('0.6', '29/09/2022',
+        `- Added cp counter\n- Added player stats windows\n- Added admin panel and\n  windows\n- Improved karma system`, w, h)
     ]
     return grid.constructXml(entries)
   }
