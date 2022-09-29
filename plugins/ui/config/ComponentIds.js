@@ -60,5 +60,6 @@ export default {
   topVotes: 280000,
   topWins: 290000,
   topSums: 300000,
-  mutelist: 310000
+  mutelist: 310000,
+  cpTime: 320000
 }
