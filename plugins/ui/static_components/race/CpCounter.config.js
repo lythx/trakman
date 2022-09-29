@@ -24,5 +24,6 @@ export default {
     equal: p.tmYellow,
     finish: p.tmGreen
   },
-  background: cfg.background
+  background: cfg.background,
+  finishTextDuration: 3000
 }
