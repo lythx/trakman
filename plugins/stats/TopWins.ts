@@ -14,7 +14,7 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top wins', res.message, res.stack)
     return
   }
-  topList = res
+  topList = res.filter(a => a.wins !== 0)
 }
 
 tm.addListener('Startup', async (): Promise<void> => {
