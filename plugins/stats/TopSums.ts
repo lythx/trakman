@@ -2,10 +2,13 @@
 import config from './Config.js' // TODO FIX
 
 let topList: { login: string, nickname: string, sums: [number, number, number, number] }[] = []
-const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, sums: [number, number, number, number] }[]) => void)[] = []
+const updateListeners: ((list: { login: string, nickname: string, sums: [number, number, number, number] }[], updatedLogin?: string) => void)[] = []
 const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+let initialLocals: tm.LocalRecord[] = []
+let refreshNeeded = false
 
 const initialize = async () => {
+  refreshNeeded = false
   const res: { uid: string, login: string, nickname: string }[] | Error =
     await tm.db.query(`SELECT uid, login, nickname FROM records
   JOIN map_ids ON map_ids.id=records.map_id
@@ -58,13 +61,22 @@ const initialize = async () => {
     curMap = res[i + 1]?.uid
   }
   topList.sort((a, b) => b.sums[0] - a.sums[0])
+  topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) {
-    e('', [...topList])
+    e([...topList])
   }
 }
 
 tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
+  initialLocals = tm.records.local
+})
+
+tm.addListener('BeginMap', () => {
+  if (refreshNeeded === true) {
+    void initialize()
+  }
+  initialLocals = tm.records.local
 })
 
 tm.addListener('PlayerInfoUpdated', (info) => {
@@ -83,21 +95,34 @@ tm.addListener('PlayerInfoUpdated', (info) => {
   }
 })
 
-tm.addListener('PlayerJoin', (info) => {
-  // const login = info.login
-  // const visits = info.visits
-  // if (visits <= topList[topList.length - 1].visits) { return }
-  // const entry = topList.find(a => a.login === login)
-  // if (entry !== undefined) {
-  //   entry.visits = visits
-  //   topList.sort((a, b) => b.visits - a.visits)
-  // } else {
-  //   topList.splice(topList.findIndex(a => a.visits < visits), 0, { login, visits, nickname: info.nickname })
-  //   topList.length = config.visitsCount
-  // }
-  // for (const e of updateListeners) {
-  //   e(login, [...topList])
-  // }
+tm.addListener('LocalRecord', (info) => {
+  const prevRecordIndex = initialLocals.findIndex(a => a.login === info.login)
+  let oldArrPos = prevRecordIndex
+  if (info.position > 3) {
+    oldArrPos = 4
+  }
+  let newArrPos = info.position - 1
+  if (info.position > 3) {
+    newArrPos = 4
+  }
+  if (oldArrPos === newArrPos) { return }
+  const obj = topList.find(a => a.login === info.login)
+  if (obj === undefined) {
+    refreshNeeded = true
+    return
+  }
+  obj.sums[newArrPos]++
+  obj.sums[oldArrPos]--
+  for (let i = newArrPos; i < Math.min(oldArrPos, 3); i++) {
+    const obj = topList.find(a => a.login === initialLocals[i]?.login)
+    if (obj !== undefined) {
+      obj.sums[i]--
+      obj.sums[i + 1]++
+    }
+  }
+  for (const e of updateListeners) {
+    e([...topList], info.login)
+  }
 })
 
 export const topSums = {
@@ -106,7 +131,10 @@ export const topSums = {
     return [...topList]
   },
 
-  onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, sums: [number, number, number, number] }[]) => void) {
+  onUpdate(callback: (list: {
+    login: string, nickname: string,
+    sums: Readonly<[number, number, number, number]>
+  }[], updatedLogin?: string) => void) {
     updateListeners.push(callback)
   },
 
