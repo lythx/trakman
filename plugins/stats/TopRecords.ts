@@ -102,7 +102,7 @@ tm.addListener('LocalRecord', info => {
       topList.sort((a, b) => b.amount - a.amount)
     } else {
       topList.splice(topList.findIndex(a => a.amount < obj.amount), 0, { ...obj })
-      topList.length = config.donationsCount
+      topList.length = Math.min(config.recordsCount, topList.length)
     }
     for (const e of listeners) {
       e(info.login, [...topList])

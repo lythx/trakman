@@ -63,7 +63,7 @@ tm.addListener('KarmaVote', (info): void => {
     const topIndex: number = topList.findIndex(a => a.login === info.login)
     if (topIndex === -1 && count.count > topList[topList.length - 1].count) {
       topList.splice(topList.findIndex(a => a.count < count.count), 0, count)
-      topList.length = 10
+      topList.length = Math.min(config.votesCount, topList.length)
       for (const e of updateListeners) {
         e(topList[topIndex].login, [...topList])
       }
