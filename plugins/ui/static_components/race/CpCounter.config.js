@@ -6,7 +6,7 @@ export default {
   height: 2.17,
   width: 12.7,
   posX: 12,
-  posY: -40,
+  posY: -37,
   margin: cfg.margin,
   side: true,
   rectangleWidth: 7.7,
