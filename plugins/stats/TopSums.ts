@@ -1,5 +1,5 @@
 
-import config from './Config.js' // TODO FIX
+import config from './Config.js'
 
 let topList: { login: string, nickname: string, sums: [number, number, number, number] }[] = []
 const updateListeners: ((list: { login: string, nickname: string, sums: [number, number, number, number] }[], updatedLogin?: string) => void)[] = []
@@ -60,6 +60,9 @@ const initialize = async () => {
     prevMap = res[i].uid
     curMap = res[i + 1]?.uid
   }
+  topList.sort((a, b) => b.sums[3] - a.sums[3])
+  topList.sort((a, b) => b.sums[2] - a.sums[2])
+  topList.sort((a, b) => b.sums[1] - a.sums[1])
   topList.sort((a, b) => b.sums[0] - a.sums[0])
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) {
