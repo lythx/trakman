@@ -54,7 +54,7 @@ tm.addListener('RanksAndAveragesUpdated', async (info) => {
       }
       topList.splice(topList.findIndex(a => a.average > e.average), 0,
         { login: e.login, nickname: nickname ?? e.login, average: e.average })
-      topList.length = config.averagesCount
+      topList.length = Math.min(config.averagesCount, topList.length)
     }
   }
   for (const e of updateListeners) {

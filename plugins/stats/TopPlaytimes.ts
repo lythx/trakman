@@ -48,7 +48,7 @@ tm.addListener('EndMap', () => {
       topList.sort((a, b) => b.playtime - a.playtime)
     } else {
       topList.splice(topList.findIndex(a => a.playtime < pt), 0, { login: e.login, nickname: e.nickname, playtime: pt })
-      topList.length = config.playtimesCount
+      topList.length = Math.min(config.playtimesCount, topList.length)
     }
   }
   for (const e of updateListeners) {

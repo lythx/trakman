@@ -49,7 +49,7 @@ donations.onDonation((info) => {
     topList.sort((a, b) => b.amount - a.amount)
   } else {
     topList.splice(topList.findIndex(a => a.amount < amount), 0, { login, nickname: info.nickname, amount })
-    topList.length = config.donationsCount
+    topList.length = Math.min(config.donationsCount, topList.length)
   }
   for (const e of listeners) {
     e(login, [...topList])

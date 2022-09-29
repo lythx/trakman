@@ -47,7 +47,7 @@ tm.addListener('PlayerJoin', (info) => {
     topList.sort((a, b) => b.visits - a.visits)
   } else {
     topList.splice(topList.findIndex(a => a.visits < visits), 0, { login, visits, nickname: info.nickname })
-    topList.length = config.visitsCount
+    topList.length = Math.min(config.visitsCount, topList.length)
   }
   for (const e of updateListeners) {
     e(login, [...topList])
