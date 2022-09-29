@@ -132,7 +132,7 @@ export const Utils = {
    */
   getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
     let split = region.split('|')
-    if (region.startsWith('World')) { // check if works todo
+    if (region.startsWith('World')) {
       split.shift()
     }
     const r: string = split.join('|')
