@@ -52,7 +52,7 @@ tm.addListener('EndMap', async (info) => {
       nickname = (await tm.players.fetch(login))?.nickname
     }
     topList.splice(topList.findIndex(a => a.wins < wins), 0, { login, wins, nickname: nickname ?? login })
-    topList.length = config.winsCount
+    topList.length = Math.min(config.winsCount, topList.length)
   }
   for (const e of updateListeners) {
     e(login, [...topList])
