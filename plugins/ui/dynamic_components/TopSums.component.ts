@@ -9,14 +9,14 @@ export default class TopSums extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, sums: [number, number, number, number] }[]
+  private ranks: { login: string, nickname: string, sums: Readonly<[number, number, number, number]> }[]
 
   constructor() {
     super(IDS.topSums, config.icon, config.title, config.navbar)
     this.ranks = stats.sums.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.sums.onUpdate((_, list) => {
+    stats.sums.onUpdate((list) => {
       this.ranks = list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
