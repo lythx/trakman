@@ -215,6 +215,7 @@ export class MapService {
       this._queue.shift()
       this.fillQueue()
     }
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
   }
 
@@ -249,7 +250,7 @@ export class MapService {
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -273,7 +274,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     return true
   }
@@ -291,7 +292,7 @@ export class MapService {
       }
     }
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -308,7 +309,7 @@ export class MapService {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
