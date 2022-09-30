@@ -11,7 +11,7 @@ export class PlayerCounter extends UiButton {
 
   constructor() {
     super()
-    const all: TM.Player[] = tm.players.list
+    const all: tm.Player[] = tm.players.list
     const players: number = all.filter(a => !a.isSpectator).length
     this.buttonData = {
       icon: cfg.icon,
@@ -29,7 +29,7 @@ export class PlayerCounter extends UiButton {
       equalTexts: cfg.texts.equal
     }
     tm.addListener(['PlayerJoin', 'PlayerLeave', 'PlayerInfoChanged'], (): void => {
-      const all: TM.Player[] = tm.players.list
+      const all: tm.Player[] = tm.players.list
       const players: number = all.filter(a => !a.isSpectator).length
       this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], {
         count: all.length - players,

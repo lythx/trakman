@@ -11,10 +11,10 @@ import config from '../../config/Config.js'
 export class RecordService {
 
   private static repo: RecordRepository = new RecordRepository()
-  private static _localRecords: TM.LocalRecord[] = []
+  private static _localRecords: tm.LocalRecord[] = []
   private static _liveRecords: FinishInfo[] = []
   static readonly maxLocalsAmount: number = config.localRecordsLimit
-  private static _initialLocals: TM.LocalRecord[] = []
+  private static _initialLocals: tm.LocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
 
   /**
@@ -52,7 +52,7 @@ export class RecordService {
     this._playerRanks = this._playerRanks.filter(a => !logins.includes(a.login))
     const presentMaps = MapService.maps.map(a => a.id)
     if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
-    let records: TM.Record[] = await this.repo.getAll()
+    let records: tm.Record[] = await this.repo.getAll()
     if (records.length === 0) { return }
     let rank = 1
     let prevMap = records[0].map
@@ -90,7 +90,7 @@ export class RecordService {
    * containing finishInfo object, localRecord object if record was a local record and liveRecord object if 
    * record was a live record
    */
-  static async add(map: string, player: TM.Player, time: number): Promise<false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo }> {
+  static async add(map: string, player: tm.Player, time: number): Promise<false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo }> {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
@@ -152,7 +152,7 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if local record gets added, undefined otherwise
    */
-  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TM.Player): Promise<RecordInfo | undefined> {
+  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): Promise<RecordInfo | undefined> {
     const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
     let position: number = this._localRecords.findIndex(a => a.time > time) + 1
     // If player gets the worst record on the server set position to array length + 1
@@ -190,7 +190,7 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if live record gets added, undefined otherwise
    */
-  private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: TM.Player): RecordInfo | undefined {
+  private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): RecordInfo | undefined {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
     const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
@@ -271,7 +271,7 @@ export class RecordService {
    * @param previousPosition Previous record position
    * @returns Record object
    */
-  private static constructRecordObject(player: TM.Player, mapId: string, date: Date, checkpoints: number[],
+  private static constructRecordObject(player: tm.Player, mapId: string, date: Date, checkpoints: number[],
     time: number, previousTime: number, position: number, previousPosition: number): RecordInfo {
     return {
       id: player.id,
@@ -352,15 +352,15 @@ export class RecordService {
    * @param login Player login
    * @returns Local record object or undefined if the player doesn't have a local record
    */
-  static getLocal(login: string): TM.LocalRecord | undefined
+  static getLocal(login: string): tm.LocalRecord | undefined
   /**
    * Gets multiple local records on the current map from runtime memory. If some player has no local record 
    * his record object wont be returned. Returned array is sorted primary by time ascending, secondary by date ascending
    * @param logins Array of player logins
    * @returns Array of local record objects
    */
-  static getLocal(logins: string[]): TM.LocalRecord[]
-  static getLocal(logins: string | string[]): TM.LocalRecord | undefined | TM.LocalRecord[] {
+  static getLocal(logins: string[]): tm.LocalRecord[]
+  static getLocal(logins: string | string[]): tm.LocalRecord | undefined | tm.LocalRecord[] {
     if (typeof logins === 'string') {
       return this._localRecords.find(a => a.login === logins)
     }
@@ -393,7 +393,7 @@ export class RecordService {
    * @param mapIds Map uids
    * @returns Array of record objects
    */
-  static async fetch(...mapIds: string[]): Promise<TM.Record[]> {
+  static async fetch(...mapIds: string[]): Promise<tm.Record[]> {
     return await this.repo.get(...mapIds)
   }
 
@@ -403,7 +403,7 @@ export class RecordService {
    * @param logins Player logins
    * @returns Array of record objects
    */
-  static async fetchRecordsByLogin(...logins: string[]): Promise<TM.Record[]> {
+  static async fetchRecordsByLogin(...logins: string[]): Promise<tm.Record[]> {
     return await this.repo.getByLogin(...logins)
   }
 
@@ -422,14 +422,14 @@ export class RecordService {
    * @param login Player login
    * @returns Record object or undefined if player has no record
    */
-  static async fetchOne(mapId: string, login: string): Promise<TM.Record | undefined> {
+  static async fetchOne(mapId: string, login: string): Promise<tm.Record | undefined> {
     return await this.repo.getOne(mapId, login)
   }
 
   /**
    * @returns Local records array from start of the map
    */
-  static get initialLocals(): Readonly<TM.LocalRecord>[] {
+  static get initialLocals(): Readonly<tm.LocalRecord>[] {
     return [...this._initialLocals]
   }
 
@@ -443,7 +443,7 @@ export class RecordService {
   /**
    * @returns Local records array on the current map
    */
-  static get localRecords(): Readonly<TM.LocalRecord>[] {
+  static get localRecords(): Readonly<tm.LocalRecord>[] {
     return [...this._localRecords]
   }
 

@@ -11,7 +11,7 @@ let mapKarmaValue: number = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
 let playerVotes: MKVote[] = []
 let newVotes: MKVote[] = []
-let lastMap: Readonly<TM.CurrentMap>
+let lastMap: Readonly<tm.CurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
 const voteListeners: ((vote: MKVote) => void)[] = []

@@ -1,1 +1,1 @@
-type ManialinkClickInfo = TM.Player & { actionId: number }
+type ManialinkClickInfo = tm.Player & { actionId: number }

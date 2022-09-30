@@ -34,7 +34,7 @@ export class BanlistRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(): Promise<TM.BanlistEntry[]> {
+  async get(): Promise<tm.BanlistEntry[]> {
     const query: string = `SELECT ip, banlist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM banlist
     JOIN players AS caller ON caller.id=banlist.caller_id
@@ -60,7 +60,7 @@ export class BanlistRepository extends Repository {
     await this.query(query, login)
   }
 
-  private constructBanObject(entry: TableEntry): TM.BanlistEntry {
+  private constructBanObject(entry: TableEntry): tm.BanlistEntry {
     return {
       ip: entry.ip,
       login: entry.login,

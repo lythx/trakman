@@ -1,4 +1,4 @@
-type RecordInfo = Omit<TM.Player & TM.LocalRecord & {
+type RecordInfo = Omit<tm.Player & tm.LocalRecord & {
   readonly position: number
   readonly previousPosition: number
   readonly previousTime: number

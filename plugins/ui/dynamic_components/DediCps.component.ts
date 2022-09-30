@@ -41,7 +41,7 @@ export default class DediCps extends PopupWindow {
     tm.commands.add({
       aliases: ['dcp', 'dedicptms', 'dedirecs'],
       help: 'Display current map dedimania checkpoints.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
