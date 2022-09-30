@@ -1,1 +1,1 @@
-type FinishInfo = Omit<TM.Player & TM.LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'>
+type FinishInfo = Omit<tm.Player & tm.LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'>

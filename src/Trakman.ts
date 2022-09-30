@@ -16,28 +16,6 @@ import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/Prefixes.js'
 import controllerConfig from '../config/Config.js'
-import { TMCallParams } from './types/TMCallParams.js'
-import { TMServerInfo } from './types/TMServerInfo.js'
-import { TMBanlistEntry } from './types/TMBanlistEntry.js'
-import { TMBlacklistEntry } from './types/TMBlacklistEntry.js'
-import { TMCall } from './types/TMCall.js'
-import { TMCheckpoint } from './types/TMCheckpoint.js'
-import { TMCommand } from './types/TMCommand.js'
-import { TMEvents } from './types/TMEvents.js'
-import { TMGame } from './types/TMGame.js'
-import { TMGuestlistEntry } from './types/TMGuestlistEntry.js'
-import { TMOfflinePlayer } from './types/TMOfflinePlayer.js'
-import { TMLocalRecord } from './types/TMLocalRecord.js'
-import { TMPlayer } from './types/TMPlayer.js'
-import { TMRecord } from './types/TMRecord.js'
-import { TMVote } from './types/TMVote.js'
-import { TMCurrentMap } from './types/TMCurrentMap.js'
-import { TMMap } from './types/TMMap.js'
-import { TMMessage } from './types/TMMessage.js'
-import { TMMutelistEntry } from './types/TMMutelistEntry.js'
-import { TMXMapInfo } from './types/TMXMapInfo.js'
-import { TMXReplay as TMTMXReplay } from './types/TMXReplay.js'
-import { MessageInfo as TMMessageInfo } from './types/TMMessageInfo.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -444,30 +422,6 @@ namespace trakman {
 
 declare global {
   const tm: typeof trakman
-  namespace tm {
-    export type Player = TMPlayer
-    export type CallParams = TMCallParams
-    export type ServerInfo = TMServerInfo
-    export type BanlistEntry = TMBanlistEntry
-    export type BlacklistEntry = TMBlacklistEntry
-    export type Call = TMCall
-    export type Checkpoint = TMCheckpoint
-    export type Command = TMCommand
-    export type CurrentMap = TMCurrentMap
-    export type Game = TMGame
-    export type GuestlistEntry = TMGuestlistEntry
-    export type LocalRecord = TMLocalRecord
-    export type Map = TMMap
-    export type Message = TMMessage
-    export type MutelistEntry = TMMutelistEntry
-    export type OfflinePlayer = TMOfflinePlayer
-    export type Record = TMRecord
-    export type Vote = TMVote
-    export type TMXMap = TMXMapInfo
-    export type TMXReplay = TMTMXReplay
-    export type Events = TMEvents
-    export type MessageInfo = TMMessageInfo
-  }
 }
 
 (global as any).tm = trakman

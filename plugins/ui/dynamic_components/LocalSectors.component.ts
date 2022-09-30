@@ -40,7 +40,7 @@ export default class LocalSectors extends PopupWindow {
     tm.commands.add({
       aliases: ['sc', 'sectms'],
       help: 'Display current map local sectors.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
@@ -51,7 +51,7 @@ export default class LocalSectors extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records: TM.LocalRecord[] = []
+    const records: tm.LocalRecord[] = []
     for (const e of tm.records.local) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }

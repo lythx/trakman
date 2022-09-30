@@ -26,7 +26,7 @@
 //     this.positionX = pos.x
 //     this.positionY = pos.y
 //     tm.addListener('PlayerCheckpoint', (info: CheckpointInfo): void => {
-//       const pb: TM.Record | undefined = tm.records.getLocal(info.player.login)
+//       const pb: tm.Record | undefined = tm.records.getLocal(info.player.login)
 //       if (pb !== undefined) {
 //         const cpIndex: number = info.index
 //         const diff: number = pb.checkpoints[cpIndex] - info.time

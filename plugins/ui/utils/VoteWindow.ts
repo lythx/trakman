@@ -36,7 +36,7 @@ export default class VoteWindow {
    * @param eligibleLogins list of logins of players that can vote
    * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: TM.Player }> | undefined {
+  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
     return new Promise((resolve) => {
       this.vote.onUpdate = (votes, seconds) => {
         this.display(votes, seconds)
@@ -59,11 +59,11 @@ export default class VoteWindow {
     })
   }
 
-  pass(caller?: TM.Player): void {
+  pass(caller?: tm.Player): void {
     this.vote.pass(caller)
   }
 
-  cancel(caller?: TM.Player): void {
+  cancel(caller?: tm.Player): void {
     this.vote.cancel(caller)
   }
 

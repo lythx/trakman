@@ -24,7 +24,7 @@ export default class CheckpointRecords extends PopupWindow {
     tm.commands.add({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
-      callback: (info: TM.MessageInfo) => {
+      callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0
@@ -37,7 +37,7 @@ export default class CheckpointRecords extends PopupWindow {
     checkpointRecords.addListener('PlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
     checkpointRecords.addListener('DeleteBestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('DeletePlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
-    checkpointRecords.addListener('NicknameUpdated', ()=>this.reRender())
+    checkpointRecords.addListener('NicknameUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

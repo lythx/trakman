@@ -101,7 +101,7 @@ export default class MapWidget extends StaticComponent {
       </manialink>`
   }
 
-  private getTag(map: TM.Map, TMXMap?: TM.TMXMap): string {
+  private getTag(map: tm.Map, TMXMap?: tm.TMXMap): string {
     for (const e of config.customTags) {
       if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) ||
         e?.names?.some(a => a.test(map.name) || a.test(tm.utils.strip(map.name)) ||

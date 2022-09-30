@@ -66,7 +66,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
-  const cfg: TM.ServerInfo = tm.state.serverConfig
+  const cfg: tm.ServerInfo = tm.state.serverConfig
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
   const players = tm.players.list
   const rawDedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
@@ -146,7 +146,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
   if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
 }
 
-const addRecord = (player: Omit<TM.Player, 'currentCheckpoints' | 'isSpectator'>,
+const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
   time: number, checkpoints: number[]): void => {
   if (client.connected === false) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
@@ -183,7 +183,7 @@ const addRecord = (player: Omit<TM.Player, 'currentCheckpoints' | 'isSpectator'>
 const updateServerPlayers = (): void => {
   setInterval(async (): Promise<void> => {
     if (client.connected === false) { return }
-    const cfg: TM.ServerInfo = tm.state.serverConfig
+    const cfg: tm.ServerInfo = tm.state.serverConfig
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
     const status: any[] | Error = await client.call('dedimania.UpdateServerPlayers',
@@ -250,7 +250,7 @@ const playerLeave = async (player: { login: string, nickname: string }): Promise
 }
 
 const getPlayersArray = (): any[] => {
-  const players: TM.Player[] = tm.players.list
+  const players: tm.Player[] = tm.players.list
   let arr: any[] = []
   for (const player of players) {
     arr.push(
@@ -272,7 +272,7 @@ const getPlayersArray = (): any[] => {
   return arr
 }
 
-const constructRecordObject = (player: Omit<TM.Player, 'currentCheckpoints' | 'isSpectator'>,
+const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
   checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): NewDediRecord => {
   return {
     ...player,

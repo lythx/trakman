@@ -38,9 +38,9 @@ export class PlayerRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(login: string): Promise<TM.OfflinePlayer | undefined>
-  async get(logins: string[]): Promise<TM.OfflinePlayer[]>
-  async get(logins: string | string[]): Promise<TM.OfflinePlayer | TM.OfflinePlayer[] | undefined> {
+  async get(login: string): Promise<tm.OfflinePlayer | undefined>
+  async get(logins: string[]): Promise<tm.OfflinePlayer[]>
+  async get(logins: string | string[]): Promise<tm.OfflinePlayer | tm.OfflinePlayer[] | undefined> {
     if (typeof logins === 'string') {
       const query: string = `SELECT players.login, nickname, region, wins, time_played, visits, is_united, last_online, average, privilege FROM players 
       LEFT JOIN privileges ON players.login=privileges.login
@@ -56,7 +56,7 @@ export class PlayerRepository extends Repository {
     return res.map(a => this.constructPlayerObject(a))
   }
 
-  async add(...players: TM.OfflinePlayer[]): Promise<void> {
+  async add(...players: tm.OfflinePlayer[]): Promise<void> {
     if (players.length === 0) { return }
     const query: string = `INSERT INTO players(login, nickname, region, wins, time_played, visits, is_united, last_online, average) 
     ${this.getInsertValuesString(9, players.length)};`
@@ -141,7 +141,7 @@ export class PlayerRepository extends Repository {
     return isArr === true ? ret.concat(res) : res[0]?.id
   }
 
-  private constructPlayerObject(entry: TableEntry): TM.OfflinePlayer {
+  private constructPlayerObject(entry: TableEntry): tm.OfflinePlayer {
     const { countryCode, country } = Utils.getRegionInfo(entry.region)
     if (countryCode === undefined) {
       void Logger.fatal(`Country code for player ${entry.login} is undefined, received region: ${entry.region}. Check your database`)

@@ -17,21 +17,21 @@ export class Vote {
   static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onInterrupt: ((info: {
-    caller?: TM.Player;
+    caller?: tm.Player;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onInterrupt: ((info: {
-    caller?: TM.Player;
+    caller?: tm.Player;
     result: boolean;
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   loginList: string[] = []
   private isActive: boolean = false
   private seconds: number
-  private interrupted: { caller?: TM.Player, result: boolean } | undefined
+  private interrupted: { caller?: tm.Player, result: boolean } | undefined
   private readonly cancelOnRoundEnd: boolean
   private readonly cancelOnRoundStart: boolean
 
@@ -130,12 +130,12 @@ export class Vote {
     return (yesVotes / allVotes) > this.goal
   }
 
-  pass(caller?: TM.Player): void {
+  pass(caller?: tm.Player): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: true }
   }
 
-  cancel(caller?: TM.Player): void {
+  cancel(caller?: tm.Player): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: false }
   }

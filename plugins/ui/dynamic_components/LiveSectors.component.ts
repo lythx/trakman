@@ -40,7 +40,7 @@ export default class LiveSectors extends PopupWindow {
     tm.commands.add({
       aliases: ['lsc', 'livesectms'],
       help: 'Display current map live sectors.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())

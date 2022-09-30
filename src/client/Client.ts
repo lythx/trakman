@@ -6,7 +6,7 @@ export abstract class Client {
 
   private static readonly socket: ClientSocket = new ClientSocket()
   private static requestId: number = 0x80000000
-  private static readonly proxies: { methods: string[], callback: ((method: string, params: TM.CallParams[], response: any[]) => void) }[] = []
+  private static readonly proxies: { methods: string[], callback: ((method: string, params: tm.CallParams[], response: any[]) => void) }[] = []
 
   static async connect(host = 'localhost', port = 5000): Promise<void> {
     if (port < 0 || port >= 65536 || isNaN(port)) {
@@ -27,7 +27,7 @@ export abstract class Client {
    * @param params Optional params for the dedicated server method
    * @returns Server response or error if the server returns one
    */
-  static async call(method: string, params: TM.CallParams[] = []): Promise<any[] | Error> {
+  static async call(method: string, params: tm.CallParams[] = []): Promise<any[] | Error> {
     this.requestId++ // increment requestId so every request has an unique id
     const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
@@ -44,7 +44,7 @@ export abstract class Client {
    * @param method Dedicated server method to be executed
    * @param params Optional params for the dedicated server method
    */
-  static callNoRes(method: string, params: TM.CallParams[] = []): void {
+  static callNoRes(method: string, params: tm.CallParams[] = []): void {
     this.requestId++
     const request: ClientRequest = new ClientRequest(method, params)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
@@ -57,13 +57,13 @@ export abstract class Client {
  * @param methods Array of dedicated server methods
  * @param callback Callback to execute
  */
-  static addProxy(methods: string[], callback: ((method: string, params: TM.CallParams[], response: any[]) => void)): void {
+  static addProxy(methods: string[], callback: ((method: string, params: tm.CallParams[], response: any[]) => void)): void {
     this.proxies.push({ methods, callback })
   }
 
-  private static callProxies(method: string, params: TM.CallParams[], response: any[]): void {
+  private static callProxies(method: string, params: tm.CallParams[], response: any[]): void {
     if (method === 'system.multicall') {
-      const calls: ({ method: string, params: TM.CallParams[], response: any[] } | Error)[] = []
+      const calls: ({ method: string, params: tm.CallParams[], response: any[] } | Error)[] = []
       for (const [i, r] of response.entries()) {
         if (r.faultCode === undefined) {
           calls.push({
@@ -86,7 +86,7 @@ export abstract class Client {
     }
   }
 
-  private static async getProxyResponse(method: string, params: TM.CallParams[], requestId: number): Promise<void> {
+  private static async getProxyResponse(method: string, params: tm.CallParams[], requestId: number): Promise<void> {
     const response: any[] | Error = await this.socket.awaitResponse(requestId, method).catch((err: Error) => err)
     if (!(response instanceof Error)) {
       this.callProxies(method, params, response)

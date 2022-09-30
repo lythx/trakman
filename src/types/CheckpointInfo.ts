@@ -1,1 +1,1 @@
-type CheckpointInfo = TM.Checkpoint & { readonly player: TM.Player }
+type CheckpointInfo = tm.Checkpoint & { readonly player: tm.Player }
