@@ -1,5 +1,6 @@
 import icons from '../config/Icons.js'
 import ids from '../config/ComponentIds.js'
+const p = tm.utils.palette
 
 export default {
   title: "Map List",
@@ -41,5 +42,12 @@ export default {
   contentBackground: "555C",
   plusImage: icons.addMap,
   minusImage: icons.removeMap,
-  blankImage: icons.blank
+  blankImage: icons.blank,
+  public: true,
+  messages: {
+    error: `${p.error}Error while adding the map to queue.`,
+    noPermission: `${p.error}You can't add more than one map to the queue.`,
+    remove: `${p.highlight}#{player} ${p.vote}removed ${p.highlight}#{map}${p.vote} from the queue.`,
+    add: `${p.highlight}#{player} ${p.vote}added ${p.highlight}#{map}${p.vote} to the queue.`
+  }
 }

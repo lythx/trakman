@@ -1,5 +1,4 @@
 import { IDS, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
-
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanelResult.config.js'
 // todo u cant do some of these things on result right
@@ -15,7 +14,8 @@ export default class AdminPanelResult extends StaticComponent {
     jukebox: 10,
     requeue: 20,
     previous: 30,
-    players: 40
+    players: 40,
+    shuffle: 50
   }
   private readonly grid: Grid
 
@@ -26,16 +26,9 @@ export default class AdminPanelResult extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.grid = new Grid(config.width, config.height - this.header.options.height, new Array(4).fill(1), [1], { margin: config.margin })
+    this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(5).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info) => {
       this.displayToPlayer(info.login)
-    })
-    addManialinkListener(this.id + this.actions.jukebox, async info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.skip, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`)
     })
     addManialinkListener(this.id + this.actions.requeue, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.requeue, {
@@ -56,7 +49,13 @@ export default class AdminPanelResult extends StaticComponent {
       tm.openManialink(IDS.playerList, info.login)
     })
     addManialinkListener(this.id + this.actions.jukebox, info => {
-      tm.openManialink(IDS.mapList, info.login) // Todo make it jukebox
+      tm.openManialink(IDS.jukebox, info.login)
+    })
+    addManialinkListener(this.id + this.actions.shuffle, info => {
+      tm.sendMessage(tm.utils.strVar(config.messages.shuffle,
+        { title: info.title, adminName: tm.utils.strip(info.nickname) }),
+        config.public ? undefined : info.login)
+      tm.jukebox.shuffle(info)
     })
   }
 
@@ -95,6 +94,8 @@ export default class AdminPanelResult extends StaticComponent {
     }
     const replayButton: GridCellFunction = (i, j, w, h) =>
       this.constructButton(w, h, config.icons.requeue, config.iconsHover.requeue, this.actions.requeue)
+    const shuffleButton: GridCellFunction = (i, j, w, h) =>
+      this.constructButton(w, h, config.icons.shuffle, config.iconsHover.shuffle, this.actions.shuffle)
     const jukeboxButton: GridCellFunction = (i, j, w, h) =>
       this.constructButton(w, h, config.icons.jukebox, config.iconsHover.jukebox, this.actions.jukebox)
     this.xml = `
@@ -102,8 +103,8 @@ export default class AdminPanelResult extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side)}
-        <frame posn="0 ${-this.header.options.height - config.margin} 1">
-          ${this.grid.constructXml([playersButton, previousButton, replayButton, jukeboxButton])}
+        <frame posn="${-config.margin} ${-this.header.options.height - config.margin} 1">
+          ${this.grid.constructXml([playersButton, previousButton, replayButton, shuffleButton, jukeboxButton])}
         </frame>
       </frame>
     </manialink>`

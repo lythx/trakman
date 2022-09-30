@@ -18,7 +18,8 @@ export default {
     previous: icons.pageLeft,
     requeue: icons.payReplay,
     skip: icons.pageRight,
-    endRound: icons.pageLast
+    endRound: icons.pageLast,
+    jukebox: icons.mapList
   },
   iconsHover: {
     players: icons.placeholder,
@@ -26,7 +27,8 @@ export default {
     previous: icons.pageLeftHover,
     requeue: icons.placeholder, // todon icons
     skip: icons.pageRightHover,
-    endRound: icons.pageLastHover
+    endRound: icons.pageLastHover,
+    jukebox: icons.placeholder
   },
   messages: {
     skip: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,

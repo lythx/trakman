@@ -20,6 +20,7 @@ export default class Paginator {
   readonly width: number
   readonly height: number
   private _onPageChange: (login: string, page: number, info: ManialinkClickInfo) => void = () => undefined
+  private clickListener: ((params: ManialinkClickInfo) => void) | undefined
   pageCount: number
   yPos: number
   xPos: number[]
@@ -56,7 +57,7 @@ export default class Paginator {
     if (pageCount > 1) { this.buttonCount = 1 }
     if (pageCount > 3) { this.buttonCount = 2 }
     if (pageCount > 10) { this.buttonCount = 3 }
-    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
+    this.clickListener = (info: ManialinkClickInfo): void => {
       if (this.ids.includes(info.actionId)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)
         if (playerPage === undefined) { // Should never happen
@@ -69,7 +70,8 @@ export default class Paginator {
         playerPage.page = page
         this._onPageChange(info.login, page, info)
       }
-    })
+    }
+    tm.addListener('ManialinkClick', this.clickListener)
   }
 
   set onPageChange(callback: (login: string, page: number, info: ManialinkClickInfo) => void) {
@@ -134,10 +136,14 @@ export default class Paginator {
     }
   }
 
+  destroy() {
+    if(this.clickListener === undefined) { return }
+    tm.removeListener(this.clickListener)
+    this.clickListener = undefined
+  }
+
   constructXml(page: number): string
-
   constructXml(login: string): string
-
   constructXml(arg: number | string): string {
     let page: number
     if (typeof arg === 'string') {
