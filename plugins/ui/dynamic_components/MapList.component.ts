@@ -1,67 +1,55 @@
 import PopupWindow from "../PopupWindow.js";
-
-import { centeredText, closeButton, Grid, IDS, verticallyCenteredText } from '../UiUtils.js'
+import { centeredText, closeButton, Grid, IDS, verticallyCenteredText, addManialinkListener } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import { maplist } from '../../maplist/Maplist.js'
 import config from './MapList.config.js'
 
-export default class MapList extends PopupWindow {
+export default class MapList extends PopupWindow<{ page: number, paginator: Paginator, list?: readonly tm.Map[] }> {
 
   private readonly paginator: Paginator
   private readonly mapAddId = 1000
   private readonly grid: Grid
   private readonly challengeActionIds: string[] = []
-  private readonly contentBg = config.contentBackground
-  private readonly iconBg = config.iconBackground
-  private readonly icons = config.icons
-  private readonly playerQueries: { paginator: Paginator, list: readonly TM.Map[], login: string }[] = []
-  private readonly iconW = config.iconWidth
-  private readonly queueW = config.queueWidth
-  private readonly queueNumberW = config.queueNumberWidth
-  private readonly timeW = config.timeWidth
-  private readonly positionW = config.positionWidth
+  private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string }[] = []
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
-  private sortedList: TM.Map[]
 
   constructor() {
     super(IDS.mapList, config.icon, config.title, config.navbar)
-    const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
-    this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
-    const pageCount = Math.ceil(this.sortedList.length / (config.rows * config.columns))
+    const pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
     this.paginator.onPageChange = (login: string, page: number) => {
-      let pageCount = Math.ceil(this.sortedList.length / (config.rows * config.columns))
+      let pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
-      this.displayToPlayer(login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
+      this.displayToPlayer(login, { page, paginator: this.paginator }, `${page}/${pageCount}`)
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
-    tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.actionId >= this.openId + this.mapAddId && info.actionId <= this.openId + this.mapAddId + 5000) {
-        const mapId = this.challengeActionIds[info.actionId - (this.openId + this.mapAddId)]
-        if (mapId === undefined) {
-          tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding the map to queue.`, info.login)
-          tm.log.error('Error while adding map to queue from jukebox', `Challenge index out of range`)
-          return
-        }
-        const gotQueued = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
-        if (gotQueued === false) { return }
-        this.reRender()
+    addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex) => {
+      const mapId = this.challengeActionIds[mapIndex]
+      if (mapId === undefined) {
+        tm.sendMessage(config.messages.error, info.login)
+        tm.log.error('Error while adding map to queue from jukebox', `Map index out of range`)
+        return
       }
+      const gotQueued = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
+      if (gotQueued === false) { return }
+      this.reRender()
     })
+    addManialinkListener(IDS.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
     tm.commands.add({
       aliases: ['l', 'ml', 'list'],
-      help: 'Display list of maps. Start with $a to author search. Options: name, karma, short, long, best, worst, worstkarma.',
+      help: 'Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: async (info: TM.MessageInfo, query?: string): Promise<void> => {
+      callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
         if (query === undefined) {
           tm.openManialink(this.openId, info.login)
           return
         }
+        if (query === 'jb') { query = 'jukebox' }
         const option = query.split(' ').filter(a => a !== '')[0]
-        const arr: ['name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'bestkarma'] = ['name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'bestkarma']
+        const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
           await this.openWithOption(info.login, o)
@@ -78,7 +66,7 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
-      callback: async (info: TM.MessageInfo): Promise<void> => {
+      callback: async (info: tm.MessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'best')
       },
       privilege: 0
@@ -86,72 +74,54 @@ export default class MapList extends PopupWindow {
     tm.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
-      callback: async (info: TM.MessageInfo): Promise<void> => {
+      callback: async (info: tm.MessageInfo): Promise<void> => {
         await this.openWithOption(info.login, 'worst')
       },
       privilege: 0
     })
-    tm.addListener('MapRemoved', (map) => this.updateList(map.id))
-    tm.addListener('MapAdded', (map) => this.updateList(map.id))
-    tm.addListener('BeginMap', () => this.reRender())
+    tm.commands.add({
+      aliases: ['jb', 'jukebox'],
+      help: 'Display jukebox.',
+      callback: async (info: tm.MessageInfo): Promise<void> => {
+        await this.openWithOption(info.login, 'jukebox')
+      },
+      privilege: 0
+    })
+    maplist.onListUpdate(() => this.reRender())
+    maplist.onJukeboxUpdate(() => this.reRender())
   }
 
-  private updateList(id: string) {
-    const arr = tm.maps.list.sort((a, b) => a.name.localeCompare(b.name))
-    this.sortedList = arr.sort((a, b) => a.author.localeCompare(b.author))
-    let pageCount = Math.ceil(this.sortedList.length / (config.rows * config.columns))
-    if (pageCount === 0) { pageCount++ }
-    this.paginator.setPageCount(pageCount)
-    for (const e of this.playerQueries) {
-      const newList = [...e.list]
-      newList.splice(e.list.findIndex(a => a.id === id), 1)
-      e.list = newList
-    }
-    this.reRender()
-  }
-
-  async openWithOption(login: string, option: 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'bestkarma') {
-    let list: TM.Map[] = []
+  async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma'): Promise<void> {
+    let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = await maplist.getByPosition(login, option)
     } else {
-      list = [...maplist.get(option)]
+      list = maplist.get(option)
     }
-    const pageCount = Math.ceil(list.length / (config.rows * config.columns))
-    const index = this.playerQueries.findIndex(a => a.login === login)
-    if (index !== -1) {
-      this.playerQueries.splice(index, 1)
-    }
-    const paginator = this.getPaginator(login, list, pageCount)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+    const paginator = this.getPaginator(login, list)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
   }
 
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
     const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
-    const pageCount = Math.ceil(list.length / (config.rows * config.columns))
-    const index = this.playerQueries.findIndex(a => a.login === login)
-    if (index !== -1) {
-      this.playerQueries.splice(index, 1)
-    }
-    const paginator = this.getPaginator(login, list, pageCount)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+    const paginator = this.getPaginator(login, list)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
   }
 
-  private getPaginator(login: string, list: readonly TM.Map[], pageCount: number) {
+  private getPaginator(login: string, list: readonly tm.Map[]) {
+    const pageCount = Math.ceil(list.length / (config.rows * config.columns))
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
     if (playerQuery !== undefined) {
-      const prevLgt = playerQuery.list.length
       playerQuery.list = list
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
-      if (prevLgt !== list.length) {
-        paginator.setPageCount(pageCount)
-        paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-          { page, paginator, list }, `${page}/${pageCount}`)
-      }
+      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
+        { page, paginator, list }, `${page}/${pageCount}`)
+      paginator.setPageCount(pageCount)
     } else {
-      paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId, this.windowWidth, this.footerHeight, pageCount)
+      paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
+        this.windowWidth, this.footerHeight, pageCount)
       this.nextPaginatorId += 10
       this.nextPaginatorId = this.nextPaginatorId % 3000
       this.playerQueries.push({ paginator, login, list })
@@ -166,7 +136,7 @@ export default class MapList extends PopupWindow {
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list: readonly TM.Map[] = this.sortedList
+      let list = maplist.get()
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
@@ -178,38 +148,43 @@ export default class MapList extends PopupWindow {
         this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
         return
       }
-      this.paginator.setPageCount(pageCount)
       this.displayToPlayer(login, { page, paginator, list }, `${page}/${pageCount}`)
     }
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    let pageCount = Math.ceil(this.sortedList.length / (config.rows * config.columns))
+    let pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
     if (page === undefined) {
-      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator, list: this.sortedList }, `1/${pageCount}`)
+      this.displayToPlayer(info.login, { page: 1, paginator: this.paginator }, `1/${pageCount}`)
       return
     }
     this.paginator.setPageCount(pageCount)
     const index = this.playerQueries.findIndex(a => a.login === info.login)
-    this.playerQueries.splice(index, 1)
-    this.displayToPlayer(info.login, { page, paginator: this.paginator, list: this.sortedList }, `${page}/${pageCount}`)
+    if (index !== -1) {
+      this.playerQueries[index].paginator.destroy()
+      this.playerQueries.splice(index, 1)
+    }
+    this.displayToPlayer(info.login, { page, paginator: this.paginator }, `${page}/${pageCount}`)
   }
 
   protected onClose(info: ManialinkClickInfo): void {
     const index = this.playerQueries.findIndex(a => a.login === info.login)
-    this.playerQueries.splice(index, 1)
+    if (index !== -1) {
+      this.playerQueries[index].paginator.destroy()
+      this.playerQueries.splice(index, 1)
+    }
     const index2 = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
-    if (index2 !== -1) {
+    if (index2 !== -1) { // TODO SEPEARATE
       PopupWindow.playersWithWindowOpen.splice(index2, 1)
     }
     this.hideToPlayer(info.login)
   }
 
-  protected async constructContent(login: string, params: { page: number, list: TM.Map[] }): Promise<string> {
-    const maps = params.list
-    const startIndex = (config.rows * config.columns) * (params.page - 1)
+  protected async constructContent(login: string, params?: { page: number, list?: readonly tm.Map[] }): Promise<string> {
+    const maps = params?.list ?? maplist.get()
+    const startIndex = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
     const mapsToDisplay = Math.min(maps.length - startIndex, config.rows * config.columns)
     const recordIndexStrings = await this.getRecordIndexStrings(login, ...maps.slice(startIndex,
       (config.rows * config.columns) + startIndex).map(a => a.id))
@@ -220,56 +195,56 @@ export default class MapList extends PopupWindow {
       const actionId = this.getActionId(maps[index].id)
       const header = this.getHeader(login, index, maps[index].id, actionId, w, h)
       const rowH = (h - this.margin) / 4
-      const width = (w - this.margin * 3) - this.iconW
-      const karmaW = width - (this.timeW + this.positionW + this.margin * 4 + this.iconW * 2)
+      const width = (w - this.margin * 3) - config.iconWidth
+      const karmaW = width - (config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2)
       return `
         <frame posn="${this.margin} ${-this.margin} 3">
           <format textsize="1"/>
           ${header}
           <frame posn="0 ${-rowH} 2">
-            <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
+            <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4"
-             sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${this.icons[1]}"/>
-            <frame posn="${this.iconW + this.margin} 0 2">
-              <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
+             sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[1]}"/>
+            <frame posn="${config.iconWidth + this.margin} 0 2">
+              <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
               ${verticallyCenteredText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width,
         rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
-            <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
+            <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" 
-             sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" image="${this.icons[2]}"/>
-            <frame posn="${this.iconW + this.margin} 0 2">
-              <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
+             sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[2]}"/>
+            <frame posn="${config.iconWidth + this.margin} 0 2">
+              <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
               ${verticallyCenteredText(tm.utils.safeString(maps[index].author), width, rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
-            <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" 
-             image="${this.icons[3]}"/>
-            <frame posn="${this.iconW + this.margin} 0 2">
-              <quad posn="0 0 2" sizen="${this.timeW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(tm.utils.getTimeString(maps[index].authorTime), this.timeW, rowH - this.margin,
+            <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" 
+             image="${config.icons[3]}"/>
+            <frame posn="${config.iconWidth + this.margin} 0 2">
+              <quad posn="0 0 2" sizen="${config.timeWidth} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
+              ${centeredText(tm.utils.getTimeString(maps[index].authorTime), config.timeWidth, rowH - this.margin,
           { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
-          <frame posn="${this.timeW + this.iconW + this.margin * 2} ${-rowH * 3} 2">
-            <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}" 
-             image="${this.icons[4]}"/>
-            <frame posn="${this.iconW + this.margin} 0 2">
-              <quad posn="0 0 2" sizen="${this.positionW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
-              ${centeredText(` ${recordIndexString} `, this.positionW, rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
+          <frame posn="${config.timeWidth + config.iconWidth + this.margin * 2} ${-rowH * 3} 2">
+            <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" 
+             image="${config.icons[4]}"/>
+            <frame posn="${config.iconWidth + this.margin} 0 2">
+              <quad posn="0 0 2" sizen="${config.positionWidth} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
+              ${centeredText(` ${recordIndexString} `, config.positionWidth, rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
-          <frame posn="${this.timeW + this.positionW + this.margin * 4 + this.iconW * 2} ${-rowH * 3} 2">
-            <quad posn="0 0 3" sizen="${this.iconW} ${rowH - this.margin}" bgcolor="${this.iconBg}"/>
-            <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${rowH - this.margin * 3}"
-             image="${this.icons[5]}"/>
-            <frame posn="${this.iconW + this.margin} 0 2">
-              <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${this.contentBg}"/>
+          <frame posn="${config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2} ${-rowH * 3} 2">
+            <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
+            <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}"
+             image="${config.icons[5]}"/>
+            <frame posn="${config.iconWidth + this.margin} 0 2">
+              <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
               ${centeredText(maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
             rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
@@ -279,30 +254,30 @@ export default class MapList extends PopupWindow {
     return this.grid.constructXml(new Array(mapsToDisplay).fill(cell))
   }
 
-  protected constructFooter(login: string, params: { paginator: Paginator }): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + params.paginator.constructXml(login)
+  protected constructFooter(login: string, params?: { paginator: Paginator }): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + (params?.paginator ?? this.paginator).constructXml(login)
   }
 
   private handleMapClick(mapId: string, login: string, nickname: string, privilege: number): boolean {
-    const challenge = this.sortedList.find(a => a.id === mapId)
-    if (challenge === undefined) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Error while adding the map to queue.`, login)
+    const map = maplist.get().find(a => a.id === mapId)
+    if (map === undefined) {
+      tm.sendMessage(config.messages.error, login)
       tm.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
       return false
     }
     if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
       tm.jukebox.remove(mapId, { login, nickname })
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname, true)} `
-        + `${tm.utils.palette.vote}removed ${tm.utils.palette.highlight + tm.utils.strip(challenge.name, true)}${tm.utils.palette.vote} from the queue.`)
+      tm.sendMessage(tm.utils.strVar(config.messages.remove,
+         { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true)}), config.public === true ? undefined : login)
     }
     else {
       if (privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === login)) {
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.vote}You can't add more than one map to the queue.`, login)
+        tm.sendMessage(config.messages.noPermission, login)
         return false
       }
       tm.jukebox.add(mapId, { login, nickname })
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname, true)} `
-        + `${tm.utils.palette.vote}added ${tm.utils.palette.highlight + tm.utils.strip(challenge.name, true)}${tm.utils.palette.vote} to the queue.`)
+      tm.sendMessage(tm.utils.strVar(config.messages.add,
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true)}), config.public === true ? undefined : login)
     }
     return true
   }
@@ -351,7 +326,7 @@ export default class MapList extends PopupWindow {
   }
 
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
-    const width = (w - this.margin * 3) - this.iconW
+    const width = (w - this.margin * 3) - config.iconWidth
     const height = h - this.margin
     const index = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
     const prevIndex = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
@@ -361,35 +336,35 @@ export default class MapList extends PopupWindow {
     if (player?.privilege <= 0 && (prevIndex !== -1 || (tm.jukebox.juked[index]?.callerLogin !== undefined &&
       tm.jukebox.juked[index].callerLogin !== login))) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
-        <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>`
+        <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }
     if (index !== -1) {
       return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
             imagefocus="${config.minusImage}"/>`}
-          <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${this.icons[0]}"/>
-          <frame posn="${this.iconW + this.margin} 0 1">
-            <quad posn="0 0 3" sizen="${width - (this.margin * 2 + this.queueW + this.queueNumberW)} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${verticallyCenteredText(`${config.texts.map}${mapIndex + 1}`, width - (this.margin * 2 + this.queueW) + this.queueNumberW, height / 4 - this.margin, { textScale: config.textScale })}
+          <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${config.icons[0]}"/>
+          <frame posn="${config.iconWidth + this.margin} 0 1">
+            <quad posn="0 0 3" sizen="${width - (this.margin * 2 + config.queueWidth + config.queueNumberWidth)} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+            ${verticallyCenteredText(`${config.texts.map}${mapIndex + 1}`, width - (this.margin * 2 + config.queueWidth) + config.queueNumberWidth, height / 4 - this.margin, { textScale: config.textScale })}
           </frame>
-          <frame posn="${this.iconW + width - (this.queueW + this.queueNumberW)} 0 1">
-            <quad posn="0 0 3" sizen="${this.queueW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`${config.colour}${config.texts.queued}`, this.queueW, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
-          <frame posn="${this.queueW + this.margin} 0 1">
-            <quad posn="0 0 3" sizen="${this.queueNumberW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, this.queueNumberW, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+          <frame posn="${config.iconWidth + width - (config.queueWidth + config.queueNumberWidth)} 0 1">
+            <quad posn="0 0 3" sizen="${config.queueWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+            ${centeredText(`${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+          <frame posn="${config.queueWidth + this.margin} 0 1">
+            <quad posn="0 0 3" sizen="${config.queueNumberWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           </frame>
           </frame>`
     }
     return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
             imagefocus="${config.plusImage}"/>`}
-          <quad posn="0 0 3" sizen="${this.iconW} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
-          <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.iconW - this.margin * 2} ${(height / 4) - this.margin * 3}" 
-           image="${this.icons[0]}"/>
-          <frame posn="${this.iconW + this.margin} 0 1">
-            <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${this.iconBg}"/>
+          <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+          <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${(height / 4) - this.margin * 3}" 
+           image="${config.icons[0]}"/>
+          <frame posn="${config.iconWidth + this.margin} 0 1">
+            <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
             ${verticallyCenteredText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
           </frame>`
   }

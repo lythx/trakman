@@ -2,7 +2,7 @@ import { Client } from "./client/Client.js"
 import { Logger } from "./Logger.js"
 import { GameService } from './services/GameService.js'
 
-const eventListeners: { event: keyof TM.Events, callback: ((params: any) => void | Promise<void>) }[] = []
+const eventListeners: { event: keyof tm.Events, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
 const initialize = async () => {
@@ -32,10 +32,10 @@ const initialize = async () => {
  * @param callback function to execute on event
  * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
-const addListener = <T extends keyof TM.Events>(event: T | (keyof TM.Events)[],
-  callback: ((params: T extends keyof TM.Events ? TM.Events[T] : any)
+const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
+  callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any)
     => void | Promise<void>), prepend?: true): void => {
-  const arr: { event: keyof TM.Events, callback: ((params: any) => void) }[] = []
+  const arr: { event: keyof tm.Events, callback: ((params: any) => void) }[] = []
   if (Array.isArray(event)) {
     arr.push(...event.map(a => ({ event: a, callback })))
   } else {
@@ -45,12 +45,21 @@ const addListener = <T extends keyof TM.Events>(event: T | (keyof TM.Events)[],
 }
 
 /**
+ * Removes event listener
+ * @param callback Callback function of listener to remove
+ */
+const removeListener = (callback: Function): void => {
+  const index = eventListeners.findIndex(a => a.callback === callback)
+  if (index !== -1) { eventListeners.splice(index, 1) }
+}
+
+/**
  * Execute the event callbacks
  * @param event callback event name
  * @param params callback params
  */
-const emit = async <T extends keyof TM.Events>(event: T,
-  params: TM.Events[T]): Promise<void> => {
+const emit = async <T extends keyof tm.Events>(event: T,
+  params: tm.Events[T]): Promise<void> => {
   if (controllerReady === false) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
@@ -58,4 +67,4 @@ const emit = async <T extends keyof TM.Events>(event: T,
   }
 }
 
-export const Events = { initialize, addListener, emit }
+export const Events = { initialize, addListener, removeListener, emit }

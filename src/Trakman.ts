@@ -419,6 +419,12 @@ namespace trakman {
   export const addListener = Events.addListener
 
   /**
+   * Removes event listener
+   * @param callback Callback function of listener to remove
+   */
+  export const removeListener = Events.removeListener
+
+  /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login

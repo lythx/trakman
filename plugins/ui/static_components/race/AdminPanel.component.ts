@@ -16,7 +16,8 @@ export default class AdminPanel extends StaticComponent {
     previous: 30,
     players: 40,
     restart: 50,
-    endRound: 60
+    endRound: 60,
+    jukebox: 70
   }
   private readonly grid: Grid
 
@@ -27,7 +28,7 @@ export default class AdminPanel extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('race')
-    this.grid = new Grid(config.width, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
+    this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info) => {
       this.displayToPlayer(info.login)
     })
@@ -55,6 +56,9 @@ export default class AdminPanel extends StaticComponent {
     })
     addManialinkListener(this.id + this.actions.players, info => {
       tm.openManialink(IDS.playerList, info.login)
+    })
+    addManialinkListener(this.id + this.actions.jukebox, info => {
+      tm.openManialink(IDS.jukebox, info.login)
     })
     addManialinkListener(this.id + this.actions.restart, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.restart, {
@@ -115,7 +119,7 @@ export default class AdminPanel extends StaticComponent {
       this.constructButton(w, h, config.icons.skip, config.iconsHover.skip, this.actions.skip)
     const endRoundButton: GridCellFunction = (i, j, w, h) => {
       if ([1, 4].includes(tm.state.gameConfig.gameMode)) { // Stunts and TA have no rounds
-        return this.constructButton(w, h, config.icons.endRound, config.iconsHover.endRound)
+        return this.constructButton(w, h, config.icons.jukebox, config.iconsHover.jukebox, this.actions.jukebox)
       }
       return this.constructButton(w, h, config.icons.endRound, config.iconsHover.endRound, this.actions.endRound)
     }
@@ -124,7 +128,7 @@ export default class AdminPanel extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side)}
-        <frame posn="0 ${-this.header.options.height - config.margin} 1">
+        <frame posn="${-config.margin} ${-this.header.options.height - config.margin / 2} 1">
           ${this.grid.constructXml([playersButton, restartButton, previousButton, replayButton, skipButton, endRoundButton])}
         </frame>
       </frame>
