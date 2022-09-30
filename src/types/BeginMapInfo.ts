@@ -1,1 +1,1 @@
-type BeginMapInfo = TM.Map & { isRestart: boolean }
+type BeginMapInfo = tm.Map & { isRestart: boolean }

@@ -40,7 +40,7 @@ export default class LiveCps extends PopupWindow {
     tm.commands.add({
       aliases: ['lcp', 'livecptms', 'liverecs'],
       help: 'Display current map live checkpoints.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())

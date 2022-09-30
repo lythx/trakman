@@ -1,12 +1,12 @@
 
 import config from '../config/AdminCommands.config.js'
 
-const commands: TM.Command[] = [
+const commands: tm.Command[] = [
   {
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: (info: TM.MessageInfo, login: string, reason?: string): void => {
+    callback: (info: tm.MessageInfo, login: string, reason?: string): void => {
       const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.kick.error, info.login)
@@ -43,8 +43,8 @@ const commands: TM.Command[] = [
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TM.OfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -67,8 +67,8 @@ const commands: TM.Command[] = [
     aliases: ['fs', 'forcespec'],
     help: 'Force a player into spectator mode.',
     params: [{ name: 'login' }],
-    callback: (info: TM.MessageInfo, login: string): void => {
-      const targetInfo: TM.Player | undefined = tm.players.get(login)
+    callback: (info: tm.MessageInfo, login: string): void => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.forcespec.error, info.login)
         return
@@ -91,8 +91,8 @@ const commands: TM.Command[] = [
     aliases: ['fp', 'forceplay'],
     help: 'Force a player into player mode.',
     params: [{ name: 'login' }],
-    callback: (info: TM.MessageInfo, login: string): void => {
-      const targetInfo: TM.Player | undefined = tm.players.get(login)
+    callback: (info: tm.MessageInfo, login: string): void => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.forceplay.error, info.login)
         return
@@ -119,7 +119,7 @@ const commands: TM.Command[] = [
     aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
     help: 'Manipulate every soul on the server that you kicked someone.',
     params: [{ name: 'login' }],
-    callback: (info: TM.MessageInfo, login: string): void => {
+    callback: (info: tm.MessageInfo, login: string): void => {
       tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
       tm.client.callNoRes(`Kick`, [{ string: login }])
     },
@@ -129,8 +129,8 @@ const commands: TM.Command[] = [
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TM.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      const targetInfo: TM.Player | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(tm.utils.strVar(config.ban.error, { login }), info.login)
         return
@@ -147,8 +147,8 @@ const commands: TM.Command[] = [
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
-      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
       const result = await tm.admin.unban(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
@@ -168,8 +168,8 @@ const commands: TM.Command[] = [
     aliases: ['bl', 'blacklist'],
     help: 'Blacklist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TM.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      let targetInfo: TM.OfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -191,8 +191,8 @@ const commands: TM.Command[] = [
     aliases: ['ubl', 'unblacklist'],
     help: 'Remove a specific player from the blacklist.',
     params: [{ name: 'login' }],
-    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
-      const targetInfo: TM.OfflinePlayer | undefined = await tm.players.fetch(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
       const result = await tm.admin.unblacklist(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
@@ -212,8 +212,8 @@ const commands: TM.Command[] = [
     aliases: ['ag', 'addguest'],
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TM.OfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -236,8 +236,8 @@ const commands: TM.Command[] = [
     aliases: ['rg', 'rmguest', 'removeguest'],
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: TM.MessageInfo, login: string): Promise<void> => {
-      let targetInfo: TM.OfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }

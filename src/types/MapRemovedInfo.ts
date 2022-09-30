@@ -1,3 +1,3 @@
-type MapRemovedInfo = TM.Map & {
+type MapRemovedInfo = tm.Map & {
   readonly callerLogin?: string
 }

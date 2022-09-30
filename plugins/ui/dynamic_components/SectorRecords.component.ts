@@ -21,12 +21,12 @@ export default class SectorRecords extends PopupWindow {
     tm.commands.add({
       aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
-      callback: (info: TM.MessageInfo) => {
+      callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0
     })
-   sectorRecords.addListener('NicknameUpdated',()=>this.reRender())
+    sectorRecords.addListener('NicknameUpdated', () => this.reRender())
     sectorRecords.addListener('BestSector', () => this.reRender())
     sectorRecords.addListener('SectorsFetch', () => {
       this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))

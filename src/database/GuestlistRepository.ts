@@ -28,7 +28,7 @@ export class GuestlistRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(): Promise<TM.GuestlistEntry[]> {
+  async get(): Promise<tm.GuestlistEntry[]> {
     const query: string = `SELECT guestlist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname FROM guestlist
     JOIN players AS caller ON caller.id=guestlist.caller_id
@@ -54,7 +54,7 @@ export class GuestlistRepository extends Repository {
     await this.query(query, login)
   }
 
-  private constructGuestlistObject(entry: TableEntry): TM.GuestlistEntry {
+  private constructGuestlistObject(entry: TableEntry): tm.GuestlistEntry {
     return {
       login: entry.login,
       nickname: entry.nickname ?? undefined,

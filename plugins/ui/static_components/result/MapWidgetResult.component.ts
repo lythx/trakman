@@ -132,7 +132,7 @@ export default class MapWidgetResult extends StaticComponent {
       </manialink>`
   }
 
-  private getTagAndAward(map: TM.Map, TMXMap?: TM.TMXMap): { tag: string, award: string } {
+  private getTagAndAward(map: tm.Map, TMXMap?: tm.TMXMap): { tag: string, award: string } {
     let tag = config.icons.tags.normal
     let award = config.icons.awards.normal
     if (map.isNadeo === true) {

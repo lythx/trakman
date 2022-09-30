@@ -33,7 +33,7 @@ export default class TMXWindow extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['tmxinfo'],
       help: 'Display TMX info.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
@@ -54,8 +54,8 @@ export default class TMXWindow extends PopupWindow<number> {
 
   protected async constructContent(login: string, page: number): Promise<string> {
     const historyCount = Math.min(config.historyCount, tm.jukebox.historyCount)
-    let maps: (TM.Map | undefined)[]
-    let TMXMaps: (TM.TMXMap | null | undefined)[]
+    let maps: (tm.Map | undefined)[]
+    let TMXMaps: (tm.TMXMap | null | undefined)[]
     let titles: string[]
     const currentPage = Math.ceil((historyCount - 1) / config.itemsPerPage) + 1
     if (currentPage === page) {
@@ -98,7 +98,7 @@ export default class TMXWindow extends PopupWindow<number> {
     return this.paginator.constructXml(page) + closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 
-  private constructHeader(width: number, height: number, title: string, map: TM.Map, TMXMap?: TM.TMXMap): string {
+  private constructHeader(width: number, height: number, title: string, map: tm.Map, TMXMap?: tm.TMXMap): string {
     const icon = (x: number, y: number, image: string, url: string): string => {
       return `<quad posn="${x + config.margin} ${-(y + config.margin)} 3" 
        sizen="${config.iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}" url="${url}"/>
@@ -130,7 +130,7 @@ export default class TMXWindow extends PopupWindow<number> {
       </frame>`
   }
 
-  protected constructScreenshot(login: string, width: number, height: number, records: TM.Record[], TMXMap?: TM.TMXMap) {
+  protected constructScreenshot(login: string, width: number, height: number, records: tm.Record[], TMXMap?: tm.TMXMap) {
     const rightW = width - (config.screenshotWidth + config.margin)
     const count = config.localsCount
     const grid = new Grid(rightW, height, [1, 2, 3], new Array(count + 1).fill(1),
@@ -178,14 +178,14 @@ export default class TMXWindow extends PopupWindow<number> {
       </frame>`
   }
 
-  protected constructAuthor(width: number, height: number, map: TM.Map): string {
+  protected constructAuthor(width: number, height: number, map: tm.Map): string {
     return `${this.constructEntry(tm.utils.safeString(map.author), config.icons.author, width - config.authorTimeWidth, height, config.iconWidth)}
     <frame posn="${width - (config.authorTimeWidth + config.margin)} 0 4">
       ${this.constructEntry(tm.utils.getTimeString(map.authorTime), config.icons.authorTime, config.authorTimeWidth + config.margin, height, config.iconWidth, true)}
     </frame>`
   }
 
-  private constructInfoXml(width: number, height: number, map: TM.Map, TMXMap?: TM.TMXMap): string {
+  private constructInfoXml(width: number, height: number, map: tm.Map, TMXMap?: tm.TMXMap): string {
     const grid = new Grid(width, height, config.info.columnsProportions, new Array(config.info.rows).fill(1),
       { margin: config.margin })
     const ic = config.icons
@@ -233,7 +233,7 @@ export default class TMXWindow extends PopupWindow<number> {
     return grid.constructXml(new Array(config.info.columnsProportions.length * config.info.rows).fill(null).map(() => cell))
   }
 
-  private counstructTmxRecordsXml(width: number, height: number, replays: TM.TMXReplay[] = []): string {
+  private counstructTmxRecordsXml(width: number, height: number, replays: tm.TMXReplay[] = []): string {
     const grid = new Grid(width, height, config.tmxColumns, new Array(config.tmxRecordCount + 1).fill(1),
       { margin: config.margin, background: config.gridBackground, headerBackground: config.iconBackground })
     const options = { textScale: config.recordTextScale }

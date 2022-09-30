@@ -36,7 +36,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     tm.commands.add({
       aliases: ['players', 'playerl', 'playerlist'],
       help: 'Display playerlist.',
-      callback: (info: TM.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())

@@ -22,7 +22,7 @@ export class ChatRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(options?: { limit?: number, date?: Date }): Promise<TM.Message[]> {
+  async get(options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 1
     let limitStr = ''
     let dateStr = ''
@@ -44,7 +44,7 @@ export class ChatRepository extends Repository {
     return await this.query(query, ...params)
   }
 
-  async getByLogin(login: string, options?: { limit?: number, date?: Date }): Promise<TM.Message[]> {
+  async getByLogin(login: string, options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 2
     let limitStr = ''
     let dateStr = ''
