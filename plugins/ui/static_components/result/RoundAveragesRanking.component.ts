@@ -1,4 +1,3 @@
-
 import { List, IDS, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './RoundAveragesRanking.config.js'

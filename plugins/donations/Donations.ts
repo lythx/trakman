@@ -1,4 +1,3 @@
-
 import config from './Config.js'
 
 interface DonationInfo {
@@ -44,7 +43,7 @@ tm.addListener('PlayerInfoUpdated', (info) => {
     }
   }
   if (changedObjects.length !== 0) {
-    for(const e of nicknameChangeListeners) {
+    for (const e of nicknameChangeListeners) {
       e(changedObjects)
     }
   }

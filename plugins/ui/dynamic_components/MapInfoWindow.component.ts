@@ -1,9 +1,8 @@
-import PopupWindow from "../PopupWindow.js";
-
+import PopupWindow from "../PopupWindow.js"
 import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js";
+import { Paginator } from "../UiUtils.js"
 import config from './MapInfoWindow.config.js'
-import { tmx } from "../../tmx/Tmx.js";
+import { tmx } from "../../tmx/Tmx.js"
 
 // TODO FIX RECORDS BEING FETCHED EVERYTIME 
 

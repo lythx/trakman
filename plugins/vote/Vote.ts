@@ -1,4 +1,3 @@
-
 import { addKeyListener } from "../ui/utils/KeyListener.js"
 import IDS from '../ui/config/UtilIds.js'
 import config from './Config.js'
@@ -17,15 +16,15 @@ export class Vote {
   static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onInterrupt: ((info: {
-    caller?: tm.Player;
-    result: boolean;
+    caller?: tm.Player,
+    result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onInterrupt: ((info: {
-    caller?: tm.Player;
-    result: boolean;
+    caller?: tm.Player,
+    result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   loginList: string[] = []

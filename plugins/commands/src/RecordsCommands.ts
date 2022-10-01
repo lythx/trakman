@@ -1,4 +1,3 @@
-
 import config from '../config/RecordsCommands.config.js'
 
 const commands: tm.Command[] = [{

@@ -1,4 +1,3 @@
-
 import StaticComponent from '../../StaticComponent.js'
 import { IDS, Grid, centeredText, verticallyCenteredText, StaticHeader } from '../../UiUtils.js'
 import config from './BestFinishes.config.js'

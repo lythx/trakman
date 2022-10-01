@@ -1,4 +1,3 @@
-
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 

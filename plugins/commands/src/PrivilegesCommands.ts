@@ -1,4 +1,3 @@
-
 import config from '../config/PrivilegesCommands.config.js'
 
 const commands: tm.Command[] = [

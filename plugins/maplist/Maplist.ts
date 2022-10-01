@@ -1,4 +1,3 @@
-
 import config from './Config.js'
 
 const authorSort: tm.Map[] = []

@@ -1,5 +1,4 @@
 import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
-
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'

@@ -1,4 +1,3 @@
-
 import IDS from '../config/UtilIds.js'
 import raceConfig from './RecordListRace.config.js'
 import resultConfig from './RecordListResult.config.js'
@@ -49,10 +48,10 @@ export default class RecordList {
   readonly downloadIcon: string
   readonly clickListeners: Function[] = []
   readonly timeColours: {
-    slower: string;
-    faster: string;
-    you: string;
-    top: string;
+    slower: string,
+    faster: string,
+    you: string,
+    top: string
   }
 
   constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,

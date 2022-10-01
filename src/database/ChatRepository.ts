@@ -10,8 +10,7 @@ const createQuery: string = `
       CONSTRAINT fk_player_id
         FOREIGN KEY(player_id) 
 	        REFERENCES players(id) 
-  );
-`
+  );`
 
 const playerRepo = new PlayerRepository()
 

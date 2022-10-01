@@ -1,4 +1,3 @@
-
 import { BestSectors, PlayerSectors } from './SectorTypes.js'
 import { bestSecsDB, allSecsDB } from './SectorDB.js'
 import { emitEvent } from './SectorEvents.js'
@@ -168,10 +167,10 @@ if (config.isEnabled === true) {
     callback(info, sectorIndex?: number) {
       if (sectorIndex === undefined) {
         const arr: {
-          login: string;
-          nickname: string;
-          sector: number;
-          date: Date;
+          login: string,
+          nickname: string,
+          sector: number,
+          date: Date
         }[] = currentBestSecs.filter(a => a !== undefined) as any
         currentBestSecs.length = 0
         tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,

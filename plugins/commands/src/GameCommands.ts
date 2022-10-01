@@ -1,4 +1,3 @@
-
 import config from '../config/GameCommands.config.js'
 
 const commands: tm.Command[] = [

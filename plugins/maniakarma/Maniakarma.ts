@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-
 import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 
@@ -181,7 +180,7 @@ const getJson = (data: string): any => {
 }
 
 const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void => {
-  const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
+  const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic']
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v = playerVotes.find(a => a.login === login)
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }

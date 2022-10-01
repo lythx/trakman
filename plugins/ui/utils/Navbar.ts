@@ -1,4 +1,3 @@
-
 import config from './Navbar.config.js'
 
 export default class Navbar {

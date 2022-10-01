@@ -1,4 +1,3 @@
-
 import config from '../config/AdminCommands.config.js'
 
 const commands: tm.Command[] = [
