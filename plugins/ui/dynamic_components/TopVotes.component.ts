@@ -1,8 +1,7 @@
-import PopupWindow from "../PopupWindow.js";
-
-import { stats } from "../../stats/Stats.js";
+import PopupWindow from "../PopupWindow.js"
+import { stats } from "../../stats/Stats.js"
 import { IDS, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
 import config from './TopVotes.config.js'
 
 export default class TopVisits extends PopupWindow<number> {

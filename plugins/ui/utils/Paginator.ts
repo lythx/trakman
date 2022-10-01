@@ -1,4 +1,3 @@
-
 import config from './Paginator.config.js'
 import IDS from '../config/UtilIds.js'
 
@@ -137,7 +136,7 @@ export default class Paginator {
   }
 
   destroy() {
-    if(this.clickListener === undefined) { return }
+    if (this.clickListener === undefined) { return }
     tm.removeListener(this.clickListener)
     this.clickListener = undefined
   }

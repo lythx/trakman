@@ -1,4 +1,3 @@
-
 import StaticComponent from '../../StaticComponent.js'
 import { donations } from '../../../donations/Donations.js'
 import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'

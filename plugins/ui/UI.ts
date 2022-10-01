@@ -3,6 +3,7 @@
 STATIC COMPONENTS
 -----------------
 */
+
 import CustomUi from './CustomUi.js'
 //import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/race/RankWidget.component.js'
@@ -21,7 +22,6 @@ import AdminPanel from './static_components/race/AdminPanel.component.js'
 import BestCps from './static_components/race/BestCps.component.js'
 import BestFinishes from './static_components/race/BestFinishes.component.js'
 import CpCounter from './static_components/race/CpCounter.component.js'
-
 import MapWidgetResult from './static_components/result/MapWidgetResult.component.js'
 import NextMapRecords from './static_components/result/NextMapRecords.component.js'
 import TimerWidgetResult from './static_components/result/TimerWidgetResult.component.js'
@@ -45,6 +45,7 @@ import MostRecordsRanking from './static_components/result/MostRecordsRanking.co
 DYNAMIC COMPONENTS
 ------------------
 */
+
 import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/Commandlist.component.js'
 import TMXWindow from './dynamic_components/MapInfoWindow.component.js'

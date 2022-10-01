@@ -1,5 +1,4 @@
-
-import DynamicComponent from "./DynamicComponent.js";
+import DynamicComponent from "./DynamicComponent.js"
 import { IDS } from './UiUtils.js'
 import UTILIDS from './config/UtilIds.js'
 import Navbar from './utils/Navbar.js'
@@ -41,8 +40,8 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.openId = windowId + UTILIDS.PopupWindow.open
     this.closeId = windowId + UTILIDS.PopupWindow.close
     this.windowHeight = windowHeight
-    this.windowWidth = windowWidth;
-    this.navbar = new Navbar(navbar, this.windowWidth);
+    this.windowWidth = windowWidth
+    this.navbar = new Navbar(navbar, this.windowWidth)
     this.navbarHeight = this.navbar.height
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);

@@ -1,5 +1,4 @@
 import { centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
-
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './KarmaWidget.config.js'
@@ -80,12 +79,12 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   private constructGraph(max: number, voteAmounts: number[], mkVotes: {
-    fantastic: number;
-    beautiful: number;
-    good: number;
-    bad: number;
-    poor: number;
-    waste: number;
+    fantastic: number,
+    beautiful: number,
+    good: number,
+    bad: number,
+    poor: number,
+    waste: number
   }): string {
     const width: number = (config.width + config.margin - config.buttonWidth) / 2 - config.margin
     let ret: string = `<quad posn="0 0 1" sizen="${width} ${config.height - (this.headerH + config.margin)}" bgcolor="${config.background}"/>`

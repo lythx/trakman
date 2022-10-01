@@ -1,5 +1,4 @@
 import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
-
 import StaticComponent from '../../StaticComponent.js'
 import config from './LiveRanking.config.js'
 

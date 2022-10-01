@@ -1,14 +1,14 @@
-import { Logger } from "../Logger.js";
-import { Client } from "../client/Client.js";
+import { Logger } from "../Logger.js"
+import { Client } from "../client/Client.js"
 import config from "../../config/Config.js"
-import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
+import { PrivilegeRepository } from "../database/PrivilegeRepository.js"
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
 import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
-import { PlayerService } from "./PlayerService.js";
-import { Events } from "../Events.js";
-import { Utils } from "../Utils.js";
+import { PlayerService } from "./PlayerService.js"
+import { Events } from "../Events.js"
+import { Utils } from "../Utils.js"
 
 export class AdministrationService {
 

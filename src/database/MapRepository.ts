@@ -78,7 +78,7 @@ const environments = {
   Bay: 5,
   Coast: 6,
   Snow: 7
-};
+}
 
 const mapIdsRepo = new MapIdsRepository()
 
