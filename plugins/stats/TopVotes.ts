@@ -1,4 +1,3 @@
-
 import config from './Config.js'
 
 let onlineList: { login: string, nickname: string, count: number }[] = []

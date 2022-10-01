@@ -1,6 +1,5 @@
-import PopupWindow from "../PopupWindow.js";
-
-import { dedimania } from "../../dedimania/Dedimania.js";
+import PopupWindow from "../PopupWindow.js"
+import { dedimania } from "../../dedimania/Dedimania.js"
 import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './DediCps.config.js'
 

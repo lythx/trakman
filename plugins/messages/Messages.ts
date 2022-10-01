@@ -1,4 +1,3 @@
-
 import { dedimania } from '../dedimania/Dedimania.js'
 import { Logger } from '../../src/Logger.js'
 import c from './Config.js'

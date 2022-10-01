@@ -1,5 +1,4 @@
 import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
-
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './DediRankingResult.config.js'

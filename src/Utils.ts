@@ -1,10 +1,10 @@
 import { Client } from "./client/Client.js"
-import dsc from 'dice-similarity-coeff';
+import dsc from 'dice-similarity-coeff'
 import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import countries from './data/Countries.json' assert { type: 'json' }
 import { Events } from './Events.js'
 import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
-import { PlayerService } from "./services/PlayerService.js";
+import { PlayerService } from "./services/PlayerService.js"
 import colours from './data/Colours.json' assert { type: 'json' }
 import { palette } from '../config/Prefixes.js'
 import config from '../config/Config.js'

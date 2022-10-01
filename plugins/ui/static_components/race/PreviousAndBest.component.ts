@@ -1,5 +1,4 @@
 import { IDS } from '../../UiUtils.js'
-
 import StaticComponent from '../../StaticComponent.js'
 import config from './PreviousAndBest.config.js'
 

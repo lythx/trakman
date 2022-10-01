@@ -1,6 +1,6 @@
-import PopupWindow from "../PopupWindow.js";
+import PopupWindow from "../PopupWindow.js"
 import { centeredText, closeButton, Grid, IDS, verticallyCenteredText, addManialinkListener } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js";
+import { Paginator } from "../UiUtils.js"
 import { maplist } from '../../maplist/Maplist.js'
 import config from './Maplist.config.js'
 

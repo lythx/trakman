@@ -1,4 +1,3 @@
-
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 

@@ -1,4 +1,3 @@
-
 import PopupWindow from '../PopupWindow.js'
 import { Grid, IDS, GridCellFunction, centeredText, closeButton } from '../UiUtils.js'
 import config from './Changelog.config.js'

@@ -1,5 +1,3 @@
-
-
 import StaticComponent from '../../StaticComponent.js'
 import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
 import config from './CpCounter.config.js'

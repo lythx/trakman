@@ -1,4 +1,3 @@
-
 import config from '../config/RaceCommands.config.js'
 
 const commands: tm.Command[] = [

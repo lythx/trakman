@@ -1,5 +1,4 @@
 import { IDS, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
-
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanel.config.js'
 

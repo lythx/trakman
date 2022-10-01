@@ -1,4 +1,3 @@
-
 import StaticComponent from '../../StaticComponent.js'
 import { IDS, Grid, centeredText, rightAlignedText, verticallyCenteredText, Paginator, StaticHeader } from '../../UiUtils.js'
 import config from './BestCps.config.js'

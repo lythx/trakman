@@ -1,4 +1,3 @@
-
 import config from './Config.js'
 
 let topList: { readonly login: string, nickname: string, amount: number }[] = []

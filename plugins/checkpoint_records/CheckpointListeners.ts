@@ -1,4 +1,3 @@
-
 import { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
 import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
@@ -139,10 +138,10 @@ if (config.isEnabled === true) {
     callback(info, cpIndex?: number) {
       if (cpIndex === undefined) {
         const arr: {
-          login: string;
-          nickname: string;
-          checkpoint: number;
-          date: Date;
+          login: string,
+          nickname: string,
+          checkpoint: number,
+          date: Date
         }[] = currentBestCps.filter(a => a !== undefined) as any
         currentBestCps.length = 0
         tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved,

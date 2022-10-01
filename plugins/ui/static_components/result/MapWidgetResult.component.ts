@@ -1,6 +1,5 @@
 import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
 import flags from '../../config/FlagIcons.json' assert { type: 'json' }
-
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'

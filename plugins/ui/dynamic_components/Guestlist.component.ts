@@ -1,5 +1,4 @@
 import PopupWindow from '../PopupWindow.js'
-
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './Guestlist.config.js'
 

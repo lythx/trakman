@@ -1,4 +1,3 @@
-
 import config from '../config/JukeboxCommands.config.js'
 
 const commands: tm.Command[] = [{

@@ -1,4 +1,3 @@
-
 import config from '../config/ChatCommands.config.js'
 
 const commands: tm.Command[] = [
