@@ -1,5 +1,3 @@
-
-
 /*
 -----------------
 STATIC COMPONENTS
@@ -48,7 +46,7 @@ DYNAMIC COMPONENTS
 ------------------
 */
 import DynamicComponent from './DynamicComponent.js'
-import CommandList from './dynamic_components/CommandList.component.js'
+import CommandList from './dynamic_components/Commandlist.component.js'
 import TMXWindow from './dynamic_components/MapInfoWindow.component.js'
 import LocalCps from './dynamic_components/LocalCps.component.js'
 import DediCps from './dynamic_components/DediCps.component.js'
@@ -57,9 +55,9 @@ import DediSectors from './dynamic_components/DediSectors.component.js'
 import LocalSectors from './dynamic_components/LocalSectors.component.js'
 import LiveSectors from './dynamic_components/LiveCps.component.js'
 import CurrentCps from './dynamic_components/CurrentCps.component.js'
-import MapList from './dynamic_components/MapList.component.js'
+import MapList from './dynamic_components/Maplist.component.js'
 import DonationPanel from './static_components/race/DonationPanel.component.js'
-import PlayerList from './dynamic_components/PlayerList.component.js'
+import PlayerList from './dynamic_components/Playerlist.component.js'
 import Banlist from './dynamic_components/Banlist.component.js'
 import Blacklist from './dynamic_components/Blacklist.component.js'
 import Guestlist from './dynamic_components/Guestlist.component.js'

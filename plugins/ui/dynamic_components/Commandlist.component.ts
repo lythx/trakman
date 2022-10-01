@@ -1,7 +1,6 @@
-
 import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction } from "../UiUtils.js";
 import PopupWindow from "../PopupWindow.js";
-import config from './CommandList.config.js'
+import config from './Commandlist.config.js'
 
 interface DisplayParams {
   page: number

@@ -2,7 +2,7 @@ import PopupWindow from "../PopupWindow.js";
 import { centeredText, closeButton, Grid, IDS, verticallyCenteredText, addManialinkListener } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js";
 import { maplist } from '../../maplist/Maplist.js'
-import config from './MapList.config.js'
+import config from './Maplist.config.js'
 
 export default class MapList extends PopupWindow<{ page: number, paginator: Paginator, list?: readonly tm.Map[] }> {
 
@@ -268,7 +268,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
       tm.jukebox.remove(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.remove,
-         { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true)}), config.public === true ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public === true ? undefined : login)
     }
     else {
       if (privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === login)) {
@@ -277,7 +277,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       }
       tm.jukebox.add(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.add,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true)}), config.public === true ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public === true ? undefined : login)
     }
     return true
   }
