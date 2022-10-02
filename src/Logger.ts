@@ -1,5 +1,5 @@
 import fs from 'fs/promises'
-import 'dotenv/config'
+import config from '../config/Logging.js'
 import { WebhookClient, EmbedBuilder } from 'discord.js'
 
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
@@ -55,13 +55,13 @@ export abstract class Logger {
     },
   }
   private static crashed: boolean = false
-  private static readonly useDiscord: boolean = process.env.USE_DISCORD_LOG === 'YES'
+  private static readonly useDiscord: boolean = config.discordEnabled === true
   private static webhook: WebhookClient
   private static discordLogLevel: number
   private static isFirstLog: boolean = true
 
   static async initialize(): Promise<void> {
-    this.logLevel = Number(process.env.LOG_LEVEL)
+    this.logLevel = Number(config.logLevel)
     if (isNaN(this.logLevel)) {
       throw new Error('Error while initializing logger: LOG_LEVEL is not a number. Check if its set in the .env file.')
     }
@@ -77,16 +77,16 @@ export abstract class Logger {
       void this.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
     if (this.useDiscord === true) {
-      this.discordLogLevel = Number(process.env.DISCORD_LOG_LEVEL)
+      this.discordLogLevel = Number(config.discordLogLevel)
       if (isNaN(this.discordLogLevel)) {
         await this.fatal('DISCORD_LOG_LEVEL is undefined or not a number. Check your .env file')
         return
       }
-      if (process.env.DISCORD_WEBHOOK_URL === undefined) {
+      if (config.discordWebhookUrl === undefined) {
         await this.fatal('DISCORD_WEEBHOOK_URL is undefined. Check your .env file')
         return
       }
-      this.webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL })
+      this.webhook = new WebhookClient({ url: config.discordWebhookUrl })
     }
   }
 
@@ -161,16 +161,13 @@ export abstract class Logger {
       await fs.appendFile(file, logStr)
     }
     if (this.useDiscord === true && this.logTypes[tag].level <= this.discordLogLevel) {
-      const users: string | undefined = process.env.USERS_TO_PING_ON_CRASH
-      const pings: string[] = users === undefined ? [] : users.split(',')
-      // Useless feature incoming..
-      const thumbs: string | undefined = process.env.EMBED_IMAGE_URLS
-      const embedThumbnails: string[] = thumbs === undefined ? [] : thumbs.split(',')
+      const users: string[] = config.discordTaggedUsers.length === 0 ? [] : config.discordTaggedUsers
+      const thumbs: string[] = config.discordEmbedImages.length === 0 ? [] : config.discordEmbedImages
       const embed: EmbedBuilder = new EmbedBuilder()
-        .setTitle(`${tag.toUpperCase()} on server ${process.env.SERVER_LOGIN}`)
+        .setTitle(`${tag.toUpperCase()} on server ${tm.state.serverConfig.login}`)
         .setColor(this.logTypes[tag].discordColour)
         .setTimestamp(new Date())
-        .setThumbnail(embedThumbnails[~~(Math.random() * embedThumbnails.length)])
+        .setThumbnail(thumbs[~~(Math.random() * thumbs.length)])
         .addFields([
           {
             name: location,
@@ -181,7 +178,7 @@ export abstract class Logger {
       const separator: string | undefined = this.isFirstLog === false ? undefined : '---------------------------------------------'
       if (tag === 'fatal') {
         await this.webhook.send({
-          content: (separator ?? '') + '\n' + pings.join(' '),
+          content: (separator ?? '') + '\n' + users.join(' '),
           embeds: [embed]
         })
       } else {
