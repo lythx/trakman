@@ -3,6 +3,6 @@ export default {
     discordEnabled: true,
     discordLogLevel: 2,
     discordWebhookUrl: ``,
-    discordEmbedImages: [],
-    discordTaggedUsers: []
+    discordEmbedImages: [``],
+    discordTaggedUsers: [``]
 }
