@@ -21,11 +21,26 @@ On Windows, the installation instructions might be a little goofy and I'm not wi
 
 ### Settings
 The `config` directory is split into multiple files:
+##### Server.js
+See [the TM-Forum post](https://www.tm-forum.com/viewtopic.php?t=14203) for dedicated server installation instructions
+- `serverAddress` - IP address of the server
+- `serverPort` - Port used for the server communication (`5000` by [default](https://www.tm-forum.com/viewtopic.php?p=107361&hilit=5000#p107361))
+- `superAdminName` - SuperAdmin name from your `dedicated_cfg.txt`
+- `superAdminPassword` - SuperAdmin password from your `dedicated_cfg.txt`
+##### Database.js
+You might want to take a look at the [official PostgreSQL docs](https://www.postgresql.org/docs/current/) before setting these
+- `dbUser` - PostgreSQL database user
+- `dbPassword` - Password for `dbUser`
+- `dbName` - Name of the PostgreSQL database
+- `dbAddress` - IP address of the database server
+- `dbPort` - Port used for the database communication (`5432` by [default](https://www.postgresql.org/docs/current/runtime-config-connection.html#RUNTIME-CONFIG-CONNECTION-SETTINGS))
+- `serverOwnerLogin` - Trackmania login of the server owner, highest privilege user
+- `fixRankCoherence` - Whether to fix rankings coherence on startup (useful if you changed the `localRecordsLimit`, or just migrated the database)
 ##### Config.js
-- `localRecordsLimit` - Local records limit for widget display and rank calculation
+- `localRecordsLimit` - Local records limit for rank calculation and plugins
 - `chatMessagesInRuntime` - Amount of chat messages stored in runtime memory
-- `jukeboxQueueSize` - Amount of maps in the dedicated server map queue
-- `jukeboxHistorySize` - Amount of maps kept in the queue history
+- `jukeboxQueueSize` - Amount of maps in the controller map queue
+- `jukeboxHistorySize` - Amount of maps kept in the map history
 - `privileges` - Privilege levels for each of the administrative actions (e.g. ban, mute, etc.)
 - `blacklistFile` - Relative path (/GameData/Config/) to the blacklist file
 - `guestlistFile` - Relative path (/GameData/Config/) to the guestlist file
@@ -55,32 +70,17 @@ The `config` directory is split into multiple files:
 - `titles.logins` - Pairs of `login` and `title` where the `title` is assigned to the specified `login`
 - `titles.countries` - Pairs of `country` and `title` where the `title` is assigned to every player from the specified `country` (country codes work too)
 - `titles.privileges` - Pairs of `privilege` and `title` where the `title` is assigned to every player with the specified `privilege` level
-##### Server.js
-See [the TM-Forum post](https://www.tm-forum.com/viewtopic.php?t=14203) for dedicated server installation instructions
-- `serverAddress` - IP address of the server
-- `serverPort` - Port used for the server communication (`5000` by [default](https://www.tm-forum.com/viewtopic.php?p=107361&hilit=5000#p107361))
-- `superAdminName` - SuperAdmin name from your `dedicated_cfg.txt`
-- `superAdminPassword` - SuperAdmin password from your `dedicated_cfg.txt`
-##### Database.js
-You might want to take a look at the [official PostgreSQL docs](https://www.postgresql.org/docs/current/) before setting these
-- `dbUser` - PostgreSQL database user
-- `dbPassword` - Password for `dbUser`
-- `dbName` - Name of the PostgreSQL database
-- `dbAddress` - IP address of the database server
-- `dbPort` - Port used for the database communication (`5432` by [default](https://www.postgresql.org/docs/current/runtime-config-connection.html#RUNTIME-CONFIG-CONNECTION-SETTINGS))
-- `serverOwnerLogin` - Trackmania login of the server owner, highest privilege user
-- `fixRankCoherence` - Whether to fix rankings coherence on startup (useful if you changed the `localRecordsLimit`, or just migrated the database)
 ##### Logging.js
 If you want to use the Discord logging feature, please [take a look at the Discord webhook docs](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) first
 - `logLevel` - The level of logging (`1` - error, `2` - warn, `3` - info, `4` - debug, `5` - trace)
 - `discordEnabled` - Enable or disable sending logs to Discord
-- `discordLogLevel - The level of logging, affects only the webhook (`1` - error, `2` - warn, `3` - info, `4` - debug, `5` - trace)
+- `discordLogLevel` - The level of logging, affects only the webhook (`1` - error, `2` - warn, `3` - info, `4` - debug, `5` - trace)
 - `discordWebhookUrl` - URL for the Discord webhook you have created
 - `discordEmbedImages` - List of image URLs to be used in the Discord embed
 - `discordTaggedUsers` - List of users to be mentioned when the controller crashes (fatal error)
 
 ### Limitations
 1. Stunts mode is not supported (yet?)
-2. Rounds mode is not supported by the UI (yet)
-3. Some methods/callbacks were never tested, thus may disfunction (very unlikely)
+2. Rounds/teams/cup mode is not supported by the UI (yet)
+3. Some methods/callbacks were never tested, thus may disfunction
 4. Stability is questionable as of now
