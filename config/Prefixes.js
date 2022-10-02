@@ -1,4 +1,4 @@
-import colours from '../src/data/Colours.json' assert { type: 'json' }
+import colours from '../src/data/Colours.js'
 
 export const palette = {
   // All admin commands
