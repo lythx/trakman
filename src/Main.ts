@@ -2,7 +2,6 @@ import './Trakman.js'
 import { Client } from './client/Client.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
-import 'dotenv/config'
 import { Listeners } from './Listeners.js'
 import { PlayerService } from './services/PlayerService.js'
 import { ChatService } from './services/ChatService.js'
@@ -13,26 +12,26 @@ import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { fixCoherence } from './FixRankCoherence.js'
+import config from '../config/Server.js'
 await import('../Plugins.js')
 
 async function main(): Promise<void> {
   await Logger.initialize()
   Logger.info('Starting the controller...')
   Logger.trace('Establishing connection with the dedicated server...')
-  await Client.connect(process.env.SERVER_IP, Number(process.env.SERVER_PORT))
+  await Client.connect(config.serverAddress, Number(config.serverPort))
   Logger.trace('Connection with the dedicated server established')
   Logger.trace('Authenticating...')
-  if (process.env.SUPERADMIN_NAME === undefined) { await Logger.fatal('SUPERADMIN_NAME is undefined. Check your .env file') }
-  if (process.env.SUPERADMIN_PASSWORD === undefined) { await Logger.fatal('SUPERADMIN_PASSWORD is undefined. Check your .env file') }
+  if (config.superAdminName === undefined) { await Logger.fatal('superAdminName is undefined. Check your server config file') }
+  if (config.superAdminPassword === undefined) { await Logger.fatal('superAdminPassword is undefined. Check your server config file') }
   const authenticationStatus: any[] | Error = await Client.call('Authenticate', [
-    { string: process.env.SUPERADMIN_NAME },
-    { string: process.env.SUPERADMIN_PASSWORD }
+    { string: config.superAdminName },
+    { string: config.superAdminPassword }
   ])
   if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
-  if (process.env.FIX_RANK_COHERENCE === "YES") {
-    await fixCoherence()
-  }
+  // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //if (process.env.FIX_RANK_COHERENCE === "YES") { await fixCoherence() }
   Logger.trace('Retrieving game info...')
   await GameService.initialize()
   Logger.trace('Game info fetched')

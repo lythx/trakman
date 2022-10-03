@@ -1,6 +1,7 @@
 import { Logger } from "../Logger.js"
 import { Client } from "../client/Client.js"
 import config from "../../config/Config.js"
+import dbConfig from '../../config/Database.js'
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js"
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
@@ -8,7 +9,6 @@ import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
 import { PlayerService } from "./PlayerService.js"
 import { Events } from "../Events.js"
-import { Utils } from "../Utils.js"
 
 export class AdministrationService {
 
@@ -107,11 +107,7 @@ export class AdministrationService {
    */
   private static async setOwner(): Promise<void> {
     const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
-    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
-    if (newOwnerLogin === undefined) {
-      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
-      return
-    }
+    const newOwnerLogin: string = dbConfig.serverOwnerLogin
     if (oldOwnerLogin !== newOwnerLogin) {
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
       await this.setPrivilege(newOwnerLogin, 4)

@@ -1,15 +1,13 @@
 import { Client } from "./client/Client.js"
 import dsc from 'dice-similarity-coeff'
-import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
-import countries from './data/Countries.json' assert { type: 'json' }
+import specialCharmap from './data/SpecialCharmap.js'
+import countries from './data/Countries.js'
 import { Events } from './Events.js'
-import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { PlayerService } from "./services/PlayerService.js"
-import colours from './data/Colours.json' assert { type: 'json' }
+import colours from './data/Colours.js'
 import { palette } from '../config/Prefixes.js'
 import config from '../config/Config.js'
 
-const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('BillUpdated', (info: BillUpdatedInfo): void => {
   const billIndex: number = bills.findIndex(a => a.id === info.id)
