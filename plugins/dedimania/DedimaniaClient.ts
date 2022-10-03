@@ -1,7 +1,7 @@
 import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
-import { trakman as tm } from '../../src/Trakman.js'
+
 import DediConfig from './Config.js'
 
 export class DedimaniaClient {
@@ -74,7 +74,7 @@ export class DedimaniaClient {
 
   setupListeners(): void {
     this.socket.on('data', async buffer => {
-      this.response.addData(buffer.toString())
+      this.response.addData(buffer)
     })
     this.socket.on('error', async err => {
       tm.log.error('Dedimania socket error:', err.message)
@@ -82,7 +82,7 @@ export class DedimaniaClient {
     })
   }
 
-  async call(method: string, params: CallParams[] = []): Promise<any[] | Error> {
+  async call(method: string, params: tm.CallParams[] = []): Promise<any[] | Error> {
     while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) }
     if (!this._connected) { return new Error('Not connected to dedimania') }
     this.receivingResponse = true

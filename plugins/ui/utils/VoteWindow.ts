@@ -1,4 +1,3 @@
-import { trakman as tm } from "../../../src/Trakman.js"
 import IDS from '../config/UtilIds.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../vote/Vote.js'
@@ -36,7 +35,7 @@ export default class VoteWindow {
    * @param eligibleLogins list of logins of players that can vote
    * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: TMPlayer }> | undefined {
+  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
     return new Promise((resolve) => {
       this.vote.onUpdate = (votes, seconds) => {
         this.display(votes, seconds)
@@ -59,11 +58,11 @@ export default class VoteWindow {
     })
   }
 
-  pass(caller?: TMPlayer): void {
+  pass(caller?: tm.Player): void {
     this.vote.pass(caller)
   }
 
-  cancel(caller?: TMPlayer): void {
+  cancel(caller?: tm.Player): void {
     this.vote.cancel(caller)
   }
 
@@ -93,7 +92,7 @@ export default class VoteWindow {
     const cfg = header.options
     return `
     <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
-    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset:config.headerTextXOffset })}
+    ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset: config.headerTextXOffset })}
     <frame posn="${this.width - (cfg.squareWidth + cfg.margin) + cfg.margin} 0 1">
       <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
       <quad posn="${cfg.iconHorizontalPadding} ${-cfg.iconVerticalPadding} 4" sizen="${cfg.iconWidth} ${cfg.iconHeight}" image="${this.icon}"/> 

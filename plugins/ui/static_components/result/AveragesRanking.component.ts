@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../../src/Trakman.js'
 import { List, IDS, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { stats } from '../../../stats/Stats.js'
@@ -24,6 +23,7 @@ export default class AveragesRanking extends StaticComponent {
       config.height - (this.header.options.height + config.margin), config.columnProportions,
       { background: config.background, headerBg: this.header.options.textBackground })
     stats.averages.onUpdate(() => this.display())
+    stats.averages.onNicknameChange(() => this.display())
   }
 
   display(): void {

@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
 import { IDS, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
 import config from './CurrentCps.config.js'
@@ -65,9 +64,9 @@ export default class CurrentCps extends PopupWindow {
     tm.commands.add({
       aliases: ['ccp', 'currentcps'],
       help: 'Display each online players current cp.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
   }
 
   // Override onOpen method to add page count to params and display it

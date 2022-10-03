@@ -1,11 +1,10 @@
-import { trakman as tm } from "../../../src/Trakman.js";
-import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction } from "../UiUtils.js";
-import PopupWindow from "../PopupWindow.js";
-import config from './CommandList.config.js'
+import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction } from "../UiUtils.js"
+import PopupWindow from "../PopupWindow.js"
+import config from './Commandlist.config.js'
 
 interface DisplayParams {
   page: number
-  commands: TMCommand[]
+  commands: tm.Command[]
   paginator: Paginator
   privilege: number
   singleType?: true
@@ -20,12 +19,12 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   private readonly masteradminPaginator: Paginator
   private readonly ownerPaginator: Paginator
   private readonly table: Grid
-  private readonly commandLists: TMCommand[][] = []
-  private readonly userCommands: TMCommand[]
-  private readonly opCommands: TMCommand[]
-  private readonly adminCommands: TMCommand[]
-  private readonly masteradminCommands: TMCommand[]
-  private readonly ownerCommands: TMCommand[]
+  private readonly commandLists: tm.Command[][] = []
+  private readonly userCommands: tm.Command[]
+  private readonly opCommands: tm.Command[]
+  private readonly adminCommands: tm.Command[]
+  private readonly masteradminCommands: tm.Command[]
+  private readonly ownerCommands: tm.Command[]
 
   constructor() {
     super(IDS.commandList, config.icon, config.title, config.navbar)
@@ -51,7 +50,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     }
     for (let i: number = 0; i <= 4; i++) {
       const arr = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, i + 1)
-      const commands: TMCommand[] = arr.flat(1)
+      const commands: tm.Command[] = arr.flat(1)
       this.commandLists.push(commands)
       const pageCount: number = Math.ceil(commands.length / config.entries)
       const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.footerHeight, pageCount)
@@ -62,8 +61,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
     tm.addListener("ManialinkClick", (info) => {
-      if (info.answer >= this.openId + 100 && info.answer <= this.openId + 500) {
-        switch (info.answer - this.openId) {
+      if (info.actionId >= this.openId + 100 && info.actionId <= this.openId + 500) {
+        switch (info.actionId - this.openId) {
           case 100: {
             const paginator = this.userPaginator
             const commands = this.userCommands
@@ -106,7 +105,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       if (p !== undefined) {
         if (info.newPrivilege < p.params.privilege || p.params.singleType === undefined) {
           const paginator: Paginator = this.paginators[info.newPrivilege]
-          const commands: TMCommand[] = this.commandLists[info.newPrivilege]
+          const commands: tm.Command[] = this.commandLists[info.newPrivilege]
           const page = paginator.getPageByLogin(info.login)
           this.displayToPlayer(info.login, { page, commands, paginator, privilege: info.newPrivilege }, `${page}/${paginator.pageCount}`)
         } else {
@@ -117,16 +116,16 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     tm.commands.add({
       aliases: ['h', 'help', 'helpall'],
       help: 'Display the commands list.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     },)
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
-    const player: TMPlayer | undefined = tm.players.get(info.login)
+    const player: tm.Player | undefined = tm.players.get(info.login)
     if (player === undefined) { return }
     const paginator: Paginator = this.paginators[player.privilege]
-    const commands: TMCommand[] = this.commandLists[player.privilege]
+    const commands: tm.Command[] = this.commandLists[player.privilege]
     const page = paginator.getPageByLogin(info.login)
     this.displayToPlayer(info.login, { page, commands, paginator, privilege: player.privilege }, `${page}/${paginator.pageCount}`)
   }
@@ -154,14 +153,14 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       (i, j, w, h) => centeredText(' Comment ', w, h), // Space to prevent translation
     ]
     const nameCell: GridCellFunction = (i, j, w, h) => {
-      const command: TMCommand = params.commands[i + n]
+      const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
       return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
       scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
-      const command: TMCommand = params.commands[i + n]
+      const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       let text: string = ''
       let hasOptionals: boolean = false
@@ -181,7 +180,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
-      const command: TMCommand = params.commands[i + n]
+      const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
       scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign="center" halign="center"/>`

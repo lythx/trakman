@@ -1,5 +1,4 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './Guestlist.config.js'
 
@@ -18,15 +17,15 @@ export default class Guestlist extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
-      if (info.answer >= this.openId + 1000 && info.answer < this.openId + 2000) {
-        const target = tm.admin.guestlist[info.answer - this.openId - 1000]
+      if (info.actionId >= this.openId + 1000 && info.actionId < this.openId + 2000) {
+        const target = tm.admin.guestlist[info.actionId - this.openId - 1000]
         if (target === undefined) { return }
         const status = await tm.admin.removeGuest(target.login, info)
         if (status instanceof Error) {
           tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
         } else if (status === true) {
           tm.sendMessage(tm.utils.strVar(config.messages.text, {
-            title: tm.utils.getTitle(info),
+            title: info.title,
             adminName: tm.utils.strip(info.nickname, true),
             name: tm.utils.strip(target.nickname ?? target.login, true)
           }))
@@ -44,9 +43,10 @@ export default class Guestlist extends PopupWindow<number> {
     tm.commands.add({
       aliases: ['guestl', 'guestlist'],
       help: 'Display guestlist.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

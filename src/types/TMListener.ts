@@ -1,4 +1,4 @@
 interface TMListener {
-  readonly event: (keyof TMEvents) | (keyof TMEvents)[]
+  readonly event: (keyof tm.Events) | (keyof tm.Events)[]
   readonly callback: ((params: any) => void)
 }

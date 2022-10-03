@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { IDS, Grid, centeredText, verticallyCenteredText, StaticHeader } from '../../UiUtils.js'
 import config from './BestFinishes.config.js'
@@ -30,6 +29,13 @@ export default class BestFinishes extends StaticComponent {
         this.newestFinish = index
         this.display()
       }
+    })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      for (const e of this.bestFinishes) {
+        const newNickname = info.find(a => a.login === e.login)?.nickname
+        if (newNickname !== undefined) { e.nickname = newNickname }
+      }
+      this.display()
     })
     tm.addListener('BeginMap', () => {
       this.newestFinish = -1

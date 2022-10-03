@@ -1,5 +1,4 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
+import PopupWindow from "../PopupWindow.js"
 import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
 import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './DediSectors.config.js'
@@ -41,9 +40,10 @@ export default class DediSectors extends PopupWindow {
     tm.commands.add({
       aliases: ['dsc', 'dedisectms'],
       help: 'Display current map dedimania sectors.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

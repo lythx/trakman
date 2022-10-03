@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../../src/Trakman.js'
 import { List, IDS, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './RoundAveragesRanking.config.js'
@@ -33,6 +32,9 @@ export default class RoundAveragesRanking extends StaticComponent {
     })
     tm.addListener('BeginMap', () => {
       this.averages.length = 0
+    })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }
 

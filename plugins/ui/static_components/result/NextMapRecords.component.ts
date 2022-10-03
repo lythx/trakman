@@ -1,6 +1,6 @@
 import { IDS, RecordList, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
+
 import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {
@@ -9,7 +9,7 @@ export default class NextMapRecords extends StaticComponent {
   private readonly posY: number
   private readonly side: boolean
   private readonly header: StaticHeader
-  private records: TMRecord[] = []
+  private records: tm.Record[] = []
   private readonly list: RecordList
 
   constructor() {
@@ -38,6 +38,9 @@ export default class NextMapRecords extends StaticComponent {
       const mapId = tm.jukebox.queue[0].id
       this.records = await tm.records.fetchByMap(mapId) // TODO fix after prefetch in source
       this.display()
+    })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('BeginMap', () => {
       this.records.length = 0

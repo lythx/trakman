@@ -1,19 +1,18 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/AdminCommands.config.js'
 
-const commands: TMCommand[] = [
+const commands: tm.Command[] = [
   {
     aliases: ['k', 'kick'],
     help: 'Kick a specific player.',
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: (info: TMMessageInfo, login: string, reason?: string): void => {
-      const targetInfo: TMPlayer | undefined = tm.players.get(login)
+    callback: (info: tm.MessageInfo, login: string, reason?: string): void => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.kick.error, info.login)
         return
       }
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.kick.reason, { reason: reason })}.`
-      tm.sendMessage(tm.utils.strVar(config.kick.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo.nickname) }) + `${reasonString}`, config.kick.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.kick.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo.nickname) }) + `${reasonString}`, config.kick.public ? undefined : info.login)
       tm.client.callNoRes(`Kick`, [{ string: login }, { string: reason === undefined ? 'No reason specified' : reason }])
     },
     privilege: config.kick.privilege
@@ -22,8 +21,8 @@ const commands: TMCommand[] = [
     aliases: ['m', 'mute'],
     help: 'Mute a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TMMessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -32,7 +31,7 @@ const commands: TMCommand[] = [
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
       tm.sendMessage(tm.utils.strVar(config.mute.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login),
         duration: durationString
       }) + `${reasonString}`, config.mute.public ? undefined : info.login)
@@ -43,8 +42,8 @@ const commands: TMCommand[] = [
     aliases: ['um', 'unmute'],
     help: 'Unmute a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -59,7 +58,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unmute.notMuted, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unmute.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unmute.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unmute.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unmute.public ? undefined : info.login)
     },
     privilege: config.unmute.privilege
   },
@@ -67,13 +66,13 @@ const commands: TMCommand[] = [
     aliases: ['fs', 'forcespec'],
     help: 'Force a player into spectator mode.',
     params: [{ name: 'login' }],
-    callback: (info: TMMessageInfo, login: string): void => {
-      const targetInfo: TMPlayer | undefined = tm.players.get(login)
+    callback: (info: tm.MessageInfo, login: string): void => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.forcespec.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
       tm.multiCallNoRes(
         {
           method: 'ForceSpectator',
@@ -91,14 +90,14 @@ const commands: TMCommand[] = [
     aliases: ['fp', 'forceplay'],
     help: 'Force a player into player mode.',
     params: [{ name: 'login' }],
-    callback: (info: TMMessageInfo, login: string): void => {
-      const targetInfo: TMPlayer | undefined = tm.players.get(login)
+    callback: (info: tm.MessageInfo, login: string): void => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         tm.sendMessage(config.forceplay.error, info.login)
         return
       }
       tm.sendMessage(tm.utils.strVar(config.forceplay.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname),
         name: tm.utils.strip(targetInfo.nickname)
       }), config.forceplay.public ? undefined : info.login)
@@ -119,8 +118,8 @@ const commands: TMCommand[] = [
     aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
     help: 'Manipulate every soul on the server that you kicked someone.',
     params: [{ name: 'login' }],
-    callback: (info: TMMessageInfo, login: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
+    callback: (info: tm.MessageInfo, login: string): void => {
+      tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
       tm.client.callNoRes(`Kick`, [{ string: login }])
     },
     privilege: config.kickghost.privilege
@@ -129,17 +128,17 @@ const commands: TMCommand[] = [
     aliases: ['b', 'ban'],
     help: 'Ban a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TMMessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      const targetInfo: TMPlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      const targetInfo: tm.Player | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
-        tm.sendMessage(config.ban.error, info.login)
+        tm.sendMessage(tm.utils.strVar(config.ban.error, { login }), info.login)
         return
       }
       const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
       await tm.admin.ban(targetInfo.ip, targetInfo.login, info, targetInfo.nickname, reason, expireDate)
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.sendMessage(tm.utils.strVar(config.ban.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.ban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
     },
     privilege: config.ban.privilege
   },
@@ -147,8 +146,8 @@ const commands: TMCommand[] = [
     aliases: ['ub', 'unban'],
     help: 'Unban a specific player.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
       const result = await tm.admin.unban(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
@@ -160,7 +159,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unban.notBanned, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unban.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unban.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unban.public ? undefined : info.login)
     },
     privilege: config.unban.privilege
   },
@@ -168,8 +167,8 @@ const commands: TMCommand[] = [
     aliases: ['bl', 'blacklist'],
     help: 'Blacklist a specific player.',
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
-    callback: async (info: TMMessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -183,7 +182,7 @@ const commands: TMCommand[] = [
       }
       const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
       const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
-      tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
     },
     privilege: config.blacklist.privilege
   },
@@ -191,8 +190,8 @@ const commands: TMCommand[] = [
     aliases: ['ubl', 'unblacklist'],
     help: 'Remove a specific player from the blacklist.',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
       const result = await tm.admin.unblacklist(login, info)
       let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
       if (result instanceof Error) {
@@ -204,7 +203,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.unblacklist.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unblacklist.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.unblacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unblacklist.public ? undefined : info.login)
     },
     privilege: config.unblacklist.privilege
   },
@@ -212,8 +211,8 @@ const commands: TMCommand[] = [
     aliases: ['ag', 'addguest'],
     help: 'Add a player to the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -228,7 +227,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.addguest.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.addguest.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.addguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.addguest.public ? undefined : info.login)
     },
     privilege: config.addguest.privilege
   },
@@ -236,8 +235,8 @@ const commands: TMCommand[] = [
     aliases: ['rg', 'rmguest', 'removeguest'],
     help: 'Remove a player from the guestlist',
     params: [{ name: 'login' }],
-    callback: async (info: TMMessageInfo, login: string): Promise<void> => {
-      let targetInfo: TMOfflinePlayer | undefined = tm.players.get(login)
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
       if (targetInfo === undefined) {
         targetInfo = await tm.players.fetch(login)
       }
@@ -252,7 +251,7 @@ const commands: TMCommand[] = [
         tm.sendMessage(tm.utils.strVar(config.rmguest.notGuest, { login: login }), info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
     },
     privilege: config.rmguest.privilege
   }

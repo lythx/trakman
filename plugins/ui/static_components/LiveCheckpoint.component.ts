@@ -1,5 +1,5 @@
 // import StaticComponent from '../StaticComponent.js'
-// import { trakman as tm } from '../../../src/Trakman.js'
+//
 // import { IDS, CONFIG,  staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 
  //export default class LiveCheckpoint extends StaticComponent {
@@ -26,7 +26,7 @@
 //     this.positionX = pos.x
 //     this.positionY = pos.y
 //     tm.addListener('PlayerCheckpoint', (info: CheckpointInfo): void => {
-//       const pb: TMRecord | undefined = tm.records.getLocal(info.player.login)
+//       const pb: tm.Record | undefined = tm.records.getLocal(info.player.login)
 //       if (pb !== undefined) {
 //         const cpIndex: number = info.index
 //         const diff: number = pb.checkpoints[cpIndex] - info.time

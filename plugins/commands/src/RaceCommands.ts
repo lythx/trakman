@@ -1,13 +1,12 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import config from '../config/RaceCommands.config.js'
 
-const commands: TMCommand[] = [
+const commands: tm.Command[] = [
   {
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.skip.public ? undefined : info.login)
       tm.client.callNoRes(`NextChallenge`)
@@ -17,9 +16,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['r', 'res', 'restart'],
     help: 'Restart the current map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.res.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.res.public ? undefined : info.login)
       tm.client.callNoRes(`RestartChallenge`)
@@ -29,13 +28,13 @@ const commands: TMCommand[] = [
   {
     aliases: ['pt', 'prev', 'previous'],
     help: 'Requeue the previously played map.',
-    callback: async (info: TMMessageInfo): Promise<void> => {
+    callback: async (info: tm.MessageInfo): Promise<void> => {
       if (tm.jukebox.history[0] === undefined) {
         tm.sendMessage(config.prev.error, info.login)
         return
       }
       tm.sendMessage(tm.utils.strVar(config.prev.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.prev.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
@@ -46,9 +45,9 @@ const commands: TMCommand[] = [
   {
     aliases: ['rq', 'requeue', 'replay'],
     help: 'Requeue the ongoing map.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.replay.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.replay.public ? undefined : info.login)
       tm.jukebox.add(tm.maps.current.id, info)
@@ -58,12 +57,13 @@ const commands: TMCommand[] = [
   {
     aliases: ['er', 'endround'],
     help: 'End the ongoing round in rounds-based gamemodes.',
-    callback: (info: TMMessageInfo): void => {
+    callback: (info: tm.MessageInfo): void => {
       if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.endround.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.endround.text, { title: tm.utils.getTitle(info), adminName: tm.utils.strip(info.nickname) }), config.endround.public ? undefined : info.login)
+      tm.client.callNoRes('ForceEndRound')
+      tm.sendMessage(tm.utils.strVar(config.endround.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.endround.public ? undefined : info.login)
     },
     privilege: config.endround.privilege
   },
@@ -71,12 +71,12 @@ const commands: TMCommand[] = [
     aliases: ['fpt', 'forceteam', 'forceplayerteam'],
     help: 'Force a player into the specified team.',
     params: [{ name: 'player' }, { name: 'team', validValues: ['blue', 'red'] }],
-    callback: async (info: TMMessageInfo, player: string, team: string): Promise<void> => {
+    callback: async (info: tm.MessageInfo, player: string, team: string): Promise<void> => {
       if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.forceteam.notRounds, info.login)
         return
       }
-      const playerInfo: TMPlayer | undefined = tm.players.get(player)
+      const playerInfo: tm.Player | undefined = tm.players.get(player)
       if (playerInfo === undefined) {
         tm.sendMessage(config.forceteam.playerOffline, info.login)
         return
@@ -93,7 +93,7 @@ const commands: TMCommand[] = [
           teamColour = `${tm.utils.colours.red}`
       }
       tm.sendMessage(tm.utils.strVar(config.forceteam.text, {
-        title: tm.utils.getTitle(info),
+        title: info.title,
         adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(playerInfo.nickname),
         team: (teamColour + team.toUpperCase())
       }), config.forceteam.public ? undefined : info.login)

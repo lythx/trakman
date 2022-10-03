@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../src/Trakman.js'
 import { dedimania } from '../dedimania/Dedimania.js'
 import { Logger } from '../../src/Logger.js'
 import c from './Config.js'
@@ -20,7 +19,7 @@ const events: TMListener[] = [
         if (index === -1) {
           tm.sendMessage(c.noPb, player.login)
         } else {
-          const rec: TMLocalRecord = tm.records.local[index]
+          const rec: tm.LocalRecord = tm.records.local[index]
           tm.sendMessage(tm.utils.strVar(c.pb, {
             time: tm.utils.getTimeString(rec.time),
             rank: tm.utils.getPositionString(index + 1)
@@ -54,7 +53,7 @@ const events: TMListener[] = [
       if (index === -1) {
         tm.sendMessage(c.noPb, player.login)
       } else {
-        const rec: TMLocalRecord = tm.records.local[index]
+        const rec: tm.LocalRecord = tm.records.local[index]
         tm.sendMessage(tm.utils.strVar(c.pb, {
           time: tm.utils.getTimeString(rec.time),
           rank: tm.utils.getPositionString(index + 1)
@@ -75,7 +74,7 @@ const events: TMListener[] = [
         }), player.login)
       }
       tm.sendMessage(tm.utils.strVar(c.join, {
-        title: tm.utils.getTitle(player),
+        title: player.title,
         nickname: tm.utils.strip(player.nickname, true),
         country: player.country,
         visits: player.visits

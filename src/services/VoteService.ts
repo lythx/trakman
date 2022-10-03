@@ -7,7 +7,7 @@ import { Utils } from '../Utils.js'
 export abstract class VoteService {
 
   private static readonly repo: VoteRepository = new VoteRepository()
-  private static _votes: { uid: string, votes: TMVote[] }[] = []
+  private static _votes: { uid: string, votes: tm.Vote[] }[] = []
   private static readonly prefetchCount: number = 4
 
   /**
@@ -15,7 +15,7 @@ export abstract class VoteService {
    */
   static async initialize(): Promise<void> {
     await this.repo.initialize()
-    const res: TMVote[] = await this.repo.getAll()
+    const res: tm.Vote[] = await this.repo.getAll()
     const maps = [MapService.current, ...MapService.queue]
     for (let i: number = 0; i < this.prefetchCount + 1; i++) {
       const uid: string = maps[i].id
@@ -32,7 +32,7 @@ export abstract class VoteService {
   static async nextMap(): Promise<void> {
     const newId: string = MapService.queue[this.prefetchCount - 1].id
     if (this._votes.some(a => a.uid === newId)) { return }
-    const res: TMVote[] = await this.repo.get(newId)
+    const res: tm.Vote[] = await this.repo.get(newId)
     this._votes.unshift({ uid: newId, votes: res })
     this._votes.length = Math.min(this._votes.length, this.prefetchCount * 2 + 1)
   }
@@ -68,7 +68,7 @@ export abstract class VoteService {
   }
 
   static async updatePrefetch(): Promise<void> {
-    const arr: { uid: string, votes: TMVote[] }[] = []
+    const arr: { uid: string, votes: tm.Vote[] }[] = []
     const mapsToFetch: string[] = []
     const notQueueMaps = this._votes.slice(this.prefetchCount)
     const queue = MapService.queue.slice(0, this.prefetchCount).reverse()
@@ -91,28 +91,42 @@ export abstract class VoteService {
     Events.emit('VotesPrefetch', res)
   }
 
-  private static updateMapVoteData(uid: string, arr: TMVote[]) {
+  private static updateMapVoteData(uid: string, arr: tm.Vote[]) {
     const count = arr.length
     const sum = arr.reduce((acc, cur) => acc += cur.vote, 0)
-    MapService.setVoteData({ uid, count, ratio: count === 0 ? 0 : (((sum / count) + 3) / 6) * 100 })
+    MapService.setVoteData({ uid, count, ratio: this.calculateVoteRatio(arr) })
   }
 
-  static async fetch(mapId: string): Promise<TMVote[] | undefined>
-  static async fetch(mapIds: string[]): Promise<{ uid: string, votes: TMVote[] }[]>
-  static async fetch(mapIds: string | string[]): Promise<TMVote[] | undefined | { uid: string, votes: TMVote[] }[]> {
+  private static calculateVoteRatio(votes: tm.Vote[]): number {
+    const values = {
+      '-3': 0,
+      '-2': 20,
+      '-1': 40,
+      '1': 60,
+      '2': 80,
+      '3': 100
+    }
+    const count = votes.length
+    const sum = votes.map(a => values[a.vote.toString() as keyof typeof values]).reduce((acc, cur) => acc += cur, 0)
+    return count === 0 ? 0 : sum / count
+  }
+
+  static async fetch(mapId: string): Promise<tm.Vote[] | undefined>
+  static async fetch(mapIds: string[]): Promise<{ uid: string, votes: tm.Vote[] }[]>
+  static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[]> {
     return await this.repo.get(mapIds as any)
   }
 
-  static get(uid: string): TMVote[] | undefined
-  static get(uids: string[]): { uid: string, votes: TMVote[] }[]
-  static get(uids: string | string[]): TMVote[] | undefined | { uid: string, votes: TMVote[] }[] {
+  static get(uid: string): tm.Vote[] | undefined
+  static get(uids: string[]): { uid: string, votes: tm.Vote[] }[]
+  static get(uids: string | string[]): tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[] {
     if (typeof uids === 'string') {
       return this._votes.find(a => a.uid === uids)?.votes
     }
     return this._votes.filter(a => uids.includes(a.uid))
   }
 
-  static get current(): Readonly<TMVote>[] {
+  static get current(): Readonly<tm.Vote>[] {
     return [...this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []]
   }
 
@@ -120,7 +134,7 @@ export abstract class VoteService {
     return this._votes.find(a => a.uid === MapService.current.id)?.votes?.length ?? 0
   }
 
-  static get votes(): Readonly<{ uid: string, votes: TMVote[] }>[] {
+  static get votes(): Readonly<{ uid: string, votes: tm.Vote[] }>[] {
     return [...this._votes]
   }
 

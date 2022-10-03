@@ -1,6 +1,1 @@
-interface CheckpointInfo {
-  readonly player: TMPlayer
-  readonly time: number
-  readonly lap: number
-  readonly index: number
-}
+type CheckpointInfo = tm.Checkpoint & { readonly player: tm.Player }

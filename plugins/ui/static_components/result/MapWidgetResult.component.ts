@@ -1,6 +1,5 @@
 import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
 import flags from '../../config/FlagIcons.json' assert { type: 'json' }
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
@@ -55,22 +54,22 @@ export default class MapWidgetResult extends StaticComponent {
     const map = this.isRestart ? tm.jukebox.current : tm.jukebox.queue[0]
     const authorData = this.isRestart ? webservices.currentAuthor : webservices.nextAuthor
     const author: string = authorData?.nickname ?? map.author
-    const tmxMap = this.isRestart ? tmx.current : tmx.queue[0]
-    const date: Date | undefined = tmxMap?.lastUpdateDate
+    const TMXMap = this.isRestart ? tmx.current : tmx.queue[0]
+    const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
     let authorIcon = ic.author
     if (authorData?.country !== undefined) {
       authorIcon = (flags as any)[authorData.country] // cope typescript
     }
-    const obj = this.getTagAndAward(map, tmxMap ?? undefined)
+    const obj = this.getTagAndAward(map, TMXMap ?? undefined)
     const infos: [string, string][] = [
       [config.title, ic.header],
       [tm.utils.safeString(map.name), obj.tag],
       [tm.utils.safeString(author), authorIcon],
       [tm.utils.getTimeString(map.authorTime), ic.authorTime],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
-      [tmxMap?.awards === undefined ? config.noAwardsText : tmxMap.awards.toString(), obj.award],
-      [tmxMap?.replays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(tmxMap.replays[0].time), ic.tmxWr]
+      [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
+      [TMXMap?.replays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.replays[0].time), ic.tmxWr]
     ]
     const headerCfg = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
@@ -132,7 +131,7 @@ export default class MapWidgetResult extends StaticComponent {
       </manialink>`
   }
 
-  private getTagAndAward(map: TMMap, tmxMap?: TMXMapInfo): { tag: string, award: string } {
+  private getTagAndAward(map: tm.Map, TMXMap?: tm.TMXMap): { tag: string, award: string } {
     let tag = config.icons.tags.normal
     let award = config.icons.awards.normal
     if (map.isNadeo === true) {
@@ -144,9 +143,9 @@ export default class MapWidgetResult extends StaticComponent {
       award = config.icons.awards.classic
     }
     for (const e of config.customTags) {
-      if (e?.authors?.some(a => a === map.author || a === tmxMap?.author) ||
+      if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) ||
         e?.names?.some(a => a.test(map.name) || a.test(tm.utils.strip(map.name)) ||
-          (tmxMap !== undefined ? (a.test(tmxMap.name) || a.test(tm.utils.strip(tmxMap.name))) : false))) {
+          (TMXMap !== undefined ? (a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name))) : false))) {
         tag = e.icon
       }
     }

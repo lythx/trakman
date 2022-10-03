@@ -1,5 +1,4 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
 import config from './SectorRecords.config.js'
@@ -21,11 +20,12 @@ export default class SectorRecords extends PopupWindow {
     tm.commands.add({
       aliases: ['secr', 'secrecs'],
       help: 'Displays the sector records on the current map.',
-      callback: (info: TMMessageInfo) => {
+      callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0
     })
+    sectorRecords.addListener('NicknameUpdated', () => this.reRender())
     sectorRecords.addListener('BestSector', () => this.reRender())
     sectorRecords.addListener('SectorsFetch', () => {
       this.paginator.setPageCount(Math.ceil(tm.maps.current.checkpointsAmount / config.entries))

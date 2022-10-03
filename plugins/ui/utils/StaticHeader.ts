@@ -12,13 +12,13 @@ interface StaticHeaderOptions {
 
 export default class StaticHeader {
 
-  options: StaticHeaderOptions 
+  options: StaticHeaderOptions
 
   constructor(preset: 'race' | 'result', defaultOptions: Partial<StaticHeaderOptions> = {}) {
-    if(preset === 'result') {
-      this.options = resultConfig
+    if (preset === 'result') {
+      this.options = { ...resultConfig }
     } else {
-      this.options = raceConfig
+      this.options = { ...raceConfig }
     }
     for (const [k, v] of Object.entries(defaultOptions)) {
       (this.options as any)[k] = v

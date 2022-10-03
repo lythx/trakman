@@ -1,8 +1,6 @@
-
-import { ButtonData } from "./ButtonData.js";
-import { UiButton } from "./UiButton.js";
+import { ButtonData } from "./ButtonData.js"
+import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-import { trakman as tm } from "../../../../../src/Trakman.js";
 import { IDS } from '../../../UiUtils.js'
 
 const cfg = config.mapsButton

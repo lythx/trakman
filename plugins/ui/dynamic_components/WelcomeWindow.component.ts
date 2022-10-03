@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import PopupWindow from '../PopupWindow.js'
 import { Grid, IDS, GridCellFunction, centeredText } from '../UiUtils.js'
 import config from './WelcomeWindow.config.js'
@@ -22,7 +21,7 @@ export default class WelcomeWindow extends PopupWindow {
     tm.commands.add({
       aliases: ['info'],
       help: 'Display info about the controller.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     },)
   }

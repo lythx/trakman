@@ -1,8 +1,7 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
-import { stats } from "../../stats/Stats.js";
+import PopupWindow from "../PopupWindow.js"
+import { stats } from "../../stats/Stats.js"
 import { IDS, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
 import config from './TopVotes.config.js'
 
 export default class TopVisits extends PopupWindow<number> {
@@ -21,12 +20,17 @@ export default class TopVisits extends PopupWindow<number> {
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
+    stats.votes.onNicknameChange(() => {
+      this.ranks = stats.votes.list
+      this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
+      this.reRender()
+    })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(this.ranks.length / config.entries))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['votes','topvotes'],
+      aliases: ['votes', 'topvotes'],
       help: 'Display top vote amounts.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)

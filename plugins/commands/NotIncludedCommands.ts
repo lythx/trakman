@@ -1,10 +1,10 @@
 
 
-// const commands: TMCommand[] = [{
+// const commands: tm.Command[] = [{
 //   aliases: ['hm', 'hardmute'],
 //   help: 'Mute a player and disable their commands.',
 //   callback: async (info: MessageInfo): Promise<void> => {
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: tm.Player | undefined = tm.players.get(info.text)
 //       if (targetInfo === undefined) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Unknown player or no login specified.`, info.login)
 //           return
@@ -33,7 +33,7 @@
 //       tm.multiCallNoRes({
 //           method: 'ChatSendServerMessage',
 //           params: [{
-//               string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+//               string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} ` +
 //                   `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
 //                   `commands and muted ${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname, true)}${tm.utils.palette.admin}.`
 //           }]
@@ -53,7 +53,7 @@
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}No login specified.`, info.login)
 //           return
 //       }
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: tm.Player | undefined = tm.players.get(info.text)
 //       if (targetInfo === undefined) {
 //           tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Player is not on the server.`, info.login)
 //           return
@@ -71,7 +71,7 @@
 //           {
 //               method: 'ChatSendServerMessage',
 //               params: [{
-//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has hardforced `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo.nickname)}${tm.utils.palette.admin} into specmode.`
 //               }]
@@ -106,7 +106,7 @@
 //           return
 //       }
 //       hfsList.splice(hfsList.indexOf(info.login), 1)
-//       const targetInfo: TMPlayer | undefined = tm.players.get(info.text)
+//       const targetInfo: tm.Player | undefined = tm.players.get(info.text)
 //       tm.multiCallNoRes(
 //           {
 //               method: 'ForceSpectator',
@@ -115,7 +115,7 @@
 //           {
 //               method: 'ChatSendServerMessage',
 //               params: [{
-//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//                   string: `${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has released `
 //                       + `${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname || info.login)}${tm.utils.palette.admin} out of specmode.`
 //               }]
@@ -127,7 +127,7 @@
 // {
 //   aliases: ['ffdb', 'fetchallfromdb'],
 //   help: 'Adds all the maps present in database if they are on TMX based on id',
-//   callback: async (info: TMMessageInfo): Promise<void> => {
+//   callback: async (info: tm.MessageInfo): Promise<void> => {
 //     const res: { uid: string, id: number }[] | Error = await tm.db.query(`SELECT uid, id FROM map_ids`)
 //     const filenames: { filename: string }[] | Error = await tm.db.query(`SELECT filename FROM maps`)
 //     if (res instanceof Error || filenames instanceof Error) {
@@ -156,7 +156,7 @@
 //         tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to insert the map ${tm.utils.palette.highlight + tm.utils.strip(map.uid, false)}$z$s ${tm.utils.palette.error}into queue.`, info.login)
 //         continue
 //       }
-//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} `
+//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} `
 //         + `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has added and queued `
 //         + `${tm.utils.palette.highlight + tm.utils.strip(map.uid, true)}${tm.utils.palette.admin} from TMX.`)
 //     }
@@ -194,10 +194,10 @@
 //   aliases: ['dcmds', 'disablecommands'],
 //   help: 'Disable player commands.',
 //   params: [{ name: 'login' }],
-//   callback: async (info: TMMessageInfo, login: string): Promise<void> => {
+//   callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
 //     const targetLogin: string = login
 //     const callerLogin: string = info.login
-//     const targetInfo: TMOfflinePlayer | undefined = await tm.players.fetch(targetLogin)
+//     const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(targetLogin)
 //     const prevPrivilege: number = targetInfo?.privilege ?? 0
 //     if (prevPrivilege >= info.privilege) {
 //       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}You cannot control privileges of a person who has equal or higher privilege than you.`, callerLogin)
@@ -206,7 +206,7 @@
 //     if (prevPrivilege === -1) {
 //       tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.error} already can't use commands.`, callerLogin)
 //     } else {
-//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${tm.utils.getTitle(info)} ` +
+//       tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${info.title} ` +
 //         `${tm.utils.palette.highlight + tm.utils.strip(info.nickname, true)}${tm.utils.palette.admin} has disabled ` +
 //         `commands for ${tm.utils.palette.highlight + tm.utils.strip(targetInfo?.nickname ?? login, true)}${tm.utils.palette.admin}.`)
 //       await tm.admin.setPrivilege(targetLogin, -1, info)

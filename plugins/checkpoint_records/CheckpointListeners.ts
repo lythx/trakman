@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../src/Trakman.js'
 import { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
 import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
@@ -39,6 +38,29 @@ if (config.isEnabled === true) {
 
   tm.addListener('BeginMap', async (): Promise<void> => {
     await onMapStart()
+  }, true)
+
+  tm.addListener('PlayerInfoUpdated', (info) => {
+    const changedObjects: { login: string; nickname: string; }[] = []
+    for (const e of currentBestCps) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    for (const e of currentPlayerCps) {
+      if (e === undefined) { continue }
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    if (changedObjects.length !== 0) {
+      emitEvent('NicknameUpdated', changedObjects)
+    }
   }, true)
 
   tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
@@ -116,14 +138,14 @@ if (config.isEnabled === true) {
     callback(info, cpIndex?: number) {
       if (cpIndex === undefined) {
         const arr: {
-          login: string;
-          nickname: string;
-          checkpoint: number;
-          date: Date;
+          login: string,
+          nickname: string,
+          checkpoint: number,
+          date: Date
         }[] = currentBestCps.filter(a => a !== undefined) as any
         currentBestCps.length = 0
         tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved,
-          { title: tm.utils.getTitle(info), nickname: tm.utils.strip(info.nickname, true) }))
+          { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
         emitEvent('DeleteBestCheckpoint', arr.map((a, i) => ({ ...a, index: i })))
         void bestCpsDB.delete(currentMapDBId)
       } else {
@@ -134,7 +156,7 @@ if (config.isEnabled === true) {
         const deleted = currentBestCps[cpIndex - 1]
         currentBestCps[cpIndex - 1] = undefined
         tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
-          title: tm.utils.getTitle(info),
+          title: info.title,
           nickname: tm.utils.strip(info.nickname, true),
           index: tm.utils.getPositionString(cpIndex)
         }))

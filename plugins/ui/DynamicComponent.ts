@@ -1,4 +1,4 @@
-import { trakman as tm } from "../../src/Trakman.js"
+
 
 export default abstract class DynamicComponent {
 

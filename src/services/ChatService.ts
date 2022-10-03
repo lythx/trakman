@@ -7,6 +7,7 @@ import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/Prefixes.js'
+import { MessageInfo } from '../types/TMMessageInfo.js'
 
 /**
  * This service manages chat table and chat commands
@@ -14,9 +15,9 @@ import { prefixes } from '../../config/Prefixes.js'
 export abstract class ChatService {
 
   private static readonly messagesArraySize: number = config.chatMessagesInRuntime
-  static readonly _messages: TMMessage[] = []
+  static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
-  private static readonly _commandList: TMCommand[] = []
+  private static readonly _commandList: tm.Command[] = []
 
   /**
    * Fetches messages from database
@@ -30,7 +31,7 @@ export abstract class ChatService {
    * Adds chat commands to the server
    * @param commands Chat commands to register
    */
-  static addCommand(...commands: TMCommand[]): void {
+  static addCommand(...commands: tm.Command[]): void {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
     for (const command of commands) {
@@ -38,7 +39,7 @@ export abstract class ChatService {
     }
   }
 
-  private static async commandCallback(command: TMCommand, info: TMMessageInfo): Promise<void> {
+  private static async commandCallback(command: tm.Command, info: MessageInfo): Promise<void> {
     const prefix: string = command.privilege === 0 ? '/' : '//'
     const input: string = info.text?.trim()
     const [alias, ...params] = input.split(' ').filter(a => a !== '')
@@ -49,7 +50,7 @@ export abstract class ChatService {
       return
     }
     Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${aliasUsed}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
-    const parsedParams: (string | number | boolean | undefined | TMPlayer | TMOfflinePlayer)[] = []
+    const parsedParams: (string | number | boolean | undefined | tm.Player | tm.OfflinePlayer)[] = []
     if (command.params !== undefined) {
       for (const [i, param] of command.params.entries()) {
         if (params[i] === undefined && param.optional === true) { continue }
@@ -94,33 +95,43 @@ export abstract class ChatService {
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
           case 'time':
-            if (!isNaN(Number(params[i]))) {
+            if (!isNaN(Number(params[i])) && Number(params[i]) > 0) {
+              if (isNaN(new Date(Number(params[i])).getTime())) {
+                this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
+                return
+              }
               parsedParams.push(Number(params[i]) * 1000 * 60)
               break
             } // If there's no modifier then time is treated as minutes
             const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
             const time: number = Number(params[i].substring(0, params[i].length - 1))
-            if (isNaN(time)) {
+            if (isNaN(time) || time < 0) {
               this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
               return
             }
+            let parsedTime: number
             switch (unit) {
               case 's':
-                parsedParams.push(time * 1000)
+                parsedTime = time * 1000
                 break
               case 'm':
-                parsedParams.push(time * 1000 * 60)
+                parsedTime = time * 1000 * 60
                 break
               case 'h':
-                parsedParams.push(time * 1000 * 60 * 60)
+                parsedTime = time * 1000 * 60 * 60
                 break
               case 'd':
-                parsedParams.push(time * 1000 * 60 * 60 * 24)
+                parsedTime = time * 1000 * 60 * 60 * 24
                 break
               default:
                 this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
                 return
             }
+            if (isNaN(new Date(parsedTime).getTime())) {
+              this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
+              return
+            }
+            parsedParams.push(parsedTime)
             break
           case 'player': {
             let player = PlayerService.get(params[i])
@@ -135,7 +146,7 @@ export abstract class ChatService {
             break
           }
           case 'offlinePlayer': {
-            let player: TMOfflinePlayer | undefined = PlayerService.get(params[i])
+            let player: tm.OfflinePlayer | undefined = PlayerService.get(params[i])
             if (player === undefined) {
               player = await PlayerService.fetch(params[i])
               if (player === undefined) {
@@ -165,7 +176,7 @@ export abstract class ChatService {
         }
       }
     }
-    const messageInfo: TMMessageInfo & { aliasUsed: string } = {
+    const messageInfo: MessageInfo & { aliasUsed: string } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
       aliasUsed
@@ -183,20 +194,20 @@ export abstract class ChatService {
    * @param text Message text
    * @returns Message object or Error if unsuccessfull
    */
-  static add(login: string, text: string): TMMessageInfo | Error {
-    const player: TMPlayer | undefined = PlayerService.get(login)
+  static add(login: string, text: string): MessageInfo | Error {
+    const player: tm.Player | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }
-    const message: TMMessage = {
+    const message: tm.Message = {
       login,
       nickname: player.nickname,
       text,
       date: new Date()
     }
-    const messageInfo: TMMessageInfo = {
+    const messageInfo: MessageInfo = {
       text,
       date: message.date,
       ...player
@@ -216,7 +227,7 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetchByLogin(login: string, options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+  static async fetchByLogin(login: string, options: { limit?: number; date?: Date; }): Promise<tm.Message[]> {
     return await this.repo.getByLogin(login, options)
   }
 
@@ -225,7 +236,7 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetch(options: { limit?: number; date?: Date; }): Promise<TMMessage[]> {
+  static async fetch(options: { limit?: number; date?: Date; }): Promise<tm.Message[]> {
     return await this.repo.get(options)
   }
 
@@ -234,21 +245,21 @@ export abstract class ChatService {
    * @param login Player login 
    * @returns Array of message objects
    */
-  static get(login: string): Readonly<TMMessage>[] {
+  static get(login: string): Readonly<tm.Message>[] {
     return this._messages.filter(a => a.login === login)
   }
 
   /**
    * @returns Array of message objects
    */
-  static get messages(): Readonly<TMMessage>[] {
+  static get messages(): Readonly<tm.Message>[] {
     return [...this._messages]
   }
 
   /**
    * @returns Array of command objects
    */
-  static get commandList(): TMCommand[] {
+  static get commandList(): tm.Command[] {
     return [...this._commandList]
   }
 

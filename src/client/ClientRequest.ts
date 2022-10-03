@@ -6,7 +6,7 @@ export class ClientRequest {
   * Prepares XML string for a dedicated server request.
   * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
   */
-  constructor(method: string, params: CallParams[]) {
+  constructor(method: string, params: tm.CallParams[]) {
     this.xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       const str = this.handleParamType(param)
@@ -32,7 +32,7 @@ export class ClientRequest {
    * Wraps params with type tags depending on type specified in param object,
    * calls itself recursively in case type is array or struct
    */
-  private handleParamType(param: CallParams): string | Error {
+  private handleParamType(param: tm.CallParams): string | Error {
     type Keys = keyof typeof param
     const type: Keys = Object.keys(param)[0] as Keys
     const value = param[type]

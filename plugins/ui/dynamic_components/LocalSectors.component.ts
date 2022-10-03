@@ -1,5 +1,4 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
+import PopupWindow from "../PopupWindow.js"
 import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './LocalSectors.config.js'
 
@@ -40,9 +39,10 @@ export default class LocalSectors extends PopupWindow {
     tm.commands.add({
       aliases: ['sc', 'sectms'],
       help: 'Display current map local sectors.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {
@@ -50,7 +50,7 @@ export default class LocalSectors extends PopupWindow {
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records: TMLocalRecord[] = []
+    const records: tm.LocalRecord[] = []
     for (const e of tm.records.local) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }

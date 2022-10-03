@@ -1,4 +1,4 @@
-import { Repository } from "./Repository.js";
+import { Repository } from "./Repository.js"
 
 const createQuery = `CREATE TABLE IF NOT EXISTS map_ids(
   id INT4 GENERATED ALWAYS AS IDENTITY,

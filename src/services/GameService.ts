@@ -3,7 +3,7 @@ import { Logger } from '../Logger.js'
 
 export class GameService {
 
-  private static _game: TMGame
+  private static _game: tm.Game
   private static readonly proxyMethods: string[] = [
     'SetGameMode',
     'SetChatTime',
@@ -45,7 +45,7 @@ export class GameService {
     if (status instanceof Error) {
       await Logger.fatal('Failed to retrieve game info. Error:', status.message)
     }
-    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]): Promise<void> => {
+    Client.addProxy(this.proxyMethods, async (method: string, params: tm.CallParams[]): Promise<void> => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
@@ -108,7 +108,7 @@ export class GameService {
     }
   }
 
-  static get config(): TMGame {
+  static get config(): tm.Game {
     return this._game
   }
 

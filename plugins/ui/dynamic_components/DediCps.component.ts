@@ -1,6 +1,5 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
-import { dedimania } from "../../dedimania/Dedimania.js";
+import PopupWindow from "../PopupWindow.js"
+import { dedimania } from "../../dedimania/Dedimania.js"
 import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './DediCps.config.js'
 
@@ -41,9 +40,10 @@ export default class DediCps extends PopupWindow {
     tm.commands.add({
       aliases: ['dcp', 'dedicptms', 'dedirecs'],
       help: 'Display current map dedimania checkpoints.',
-      callback: (info: TMMessageInfo): void =>    tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

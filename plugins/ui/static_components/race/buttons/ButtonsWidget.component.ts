@@ -1,5 +1,4 @@
 import { IDS, Grid, staticButton, GridCellFunction } from '../../../UiUtils.js'
-import { trakman as tm } from '../../../../../src/Trakman.js'
 import StaticComponent from '../../../StaticComponent.js'
 import { VisitCounter } from './VisitCounter.js'
 import { TimeButton } from './TimeButton.js'

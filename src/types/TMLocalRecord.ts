@@ -1,1 +1,0 @@
-type TMLocalRecord = TMRecord & TMOfflinePlayer

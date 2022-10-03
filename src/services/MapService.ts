@@ -6,7 +6,7 @@ import { Utils } from '../Utils.js'
 import config from "../../config/Config.js"
 
 interface JukeboxMap {
-  readonly map: TMMap
+  readonly map: tm.Map
   readonly isForced: boolean
   readonly callerLogin?: string
 }
@@ -16,11 +16,11 @@ interface JukeboxMap {
  */
 export class MapService {
 
-  private static _current: TMCurrentMap
-  private static _maps: TMMap[] = []
+  private static _current: tm.CurrentMap
+  private static _maps: tm.Map[] = []
   private static readonly repo = new MapRepository()
   private static readonly _queue: JukeboxMap[] = []
-  private static readonly _history: TMMap[] = []
+  private static readonly _history: tm.Map[] = []
   static readonly queueSize: number = config.jukeboxQueueSize
   static readonly historySize: number = config.jukeboxHistorySize
 
@@ -62,12 +62,12 @@ export class MapService {
       const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: current[0].FileName }])
       if (insert instanceof Error) { await Logger.fatal('Failed to insert current challenge') }
     }
-    const DBMapList: TMMap[] = (await this.repo.getAll())
+    const DBMapList: tm.Map[] = (await this.repo.getAll())
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
     if (mapsNotInDB.length > 100) {
       Logger.warn(`Large amount of maps (${mapsNotInDB.length}) present in maplist are not in the database. Fetching maps might take a few minutes...`)
     }
-    const mapsNotInDBObjects: TMMap[] = []
+    const mapsNotInDBObjects: tm.Map[] = []
     // Fetch info and add all maps which were not present in the database
     const voteRatios = await this.repo.getVoteCountAndRatio(mapsNotInDB.map(a => a.UId))
     for (const c of mapsNotInDB) {
@@ -79,7 +79,7 @@ export class MapService {
       const v = voteRatios.find(a => a.uid === c.UId)
       mapsNotInDBObjects.push(({ ...this.constructNewMapObject(res[0]), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
     }
-    const mapsInMapList: TMMap[] = []
+    const mapsInMapList: tm.Map[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
     for (const map of DBMapList) {
       if (mapList.some(a => a.UId === map.id)) {
@@ -101,7 +101,7 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const mapInfo: TMMap | undefined = this._maps.find(a => a.id === res[0].UId)
+    const mapInfo: tm.Map | undefined = this._maps.find(a => a.id === res[0].UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
       return
@@ -149,12 +149,12 @@ export class MapService {
    * @param caller Object containing login and nickname of the player who is adding the map
    * @returns Added map object or error if unsuccessful
    */
-  static async add(filename: string, caller?: { login: string, nickname: string }): Promise<TMMap | Error> {
+  static async add(filename: string, caller?: { login: string, nickname: string }): Promise<tm.Map | Error> {
     const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: filename }])
     if (insert instanceof Error) { return insert }
     if (insert[0] === false) { return new Error(`Failed to insert map ${filename}`) }
-    const dbEntry: TMMap | undefined = await this.repo.getByFilename(filename)
-    let obj: TMMap
+    const dbEntry: tm.Map | undefined = await this.repo.getByFilename(filename)
+    let obj: tm.Map
     if (dbEntry !== undefined) { // If map is present in the database use the database info
       obj = { ...dbEntry }
     } else { // Otherwise fetch the info from server and save it in the database
@@ -187,7 +187,7 @@ export class MapService {
    * @returns True if map was successfully removed, false if map was not in the map list, Error if server fails to remove the map
    */
   static async remove(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
-    const map: TMMap | undefined = this._maps.find(a => id === a.id)
+    const map: tm.Map | undefined = this._maps.find(a => id === a.id)
     if (map === undefined) { return false }
     const remove: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
     if (remove instanceof Error) { return remove }
@@ -215,6 +215,7 @@ export class MapService {
       this._queue.shift()
       this.fillQueue()
     }
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
   }
 
@@ -224,7 +225,7 @@ export class MapService {
    */
   private static async updateNextMap(): Promise<void> {
     const id: string = this._queue[0].map.id
-    const map: TMMap | undefined = this._maps.find(a => a.id === id)
+    const map: tm.Map | undefined = this._maps.find(a => a.id === id)
     if (map === undefined) { throw new Error(`Cant find map with id ${id} in memory`) }
     let res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
     let i = 1
@@ -245,11 +246,11 @@ export class MapService {
    * @param setAsNextMap If true map is going to be placed in front of the queue
    */
   static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<void | Error> {
-    const map: TMMap | undefined = MapService.maps.find(a => a.id === mapId)
+    const map: tm.Map | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -273,7 +274,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     return true
   }
@@ -291,7 +292,7 @@ export class MapService {
       }
     }
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -308,7 +309,7 @@ export class MapService {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.queue)
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
@@ -324,7 +325,7 @@ export class MapService {
     while (this._queue.length < this.queueSize) {
       let currentIndex: number = this._maps.findIndex(a => a.id === this._current.id)
       const lgt: number = this._maps.length
-      let current: TMMap
+      let current: tm.Map
       let i: number = 0
       do {
         i++
@@ -338,10 +339,10 @@ export class MapService {
   }
 
   /**
-   * Contstructs TMMap object from dedicated server response
+   * Contstructs tm.Map object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
    */
-  private static constructNewMapObject(info: any): Omit<TMMap, 'voteCount' | 'voteRatio'> {
+  private static constructNewMapObject(info: any): Omit<tm.Map, 'voteCount' | 'voteRatio'> {
     // Translate mood to controller type (some maps have non standard mood or space in front of it)
     info.Mood = info.Mood.trim()
     if (!["Sunrise", "Day", "Sunset", "Night"].includes(info.Mood)) { // If map has non-standard mood set it to day
@@ -379,15 +380,15 @@ export class MapService {
    * @param uid Map uid
    * @returns map object or undefined if map is not in the playlist
    */
-  static get(uid: string): Readonly<TMMap> | undefined
+  static get(uid: string): Readonly<tm.Map> | undefined
   /**
    * Gets multiple maps from current playlist. Playlist is stored in runtime memory.
    * If some map is not present in memory it won't be returned. Returned array is not in initial order
    * @param uids Array of map uids
    * @returns Array of map objects
    */
-  static get(uids: string[]): Readonly<TMMap>[]
-  static get(uids: string | string[]): Readonly<TMMap> | Readonly<TMMap>[] | undefined {
+  static get(uids: string[]): Readonly<tm.Map>[]
+  static get(uids: string | string[]): Readonly<tm.Map> | Readonly<tm.Map>[] | undefined {
     if (typeof uids === 'string') {
       return this._maps.find(a => a.id === uids)
     }
@@ -399,15 +400,15 @@ export class MapService {
    * @param uid Map uid
    * @returns Map object or undefined if map is not in the database
    */
-  static fetch(uid: string): Promise<TMMap | undefined>
+  static fetch(uid: string): Promise<tm.Map | undefined>
   /**
    * Fetches multiple maps from the database. This method should be used to get maps which are not in the current Match Settings
    * If some map is not present in the database it won't be returned. Returned array is not in initial order
    * @param uids Array of map uids
    * @returns Map objects array
    */
-  static async fetch(uids: string[]): Promise<TMMap[]>
-  static async fetch(uids: string | string[]): Promise<TMMap | undefined | TMMap[]> {
+  static async fetch(uids: string[]): Promise<tm.Map[]>
+  static async fetch(uids: string | string[]): Promise<tm.Map | undefined | tm.Map[]> {
     if (typeof uids === 'string') {
       const data = await this.repo.get(uids)
       if (data === undefined) { return undefined }
@@ -415,7 +416,7 @@ export class MapService {
       return { ...data, voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }
     }
     const data = await this.repo.get(uids)
-    const ret: TMMap[] = []
+    const ret: tm.Map[] = []
     const voteRatios = await this.repo.getVoteCountAndRatio(uids)
     for (const e of data) {
       const v = voteRatios.find(a => a.uid === e.id)
@@ -429,15 +430,15 @@ export class MapService {
    * @param uid Map uid
    * @returns Map object or undefined if map is not in the queue
    */
-  static getFromQueue(uid: string): Readonly<TMMap> | undefined
+  static getFromQueue(uid: string): Readonly<tm.Map> | undefined
   /**
    * Gets multiple maps from queue. If some map is not present in queue it won't be returned.
    * Returned array is not in initial order
    * @param uids Array of map uids
    * @returns Array of map objects
    */
-  static getFromQueue(uids: string[]): Readonly<TMMap>[]
-  static getFromQueue(uids: string | string[]): Readonly<TMMap> | Readonly<TMMap>[] | undefined {
+  static getFromQueue(uids: string[]): Readonly<tm.Map>[]
+  static getFromQueue(uids: string | string[]): Readonly<tm.Map> | Readonly<tm.Map>[] | undefined {
     if (typeof uids === 'string') {
       return this._queue.find(a => a.map.id === uids)?.map
     }
@@ -449,15 +450,15 @@ export class MapService {
    * @param uid Map uid
    * @returns Map object or undefined if map is not in the history
    */
-  static getFromHistory(uid: string): Readonly<TMMap> | undefined
+  static getFromHistory(uid: string): Readonly<tm.Map> | undefined
   /**
    * Gets multiple maps from map history. If some map is not present in history it won't be returned.
    * Returned array is not in initial order
    * @param uids Array of map uids
    * @returns Array of map objects
    */
-  static getFromHistory(uids: string[]): Readonly<TMMap>[]
-  static getFromHistory(uids: string | string[]): Readonly<TMMap> | Readonly<TMMap>[] | undefined {
+  static getFromHistory(uids: string[]): Readonly<tm.Map>[]
+  static getFromHistory(uids: string | string[]): Readonly<tm.Map> | Readonly<tm.Map>[] | undefined {
     if (typeof uids === 'string') {
       return this._history.find(a => a.id === uids)
     }
@@ -469,15 +470,15 @@ export class MapService {
    * @param uid Map uid
    * @returns jukebox object or undefined if map is not in the jukeboxed
    */
-  static getFromJukebox(uid: string): Readonly<{ map: TMMap, callerLogin?: string }> | undefined
+  static getFromJukebox(uid: string): Readonly<{ map: tm.Map, callerLogin?: string }> | undefined
   /**
    * Gets multiple maps from jukebox. If some map is not present in jukebox it won't be returned. 
    * Returned array is not in initial order
    * @param uids Array of map uids
    * @returns Array of jukebox objects
    */
-  static getFromJukebox(uids: string[]): Readonly<{ map: TMMap, callerLogin?: string }>[]
-  static getFromJukebox(uids: string | string[]): Readonly<{ map: TMMap, callerLogin?: string }> | Readonly<{ map: TMMap, callerLogin?: string }>[] | undefined {
+  static getFromJukebox(uids: string[]): Readonly<{ map: tm.Map, callerLogin?: string }>[]
+  static getFromJukebox(uids: string | string[]): Readonly<{ map: tm.Map, callerLogin?: string }> | Readonly<{ map: tm.Map, callerLogin?: string }>[] | undefined {
     if (typeof uids === 'string') {
       const obj = this._queue.find(a => a.map.id === uids && a.isForced === true)
       return obj === undefined ? undefined : { map: obj.map, callerLogin: obj.callerLogin }
@@ -488,14 +489,14 @@ export class MapService {
   /**
    * @returns Currently played map
    */
-  static get current(): Readonly<TMCurrentMap> {
+  static get current(): Readonly<tm.CurrentMap> {
     return this._current
   }
 
   /**
    * @returns All maps from current playlist
    */
-  static get maps(): Readonly<TMMap>[] {
+  static get maps(): Readonly<tm.Map>[] {
     return [...this._maps]
   }
 
@@ -509,7 +510,7 @@ export class MapService {
   /**
    * @returns All maps from jukebox
    */
-  static get jukebox(): ({ map: TMMap, callerLogin?: string })[] {
+  static get jukebox(): ({ map: tm.Map, callerLogin?: string })[] {
     return this._queue.filter(a => a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
   }
 
@@ -523,14 +524,14 @@ export class MapService {
   /**
    * @returns All maps from queue
    */
-  static get queue(): Readonly<TMMap>[] {
+  static get queue(): Readonly<tm.Map>[] {
     return [...this._queue.map(a => a.map)]
   }
 
   /**
    * @returns All maps from map history
    */
-  static get history(): Readonly<TMMap>[] {
+  static get history(): Readonly<tm.Map>[] {
     return [...this._history]
   }
 

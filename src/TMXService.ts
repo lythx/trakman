@@ -76,7 +76,7 @@ export abstract class TMXService {
    * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */
-  static async fetchMapInfo(mapId: string): Promise<TMXMapInfo | Error> {
+  static async fetchMapInfo(mapId: string): Promise<tm.TMXMap | Error> {
     let data: string = ''
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) { // Search for right prefix
@@ -105,7 +105,7 @@ export abstract class TMXService {
     }
     const replaysData: string[] = (await replaysRes.text()).split('\r\n')
     replaysData.pop()
-    const replays: TMXReplay[] = []
+    const replays: tm.TMXReplay[] = []
     for (const r of replaysData) {
       const rs: string[] = r.split('\t')
       replays.push({
@@ -123,7 +123,7 @@ export abstract class TMXService {
       })
     }
     Object.freeze(replays)
-    const mapInfo: TMXMapInfo = {
+    const mapInfo: tm.TMXMap = {
       id: mapId,
       TMXId,
       name: s[1],
