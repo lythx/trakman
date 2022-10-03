@@ -40,7 +40,6 @@ const commands: tm.Command[] = [
         adminName: tm.utils.strip(info.nickname)
       }), config.prev.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
-      tm.client.callNoRes(`NextChallenge`)
     },
     privilege: config.prev.privilege
   },
