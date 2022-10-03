@@ -1,4 +1,4 @@
-{
+export default {
     "bistre": "$321",
     "black": "$000",
     "blackbean": "$300",

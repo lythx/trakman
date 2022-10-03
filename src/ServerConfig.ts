@@ -80,7 +80,7 @@ export class ServerConfig {
       allowMapDownload: options[0].AllowChallengeDownload,
       autoSaveReplays: options[0].AutoSaveReplays,
       // Stuff from PlayerInfo
-      login: loginInfo[0].Login, // Already in .env tho
+      login: loginInfo[0].Login,
       id: loginInfo[0].PlayerId, // Always 0
       zone: loginInfo[0].Path.substring(6), // Remove "World"
       ipAddress: loginInfo[0].IPAddress.split(':')[0], // Throw port away

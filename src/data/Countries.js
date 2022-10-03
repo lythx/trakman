@@ -1,4 +1,4 @@
-[
+export default [
   {
     "code": "ALG",
     "name": "Algeria"
