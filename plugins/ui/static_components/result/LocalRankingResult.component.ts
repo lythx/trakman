@@ -1,5 +1,4 @@
 import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './LocalRankingResult.config.js'
 
@@ -27,6 +26,9 @@ export default class LocalRankingResult extends StaticComponent {
     })
     tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+    })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }

@@ -1,6 +1,5 @@
-import {  IDS, List, StaticHeader } from '../../UiUtils.js'
+import { IDS, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './VotersRanking.config.js'
 
@@ -21,8 +20,9 @@ export default class VotersRanking extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
-    config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.votes.onUpdate(() =>   this.display())
+      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+    stats.votes.onUpdate(() => this.display())
+    stats.votes.onNicknameChange(() => this.display())
   }
 
   display(): void {

@@ -1,8 +1,7 @@
-
-import { ButtonData } from "./ButtonData.js";
-import { UiButton } from "./UiButton.js";
+import { ButtonData } from "./ButtonData.js"
+import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-import { trakman as tm } from "../../../../../src/Trakman.js";
+
 
 const cfg = config.payReplay
 
@@ -30,7 +29,7 @@ export class PayReplay extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.addListener('ManialinkClick', (info) => {
-      if (info.answer === cfg.actionId + this.parentId) {
+      if (info.actionId === cfg.actionId + this.parentId) {
         void this.handleClick(info.login, info.nickname)
       }
     })

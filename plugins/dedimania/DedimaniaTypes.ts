@@ -5,7 +5,7 @@ export interface DediRecord {
   checkpoints: number[]
 }
 
-export type NewDediRecord = Omit<TMPlayer & DediRecord & {
+export type NewDediRecord = Omit<tm.Player & DediRecord & {
   readonly position: number
   readonly previousPosition: number
   readonly previousTime: number

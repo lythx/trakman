@@ -1,4 +1,3 @@
-import { trakman as tm } from "../../../src/Trakman.js";
 import fs from 'node:fs/promises'
 import config from './TestWidget.config.js'
 

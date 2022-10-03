@@ -1,4 +1,4 @@
-type LeaveInfo = Omit<TMPlayer, 'lastOnline'> & {
+type LeaveInfo = Omit<tm.Player, 'lastOnline'> & {
   readonly sessionTime: number
   readonly wins: number
   readonly privilege: number

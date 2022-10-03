@@ -1,5 +1,4 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
+import PopupWindow from "../PopupWindow.js"
 import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './LocalCps.config.js'
 
@@ -40,9 +39,10 @@ export default class LocalCps extends PopupWindow {
     tm.commands.add({
       aliases: ['cp', 'cptms', 'recs'],
       help: 'Display current map local checkpoints.',
-      callback: (info: TMMessageInfo): void => tm.openManialink(this.openId, info.login),
+      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
-    },)
+    })
+    tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

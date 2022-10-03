@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import 'dotenv/config'
-import { WebhookClient, EmbedBuilder, WebhookEditData } from 'discord.js'
+import { WebhookClient, EmbedBuilder } from 'discord.js'
 
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 

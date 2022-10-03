@@ -1,5 +1,4 @@
 import { centeredText, Grid, GridCellFunction, IDS, StaticHeader } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './KarmaWidget.config.js'
@@ -28,9 +27,9 @@ export default class KarmaWidget extends StaticComponent {
     maniakarma.onMapFetch(this.display.bind(this))
     maniakarma.onVote(this.display.bind(this))
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
-      if (info.answer > this.id && info.answer <= this.id + 6) {
-        const index: number = info.answer - (this.id + 1)
-        const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
+      if (info.actionId > this.id && info.actionId <= this.id + 6) {
+        const index: number = info.actionId - (this.id + 1)
+        const votes = [3, 2, 1, -1, -2, -3] as const
         tm.karma.add(info, votes[index])
       }
     })
@@ -49,7 +48,7 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    const votes: TMVote[] = tm.karma.current
+    const votes: tm.Vote[] = tm.karma.current
     const voteAmounts: number[] = []
     for (let i = this.options.length - 1; i >= 0; i--) {
       voteAmounts.unshift(votes.filter(a => a.vote === this.options[i]).length)
@@ -61,7 +60,6 @@ export default class KarmaWidget extends StaticComponent {
     const totalMkVotes: number = Object.values(mkVotes).reduce((acc, cur) => acc += cur, 0)
     const combined = Object.values(mkVotes).map((a: number, i) => a + voteAmounts[i])
     const max: number = Math.max(...combined)
-    const maxLocalAmount = Math.max(...voteAmounts)
     const personalVote = votes.find(a => a.login === login)?.vote
     return `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
@@ -81,12 +79,12 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   private constructGraph(max: number, voteAmounts: number[], mkVotes: {
-    fantastic: number;
-    beautiful: number;
-    good: number;
-    bad: number;
-    poor: number;
-    waste: number;
+    fantastic: number,
+    beautiful: number,
+    good: number,
+    bad: number,
+    poor: number,
+    waste: number
   }): string {
     const width: number = (config.width + config.margin - config.buttonWidth) / 2 - config.margin
     let ret: string = `<quad posn="0 0 1" sizen="${width} ${config.height - (this.headerH + config.margin)}" bgcolor="${config.background}"/>`
@@ -103,7 +101,7 @@ export default class KarmaWidget extends StaticComponent {
   }
 
   private constructInfo(totalVotes: number, karma: number, totalMkVotes: number, mkKarmaValue: number): string {
-    const mkKarma: string = maniakarma.isEnabled ? Math.round(mkKarmaValue).toString() : config.defaultText
+    const mkKarma: string = totalMkVotes !== 0 ? Math.round(mkKarmaValue).toString() : config.defaultText
     const mkAmount: string = maniakarma.isEnabled ? totalMkVotes.toString() : config.defaultText
     const options = { padding: config.textPadding, textScale: config.textScale }
     const arr: GridCellFunction[] = [
@@ -115,7 +113,7 @@ export default class KarmaWidget extends StaticComponent {
 
       (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[2]}"/>`,
-      (i, j, w, h) => centeredText(Math.round(karma).toString(), w, h, options),
+      (i, j, w, h) => centeredText(karma === -1 ? config.defaultText : Math.round(karma).toString(), w, h, options),
       (i, j, w, h) => centeredText(mkKarma, w, h, options),
 
       (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,

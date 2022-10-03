@@ -7,6 +7,7 @@ export type BestSectors = ({
 
 export interface PlayerSectors {
   readonly login: string
+  nickname: string
   readonly sectors: (number | undefined)[]
 }
 
@@ -19,4 +20,5 @@ export interface SectorEventFunctions {
     deletedSectors: readonly Readonly<{ index: number, time: number }>[]
   }>) => void)
   'PlayerSector': ((playerSector: Readonly<{ login: string, nickname: string, index: number }>) => void)
+  'NicknameUpdated': ((players: Readonly<Readonly<{ login: string, nickname: string }>[]>) => void)
 }

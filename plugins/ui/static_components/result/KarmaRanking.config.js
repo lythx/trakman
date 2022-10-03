@@ -5,6 +5,7 @@ export default {
   height: 12.92,
   width: cfg.width,
   title: "Best Maps",
+  defaultText: '-',
   icon: icons.karmaStats,
   margin: cfg.margin,
   background: cfg.background,

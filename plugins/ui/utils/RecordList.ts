@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import IDS from '../config/UtilIds.js'
 import raceConfig from './RecordListRace.config.js'
 import resultConfig from './RecordListResult.config.js'
@@ -49,10 +48,10 @@ export default class RecordList {
   readonly downloadIcon: string
   readonly clickListeners: Function[] = []
   readonly timeColours: {
-    slower: string;
-    faster: string;
-    you: string;
-    top: string;
+    slower: string,
+    faster: string,
+    you: string,
+    top: string
   }
 
   constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
@@ -127,7 +126,7 @@ export default class RecordList {
 
   private setupListeners(): void {
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
-      if (info.answer === IDS.ClearAlerts) {
+      if (info.actionId === IDS.ClearAlerts) {
         const index: number = this.infos.findIndex(a => a.login === info.login)
         if (index !== -1) {
           this.infos.splice(index, 1)
@@ -136,15 +135,15 @@ export default class RecordList {
           e(info)
         }
       }
-      if (info.answer > this.id + 1 && info.answer <= this.id + this.maxCount + 1) {
-        const index: number = info.answer - this.id - 2
+      if (info.actionId > this.id + 1 && info.actionId <= this.id + this.maxCount + 1) {
+        const index: number = info.actionId - this.id - 2
         const i = this.infos.find(a => a.login === info.login)
         if (i === undefined) {
           this.infos.push({ login: info.login, indexes: [index] })
         } else if (!i.indexes.includes(index)) {
           i.indexes.push(index)
         } else {
-          const index: number = i.indexes.indexOf(info.answer - this.id - 2)
+          const index: number = i.indexes.indexOf(info.actionId - this.id - 2)
           if (index !== -1) {
             i.indexes.splice(index, 1)
           }
@@ -170,7 +169,7 @@ export default class RecordList {
       }
     }
     if (this.noRecordEntry === true && playerRecord === undefined) {
-      const player: TMPlayer | undefined = tm.players.get(login)
+      const player: tm.Player | undefined = tm.players.get(login)
       if (player !== undefined) {
         ret.push({ index: -1, record: { name: player.nickname, time: -1 } })
       }
@@ -259,7 +258,7 @@ export default class RecordList {
       }
       const login: string | undefined = records[i].login
       if (login !== undefined) {
-        const player: TMPlayer | undefined = tm.players.get(login)
+        const player: tm.Player | undefined = tm.players.get(login)
         if (player !== undefined) {
           if (i < playerIndex || playerIndex === -1) {
             ret.push('slower')

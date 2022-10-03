@@ -1,5 +1,4 @@
 import { IDS } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './TimerWidgetResult.config.js'
 

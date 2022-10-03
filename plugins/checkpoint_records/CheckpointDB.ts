@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../src/Trakman.js'
 import config from './Config.js'
 
 const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(

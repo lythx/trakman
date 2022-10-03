@@ -1,5 +1,5 @@
 export interface TMXMapChangedInfo {
-  history: (TMXMapInfo | null)[]
-  current: TMXMapInfo | null
-  queue: (TMXMapInfo | null)[]
+  history: (tm.TMXMap | null)[]
+  current: tm.TMXMap | null
+  queue: (tm.TMXMap | null)[]
 }

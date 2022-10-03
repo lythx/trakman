@@ -1,5 +1,4 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
-import { trakman as tm } from '../../src/Trakman.js'
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
@@ -10,6 +9,7 @@ const client: DedimaniaClient = new DedimaniaClient()
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
+const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -17,6 +17,10 @@ const emitRecordEvent = (record: NewDediRecord): void => {
 
 const emitFetchEvent = (dedis: DediRecord[]): void => {
   for (const e of fetchListeners) { e(dedis) }
+}
+
+const emitNicknameUpdateEvent = (updatedRecords: DediRecord[]): void => {
+  for (const e of nicknameUpdateListeners) { e(updatedRecords) }
 }
 
 const initialize = async (): Promise<void> => {
@@ -62,7 +66,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
-  const cfg: ServerInfo = tm.state.serverConfig
+  const cfg: tm.ServerInfo = tm.state.serverConfig
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
   const players = tm.players.list
   const rawDedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
@@ -93,11 +97,11 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { array: getPlayersArray() }
     ])
   if (rawDedis instanceof Error) {
-    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), reveived error:`, rawDedis.message)
+    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`, rawDedis.message)
     return
   }
   else if (rawDedis?.[0]?.Records === undefined) {
-    tm.log.error(`Failed to fetch dedimania records for map ${name} (${id}), received empty response`)
+    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received empty response`)
     return
   }
   currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>
@@ -105,6 +109,9 @@ const getRecords = async (id: string, name: string, environment: string, author:
     login: a.Login, nickname: a.NickName, time: a.Best,
     checkpoints: a.Checks.slice(0, a.Checks.length - 1)
   }))
+  if (config.syncName === true) {
+    void tm.updatePlayerInfo(...currentDedis)
+  }
   emitFetchEvent(currentDedis)
 }
 
@@ -139,7 +146,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
   if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
 }
 
-const addRecord = (player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
+const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
   time: number, checkpoints: number[]): void => {
   if (client.connected === false) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
@@ -176,7 +183,7 @@ const addRecord = (player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
 const updateServerPlayers = (): void => {
   setInterval(async (): Promise<void> => {
     if (client.connected === false) { return }
-    const cfg: ServerInfo = tm.state.serverConfig
+    const cfg: tm.ServerInfo = tm.state.serverConfig
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
     const status: any[] | Error = await client.call('dedimania.UpdateServerPlayers',
@@ -243,7 +250,7 @@ const playerLeave = async (player: { login: string, nickname: string }): Promise
 }
 
 const getPlayersArray = (): any[] => {
-  const players: TMPlayer[] = tm.players.list
+  const players: tm.Player[] = tm.players.list
   let arr: any[] = []
   for (const player of players) {
     arr.push(
@@ -265,7 +272,7 @@ const getPlayersArray = (): any[] => {
   return arr
 }
 
-const constructRecordObject = (player: Omit<TMPlayer, 'currentCheckpoints' | 'isSpectator'>,
+const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
   checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): NewDediRecord => {
   return {
     ...player,
@@ -308,6 +315,20 @@ if (config.isEnabled === true) {
   tm.addListener('PlayerFinish', (info) => {
     void addRecord(info, info.time, info.checkpoints)
   }, true)
+
+  tm.addListener('PlayerInfoUpdated', (info) => {
+    const changedObjects: DediRecord[] = []
+    for (const e of currentDedis) {
+      const newNickname = info.find(a => a.login === e.login)?.nickname
+      if (newNickname !== undefined) {
+        e.nickname = newNickname
+        changedObjects.push(e)
+      }
+    }
+    if (changedObjects.length !== 0) {
+      emitNicknameUpdateEvent(changedObjects)
+    }
+  })
 
 }
 
@@ -357,7 +378,7 @@ export const dedimania = {
    * Add a callback function to execute on a dedimania record
    * @param callback Function to execute on event. It takes new record object as a parameter
    */
-  onRecord(callback: ((record: NewDediRecord) => void)): void {
+  onRecord(callback: ((record: Readonly<NewDediRecord>) => void)): void {
     recordListeners.push(callback)
   },
 
@@ -365,8 +386,16 @@ export const dedimania = {
    * Add a callback function to execute when dedimania records get fetched
    * @param callback Function to execute on event. It takes record objects array as a parameter
    */
-  onFetch(callback: ((dedis: DediRecord[]) => void)): void {
+  onFetch(callback: ((dedis: Readonly<Readonly<DediRecord>[]>) => void)): void {
     fetchListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute when player nickname in dedimania records gets updated
+   * @param callback Function to execute on event. It takes changed record objects array as a parameter
+   */
+  onNicknameUpdate(callback: ((dedis: Readonly<Readonly<DediRecord>[]>) => void)): void {
+    nicknameUpdateListeners.push(callback)
   },
 
   getRecord,

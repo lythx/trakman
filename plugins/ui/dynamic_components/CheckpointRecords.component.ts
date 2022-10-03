@@ -1,5 +1,4 @@
 import PopupWindow from '../PopupWindow.js'
-import { trakman as tm } from '../../../src/Trakman.js'
 import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 import config from './CheckpointRecords.config.js'
@@ -24,7 +23,7 @@ export default class CheckpointRecords extends PopupWindow {
     tm.commands.add({
       aliases: ['cpr', 'cprecs'],
       help: 'Displays the checkpoint records on the current map.',
-      callback: (info: TMMessageInfo) => {
+      callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
       privilege: 0
@@ -37,6 +36,7 @@ export default class CheckpointRecords extends PopupWindow {
     checkpointRecords.addListener('PlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
     checkpointRecords.addListener('DeleteBestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('DeletePlayerCheckpoint', (info) => this.reRenderToPlayer(info.login))
+    checkpointRecords.addListener('NicknameUpdated', () => this.reRender())
   }
 
   protected onOpen(info: ManialinkClickInfo): void {

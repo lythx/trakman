@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-import { trakman as tm } from '../../src/Trakman.js'
 import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 
@@ -11,7 +10,7 @@ let mapKarmaValue: number = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
 let playerVotes: MKVote[] = []
 let newVotes: MKVote[] = []
-let lastMap: Readonly<TMCurrentMap>
+let lastMap: Readonly<tm.CurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
 const voteListeners: ((vote: MKVote) => void)[] = []
@@ -181,7 +180,7 @@ const getJson = (data: string): any => {
 }
 
 const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void => {
-  const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic'];
+  const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic']
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v = playerVotes.find(a => a.login === login)
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
@@ -199,13 +198,13 @@ const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): 
 }
 
 const fixCoherence = async (): Promise<void> => {
-  const localVotes: TMVote[] = tm.karma.current
+  const localVotes: tm.Vote[] = tm.karma.current
   const mkVotes: MKVote[] = playerVotes
   for (const e of mkVotes) {
     const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)
     if (v === undefined) {
       const nickname = tm.players.get(e.login)?.nickname
-      await tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
+      tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
     }
   }
   for (const e of localVotes) {

@@ -65,7 +65,7 @@ export default {
   },
   sectorsButton: {
     texts: { 0: "SECTOR", 1: "$AF4RECORDS", equal: true },
-    icon:  icons.clockList,
+    icon: icons.clockList,
     width: 1.8,
     height: 1.8,
     padding: 0.2
@@ -84,7 +84,7 @@ export default {
       { 0: "$E22DISABLED", 1: "DUE TO RES", equal: true },
       { 0: "MAP IS", 1: "$E22SKIPPED", equal: true },
     ],
-    icon:  icons.voteSkip,
+    icon: icons.voteSkip,
     voteIcon: icons.voteSkip,
     triesLimit: 3,
     timeout: 30,
@@ -104,8 +104,8 @@ export default {
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true }
     ],
-    icon:  icons.voteReplay,
-    voteIcon:  icons.voteReplay,
+    icon: icons.voteReplay,
+    voteIcon: icons.voteReplay,
     replayLimit: 5,
     triesLimit: 3,
     timeout: 30,
@@ -124,11 +124,11 @@ export default {
       { 0: "$E22DISABLED", 1: "DUE TO RES", equal: true },
       { 0: "MAP IS", 1: "$E22SKIPPED", equal: true },
     ],
-    icon:  icons.paySkip,
+    icon: icons.paySkip,
     width: 1.8,
     height: 1.8,
     padding: 0.2,
-    cost: 2,
+    cost: 500,
     countdown: 15,
     actionId: 3
   },
@@ -139,16 +139,16 @@ export default {
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true }
     ],
-    icon:  icons.payReplay,
+    icon: icons.payReplay,
     width: 1.8,
     height: 1.8,
     padding: 0.2,
     costs: [
-      1,
-      2,
-      3,
-      4,
-      5
+      100,
+      200,
+      300,
+      400,
+      500
     ],
     actionId: 4
   }

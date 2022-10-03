@@ -1,8 +1,7 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
-import { stats } from "../../stats/Stats.js";
+import PopupWindow from "../PopupWindow.js"
+import { stats } from "../../stats/Stats.js"
 import { IDS, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
 import config from './TopPlaytimes.config.js'
 
 export default class TopPlaytimes extends PopupWindow<number> {
@@ -18,6 +17,11 @@ export default class TopPlaytimes extends PopupWindow<number> {
       new Array((config.entries / 2) + 1).fill(1), config.grid)
     stats.playtimes.onUpdate((_, list) => {
       this.ranks = list
+      this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
+      this.reRender()
+    })
+    stats.playtimes.onNicknameChange(() => {
+      this.ranks = stats.playtimes.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })

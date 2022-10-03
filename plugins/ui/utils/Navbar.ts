@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../src/Trakman.js'
 import config from './Navbar.config.js'
 
 export default class Navbar {

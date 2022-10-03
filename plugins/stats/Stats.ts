@@ -8,12 +8,12 @@ import { topPlaytimes } from './TopPlaytimes.js'
 import { topSums } from './TopSums.js'
 
 export const stats = {
-    votes: topVotes,
-    wins: topWins,
-    visits: topVisits,
-    averages: topAverages,
-    donations: topDonations,
-    records: topRecords,
-    playtimes: topPlaytimes,
-    sums: topSums
+  votes: topVotes,
+  wins: topWins,
+  visits: topVisits,
+  averages: topAverages,
+  donations: topDonations,
+  records: topRecords,
+  playtimes: topPlaytimes,
+  sums: topSums
 }

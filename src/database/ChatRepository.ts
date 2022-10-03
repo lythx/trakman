@@ -10,8 +10,7 @@ const createQuery: string = `
       CONSTRAINT fk_player_id
         FOREIGN KEY(player_id) 
 	        REFERENCES players(id) 
-  );
-`
+  );`
 
 const playerRepo = new PlayerRepository()
 
@@ -22,7 +21,7 @@ export class ChatRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(options?: { limit?: number, date?: Date }): Promise<TMMessage[]> {
+  async get(options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 1
     let limitStr = ''
     let dateStr = ''
@@ -44,7 +43,7 @@ export class ChatRepository extends Repository {
     return await this.query(query, ...params)
   }
 
-  async getByLogin(login: string, options?: { limit?: number, date?: Date }): Promise<TMMessage[]> {
+  async getByLogin(login: string, options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 2
     let limitStr = ''
     let dateStr = ''
@@ -63,7 +62,7 @@ export class ChatRepository extends Repository {
     WHERE login=$1${dateStr}
     ${limitStr}`
     if (params.length === 0) { return await this.query(query, login) }
-    return await this.query(query,login, ...params)
+    return await this.query(query, login, ...params)
   }
 
   async add(login: string, text: string, date: Date): Promise<void> {

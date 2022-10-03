@@ -1,10 +1,10 @@
-import { trakman as tm } from "../../src/Trakman.js";
 import config from './Config.js'
 
 let onlineList: { login: string, nickname: string, count: number }[] = []
-let initialVotes: TMVote[] = []
+let initialVotes: tm.Vote[] = []
 let topList: { login: string, nickname: string, count: number }[] = []
 const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, count(players.id)::int
@@ -17,12 +17,35 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top votes', res.message, res.stack)
     return
   }
-  topList.push(...res)
+  topList.push(...res.filter(a => a.count !== 0))
 }
 
 tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
   initialVotes = tm.karma.current
+})
+
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  for (const e of onlineList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
 })
 
 tm.addListener('BeginMap', (): void => {
@@ -39,7 +62,7 @@ tm.addListener('KarmaVote', (info): void => {
     const topIndex: number = topList.findIndex(a => a.login === info.login)
     if (topIndex === -1 && count.count > topList[topList.length - 1].count) {
       topList.splice(topList.findIndex(a => a.count < count.count), 0, count)
-      topList.length = 10
+      topList.length = Math.min(config.votesCount, topList.length)
       for (const e of updateListeners) {
         e(topList[topIndex].login, [...topList])
       }
@@ -85,6 +108,14 @@ export const topVotes = {
 
   onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void) {
     updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
   }
 
 }

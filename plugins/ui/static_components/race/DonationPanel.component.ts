@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { donations } from '../../../donations/Donations.js'
 import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
@@ -21,8 +20,8 @@ export default class DonationPanel extends StaticComponent {
     this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
-      if (info.answer > this.id && info.answer <= this.id + config.amounts.length) {
-        const amount = config.amounts[info.answer - (this.id + 1)]
+      if (info.actionId > this.id && info.actionId <= this.id + config.amounts.length) {
+        const amount = config.amounts[info.actionId - (this.id + 1)]
         void donations.donate(info.login, info.nickname, amount)
       }
     })

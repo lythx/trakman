@@ -1,8 +1,7 @@
-import PopupWindow from "../PopupWindow.js";
-import { trakman as tm } from "../../../src/Trakman.js";
-import { stats } from "../../stats/Stats.js";
+import PopupWindow from "../PopupWindow.js"
+import { stats } from "../../stats/Stats.js"
 import { IDS, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js";
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
 import config from './TopDonations.config.js'
 
 export default class TopDonations extends PopupWindow<number> {
@@ -18,6 +17,11 @@ export default class TopDonations extends PopupWindow<number> {
       new Array((config.entries / 2) + 1).fill(1), config.grid)
     stats.donations.onUpdate((_, list) => {
       this.ranks = list
+      this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
+      this.reRender()
+    })
+    stats.donations.onNicknameChange(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })

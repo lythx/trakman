@@ -9,7 +9,7 @@ export class DedimaniaRequest {
     'Host: dedimania.net\r\n' +
     'User-Agent: XMLaccess\r\n' +
     'Cache-Control: no-cache\r\n' +
-    'Accept-Encoding: text\n' +
+    'Accept-Encoding: gzip\n' +
     'Content-Encoding: gzip\r\n' +
     'Content-type: text/xml; charset=UTF-8\r\n'
   )
@@ -20,7 +20,7 @@ export class DedimaniaRequest {
   * @param params parameters
   * @param sessionKey 
   */
-  constructor(method: string, params: CallParams[], sessionKey?: string) {
+  constructor(method: string, params: tm.CallParams[], sessionKey?: string) {
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
       const str: string | Error = this.handleParamType(param)
@@ -46,7 +46,7 @@ export class DedimaniaRequest {
     }
   }
 
-  private handleParamType(param: CallParams): string | Error {
+  private handleParamType(param: tm.CallParams): string | Error {
     type Keys = keyof typeof param
     const type: Keys = Object.keys(param)[0] as Keys
     const value = param[type]

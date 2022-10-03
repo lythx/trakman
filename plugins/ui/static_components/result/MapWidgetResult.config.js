@@ -6,7 +6,7 @@ export default {
   height: 11.4,
   margin: cfg.margin,
   width: cfg.width,
-  title: "Ongoing",
+  title: "Next",
   background: cfg.background,
   mapPadding: 0.3,
   customTags: [

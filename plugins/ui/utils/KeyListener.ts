@@ -1,14 +1,14 @@
 import utilIds from '../config/UtilIds.js'
-import { trakman as tm } from '../../../src/Trakman.js'
 
-let keyListeners: { callback: ((info: ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number, id: string }[] = []
 
-export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: ManialinkClickInfo) => void, importance: number, id: string) => {
-  keyListeners.unshift({ callback, key, importance, id })
+let keyListeners: { callback: ((info: ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
+
+export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: ManialinkClickInfo) => void, importance: number) => {
+  keyListeners.unshift({ callback, key, importance })
 }
 
-export const removeKeyListener = (id: string) => {
-  keyListeners = keyListeners.filter(a => a.id === id)
+export const removeKeyListener = (callback: (info: ManialinkClickInfo) => void) => {
+  keyListeners = keyListeners.filter(a => callback !== a.callback)
 }
 
 export const initialize = () => {
@@ -42,7 +42,7 @@ tm.addListener('PlayerJoin', (info) => {
 
 
 tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
-  switch (info.answer) {
+  switch (info.actionId) {
     case utilIds.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)
       break

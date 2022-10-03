@@ -1,4 +1,3 @@
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { IDS, Grid, centeredText, rightAlignedText, verticallyCenteredText, Paginator, StaticHeader } from '../../UiUtils.js'
 import config from './BestCps.config.js'
@@ -41,6 +40,13 @@ export default class BestCps extends StaticComponent {
       this.paginator.resetPlayerPages()
       this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
       this.bestCps.length = 0
+      this.display()
+    })
+    tm.addListener('PlayerInfoUpdated', (info) => {
+      for (const e of this.bestCps) {
+        const newNickname = info.find(a => a.login === e.login)?.nickname
+        if (newNickname !== undefined) { e.nickname = newNickname }
+      }
       this.display()
     })
     this.paginator.onPageChange = (login: string) => {

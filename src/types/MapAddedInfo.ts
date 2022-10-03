@@ -1,2 +1,2 @@
-type MapAddedInfo = TMMap &
+type MapAddedInfo = tm.Map &
 { readonly callerLogin?: string }

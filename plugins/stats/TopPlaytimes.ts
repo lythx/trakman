@@ -1,9 +1,8 @@
-import { trakman as tm } from "../../src/Trakman.js";
 import config from './Config.js'
 
 let topList: { login: string, nickname: string, playtime: number }[] = []
-
 const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, time_played AS playtime FROM players
@@ -17,11 +16,27 @@ const initialize = async () => {
   topList = res.map(a => ({ ...a, playtime: a.playtime * 1000 }))
 }
 
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
+})
+
 tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 
-tm.addListener('EndMap', (info) => {
+tm.addListener('EndMap', () => {
   const players = tm.players.list
   for (const e of players) {
     const pt = e.timePlayed + Date.now() - e.joinTimestamp
@@ -32,7 +47,7 @@ tm.addListener('EndMap', (info) => {
       topList.sort((a, b) => b.playtime - a.playtime)
     } else {
       topList.splice(topList.findIndex(a => a.playtime < pt), 0, { login: e.login, nickname: e.nickname, playtime: pt })
-      topList.length = config.playtimesCount
+      topList.length = Math.min(config.playtimesCount, topList.length)
     }
   }
   for (const e of updateListeners) {
@@ -48,6 +63,14 @@ export const topPlaytimes = {
 
   onUpdate(callback: (updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void) {
     updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
   }
 
 }

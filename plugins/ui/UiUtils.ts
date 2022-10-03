@@ -12,6 +12,7 @@ import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
 import { List } from './utils/List.js'
 import StaticHeader from './utils/StaticHeader.js'
 import staticButton from './utils/StaticButton.js'
+import { addManialinkListener, removeManialinkListener } from './utils/ManialinkListener.js'
 
 const fullScreenListener = (actionId: number, zIndex: number = -100): string => {
   return `<quad posn="-70 50 ${zIndex}" sizen="140 100" action="${actionId}"/>`
@@ -22,5 +23,5 @@ export {
   ICONS, IDS,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton,  fullScreenListener, centeredText,
-  verticallyCenteredText
+  verticallyCenteredText, addManialinkListener, removeManialinkListener
 }

@@ -4,7 +4,7 @@ import { Utils } from "./Utils.js"
 
 export class ServerConfig {
 
-  private static _config: ServerInfo
+  private static _config: tm.ServerInfo
   private static readonly proxyMethods: string[] = [
     'SetCallVoteTimeOut',
     'SetCallVoteRatio',
@@ -22,7 +22,7 @@ export class ServerConfig {
 
   static async initialize(): Promise<void> {
     await this.update()
-    Client.addProxy(this.proxyMethods, async (method: string, params: CallParams[]): Promise<void> => {
+    Client.addProxy(this.proxyMethods, async (method: string, params: tm.CallParams[]): Promise<void> => {
       Logger.info(`Server config changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
@@ -92,7 +92,7 @@ export class ServerConfig {
     }
   }
 
-  static get config(): ServerInfo {
+  static get config(): tm.ServerInfo {
     return { ...this._config }
   }
 

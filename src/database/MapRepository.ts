@@ -78,7 +78,7 @@ const environments = {
   Bay: 5,
   Coast: 6,
   Snow: 7
-};
+}
 
 const mapIdsRepo = new MapIdsRepository()
 
@@ -91,7 +91,7 @@ export class MapRepository extends Repository {
     await this.query(voteCreateQuery)
   }
 
-  async add(...maps: TMMap[]): Promise<void> {
+  async add(...maps: tm.Map[]): Promise<void> {
     if (maps.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
@@ -107,7 +107,7 @@ export class MapRepository extends Repository {
     await this.query(query, ...values)
   }
 
-  async getAll(): Promise<TMMap[]> {
+  async getAll(): Promise<tm.Map[]> {
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
     count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
@@ -118,9 +118,9 @@ export class MapRepository extends Repository {
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
-  async get(mapId: string): Promise<TMMap | undefined>
-  async get(mapIds: string[]): Promise<TMMap[]>
-  async get(mapIds: string | string[]): Promise<TMMap | TMMap[] | undefined> {
+  async get(mapId: string): Promise<tm.Map | undefined>
+  async get(mapIds: string[]): Promise<tm.Map[]>
+  async get(mapIds: string | string[]): Promise<tm.Map | tm.Map[] | undefined> {
     let isArr = true
     if (typeof mapIds === 'string') {
       isArr = false
@@ -142,9 +142,9 @@ export class MapRepository extends Repository {
     return res.map(a => this.constructMapObject(a))
   }
 
-  async getByFilename(fileName: string): Promise<TMMap | undefined>
-  async getByFilename(fileNames: string[]): Promise<TMMap[]>
-  async getByFilename(fileNames: string | string[]): Promise<TMMap | TMMap[] | undefined> {
+  async getByFilename(fileName: string): Promise<tm.Map | undefined>
+  async getByFilename(fileNames: string[]): Promise<tm.Map[]>
+  async getByFilename(fileNames: string | string[]): Promise<tm.Map | tm.Map[] | undefined> {
     let isArr = true
     if (typeof fileNames === 'string') {
       isArr = false
@@ -184,9 +184,9 @@ export class MapRepository extends Repository {
     }
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
-      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) + 3) / 6) * 100, count: res[0].count }
+      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count }
     }
-    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) + 3) / 6) * 100, count: a.count }))
+    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
   async remove(...mapIds: string[]): Promise<void> {
@@ -208,7 +208,7 @@ export class MapRepository extends Repository {
     await this.query(query, awards, lbRating, id)
   }
 
-  private constructMapObject(entry: TableEntry): TMMap {
+  private constructMapObject(entry: TableEntry): tm.Map {
     return {
       id: entry.uid,
       name: entry.name,
@@ -228,7 +228,7 @@ export class MapRepository extends Repository {
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,
-      voteRatio: entry.vote_count === 0 ? 0 : (((entry.vote_sum / entry.vote_count) + 3) / 6) * 100,
+      voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
       isClassic: entry.leaderboard_rating === 0,
       isNadeo: entry.leaderboard_rating === 50000
     }

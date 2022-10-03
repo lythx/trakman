@@ -1,13 +1,14 @@
-import { Logger } from "../Logger.js";
-import { Client } from "../client/Client.js";
+import { Logger } from "../Logger.js"
+import { Client } from "../client/Client.js"
 import config from "../../config/Config.js"
-import { PrivilegeRepository } from "../database/PrivilegeRepository.js";
+import { PrivilegeRepository } from "../database/PrivilegeRepository.js"
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
 import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
-import { PlayerService } from "./PlayerService.js";
-import { Events } from "../Events.js";
+import { PlayerService } from "./PlayerService.js"
+import { Events } from "../Events.js"
+import { Utils } from "../Utils.js"
 
 export class AdministrationService {
 
@@ -16,12 +17,12 @@ export class AdministrationService {
   private static readonly blacklistRepo = new BlacklistRepository()
   private static readonly mutelistRepo = new MutelistRepository()
   private static readonly guestlistRepo = new GuestlistRepository()
-  private static serverBanlist: TMBanlistEntry[] = []
-  private static banOnJoin: TMBanlistEntry[] = []
-  private static _blacklist: TMBlacklistEntry[] = []
-  private static serverMutelist: TMMutelistEntry[] = []
-  private static muteOnJoin: TMMutelistEntry[] = []
-  private static _guestlist: TMGuestlistEntry[] = []
+  private static serverBanlist: tm.BanlistEntry[] = []
+  private static banOnJoin: tm.BanlistEntry[] = []
+  private static _blacklist: tm.BlacklistEntry[] = []
+  private static serverMutelist: tm.MutelistEntry[] = []
+  private static muteOnJoin: tm.MutelistEntry[] = []
+  private static _guestlist: tm.GuestlistEntry[] = []
   private static readonly blacklistFile: string = config.blacklistFile
   private static readonly guestlistFile: string = config.guestlistFile
   static readonly banPrivilege = config.privileges.ban
@@ -47,6 +48,12 @@ export class AdministrationService {
     this.pollExpireDates()
   }
 
+  /**
+   * Handle ban and mute on join
+   * @param login Player login
+   * @param ip Player ip address
+   * @returns True if player can join, false otherwise
+   */
   static async handleJoin(login: string, ip: string): Promise<boolean> {
     const mute = this.muteOnJoin.find(a => a.login === login)
     if (mute !== undefined) {
@@ -72,6 +79,27 @@ export class AdministrationService {
       return false
     }
     return true
+  }
+
+  /**
+   * Updates the player nickname in runtime memory
+   * @param players Objects containing player logins and nicknames
+   */
+  static updateNickname(...players: { login: string, nickname: string }[]): void {
+    const replaceNickname = (arr: { nickname?: string, login: string, callerLogin: string, callerNickname: string }[]) => {
+      for (const p of players) {
+        const obj = arr.find(a => a.login === p.login)
+        if (obj !== undefined) { obj.nickname = p.nickname }
+        const obj2 = arr.find(a => a.callerLogin === p.login)
+        if (obj2 !== undefined) { obj2.callerNickname = p.nickname }
+      }
+    }
+    replaceNickname(this.banOnJoin)
+    replaceNickname(this.serverBanlist)
+    replaceNickname(this._blacklist)
+    replaceNickname(this.muteOnJoin)
+    replaceNickname(this.serverMutelist)
+    replaceNickname(this._guestlist)
   }
 
   /**
@@ -103,7 +131,7 @@ export class AdministrationService {
       return
     }
     for (const e of this.banOnJoin) {
-      const params: CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: config.defaultReasonMessage }, { boolean: false }] :
+      const params: tm.CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: config.defaultReasonMessage }, { boolean: false }] :
         [{ string: e.login }, { string: e.reason }, { boolean: false }]
       if (!banlist.some((a: any): boolean => a.Login === e.login)) {
         const res = await Client.call('BanAndBlackList', params)
@@ -147,7 +175,7 @@ export class AdministrationService {
     }
     for (const e of this._blacklist) {
       if (!blacklist.some((a: any): boolean => a.Login === e.login)) {
-        const params: CallParams[] = e.reason === undefined ? [{ string: e.login }] :
+        const params: tm.CallParams[] = e.reason === undefined ? [{ string: e.login }] :
           [{ string: e.login }, { string: e.reason }]
         const res: any[] | Error = await Client.call('BlackList', params)
         if (res instanceof Error) {
@@ -264,7 +292,7 @@ export class AdministrationService {
    * @param caller Optional caller player object
    */
   static async setPrivilege(login: string, privilege: number, caller?: { login: string, nickname: string }): Promise<void> {
-    const player: TMPlayer | undefined = PlayerService.get(login)
+    const player: tm.Player | undefined = PlayerService.get(login)
     if (player !== undefined) { player.privilege = privilege }
     if (caller !== undefined) {
       Logger.info(`Player ${caller.login} changed ${login} privilege to ${privilege}`)
@@ -283,6 +311,7 @@ export class AdministrationService {
       void this.privilegeRepo.set(login, privilege)
       return
     }
+    PlayerService.updateInfo({ login, title: PlayerService.getTitle(login, privilege, player.country, player.countryCode) })
     Events.emit('PrivilegeChanged', {
       player: player === undefined ? undefined : { ...player, privilege },
       login,
@@ -358,7 +387,7 @@ export class AdministrationService {
     const serverBanIndex = this.serverBanlist.findIndex(a => a.login === login)
     const banOnJoinIndex = this.banOnJoin.findIndex(a => a.login === login)
     if (serverBanIndex === -1 && banOnJoinIndex === -1) { return 'Player not banned' }
-    let obj: TMBanlistEntry | undefined
+    let obj: tm.BanlistEntry | undefined
     if (serverBanIndex !== -1) {
       const res = await Client.call('UnBan', [{ string: login }])
       if (res instanceof Error) { return res }
@@ -465,7 +494,7 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
-   * @returns True if successfull, false if caller privilege is too low, Error if dedicated server call fails
+   * @returns True if successfull, false if caller privilege is too low
    */
   static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
@@ -517,7 +546,7 @@ export class AdministrationService {
     const serverMuteIndex = this.serverMutelist.findIndex(a => a.login === login)
     const muteOnJoinIndex = this.muteOnJoin.findIndex(a => a.login === login)
     if (serverMuteIndex === -1 && muteOnJoinIndex === -1) { return 'Player not muted' }
-    let obj: TMMutelistEntry | undefined
+    let obj: tm.MutelistEntry | undefined
     if (serverMuteIndex !== -1) {
       const res = await Client.call('UnIgnore', [{ string: login }])
       if (res instanceof Error) { return res }
@@ -572,9 +601,9 @@ export class AdministrationService {
    * @returns True if successfull, false if caller privilege is too low 
    * 'Player not in guestlist' if player was not in the guestlist, Error if dedicated server call fails
    */
-  static async removeGuest(login: string, caller?: { login: string, privilege: number, nickname: string }): 
-  Promise<boolean | 'Player not in guestlist' | Error> {
-    if(caller !== undefined && caller.privilege < this.addGuestPrivilege) { return false }
+  static async removeGuest(login: string, caller?: { login: string, privilege: number, nickname: string }):
+    Promise<boolean | 'Player not in guestlist' | Error> {
+    if (caller !== undefined && caller.privilege < this.addGuestPrivilege) { return false }
     const guestIndex = this._guestlist.findIndex(a => a.login === login)
     if (guestIndex === -1) { return 'Player not in guestlist' }
     const res = await Client.call('RemoveGuest', [{ string: login }])
@@ -597,14 +626,14 @@ export class AdministrationService {
    * @param login Player login
    * @returns Ban object or undefined if the player isn't banned
    */
-  static getBan(login: string): Readonly<TMBanlistEntry> | undefined
+  static getBan(login: string): Readonly<tm.BanlistEntry> | undefined
   /**
    * Gets multiple bans information for given logins
    * @param logins Array of player logins
    * @returns Array of ban objects
    */
-  static getBan(logins: string[]): Readonly<TMBanlistEntry>[]
-  static getBan(logins: string | string[]): Readonly<TMBanlistEntry> | Readonly<TMBanlistEntry>[] | undefined {
+  static getBan(logins: string[]): Readonly<tm.BanlistEntry>[]
+  static getBan(logins: string | string[]): Readonly<tm.BanlistEntry> | Readonly<tm.BanlistEntry>[] | undefined {
     if (typeof logins === 'string') {
       return this.banlist.find(a => a.login === logins)
     }
@@ -616,14 +645,14 @@ export class AdministrationService {
    * @param login Player login
    * @returns Blacklist object or undefined if the player isn't blacklisted
    */
-  static getBlacklist(login: string): Readonly<TMBlacklistEntry> | undefined
+  static getBlacklist(login: string): Readonly<tm.BlacklistEntry> | undefined
   /**
    * Gets multiple blacklists information for given logins
    * @param logins Array of player logins
    * @returns Array of blacklist objects
    */
-  static getBlacklist(logins: string[]): Readonly<TMBlacklistEntry>[]
-  static getBlacklist(logins: string | string[]): Readonly<TMBlacklistEntry> | Readonly<TMBlacklistEntry>[] | undefined {
+  static getBlacklist(logins: string[]): Readonly<tm.BlacklistEntry>[]
+  static getBlacklist(logins: string | string[]): Readonly<tm.BlacklistEntry> | Readonly<tm.BlacklistEntry>[] | undefined {
     if (typeof logins === 'string') {
       return this._blacklist.find(a => a.login === logins)
     }
@@ -635,14 +664,14 @@ export class AdministrationService {
    * @param login Player login
    * @returns Mute object or undefined if the player isn't muted
    */
-  static getMute(login: string): Readonly<TMMutelistEntry> | undefined
+  static getMute(login: string): Readonly<tm.MutelistEntry> | undefined
   /**
    * Gets multiple mutes information for given logins
    * @param logins Array of player logins
    * @returns Array of mute objects
    */
-  static getMute(logins: string[]): Readonly<TMMutelistEntry>[]
-  static getMute(logins: string | string[]): Readonly<TMMutelistEntry> | Readonly<TMMutelistEntry>[] | undefined {
+  static getMute(logins: string[]): Readonly<tm.MutelistEntry>[]
+  static getMute(logins: string | string[]): Readonly<tm.MutelistEntry> | Readonly<tm.MutelistEntry>[] | undefined {
     if (typeof logins === 'string') {
       return this.mutelist.find(a => a.login === logins)
     }
@@ -654,14 +683,14 @@ export class AdministrationService {
    * @param login Player login
    * @returns Guest object or undefined if the player isn't in the guestlist
    */
-  static getGuest(login: string): Readonly<TMGuestlistEntry> | undefined
+  static getGuest(login: string): Readonly<tm.GuestlistEntry> | undefined
   /**
    * Gets multiple guests information for given logins
    * @param logins Array of player logins
    * @returns Array of guest objects
    */
-  static getGuest(logins: string[]): Readonly<TMGuestlistEntry>[]
-  static getGuest(logins: string | string[]): Readonly<TMGuestlistEntry> | Readonly<TMGuestlistEntry>[] | undefined {
+  static getGuest(logins: string[]): Readonly<tm.GuestlistEntry>[]
+  static getGuest(logins: string | string[]): Readonly<tm.GuestlistEntry> | Readonly<tm.GuestlistEntry>[] | undefined {
     if (typeof logins === 'string') {
       return this._guestlist.find(a => a.login === logins)
     }
@@ -671,28 +700,28 @@ export class AdministrationService {
   /**
    * @returns Array of all ban objects
    */
-  static get banlist(): Readonly<TMBanlistEntry>[] {
+  static get banlist(): Readonly<tm.BanlistEntry>[] {
     return [...this.serverBanlist, ...this.banOnJoin]
   }
 
   /**
    * @returns Array of all blacklist objects
    */
-  static get blacklist(): Readonly<TMBlacklistEntry>[] {
+  static get blacklist(): Readonly<tm.BlacklistEntry>[] {
     return [...this._blacklist]
   }
 
   /**
    * @returns Array of all mute objects
    */
-  static get mutelist(): Readonly<TMMutelistEntry>[] {
+  static get mutelist(): Readonly<tm.MutelistEntry>[] {
     return [...this.serverMutelist, ...this.muteOnJoin]
   }
 
   /**
    * @returns Array of all guest objects
    */
-  static get guestlist(): Readonly<TMGuestlistEntry>[] {
+  static get guestlist(): Readonly<tm.GuestlistEntry>[] {
     return [...this._guestlist]
   }
 

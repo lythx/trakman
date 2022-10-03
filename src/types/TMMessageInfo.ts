@@ -1,1 +1,1 @@
-type TMMessageInfo = TMMessage & TMPlayer
+export type MessageInfo = tm.Message & tm.Player

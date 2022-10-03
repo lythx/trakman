@@ -1,10 +1,10 @@
-import { trakman as tm } from '../../src/Trakman.js'
 import xml2js from 'xml2js'
+import zlib from 'zlib'
 
 export class DedimaniaResponse {
 
   private _status: string = 'pending'
-  private _data: string = ''
+  private _data: Buffer = Buffer.from('')
   private _xml: string = ''
   private _isError: boolean | null = null
   private _errorCode: number | null = null
@@ -12,21 +12,25 @@ export class DedimaniaResponse {
   private _json: any = null
   private _sessionId: string | null = null
 
-  addData(data: string): void {
-    this._data += data
-    const split: string[] = this._data.split('\n')
-    if (split[split.length - 1] === '</methodResponse>' && split[0] === 'HTTP/1.1 200 OK\r') {
+  addData(data: Buffer): void {
+    this._data = Buffer.concat([this._data, data])
+    const str = this._data.toString()
+    const split: string[] = str.split('\n')
+    const resLength = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
+    const index = this._data.indexOf('\r\n\r\n')
+    const content = this._data.slice(index + 4)
+    if (content.length === resLength) {
       for (const row of split) {
         if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }
       }
-      this._status = 'completed'
-      this._xml = this._data.split('\r\n\r\n')[1]
+      this._xml = zlib.gunzipSync(content).toString()
       this.generateJson()
+      this._status = 'completed'
     }
   }
 
   get data(): string {
-    return this._data
+    return this._data.toString()
   }
 
   get json(): any[] {

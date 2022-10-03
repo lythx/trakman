@@ -1,4 +1,4 @@
-interface TMGame {
+export interface TMGame {
   gameMode: number
   resultTime: number // what the fuck is this
   mapIndex: number

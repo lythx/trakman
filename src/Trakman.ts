@@ -15,7 +15,7 @@ import { Logger } from './Logger.js'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/Prefixes.js'
-import config from '../config/Config.js'
+import controllerConfig from '../config/Config.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
 await playerIdsRepo.initialize()
@@ -25,11 +25,11 @@ await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 
-export const trakman = {
+namespace trakman {
 
-  utils: Utils,
+  export const utils = Utils
 
-  db: {
+  export const db = {
 
     getMapId: mapIdsRepo.get.bind(mapIdsRepo),
 
@@ -66,17 +66,17 @@ export const trakman = {
       }
     }
 
-  },
+  }
 
-  tmx: {
+  export const tmx = {
 
     fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
 
     fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
 
-  },
+  }
 
-  players: {
+  export const players = {
 
     get: PlayerService.get.bind(PlayerService),
 
@@ -86,9 +86,9 @@ export const trakman = {
 
     get count() { return PlayerService.playerCount }
 
-  },
+  }
 
-  records: {
+  export const records = {
 
     getLocal: RecordService.getLocal.bind(RecordService),
 
@@ -118,9 +118,9 @@ export const trakman = {
 
     get maxLocalsAmount() { return RecordService.maxLocalsAmount }
 
-  },
+  }
 
-  messages: {
+  export const messages = {
 
     fetch: ChatService.fetch.bind(ChatService),
 
@@ -130,17 +130,17 @@ export const trakman = {
 
     get list() { return ChatService._messages }
 
-  },
+  }
 
-  commands: {
+  export const commands = {
 
     add: ChatService.addCommand.bind(ChatService),
 
     get list() { return ChatService.commandList }
 
-  },
+  }
 
-  client: {
+  export const client = {
 
     call: Client.call.bind(Client),
 
@@ -148,9 +148,9 @@ export const trakman = {
 
     addProxy: Client.addProxy.bind(Client),
 
-  },
+  }
 
-  maps: {
+  export const maps = {
 
     get: MapService.get.bind(MapService),
 
@@ -166,9 +166,9 @@ export const trakman = {
 
     get count() { return MapService.mapCount }
 
-  },
+  }
 
-  log: {
+  export const log = {
 
     fatal: Logger.fatal.bind(Logger),
 
@@ -182,9 +182,9 @@ export const trakman = {
 
     trace: Logger.trace.bind(Logger)
 
-  },
+  }
 
-  jukebox: {
+  export const jukebox = {
 
     add: MapService.addToJukebox.bind(MapService),
 
@@ -216,9 +216,9 @@ export const trakman = {
 
     get juked() { return MapService.jukebox }
 
-  },
+  }
 
-  karma: {
+  export const karma = {
 
     /**
      * Adds a player vote to the database and to Maniakarma service if its running
@@ -239,9 +239,9 @@ export const trakman = {
 
     get list() { return VoteService.votes }
 
-  },
+  }
 
-  state: {
+  export const state = {
 
     /**
      * @returns remaining map time in seconds
@@ -258,17 +258,17 @@ export const trakman = {
       return GameService.state
     },
 
-    get gameConfig(): TMGame {
+    get gameConfig(): tm.Game {
       return GameService.config
     },
 
-    get serverConfig(): ServerInfo {
+    get serverConfig(): tm.ServerInfo {
       return ServerConfig.config
     }
 
-  },
+  }
 
-  admin: {
+  export const admin = {
 
     setPrivilege: AdministrationService.setPrivilege.bind(AdministrationService),
 
@@ -312,21 +312,21 @@ export const trakman = {
 
     get guestCount() { return AdministrationService.guestCount }
 
-  },
+  }
 
   /**
   * Sends a server message
   * @param message Message to be sent
   * @param login Optional player login (or comma-joined list of logins)
   */
-  sendMessage(message: string, login?: string, prefix: boolean = true): void {
+  export const sendMessage = (message: string, login?: string, prefix: boolean = true): void => {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin',
         [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message }, { string: login }])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
-  },
+  }
 
   /**
    * Sends a server manialink
@@ -335,17 +335,29 @@ export const trakman = {
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  sendManialink(manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void {
+  export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
     }
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
-  },
+  }
+
+  /**
+   * Updates player information in runtime memory and database
+   * @param players Objects containing player login and infos to update
+   */
+  export const updatePlayerInfo = async (...players:
+    { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> => {
+    await PlayerService.updateInfo(...players)
+    RecordService.updateInfo(...players)
+    AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
+    Events.emit('PlayerInfoUpdated', players)
+  }
 
   // TO BE REMOVED
-  getPlayerDBId: playerIdsRepo.getId.bind(playerIdsRepo),
+  export const getPlayerDBId = playerIdsRepo.getId.bind(playerIdsRepo)
 
   //CHANGE LATER
   /**
@@ -353,16 +365,16 @@ export const trakman = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+  export const multiCall = async (...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> => {
     return Utils.multiCall(...calls)
-  },
+  }
 
   //CHANGE LATER
   /**
    * Calls multiple dedicated server methods simultaneously without caring for the response
    * @param calls Array of dedicated server calls
    */
-  multiCallNoRes(...calls: TMCall[]): void {
+  export const multiCallNoRes = (...calls: tm.Call[]): void => {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -374,7 +386,7 @@ export const trakman = {
       })
     }
     Client.callNoRes('system.multicall', [{ array: arr }])
-  },
+  }
 
   /**
    * Adds a listener to an event to execute callbacks
@@ -382,25 +394,34 @@ export const trakman = {
    * @param callback Callback to register on given event
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
-  addListener: Events.addListener,
+  export const addListener = Events.addListener
+
+  /**
+   * Removes event listener
+   * @param callback Callback function of listener to remove
+   */
+  export const removeListener = Events.removeListener
 
   /**
    * Handles manialink interaction
    * @param id Manialink ID
    * @param login Player login
    */
-  openManialink(id: number, login: string): void {
+  export const openManialink = (id: number, login: string): void => {
     const temp: any = PlayerService.get(login)
-    temp.answer = id
+    temp.actionId = id
     const info: ManialinkClickInfo = temp
     Events.emit('ManialinkClick', info)
-  },
+  }
 
   /**
    * Controller config
    */
-  config
-
+  export const config = controllerConfig
 }
 
-export const palette = Utils.palette 
+declare global {
+  const tm: typeof trakman
+}
+
+(global as any).tm = trakman

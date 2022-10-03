@@ -1,10 +1,10 @@
 import { Client } from "./client/Client.js"
-import dsc from 'dice-similarity-coeff';
+import dsc from 'dice-similarity-coeff'
 import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
 import countries from './data/Countries.json' assert { type: 'json' }
 import { Events } from './Events.js'
 import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
-import { PlayerService } from "./services/PlayerService.js";
+import { PlayerService } from "./services/PlayerService.js"
 import colours from './data/Colours.json' assert { type: 'json' }
 import { palette } from '../config/Prefixes.js'
 import config from '../config/Config.js'
@@ -68,7 +68,7 @@ export const Utils = {
    * @param calls Array of dedicated server calls
    * @returns Server response or error if the server returns one
    */
-  async multiCall(...calls: TMCall[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
+  async multiCall(...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
     const arr: any[] = []
     for (const c of calls) {
       const params: any[] = c.params === undefined ? [] : c.params
@@ -123,6 +123,22 @@ export const Utils = {
       }
     }
     return strippedStr
+  },
+
+  /**
+   * Gets country information from region in Nadeo format
+   * @param region Region in Nadeo format, can start with World but doesn't have to
+   * @returns Object containing parsed region, country and country code if matching one was found
+   */
+  getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
+    let split = region.split('|')
+    if (region.startsWith('World')) {
+      split.shift()
+    }
+    const r: string = split.join('|')
+    const country: string = split[0]
+    const countryCode: string | undefined = this.countryToCode(country)
+    return { region: r, country, countryCode }
   },
 
   matchString,
@@ -220,24 +236,10 @@ export const Utils = {
   },
 
   /**
- * Determines the player title on join/actions
- * @param player Object of the player to get the title for
- * @returns The title string
- */
-  getTitle(player: { login: string, privilege: number, country: string }): string {
-    // Apparently this is a thing
-    const specialTitle: string | undefined = specialTitles[player?.login as keyof typeof specialTitles]
-    if (specialTitle !== undefined) {
-      return specialTitle
-    }
-    return titles[player.privilege]
-  },
-
-  /**
- * Converts milliseconds to humanly readable time
- * @param ms Time to convert (in milliseconds)
- * @returns Humanly readable time string
- */
+   * Converts milliseconds to humanly readable time
+   * @param ms Time to convert (in milliseconds)
+   * @returns Humanly readable time string
+   */
   msToTime(ms: number): string {
     const d: Date = new Date(ms)
     let str: string = ''
@@ -285,13 +287,13 @@ export const Utils = {
   } = {
       similarityGoal: config.nicknameToLoginSimilarityGoal,
       minimumDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
-    }): TMPlayer | undefined {
+    }): tm.Player | undefined {
     const players = PlayerService.players
-    const strippedNicknames: { strippedNickname: string, player: TMPlayer }[] = []
+    const strippedNicknames: { strippedNickname: string, player: tm.Player }[] = []
     for (const e of players) {
       strippedNicknames.push({ strippedNickname: this.stripSpecialChars(Utils.strip(e.nickname).toLowerCase()), player: e })
     }
-    const matches: { player: TMPlayer, value: number }[] = []
+    const matches: { player: tm.Player, value: number }[] = []
     for (const e of strippedNicknames) {
       const value = dsc.twoStrings(e.strippedNickname, nickname.toLowerCase())
       if (value > options.similarityGoal) {

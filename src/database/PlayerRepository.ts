@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { Utils } from '../Utils.js'
+import { Logger } from '../Logger.js'
 
 const createQuery: string = `
   CREATE TABLE IF NOT EXISTS players(
@@ -37,9 +38,9 @@ export class PlayerRepository extends Repository {
     await super.initialize(createQuery)
   }
 
-  async get(login: string): Promise<TMOfflinePlayer | undefined>
-  async get(logins: string[]): Promise<TMOfflinePlayer[]>
-  async get(logins: string | string[]): Promise<TMOfflinePlayer | TMOfflinePlayer[] | undefined> {
+  async get(login: string): Promise<tm.OfflinePlayer | undefined>
+  async get(logins: string[]): Promise<tm.OfflinePlayer[]>
+  async get(logins: string | string[]): Promise<tm.OfflinePlayer | tm.OfflinePlayer[] | undefined> {
     if (typeof logins === 'string') {
       const query: string = `SELECT players.login, nickname, region, wins, time_played, visits, is_united, last_online, average, privilege FROM players 
       LEFT JOIN privileges ON players.login=privileges.login
@@ -55,7 +56,7 @@ export class PlayerRepository extends Repository {
     return res.map(a => this.constructPlayerObject(a))
   }
 
-  async add(...players: TMOfflinePlayer[]): Promise<void> {
+  async add(...players: tm.OfflinePlayer[]): Promise<void> {
     if (players.length === 0) { return }
     const query: string = `INSERT INTO players(login, nickname, region, wins, time_played, visits, is_united, last_online, average) 
     ${this.getInsertValuesString(9, players.length)};`
@@ -69,6 +70,11 @@ export class PlayerRepository extends Repository {
   async updateAverage(login: string, average: number): Promise<void> {
     const query: string = `UPDATE players SET average=$1 WHERE login=$2;`
     await this.query(query, average, login)
+  }
+
+  async updateNicknameAndRegion(login: string, nickname: string, region: string): Promise<void> {
+    const query: string = `UPDATE players SET nickname=$1, region=$2 WHERE login=$3;`
+    await this.query(query, nickname, region, login)
   }
 
   async updateOnWin(login: string, wins: number): Promise<void> {
@@ -135,13 +141,17 @@ export class PlayerRepository extends Repository {
     return isArr === true ? ret.concat(res) : res[0]?.id
   }
 
-  private constructPlayerObject(entry: TableEntry): TMOfflinePlayer {
-    const country: string = entry.region.split('|')[0]
+  private constructPlayerObject(entry: TableEntry): tm.OfflinePlayer {
+    const { countryCode, country } = Utils.getRegionInfo(entry.region)
+    if (countryCode === undefined) {
+      void Logger.fatal(`Country code for player ${entry.login} is undefined, received region: ${entry.region}. Check your database`)
+      return null as any
+    }
     return {
       login: entry.login,
       nickname: entry.nickname,
       country: country,
-      countryCode: Utils.countryToCode(country) as any,
+      countryCode: countryCode,
       region: entry.region,
       timePlayed: entry.time_played * 1000,
       lastOnline: entry.last_online ?? undefined,

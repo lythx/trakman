@@ -1,9 +1,8 @@
-import { trakman as tm } from "../../src/Trakman.js";
 import config from './Config.js'
 
 let topList: { login: string, nickname: string, average: number }[] = []
-
 const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, average: number }[]) => void)[] = []
+const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
   const res: { login: string, nickname: string, average: number }[] | Error =
@@ -22,6 +21,22 @@ tm.addListener('Startup', async (): Promise<void> => {
   void initialize()
 })
 
+tm.addListener('PlayerInfoUpdated', (info) => {
+  const changedObjects: { login: string, nickname: string }[] = []
+  for (const e of topList) {
+    const newNickname = info.find(a => a.login === e.login)?.nickname
+    if (newNickname !== undefined) {
+      e.nickname = newNickname
+      changedObjects.push(e)
+    }
+  }
+  if (changedObjects.length !== 0) {
+    for (const e of nicknameChangeListeners) {
+      e(changedObjects)
+    }
+  }
+})
+
 tm.addListener('RanksAndAveragesUpdated', async (info) => {
   const updated: string[] = []
   for (const e of info) {
@@ -38,7 +53,7 @@ tm.addListener('RanksAndAveragesUpdated', async (info) => {
       }
       topList.splice(topList.findIndex(a => a.average > e.average), 0,
         { login: e.login, nickname: nickname ?? e.login, average: e.average })
-      topList.length = config.averagesCount
+      topList.length = Math.min(config.averagesCount, topList.length)
     }
   }
   for (const e of updateListeners) {
@@ -54,6 +69,14 @@ export const topAverages = {
 
   onUpdate(callback: (updatedLogins: string[], list: { login: string, nickname: string, average: number }[]) => void) {
     updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on donator nickname change
+   * @param callback Function to execute on event. It takes donation object as a parameter
+   */
+  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+    nicknameChangeListeners.push(callback)
   }
 
 }

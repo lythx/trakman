@@ -7,13 +7,14 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
+import { titles } from '../../config/Titles.js'
 
 /**
  * This service manages online players on the server and players table in the database
  */
 export class PlayerService {
 
-  private static _players: TMPlayer[] = []
+  private static _players: tm.Player[] = []
   private static readonly repo: PlayerRepository = new PlayerRepository()
   private static readonly privilegeRepo = new PrivilegeRepository()
   private static newLocalsAmount = 0
@@ -61,6 +62,22 @@ export class PlayerService {
   }
 
   /**
+   * Gets player title based on config
+   * @param login Player login
+   * @param country Player nation
+   * @param countryCode Player nation code
+   */
+  static getTitle(login: string, privilege: number, country: string, countryCode: string): string {
+    const loginTitle = titles.logins[login as keyof typeof titles.logins]
+    if (loginTitle !== undefined) { return loginTitle }
+    const countryTitle = titles.countries[country as keyof typeof titles.countries]
+    if (countryTitle !== undefined) { return countryTitle }
+    const countryCodeTitle = titles.countries[countryCode as keyof typeof titles.countries]
+    if (countryCodeTitle !== undefined) { return countryCodeTitle }
+    return titles.privileges[privilege as keyof typeof titles.privileges]
+  }
+
+  /**
    * Adds a player into the list and database
    * @param login Player login
    * @param nickname Player nickname
@@ -74,18 +91,15 @@ export class PlayerService {
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
     ladderPoints: number, ladderRank: number, serverStart?: true): Promise<JoinInfo> {
-    let s: string[] = fullRegion.split('|').slice(1)
-    const region: string = s.join('|')
-    const country: string = s[0]
-    let countryCode: string | undefined = Utils.countryToCode(country)
+    const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
       await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
       return {} as any // Shut up IDE
     }
-    const playerData: TMOfflinePlayer | undefined = await this.repo.get(login)
+    const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
-    let player: TMPlayer
+    let player: tm.Player
     const index: number = this.ranks.indexOf(login)
     if (playerData === undefined) {
       player = {
@@ -107,7 +121,8 @@ export class PlayerService {
         average: RecordService.maxLocalsAmount,
         ladderPoints,
         ladderRank,
-        rank: index === -1 ? undefined : (index + 1)
+        rank: index === -1 ? undefined : (index + 1),
+        title: this.getTitle(login, privilege, country, countryCode)
       }
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
@@ -131,7 +146,8 @@ export class PlayerService {
         rank: index === -1 ? undefined : (index + 1),
         average: playerData.average,
         ladderPoints,
-        ladderRank
+        ladderRank,
+        title: this.getTitle(login, privilege, country, countryCode)
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
@@ -141,6 +157,23 @@ export class PlayerService {
         `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
+  }
+
+  /**
+   * Updates the player information in runtime memory and the database
+   * @param players Objects containing player login and infos to change
+   */
+  static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
+    for (const p of players) {
+      const obj = this._players.find(a => a.login === p.login)
+      if (obj === undefined) { continue }
+      if (p.title !== undefined) { obj.title = p.title }
+      const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
+      if (p.nickname !== undefined || countryCode !== undefined) {
+        const r = countryCode === undefined ? obj.region : region // Set only if region is valid
+        await this.repo.updateNicknameAndRegion(p.login, p.nickname ?? obj.nickname, r)
+      }
+    }
   }
 
   /**
@@ -155,7 +188,7 @@ export class PlayerService {
       Logger.error(errStr)
       return new Error(errStr)
     }
-    const player: TMPlayer | undefined = this._players[playerIndex]
+    const player: tm.Player | undefined = this._players[playerIndex]
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: LeaveInfo = {
@@ -174,7 +207,7 @@ export class PlayerService {
    * @param player Player object
    * @param cp Checkpoint object
    */
-  static addCP(player: TMPlayer, cp: TMCheckpoint): Error | boolean {
+  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean {
     let laps
     if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
@@ -209,7 +242,7 @@ export class PlayerService {
    * @returns True if successfull
    */
   static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
-    const player: TMPlayer | undefined = this._players.find(a => a.login === login)
+    const player: tm.Player | undefined = this._players.find(a => a.login === login)
     if (player === undefined) { return false }
     player.isSpectator = status
     return true
@@ -248,7 +281,7 @@ export class PlayerService {
       let newRank: number = localRecords.findIndex(a => a.login === avg.login) + 1
       // Calculate average
       const average: number = (amount * avg.average + newRank - previousRank) / amount
-      const onlinePlayer: TMPlayer | undefined = this.get(avg.login)
+      const onlinePlayer: tm.Player | undefined = this.get(avg.login)
       if (onlinePlayer !== undefined) { // Set average in runtime if player is online
         onlinePlayer.average = average
       }
@@ -265,15 +298,15 @@ export class PlayerService {
    * @param login Player login
    * @returns Player object or undefined if player is not in the database
    */
-  static fetch(login: string): Promise<TMOfflinePlayer | undefined>
+  static fetch(login: string): Promise<tm.OfflinePlayer | undefined>
   /**
    * Fetches multiple players from the database. This method should be used to get players who are not online
    * If some player is not present in the database he won't be returned. Returned array is not in initial order
    * @param logins Array of player logins
    * @returns Player objects array 
    */
-  static fetch(logins: string[]): Promise<TMOfflinePlayer[]>
-  static fetch(logins: string | string[]): Promise<TMOfflinePlayer | undefined | TMOfflinePlayer[]> {
+  static fetch(logins: string[]): Promise<tm.OfflinePlayer[]>
+  static fetch(logins: string | string[]): Promise<tm.OfflinePlayer | undefined | tm.OfflinePlayer[]> {
     return this.repo.get(logins as any)
   }
 
@@ -282,16 +315,16 @@ export class PlayerService {
    * @param login Player login
    * @returns Player object or undefined if the player isn't online
    */
-  static get(login: string): Readonly<TMPlayer & { currentCheckpoints: Readonly<Readonly<TMCheckpoint>[]> }> | undefined
+  static get(login: string): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined
   /**
    * Gets multiple players information from runtime memory. Only online players are stored
    * If some player is not online he won't be returned. Returned array is not in initial order
    * @param logins Array of player logins
    * @returns Array of player objects
    */
-  static get(logins: string[]): Readonly<TMPlayer & { currentCheckpoints: Readonly<Readonly<TMCheckpoint>[]> }>[]
-  static get(logins: string | string[]): Readonly<TMPlayer & { currentCheckpoints: Readonly<Readonly<TMCheckpoint>[]> }> | undefined |
-    Readonly<TMPlayer & { currentCheckpoints: Readonly<Readonly<TMCheckpoint>[]> }>[] {
+  static get(logins: string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[]
+  static get(logins: string | string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined |
+    Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[] {
     if (typeof logins === 'string') {
       return this._players.find(a => a.login === logins)
     }
@@ -301,7 +334,7 @@ export class PlayerService {
   /**
    * @returns All online players
    */
-  static get players(): Readonly<TMPlayer & { currentCheckpoints: Readonly<TMCheckpoint>[] }>[] {
+  static get players(): Readonly<tm.Player & { currentCheckpoints: Readonly<tm.Checkpoint>[] }>[] {
     return [...this._players]
   }
 

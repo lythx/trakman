@@ -1,5 +1,4 @@
 import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
-import { trakman as tm } from '../../../../src/Trakman.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'
@@ -45,7 +44,7 @@ export default class TMXRanking extends StaticComponent {
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
-    const tmxInfo: TMXMapInfo | null = tmx.current
+    const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {
       replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }
