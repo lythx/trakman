@@ -1,46 +1,6 @@
 import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
 
-const createQuery: string = `
-CREATE TABLE IF NOT EXISTS maps(
-  id INT4 NOT NULL,
-  name VARCHAR(60) NOT NULL,
-  filename VARCHAR(255) NOT NULL UNIQUE,
-  author VARCHAR(40) NOT NULL,
-  environment INT2 NOT NULL,
-  mood INT2 NOT NULL,
-  bronze_time INT4 NOT NULL,
-  silver_time INT4 NOT NULL,
-  gold_time INT4 NOT NULL,
-  author_time INT4 NOT NULL,
-  copper_price INT4 NOT NULL,
-  is_lap_race BOOLEAN NOT NULL,
-  add_date TIMESTAMP NOT NULL,
-  leaderboard_rating INT4,
-  awards INT2,
-  laps_amount INT2,
-  checkpoints_amount INT2,
-  PRIMARY KEY(id),
-  CONSTRAINT fk_map_id
-    FOREIGN KEY(id) 
-	    REFERENCES map_ids(id)
-);`
-
-// TODO fix this later probably
-const voteCreateQuery = `CREATE TABLE IF NOT EXISTS votes(
-  map_id INT4 NOT NULL,
-  player_id INT4 NOT NULL,
-  vote INT2 NOT NULL,
-  date TIMESTAMP NOT NULL,
-  PRIMARY KEY(map_id, player_id),
-  CONSTRAINT fk_player_id
-    FOREIGN KEY(player_id) 
-      REFERENCES players(id),
-  CONSTRAINT fk_map_id
-    FOREIGN KEY(map_id)
-      REFERENCES map_ids(id)
-);`
-
 interface TableEntry {
   readonly uid: string
   readonly name: string
@@ -83,13 +43,6 @@ const environments = {
 const mapIdsRepo = new MapIdsRepository()
 
 export class MapRepository extends Repository {
-
-  async initialize(): Promise<void> {
-    await mapIdsRepo.initialize()
-    await super.initialize(createQuery)
-    // This service joins vote service which gets initialized later therefore table needs to be created here
-    await this.query(voteCreateQuery)
-  }
 
   async add(...maps: tm.Map[]): Promise<void> {
     if (maps.length === 0) { return }

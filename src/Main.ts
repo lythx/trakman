@@ -1,5 +1,6 @@
 import './Trakman.js'
 import { Client } from './client/Client.js'
+import { Database } from './database/DB.js'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 import { Listeners } from './Listeners.js'
@@ -11,7 +12,7 @@ import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
-import { fixCoherence } from './FixRankCoherence.js'
+import { fixRankCoherence } from './FixRankCoherence.js'
 import config from '../config/Server.js'
 await import('../Plugins.js')
 
@@ -30,7 +31,9 @@ async function main(): Promise<void> {
   ])
   if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
   Logger.trace('Authentication success')
-  // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Logger.trace('Initializing database...')
+  Database.initialize()
+  Logger.trace('Database initialized...')
   //if (process.env.FIX_RANK_COHERENCE === "YES") { await fixCoherence() }
   Logger.trace('Retrieving game info...')
   await GameService.initialize()

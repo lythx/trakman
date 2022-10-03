@@ -14,7 +14,6 @@ export abstract class VoteService {
    * Fetches votes for current and next maps
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
     const res: tm.Vote[] = await this.repo.getAll()
     const maps = [MapService.current, ...MapService.queue]
     for (let i: number = 0; i < this.prefetchCount + 1; i++) {

@@ -21,7 +21,6 @@ export class RecordService {
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
     await this.fetchAndStoreRecords(MapService.current.id)
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed

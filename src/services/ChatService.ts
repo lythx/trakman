@@ -23,7 +23,6 @@ export abstract class ChatService {
    * Fetches messages from database
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
     this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
   }
 
