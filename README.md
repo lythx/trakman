@@ -1,24 +1,21 @@
-## TRAKMAN
+# TRAKMAN
 Trackmania Forever server controller written in TypeScript
 
-Info about plugin development can be found on the [project wiki](https://github.com/felacek/trakman/wiki)
-
+Info about included plugins and general plugin development can be found on the [project wiki](https://github.com/felacek/trakman/wiki)
 ### Prerequisites
+- [Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip) Trackmania Forever dedicated server
 - [Latest](https://nodejs.org/en/download/current/) Node.js
-
 - [Latest](https://www.postgresql.org/download/) PostgreSQL
 
-On Linux, those should be available in your repos by default (see [[1]](https://repology.org/project/nodejs/versions) and [[2]](https://repology.org/project/postgresql/versions), unless you're using a distro with prehistoric package versions (sometimes people call it [Debian](https://packages.debian.org/bookworm/nodejs)).
+On Linux, relevant versions of Node & Postgres should be available in your distro's repositories by default (see [[1]](https://repology.org/project/nodejs/versions),  [[2]](https://repology.org/project/postgresql/versions)), that might not be the case if you are a [Debian](https://packages.debian.org/bookworm/nodejs) user.
 
-On Windows, the installation instructions might be a little goofy and I'm not willing to look for it to satisfy the minority.
-
+On Windows, the installation instructions might be a little goofy, thus you are adviced to look into it by yourself (it is never a good idea though).
 ### Install & Run
 1. Get a hold of the current main branch via `git clone` or by downloading the source
 2. `$ npm i` to install all the dependencies
 3. Open `config` directory and configure the [settings](#settings)
 4. `$ npm run build` to [compile](https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html#compiling-your-code) the code
 5. `$ npm run start` to run the controller
-
 ### Settings
 The `config` directory is split into multiple files:
 ##### Server.js
@@ -78,7 +75,6 @@ If you want to use the Discord logging feature, please [take a look at the Disco
 - `discordWebhookUrl` - URL for the Discord webhook you have created
 - `discordEmbedImages` - List of image URLs to be used in the Discord embed
 - `discordTaggedUsers` - List of users to be mentioned when the controller crashes (fatal error)
-
 ### Limitations
 1. Stunts mode is not supported (yet?)
 2. Rounds/teams/cup mode is not supported by the UI (yet)
