@@ -126,10 +126,17 @@ export class RecordService {
    * @param players Objects containing player logins and nicknames
    */
   static updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): void {
-    const replaceInfos = (obj: { nickname: string, region: string, title?: string },
+    const replaceInfos = (obj: { nickname: string, region: string, country: string, countryCode: string, title?: string },
       replacer: { nickname?: string, region?: string, title?: string }) => {
       if (replacer.nickname !== undefined) { obj.nickname = replacer.nickname }
-      if (replacer.region !== undefined) { obj.region = replacer.region } // todo country and country code
+      if (replacer.region !== undefined) {
+        const { region, country, countryCode } = Utils.getRegionInfo(replacer.region)
+        if (countryCode !== undefined) {
+          obj.region = region
+          obj.country = country
+          obj.countryCode = countryCode
+        }
+      }
       if (replacer.title !== undefined && obj.title !== undefined) { obj.title = replacer.title }
     }
     for (const p of players) {

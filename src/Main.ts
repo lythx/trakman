@@ -19,7 +19,7 @@ async function main(): Promise<void> {
   await Logger.initialize()
   Logger.info('Starting the controller...')
   Logger.trace('Establishing connection with the dedicated server...')
-  await Client.connect(config.serverAddress, Number(config.serverPort))
+  await Client.connect(config.serverAddress, config.serverPort)
   Logger.trace('Connection with the dedicated server established')
   Logger.trace('Authenticating...')
   if (config.superAdminName === undefined) { await Logger.fatal('superAdminName is undefined. Check your server config file') }

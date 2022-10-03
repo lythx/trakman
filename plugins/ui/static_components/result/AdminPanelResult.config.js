@@ -3,7 +3,7 @@ import icons from '../../config/Icons.js'
 const p = tm.utils.palette
 
 export default {
-  height: 6,
+  height: 5,
   width: cfg.width,
   privilege: 1,
   margin: cfg.margin,
