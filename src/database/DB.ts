@@ -10,7 +10,7 @@ export class Database {
     password: config.dbPassword,
     database: config.dbName,
     host: config.dbAddress,
-    port: Number(config.dbPort)
+    port: config.dbPort
   })
   private client: postgres.Pool | postgres.PoolClient = Database.pool
 

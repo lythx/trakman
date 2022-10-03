@@ -55,16 +55,13 @@ export abstract class Logger {
     },
   }
   private static crashed: boolean = false
-  private static readonly useDiscord: boolean = config.discordEnabled === true
+  private static readonly useDiscord: boolean = config.discordEnabled
   private static webhook: WebhookClient
   private static discordLogLevel: number
   private static isFirstLog: boolean = true
 
   static async initialize(): Promise<void> {
-    this.logLevel = Number(config.logLevel)
-    if (isNaN(this.logLevel)) {
-      throw new Error('Error while initializing logger: LOG_LEVEL is not a number. Check if its set in the .env file.')
-    }
+    this.logLevel = config.logLevel
     await fs.mkdir(this.logDir).catch((err: Error): void => {
       if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
@@ -79,11 +76,13 @@ export abstract class Logger {
     if (this.useDiscord === true) {
       this.discordLogLevel = Number(config.discordLogLevel)
       if (isNaN(this.discordLogLevel)) {
-        await this.fatal('DISCORD_LOG_LEVEL is undefined or not a number. Check your .env file')
+        this.error('discordLogLevel is undefined or not a number,' +
+          ' set it in logging config to use discord logging')
         return
       }
       if (config.discordWebhookUrl === undefined) {
-        await this.fatal('DISCORD_WEEBHOOK_URL is undefined. Check your .env file')
+        this.error('discordWebhookUrl is undefined,' +
+          ' set it in logging config to use discord logging')
         return
       }
       this.webhook = new WebhookClient({ url: config.discordWebhookUrl })
