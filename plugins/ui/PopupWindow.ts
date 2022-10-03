@@ -49,7 +49,13 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
       if (info.actionId === this.openId) { this.onOpen(info) }
-      else if (info.actionId === this.closeId) { this.onClose(info) }
+      else if (info.actionId === this.closeId) { 
+        const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+        if (index !== -1) {
+          PopupWindow.playersWithWindowOpen.splice(index, 1)
+        }
+        this.onClose(info)
+       }
     })
     tm.addListener('PlayerLeave', (info: LeaveInfo) => {
       const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
@@ -64,10 +70,6 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   protected onClose(info: ManialinkClickInfo): void {
-    const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
-    if (index !== -1) {
-      PopupWindow.playersWithWindowOpen.splice(index, 1)
-    }
     this.hideToPlayer(info.login)
   }
 

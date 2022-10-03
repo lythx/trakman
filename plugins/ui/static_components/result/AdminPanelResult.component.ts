@@ -1,7 +1,6 @@
 import { IDS, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanelResult.config.js'
-// todo u cant do some of these things on result right
 
 export default class AdminPanelResult extends StaticComponent {
 

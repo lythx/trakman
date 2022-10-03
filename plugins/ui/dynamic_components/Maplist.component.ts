@@ -175,10 +175,6 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       this.playerQueries[index].paginator.destroy()
       this.playerQueries.splice(index, 1)
     }
-    const index2 = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
-    if (index2 !== -1) { // TODO SEPEARATE
-      PopupWindow.playersWithWindowOpen.splice(index2, 1)
-    }
     this.hideToPlayer(info.login)
   }
 
