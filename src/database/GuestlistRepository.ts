@@ -1,16 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
 
-const createQuery: string = `CREATE TABLE IF NOT EXISTS guestlist(
-    login VARCHAR(25) NOT NULL,
-    date TIMESTAMP NOT NULL,
-    caller_id INT4 NOT NULL,
-    PRIMARY KEY(login),
-    CONSTRAINT fk_caller_id
-      FOREIGN KEY(caller_id)
-	      REFERENCES players(id)
-);`
-
 interface TableEntry {
   readonly login: string
   readonly nickname: string | null
@@ -22,11 +12,6 @@ interface TableEntry {
 const playerRepo = new PlayerRepository()
 
 export class GuestlistRepository extends Repository {
-
-  async initialize(): Promise<void> {
-    playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
 
   async get(): Promise<tm.GuestlistEntry[]> {
     const query: string = `SELECT guestlist.login, player.nickname, date, caller.login AS caller_login, 

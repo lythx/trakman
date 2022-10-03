@@ -3,22 +3,6 @@ import { MapIdsRepository } from './MapIdsRepository.js'
 import { PlayerRepository } from './PlayerRepository.js'
 import { Utils } from '../Utils.js'
 
-const createQuery: string = `
-  CREATE TABLE IF NOT EXISTS records(
-      map_id INT4 NOT NULL,
-      player_id INT4 NOT NULL,
-      time INT4 NOT NULL,
-      checkpoints INT4[] NOT NULL,
-      date TIMESTAMP NOT NULL,
-      PRIMARY KEY(map_id, player_id),
-      CONSTRAINT fk_player_id
-        FOREIGN KEY(player_id) 
-	        REFERENCES players(id),
-      CONSTRAINT fk_map_id
-        FOREIGN KEY(map_id)
-          REFERENCES map_ids(id)
-  );`
-
 const mapIdsRepo = new MapIdsRepository()
 const playerRepo = new PlayerRepository()
 
@@ -45,12 +29,6 @@ type TableEntryWithPlayerInfo = TableEntry & {
 }
 
 export class RecordRepository extends Repository {
-
-  async initialize(): Promise<void> {
-    await mapIdsRepo.initialize()
-    await playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
 
   async add(...records: RecordInfo[]): Promise<void> {
     if (records.length === 0) { return }

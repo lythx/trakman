@@ -2,20 +2,6 @@ import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
 
-const createQuery: string = `
-CREATE TABLE IF NOT EXISTS votes(
-    map_id INT4 NOT NULL,
-    player_id INT4 NOT NULL,
-    vote INT2 NOT NULL,
-    date TIMESTAMP NOT NULL,
-    PRIMARY KEY(map_id, player_id),
-    CONSTRAINT fk_player_id
-      FOREIGN KEY(player_id) 
-        REFERENCES players(id),
-    CONSTRAINT fk_map_id
-      FOREIGN KEY(map_id)
-        REFERENCES map_ids(id)
-);`
 interface TableEntry {
   readonly uid: string
   readonly login: string
@@ -35,12 +21,6 @@ const tableVotes = {
 } as const
 
 export class VoteRepository extends Repository {
-
-  async initialize(): Promise<void> {
-    await mapIdsRepo.initialize()
-    await playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
 
   async add(...votes: tm.Vote[]): Promise<void> {
     if (votes.length === 0) { return }

@@ -28,7 +28,6 @@ export class MapService {
    * Creates maplist, sets current map and adds a proxy for Match Settings update
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
     await this.createList()
     await this.setCurrent()
     this.fillQueue()

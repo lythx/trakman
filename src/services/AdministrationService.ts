@@ -31,12 +31,7 @@ export class AdministrationService {
   static readonly addGuestPrivilege = config.privileges.addGuest
 
   static async initialize(): Promise<void> {
-    await this.privilegeRepo.initialize()
     void this.setOwner()
-    await this.banlistRepo.initialize()
-    await this.blacklistRepo.initialize()
-    await this.mutelistRepo.initialize()
-    await this.guestlistRepo.initialize()
     this.banOnJoin = await this.banlistRepo.get()
     this._blacklist = await this.blacklistRepo.get()
     this.muteOnJoin = await this.mutelistRepo.get()

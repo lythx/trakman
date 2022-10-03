@@ -18,10 +18,7 @@ import prefixes from '../config/Prefixes.js'
 import controllerConfig from '../config/Config.js'
 
 const playerIdsRepo: PlayerRepository = new PlayerRepository()
-await playerIdsRepo.initialize()
-
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
-await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 
@@ -56,7 +53,7 @@ namespace trakman {
      */
     async getClient(): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> {
       const db = new Database()
-      await db.initializeClient()
+      await db.enableClient()
       return async (query: string, ...params: any[]): Promise<any[] | Error> => {
         const res = await db.query(query, ...params).catch((err: Error) => err)
         if (res instanceof Error) {
@@ -369,7 +366,7 @@ namespace trakman {
     return Utils.multiCall(...calls)
   }
 
-  //CHANGE LATER
+  //CHANGE LATER TODO
   /**
    * Calls multiple dedicated server methods simultaneously without caring for the response
    * @param calls Array of dedicated server calls
