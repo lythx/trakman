@@ -29,8 +29,8 @@ export class VoteSkip extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.commands.add({
-      aliases: ['r', 'res', 'replay'],
-      help: 'Start a vote to replay the ongoing map',
+      aliases: ['s', 'skip'],
+      help: 'Start a vote to skip the ongoing map',
       callback: info => {
         this.handleClick(info.login, info.nickname)
       },
