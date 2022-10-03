@@ -250,6 +250,45 @@ if (config.isEnabled === true) {
   })
 }
 
+/**
+ * Gets the players maniakarma vote on the current map
+ * @param login Player login
+ * @returns Vote object or undefined if the player didn't vote
+ */
+function getVote(login: string): MKVote | undefined
+/**
+ * Gets multiple maniakarma votes on the current map
+ * @param logins Array of player logins
+ * @returns Array of vote objects
+ */
+function getVote(logins: string[]): MKVote[]
+function getVote(logins: string | string[]): MKVote | MKVote[] | undefined {
+  if (typeof logins === 'string') {
+    return playerVotes.find(a => a.login === logins)
+  }
+  return playerVotes.filter(a => logins.includes(a.login))
+}
+
+/**
+ * Gets the players new maniakarma vote on the current map
+ * @param login Player login
+ * @returns Vote object or undefined if the player didn't change his vote in this round
+ */
+function getNewVote(login: string): MKVote | undefined
+/**
+ * Gets multiple new maniakarma votes on the current map
+ * @param logins Array of player logins
+ * @returns Array of vote objects
+ */
+function getNewVote(logins: string[]): MKVote[]
+function getNewVote(logins: string | string[]): MKVote | MKVote[] | undefined {
+  if (typeof logins === 'string') {
+    return newVotes.find(a => a.login === logins)
+  }
+  return newVotes.filter(a => logins.includes(a.login))
+}
+
+
 export const maniakarma = {
 
   /**
@@ -276,19 +315,9 @@ export const maniakarma = {
     playerFetchListeners.push(callback)
   },
 
-  getVote(logins: string | string[]) {
-    if (typeof logins === 'string') {
-      return playerVotes.find(a => a.login === logins)
-    }
-    return playerVotes.filter(a => logins.includes(a.login))
-  },
+  getVote,
 
-  getNewVote(logins: string | string[]) {
-    if (typeof logins === 'string') {
-      return newVotes.find(a => a.login === logins)
-    }
-    return newVotes.filter(a => logins.includes(a.login))
-  },
+  getNewVote,
 
   get votes(): Readonly<MKVote>[] {
     return [...playerVotes]
