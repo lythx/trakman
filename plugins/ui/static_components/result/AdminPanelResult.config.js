@@ -28,7 +28,7 @@ export default {
   },
   messages: {
     requeue: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the ongoing map.`,
-    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`, // todo more like replayed not requeued right?
+    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`,
     shuffle: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has shuffled the queue.`
   }
 }

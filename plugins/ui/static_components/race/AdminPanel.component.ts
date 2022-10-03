@@ -51,7 +51,6 @@ export default class AdminPanel extends StaticComponent {
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
-      tm.client.callNoRes(`NextChallenge`)
     })
     addManialinkListener(this.id + this.actions.players, info => {
       tm.openManialink(IDS.playerList, info.login)
