@@ -72,7 +72,7 @@ export default class CpCounter extends StaticComponent {
     const h = this.header.options
     const timeColour = isFinish === true ? config.colours.finish : config.colours.default
     return `${this.header.constructXml(timeColour + tm.utils.getTimeString(currentTime),
-      config.icon, config.side, { rectangleWidth: w, centerText: true })}
+      config.iconBottom, config.side, { rectangleWidth: w, centerText: true })}
     <frame posn="${w + config.margin * 2 + h.squareWidth} 0 3">
       <quad posn="0 0 3" sizen="${w} ${h.height}" bgcolor="${h.textBackground}"/>
       ${centeredText(config.colours.default + differenceString, w, h.height, h)}
