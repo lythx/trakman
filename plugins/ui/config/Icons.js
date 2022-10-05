@@ -108,5 +108,21 @@ export default {
     "leaderboardRatingNadeo": "https://cdn.discordapp.com/attachments/793464821030322196/1013123035592671262/LeaderboardRatingNadeo.png",
     "trophy": "https://cdn.discordapp.com/attachments/793464821030322196/1013123085580369960/Trophy.png",
     "trophyClassic": "https://cdn.discordapp.com/attachments/793464821030322196/1013123085907529838/TrophyClassic.png",
-    "trophyNadeo": "https://cdn.discordapp.com/attachments/793464821030322196/1013123086226313236/TrophyNadeo.png"
+    "trophyNadeo": "https://cdn.discordapp.com/attachments/793464821030322196/1013123086226313236/TrophyNadeo.png",
+    kick: "https://cdn.discordapp.com/attachments/793464821030322196/1027309808971423794/Kick.png",
+    kickHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309809357312042/KickHover.png",
+    forceSpectatorHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309809810288790/ForceSpectatorHover.png",
+    forceGamingHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309810183590008/ForceGamingHover.png",
+    playerListHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309810548486204/PlayerListHover.png",
+    restartHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309810917584957/RestartHover.png",
+    restart: "https://cdn.discordapp.com/attachments/793464821030322196/1027309811450269706/Restart.png",
+    requeueHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309811815165953/RequeueHover.png",
+    requeue: "https://cdn.discordapp.com/attachments/793464821030322196/1027309812154900500/Requeue.png",
+    mapListHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027309812494651493/MapListHover.png",
+    tagKacky: "https://cdn.discordapp.com/attachments/793464821030322196/1027309854072778833/TagKacky.png",
+    noScreenshot: "https://cdn.discordapp.com/attachments/793464821030322196/1027309854865490000/NoScreenshot.png",
+    waypoint: "https://cdn.discordapp.com/attachments/793464821030322196/1027309855217827880/Waypoint.png",
+    bgGreyOpaque50: "https://cdn.discordapp.com/attachments/793464821030322196/1027309854508986399/GreyOpaque50.png",
+    shuffleHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774141259796/ShuffleHover.png",
+    shuffle: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774577471518/Shuffle.png"
 }

@@ -8,7 +8,7 @@ export default {
   posY: cfg.topBorder,
   side: true,
   title: "Top Hours Played",
-  icon: icons.placeholder,
+  icon: icons.clockList,
   margin: cfg.margin,
   background: cfg.background,
   entries: 5,
