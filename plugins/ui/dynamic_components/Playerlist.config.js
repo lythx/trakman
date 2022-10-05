@@ -20,7 +20,7 @@ export default {
     4: 'FF0'
   },
   icons: {
-    kick: icons.ban, // todo
+    kick: icons.kick,
     ban: icons.ban,
     blacklist: icons.addToBlacklist,
     mute: icons.mute,
@@ -31,15 +31,15 @@ export default {
     forcePlay: icons.forceGaming
   },
   hoverIcons: {
-    kick: icons.ban, // todo
+    kick: icons.kickHover, 
     ban: icons.banHover,
     blacklist: icons.addToBlacklistHover,
     mute: icons.muteHover,
     unmute: icons.unmuteHover,
     addGuest: icons.addGuestHover,
     removeGuest: icons.removeGuestHover,
-    forceSpec: icons.forceSpectator, // todo
-    forcePlay: icons.forceGaming // todo
+    forceSpec: icons.forceSpectatorHover,
+    forcePlay: icons.forceGamingHover
   },
   entries: 15,
   columnProportions: [

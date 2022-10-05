@@ -14,21 +14,21 @@ export default {
   public: true,
   icons: {
     players: icons.playerList,
-    restart: icons.placeholder,
+    restart: icons.restart,
     previous: icons.pageLeft,
-    requeue: icons.payReplay,
+    requeue: icons.requeue,
     skip: icons.pageRight,
     endRound: icons.pageLast,
     jukebox: icons.mapList
   },
   iconsHover: {
-    players: icons.placeholder,
-    restart: icons.placeholder,
+    players: icons.playerListHover,
+    restart: icons.restartHover,
     previous: icons.pageLeftHover,
-    requeue: icons.placeholder, // todon icons
+    requeue: icons.requeueHover,
     skip: icons.pageRightHover,
     endRound: icons.pageLastHover,
-    jukebox: icons.placeholder
+    jukebox: icons.mapListHover
   },
   messages: {
     skip: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,

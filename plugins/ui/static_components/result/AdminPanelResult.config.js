@@ -15,16 +15,16 @@ export default {
   icons: {
     players: icons.playerList,
     previous: icons.pageLeft,
-    requeue: icons.payReplay,
+    requeue: icons.requeue,
     jukebox: icons.mapList,
-    shuffle: icons.placeholder
+    shuffle: icons.shuffle
   },
   iconsHover: {
-    players: icons.placeholder,
+    players: icons.playerListHover,
     previous: icons.pageLeftHover,
-    requeue: icons.placeholder, // todon icons
-    jukebox: icons.placeholder,
-    shuffle: icons.placeholder
+    requeue: icons.requeueHover,
+    jukebox: icons.mapListHover,
+    shuffle: icons.shuffleHover
   },
   messages: {
     requeue: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the ongoing map.`,
