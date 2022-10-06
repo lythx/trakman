@@ -1,6 +1,7 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly uid: string
@@ -23,13 +24,20 @@ const tableVotes = {
 export class VoteRepository extends Repository {
 
   async add(...votes: tm.Vote[]): Promise<void> {
-    if (votes.length === 0) { return }
-    const query = `INSERT INTO votes(map_id, player_id, vote, date) 
-    ${this.getInsertValuesString(4, votes.length)}`
     const mapIds = await mapIdsRepo.get(votes.map(a => a.mapId))
     const playerIds = await playerRepo.getId(votes.map(a => a.login))
+    const arr = votes.filter(a => mapIds.some(b => b.uid === a.mapId) && playerIds.some(b => b.login === a.login))
+    if (arr.length !== votes.length) {
+      Logger.error(`Failed to get ids for maps or players ${votes
+        .filter(a => !(mapIds.some(b => b.uid === a.mapId)
+          && playerIds.some(b => b.login === a.login)))
+          .map(a => `(${a.login}, ${a.mapId})`).join(', ')} while inserting into votes table`)
+    }
+    if (arr.length === 0) { return }
+    const query = `INSERT INTO votes(map_id, player_id, vote, date) 
+    ${this.getInsertValuesString(4, arr.length)}`
     const values: any[] = []
-    for (const [i, vote] of votes.entries()) {
+    for (const [i, vote] of arr.entries()) {
       const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote.vote)?.[0])
       values.push(mapIds[i].id, playerIds[i].id, parsedVote, vote.date)
     }
@@ -40,6 +48,10 @@ export class VoteRepository extends Repository {
     const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
+    if (mapId === undefined || playerId === undefined) {
+      Logger.error(`Failed to get mapId or playerId (${login},${mapUid}) while updating votes table`)
+      return
+    }
     const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote)?.[0])
     await this.query(query, parsedVote, date, mapId, playerId)
   }
@@ -55,12 +67,12 @@ export class VoteRepository extends Repository {
   }
 
   async get(...mapUids: string[]): Promise<tm.Vote[]> {
+    const ids = await mapIdsRepo.get(mapUids)
+    if (ids.length === 0) { return [] }
     const query: string = `SELECT uid, login, vote, date FROM votes 
     JOIN players ON players.id=votes.player_id
     JOIN map_ids ON map_ids.id=votes.map_id
-    WHERE ${mapUids.map((a, i) => `votes.map_id=$${i + 1} OR `).join('').slice(0, -3)}`
-    const ids = await mapIdsRepo.get(mapUids)
-    if (ids.length === 0) { return [] }
+    WHERE ${ids.map((a, i) => `votes.map_id=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...ids.map(a => a.id))
     return res.map(a => this.constructVoteObject(a))
   }

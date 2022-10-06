@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly uid: string
@@ -45,13 +46,18 @@ const mapIdsRepo = new MapIdsRepository()
 export class MapRepository extends Repository {
 
   async add(...maps: tm.Map[]): Promise<void> {
-    if (maps.length === 0) { return }
+    const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
+    const arr = maps.filter(a => ids.some(b => b.uid === a.id))
+    if (arr.length !== maps.length) {
+      Logger.error(`Failed to get ids for maps ${maps
+        .filter(a => !ids.some(b => b.uid === a.id)).join(', ')} while inserting into maps table`)
+    }
+    if (arr.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, maps.length)}`
-    const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)}`
     const values: any[] = []
-    for (const [i, map] of maps.entries()) {
+    for (const [i, map] of arr.entries()) {
       values.push(ids[i].id, map.name,
         map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
         map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate,
@@ -78,16 +84,17 @@ export class MapRepository extends Repository {
     if (typeof mapIds === 'string') {
       isArr = false
       mapIds = [mapIds]
-    } else if (mapIds.length === 0) { return [] }
+    }
+    const ids = await mapIdsRepo.get(mapIds)
+    if (ids.length === 0) { return isArr === true ? [] : undefined }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
     count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     LEFT JOIN votes ON votes.map_id=maps.id
-    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+    WHERE ${ids.map((_, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
-    const ids = await mapIdsRepo.get(mapIds)
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
@@ -127,14 +134,12 @@ export class MapRepository extends Repository {
       isArr = false
       mapIds = [mapIds]
     }
+    const ids = await mapIdsRepo.get(mapIds)
+    if (ids.length === 0) { return isArr === true ? [] : undefined }
     const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote) FROM map_ids
     LEFT JOIN votes ON votes.map_id=map_ids.id
-    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+    WHERE ${ids.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY uid;`
-    const ids = await mapIdsRepo.get(mapIds)
-    if (ids.length === 0) {
-      return isArr ? [] : undefined
-    }
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (isArr === false) {
       return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count }
@@ -143,20 +148,31 @@ export class MapRepository extends Repository {
   }
 
   async remove(...mapIds: string[]): Promise<void> {
-    if (mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
+    if (ids.length !== mapIds.length) {
+      Logger.error(`Failed to get id for maps ${mapIds.map(a => !ids.some(b => b.uid === a))} while removing from maps table`)
+      return
+    }
     await this.query(query, ...ids.map(a => a.id))
   }
 
   async setCpsAndLapsAmount(uid: string, lapsAmount: number, cpsAmount: number): Promise<void> {
     const id = await mapIdsRepo.get(uid)
+    if (id === undefined) {
+      Logger.error(`Failed to get id for map ${uid} while setting cps and laps amount in maps table`)
+      return
+    }
     const query = `UPDATE maps SET laps_amount=$1, checkpoints_amount=$2 WHERE id=$3`
     await this.query(query, lapsAmount, cpsAmount, id)
   }
 
   async setAwardsAndLbRating(uid: string, awards: number, lbRating: number): Promise<void> {
     const id = await mapIdsRepo.get(uid)
+    if (id === undefined) {
+      Logger.error(`Failed to get id for map ${uid} while setting awards and lb rating in maps table`)
+      return
+    }
     const query = `UPDATE maps SET awards=$1, leaderboard_rating=$2 WHERE id=$3`
     await this.query(query, awards, lbRating, id)
   }
