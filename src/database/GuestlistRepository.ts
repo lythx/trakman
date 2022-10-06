@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly login: string
@@ -25,12 +26,20 @@ export class GuestlistRepository extends Repository {
     const query: string = `INSERT INTO guestlist(login, date, caller_id) 
     VALUES($1, $2, $3);`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while inserting into guestlist table`)
+      return
+    }
     await this.query(query, login, date, callerId)
   }
 
   async update(login: string, date: Date, callerLogin: string): Promise<void> {
     const query: string = `UPDATE guestlist SET date=$1, caller_id=$2 WHERE login=$3;`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while updating guestlist table`)
+      return
+    }
     await this.query(query, date, callerId, login)
   }
 

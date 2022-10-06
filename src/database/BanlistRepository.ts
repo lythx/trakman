@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly ip: string
@@ -28,12 +29,20 @@ export class BanlistRepository extends Repository {
     const query: string = `INSERT INTO banlist(ip, login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5, $6);`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while inserting into banlist table`)
+      return
+    }
     await this.query(query, ip, login, date, callerId, reason, expireDate)
   }
 
   async update(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
     const query: string = `UPDATE banlist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE ip=$5 AND login=$6;`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while updating banlist table`)
+      return
+    }
     await this.query(query, date, callerId, reason, expireDate, ip, login)
   }
 

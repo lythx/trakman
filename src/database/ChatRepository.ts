@@ -1,5 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
+import { Logger } from '../Logger.js' 
 
 const playerRepo = new PlayerRepository()
 
@@ -51,6 +52,10 @@ export class ChatRepository extends Repository {
 
   async add(login: string, text: string, date: Date): Promise<void> {
     const id = await playerRepo.getId(login)
+    if (id === undefined) { 
+      Logger.error(`Failed to get id for player ${login} while inserting into chat table`)
+      return
+    }
     const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
     await this.query(query, id, text, date)
   }

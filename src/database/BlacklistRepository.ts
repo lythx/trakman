@@ -1,5 +1,7 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
+import { Logger } from '../Logger.js'
+
 interface TableEntry {
   readonly login: string
   readonly nickname: string | null
@@ -26,12 +28,20 @@ export class BlacklistRepository extends Repository {
     const query: string = `INSERT INTO blacklist(login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5);`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) { 
+      Logger.error(`Failed to get callerId for player ${login} while inserting into blacklist table`)
+      return
+    }
     await this.query(query, login, date, callerId, reason, expireDate)
   }
 
   async update(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
     const query: string = `UPDATE blacklist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE login=$5;`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) { 
+      Logger.error(`Failed to get callerId for player ${login} while updating blacklist table`)
+      return
+    }
     await this.query(query, date, callerId, reason, expireDate, login)
   }
 

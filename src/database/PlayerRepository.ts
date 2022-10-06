@@ -1,6 +1,7 @@
 import { Repository } from './Repository.js'
 import { Utils } from '../Utils.js'
 import { Logger } from '../Logger.js'
+
 interface TableEntry {
   readonly login: string
   readonly nickname: string
