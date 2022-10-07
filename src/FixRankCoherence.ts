@@ -18,17 +18,17 @@ export const fixRankCoherence = async (): Promise<void> => {
   time ASC,
   date ASC;`)).rows
   const maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
-  const records = allRecords.filter(a => maps.some(b => b.id === a.map_id)).map(a => a.player_id)
+  const records = allRecords.filter(a => maps.some(b => b.id === a.map_id))
   const limit = config.localRecordsLimit
   const sums: { id: number, average: number }[] = []
   for (let i = 0; i < playerIds.length; i++) {
     const indexes: number[] = []
     let sum = 0
-    for (let j = 0; j < records.length; j++) { if (records[j] === playerIds[i]) { indexes.push(j) } }
+    for (let j = 0; j < records.length; j++) { if (records[j].player_id === playerIds[i]) { indexes.push(j) } }
     for (let j = 0; j < indexes.length; j++) {
       let position = 1
       for (let k = indexes[j] - 1; k >= 0; k--) {
-        if (records[k] !== playerIds[i]) { break }
+        if (records[k].map_id !== records[indexes[j]].map_id) { break }
         position++
       }
       if (position > limit) {
@@ -37,11 +37,9 @@ export const fixRankCoherence = async (): Promise<void> => {
       sum += position
     }
     sum += (maps.length - indexes.length) * limit
-    if (sum < 0) { console.log(maps.length) }
     sums[i] = { average: sum / maps.length, id: playerIds[i] }
   }
   if (sums.length === 0) { return }
-  console.log('end')
   db.query(`UPDATE players AS p SET
   average = v.average
   FROM (VALUES
