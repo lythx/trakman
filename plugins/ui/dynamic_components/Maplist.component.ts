@@ -278,7 +278,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     return true
   }
 
-  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
+  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> { // TODO
     const records = await tm.records.fetchByMap(...mapIds)
     const positions: number[] = []
     let i = -1
