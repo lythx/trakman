@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   Logger.trace('Initializing database...')
   Database.initialize()
   Logger.trace('Database initialized...')
-  //if (process.env.FIX_RANK_COHERENCE === "YES") { await fixCoherence() }
+  await fixRankCoherence()
   Logger.trace('Retrieving game info...')
   await GameService.initialize()
   Logger.trace('Game info fetched')
