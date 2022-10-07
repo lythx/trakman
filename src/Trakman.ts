@@ -91,6 +91,14 @@ namespace trakman {
 
     getLive: RecordService.getLive.bind(RecordService),
 
+    getFromQueue: RecordService.getFromQueue.bind(RecordService),
+
+    getOneFromQueue: RecordService.getOneFromQueue.bind(RecordService),
+
+    getFromHistory: RecordService.getFromHistory.bind(RecordService),
+
+    getOneFromHistory: RecordService.getOneFromHistory.bind(RecordService),
+
     remove: RecordService.remove.bind(RecordService),
 
     removeAll: RecordService.removeAll.bind(RecordService),

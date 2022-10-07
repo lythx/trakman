@@ -118,7 +118,7 @@ export class RecordRepository extends Repository {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     if (mapId === undefined || playerId === undefined) {
-      Logger.error(`Failed to get mapId or playerId (${login},${mapUid}) while removing from records table`)
+      Logger.error(`Failed to get mapId or playerId (${mapUid},${login}) while removing from records table`)
       return
     }
     const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`

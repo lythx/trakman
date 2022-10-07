@@ -28,7 +28,7 @@ export default class TMXWindow extends PopupWindow<number> {
       this.paginator.setPageCount(this.historyCount + 1 + nextCount)
       this.reRender()
     })
-    tm.addListener('JukeboxChanged', () => this.reRender())
+    tm.addListener('RecordsPrefetch', () => this.reRender())
     tm.commands.add({
       aliases: ['tmxinfo'],
       help: 'Display TMX info.',
@@ -58,21 +58,22 @@ export default class TMXWindow extends PopupWindow<number> {
     let titles: string[]
     const currentPage = Math.ceil((historyCount - 1) / config.itemsPerPage) + 1
     if (currentPage === page) {
-      maps = [tm.jukebox?.history[0], tm.maps.current, tm.jukebox?.queue[0]]
-      TMXMaps = [tmx.history[0], tmx.current, tmx.queue[0]]
+      maps = [tm.jukebox.history?.[0], tm.maps.current, tm.jukebox.queue?.[0]]
+      TMXMaps = [tmx.history?.[0], tmx.current, tmx.queue?.[0]]
       titles = [`${config.titles.previous} #1`, config.titles.current, `${config.titles.next} #1`]
     } else if (currentPage > page) {
       const index = Math.ceil((currentPage - (page + 1)) * config.itemsPerPage) + 1
-      maps = [tm.jukebox.history[index + 2], tm.jukebox.history?.[index + 1], tm.jukebox.history?.[index]]
-      TMXMaps = [tmx.history[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
+      maps = [tm.jukebox.history?.[index + 2], tm.jukebox.history?.[index + 1], tm.jukebox.history?.[index]]
+      TMXMaps = [tmx.history?.[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
       titles = [`${config.titles.previous} #${index + 3}`, `${config.titles.previous} #${index + 2}`, `${config.titles.previous} #${index + 1}`]
     } else {
       const index = Math.ceil((page - (currentPage + 1)) * config.itemsPerPage) + 1
-      maps = [tm.jukebox.queue[index], tm.jukebox.queue?.[index + 1], tm.jukebox.queue?.[index + 2]]
-      TMXMaps = [tmx.queue[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
+      maps = [tm.jukebox.queue?.[index], tm.jukebox.queue?.[index + 1], tm.jukebox.queue?.[index + 2]]
+      TMXMaps = [tmx.queue?.[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
       titles = [`${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`, `${config.titles.next} #${index + 3}`]
     }
-    const allRecords = await tm.records.fetchByMap(...maps.filter(a => a !== undefined).map(a => (a as any).id))
+    const m = maps.filter(a => a !== undefined).map(a => (a as any).id)
+    const allRecords: Readonly<tm.Record[]> = [...tm.records.getFromHistory(...m), ...tm.records.local, ...tm.records.getFromQueue(...m)]
     const cell: GridCellFunction = (i, j, w, h) => {
       const map = maps[j]
       if (map === undefined) { return '' }

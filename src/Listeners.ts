@@ -178,11 +178,11 @@ export class Listeners {
         // Update server parameters
         await GameService.update()
         // Get records for current map
-        await RecordService.fetchAndStoreRecords(map.UId)
         // Check whether the map was restarted
         if (isRestart == false) {
           // In case it wasn't, update the ongoing map
           await MapService.update()
+          await RecordService.nextMap()
           await VoteService.nextMap()
         }
         // Update server config

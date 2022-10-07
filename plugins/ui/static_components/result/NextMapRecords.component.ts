@@ -30,13 +30,13 @@ export default class NextMapRecords extends StaticComponent {
         this.display()
       } else {
         const mapId = tm.jukebox.queue[0].id
-        this.records = await tm.records.fetchByMap(mapId)
+        this.records = tm.records.getFromQueue(mapId)
         this.display()
       }
     })
-    tm.addListener('JukeboxChanged', async () => {
+    tm.addListener('RecordsPrefetch', async () => {
       const mapId = tm.jukebox.queue[0].id
-      this.records = await tm.records.fetchByMap(mapId) // TODO fix after prefetch in source
+      this.records = tm.records.getFromQueue(mapId)
       this.display()
     })
     tm.addListener('PlayerInfoUpdated', (info) => {
