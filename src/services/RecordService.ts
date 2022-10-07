@@ -33,8 +33,7 @@ export class RecordService {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
-    Events.addListener('PlayerChat', () => console.log(JSON.stringify(this._queueRecords, null, 2), JSON.stringify(this._historyRecords, null, 2)))
-  }
+   }
 
   /**
    * Fetches and stores records for current map
