@@ -2,11 +2,9 @@ import fetch from 'node-fetch'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 
-// todo rename
-
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
-export abstract class TMXService {
+export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
@@ -125,7 +123,7 @@ export abstract class TMXService {
       })
     }
     const lastUpdateDate = new Date(s[5])
-    const validReplays = replays.filter(a=> a.mapDate.getTime() === lastUpdateDate.getTime())
+    const validReplays = replays.filter(a => a.mapDate.getTime() === lastUpdateDate.getTime())
     Object.freeze(replays)
     const mapInfo: tm.TMXMap = {
       id: mapId,

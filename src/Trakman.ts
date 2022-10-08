@@ -7,7 +7,7 @@ import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
 import { Database } from './database/DB.js'
-import { TMXService } from './TMXService.js'
+import { TMXFetcher } from './TMXFetcher.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ServerConfig } from './ServerConfig.js'
@@ -69,9 +69,9 @@ namespace trakman {
 
   export const tmx = {
 
-    fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
+    fetchMapInfo: TMXFetcher.fetchMapInfo.bind(TMXFetcher),
 
-    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
+    fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher)
 
   }
 

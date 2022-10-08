@@ -129,7 +129,7 @@ export class MapService {
   }
 
   /**
-   * Sets the awards and leaderboard rating (from TMX). This method is called by TMXService on every map fetch
+   * Sets the awards and leaderboard rating (from TMX). This method is called by TMXFetcher on every map fetch
    * @param uid Map uid
    * @param awards Number of TMX awards
    * @param lbRating TMX leaderboard rating
