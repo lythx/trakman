@@ -180,6 +180,7 @@ declare global {
       readonly isClassic: boolean
       readonly isNadeo: boolean
       readonly replays: TMXReplay[]
+      readonly validReplays: TMXReplay[]
     }
     export interface TMXReplay {
       readonly id: number
@@ -201,7 +202,7 @@ declare global {
     }
     export type LocalRecord = Record & OfflinePlayer
 
-
+    // TODO
     export type MessageInfo = TMMessageInfo
     export type Events = TMEvents
     export type ServerInfo = TMServerInfo

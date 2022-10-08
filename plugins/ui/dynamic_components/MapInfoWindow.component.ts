@@ -86,7 +86,7 @@ export default class TMXWindow extends PopupWindow<number> {
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructInfoXml(ww, hh, map, TMXMap)
-      const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, TMXMap?.replays)
+      const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, TMXMap?.validReplays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
     }
     return `<format textsize="3"/>` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))

@@ -24,13 +24,13 @@ export default class TMXRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     tm.addListener('LiveRecord', (info: FinishInfo): void => {
-      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerJoin', (info: JoinInfo): void => {
-      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
-      if (tmx.current?.replays?.some(a => a.login === info.login)) { this.display() }
+      if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.display() }
     })
   }
 
@@ -46,7 +46,7 @@ export default class TMXRanking extends StaticComponent {
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {
-      replays = tmxInfo.replays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
+      replays = tmxInfo.validReplays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
     }
     tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
