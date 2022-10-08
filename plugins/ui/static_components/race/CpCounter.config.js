@@ -16,14 +16,14 @@ export default {
   noCpsText: 'No Checkpoints',
   noCpsWidth: 10.2,
   defaultDifference: '$CCC-:--.--',
-  finishText: `${p.tmGreen}Finish`,
+  finishText: `$${p.green}Finish`,
   colours: {
-    default: '$CCC',
-    cpsCollected: p.tmGreen,
-    worse: p.tmRed,
-    better: "$00F",
-    equal: p.tmYellow,
-    finish: p.tmGreen
+    default: 'CCC',
+    cpsCollected: p.green,
+    worse: p.red,
+    better: p.purple,
+    equal: p.yellow,
+    finish: p.green
   },
   background: cfg.background,
   finishTextDuration: 3000

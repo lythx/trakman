@@ -73,15 +73,15 @@ const commands: tm.Command[] = [
         return
       }
       tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
-      tm.multiCallNoRes(
-        {
+      tm.client.callNoRes('system.multicall',
+        [{
           method: 'ForceSpectator',
           params: [{ string: login }, { int: 1 }]
         },
         {
           method: 'ForceSpectator',
           params: [{ string: login }, { int: 0 }]
-        }
+        }]
       )
     },
     privilege: config.forcespec.privilege
@@ -101,15 +101,15 @@ const commands: tm.Command[] = [
         adminName: tm.utils.strip(info.nickname),
         name: tm.utils.strip(targetInfo.nickname)
       }), config.forceplay.public ? undefined : info.login)
-      tm.multiCallNoRes(
-        {
+      tm.client.callNoRes('system.multicall',
+        [{
           method: 'ForceSpectator',
           params: [{ string: login }, { int: 2 }]
         },
         {
           method: 'ForceSpectator',
           params: [{ string: login }, { int: 0 }]
-        }
+        }]
       )
     },
     privilege: config.forceplay.privilege

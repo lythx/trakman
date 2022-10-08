@@ -21,9 +21,9 @@ export default {
     { name: 'Local Sectors', actionId: ids.localSectors },
   ],
   colours: {
-    worse: "$F00",
-    better: "$00F",
-    equal: "$FF0"
+    worse: tm.utils.palette.red,
+    better: tm.utils.palette.purple,
+    equal: tm.utils.palette.yellow
   },
   grid: {
     background: "9996",

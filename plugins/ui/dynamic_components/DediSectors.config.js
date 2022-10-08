@@ -1,16 +1,17 @@
 import icons from '../config/Icons.js'
 import ids from '../config/ComponentIds.js'
+const p = tm.utils.palette
 
 export default {
   entries: 15,
   cpsOnFirstPage: 10,
   icon: icons.chartDedi,
   title: "Dedi Sectors",
-  selfColour: "0F0F",
+  selfColour: `${p.green}F`,
   cpColours: {
-    best: "0F0F",
-    worst: "F00F",
-    equal: "FF0F"
+    best: `${p.green}F`,
+    worst: `${p.red}F`,
+    equal: `${p.yellow}F`
   },
   navbar: [
     { name: 'Dedi Checkpoints', actionId: ids.dediCps },

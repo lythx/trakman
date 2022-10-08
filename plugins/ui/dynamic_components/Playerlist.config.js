@@ -14,10 +14,10 @@ export default {
   disabledColour: '333C',
   privilegeColours: {
     0: 'FFF',
-    1: '0F0',
-    2: '00F',
-    3: 'F00', // todo colours
-    4: 'FF0'
+    1: tm.utils.palette.green,
+    2: tm.utils.palette.purple,
+    3: tm.utils.palette.red,
+    4: tm.utils.palette.yellow
   },
   icons: {
     kick: icons.kick,
@@ -31,7 +31,7 @@ export default {
     forcePlay: icons.forceGaming
   },
   hoverIcons: {
-    kick: icons.kickHover, 
+    kick: icons.kickHover,
     ban: icons.banHover,
     blacklist: icons.addToBlacklistHover,
     mute: icons.muteHover,
@@ -60,7 +60,7 @@ export default {
     { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute },
     { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest }
   ],
-  selfColour: "0F0",
+  selfColour: `${p.green}`,
   grid: {
     background: "9996",
     margin: 0.15,

@@ -61,21 +61,21 @@ export default class CpCounter extends StaticComponent {
     if (bestTime !== undefined) {
       const difference = bestTime - currentTime
       if (difference > 0) {
-        differenceString = `${config.colours.better}-${tm.utils.getTimeString(difference)}`
+        differenceString = `$${config.colours.better}-${tm.utils.getTimeString(difference)}`
       } else if (difference === 0) {
-        differenceString = `${config.colours.equal}${tm.utils.getTimeString(difference)}`
+        differenceString = `$${config.colours.equal}${tm.utils.getTimeString(difference)}`
       } else {
-        differenceString = `${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}`
+        differenceString = `$${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}`
       }
     }
     const w = (config.width - config.margin) / 2
     const h = this.header.options
-    const timeColour = isFinish === true ? config.colours.finish : config.colours.default
+    const timeColour = '$' + (isFinish === true ? config.colours.finish : config.colours.default)
     return `${this.header.constructXml(timeColour + tm.utils.getTimeString(currentTime),
       config.iconBottom, config.side, { rectangleWidth: w, centerText: true })}
     <frame posn="${w + config.margin * 2 + h.squareWidth} 0 3">
       <quad posn="0 0 3" sizen="${w} ${h.height}" bgcolor="${h.textBackground}"/>
-      ${centeredText(config.colours.default + differenceString, w, h.height, h)}
+      ${centeredText('$' + config.colours.default + differenceString, w, h.height, h)}
     </frame>`
   }
 
@@ -90,7 +90,7 @@ export default class CpCounter extends StaticComponent {
     const counterW = config.width - (config.rectangleWidth + config.margin)
     let text = config.text
     let rectangleWidth = config.rectangleWidth
-    let counter = `${colour}${params?.index ?? 0}/${cpAmount}`
+    let counter = `$${colour}${params?.index ?? 0}/${cpAmount}`
     if (params?.isFinish === true) {
       counter = config.finishText
       setTimeout(() => this.displayToPlayer(login), config.finishTextDuration)
@@ -109,7 +109,7 @@ export default class CpCounter extends StaticComponent {
         <manialink id="${this.id}">
             <frame posn="${config.posX} ${config.posY} 4">
               <format textsize="1"/>
-              ${this.header.constructXml(config.colours.default + text, config.icon, config.side, { rectangleWidth })}
+              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
                 ${cpAmount === 0 ? '' : this.constructTimeXml(login, params?.isFinish, params?.current, params?.best)}

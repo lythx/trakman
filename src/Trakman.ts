@@ -363,35 +363,6 @@ namespace trakman {
     Events.emit('PlayerInfoUpdated', players)
   }
 
-  //CHANGE LATER TODO
-  /**
-   * Calls multiple dedicated server methods simultaneously and awaits the response
-   * @param calls Array of dedicated server calls
-   * @returns Server response or error if the server returns one
-   */
-  export const multiCall = async (...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> => {
-    return Utils.multiCall(...calls)
-  }
-
-  //CHANGE LATER TODO
-  /**
-   * Calls multiple dedicated server methods simultaneously without caring for the response
-   * @param calls Array of dedicated server calls
-   */
-  export const multiCallNoRes = (...calls: tm.Call[]): void => {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params: any[] = c.params === undefined ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    Client.callNoRes('system.multicall', [{ array: arr }])
-  }
-
   /**
    * Adds a listener to an event to execute callbacks
    * @param event Event to register the callback on
