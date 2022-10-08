@@ -2,6 +2,8 @@ import fetch from 'node-fetch'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
 
+// todo rename
+
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
 export abstract class TMXService {
@@ -122,6 +124,8 @@ export abstract class TMXService {
         url: `https://${prefix}.tm-exchange.com/recordgbx/${rs[0]}`
       })
     }
+    const lastUpdateDate = new Date(s[5])
+    const validReplays = replays.filter(a=> a.mapDate.getTime() === lastUpdateDate.getTime())
     Object.freeze(replays)
     const mapInfo: tm.TMXMap = {
       id: mapId,
@@ -130,7 +134,7 @@ export abstract class TMXService {
       authorId: Number(s[2]),
       author: s[3],
       uploadDate: new Date(s[4]),
-      lastUpdateDate: new Date(s[5]),
+      lastUpdateDate,
       type: s[7],
       environment: s[8],
       mood: s[9],
@@ -149,7 +153,8 @@ export abstract class TMXService {
       screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${TMXId}`,
       thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${TMXId}`,
       downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${TMXId}`,
-      replays
+      replays,
+      validReplays
     }
     if (!Number.isInteger(mapInfo.awards) || !Number.isInteger(mapInfo.leaderboardRating)) {
       Logger.debug(JSON.stringify(mapInfo, null, 2))
