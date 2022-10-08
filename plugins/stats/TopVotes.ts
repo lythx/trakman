@@ -82,7 +82,7 @@ tm.addListener('KarmaVote', (info): void => {
 })
 
 tm.addListener('PlayerJoin', async (info): Promise<void> => {
-  const id: number | undefined = await tm.getPlayerDBId(info.login)
+  const id: number | undefined = await tm.db.getPlayerId(info.login)
   const res: any[] | Error = await tm.db.query(`SELECT count(*) FROM VOTES
       WHERE player_id=$1`, id)
   if (res instanceof Error) {

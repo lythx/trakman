@@ -6,7 +6,7 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
-import { prefixes } from '../../config/Prefixes.js'
+import { prefixes } from '../../config/PrefixesAndPalette.js'
 import { MessageInfo } from '../types/TMMessageInfo.js'
 
 /**

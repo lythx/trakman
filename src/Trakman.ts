@@ -14,10 +14,10 @@ import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
-import prefixes from '../config/Prefixes.js'
+import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 
-const playerIdsRepo: PlayerRepository = new PlayerRepository()
+const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
 
 const DB: Database = new Database()
@@ -29,6 +29,8 @@ namespace trakman {
   export const db = {
 
     getMapId: mapIdsRepo.get.bind(mapIdsRepo),
+
+    getPlayerId: playersRepo.getId.bind(playersRepo),
 
     /**
     * Executes a query on the database
@@ -361,10 +363,7 @@ namespace trakman {
     Events.emit('PlayerInfoUpdated', players)
   }
 
-  // TO BE REMOVED
-  export const getPlayerDBId = playerIdsRepo.getId.bind(playerIdsRepo)
-
-  //CHANGE LATER
+  //CHANGE LATER TODO
   /**
    * Calls multiple dedicated server methods simultaneously and awaits the response
    * @param calls Array of dedicated server calls

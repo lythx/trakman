@@ -1,4 +1,4 @@
-import prefixes from './Prefixes.js'
+import prefixes from './PrefixesAndPalette.js'
 
 const p = prefixes.palette
 

@@ -1,4 +1,4 @@
-import { palette as p } from "../../config/Prefixes.js"
+import { palette as p } from "../../config/PrefixesAndPalette.js"
 
 export default {
   isEnabled: true,
