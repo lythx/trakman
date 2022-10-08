@@ -18,7 +18,7 @@ export default {
   options: ['+++', '++', '+', '-', '--', '---'],
   buttonWidth: 1.7,
   background: cfg.background,
-  selfColour: 'FF0A',
+  selfColour: `${tm.utils.palette.yellow}A`,
   defaultText: '-',
   textScale: 0.65,
   textPadding: 0.1,

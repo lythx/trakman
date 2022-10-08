@@ -8,9 +8,9 @@ export default class CheckpointRecords extends PopupWindow {
   private readonly grid: Grid
   private readonly paginator: Paginator
   private readonly diffColours = {
-    worse: "$F00",
-    better: "$00F",
-    equal: "$FF0"
+    worse: tm.utils.palette.red,
+    better: tm.utils.palette.purple,
+    equal: tm.utils.palette.yellow
   }
 
   constructor() {

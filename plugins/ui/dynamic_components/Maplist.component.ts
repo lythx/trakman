@@ -346,10 +346,10 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>
           <frame posn="${config.iconWidth + width - (config.queueWidth + config.queueNumberWidth)} 0 1">
             <quad posn="0 0 3" sizen="${config.queueWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${centeredText(`${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+            ${centeredText(`$${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           <frame posn="${config.queueWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${config.queueNumberWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+            ${centeredText(`$${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           </frame>
           </frame>`
     }

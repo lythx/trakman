@@ -34,10 +34,10 @@ export class ServerConfig {
       Logger.error(`Failed to fetch system info.`, systemRes.message)
       return
     }
-    const res = await Utils.multiCall(
-      { method: 'GetServerOptions' },
+    const res = await Client.call('system.multicall',
+      [{ method: 'GetServerOptions' },
       { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes[0].ServerLogin }] },
-      { method: 'GetVersion' }
+      { method: 'GetVersion' }]
     )
     if (res instanceof Error) {
       Logger.error('Failed to fetch server info', res.message)

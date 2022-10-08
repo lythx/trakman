@@ -84,15 +84,15 @@ const commands: tm.Command[] = [
     help: 'Update the server players on your position relative to the keyboard.',
     callback: async (info: tm.MessageInfo): Promise<void> => {
       tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
-      await tm.multiCall(
-        {
+      await tm.client.call('system.multicall',
+        [{
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 1 }]
         },
         {
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]
-        })
+        }])
       tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
     },
     privilege: config.afk.privilege

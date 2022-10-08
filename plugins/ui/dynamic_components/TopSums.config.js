@@ -22,7 +22,7 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: "0F0",
+  selfColour: tm.utils.palette.green,
   colours: {
     gold: 'FD0',
     silver: 'CCC',

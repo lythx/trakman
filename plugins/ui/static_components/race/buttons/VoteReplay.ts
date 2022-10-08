@@ -63,7 +63,7 @@ export class VoteReplay extends UiButton {
     const startMsg: string = `${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname)} `
       + `${tm.utils.palette.vote}started a vote to ${tm.utils.palette.highlight}replay ${tm.utils.palette.vote}the ongoing map.`
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal,
-      `${tm.utils.palette.highlight}Vote to ${tm.utils.palette.tmGreen}REPLAY${tm.utils.palette.highlight} the ongoing map`,
+      `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
       startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
