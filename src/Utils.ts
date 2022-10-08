@@ -5,7 +5,7 @@ import countries from './data/Countries.js'
 import { Events } from './Events.js'
 import { PlayerService } from "./services/PlayerService.js"
 import colours from './data/Colours.js'
-import { palette } from '../config/Prefixes.js'
+import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []

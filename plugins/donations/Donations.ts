@@ -63,7 +63,7 @@ async function getFromDB(login: string): Promise<DonationInfo | undefined>
 async function getFromDB(logins: string[]): Promise<DonationInfo[]>
 async function getFromDB(logins: string | string[]): Promise<DonationInfo | undefined | DonationInfo[]> {
   if (typeof logins === 'string') {
-    const id = await tm.getPlayerDBId(logins)
+    const id = await tm.db.getPlayerId(logins)
     if (id === undefined) { return }
     const res = await tm.db.query(`SELECT nickname, date, amount FROM donations
     JOIN players ON players.id=donations.player_id
@@ -80,7 +80,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
       history: res.map(a => ({ amount: a.amount, date: a.date }))
     }
   }
-  const ids = await tm.getPlayerDBId(logins)
+  const ids = await tm.db.getPlayerId(logins)
   if (ids.length === 0) { return [] }
   const res = await tm.db.query(`SELECT login, nickname, date, amount FROM donations
   JOIN players ON players.id=donations.player_id
@@ -104,7 +104,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
 }
 
 const addToDB = async (login: string, amount: number, date: Date): Promise<void> => {
-  const id: number | undefined = await tm.getPlayerDBId(login)
+  const id: number | undefined = await tm.db.getPlayerId(login)
   if (id === undefined) {
     tm.log.error(`Failed to save donation from player ${login} (amount ${amount})`, 'Failed to fetch player DB ID')
     return

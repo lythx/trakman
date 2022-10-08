@@ -97,7 +97,17 @@ export class PlayerRepository extends Repository {
     return res.map(a => a.login)
   }
 
+  /**
+   * Fetches player database id
+   * @param login Player login
+   * @returns Player id or undefined if player is not in database
+   */
   async getId(login: string): Promise<number | undefined>
+  /**
+   * Fetches multiple player database ids
+   * @param logins Array of player logins
+   * @returns Array of objects containing player id and login. If map is not in the database it won't be in the array
+   */
   async getId(logins: string[]): Promise<{ login: string, id: number }[]>
   async getId(logins: string[] | string): Promise<{ login: string, id: number }[] | number | undefined> {
     let isArr = true

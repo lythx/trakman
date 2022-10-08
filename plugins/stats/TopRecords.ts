@@ -55,7 +55,7 @@ async function getFromDB(logins: string | string[]):
   Promise<{ login: string, nickname: string, amount: number } | undefined |
     { login: string, nickname: string, amount: number }[]> {
   if (typeof logins === 'string') {
-    const id = await tm.getPlayerDBId(logins)
+    const id = await tm.db.getPlayerId(logins)
     if (id === undefined) { return }
     const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
     const res = await tm.db.query(`WITH r(player_id, map_id) AS
@@ -71,7 +71,7 @@ async function getFromDB(logins: string | string[]):
     if (res[0] === undefined) { return undefined }
     return { login: logins, nickname: res[0].nickname, amount: res[0].amount }
   }
-  const ids = await tm.getPlayerDBId(logins)
+  const ids = await tm.db.getPlayerId(logins)
   if (ids.length === 0) { return [] }
   const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
   const res = await tm.db.query(`WITH r(player_id, map_id) AS
