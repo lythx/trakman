@@ -36,15 +36,13 @@ const sendLive = async (): Promise<true | Error> => {
     }
   }
   return new Promise((resolve): void => {
-    const req: ClientRequest = http.request(options, function (res): void {
+    const req: ClientRequest = http.request(options, (res): void => {
       if (res.statusCode === 200) {
         resolve(true)
         return
       }
       let data: string = ''
-      res.on('data', function (chunk): void {
-        data += chunk
-      })
+      res.on('data', (chunk): void => { data += chunk })
       tm.log.error(`Couldn't send Freezone Manialive request`)
       res.on('end', (): void => resolve(new Error(data)))
     })
