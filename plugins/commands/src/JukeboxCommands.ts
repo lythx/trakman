@@ -5,7 +5,7 @@ const commands: tm.Command[] = [{
   help: 'Drop the specified track from the map queue',
   params: [{ name: 'index', type: 'int' }],
   callback: (info: tm.MessageInfo, index: number): void => {
-    const map: tm.Map | undefined = tm.jukebox.juked[index + 1]?.map
+    const map: tm.Map | undefined = tm.jukebox.juked[index - 1]?.map
     if (map === undefined) {
       tm.sendMessage(config.dropjukebox.error, info.login)
       return
