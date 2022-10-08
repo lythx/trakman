@@ -166,9 +166,7 @@ export class AdministrationService {
     }
     for (const e of this._blacklist) {
       if (!blacklist.some((a: any): boolean => a.Login === e.login)) {
-        const params: tm.CallParams[] = e.reason === undefined ? [{ string: e.login }] :
-          [{ string: e.login }, { string: e.reason }]
-        const res: any[] | Error = await Client.call('BlackList', params)
+        const res: any[] | Error = await Client.call('BlackList', [{ string: e.login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to add login ${e.login} to blacklist`, `Server responded with error:`, res.message)
         }
