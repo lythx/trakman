@@ -6,16 +6,18 @@ const commands: tm.Command[] = [{
   params: [{ name: 'indexOrValue' }],
   callback: (info: tm.MessageInfo, indexOrValue: string): void => {
     let playerRecord: tm.LocalRecord | undefined
-    if (Number(indexOrValue)) {
-      playerRecord = tm.records.local[Number(indexOrValue) - 1]
-      if (playerRecord === undefined) {
-        tm.sendMessage(tm.utils.strVar(config.delrec.outOfRange, { login: indexOrValue }), info.login)
-        return
-      }
+    const list = tm.records.local
+    const index = Number(indexOrValue) - 1
+    if (!isNaN(index) && index < list.length && index >= 0) {
+      playerRecord = list[index]
     } else {
       playerRecord = tm.records.getLocal(indexOrValue)
       if (playerRecord === undefined) {
-        tm.sendMessage(tm.utils.strVar(config.delrec.noPlayerRecord, { login: indexOrValue }), info.login)
+        if (index < tm.records.maxLocalsAmount) {
+          tm.sendMessage(tm.utils.strVar(config.delrec.outOfRange, { index: indexOrValue }), info.login)
+        } else {
+          tm.sendMessage(tm.utils.strVar(config.delrec.noPlayerRecord, { login: indexOrValue }), info.login)
+        }
         return
       }
     }
