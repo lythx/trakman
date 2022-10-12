@@ -1,4 +1,4 @@
-import colours from '../src/data/Colours.json' assert { type: 'json' }
+import colours from '../src/data/Colours.js'
 
 export const palette = {
   // All admin commands
@@ -28,13 +28,13 @@ export const palette = {
   // Voting messages
   vote: colours.chartreuse,
   // Green
-  tmGreen: '$af4',
+  green: 'af4',
   // Red
-  tmRed: '$e22',
+  red: 'e22',
   // Yellow
-  tmYellow: '$fc1',
+  yellow: 'fc1',
   // Purple
-  tmPurple: '$73f'
+  purple: '4af'
 }
 
 export const prefixes = {

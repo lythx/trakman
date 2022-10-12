@@ -2,21 +2,6 @@ import { Repository } from './Repository.js'
 import { Utils } from '../Utils.js'
 import { Logger } from '../Logger.js'
 
-const createQuery: string = `
-  CREATE TABLE IF NOT EXISTS players(
-    id INT4 GENERATED ALWAYS AS IDENTITY,
-    login VARCHAR(40) NOT NULL UNIQUE,
-    nickname VARCHAR(45) NOT NULL,
-    region VARCHAR(58) NOT NULL,
-    wins INT4 NOT NULL,
-    time_played INT4 NOT NULL,
-    visits INT4 NOT NULL,
-    is_united BOOLEAN NOT NULL,
-    average REAL NOT NULL,
-    last_online TIMESTAMP,
-    PRIMARY KEY(id)
-  );`
-
 interface TableEntry {
   readonly login: string
   readonly nickname: string
@@ -33,11 +18,7 @@ interface TableEntry {
 export class PlayerRepository extends Repository {
 
   readonly cachedIds: { login: string, id: number }[] = []
-
-  async initialize(): Promise<void> {
-    await super.initialize(createQuery)
-  }
-
+  
   async get(login: string): Promise<tm.OfflinePlayer | undefined>
   async get(logins: string[]): Promise<tm.OfflinePlayer[]>
   async get(logins: string | string[]): Promise<tm.OfflinePlayer | tm.OfflinePlayer[] | undefined> {
@@ -116,7 +97,17 @@ export class PlayerRepository extends Repository {
     return res.map(a => a.login)
   }
 
+  /**
+   * Fetches player database id
+   * @param login Player login
+   * @returns Player id or undefined if player is not in database
+   */
   async getId(login: string): Promise<number | undefined>
+  /**
+   * Fetches multiple player database ids
+   * @param logins Array of player logins
+   * @returns Array of objects containing player id and login. If map is not in the database it won't be in the array
+   */
   async getId(logins: string[]): Promise<{ login: string, id: number }[]>
   async getId(logins: string[] | string): Promise<{ login: string, id: number }[] | number | undefined> {
     let isArr = true

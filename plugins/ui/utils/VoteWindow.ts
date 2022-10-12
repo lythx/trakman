@@ -119,7 +119,7 @@ export default class VoteWindow {
       <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
       <quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="0D0F"/>
       <quad posn="${this.margin} ${-this.margin} 4" sizen="${noVotesW - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="F00F"/>
-    </frame>`
+    </frame>` // TODO CONFIG COLOURS
   }
 
   private constructRight(votes: { login: string; vote: boolean; }[], seconds: number) {

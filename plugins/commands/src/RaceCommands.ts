@@ -5,6 +5,7 @@ const commands: tm.Command[] = [
     aliases: ['s', 'skip'],
     help: 'Skip to the next map.',
     callback: (info: tm.MessageInfo): void => {
+      if (tm.state.current === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -17,6 +18,7 @@ const commands: tm.Command[] = [
     aliases: ['r', 'res', 'restart'],
     help: 'Restart the current map.',
     callback: (info: tm.MessageInfo): void => {
+      if (tm.state.current === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.res.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -38,7 +40,6 @@ const commands: tm.Command[] = [
         adminName: tm.utils.strip(info.nickname)
       }), config.prev.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
-      tm.client.callNoRes(`NextChallenge`)
     },
     privilege: config.prev.privilege
   },

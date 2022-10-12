@@ -33,11 +33,9 @@ const fetchPlayer = async (login: string): Promise<{
     }
   }
   return new Promise((resolve): void => {
-    http.request(options, function (res): void {
+    http.request(options, (res): void => {
       let data: string = ''
-      res.on('data', function (chunk): void {
-        data += chunk
-      })
+      res.on('data', (chunk): void => { data += chunk })
       if (res.statusCode === 200) {
         res.on('end', (): void => resolve(JSON.parse(data)))
         return

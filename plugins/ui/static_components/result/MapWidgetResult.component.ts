@@ -1,5 +1,5 @@
 import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
-import flags from '../../config/FlagIcons.json' assert { type: 'json' }
+import flags from '../../config/FlagIcons.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
@@ -69,7 +69,7 @@ export default class MapWidgetResult extends StaticComponent {
       [tm.utils.getTimeString(map.authorTime), ic.authorTime],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
       [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
-      [TMXMap?.replays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.replays[0].time), ic.tmxWr]
+      [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
     ]
     const headerCfg = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {

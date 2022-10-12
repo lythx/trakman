@@ -11,7 +11,7 @@ export default {
   unblacklistIcon: icons.unblacklist,
   unblacklistIconHover: icons.unblacklistHover,
   entries: 15,
-  selfColour: "0F0",
+  selfColour: `${p.green}0`,
   defaultNickname: 'N/A',
   columnProportions: [
     0.6,

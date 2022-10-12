@@ -1,6 +1,6 @@
-// 
+//
 // import ICN from '../config/Icons.js'
-// import BG from '../config/Backgrounds.json' assert { type: 'json' }
+// import BG from '../config/Backgrounds.js'
 
 // const DEFAULT_OPTION_HEIGHT: number = 2
 // const DEFAULT_PADDING: number = 1

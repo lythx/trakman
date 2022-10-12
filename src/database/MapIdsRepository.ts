@@ -1,18 +1,18 @@
 import { Repository } from "./Repository.js"
 
-const createQuery = `CREATE TABLE IF NOT EXISTS map_ids(
-  id INT4 GENERATED ALWAYS AS IDENTITY,
-  uid VARCHAR(27) NOT NULL UNIQUE,
-  PRIMARY KEY(id)
-);`
-
 export class MapIdsRepository extends Repository {
 
-  async initialize() {
-    await super.initialize(createQuery)
-  }
-
+  /**
+   * Fetches map database id
+   * @param mapUid Map uid
+   * @returns Map id or undefined if map is not in database
+   */
   async get(mapUid: string): Promise<number | undefined>
+  /**
+   * Fetches multiple map database ids
+   * @param mapUids Array of map uids
+   * @returns Array of objects containing map id and uid. If map is not in the database it won't be in the array
+   */
   async get(mapUids: string[]): Promise<{ uid: string, id: number }[]>
   async get(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number | undefined> {
     let isArr = true

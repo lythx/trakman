@@ -55,30 +55,30 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         const target = tm.players.list[info.actionId - this.openId - this.actions.forceSpec]
         if (target === undefined) { return }
         if (target.isSpectator === true) { // ForcePlay
-          tm.multiCallNoRes(
-            {
+          tm.client.callNoRes('system.multicall',
+            [{
               method: 'ForceSpectator',
               params: [{ string: target.login }, { int: 2 }]
             },
             {
               method: 'ForceSpectator',
               params: [{ string: target.login }, { int: 0 }]
-            })
+            }])
           tm.sendMessage(tm.utils.strVar(config.messages.forcePlay, {
             title: info.title,
             adminName: tm.utils.strip(info.nickname),
             name: tm.utils.strip(target.nickname)
           }), config.public === true ? undefined : info.login)
         } else { // ForceSpec
-          await tm.multiCall(
-            {
+          await tm.client.call('system.multicall',
+            [{
               method: 'ForceSpectator',
               params: [{ string: target.login }, { int: 1 }]
             },
             {
               method: 'ForceSpectator',
               params: [{ string: target.login }, { int: 0 }]
-            })
+            }])
           tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: target.login }])
           tm.sendMessage(tm.utils.strVar(config.messages.forceSpec, {
             title: info.title,

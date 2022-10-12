@@ -6,8 +6,11 @@ const listeners: ((updatedLogin: string, list: Readonly<{ login: string, nicknam
 const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await tm.db.query(`SELECT count(*)::int as amount, nickname, login FROM records
-  JOIN players ON players.id=records.player_id
+  const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
+  const res: any[] | Error = await tm.db.query(`WITH r(player_id, map_id) AS
+    (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+  SELECT count(*)::int as amount, nickname, login FROM r
+  JOIN players ON players.id=r.player_id
   GROUP BY (nickname, login, last_online)
   ORDER BY amount DESC,
   last_online DESC
@@ -18,6 +21,9 @@ const initialize = async () => {
   }
   topList = res
   onlineList = await getFromDB(tm.players.list.map(a => a.login))
+  for (const e of nicknameChangeListeners) {
+    e([...topList])
+  }
 }
 
 tm.addListener('PlayerInfoUpdated', (info) => {
@@ -49,10 +55,13 @@ async function getFromDB(logins: string | string[]):
   Promise<{ login: string, nickname: string, amount: number } | undefined |
     { login: string, nickname: string, amount: number }[]> {
   if (typeof logins === 'string') {
-    const id = await tm.getPlayerDBId(logins)
+    const id = await tm.db.getPlayerId(logins)
     if (id === undefined) { return }
-    const res = await tm.db.query(`SELECT count(*)::int as amount, nickname FROM records
-    JOIN players ON players.id=records.player_id
+    const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
+    const res = await tm.db.query(`WITH r(player_id, map_id) AS
+      (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+    SELECT count(*)::int as amount, nickname FROM r
+    JOIN players ON players.id=r.player_id
     WHERE player_id=$1
     GROUP BY (nickname, login, last_online)`, id)
     if (res instanceof Error) {
@@ -62,10 +71,13 @@ async function getFromDB(logins: string | string[]):
     if (res[0] === undefined) { return undefined }
     return { login: logins, nickname: res[0].nickname, amount: res[0].amount }
   }
-  const ids = await tm.getPlayerDBId(logins)
+  const ids = await tm.db.getPlayerId(logins)
   if (ids.length === 0) { return [] }
-  const res = await tm.db.query(`SELECT login, count(*)::int as amount, nickname FROM records
-  JOIN players ON players.id=records.player_id
+  const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
+  const res = await tm.db.query(`WITH r(player_id, map_id) AS
+    (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+  SELECT login, count(*)::int as amount, nickname FROM r
+  JOIN players ON players.id=r.player_id
   WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join('').slice(0, -3)}
   GROUP BY (nickname, login, last_online)
   ORDER BY amount DESC`, ...ids.map(a => a.id))
@@ -108,6 +120,8 @@ tm.addListener('LocalRecord', info => {
     }
   }
 })
+
+tm.addListener('MatchSettingsUpdated', () => initialize())
 
 export const topRecords = {
 

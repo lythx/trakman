@@ -1,4 +1,4 @@
-{
+export default {
     "ALG": "https://cdn.discordapp.com/attachments/502122268936110100/994276320773144687/ALG.png",
     "ANG": "https://cdn.discordapp.com/attachments/502122268936110100/994276320982867988/ANG.png",
     "ARG": "https://cdn.discordapp.com/attachments/502122268936110100/994276321184206978/ARG.png",

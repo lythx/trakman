@@ -20,7 +20,7 @@ export default {
     current: 'Ongoing',
     next: 'Next'
   },
-  noScreenshot: icons.placeholder,
+  noScreenshot: icons.noScreenshot,
   notLoaded: `Press DEL if the image\n      doesn't appear`,
   notLoadedTextscale: 0.5,
   margin: 0.15,

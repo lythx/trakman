@@ -11,7 +11,7 @@ export default {
   removeGuestIcon: icons.removeGuest,
   removeGuestIconHover: icons.removeGuestHover,
   entries: 15,
-  selfColour: "0F0",
+  selfColour: p.green,
   defaultNickname: 'N/A',
   columnProportions: [
     0.8,

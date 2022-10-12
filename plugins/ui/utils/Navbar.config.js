@@ -1,4 +1,4 @@
-
+import icons from '../config/Icons.js'
 
 export default {
   height: 3.5,
@@ -6,5 +6,5 @@ export default {
   margin: 0.15,
   padding: 1,
   background: '000C',
-  hoverImage: '' // TODO
+  hoverImage: icons.bgGreyOpaque50
 }

@@ -1,26 +1,11 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
-
-const createQuery: string = `
-  CREATE TABLE IF NOT EXISTS chat(
-      player_id INT4 NOT NULL,
-      message VARCHAR(150) NOT NULL,
-      date TIMESTAMP NOT NULL,
-      PRIMARY KEY(player_id, date),
-      CONSTRAINT fk_player_id
-        FOREIGN KEY(player_id) 
-	        REFERENCES players(id) 
-  );`
+import { Logger } from '../Logger.js' 
 
 const playerRepo = new PlayerRepository()
 
 export class ChatRepository extends Repository {
-
-  async initialize(): Promise<void> {
-    await playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
-
+  
   async get(options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 1
     let limitStr = ''
@@ -67,6 +52,10 @@ export class ChatRepository extends Repository {
 
   async add(login: string, text: string, date: Date): Promise<void> {
     const id = await playerRepo.getId(login)
+    if (id === undefined) { 
+      Logger.error(`Failed to get id for player ${login} while inserting into chat table`)
+      return
+    }
     const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
     await this.query(query, id, text, date)
   }

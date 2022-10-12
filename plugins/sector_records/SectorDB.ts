@@ -36,14 +36,14 @@ const getQueryDBFunction = async (): Promise<(query: string, ...params: any[]) =
 const queryDB = await getQueryDBFunction()
 
 for (const e of createQueries) {
-  queryDB(e)
+  await queryDB(e)
 }
 
 export const allSecsDB = {
 
   async get(mapDBId: number, ...playerLogins: string[]): Promise<{ sectors: (number | undefined)[], login: string, nickname: string }[] | Error> {
     if (playerLogins.length === 0) { return [] }
-    const playerDBIds = await tm.getPlayerDBId(playerLogins)
+    const playerDBIds = await tm.db.getPlayerId(playerLogins)
     const query = `SELECT sectors, login, nickname FROM sector_records
     JOIN players ON players.id=sector_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
@@ -56,14 +56,14 @@ export const allSecsDB = {
   },
 
   async add(mapId: number, login: string, sectors: number[]): Promise<void> {
-    const playerDBId = await tm.getPlayerDBId(login)
+    const playerDBId = await tm.db.getPlayerId(login)
     if (playerDBId === undefined) { return }
     const query = `INSERT INTO sector_records(map_id, player_id, sectors) VALUES($1, $2, $3);`
     await queryDB(query, mapId, playerDBId, sectors)
   },
 
   async update(mapId: number, login: string, sectors: number[]): Promise<void> {
-    const playerDBId = await tm.getPlayerDBId(login)
+    const playerDBId = await tm.db.getPlayerId(login)
     if (playerDBId === undefined) { return }
     const query = `UPDATE sector_records SET sectors=$1 WHERE map_id=$2 AND player_id=$3;`
     await queryDB(query, sectors, mapId, playerDBId)
@@ -93,7 +93,7 @@ export const bestSecsDB = {
 
   async add(mapId: string | number, playerId: string | number, index: number, sector: number, date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
-    const playerDBId = typeof playerId === 'number' ? playerId : await tm.getPlayerDBId(playerId)
+    const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `INSERT INTO best_sector_records(map_id, player_id, index, sector, date) VALUES($1, $2, $3, $4, $5);`
     await queryDB(query, mapDBId, playerDBId, index, sector, date)
@@ -101,7 +101,7 @@ export const bestSecsDB = {
 
   async update(mapId: string | number, playerId: string | number, index: number, sector: number, date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
-    const playerDBId = typeof playerId === 'number' ? playerId : await tm.getPlayerDBId(playerId)
+    const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `UPDATE best_sector_records SET sector=$1, date=$2 WHERE map_id=$3 AND player_id=$4 AND index=$5;`
     await queryDB(query, sector, date, mapDBId, playerDBId, index)

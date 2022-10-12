@@ -11,7 +11,7 @@ export default {
   unmuteIcon: icons.unmute,
   unmuteIconHover: icons.unmuteHover,
   entries: 15,
-  selfColour: "0F0",
+  selfColour: `${p.green}`,
   defaultNickname: 'N/A',
   columnProportions: [
     0.6,

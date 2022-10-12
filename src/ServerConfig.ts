@@ -34,10 +34,10 @@ export class ServerConfig {
       Logger.error(`Failed to fetch system info.`, systemRes.message)
       return
     }
-    const res = await Utils.multiCall(
-      { method: 'GetServerOptions' },
+    const res = await Client.call('system.multicall',
+      [{ method: 'GetServerOptions' },
       { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes[0].ServerLogin }] },
-      { method: 'GetVersion' }
+      { method: 'GetVersion' }]
     )
     if (res instanceof Error) {
       Logger.error('Failed to fetch server info', res.message)
@@ -80,7 +80,7 @@ export class ServerConfig {
       allowMapDownload: options[0].AllowChallengeDownload,
       autoSaveReplays: options[0].AutoSaveReplays,
       // Stuff from PlayerInfo
-      login: loginInfo[0].Login, // Already in .env tho
+      login: loginInfo[0].Login,
       id: loginInfo[0].PlayerId, // Always 0
       zone: loginInfo[0].Path.substring(6), // Remove "World"
       ipAddress: loginInfo[0].IPAddress.split(':')[0], // Throw port away

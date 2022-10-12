@@ -37,7 +37,7 @@ const getQueryDBFunction = async (): Promise<(query: string, ...params: any[]) =
 const queryDB = await getQueryDBFunction()
 
 for (const e of createQueries) {
-  queryDB(e)
+  await queryDB(e)
 }
 
 export const allCpsDB = {
@@ -45,7 +45,7 @@ export const allCpsDB = {
   async get(mapDBId: number, ...playerLogins: string[]):
     Promise<{ checkpoints: (number | undefined)[], login: string, nickname: string }[] | Error> {
     if (playerLogins.length === 0) { return [] }
-    const playerDBIds = await tm.getPlayerDBId(playerLogins)
+    const playerDBIds = await tm.db.getPlayerId(playerLogins)
     const query = `SELECT checkpoints, login, nickname FROM checkpoint_records
     JOIN players ON players.id=checkpoint_records.player_id
     WHERE map_id=$1 AND (${playerDBIds.map((_: any, i: number) => `player_id=$${i + 2} OR `).join('').slice(0, -3)});`
@@ -59,14 +59,14 @@ export const allCpsDB = {
   },
 
   async add(mapId: number, login: string, checkpoints: number[]): Promise<void> {
-    const playerDBId = await tm.getPlayerDBId(login)
+    const playerDBId = await tm.db.getPlayerId(login)
     if (playerDBId === undefined) { return }
     const query = `INSERT INTO checkpoint_records(map_id, player_id, checkpoints) VALUES($1, $2, $3);`
     await queryDB(query, mapId, playerDBId, checkpoints)
   },
 
   async update(mapId: number, login: string, checkpoints: number[]): Promise<void> {
-    const playerDBId = await tm.getPlayerDBId(login)
+    const playerDBId = await tm.db.getPlayerId(login)
     if (playerDBId === undefined) { return }
     const query = `UPDATE checkpoint_records SET checkpoints=$1 WHERE map_id=$2 AND player_id=$3;`
     await queryDB(query, checkpoints, mapId, playerDBId)
@@ -96,7 +96,7 @@ export const bestCpsDB = {
 
   async add(mapId: string | number, playerId: string | number, index: number, checkpoint: number, date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
-    const playerDBId = typeof playerId === 'number' ? playerId : await tm.getPlayerDBId(playerId)
+    const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `INSERT INTO best_checkpoint_records(map_id, player_id, index, checkpoint, date) VALUES($1, $2, $3, $4, $5);`
     await queryDB(query, mapDBId, playerDBId, index, checkpoint, date)
@@ -104,7 +104,7 @@ export const bestCpsDB = {
 
   async update(mapId: string | number, playerId: string | number, index: number, checkpoint: number, date: Date): Promise<void> {
     const mapDBId = typeof mapId === 'number' ? mapId : await tm.db.getMapId(mapId)
-    const playerDBId = typeof playerId === 'number' ? playerId : await tm.getPlayerDBId(playerId)
+    const playerDBId = typeof playerId === 'number' ? playerId : await tm.db.getPlayerId(playerId)
     if (mapDBId === undefined || playerDBId === undefined) { return }
     const query = `UPDATE best_checkpoint_records SET checkpoint=$1, date=$2 WHERE map_id=$3 AND player_id=$4 AND index=$5;`
     await queryDB(query, checkpoint, date, mapDBId, playerDBId, index)
