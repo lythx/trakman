@@ -16,9 +16,10 @@ export default {
      map name is tested both stripped and unstripped from special characters
      Tags are read from top to bottom
      */
-    { authors: ['Fwo Niro'], icon: icons.tagRed }, // TODO ROGLI AND ANDY
+    { authors: ['Fwo Niro'], icon: icons.tagRed }, 
     { authors: ['tony89300'], icon: icons.tagPinkCyan },
-    { names: [/{Kackiest Kacky}*/], icon: icons.tagPinkCyan } // TODO fix regex and icon
+    { names: [/{Kackiest Kacky}*/], icon: icons.tagKacky },
+   // { names: [/{\$w\$i\$f70ARC_}*/], icon: icons.tagOrange } todo
   ],
   icons: {
     header: icons.ongoingMap,

@@ -17,8 +17,8 @@ export default {
     2.8,
     4
   ],
-  selfColour: "0F0F",
-  newestColour: "FF0F",
+  selfColour: `${tm.utils.palette.green}F`,
+  newestColour: `${tm.utils.palette.yellow}F`,
   textScale: 0.87,
   textPadding: 0.2,
   upIcon: icons.pageLeft,

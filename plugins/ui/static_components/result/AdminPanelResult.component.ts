@@ -1,7 +1,6 @@
 import { IDS, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanelResult.config.js'
-// todo u cant do some of these things on result right
 
 export default class AdminPanelResult extends StaticComponent {
 
@@ -43,7 +42,6 @@ export default class AdminPanelResult extends StaticComponent {
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
-      tm.client.callNoRes(`NextChallenge`)
     })
     addManialinkListener(this.id + this.actions.players, info => {
       tm.openManialink(IDS.playerList, info.login)

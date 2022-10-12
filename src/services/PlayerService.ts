@@ -24,8 +24,6 @@ export class PlayerService {
    * Fetches ranks, players and creates playerlist
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
-    await this.privilegeRepo.initialize()
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('LocalRecord', (info: RecordInfo): void => {

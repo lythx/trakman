@@ -1,15 +1,13 @@
 import { Client } from "./client/Client.js"
 import dsc from 'dice-similarity-coeff'
-import specialCharmap from './data/SpecialCharmap.json' assert { type: 'json' }
-import countries from './data/Countries.json' assert { type: 'json' }
+import specialCharmap from './data/SpecialCharmap.js'
+import countries from './data/Countries.js'
 import { Events } from './Events.js'
-import specialTitles from './data/SpecialTitles.json' assert { type: 'json' }
 import { PlayerService } from "./services/PlayerService.js"
-import colours from './data/Colours.json' assert { type: 'json' }
-import { palette } from '../config/Prefixes.js'
+import colours from './data/Colours.js'
+import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
 
-const titles = ['Player', 'Operator', 'Admin', 'Masteradmin', 'Server Owner']
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('BillUpdated', (info: BillUpdatedInfo): void => {
   const billIndex: number = bills.findIndex(a => a.id === info.id)
@@ -61,37 +59,6 @@ export const Utils = {
       pos = -pos
     }
     return prefix + pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
-  },
-
-  /**
-   * Calls multiple dedicated server methods simultaneously and awaits the response
-   * @param calls Array of dedicated server calls
-   * @returns Server response or error if the server returns one
-   */
-  async multiCall(...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params: any[] = c.params === undefined ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    const res: any[] | Error = await Client.call('system.multicall', [{ array: arr }])
-    if (res instanceof Error) {
-      return res
-    }
-    const ret: ({ method: string, params: any[] } | Error)[] = []
-    for (const [i, r] of res.entries()) {
-      if (r.faultCode !== undefined) {
-        ret.push(new Error(`Error in system.multicall in response for call ${calls[i].method}: ${r?.faultString ?? ''} Code: ${r.faultCode}`))
-      } else {
-        ret.push({ method: calls[i].method, params: r })
-      }
-    }
-    return ret
   },
 
   strip(str: string, removeColours: boolean = true): string {

@@ -14,13 +14,13 @@ export default {
   disabledColour: '333C',
   privilegeColours: {
     0: 'FFF',
-    1: '0F0',
-    2: '00F',
-    3: 'F00', // todo colours
-    4: 'FF0'
+    1: tm.utils.palette.green,
+    2: tm.utils.palette.purple,
+    3: tm.utils.palette.red,
+    4: tm.utils.palette.yellow
   },
   icons: {
-    kick: icons.ban, // todo
+    kick: icons.kick,
     ban: icons.ban,
     blacklist: icons.addToBlacklist,
     mute: icons.mute,
@@ -31,15 +31,15 @@ export default {
     forcePlay: icons.forceGaming
   },
   hoverIcons: {
-    kick: icons.ban, // todo
+    kick: icons.kickHover,
     ban: icons.banHover,
     blacklist: icons.addToBlacklistHover,
     mute: icons.muteHover,
     unmute: icons.unmuteHover,
     addGuest: icons.addGuestHover,
     removeGuest: icons.removeGuestHover,
-    forceSpec: icons.forceSpectator, // todo
-    forcePlay: icons.forceGaming // todo
+    forceSpec: icons.forceSpectatorHover,
+    forcePlay: icons.forceGamingHover
   },
   entries: 15,
   columnProportions: [
@@ -60,7 +60,7 @@ export default {
     { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute },
     { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest }
   ],
-  selfColour: "0F0",
+  selfColour: `${p.green}`,
   grid: {
     background: "9996",
     margin: 0.15,

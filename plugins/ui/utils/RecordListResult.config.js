@@ -30,9 +30,9 @@ export default {
   },
   timeColours: {
     slower: "CCCF",
-    faster: "F00F",
-    you: "3F5F",
-    top: "FF0F"
+    faster: `${tm.utils.palette.red}F`,
+    you: `${tm.utils.palette.green}F`,
+    top: `${tm.utils.palette.yellow}F`
   },
   info: {
     iconWidth: 1.7,

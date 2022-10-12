@@ -1,15 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
-
-const createQuery: string = `CREATE TABLE IF NOT EXISTS guestlist(
-    login VARCHAR(25) NOT NULL,
-    date TIMESTAMP NOT NULL,
-    caller_id INT4 NOT NULL,
-    PRIMARY KEY(login),
-    CONSTRAINT fk_caller_id
-      FOREIGN KEY(caller_id)
-	      REFERENCES players(id)
-);`
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly login: string
@@ -23,11 +14,6 @@ const playerRepo = new PlayerRepository()
 
 export class GuestlistRepository extends Repository {
 
-  async initialize(): Promise<void> {
-    playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
-
   async get(): Promise<tm.GuestlistEntry[]> {
     const query: string = `SELECT guestlist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname FROM guestlist
@@ -40,12 +26,20 @@ export class GuestlistRepository extends Repository {
     const query: string = `INSERT INTO guestlist(login, date, caller_id) 
     VALUES($1, $2, $3);`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while inserting into guestlist table`)
+      return
+    }
     await this.query(query, login, date, callerId)
   }
 
   async update(login: string, date: Date, callerLogin: string): Promise<void> {
     const query: string = `UPDATE guestlist SET date=$1, caller_id=$2 WHERE login=$3;`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) {
+      Logger.error(`Failed to get callerId for player ${login} while updating guestlist table`)
+      return
+    }
     await this.query(query, date, callerId, login)
   }
 

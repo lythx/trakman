@@ -1,17 +1,6 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
-
-const createQuery: string = `CREATE TABLE IF NOT EXISTS blacklist(
-    login VARCHAR(25) NOT NULL,
-    date TIMESTAMP NOT NULL,
-    caller_id INT4 NOT NULL,
-    reason VARCHAR(250),
-    expires TIMESTAMP,
-    PRIMARY KEY(login),
-    CONSTRAINT fk_caller_id
-      FOREIGN KEY(caller_id)
-	      REFERENCES players(id)
-);`
+import { Logger } from '../Logger.js'
 
 interface TableEntry {
   readonly login: string
@@ -27,11 +16,6 @@ const playerRepo = new PlayerRepository()
 
 export class BlacklistRepository extends Repository {
 
-  async initialize(): Promise<void> {
-    playerRepo.initialize()
-    await super.initialize(createQuery)
-  }
-
   async get(): Promise<tm.BlacklistEntry[]> {
     const query: string = `SELECT blacklist.login, player.nickname, date, caller.login AS caller_login, 
     caller.nickname AS caller_nickname, reason, expires FROM blacklist
@@ -44,12 +28,20 @@ export class BlacklistRepository extends Repository {
     const query: string = `INSERT INTO blacklist(login, date, caller_id, reason, expires) 
     VALUES($1, $2, $3, $4, $5);`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) { 
+      Logger.error(`Failed to get callerId for player ${login} while inserting into blacklist table`)
+      return
+    }
     await this.query(query, login, date, callerId, reason, expireDate)
   }
 
   async update(login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {
     const query: string = `UPDATE blacklist SET date=$1, caller_id=$2, reason=$3, expires=$4 WHERE login=$5;`
     const callerId = await playerRepo.getId(callerLogin)
+    if (callerId === undefined) { 
+      Logger.error(`Failed to get callerId for player ${login} while updating blacklist table`)
+      return
+    }
     await this.query(query, date, callerId, reason, expireDate, login)
   }
 

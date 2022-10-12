@@ -24,19 +24,45 @@ export abstract class Client {
   /**
    * Calls a dedicated server method and awaits the response
    * @param method Dedicated server method to be executed
-   * @param params Optional params for the dedicated server method
-   * @returns Server response or error if the server returns one
+   * @param params Optional params for the dedicated server method, if method is system.multicall array of Call objects is expected instead
+   * @returns Server response or error if the server returns one, if method is system.multicall array of responses is returned instead
    */
-  static async call(method: string, params: tm.CallParams[] = []): Promise<any[] | Error> {
+  static async call<T extends string>(method: T, params: T extends 'system.multicall' ? tm.Call[] : tm.CallParams[] = []):
+    Promise<T extends 'system.multicall' ? ({ method: string, params: any[] } | Error)[] | Error : any[] | Error> {
+    let callParams: tm.CallParams[] = params
+    if (method === 'system.multicall') {
+      const calls: tm.Call[] = params as any
+      const arr: tm.CallParams[] = []
+      for (const c of calls) {
+        const params: tm.CallParams[] = c.params === undefined ? [] : c.params
+        arr.push({
+          struct: {
+            methodName: { string: c.method },
+            params: { array: params }
+          }
+        })
+      }
+      callParams = [{ array: arr }]
+    }
     this.requestId++ // increment requestId so every request has an unique id
-    const request: ClientRequest = new ClientRequest(method, params)
+    const request: ClientRequest = new ClientRequest(method as string, callParams)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
-    const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method).catch((err: Error) => err)
+    const response: any[] | Error = await this.socket.awaitResponse(this.requestId, method as string).catch((err: Error) => err)
     if (!(response instanceof Error)) {
-      this.callProxies(method, params, response)
+      this.callProxies(method as string, callParams, response)
     }
-    return response
+    if (method !== 'system.multicall') { return response }
+    if (response instanceof Error) { return response }
+    const ret: ({ method: string, params: any[] } | Error)[] = []
+    for (const [i, r] of response.entries()) {
+      if (r.faultCode !== undefined) {
+        ret.push(new Error(`Error in system.multicall in response for call ${(params[i] as tm.Call).method}: ${r?.faultString ?? ''} Code: ${r.faultCode}`))
+      } else {
+        ret.push({ method: (params[i] as tm.Call).method, params: r })
+      }
+    }
+    return ret
   }
 
   /**
@@ -44,12 +70,27 @@ export abstract class Client {
    * @param method Dedicated server method to be executed
    * @param params Optional params for the dedicated server method
    */
-  static callNoRes(method: string, params: tm.CallParams[] = []): void {
+  static callNoRes<T extends string>(method: T, params: T extends 'system.multicall' ? tm.Call[] : tm.CallParams[] = []): void {
+    let callParams: tm.CallParams[] = params
+    if (method === 'system.multicall') {
+      const calls: tm.Call[] = params as any
+      const arr: tm.CallParams[] = []
+      for (const c of calls) {
+        const params: tm.CallParams[] = c.params === undefined ? [] : c.params
+        arr.push({
+          struct: {
+            methodName: { string: c.method },
+            params: { array: params }
+          }
+        })
+      }
+      callParams = [{ array: arr }]
+    }
     this.requestId++
-    const request: ClientRequest = new ClientRequest(method, params)
+    const request: ClientRequest = new ClientRequest(method, callParams)
     const buffer: Buffer = request.getPreparedBuffer(this.requestId)
     this.socket.write(buffer)
-    void this.getProxyResponse(method, params, this.requestId)
+    void this.getProxyResponse(method, callParams, this.requestId)
   }
 
   /**

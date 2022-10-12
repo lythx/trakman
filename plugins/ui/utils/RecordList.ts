@@ -365,9 +365,9 @@ export default class RecordList {
     }
     const cps: number[] | undefined = record.checkpoints
     const colours = {
-      best: '0F0F',
-      worst: 'F00F',
-      equal: 'FF0F'
+      best: `${tm.utils.palette.green}F`,
+      worst: `${tm.utils.palette.red}F`,
+      equal: `${tm.utils.palette.yellow}F`
     }
     if (cps !== undefined) {
       for (let i: number = 0; i < cps.length / this.iCols; i++) {

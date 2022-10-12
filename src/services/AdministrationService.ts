@@ -1,6 +1,7 @@
 import { Logger } from "../Logger.js"
 import { Client } from "../client/Client.js"
 import config from "../../config/Config.js"
+import dbConfig from '../../config/Database.js'
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js"
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
@@ -8,7 +9,6 @@ import { MutelistRepository } from '../database/MutelistRepository.js'
 import { GuestlistRepository } from '../database/GuestlistRepository.js'
 import { PlayerService } from "./PlayerService.js"
 import { Events } from "../Events.js"
-import { Utils } from "../Utils.js"
 
 export class AdministrationService {
 
@@ -31,12 +31,7 @@ export class AdministrationService {
   static readonly addGuestPrivilege = config.privileges.addGuest
 
   static async initialize(): Promise<void> {
-    await this.privilegeRepo.initialize()
     void this.setOwner()
-    await this.banlistRepo.initialize()
-    await this.blacklistRepo.initialize()
-    await this.mutelistRepo.initialize()
-    await this.guestlistRepo.initialize()
     this.banOnJoin = await this.banlistRepo.get()
     this._blacklist = await this.blacklistRepo.get()
     this.muteOnJoin = await this.mutelistRepo.get()
@@ -107,11 +102,7 @@ export class AdministrationService {
    */
   private static async setOwner(): Promise<void> {
     const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
-    const newOwnerLogin: string | undefined = process.env.SERVER_OWNER_LOGIN
-    if (newOwnerLogin === undefined) {
-      await Logger.fatal('SERVER_OWNER_LOGIN is undefined. Check your .env file')
-      return
-    }
+    const newOwnerLogin: string = dbConfig.serverOwnerLogin
     if (oldOwnerLogin !== newOwnerLogin) {
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
       await this.setPrivilege(newOwnerLogin, 4)
@@ -175,9 +166,7 @@ export class AdministrationService {
     }
     for (const e of this._blacklist) {
       if (!blacklist.some((a: any): boolean => a.Login === e.login)) {
-        const params: tm.CallParams[] = e.reason === undefined ? [{ string: e.login }] :
-          [{ string: e.login }, { string: e.reason }]
-        const res: any[] | Error = await Client.call('BlackList', params)
+        const res: any[] | Error = await Client.call('BlackList', [{ string: e.login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to add login ${e.login} to blacklist`, `Server responded with error:`, res.message)
         }

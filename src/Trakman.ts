@@ -7,21 +7,18 @@ import { Client } from './client/Client.js'
 import { ChatService } from './services/ChatService.js'
 import { Utils } from './Utils.js'
 import { Database } from './database/DB.js'
-import { TMXService } from './TMXService.js'
+import { TMXFetcher } from './TMXFetcher.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { ServerConfig } from './ServerConfig.js'
 import { Logger } from './Logger.js'
 import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
-import prefixes from '../config/Prefixes.js'
+import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 
-const playerIdsRepo: PlayerRepository = new PlayerRepository()
-await playerIdsRepo.initialize()
-
+const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
-await mapIdsRepo.initialize()
 
 const DB: Database = new Database()
 
@@ -32,6 +29,8 @@ namespace trakman {
   export const db = {
 
     getMapId: mapIdsRepo.get.bind(mapIdsRepo),
+
+    getPlayerId: playersRepo.getId.bind(playersRepo),
 
     /**
     * Executes a query on the database
@@ -56,7 +55,7 @@ namespace trakman {
      */
     async getClient(): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> {
       const db = new Database()
-      await db.initializeClient()
+      await db.enableClient()
       return async (query: string, ...params: any[]): Promise<any[] | Error> => {
         const res = await db.query(query, ...params).catch((err: Error) => err)
         if (res instanceof Error) {
@@ -70,9 +69,9 @@ namespace trakman {
 
   export const tmx = {
 
-    fetchMapInfo: TMXService.fetchMapInfo.bind(TMXService),
+    fetchMapInfo: TMXFetcher.fetchMapInfo.bind(TMXFetcher),
 
-    fetchMapFile: TMXService.fetchMapFile.bind(TMXService)
+    fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher)
 
   }
 
@@ -93,6 +92,14 @@ namespace trakman {
     getLocal: RecordService.getLocal.bind(RecordService),
 
     getLive: RecordService.getLive.bind(RecordService),
+
+    getFromQueue: RecordService.getFromQueue.bind(RecordService),
+
+    getOneFromQueue: RecordService.getOneFromQueue.bind(RecordService),
+
+    getFromHistory: RecordService.getFromHistory.bind(RecordService),
+
+    getOneFromHistory: RecordService.getOneFromHistory.bind(RecordService),
 
     remove: RecordService.remove.bind(RecordService),
 
@@ -354,38 +361,6 @@ namespace trakman {
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
     Events.emit('PlayerInfoUpdated', players)
-  }
-
-  // TO BE REMOVED
-  export const getPlayerDBId = playerIdsRepo.getId.bind(playerIdsRepo)
-
-  //CHANGE LATER
-  /**
-   * Calls multiple dedicated server methods simultaneously and awaits the response
-   * @param calls Array of dedicated server calls
-   * @returns Server response or error if the server returns one
-   */
-  export const multiCall = async (...calls: tm.Call[]): Promise<({ method: string, params: any[] } | Error)[] | Error> => {
-    return Utils.multiCall(...calls)
-  }
-
-  //CHANGE LATER
-  /**
-   * Calls multiple dedicated server methods simultaneously without caring for the response
-   * @param calls Array of dedicated server calls
-   */
-  export const multiCallNoRes = (...calls: tm.Call[]): void => {
-    const arr: any[] = []
-    for (const c of calls) {
-      const params: any[] = c.params === undefined ? [] : c.params
-      arr.push({
-        struct: {
-          methodName: { string: c.method },
-          params: { array: params }
-        }
-      })
-    }
-    Client.callNoRes('system.multicall', [{ array: arr }])
   }
 
   /**

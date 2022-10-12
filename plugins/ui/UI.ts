@@ -75,7 +75,7 @@ import TopVisits from './dynamic_components/TopVisits.component.js'
 import TopVotes from './dynamic_components/TopVotes.component.js'
 import TopWins from './dynamic_components/TopWins.component.js'
 import TopSums from './dynamic_components/TopSums.component.js'
-
+import icons from './config/Icons.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
 import TestWindow from './test_widgets/TestWindow.js'
@@ -100,6 +100,16 @@ const loadMod = (): void => {
     {
       array: mods
     }])
+}
+
+const iconArr = Object.values(icons).map(a =>
+  `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
+
+const preloadIcons = (login?: string): void => {
+  tm.sendManialink(`
+  <manialink id="69696969">
+    ${iconArr}
+  </manialink>`, login)
 }
 
 let staticComponents: {
@@ -172,6 +182,7 @@ const events: TMListener[] = [
     event: 'Startup',
     callback: async (status: 'race' | 'result'): Promise<void> => {
       await tm.client.call('SendHideManialinkPage')
+      preloadIcons()
       loadMod()
       initalizeKeyListeners()
       customUi = new CustomUi()
@@ -251,6 +262,12 @@ const events: TMListener[] = [
       loadMod()
     }
   },
+  {
+    event: 'PlayerJoin',
+    callback: (info: JoinInfo) => {
+      preloadIcons(info.login)
+    }
+  }
 ]
 
 for (const event of events) { tm.addListener(event.event, event.callback) }

@@ -175,10 +175,6 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       this.playerQueries[index].paginator.destroy()
       this.playerQueries.splice(index, 1)
     }
-    const index2 = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
-    if (index2 !== -1) { // TODO SEPEARATE
-      PopupWindow.playersWithWindowOpen.splice(index2, 1)
-    }
     this.hideToPlayer(info.login)
   }
 
@@ -282,7 +278,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     return true
   }
 
-  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
+  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> { // TODO
     const records = await tm.records.fetchByMap(...mapIds)
     const positions: number[] = []
     let i = -1
@@ -350,10 +346,10 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>
           <frame posn="${config.iconWidth + width - (config.queueWidth + config.queueNumberWidth)} 0 1">
             <quad posn="0 0 3" sizen="${config.queueWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${centeredText(`${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+            ${centeredText(`$${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           <frame posn="${config.queueWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${config.queueNumberWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${centeredText(`${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+            ${centeredText(`$${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           </frame>
           </frame>`
     }

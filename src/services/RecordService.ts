@@ -16,30 +16,35 @@ export class RecordService {
   static readonly maxLocalsAmount: number = config.localRecordsLimit
   private static _initialLocals: tm.LocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
+  private static _queueRecords: { mapId: string, records: tm.Record[] }[] = []
+  private static _historyRecords: { mapId: string, records: tm.Record[] }[] = []
 
   /**
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
-    await this.repo.initialize()
-    await this.fetchAndStoreRecords(MapService.current.id)
+    await this.updateQueue()
+    this._localRecords = await this.repo.getLocalRecords(MapService.current.id)
+    this._initialLocals.push(...this._localRecords)
+    await this.updateQueue()
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
     Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
-  }
+   }
 
   /**
-   * Fetches and stores records for given map
-   * @param mapId Map uid
+   * Fetches and stores records for current map
    */
-  static async fetchAndStoreRecords(mapId: string): Promise<void> {
+  static async nextMap(): Promise<void> {
+    this._historyRecords.unshift({ mapId: MapService.history[0].id, records: [...this._localRecords] })
     this._liveRecords.length = 0
-    this._localRecords = await this.repo.getLocalRecords(mapId)
+    this._localRecords = await this.repo.getLocalRecords(MapService.current.id)
     this._initialLocals.length = 0
     this._initialLocals.push(...this._localRecords)
+    await this.updateQueue()
   }
 
   /**
@@ -126,10 +131,17 @@ export class RecordService {
    * @param players Objects containing player logins and nicknames
    */
   static updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): void {
-    const replaceInfos = (obj: { nickname: string, region: string, title?: string },
+    const replaceInfos = (obj: { nickname: string, region: string, country: string, countryCode: string, title?: string },
       replacer: { nickname?: string, region?: string, title?: string }) => {
       if (replacer.nickname !== undefined) { obj.nickname = replacer.nickname }
-      if (replacer.region !== undefined) { obj.region = replacer.region } // todo country and country code
+      if (replacer.region !== undefined) {
+        const { region, country, countryCode } = Utils.getRegionInfo(replacer.region)
+        if (countryCode !== undefined) {
+          obj.region = region
+          obj.country = country
+          obj.countryCode = countryCode
+        }
+      }
       if (replacer.title !== undefined && obj.title !== undefined) { obj.title = replacer.title }
     }
     for (const p of players) {
@@ -221,6 +233,32 @@ export class RecordService {
   }
 
   /**
+   * Updates records for maps in queue
+   */
+  static async updateQueue(): Promise<void> {
+    const arr: { mapId: string, records: tm.Record[] }[] = []
+    const mapsToFetch: string[] = []
+    const queue = MapService.queue
+    for (let i = 0; i < queue.length; i++) {
+      const mapId: string = queue[i].id
+      const r = this._queueRecords.find(a => a.mapId === mapId)
+      if (r === undefined) {
+        arr[i] = { mapId, records: [] }
+        mapsToFetch.push(mapId)
+      } else {
+        arr[i] = r
+      }
+    }
+    const res = await this.fetch(...mapsToFetch)
+    for (const e of mapsToFetch) {
+      const entry = arr.find(a => a.mapId === e)
+      if (entry !== undefined) { entry.records = res.filter(a => a.map === e) }
+    }
+    this._queueRecords = arr
+    Events.emit('RecordsPrefetch', res)
+  }
+
+  /**
    * Removes a player record
    * @param player Player object
    * @param mapId Map uid
@@ -237,7 +275,7 @@ export class RecordService {
       const record = this._localRecords[index]
       this._localRecords.splice(index, 1)
       Events.emit('LocalRecordsRemoved', [record])
-      void this.repo.remove(player.login, mapId)
+      void this.repo.remove(mapId, player.login)
     }
   }
 
@@ -365,6 +403,48 @@ export class RecordService {
       return this._localRecords.find(a => a.login === logins)
     }
     return this._localRecords.filter(a => logins.includes(a.login))
+  }
+
+  /**
+   * Gets local records on the given map if it's in map queue. 
+   * Returned array is sorted primary by queue position ascending, time ascending and date ascending
+   * @param mapIds Array of map ids
+   * @returns Array of record objects
+   */
+  static getFromQueue(...mapIds: string[]): tm.Record[] {
+    return this._queueRecords.filter(a => mapIds.includes(a.mapId)).map(a => a.records).flat(1)
+  }
+
+  /**
+   * Gets local record of the given player, on the given map if it's in map queue.
+   * @param login Player login
+   * @param mapId Map id
+   * @returns Record object or undefined if record doesn't exist
+   */
+  static getOneFromQueue(login: string, mapId: string): tm.Record | undefined {
+    const arr = this._queueRecords.find(a => mapId = a.mapId)
+    return arr?.records?.find?.(a => a.login === login)
+  }
+
+  /**
+   * Gets local records on the given map if it's in map history. 
+   * Returned array is sorted primary by history position ascending, time ascending and date ascending
+   * @param mapIds Array of map ids
+   * @returns Array of record objects
+   */
+  static getFromHistory(...mapIds: string[]): tm.Record[] {
+    return this._historyRecords.filter(a => mapIds.includes(a.mapId)).map(a => a.records).flat(1)
+  }
+
+  /**
+   * Gets local record of the given player, on the given map if it's in map history.
+   * @param login Player login
+   * @param mapId Map id
+   * @returns Record object or undefined if record doesn't exist
+   */
+  static getOneFromHistory(login: string, mapId: string): tm.Record | undefined {
+    const arr = this._historyRecords.find(a => mapId = a.mapId)
+    return arr?.records?.find?.(a => a.login === login)
   }
 
   /**

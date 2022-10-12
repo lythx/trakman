@@ -4,10 +4,6 @@ export abstract class Repository {
 
   private db: Database = new Database()
 
-  async initialize(createQuery: string): Promise<void> {
-    await this.query(createQuery)
-  }
-
   async query(q: string, ...params: any[]): Promise<any[]> {
     return (await (this.db.query(q, ...params))).rows
   }

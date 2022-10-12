@@ -3,7 +3,7 @@ import icons from '../../config/Icons.js'
 const p = tm.utils.palette
 
 export default {
-  height: 6,
+  height: 5,
   width: cfg.width,
   privilege: 1,
   margin: cfg.margin,
@@ -15,20 +15,20 @@ export default {
   icons: {
     players: icons.playerList,
     previous: icons.pageLeft,
-    requeue: icons.payReplay,
+    requeue: icons.requeue,
     jukebox: icons.mapList,
-    shuffle: icons.placeholder
+    shuffle: icons.shuffle
   },
   iconsHover: {
-    players: icons.placeholder,
+    players: icons.playerListHover,
     previous: icons.pageLeftHover,
-    requeue: icons.placeholder, // todon icons
-    jukebox: icons.placeholder,
-    shuffle: icons.placeholder
+    requeue: icons.requeueHover,
+    jukebox: icons.mapListHover,
+    shuffle: icons.shuffleHover
   },
   messages: {
     requeue: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the ongoing map.`,
-    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`, // todo more like replayed not requeued right?
+    previous: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the previous map.`,
     shuffle: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has shuffled the queue.`
   }
 }

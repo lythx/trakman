@@ -1,16 +1,6 @@
 import { Repository } from "./Repository.js"
 
-const createQuery = `CREATE TABLE IF NOT EXISTS privileges(
-    login VARCHAR(40) NOT NULL,
-    privilege INT2 NOT NULL,
-    PRIMARY KEY(login)
-);`
-
 export class PrivilegeRepository extends Repository {
-
-  async initialize() {
-    await super.initialize(createQuery)
-  }
 
   async get(login: string): Promise<number>
   async get(logins: string[]): Promise<{ login: string, privilege: number }[]>
