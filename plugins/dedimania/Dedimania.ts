@@ -372,6 +372,12 @@ function getNewRecord(logins: string | string[]): DediRecord | DediRecord[] | un
   return newDedis.filter(a => logins.includes(a.login))
 }
 
+/**
+ * Fetches and sends dedimania records.
+ * Provides utilities for accessing dedimania records related data.
+ * @author lythx & wiseraven
+ * @since 0.1
+ */
 export const dedimania = {
 
   /**

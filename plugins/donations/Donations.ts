@@ -163,6 +163,12 @@ function getDonation(logins: string | string[]): DonationInfo | DonationInfo[] |
   return onlineDonators.filter(a => logins.includes(a.login))
 }
 
+/**
+ * Provides utilities related to server coppers donations.
+ * Stores donations history in database.
+ * @author lythx
+ * @since 0.2 //TODO
+ */
 export const donations = {
 
   donate,
