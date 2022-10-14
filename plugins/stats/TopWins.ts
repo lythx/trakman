@@ -1,8 +1,8 @@
 import config from './Config.js'
 
-let topList: { login: string, nickname: string, wins: number }[] = []
-const updateListeners: ((updatedLogin: string, list: { login: string, nickname: string, wins: number }[]) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+let topList: { readonly login: string, nickname: string, wins: number }[] = []
+const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, wins: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, wins FROM players
@@ -16,9 +16,7 @@ const initialize = async () => {
   topList = res.filter(a => a.wins !== 0)
 }
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-})
+tm.addListener('Startup', (): void => void initialize())
 
 tm.addListener('PlayerInfoUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
@@ -40,39 +38,48 @@ tm.addListener('EndMap', async (info) => {
   const login = info.winnerLogin
   const wins = info.winnerWins
   if (wins === undefined || login === undefined
-    || wins <= topList[topList.length - 1].wins) { return }
+    || (topList.length < config.winsCount && wins <= topList[topList.length - 1].wins)) { return }
   const entry = topList.find(a => a.login === login)
+  let obj: typeof topList[number]
   if (entry !== undefined) {
     entry.wins = wins
+    obj = entry
     topList.sort((a, b) => b.wins - a.wins)
   } else {
     let nickname = tm.players.get(login)?.nickname
     if (nickname === undefined) {
       nickname = (await tm.players.fetch(login))?.nickname
     }
-    topList.splice(topList.findIndex(a => a.wins < wins), 0, { login, wins, nickname: nickname ?? login })
+    obj = { login, wins, nickname: nickname ?? login }
+    topList.push(obj)
+    topList.sort((a, b) => b.wins - a.wins)
     topList.length = Math.min(config.winsCount, topList.length)
   }
-  for (const e of updateListeners) {
-    e(login, [...topList])
-  }
+  for (const e of updateListeners) { e([obj]) }
 })
 
 export const topWins = {
 
-  get list() {
-    return [...topList]
+  /**
+   * List of players sorted by their wins count
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, wins: number }>[] {
+    return topList
   },
 
-  onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, wins: number }[]) => void) {
+  /**
+   * Add a callback function to execute on top wins list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+   */
+  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, wins: number }>[]) => void): void {
     updateListeners.push(callback)
   },
 
   /**
-   * Add a callback function to execute on donator nickname change
-   * @param callback Function to execute on event. It takes donation object as a parameter
+   * Add a callback function to execute on player nickname change
+   * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

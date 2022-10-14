@@ -1,8 +1,11 @@
 import config from './Config.js'
 
-let topList: { login: string, nickname: string, sums: [number, number, number, number] }[] = []
-const updateListeners: ((list: { login: string, nickname: string, sums: [number, number, number, number] }[], updatedLogin?: string) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+let topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
+const updateListeners: ((changes: readonly Readonly<{
+  login: string, nickname: string,
+  sums: [number, number, number, number]
+}>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 let initialLocals: tm.LocalRecord[] = []
 let refreshNeeded = false
 
@@ -64,21 +67,17 @@ const initialize = async () => {
   topList.sort((a, b) => b.sums[1] - a.sums[1])
   topList.sort((a, b) => b.sums[0] - a.sums[0])
   topList.length = Math.min(config.sumsCount, topList.length)
-  for (const e of updateListeners) {
-    e([...topList])
-  }
+  for (const e of updateListeners) { e(topList) }
 }
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
+tm.addListener('Startup', (): void => {
   initialLocals = tm.records.local
+  void initialize()
 })
 
-tm.addListener('BeginMap', () => {
-  if (refreshNeeded === true) {
-    void initialize()
-  }
+tm.addListener('BeginMap', (): void => {
   initialLocals = tm.records.local
+  if (refreshNeeded === true) { void initialize() }
 })
 
 tm.addListener('PlayerInfoUpdated', (info) => {
@@ -99,7 +98,7 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 
 tm.addListener('LocalRecord', (info) => {
   const prevRecordIndex = initialLocals.findIndex(a => a.login === info.login)
-  let oldArrPos = prevRecordIndex
+  let oldArrPos = prevRecordIndex === -1 ? undefined : prevRecordIndex
   if (info.position > 3) {
     oldArrPos = 4
   }
@@ -114,37 +113,49 @@ tm.addListener('LocalRecord', (info) => {
     return
   }
   obj.sums[newArrPos]++
-  obj.sums[oldArrPos]--
-  for (let i = newArrPos; i < Math.min(oldArrPos, 3); i++) {
+  if (oldArrPos !== undefined) {
+    obj.sums[oldArrPos]--
+  }
+  const updated: typeof topList = []
+  for (let i = newArrPos; i < Math.min(oldArrPos ?? 3, 3); i++) {
     const obj = topList.find(a => a.login === initialLocals[i]?.login)
     if (obj !== undefined) {
       obj.sums[i]--
       obj.sums[i + 1]++
+      updated.push(obj)
     }
   }
-  for (const e of updateListeners) {
-    e([...topList], info.login)
-  }
+  for (const e of updateListeners) { e(updated) }
 })
 
 export const topSums = {
 
-  get list() {
-    return [...topList]
-  },
-
-  onUpdate(callback: (list: {
+  /**
+   * List of players sorted by their records amount
+   */
+  get list(): readonly Readonly<{
     login: string, nickname: string,
     sums: Readonly<[number, number, number, number]>
-  }[], updatedLogin?: string) => void) {
+  }>[] {
+    return topList
+  },
+
+  /**
+   * Add a callback function to execute on top sums list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+   */
+  onUpdate(callback: (changes: readonly Readonly<{
+    login: string, nickname: string,
+    sums: Readonly<[number, number, number, number]>
+  }>[]) => void) {
     updateListeners.push(callback)
   },
 
   /**
-   * Add a callback function to execute on donator nickname change
-   * @param callback Function to execute on event. It takes donation object as a parameter
+   * Add a callback function to execute on player nickname change
+   * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

@@ -1,12 +1,13 @@
 import { donations } from '../donations/Donations.js'
 import config from './Config.js'
 
-const listeners: ((updatedLogin: string, list: { login: string, nickname: string, amount: number }[]) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
-let topList: { login: string, nickname: string, amount: number }[] = []
+let topList: { readonly login: string, nickname: string, amount: number }[] = []
+const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, amount: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await tm.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
+  const res: { amount: number, login: string, nickname: string }[] | Error =
+    await tm.db.query(`SELECT SUM(amount) AS amount, login, nickname FROM donations
   JOIN players ON players.id=donations.player_id
   GROUP BY (login, nickname)
   ORDER BY amount DESC
@@ -15,12 +16,10 @@ const initialize = async () => {
     await tm.log.fatal(res)
     return
   }
-  topList.push(...res)
+  topList = res
 }
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-}, true)
+tm.addListener('Startup', (): void => void initialize(), true)
 
 tm.addListener('PlayerInfoUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
@@ -41,35 +40,45 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 donations.onDonation((info) => {
   const login = info.login
   const amount = info.sum
-  if (amount <= topList[topList.length - 1].amount) { return }
+  if (topList.length < config.donationsCount && amount <= topList[topList.length - 1].amount) { return }
   const entry = topList.find(a => a.login === login)
+  const updated: typeof topList= []
   if (entry !== undefined) {
     entry.amount = amount
+    updated.push(entry)
     topList.sort((a, b) => b.amount - a.amount)
   } else {
-    topList.splice(topList.findIndex(a => a.amount < amount), 0, { login, nickname: info.nickname, amount })
+    const obj = { login, nickname: info.nickname, amount }
+    updated.push(obj)
+    topList.push(obj)
+    topList.sort((a, b) => b.amount - a.amount)
     topList.length = Math.min(config.donationsCount, topList.length)
   }
-  for (const e of listeners) {
-    e(login, [...topList])
-  }
+  for (const e of updateListeners) { e(updated) }
 })
 
 export const topDonations = {
 
-  get list() {
-    return [...topList]
+  /**
+   * List of players sorted by the amount of coppers donated to the server
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, amount: number }>[] {
+    return topList
   },
 
-  onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, amount: number }[]) => void) {
-    listeners.push(callback)
+  /**
+   * Add a callback function to execute on top donations list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+   */
+  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, amount: number }>[]) => void): void {
+    updateListeners.push(callback)
   },
 
   /**
    * Add a callback function to execute on donator nickname change
    * @param callback Function to execute on event. It takes donation object as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 
