@@ -44,7 +44,7 @@ export default class AveragesRanking extends StaticComponent {
       <frame posn="${this.posX} ${this.posY} 2">
       ${this.header.constructXml(config.title, config.icon, this.side)}
       <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(list.map(a => tm.utils.getTimeString(a.average)), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
+        ${this.list.constructXml(list.map(a => a.average.toString()), list.map(a => tm.utils.safeString(tm.utils.strip(a.nickname, false))))}
       </frame>
       </frame>
     </manialink>`

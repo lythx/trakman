@@ -96,6 +96,13 @@ export abstract class TMXFetcher {
       return new Error('Cannot fetch map data from TMX')
     }
     const s: string[] = data.split('\t')
+    if (s.length !== 19) { // \t can be in comment thank you tmx developers
+      const start = s.slice(0, 16)
+      const comment = s.slice(16, -2).join('\t')
+      const end = s.slice(-2)
+      s.length = 0
+      s.push(...start, comment, ...end)
+    }
     const TMXId: number = Number(s[0])
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
@@ -124,7 +131,7 @@ export abstract class TMXFetcher {
     }
     const lastUpdateDate = new Date(s[5])
     const validReplays = replays.filter(a => a.mapDate.getTime() === lastUpdateDate.getTime())
-    Object.freeze(replays)
+    const awards = Number(s[18].split('<BR>')[0])
     const mapInfo: tm.TMXMap = {
       id: mapId,
       TMXId,
@@ -141,12 +148,13 @@ export abstract class TMXFetcher {
       length: s[12],
       difficulty: s[13] as any,
       leaderboardRating: Number(s[14]),
-      isClassic: Number(s[14]) === 0,
+      // Some maps are in some kind of beta mode so they have 0 karma like classic maps (i love tmx developers)
+      isClassic: Number(s[14]) === 0 && awards !== 0,
       isNadeo: Number(s[14]) === 50000,
       game: s[15],
       comment: s[16],
       commentsAmount: Number(s[17]),
-      awards: Number(s[18].split('<BR>')[0]),
+      awards,
       pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${TMXId}`,
       screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${TMXId}`,
       thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${TMXId}`,
@@ -154,11 +162,7 @@ export abstract class TMXFetcher {
       replays,
       validReplays
     }
-    if (!Number.isInteger(mapInfo.awards) || !Number.isInteger(mapInfo.leaderboardRating)) {
-      Logger.debug(JSON.stringify(mapInfo, null, 2))
-    } else {
-      void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
-    }
+    void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
     return mapInfo
   }
 
