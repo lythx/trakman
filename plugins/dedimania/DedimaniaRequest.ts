@@ -18,7 +18,7 @@ export class DedimaniaRequest {
   * Prepares XML string for a dedimania request.
   * @param method dedimania method
   * @param params parameters
-  * @param sessionKey 
+  * @param sessionKey dedimania session key
   */
   constructor(method: string, params: tm.CallParams[], sessionKey?: string) {
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
