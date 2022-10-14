@@ -1,6 +1,15 @@
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 
+let mapToErase: string | undefined
+tm.addListener('BeginMap', (info) => {
+  if (info.isRestart === true) { return }
+  if (mapToErase !== undefined) {
+    void tm.maps.remove(mapToErase)
+    mapToErase = undefined
+  }
+})
+
 const commands: tm.Command[] = [
   {
     aliases: ['add'],
@@ -80,6 +89,22 @@ const commands: tm.Command[] = [
       }), config.add.public ? undefined : info.login)
     },
     privilege: config.addlocal.privilege
+  },
+  {
+    aliases: ['et', 'rt', 'erase', 'erasethis'],
+    help: 'Remove a current map from maplist.',
+    callback: (info): void => {
+      if (mapToErase !== undefined) {
+        tm.sendMessage(config.remove.error, info.login)
+        return
+      }
+      mapToErase = tm.maps.current.id
+      tm.sendMessage(tm.utils.strVar(config.remove.text, {
+        title: info.title,
+        nickname: tm.utils.strip(info.nickname, true)
+      }), config.remove.public ? undefined : info.login)
+    },
+    privilege: config.remove.privilege
   },
   {
     aliases: ['afu', 'addfromurl'],

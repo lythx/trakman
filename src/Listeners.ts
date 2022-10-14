@@ -83,9 +83,7 @@ export class Listeners {
         tm.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
-        if (playerId === 0) {
-          return
-        }
+        if (playerId === 0) { return }
         const player: tm.Player | undefined = PlayerService.get(login)
         if (player === undefined) {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
@@ -179,7 +177,7 @@ export class Listeners {
         await GameService.update()
         // Get records for current map
         // Check whether the map was restarted
-        if (isRestart == false) {
+        if (isRestart === false) {
           // In case it wasn't, update the ongoing map
           await MapService.update()
           await RecordService.nextMap()
@@ -193,11 +191,12 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async ([winner, map, wasWarmUp, continuesOnNextMap, isRestart]:
+      callback: async ([winner, map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         // Set game state to 'result'
+        isRestart = restart
         GameService.state = 'result'
         // Get winner login from the callback
         const login: string | undefined = winner.Login
@@ -206,7 +205,6 @@ export class Listeners {
           || winner.BestTime === -1) ? undefined : await PlayerService.addWin(login)
         const endMapInfo: EndMapInfo = {
           ...MapService.current,
-          isRestarted: isRestart,
           wasWarmUp: wasWarmUp,
           continuesOnNextMap: continuesOnNextMap,
           localRecords: RecordService.localRecords,

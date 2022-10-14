@@ -15,6 +15,12 @@ export default {
     public: true,
     privilege: 1
   },
+  remove: {
+    text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed the current map.`,
+    error: `${p.error} The map is already getting removed.`,
+    public: true,
+    privilege: 1
+  },
   addlocal: {
     addError: `${p.error} Failed to add the map.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from local files.`,

@@ -91,7 +91,7 @@ async function getFromDB(logins: string | string[]):
 
 tm.addListener('Startup', (): void => void initialize())
 
-tm.addListener('MatchSettingsUpdated', () => void initialize())// Add map removed maybe TODO
+tm.addListener('MatchSettingsUpdated', () => void initialize())
 
 tm.addListener('PlayerJoin', async info => {
   const data = await getFromDB(info.login)

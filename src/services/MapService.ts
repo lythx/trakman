@@ -198,7 +198,7 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
-    Events.emit('MapRemoved', { ...map, callerLogin: caller?.login }) // MAybe save match settings TODO
+    Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
     this.removeFromJukebox(id, caller)
     return true
   }
