@@ -8,15 +8,15 @@ export default class TopPlaytimes extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, playtime: number }[]
+  private ranks: readonly { login: string, nickname: string, playtime: number }[]
 
   constructor() {
     super(IDS.topPlaytimes, config.icon, config.title, config.navbar)
     this.ranks = stats.playtimes.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.playtimes.onUpdate((_, list) => {
-      this.ranks = list
+    stats.playtimes.onUpdate(() => {
+      this.ranks = stats.playtimes.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })

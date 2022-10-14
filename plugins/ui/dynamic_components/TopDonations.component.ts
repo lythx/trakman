@@ -8,15 +8,15 @@ export default class TopDonations extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, amount: number }[]
+  private ranks: readonly { login: string, nickname: string, amount: number }[]
 
   constructor() {
     super(IDS.topDonations, config.icon, config.title, config.navbar)
     this.ranks = stats.donations.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.donations.onUpdate((_, list) => {
-      this.ranks = list
+    stats.donations.onUpdate(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })

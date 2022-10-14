@@ -75,7 +75,7 @@ if (config.isEnabled === true) {
 /**
  * Sends manialive requests needed for freezone
  * @author lythx & wiseraven
- * @since 0.1 // TODO
+ * @since 0.3
  */
 export const freezone = {
 

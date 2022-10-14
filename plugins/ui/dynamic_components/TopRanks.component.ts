@@ -8,15 +8,15 @@ export default class TopRanks extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, average: number }[]
+  private ranks: readonly { login: string, nickname: string, average: number }[]
 
   constructor() {
     super(IDS.topRanks, config.icon, config.title, config.navbar)
     this.ranks = stats.averages.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.averages.onUpdate((_, list) => {
-      this.ranks = list
+    stats.averages.onUpdate(() => {
+      this.ranks = stats.averages.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })

@@ -8,15 +8,15 @@ export default class TopVisits extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: { login: string, nickname: string, visits: number }[]
+  private ranks: readonly { login: string, nickname: string, visits: number }[]
 
   constructor() {
     super(IDS.topVisits, config.icon, config.title, config.navbar)
     this.ranks = stats.visits.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.visits.onUpdate((_, list) => {
-      this.ranks = list
+    stats.visits.onUpdate(() => {
+      this.ranks = stats.visits.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
