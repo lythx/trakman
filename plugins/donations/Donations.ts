@@ -167,7 +167,7 @@ function getDonation(logins: string | string[]): DonationInfo | DonationInfo[] |
  * Provides utilities related to server coppers donations.
  * Stores donations history in database.
  * @author lythx
- * @since 0.2 //TODO
+ * @since 0.4
  */
 export const donations = {
 
