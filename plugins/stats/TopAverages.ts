@@ -1,8 +1,8 @@
 import config from './Config.js'
 
-let topList: { login: string, nickname: string, average: number }[] = []
-const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, average: number }[]) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+let topList: { readonly login: string, nickname: string, average: number }[] = []
+const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, average: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
 const initialize = async () => {
   const res: { login: string, nickname: string, average: number }[] | Error =
@@ -15,11 +15,10 @@ const initialize = async () => {
     return
   }
   topList = res.filter(a => a.average !== tm.records.maxLocalsAmount)
+  for (const e of updateListeners) { e(topList) }
 }
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-})
+tm.addListener('Startup', (): void => void initialize(), true)
 
 tm.addListener('PlayerInfoUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
@@ -38,44 +37,51 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 })
 
 tm.addListener('RanksAndAveragesUpdated', async (info) => {
-  const updated: string[] = []
+  const updated: typeof topList = []
   for (const e of info) {
-    updated.push(e.login)
-    if (e.average >= topList[topList.length - 1].average) { return }
+    if (topList.length < config.averagesCount && e.average >= topList[topList.length - 1].average) { return }
     const entry = topList.find(a => a.login === e.login)
     if (entry !== undefined) {
       entry.average = e.average
+      updated.push(entry)
       topList.sort((a, b) => a.average - b.average)
     } else {
       let nickname = tm.players.get(e.login)?.nickname
       if (nickname === undefined) {
         nickname = (await tm.players.fetch(e.login))?.nickname
       }
-      topList.splice(topList.findIndex(a => a.average > e.average), 0,
-        { login: e.login, nickname: nickname ?? e.login, average: e.average })
+      const obj = { login: e.login, nickname: nickname ?? e.login, average: e.average }
+      updated.push(obj)
+      topList.push(obj)
+      topList.sort((a, b) => a.average - b.average)
       topList.length = Math.min(config.averagesCount, topList.length)
     }
   }
-  for (const e of updateListeners) {
-    e(updated, [...topList])
-  }
+  for (const e of updateListeners) { e(updated) }
 })
 
 export const topAverages = {
 
-  get list() {
-    return [...topList]
+  /**
+   * List of players sorted by their average server rank
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, average: number }>[] {
+    return topList
   },
 
-  onUpdate(callback: (updatedLogins: string[], list: { login: string, nickname: string, average: number }[]) => void) {
+  /**
+  * Add a callback function to execute on top averages list update
+  * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+  */
+  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, average: number }>[]) => void): void {
     updateListeners.push(callback)
   },
 
   /**
-   * Add a callback function to execute on donator nickname change
-   * @param callback Function to execute on event. It takes donation object as a parameter
+   * Add a callback function to execute on player nickname change
+   * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

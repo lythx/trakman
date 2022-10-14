@@ -56,21 +56,21 @@ tm.addListener('BeginMap', (): void => {
 tm.addListener('KarmaVote', (info): void => {
   if (!initialVotes.some(a => a.login === info.login)) {
     initialVotes.push(info)
-    const count = onlineList.find(a => a.login === info.login)
-    if (count === undefined) { return }
-    count.count++
+    const obj = onlineList.find(a => a.login === info.login)
+    if (obj === undefined) { return }
+    obj.count++
     const topIndex: number = topList.findIndex(a => a.login === info.login)
-    if (topIndex === -1 && count.count > topList[topList.length - 1].count) {
-      topList.splice(topList.findIndex(a => a.count < count.count), 0, count)
+    if (topIndex === -1 && obj.count > topList[topList.length - 1].count) {
+      topList.splice(topList.findIndex(a => a.count < obj.count), 0, obj)
       topList.length = Math.min(config.votesCount, topList.length)
       for (const e of updateListeners) {
         e(topList[topIndex].login, [...topList])
       }
     } else if (topIndex !== -1) {
-      const newIndex: number = topList.findIndex(a => a.count < count.count)
+      const newIndex: number = topList.findIndex(a => a.count < obj.count)
       if (newIndex < topIndex) {
         topList.splice(topIndex, 1)
-        topList.splice(newIndex, 0, count)
+        topList.splice(newIndex, 0, obj)
       } else {
         topList[topIndex].count++
       }
@@ -83,29 +83,32 @@ tm.addListener('KarmaVote', (info): void => {
 
 tm.addListener('PlayerJoin', async (info): Promise<void> => {
   const id: number | undefined = await tm.db.getPlayerId(info.login)
-  const res: any[] | Error = await tm.db.query(`SELECT count(*) FROM VOTES
+  const res: { count: number }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
       WHERE player_id=$1`, id)
   if (res instanceof Error) {
     tm.log.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
     return
   }
-  onlineList.push({ login: info.login, nickname: info.nickname, count: Number(res[0].count) })
+  onlineList.push({ login: info.login, nickname: info.nickname, count: res[0].count })
 })
 
-tm.addListener('PlayerLeave', async (info): Promise<void> => {
-  onlineList.splice(onlineList.findIndex(a => a.login === info.login), 1)
+tm.addListener('PlayerLeave', (info): void => {
+  onlineList = onlineList.filter(a => a.login !== info.login)
 })
 
 export const topVotes = {
 
-  get list() {
-    return [...topList]
+  /**
+   * List of players sorted by their votes count
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, count: number }>[] {
+    return topList
   },
 
-  get(login: string): { nickname: string, count: number } | undefined {
-    return topList.find(a => a.login === login)
-  },
-
+  /**
+   * Add a callback function to execute on top votes list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+   */
   onUpdate(callback: (updatedLogin: string, list: { login: string, nickname: string, count: number }[]) => void) {
     updateListeners.push(callback)
   },

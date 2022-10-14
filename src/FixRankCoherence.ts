@@ -40,7 +40,7 @@ export const fixRankCoherence = async (): Promise<void> => {
     sums[i] = { average: sum / maps.length, id: playerIds[i] }
   }
   if (sums.length === 0) { return }
-  db.query(`UPDATE players AS p SET
+  await db.query(`UPDATE players AS p SET
   average = v.average
   FROM (VALUES
     ${sums.map(a => `(${a.id}, ${a.average}),`).join('').slice(0, -1)}

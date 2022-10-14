@@ -2,13 +2,16 @@ import config from './Config.js'
 
 let topList: { readonly login: string, nickname: string, amount: number }[] = []
 let onlineList: { readonly login: string, nickname: string, amount: number }[] = []
-const listeners: ((updatedLogin: string, list: Readonly<{ login: string, nickname: string, amount: number }>[]) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, amount: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
 const initialize = async () => {
   const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
-  const res: any[] | Error = await tm.db.query(`WITH r(player_id, map_id) AS
-    (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+  const res: { readonly login: string, nickname: string, amount: number }[] | Error =
+    await tm.db.query(`WITH r(player_id, map_id) AS
+    (SELECT player_id, map_id FROM records WHERE map_id IN(${
+      // Use only map ids in the current maplist
+      mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
   SELECT count(*)::int as amount, nickname, login FROM r
   JOIN players ON players.id=r.player_id
   GROUP BY (nickname, login, last_online)
@@ -21,9 +24,7 @@ const initialize = async () => {
   }
   topList = res
   onlineList = await getFromDB(tm.players.list.map(a => a.login))
-  for (const e of nicknameChangeListeners) {
-    e([...topList])
-  }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('PlayerInfoUpdated', (info) => {
@@ -88,16 +89,16 @@ async function getFromDB(logins: string | string[]):
   return res.map(a => ({ login: a.login, nickname: a.nickname, amount: a.amount }))
 }
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-})
+tm.addListener('Startup', (): void => void initialize())
+
+tm.addListener('MatchSettingsUpdated', () => void initialize())// Add map removed maybe TODO
 
 tm.addListener('PlayerJoin', async info => {
   const data = await getFromDB(info.login)
   if (data !== undefined) { onlineList.push(data) }
 })
 
-tm.addListener('PlayerLeave', async info => {
+tm.addListener('PlayerLeave', info => {
   onlineList = onlineList.filter(a => a.login !== info.login)
 })
 
@@ -106,38 +107,44 @@ tm.addListener('LocalRecord', info => {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.amount++
-    if (obj.amount <= topList[topList.length - 1].amount) { return }
+    if (topList.length < config.recordsCount && obj.amount <= topList[topList.length - 1].amount) { return }
     const entry = topList.find(a => a.login === info.login)
     if (entry !== undefined) {
       entry.amount = obj.amount
       topList.sort((a, b) => b.amount - a.amount)
     } else {
-      topList.splice(topList.findIndex(a => a.amount < obj.amount), 0, { ...obj })
+      topList.push(obj)
+      topList.sort((a, b) => b.amount - a.amount)
       topList.length = Math.min(config.recordsCount, topList.length)
     }
-    for (const e of listeners) {
-      e(info.login, [...topList])
+    for (const e of updateListeners) {
+      e([obj])
     }
   }
 })
 
-tm.addListener('MatchSettingsUpdated', () => initialize())
-
 export const topRecords = {
 
-  get list() {
-    return [...topList]
-  },
-
-  onUpdate(callback: (updatedLogin: string, list: Readonly<{ login: string, nickname: string, amount: number }>[]) => void) {
-    listeners.push(callback)
+  /**
+   * List of players sorted by their record count
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, amount: number }>[] {
+    return topList
   },
 
   /**
-   * Add a callback function to execute on donator nickname change
-   * @param callback Function to execute on event. It takes donation object as a parameter
+   * Add a callback function to execute on top records list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, amount: number }>[]) => void): void {
+    updateListeners.push(callback)
+  },
+
+  /**
+   * Add a callback function to execute on player nickname change
+   * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
+   */
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

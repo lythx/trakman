@@ -1,11 +1,12 @@
 import config from './Config.js'
 
-let topList: { login: string, nickname: string, playtime: number }[] = []
-const updateListeners: ((updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void)[] = []
-const nicknameChangeListeners: ((changedList: { login: string, nickname: string }[]) => void)[] = []
+let topList: { readonly login: string, nickname: string, playtime: number }[] = []
+const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, playtime: number }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
 const initialize = async () => {
-  const res: any[] | Error = await tm.db.query(`SELECT login, nickname, time_played AS playtime FROM players
+  const res: { login: string, nickname: string, playtime: number }[] | Error =
+    await tm.db.query(`SELECT login, nickname, time_played AS playtime FROM players
   ORDER BY time_played DESC,
   last_online DESC
   LIMIT ${config.playtimesCount}`)
@@ -13,7 +14,8 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top playtimes', res.message, res.stack)
     return
   }
-  topList = res.map(a => ({ ...a, playtime: a.playtime * 1000 }))
+  for (const e of res) { e.playtime = e.playtime * 1000 } // Change playtime to miliseconds
+  topList = res
 }
 
 tm.addListener('PlayerInfoUpdated', (info) => {
@@ -32,44 +34,52 @@ tm.addListener('PlayerInfoUpdated', (info) => {
   }
 })
 
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-})
+tm.addListener('Startup', (): void => void initialize())
 
 tm.addListener('EndMap', () => {
   const players = tm.players.list
+  const updated: typeof topList = []
   for (const e of players) {
     const pt = e.timePlayed + Date.now() - e.joinTimestamp
-    if (pt <= topList[topList.length - 1].playtime) { return }
+    if (topList.length < config.playtimesCount && pt <= topList[topList.length - 1].playtime) { return }
     const entry = topList.find(a => a.login === e.login)
     if (entry !== undefined) {
       entry.playtime = pt
+      updated.push(entry)
       topList.sort((a, b) => b.playtime - a.playtime)
     } else {
-      topList.splice(topList.findIndex(a => a.playtime < pt), 0, { login: e.login, nickname: e.nickname, playtime: pt })
+      const obj = { login: e.login, nickname: e.nickname, playtime: pt }
+      updated.push(obj)
+      topList.push(obj)
+      topList.sort((a, b) => b.playtime - a.playtime)
       topList.length = Math.min(config.playtimesCount, topList.length)
     }
   }
-  for (const e of updateListeners) {
-    e(players.map(a => a.login), [...topList])
-  }
+  for (const e of updateListeners) { e(updated) }
 })
 
 export const topPlaytimes = {
 
-  get list() {
-    return [...topList]
+  /**
+   * List of players sorted by their total playtime
+   */
+  get list(): readonly Readonly<{ login: string, nickname: string, playtime: number }>[] {
+    return topList
   },
 
-  onUpdate(callback: (updatedLogins: string[], list: { login: string, nickname: string, playtime: number }[]) => void) {
+  /**
+   * Add a callback function to execute on top playtimes list update
+   * @param callback Function to execute on event. It takes an array of updated objects as a parameter
+   */
+  onUpdate(callback: (changes: readonly Readonly<{ login: string, nickname: string, playtime: number }>[]) => void): void {
     updateListeners.push(callback)
   },
 
   /**
-   * Add a callback function to execute on donator nickname change
-   * @param callback Function to execute on event. It takes donation object as a parameter
+   * Add a callback function to execute on player nickname change
+   * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: { login: string, nickname: string }[]) => void) {
+  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 

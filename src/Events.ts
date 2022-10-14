@@ -58,12 +58,12 @@ const removeListener = (callback: Function): void => {
  * @param event callback event name
  * @param params callback params
  */
-const emit = async <T extends keyof tm.Events>(event: T,
-  params: tm.Events[T]): Promise<void> => {
+const emit = <T extends keyof tm.Events>(event: T,
+  params: tm.Events[T]): void => {
   if (controllerReady === false) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
-    await listener.callback(params) // TODO make not await if poss
+    listener.callback(params) // TODO make not await if poss
   }
 }
 
