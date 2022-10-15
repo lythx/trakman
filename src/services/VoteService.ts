@@ -8,7 +8,7 @@ export abstract class VoteService {
 
   private static readonly repo: VoteRepository = new VoteRepository()
   private static _votes: { uid: string, votes: tm.Vote[] }[] = []
-  private static readonly prefetchCount: number = 4
+  private static _currentVotes: tm.Vote[] = []
 
   /**
    * Fetches votes for current and next maps
@@ -16,12 +16,13 @@ export abstract class VoteService {
   static async initialize(): Promise<void> {
     const res: tm.Vote[] = await this.repo.getAll()
     const maps = [MapService.current, ...MapService.queue]
-    for (let i: number = 0; i < this.prefetchCount + 1; i++) {
+    for (let i: number = 0; i < maps.length; i++) {
       const uid: string = maps[i].id
       this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
     }
+    this._currentVotes = this._votes[0].votes
     Events.addListener('JukeboxChanged', () => {
-      this.updatePrefetch()
+      void this.updatePrefetch()
     })
   }
 
@@ -29,11 +30,8 @@ export abstract class VoteService {
    * Fetches new map and deletes the last map in array from memory
    */
   static async nextMap(): Promise<void> {
-    const newId: string = MapService.queue[this.prefetchCount - 1].id
-    if (this._votes.some(a => a.uid === newId)) { return }
-    const res: tm.Vote[] = await this.repo.get(newId)
-    this._votes.unshift({ uid: newId, votes: res })
-    this._votes.length = Math.min(this._votes.length, this.prefetchCount * 2 + 1)
+    await this.updatePrefetch()
+    this._currentVotes = this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []
   }
 
   /**
@@ -66,17 +64,15 @@ export abstract class VoteService {
     Events.emit('KarmaVote', obj)
   }
 
-  static async updatePrefetch(): Promise<void> {
+  private static async updatePrefetch(): Promise<void> {
     const arr: { uid: string, votes: tm.Vote[] }[] = []
     const mapsToFetch: string[] = []
-    const notQueueMaps = this._votes.slice(this.prefetchCount)
-    const queue = MapService.queue.slice(0, this.prefetchCount).reverse()
-    for (let i = 0; i < queue.length; i++) {
-      const uid: string = queue[i].id
-      const v = this._votes.find(a => a.uid === uid)
+    const ids: string[] = [...MapService.history, MapService.current, ...MapService.queue].map(a => a.id)
+    for (let i = 0; i < ids.length; i++) {
+      const v = this._votes.find(a => a.uid === ids[i])
       if (v === undefined) {
-        arr[i] = { uid, votes: [] }
-        mapsToFetch.push(uid)
+        arr[i] = { uid: ids[i], votes: [] }
+        mapsToFetch.push(ids[i])
       } else {
         arr[i] = v
       }
@@ -86,13 +82,12 @@ export abstract class VoteService {
       const entry = arr.find(a => a.uid === e)
       if (entry !== undefined) { entry.votes = res.filter(a => a.mapId === e) }
     }
-    this._votes = arr.concat(notQueueMaps)
+    this._votes = arr
     Events.emit('VotesPrefetch', res)
   }
 
   private static updateMapVoteData(uid: string, arr: tm.Vote[]) {
     const count = arr.length
-    const sum = arr.reduce((acc, cur) => acc += cur.vote, 0)
     MapService.setVoteData({ uid, count, ratio: this.calculateVoteRatio(arr) })
   }
 
@@ -126,11 +121,11 @@ export abstract class VoteService {
   }
 
   static get current(): Readonly<tm.Vote>[] {
-    return [...this._votes.find(a => a.uid === MapService.current.id)?.votes ?? []]
+    return this._currentVotes
   }
 
   static get currentCount(): number {
-    return this._votes.find(a => a.uid === MapService.current.id)?.votes?.length ?? 0
+    return this._currentVotes.length
   }
 
   static get votes(): Readonly<{ uid: string, votes: tm.Vote[] }>[] {
