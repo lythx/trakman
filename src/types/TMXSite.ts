@@ -1,1 +1,0 @@
-type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'

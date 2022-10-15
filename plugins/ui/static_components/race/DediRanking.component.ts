@@ -21,16 +21,16 @@ export default class DediRanking extends StaticComponent {
     this.header = new StaticHeader('race')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
-    this.recordList.onClick((info: ManialinkClickInfo): void => {
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
     dedimania.onFetch((): void => this.display())
     dedimania.onRecord((): void => this.display())
     dedimania.onNicknameUpdate((): void => this.display())
-    tm.addListener('PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
-    tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
   }

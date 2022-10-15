@@ -16,8 +16,8 @@ const commands: tm.Command[] = [
     help: 'Add a map from TMX.',
     params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
     callback: async (info: tm.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
-      const tmxSites: TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
-      const site: TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
+      const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+      const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
       let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
       if (file instanceof Error) {
         const remainingSites = tmxSites.filter(a => a !== tmxSite)

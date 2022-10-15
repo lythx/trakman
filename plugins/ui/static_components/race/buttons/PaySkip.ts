@@ -1,8 +1,9 @@
 import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
+import messages from "./Messages.config.js"
 
-
+const msg = messages.paySkip
 const cfg = config.paySkip
 
 export class PaySkip extends UiButton {
@@ -39,14 +40,17 @@ export class PaySkip extends UiButton {
   private handleClick = async (login: string, nickname: string): Promise<void> => {
     if (this.isLastMapReplay === true || this.isReplay === true
       || this.isSkip === true || tm.state.current === 'result') { return }
-    const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, 'Pay to skip the ongoing map')
+    const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`)
+      tm.sendMessage(msg.paymentFail)
     } else if (res === true) {
       let countDown: number = cfg.countdown
       const startTime: number = Date.now()
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(nickname)}${tm.utils.palette.donation} has paid ${tm.utils.palette.highlight}`
-        + `${cfg.cost}C ${tm.utils.palette.donation}to skip the ongoing map. Skipping in ${tm.utils.palette.highlight}${countDown}s${tm.utils.palette.donation}.`)
+      tm.sendMessage(tm.utils.strVar(msg.success, {
+        name: tm.utils.strip(nickname),
+        amount: cfg.cost,
+        seconds: countDown
+      }))
       this.isSkip = true
       this.buttonData.text1 = cfg.texts[1][0]
       this.buttonData.text2 = tm.utils.strVar(cfg.texts[1][1], { seconds: countDown.toString() })

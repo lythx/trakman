@@ -31,7 +31,7 @@ export default abstract class StaticComponent {
           this.hide()
         }, true)
     }
-    tm.addListener('PlayerJoin', async (info: JoinInfo) => {
+    tm.addListener('PlayerJoin', async (info: tm.JoinInfo) => {
       if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
     })
     if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {

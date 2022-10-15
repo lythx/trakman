@@ -45,12 +45,12 @@ export default class LiveSectors extends PopupWindow {
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.getPagesAndOpen(info.login)
   }
 
   protected constructContent(login: string, params: { page: number, cpPage: number }): string {
-    const records: FinishInfo[] = []
+    const records: tm.FinishInfo[] = []
     for (const e of tm.records.live) {
       records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
     }

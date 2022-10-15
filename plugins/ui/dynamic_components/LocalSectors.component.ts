@@ -45,7 +45,7 @@ export default class LocalSectors extends PopupWindow {
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.getPagesAndOpen(info.login)
   }
 

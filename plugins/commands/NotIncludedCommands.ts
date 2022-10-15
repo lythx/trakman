@@ -77,7 +77,7 @@
 //               }]
 //           }
 //       )
-//       tm.addListener('PlayerJoin', (i: JoinInfo): void => {
+//       tm.addListener('PlayerJoin', (i: tm.JoinInfo): void => {
 //           if (hfsList.some(a => a === i.login)) {
 //               tm.client.callNoRes('ForceSpectator', [{ string: info.text }, { int: 1 }])
 //           }

@@ -39,7 +39,7 @@ export default class CheckpointRecords extends PopupWindow {
     checkpointRecords.addListener('NicknameUpdated', () => this.reRender())
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.displayToPlayer(info.login, { page: 1 }, `1/${this.paginator.pageCount}`)
   }
 

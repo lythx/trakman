@@ -18,13 +18,13 @@ export default class LocalRankingResult extends StaticComponent {
     this.header = new StaticHeader('result')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry, { resultMode: true })
-    this.recordList.onClick((info: ManialinkClickInfo): void => {
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerInfoUpdated', (info) => {

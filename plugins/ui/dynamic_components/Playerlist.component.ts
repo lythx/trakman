@@ -39,7 +39,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       privilege: config.privilege
     })
     tm.addListener('PlayerInfoUpdated', () => this.reRender())
-    tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {
       if (info.actionId >= this.openId + this.actions.kick
         && info.actionId < this.openId + this.actions.kick + 1000) { // Kick
         const target = tm.players.list[info.actionId - this.openId - this.actions.kick]
@@ -164,7 +164,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     })
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
     this.displayToPlayer(info.login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount}`, info.privilege)
   }

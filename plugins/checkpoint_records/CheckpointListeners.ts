@@ -63,7 +63,7 @@ if (config.isEnabled === true) {
     }
   }, true)
 
-  tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
+  tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
     const date = new Date()
     const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)
     if (playerCheckpoints === undefined) {

@@ -124,6 +124,7 @@ export default {
       { 0: "$E22DISABLED", 1: "DUE TO RES", equal: true },
       { 0: "MAP IS", 1: "$E22SKIPPED", equal: true },
     ],
+    billMessage: 'Pay to skip the ongoing map',
     icon: icons.paySkip,
     width: 1.8,
     height: 1.8,
@@ -139,6 +140,7 @@ export default {
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true }
     ],
+    billMessage: 'Pay to restart the ongoing map',
     icon: icons.payReplay,
     width: 1.8,
     height: 1.8,

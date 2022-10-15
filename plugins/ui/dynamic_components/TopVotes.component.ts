@@ -16,7 +16,7 @@ export default class TopVisits extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
     stats.votes.onUpdate(() => {
-      this.ranks =  stats.votes.list
+      this.ranks = stats.votes.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -47,7 +47,7 @@ export default class TopVisits extends PopupWindow<number> {
     }
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
   }

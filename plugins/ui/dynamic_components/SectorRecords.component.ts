@@ -36,7 +36,7 @@ export default class SectorRecords extends PopupWindow {
     sectorRecords.addListener('DeletePlayerSector', (info) => this.reRenderToPlayer(info.login))
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.displayToPlayer(info.login, { page: 1 }, `1/${this.paginator.pageCount}`)
   }
 

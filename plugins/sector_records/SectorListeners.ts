@@ -63,7 +63,7 @@ if (config.isEnabled === true) {
     }
   }, true)
 
-  tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
+  tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
     const date = new Date()
     const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
     const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
@@ -90,7 +90,7 @@ if (config.isEnabled === true) {
     }
   })
 
-  tm.addListener('PlayerFinish', (info: FinishInfo) => {
+  tm.addListener('PlayerFinish', (info: tm.FinishInfo) => {
     const date = new Date()
     const index = info.checkpoints.length
     const playerSectors = currentPlayerSecs.find(a => a.login === info.login)

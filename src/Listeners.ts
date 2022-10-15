@@ -14,7 +14,7 @@ import config from '../config/Config.js'
 let isRestart: boolean = false
 
 export class Listeners {
-  private static readonly listeners: TMListener[] = [
+  private static readonly listeners: tm.Listener[] = [
     {
       event: 'TrackMania.PlayerConnect',
       callback: async ([login, isSpectator]: tm.Events['TrackMania.PlayerConnect']): Promise<void> => {
@@ -33,7 +33,7 @@ export class Listeners {
         const ip: string = playerInfo[0].IPAddress.split(':')[0]
         const canJoin = await AdministrationService.handleJoin(login, ip)
         if (canJoin === false) { return }
-        const joinInfo: JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
+        const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
           playerInfo[0].Path, isSpectator, playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
           playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
         AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
@@ -57,7 +57,7 @@ export class Listeners {
         if (AdministrationService.banlist.some(a => a.login === login)) {
           return
         }
-        const leaveInfo: LeaveInfo | Error = PlayerService.leave(login)
+        const leaveInfo: tm.LeaveInfo | Error = PlayerService.leave(login)
         if (!(leaveInfo instanceof Error)) {
           Events.emit('PlayerLeave', leaveInfo)
         }
@@ -109,7 +109,7 @@ export class Listeners {
           return
           // Real CP
         } else if (cpStatus === false) {
-          const info: CheckpointInfo = {
+          const info: tm.CheckpointInfo = {
             time: timeOrScore,
             lap: currentLap,
             index: checkpointIndex,
@@ -203,7 +203,7 @@ export class Listeners {
         // Only update wins if the player is not alone on the server and exists
         const wins: number | undefined = (login === undefined || PlayerService.players.length === 1
           || winner.BestTime === -1) ? undefined : await PlayerService.addWin(login)
-        const endMapInfo: EndMapInfo = {
+        const endMapInfo: tm.EndMapInfo = {
           ...MapService.current,
           wasWarmUp: wasWarmUp,
           continuesOnNextMap: continuesOnNextMap,
@@ -240,7 +240,7 @@ export class Listeners {
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
         temp.actionId = answer
-        const info: ManialinkClickInfo = temp
+        const info: tm.ManialinkClickInfo = temp
         Events.emit('ManialinkClick', info)
       }
     },
@@ -248,7 +248,7 @@ export class Listeners {
       event: 'TrackMania.BillUpdated',
       callback: ([id, state, stateName, transactionId]: tm.Events['TrackMania.BillUpdated']): void => {
         // [0] = BillId, [1] = State, [2] = StateName, [3] = TransactionId
-        const bill: BillUpdatedInfo = { id, state, stateName, transactionId }
+        const bill: tm.BillUpdatedInfo = { id, state, stateName, transactionId }
         Events.emit('BillUpdated', bill)
       }
     },
@@ -265,7 +265,7 @@ export class Listeners {
         // [0] = PlayerInfo
         const spec: any = playerInfo.SpectatorStatus.toString()
         const flags: any = playerInfo.Flags.toString()
-        const info: InfoChangedInfo = {
+        const info: tm.InfoChangedInfo = {
           login: playerInfo.Login,
           nickname: playerInfo.NickName,
           id: playerInfo.PlayerId,

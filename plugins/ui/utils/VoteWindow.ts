@@ -15,7 +15,8 @@ export default class VoteWindow {
   private readonly height = config.height
   private readonly positionX = config.posX
   private readonly positionY = config.posY
-  private readonly headerHeight = config.height
+  private readonly header = new StaticHeader('race')
+  private readonly headerHeight = this.header.options.height
   private readonly margin = config.margin
   private readonly bg = config.background
   private readonly buttonW = config.buttonWidth
@@ -88,8 +89,7 @@ export default class VoteWindow {
   }
 
   private constructHeader() {
-    const header = new StaticHeader('race')
-    const cfg = header.options
+    const cfg = this.header.options
     return `
     <quad posn="0 0 1" sizen="${this.width - (cfg.squareWidth + cfg.margin)} ${cfg.height}" bgcolor="${cfg.textBackground}"/>
     ${rightAlignedText(this.title, this.width - (cfg.squareWidth + cfg.margin), cfg.height, { textScale: cfg.textScale, xOffset: config.headerTextXOffset })}
@@ -107,33 +107,33 @@ export default class VoteWindow {
     const noVotes = votes.filter(a => a.vote === false).length
     const noVotesW = (noVotes / votes.length) * w
     const neededAmount = Math.ceil(allVotes * this.vote.goal)
-    const colour = (neededAmount - (allVotes - noVotes)) <= 0 ? '$0F0' : '$F00'
+    const colour = (neededAmount - (allVotes - noVotes)) <= 0 ? `$${config.colours.yes}` : `$${config.colours.no}`
     return `
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
     ${centeredText(this.message, w, rowH, { textScale: config.bigTextScale })}
     <frame posn="0 ${-rowH - this.margin} 1">
     <quad posn="0 0 1" sizen="${w} ${rowH}" bgcolor="${this.bg}"/>
-    ${centeredText(`Votes needed to pass: ${colour}${neededAmount}`, w, rowH, { textScale: config.bigTextScale })}
+    ${centeredText(tm.utils.strVar(config.message, { colour, amount: neededAmount }), w, rowH, { textScale: config.bigTextScale })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>
-      <quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="0D0F"/>
-      <quad posn="${this.margin} ${-this.margin} 4" sizen="${noVotesW - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="F00F"/>
-    </frame>` // TODO CONFIG COLOURS
+      <quad posn="${this.margin} ${-this.margin} 2" sizen="${w - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="${config.colours.yes}"/>
+      <quad posn="${this.margin} ${-this.margin} 4" sizen="${noVotesW - this.margin * 2} ${this.buttonH - this.margin * 2}" bgcolor="${config.colours.no}"/>
+    </frame>`
   }
 
   private constructRight(votes: { login: string; vote: boolean; }[], seconds: number) {
     const w = this.rightW
     const h = this.height - (this.headerHeight + this.margin)
     const rowH = (h - this.buttonH) / 2 - this.margin
-    const timeColour = ['$FFF', '$FF0', '$F00'][[20, 5, -1].findIndex(a => a < seconds)]
+    const timeColour = '$' + config.colours.timer[[...config.timerColourChanges, -1].findIndex(a => a < seconds)]
     return `<quad posn="0 0 1" sizen="${w - this.margin} ${rowH}" bgcolor="${this.bg}"/>
     ${centeredText(`${timeColour}${seconds}`, w - this.margin, rowH, { textScale: config.counterTextScale, specialFont: true })}
     <frame posn="0 ${-rowH - this.margin} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$F00` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: config.bigTextScale })}
+      ${centeredText(`$${config.colours.no}` + votes.filter(a => a.vote === false).length.toString(), w / 2 - this.margin, rowH, { textScale: config.bigTextScale })}
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${rowH}" bgcolor="${this.bg}"/>
-      ${centeredText(`$0F0` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: config.bigTextScale })}
+      ${centeredText(`$${config.colours.yes}` + votes.filter(a => a.vote === true).length.toString(), w / 2 - this.margin, rowH, { xOffset: w / 2, textScale: config.bigTextScale })}
     </frame>
     <frame posn="0 ${-h + this.buttonH} 1">
       <quad posn="0 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.noId}"/>

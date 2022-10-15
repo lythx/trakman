@@ -31,7 +31,7 @@ type TableEntryWithPlayerInfo = TableEntry & {
 
 export class RecordRepository extends Repository {
 
-  async add(...records: RecordInfo[]): Promise<void> {
+  async add(...records: tm.RecordInfo[]): Promise<void> {
     const mapIds = await mapIdsRepo.get(records.map(a => a.map))
     const playerIds = await playerRepo.getId(records.map(a => a.login))
     const arr = records.filter(a => mapIds.some(b => b.uid === a.map) && playerIds.some(b => b.login === a.login))
@@ -39,7 +39,7 @@ export class RecordRepository extends Repository {
       Logger.error(`Failed to get ids for maps or players ${records
         .filter(a => !(mapIds.some(b => b.uid === a.map)
           && playerIds.some(b => b.login === a.login)))
-          .map(a => `(${a.login}, ${a.map})`).join(', ')} while inserting into records table`)
+        .map(a => `(${a.login}, ${a.map})`).join(', ')} while inserting into records table`)
     }
     if (arr.length === 0) { return }
     const query = `INSERT INTO records(map_id, player_id, time, checkpoints, date) 

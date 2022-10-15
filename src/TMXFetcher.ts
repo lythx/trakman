@@ -7,7 +7,7 @@ type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
-  private static readonly sites: TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
+  private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
 
   /**
    * Fetches the map from TMX via its UID
@@ -18,8 +18,8 @@ export abstract class TMXFetcher {
   /**
    * Fetches map gbx file from tmx by TMX id, returns name and file in base64 string
    */
-  static async fetchMapFile(tmxId: number, site?: TMXSite): Promise<{ name: string, content: Buffer } | Error>
-  static async fetchMapFile(id: number | string, site: TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+  static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
+  static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
     let prefix: TMXPrefix = this.siteToPrefix(site)
     if (typeof id === 'string') {
       const res = await this.getTMXId(id)
@@ -166,7 +166,7 @@ export abstract class TMXFetcher {
     return mapInfo
   }
 
-  private static siteToPrefix(game: TMXSite): TMXPrefix {
+  private static siteToPrefix(game: tm.TMXSite): TMXPrefix {
     return this.prefixes[this.sites.indexOf(game)]
   }
 

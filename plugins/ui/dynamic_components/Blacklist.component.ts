@@ -16,7 +16,7 @@ export default class Blacklist extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
-    tm.addListener('ManialinkClick', async (info: ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {
       if (info.actionId >= this.openId + 1000 && info.actionId < this.openId + 2000) {
         const target = tm.admin.blacklist[info.actionId - this.openId - 1000]
         if (target === undefined) { return }
@@ -49,7 +49,7 @@ export default class Blacklist extends PopupWindow<number> {
     })
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
   }

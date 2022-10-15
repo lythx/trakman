@@ -26,7 +26,7 @@ export default class KarmaWidgetResult extends StaticComponent {
     })
     maniakarma.onMapFetch(this.display.bind(this))
     maniakarma.onVote(this.display.bind(this))
-    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId > this.id && info.actionId <= this.id + 6) {
         const index: number = info.actionId - (this.id + 1)
         const votes: [3, 2, 1, -1, -2, -3] = [3, 2, 1, -1, -2, -3]
