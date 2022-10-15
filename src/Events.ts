@@ -63,7 +63,7 @@ const emit = <T extends keyof tm.Events>(event: T,
   if (controllerReady === false) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
-    listener.callback(params) // TODO make not await if poss
+    listener.callback(params)
   }
 }
 

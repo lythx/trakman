@@ -81,8 +81,14 @@ namespace trakman {
 
     fetch: PlayerService.fetch.bind(PlayerService),
 
+    /**
+      All online players
+     */
     get list() { return PlayerService.players },
 
+    /**
+     * Number of online players
+     */
     get count() { return PlayerService.playerCount }
 
   }
