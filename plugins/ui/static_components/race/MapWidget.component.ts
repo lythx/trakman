@@ -23,11 +23,11 @@ export default class MapWidget extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
-    if (webservices.isEnabled === true) {
-      webservices.onCurrentAuthorChange(() => {
-        void this.display()
-      })
-    }
+    webservices.onCurrentAuthorChange(() => {
+      void this.display()
+    })
+    tmx.onMapChange(() => this.display())
+    tmx.onQueueChange(() => this.display())
   }
 
   display(): void {
