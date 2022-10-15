@@ -1,19 +1,25 @@
 import config from './Config.js'
 import http from 'http'
 
-
+interface WebservicesInfo {
+  id: number,
+  login: string,
+  united: boolean,
+  idZone: number
+  nickname: string,
+  region: string,
+  country: string,
+  countryCode: string
+}
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
-const currentAuthorListeners: ((data?: { nickname: string, country: string }) => void)[] = []
-const nextAuthorListeners: ((data?: { nickname: string, country: string }) => void)[] = []
-let currentAuthorData: { nickname: string, country: string } | undefined
-let nextAuthorData: { nickname: string, country: string } | undefined
+const currentAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
+const nextAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
+let curAuthor: WebservicesInfo | undefined
+let nextAuthor: WebservicesInfo | undefined
+let isMapRestart = false
+const cachedAuthors: WebservicesInfo[] = []
 
-/**
- * Fetches Trackmania Webservices for player information
- * @param login Player login
- * @returns Player information in JSON or error if unsuccessful
- */
-const fetchPlayer = async (login: string): Promise<{
+const fetchWebservices = async (login: string): Promise<{
   id: number
   login: string
   nickname: string
@@ -45,86 +51,75 @@ const fetchPlayer = async (login: string): Promise<{
   })
 }
 
-const fetchPlayerData = async (login: string): Promise<{ nickname: string, country: string } | Error | false> => {
-  if (regex.test(login) === true) { return false }
-  const json: any = await fetchPlayer(login)
-  if (json instanceof Error) { // UNKOWN PLAYER MOMENT
-    return json
+/**
+ * Fetches Trackmania Webservices for player information
+ * @param login Player login
+ * @returns Player information object or error if unsuccessful
+ */
+const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
+  const cacheEntry = cachedAuthors.find(a => a.login === login)
+  if (cacheEntry !== undefined) { return cacheEntry }
+  if (regex.test(login) === true) { return new Error(`Login doesn't pass regex test`) }
+  const player = await fetchWebservices(login)
+  if (player instanceof Error) { // UNKOWN PLAYER MOMENT
+    return player
   } else {
-    return { nickname: json?.nickname, country: (tm.utils.countryToCode(json?.path?.split('|')[1]) as any) }
+    const region = tm.utils.getRegionInfo(player.path)
+    if (region.countryCode === undefined) { throw new Error(`Received undefined country code from webservices for login ${login}`) }
+    const info: WebservicesInfo = {
+      id: Number(player.id),
+      login: player.login,
+      nickname: player.nickname,
+      united: Boolean(player.united),
+      idZone: Number(player.idZone),
+      region: region.region,
+      country: region.country,
+      countryCode: region.countryCode
+    }
+    cachedAuthors.unshift(info)
+    cachedAuthors.length = Math.min(config.cacheSize, cachedAuthors.length)
+    return info
   }
 }
 
 tm.addListener('Startup', async (): Promise<void> => {
-  const res = await fetchPlayerData(tm.maps.current.author)
-  if (res instanceof Error || res === false) {
-    currentAuthorData = undefined
-  } else {
-    currentAuthorData = res
-  }
-  for (const e of currentAuthorListeners) {
-    e(currentAuthorData)
-  }
+  const curRes = await fetchPlayer(tm.maps.current.author)
+  if (!(curRes instanceof Error)) { curAuthor = curRes }
+  for (const e of currentAuthorListeners) { e(curAuthor) }
+  const nextRes = await fetchPlayer(tm.jukebox.queue[0].id)
+  if (!(nextRes instanceof Error)) { nextAuthor = nextRes }
+  for (const e of nextAuthorListeners) { e(nextAuthor) }
 })
 
-tm.addListener('EndMap', async (info): Promise<void> => {
-  if (info.isRestart === true) {
-    nextAuthorData === currentAuthorData
-    for (const e of nextAuthorListeners) {
-      e(nextAuthorData)
-    }
-    return
-  }
-  const res = await fetchPlayerData(tm.jukebox.queue[0].author)
-  if (res instanceof Error || res === false) {
-    nextAuthorData = undefined
-  } else {
-    nextAuthorData = res
-  }
-  for (const e of nextAuthorListeners) {
-    e(nextAuthorData)
-  }
-})
+tm.addListener('EndMap', (info): void => { isMapRestart = info.isRestart })
+tm.addListener('BeginMap', () => { isMapRestart = false })
 
 tm.addListener('JukeboxChanged', async (): Promise<void> => {
-  if (tm.state.current === 'result') {
-    const res = await fetchPlayerData(tm.jukebox.queue[0].author)
-    if (res instanceof Error || res === false) {
-      nextAuthorData = undefined
-    } else {
-      nextAuthorData = res
-    }
-    for (const e of nextAuthorListeners) {
-      e(nextAuthorData)
-    }
+  const curLogin = tm.maps.current.author
+  if (curAuthor?.login !== curLogin) {
+    const res = await fetchPlayer(curLogin)
+    if (res instanceof Error) { curAuthor = undefined }
+    else { curAuthor = res }
   }
-})
-
-tm.addListener('BeginMap', (): void => {
-  currentAuthorData = nextAuthorData
-  nextAuthorData = undefined
-  for (const e of currentAuthorListeners) {
-    e(currentAuthorData)
+  for (const e of currentAuthorListeners) { e(curAuthor) }
+  const nextLogin = tm.jukebox.queue[0].author
+  if (nextAuthor?.login !== nextLogin) {
+    const res = await fetchPlayer(nextLogin)
+    if (res instanceof Error) { nextAuthor = undefined }
+    else { nextAuthor = res }
   }
-  for (const e of nextAuthorListeners) {
-    e(nextAuthorData)
-  }
+  for (const e of nextAuthorListeners) { e(nextAuthor) }
 })
 
 export const webservices = {
 
-  /**
-   * Fetches Trackmania Webservices for player information
-   * @param login Player login
-   * @returns Player information in JSON or error if unsuccessful
-   */
   fetchPlayer,
 
   /**
    * Adds callback listener executed when current map author webservices data gets changed
    * @param callback callback function to execute on event
    */
-  onCurrentAuthorChange: (callback: ((data?: { nickname: string, country: string }) => void)) => {
+  onCurrentAuthorChange: (callback: (data?: Readonly<WebservicesInfo>) => void) => {
     currentAuthorListeners.push(callback)
   },
 
@@ -132,7 +127,7 @@ export const webservices = {
    * Adds callback listener executed when next map author webservices data gets changed
    * @param callback callback function to execute on event
    */
-  onNextAuthorChange: (callback: ((data?: { nickname: string, country: string }) => void)) => {
+  onNextAuthorChange: (callback: (data?: Readonly<WebservicesInfo>) => void) => {
     nextAuthorListeners.push(callback)
   },
 
@@ -140,14 +135,15 @@ export const webservices = {
    * @returns current map author webservices data
    */
   get currentAuthor() {
-    return currentAuthorData
+    return curAuthor
   },
 
   /**
    * @returns next map author webservices data
    */
   get nextAuthor() {
-    return nextAuthorData
+    if (isMapRestart === true) { return curAuthor }
+    return nextAuthor
   },
 
   /**
@@ -156,4 +152,3 @@ export const webservices = {
   isEnabled: config.isEnabled
 
 }
-
