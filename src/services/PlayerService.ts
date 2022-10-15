@@ -330,14 +330,14 @@ export class PlayerService {
   }
 
   /**
-   * @returns All online players
+   * All online players
    */
   static get players(): Readonly<tm.Player & { currentCheckpoints: Readonly<tm.Checkpoint>[] }>[] {
     return [...this._players]
   }
 
   /**
-   * @returns Number of online players
+   * Number of online players
    */
   static get playerCount(): number {
     return this._players.length

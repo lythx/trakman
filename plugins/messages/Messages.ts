@@ -1,6 +1,10 @@
 import { dedimania } from '../dedimania/Dedimania.js'
-import { Logger } from '../../src/Logger.js'
 import c from './Config.js'
+
+let playerCount: number
+const res = await tm.db.query(`select count(*)::int from players;`)
+if (res instanceof Error) { await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack) }
+else { playerCount = res[0].count }
 
 const events: tm.Listener[] = [
   {
@@ -13,7 +17,6 @@ const events: tm.Listener[] = [
   {
     event: ['BeginMap', 'Startup'],
     callback: async (): Promise<void> => {
-      const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`) //FIX
       for (const player of tm.players.list) {
         const index: number = tm.records.local.findIndex(a => a.login === player.login)
         if (index === -1) {
@@ -26,16 +29,12 @@ const events: tm.Listener[] = [
           }), player.login)
         }
         const playerRank: number | undefined = player.rank
-        if (allRanks instanceof Error) {
-          Logger.error('how')
-          return
-        }
         if (playerRank === undefined) {
           tm.sendMessage(c.noRank, player.login)
         } else {
           tm.sendMessage(tm.utils.strVar(c.rank, {
             rank: tm.utils.getPositionString(playerRank),
-            total: allRanks[0].count
+            total: playerCount
           }), player.login)
         }
       }
@@ -44,6 +43,7 @@ const events: tm.Listener[] = [
   {
     event: 'PlayerJoin',
     callback: async (player: tm.JoinInfo): Promise<void> => {
+      if (player.visits === 0) { playerCount++ }
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.state.serverConfig.name),
         version: tm.config.version
@@ -60,17 +60,12 @@ const events: tm.Listener[] = [
         }), player.login)
       }
       const playerRank: number | undefined = player.rank
-      const allRanks: any[] | Error = await tm.db.query(`select count(*) from players;`) // FIX TOO
-      if (allRanks instanceof Error) {
-        Logger.error('how')
-        return
-      }
       if (playerRank === undefined) {
         tm.sendMessage(c.noRank, player.login)
       } else {
         tm.sendMessage(tm.utils.strVar(c.rank, {
           rank: tm.utils.getPositionString(playerRank),
-          total: allRanks[0].count
+          total: playerCount
         }), player.login)
       }
       tm.sendMessage(tm.utils.strVar(c.join, {
