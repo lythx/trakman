@@ -1,6 +1,5 @@
 import { Client } from "./client/Client.js"
 import { Logger } from "./Logger.js"
-import { Utils } from "./Utils.js"
 
 export class ServerConfig {
 
