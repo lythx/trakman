@@ -23,7 +23,7 @@ export default class CurrentCps extends PopupWindow {
     super(IDS.currentCps, iconUrl, config.title, config.navbar)
     // Create grid object to display the table
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1), config.grid)
-    tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
+    tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
       const currentCp = this.currentCheckpoints.find(a => a.login === info.player.login)
       const pb = tm.records.getLocal(info.player.login)
       if (currentCp === undefined) { // Add a player to array if he wasn't there
@@ -70,7 +70,7 @@ export default class CurrentCps extends PopupWindow {
   }
 
   // Override onOpen method to add page count to params and display it
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     // Calculate and update page count
     let pageCount = Math.ceil(this.currentCheckpoints.length / this.entries)
     if (pageCount === 0) { // Fix 0 pages display if theres no entries

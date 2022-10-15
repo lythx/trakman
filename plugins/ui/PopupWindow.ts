@@ -47,17 +47,17 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.frameMidTop,
     this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
-    tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => {
+    tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId === this.openId) { this.onOpen(info) }
-      else if (info.actionId === this.closeId) { 
+      else if (info.actionId === this.closeId) {
         const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
         if (index !== -1) {
           PopupWindow.playersWithWindowOpen.splice(index, 1)
         }
         this.onClose(info)
-       }
+      }
     })
-    tm.addListener('PlayerLeave', (info: LeaveInfo) => {
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo) => {
       const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
@@ -65,11 +65,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     })
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.displayToPlayer(info.login, undefined, undefined, info.privilege)
   }
 
-  protected onClose(info: ManialinkClickInfo): void {
+  protected onClose(info: tm.ManialinkClickInfo): void {
     this.hideToPlayer(info.login)
   }
 

@@ -1,13 +1,13 @@
 import utilIds from '../config/UtilIds.js'
 
 
-let keyListeners: { callback: ((info: ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
+let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
 
-export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: ManialinkClickInfo) => void, importance: number) => {
+export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void, importance: number) => {
   keyListeners.unshift({ callback, key, importance })
 }
 
-export const removeKeyListener = (callback: (info: ManialinkClickInfo) => void) => {
+export const removeKeyListener = (callback: (info: tm.ManialinkClickInfo) => void) => {
   keyListeners = keyListeners.filter(a => callback !== a.callback)
 }
 
@@ -41,7 +41,7 @@ tm.addListener('PlayerJoin', (info) => {
 
 
 
-tm.addListener('ManialinkClick', (info: ManialinkClickInfo) => {
+tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo) => {
   switch (info.actionId) {
     case utilIds.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)

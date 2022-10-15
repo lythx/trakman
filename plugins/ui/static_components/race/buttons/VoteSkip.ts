@@ -65,7 +65,7 @@ export class VoteSkip extends UiButton {
       + `${tm.utils.palette.vote}started a vote to ${tm.utils.palette.highlight}skip ${tm.utils.palette.vote}the ongoing map.`
     if (tm.state.remainingMapTime <= 30) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal,
-      `${tm.utils.palette.highlight}Vote to ${tm.utils.palette.red}SKIP${tm.utils.palette.highlight} the ongoing map`,
+      `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.red}SKIP${tm.utils.palette.highlight} the ongoing map`,
       startMsg, cfg.time, 'voteRed')
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {

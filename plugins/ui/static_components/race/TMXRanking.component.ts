@@ -20,16 +20,16 @@ export default class TMXRanking extends StaticComponent {
     this.header = new StaticHeader('race')
     this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
-    this.recordList.onClick((info: ManialinkClickInfo): void => {
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
     tm.addListener('LiveRecord', (info): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('PlayerJoin', (info: JoinInfo): void => {
+    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.displayToPlayer(info.login) }
     })
-    tm.addListener('PlayerLeave', (info: LeaveInfo): void => {
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.displayToPlayer(info.login) }
     })
   }

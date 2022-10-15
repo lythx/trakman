@@ -1,6 +1,7 @@
 import icons from '../config/Icons.js'
 import cfg from '../config/RaceUi.js'
 import header from './StaticHeaderRace.config.js'
+const p = tm.utils.palette
 
 export default {
   title: " Vote ",
@@ -13,10 +14,17 @@ export default {
   headerHeight: header.height,
   buttonHeight: 2.5,
   buttonWidth: 2.5,
-  headerTextXOffset: 0.2 ,// Check if necesarry
+  headerTextXOffset: 0.2, // Check if necesarry
   textScale: 0.7,
   bigTextScale: 1,
   counterTextScale: 0.4,
   F5Button: icons.F5,
-  F6Button: icons.F6
+  F6Button: icons.F6,
+  colours: {
+    yes: p.green,
+    no: p.red,
+    timer: ['FFF', p.yellow, p.red]
+  },
+  timerColourChanges: [20, 5],
+  message: `Votes needed to pass: #{colour}#{amount}$FFF.`
 }

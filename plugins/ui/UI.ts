@@ -177,7 +177,7 @@ let dynamicComponents: {
   readonly topSums: TopSums
 }
 
-const events: TMListener[] = [
+const events: tm.Listener[] = [
   {
     event: 'Startup',
     callback: async (status: 'race' | 'result'): Promise<void> => {
@@ -264,7 +264,7 @@ const events: TMListener[] = [
   },
   {
     event: 'PlayerJoin',
-    callback: (info: JoinInfo) => {
+    callback: (info: tm.JoinInfo) => {
       preloadIcons(info.login)
     }
   }

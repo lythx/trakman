@@ -47,7 +47,7 @@ export default class TopDonations extends PopupWindow<number> {
     }
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
   }

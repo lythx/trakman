@@ -121,7 +121,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     },)
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const player: tm.Player | undefined = tm.players.get(info.login)
     if (player === undefined) { return }
     const paginator: Paginator = this.paginators[player.privilege]

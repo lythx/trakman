@@ -23,7 +23,7 @@ export default class BestCps extends StaticComponent {
     this.cpAmount = tm.maps.current.checkpointsAmount - 1
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
-    tm.addListener('PlayerCheckpoint', (info: CheckpointInfo) => {
+    tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
         this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickname }
         this.paginator.setPageCount(Math.ceil(this.bestCps.length / config.entries))

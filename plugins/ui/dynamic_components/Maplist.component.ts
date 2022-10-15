@@ -152,7 +152,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     }
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
     let pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
@@ -169,7 +169,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     this.displayToPlayer(info.login, { page, paginator: this.paginator }, `${page}/${pageCount}`)
   }
 
-  protected onClose(info: ManialinkClickInfo): void {
+  protected onClose(info: tm.ManialinkClickInfo): void {
     const index = this.playerQueries.findIndex(a => a.login === info.login)
     if (index !== -1) {
       this.playerQueries[index].paginator.destroy()
@@ -278,36 +278,13 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     return true
   }
 
-  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> { // TODO
-    const records = await tm.records.fetchByMap(...mapIds)
-    const positions: number[] = []
-    let i = -1
-    while (true) {
-      i++
-      if (records[i] === undefined) { break }
-      const id = records[i].map
-      if (positions[mapIds.indexOf(id)] !== undefined) { continue }
-      let index = 0
-      let j = 0
-      while (true) {
-        if (records[j] === undefined) {
-          positions[mapIds.indexOf(id)] = -1
-          break
-        }
-        if (records[j].map === id) {
-          if (records[j].login === login) {
-            positions[mapIds.indexOf(id)] = index + 1
-            break
-          }
-          index++
-        }
-        j++
-      }
-    }
+  private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
+    const ranks = tm.records.getRank(login, mapIds)
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
-      if (positions[i] === -1 || positions[i] === undefined) { ret.push(config.texts.noRank) }
-      else { ret.push(tm.utils.getPositionString(positions[i])) }
+      const r = ranks.find(a => a.mapId === mapIds[i])
+      if (r === undefined) { ret.push(config.texts.noRank) }
+      else { ret.push(tm.utils.getPositionString(r.rank)) }
     }
     return ret
   }

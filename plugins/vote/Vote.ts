@@ -10,17 +10,17 @@ export class Vote {
   readonly noId: number = IDS.VoteWindow.voteNo
   readonly goal: number
   private readonly votes: { login: string, vote: boolean }[] = []
-  static listener: ((info: ManialinkClickInfo) => void) = () => undefined
+  static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
   static endMapListener: () => void = () => undefined
   static startMapListener: () => void = () => undefined
-  static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
+  static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
   static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onInterrupt: ((info: {
     caller?: tm.Player,
     result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: ManialinkClickInfo) => void) = () => undefined
+  onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   onInterrupt: ((info: {
     caller?: tm.Player,
@@ -42,7 +42,7 @@ export class Vote {
     this.cancelOnRoundStart = dontCancelOnRoundStart === undefined
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
-      tm.addListener('ManialinkClick', (info: ManialinkClickInfo): void => Vote.listener(info))
+      tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => Vote.listener(info))
       if (!['F5', 'F6', 'F7'].includes(config.yesKey)) {
         throw new Error(`Vote yesKey needs to be either F5, F6 or F7, received${config.yesKey}. Fix your vote config`)
       } else if (!['F5', 'F6', 'F7'].includes(config.noKey)) {
@@ -76,7 +76,7 @@ export class Vote {
     Vote.onInterrupt = this.onInterrupt
     Vote.onSecondsChanged = this.onSecondsChanged
     Vote.isDisplayed = true
-    Vote.listener = (info: ManialinkClickInfo): void => {
+    Vote.listener = (info: tm.ManialinkClickInfo): void => {
       if (this.isActive === true && this.loginList.includes(info.login)) {
         const vote = this.votes.find(a => a.login === info.login)
         if (vote === undefined) {

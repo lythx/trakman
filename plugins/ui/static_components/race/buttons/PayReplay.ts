@@ -1,9 +1,10 @@
 import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-
+import messages from './Messages.config.js'
 
 const cfg = config.payReplay
+const msg = messages.payReplay
 
 export class PayReplay extends UiButton {
 
@@ -42,22 +43,26 @@ export class PayReplay extends UiButton {
     if (this.isReplay === true || this.isSkip === true) { return }
     const cost: number = cfg.costs[this.costIndex]
     if (cost === undefined) { return }
-    const res: boolean | Error = await tm.utils.sendCoppers(login, cost, 'Pay to restart the ongoing map')
+    const res: boolean | Error = await tm.utils.sendCoppers(login, cost, cfg.billMessage)
     if (res instanceof Error) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}Failed to process payment.`, login)
+      tm.sendMessage(msg.paymentFail, login)
     } else if (res === true) {
       if ((this.isReplay as boolean) === true || (this.isSkip as boolean) === true) {
-        let returnMessage = '.'
-        if (cost >= 75) { // Its not worth to return under 75 due to nadeo tax growing exponentially
-          returnMessage = ', coppers will be returned.'
-          void tm.utils.payCoppers(login, cost * 0.85, 'ad')
+        let refundMessage = ''
+        if (cost >= 100) { // Its not worth to return under 100 due to nadeo tax growing exponentially
+          refundMessage = msg.refund
+          void tm.utils.payCoppers(login, cost * 0.7, msg.refundMail)
         }
-        tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}The map got` +
-          ` ${this.isReplay ? 'replayed' : 'skipped'} while processing the payment${returnMessage}`, login)
+        tm.sendMessage(tm.utils.strVar(msg.interrupt, {
+          event: this.isReplay ? msg.replayEvent : msg.skipEvent,
+          refund: refundMessage
+        }), login)
         return
       }
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.highlight + tm.utils.strip(nickname)}${tm.utils.palette.donation}` +
-        ` has paid ${tm.utils.palette.highlight}${cost}C ${tm.utils.palette.donation} to replay the ongoing map.`)
+      tm.sendMessage(tm.utils.strVar(msg.success, {
+        name: tm.utils.strip(nickname),
+        amount: cost
+      }))
       tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
       this.costIndex++
       this.handleMapReplay()

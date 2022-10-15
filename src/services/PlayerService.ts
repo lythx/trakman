@@ -26,7 +26,7 @@ export class PlayerService {
   static async initialize(): Promise<void> {
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
-    Events.addListener('LocalRecord', (info: RecordInfo): void => {
+    Events.addListener('LocalRecord', (info: tm.RecordInfo): void => {
       if (info.previousPosition > RecordService.maxLocalsAmount && info.position <= RecordService.maxLocalsAmount) {
         this.newLocalsAmount++
       }
@@ -88,7 +88,7 @@ export class PlayerService {
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<JoinInfo> {
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> {
     const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
@@ -178,7 +178,7 @@ export class PlayerService {
    * Remove the player from local memory, save timePlayed and lastOnline in database
    * @param login Player login
    */
-  static leave(login: string): LeaveInfo | Error {
+  static leave(login: string): tm.LeaveInfo | Error {
     const date: Date = new Date()
     const playerIndex: number = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
@@ -189,7 +189,7 @@ export class PlayerService {
     const player: tm.Player | undefined = this._players[playerIndex]
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
-    const leaveInfo: LeaveInfo = {
+    const leaveInfo: tm.LeaveInfo = {
       ...player,
       timePlayed: totalTimePlayed,
       sessionTime

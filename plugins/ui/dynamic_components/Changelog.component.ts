@@ -16,7 +16,7 @@ export default class Changelog extends PopupWindow {
     })
   }
 
-  protected onOpen(info: ManialinkClickInfo): void {
+  protected onOpen(info: tm.ManialinkClickInfo): void {
     this.displayToPlayer(info.login, null, `1/1`)
   }
 

@@ -12,7 +12,7 @@ export class RecordService {
 
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: tm.LocalRecord[] = []
-  private static _liveRecords: FinishInfo[] = []
+  private static _liveRecords: tm.FinishInfo[] = []
   static readonly maxLocalsAmount: number = config.localRecordsLimit
   private static _initialLocals: tm.LocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
@@ -33,7 +33,21 @@ export class RecordService {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
-   }
+    Events.addListener('LocalRecord', (info) => {
+      const ranks = this._playerRanks.filter(a => a.mapId === tm.maps.current.id)
+      const rec = ranks.find(a => a.login === info.login)
+      if (rec !== undefined) {
+        rec.rank === info.position
+      } else {
+        this._playerRanks.push({ login: info.login, rank: info.position, mapId: info.map })
+      }
+      for (const e of ranks) {
+        if (e.rank > info.position && e.rank < info.previousPosition) {
+          e.rank++
+        }
+      }
+    })
+  }
 
   /**
    * Fetches and stores records for current map
@@ -92,10 +106,12 @@ export class RecordService {
    * @param player Player login
    * @param time Record time
    * @returns False if checkpoints amount is not coherent with map checkpoints amount, otherwise an object
-   * containing finishInfo object, localRecord object if record was a local record and liveRecord object if 
+   * containing tm.FinishInfo object, localRecord object if record was a local record and liveRecord object if 
    * record was a live record
    */
-  static async add(map: string, player: tm.Player, time: number): Promise<false | { finishInfo: FinishInfo, localRecord?: RecordInfo, liveRecord?: RecordInfo }> {
+  static async add(map: string, player: tm.Player, time: number): Promise<false | {
+    finishInfo: tm.FinishInfo, localRecord?: tm.RecordInfo, liveRecord?: tm.RecordInfo
+  }> {
     const date: Date = new Date()
     const cpsPerLap: number = MapService.current.checkpointsAmount
     let laps: number
@@ -121,8 +137,8 @@ export class RecordService {
       map,
       time
     }
-    const localRecord: RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
-    const liveRecord: RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
+    const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
+    const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
   }
 
@@ -164,13 +180,13 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if local record gets added, undefined otherwise
    */
-  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): Promise<RecordInfo | undefined> {
+  private static async handleLocalRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): Promise<tm.RecordInfo | undefined> {
     const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
     let position: number = this._localRecords.findIndex(a => a.time > time) + 1
     // If player gets the worst record on the server set position to array length + 1
     if (position === 0) { position = this._localRecords.length + 1 }
     if (previousIndex === -1) {
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(-1, position, -1, time, player, 'local'))
       void this.repo.add(recordInfo)
@@ -178,13 +194,13 @@ export class RecordService {
     }
     const pb: number | undefined = this._localRecords[previousIndex].time
     if (time === pb) {
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
       Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, 'local'))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     if (time < pb) {
       const previousTime: number | undefined = this._localRecords[previousIndex].time
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._localRecords.splice(previousIndex, 1)
       this._localRecords.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'local'))
@@ -202,18 +218,18 @@ export class RecordService {
    * @param player Player object
    * @returns Record object if live record gets added, undefined otherwise
    */
-  private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): RecordInfo | undefined {
+  private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): tm.RecordInfo | undefined {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
     const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Logger.trace(...this.getLogString(-1, position, -1, time, player, 'live'))
       return recordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === player.login)?.login) + 1
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
       Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live'))
       return recordInfo
     }
@@ -224,7 +240,7 @@ export class RecordService {
         return
       }
       const previousTime: number | undefined = this._liveRecords[previousIndex].time
-      const recordInfo: RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
       Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'live'))
@@ -310,7 +326,7 @@ export class RecordService {
    * @returns Record object
    */
   private static constructRecordObject(player: tm.Player, mapId: string, date: Date, checkpoints: number[],
-    time: number, previousTime: number, position: number, previousPosition: number): RecordInfo {
+    time: number, previousTime: number, position: number, previousPosition: number): tm.RecordInfo {
     return {
       id: player.id,
       map: mapId,
@@ -360,21 +376,21 @@ export class RecordService {
    * @param mapId Map uid
    * @returns Rank or undefined if player doesn't have a record
    */
-  static async getRank(login: string, mapId: string): Promise<number | undefined>
+  static getRank(login: string, mapId: string): number | undefined
   /**
    * Gets given player local ranks on given maps
    * @param login Player login
    * @param mapIds Array of map uids
    * @returns Array of objects with player ranks and map uids
    */
-  static async getRank(login: string, mapIds?: string[]): Promise<{ mapId: string, rank: number }[]>
+  static getRank(login: string, mapIds?: string[]): { mapId: string, rank: number }[]
   /**
    * Gets given player local ranks on all maps
    * @param login Player login
    * @returns Array of objects with player ranks and map uids
    */
-  static async getRank(login: string): Promise<{ mapId: string, rank: number }[]>
-  static async getRank(login: string, mapIds?: string | string[]): Promise<number | undefined | { mapId: string, rank: number }[]> {
+  static getRank(login: string): { mapId: string, rank: number }[]
+  static getRank(login: string, mapIds?: string | string[]): number | undefined | { mapId: string, rank: number }[] {
     if (mapIds === undefined) {
       return this._playerRanks.filter(a => login === a.login && a.rank !== -1)
     }
@@ -452,15 +468,15 @@ export class RecordService {
    * @param login Player login
    * @returns Live record object or undefined if the player doesn't have a live record
    */
-  static getLive(login: string): FinishInfo | undefined
+  static getLive(login: string): tm.FinishInfo | undefined
   /**
    * Gets multiple live records If some player has no live record his record object wont be returned. 
    * Returned array is sorted primary by time ascending, secondary by date ascending
    * @param logins Array of player logins
    * @returns Array of live record objects
    */
-  static getLive(logins: string[]): FinishInfo[]
-  static getLive(logins: string | string[]): FinishInfo | undefined | FinishInfo[] {
+  static getLive(logins: string[]): tm.FinishInfo[]
+  static getLive(logins: string | string[]): tm.FinishInfo | undefined | tm.FinishInfo[] {
     if (typeof logins === 'string') {
       return this._liveRecords.find(a => a.login === logins)
     }
@@ -537,7 +553,7 @@ export class RecordService {
   /**
    * @returns Live records array
    */
-  static get liveRecords(): Readonly<FinishInfo>[] {
+  static get liveRecords(): Readonly<tm.FinishInfo>[] {
     return [...this._liveRecords]
   }
 

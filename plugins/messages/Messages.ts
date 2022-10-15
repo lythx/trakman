@@ -2,7 +2,7 @@ import { dedimania } from '../dedimania/Dedimania.js'
 import { Logger } from '../../src/Logger.js'
 import c from './Config.js'
 
-const events: TMListener[] = [
+const events: tm.Listener[] = [
   {
     event: 'Startup',
     callback: (): void => {
@@ -43,7 +43,7 @@ const events: TMListener[] = [
   },
   {
     event: 'PlayerJoin',
-    callback: async (player: JoinInfo): Promise<void> => {
+    callback: async (player: tm.JoinInfo): Promise<void> => {
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.state.serverConfig.name),
         version: tm.config.version
@@ -83,7 +83,7 @@ const events: TMListener[] = [
   },
   {
     event: 'EndMap',
-    callback: (info: EndMapInfo): void => {
+    callback: (info: tm.EndMapInfo): void => {
       if (info.winnerLogin === undefined || info.winnerWins === undefined) {
         return
       }
@@ -94,7 +94,7 @@ const events: TMListener[] = [
   },
   {
     event: 'PlayerLeave',
-    callback: (player: LeaveInfo): void => {
+    callback: (player: tm.LeaveInfo): void => {
       tm.sendMessage(tm.utils.strVar(c.leave, {
         nickname: tm.utils.strip(player.nickname, true),
         time: tm.utils.msToTime(player.sessionTime)
@@ -103,7 +103,7 @@ const events: TMListener[] = [
   },
   {
     event: 'LocalRecord',
-    callback: (info: RecordInfo): void => {
+    callback: (info: tm.RecordInfo): void => {
       let prevPos: number = info.previousPosition
       let prevTime: number = info.previousTime
       if (info.previousPosition > tm.records.maxLocalsAmount) {

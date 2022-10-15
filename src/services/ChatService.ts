@@ -7,7 +7,6 @@ import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
-import { MessageInfo } from '../types/TMMessageInfo.js'
 
 /**
  * This service manages chat table and chat commands
@@ -38,7 +37,7 @@ export abstract class ChatService {
     }
   }
 
-  private static async commandCallback(command: tm.Command, info: MessageInfo): Promise<void> {
+  private static async commandCallback(command: tm.Command, info: tm.MessageInfo): Promise<void> {
     const prefix: string = command.privilege === 0 ? '/' : '//'
     const input: string = info.text?.trim()
     const [alias, ...params] = input.split(' ').filter(a => a !== '')
@@ -175,7 +174,7 @@ export abstract class ChatService {
         }
       }
     }
-    const messageInfo: MessageInfo & { aliasUsed: string } = {
+    const messageInfo: tm.MessageInfo & { aliasUsed: string } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
       aliasUsed
@@ -193,7 +192,7 @@ export abstract class ChatService {
    * @param text Message text
    * @returns Message object or Error if unsuccessfull
    */
-  static add(login: string, text: string): MessageInfo | Error {
+  static add(login: string, text: string): tm.MessageInfo | Error {
     const player: tm.Player | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
@@ -206,7 +205,7 @@ export abstract class ChatService {
       text,
       date: new Date()
     }
-    const messageInfo: MessageInfo = {
+    const messageInfo: tm.MessageInfo = {
       text,
       date: message.date,
       ...player
