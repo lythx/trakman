@@ -32,6 +32,8 @@ export default class TMXRanking extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.displayToPlayer(info.login) }
     })
+    tmx.onMapChange(() => this.display())
+    tmx.onQueueChange(() => this.display())
   }
 
   display(): void {

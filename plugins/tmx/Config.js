@@ -1,5 +1,5 @@
 export default {
   isEnabled: true,
-  queueSize: 4,
+  queueCount: 4,
   historyCount: 4
 }

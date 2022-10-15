@@ -4,7 +4,7 @@ import { TMXMapChangedInfo } from './TmxTypes.js'
 // fill with empty strings at start to avoid undefined error on startup
 const history: (tm.TMXMap | string)[] = []
 let current: tm.TMXMap | string = ''
-const queueSize: number = config.queueSize
+const queueSize: number = config.queueCount
 const historySize: number = config.historyCount
 const queue: (tm.TMXMap | string)[] = new Array(queueSize).fill('')
 
@@ -37,16 +37,29 @@ const initialize = async (): Promise<void> => {
     queue[i] = map instanceof Error ? e.id : map
   }
   emitMapChangeEvent()
+  emitQueueChangeEvent()
   tm.log.trace('TMX plugin instantiated')
 }
 
-const updateQueue = async (jukeboxQueue: tm.Map[]): Promise<void> => {
-  const jb = jukeboxQueue.slice(0, queueSize).map(a => a.id)
-  for (const [i, e] of jb.entries()) {
-    const entry = queue.find(a => {
-      if (typeof a === 'string') { a === e }
-      else { a.id === e }
-    })
+const update = async (): Promise<void> => {
+  const fetchedMaps = [...queue, current, ...history]
+  const newQueue = tm.jukebox.queue.slice(0, queueSize).map(a => a.id)
+  const curId = tm.maps.current.id
+  if (curId !== (typeof current === 'string' ? current : current.id)) {
+    history.unshift(current)
+    history.length = Math.min(historySize, history.length)
+    const entry = fetchedMaps.find(a => typeof a === 'string' ? a === curId : a.id === curId)
+    if (entry !== undefined) {
+      current = entry
+    }
+    else {
+      const res = await tm.tmx.fetchMapInfo(curId)
+      current = res instanceof Error ? curId : res
+    }
+    emitMapChangeEvent()
+  }
+  for (const [i, e] of newQueue.entries()) {
+    const entry = fetchedMaps.find(a => typeof a === 'string' ? a === e : a.id === e)
     if (entry !== undefined) {
       queue[i] === entry
     } else {
@@ -57,30 +70,12 @@ const updateQueue = async (jukeboxQueue: tm.Map[]): Promise<void> => {
   emitQueueChangeEvent()
 }
 
-const nextMap = async (): Promise<void> => {
-  history.unshift(current)
-  history.length = Math.min(history.length, historySize)
-  let next: tm.TMXMap | string | undefined = queue.shift()
-  if (next === undefined) {
-    await tm.log.fatal(`Can't find tmx prefetch in memory while setting next map`)
-    return
-  }
-  current = next
-  const id = tm.jukebox.queue[queueSize - 1].id
-  const map: tm.TMXMap | Error = await tm.tmx.fetchMapInfo(id)
-  queue.push(map instanceof Error ? id : map)
-  emitMapChangeEvent()
-}
-
 if (config.isEnabled === true) {
   tm.addListener('Startup', () => {
     tm.log.trace('Initializing TMX...')
     void initialize()
   })
-  tm.addListener('BeginMap', (info) => {
-    if (info.isRestart === false) { void nextMap() }
-  })
-  tm.addListener('JukeboxChanged', (queue) => void updateQueue(queue))
+  tm.addListener('JukeboxChanged', () => void update())
 }
 
 /**
