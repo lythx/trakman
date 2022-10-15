@@ -43,6 +43,7 @@ const initialize = async (): Promise<void> => {
   isConnected = true
   await fetchVotes(...tm.players.list.map(a => a.login))
   tm.log.trace('Connected to Maniakarma')
+  emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
 }
 
 const reinitialize = async (): Promise<void> => {
@@ -54,6 +55,7 @@ const reinitialize = async (): Promise<void> => {
   tm.log.info('Initialized maniakarma after an error')
   isConnected = true
   await fetchVotes(...tm.players.list.map(a => a.login))
+  emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
 }
 
 const authenticate = async (): Promise<true | Error> => {

@@ -58,8 +58,8 @@ export default class MapWidgetResult extends StaticComponent {
     const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
     let authorIcon = ic.author
-    if (authorData?.country !== undefined) {
-      authorIcon = (flags as any)[authorData.country] // cope typescript
+    if (authorData !== undefined) {
+      authorIcon = (flags as any)[authorData.countryCode] // cope typescript
     }
     const obj = this.getTagAndAward(map, TMXMap ?? undefined)
     const infos: [string, string][] = [

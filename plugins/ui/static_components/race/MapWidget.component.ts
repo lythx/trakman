@@ -48,8 +48,8 @@ export default class MapWidget extends StaticComponent {
     const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
     let authorIcon = ic.author
-    if (webservices.currentAuthor?.country !== undefined) {
-      authorIcon = (flags as any)[webservices.currentAuthor.country] // cope typescript
+    if (webservices.currentAuthor !== undefined) {
+      authorIcon = (flags as any)[webservices.currentAuthor.countryCode] // cope typescript
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
