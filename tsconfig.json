@@ -102,8 +102,6 @@
   "include": [
     "Plugins.ts",
     "src/*",
-    "src/types/*",
-    "tests/**/*",
     "plugins/*"
   ],
   "exclude": [
