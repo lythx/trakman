@@ -31,7 +31,7 @@ const commands: tm.Command[] = [
         return
       }
       const base64String: string = file.content.toString('base64')
-      const write: any[] | Error = await tm.client.call('WriteFile', [{ string: file.name }, { base64: base64String }])
+      const write: any | Error = await tm.client.call('WriteFile', [{ string: file.name }, { base64: base64String }])
       if (write instanceof Error) {
         tm.log.warn(`Server failed to write map file ${file.name}.`)
         tm.sendMessage(config.add.writeError, info.login)
@@ -119,7 +119,7 @@ const commands: tm.Command[] = [
       const buffer = await file.arrayBuffer()
       const base64String: string = Buffer.from(buffer).toString('base64')
       const finalFilename = filename ?? url
-      const write: any[] | Error = await tm.client.call('WriteFile',
+      const write: any | Error = await tm.client.call('WriteFile',
         [{ string: `${finalFilename}.Challenge.Gbx` }, { base64: base64String }])
       if (write instanceof Error) {
         tm.log.warn(`Server failed to write map file ${finalFilename}.`)

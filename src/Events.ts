@@ -12,9 +12,9 @@ const initialize = async () => {
     return
   }
   let status: 'result' | 'race'
-  if (res[0].Code === 5) {
+  if (res.Code === 5) {
     status = 'result'
-  } else if (res[0].Code === 4) {
+  } else if (res.Code === 4) {
     status = 'race'
   } else {
     await new Promise((resolve) => setTimeout(resolve, 1000))

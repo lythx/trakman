@@ -166,7 +166,7 @@ export class AdministrationService {
     }
     for (const e of this._blacklist) {
       if (!blacklist.some((a: any): boolean => a.Login === e.login)) {
-        const res: any[] | Error = await Client.call('BlackList', [{ string: e.login }])
+        const res: any | Error = await Client.call('BlackList', [{ string: e.login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to add login ${e.login} to blacklist`, `Server responded with error:`, res.message)
         }
@@ -175,7 +175,7 @@ export class AdministrationService {
     for (const login of blacklist.map((a): string => a.Login)) {
       if (!this._blacklist.some((a: any): boolean => a.login === login) &&
         !this.serverBanlist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('UnBlackList', [{ string: login }])
+        const res: any | Error = await Client.call('UnBlackList', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from blacklist`, `Server responded with error:`, res.message)
         }
@@ -204,7 +204,7 @@ export class AdministrationService {
     }
     for (const e of this.muteOnJoin) {
       if (!mutelist.some((a: any): boolean => a.Login === e.login)) {
-        const res: any[] | Error = await Client.call('Ignore', [{ string: e.login }])
+        const res: any | Error = await Client.call('Ignore', [{ string: e.login }])
         if (!(res instanceof Error)) {
           this.muteOnJoin = this.muteOnJoin.filter(a => a.login !== e.login)
           this.serverMutelist.push(e)
@@ -216,7 +216,7 @@ export class AdministrationService {
     }
     for (const login of mutelist.map((a): string => a.Login)) {
       if (!this.mutelist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('UnIgnore', [{ string: login }])
+        const res: any | Error = await Client.call('UnIgnore', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from mutelist`, `Server responded with error:`, res.message)
         }
@@ -236,7 +236,7 @@ export class AdministrationService {
     }
     for (const e of this._guestlist) {
       if (!guestlist.some((a: any): boolean => a.Login === e.login)) {
-        const res: any[] | Error = await Client.call('AddGuest', [{ string: e.login }])
+        const res: any | Error = await Client.call('AddGuest', [{ string: e.login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to add login ${e.login} to guestlist`, `Server responded with error:`, res.message)
         }
@@ -244,7 +244,7 @@ export class AdministrationService {
     }
     for (const login of guestlist.map((a): string => a.Login)) {
       if (!this._guestlist.some((a: any): boolean => a.login === login)) {
-        const res: any[] | Error = await Client.call('RemoveGuest', [{ string: login }])
+        const res: any | Error = await Client.call('RemoveGuest', [{ string: login }])
         if (res instanceof Error) {
           await Logger.fatal(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
         }

@@ -24,18 +24,18 @@ export class Listeners {
           Client.callNoRes('Kick', [{ string: login }])
           return
         }
-        const playerInfo: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: login }])
+        const playerInfo: any | Error = await Client.call('GetDetailedPlayerInfo', [{ string: login }])
         if (playerInfo instanceof Error) {
           Logger.error(`Failed to get player info for login ${login}`, playerInfo.message)
           Client.callNoRes('Kick', [{ string: login }])
           return
         }
-        const ip: string = playerInfo[0].IPAddress.split(':')[0]
+        const ip: string = playerInfo.IPAddress.split(':')[0]
         const canJoin = await AdministrationService.handleJoin(login, ip)
         if (canJoin === false) { return }
-        const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo[0].Login, playerInfo[0].NickName,
-          playerInfo[0].Path, isSpectator, playerInfo[0].PlayerId, ip, playerInfo[0].OnlineRights === 3,
-          playerInfo[0]?.LadderStats.PlayerRankings[0]?.Score, playerInfo[0]?.LadderStats.PlayerRankings[0]?.Ranking)
+        const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
+          playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
+          playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
         AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
         RecordService.updateInfo({ login, nickname: joinInfo.nickname, region: joinInfo.region, title: joinInfo.title })
         Events.emit('PlayerInfoUpdated', [{
@@ -47,7 +47,7 @@ export class Listeners {
         }])
         Events.emit('PlayerJoin', joinInfo)
         // Update rank for the arriving player, this can take time hence no await
-        void RecordService.fetchAndStoreRanks(playerInfo[0].Login)
+        void RecordService.fetchAndStoreRanks(playerInfo.Login)
       }
     },
     {
@@ -172,7 +172,8 @@ export class Listeners {
       callback: async ([map]: tm.Events['TrackMania.BeginChallenge']): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
         // Set game state to 'race'
-        GameService.state = 'race'
+
+        GameService.state = 'transition'
         // Update server parameters
         await GameService.update()
         // Get records for current map
@@ -180,11 +181,11 @@ export class Listeners {
         if (isRestart === false) {
           // In case it wasn't, update the ongoing map
           await MapService.update()
-          await RecordService.nextMap()
           await VoteService.nextMap()
+          await RecordService.nextMap()
         }
         // Update server config
-        ServerConfig.update()
+        await ServerConfig.update()
         // Register map update
         Events.emit('BeginMap', { ...MapService.current, isRestart })
       }
@@ -193,6 +194,7 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async ([winner, map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
+        console.log(winner, map, wasWarmUp, continuesOnNextMap, restart)
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         // Set game state to 'result'
@@ -226,6 +228,9 @@ export class Listeners {
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
         if (params[0] === 4 || params[0] === 5) {
           GameService.startTimer()
+        }
+        if (params[0] === 4) {
+          GameService.state = 'race'
         }
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play
@@ -320,7 +325,7 @@ export class Listeners {
     for (const listener of this.listeners) {
       Events.addListener(listener.event, listener.callback)
     }
-    const cb: any[] | Error = await Client.call('EnableCallbacks', [
+    const cb: any | Error = await Client.call('EnableCallbacks', [
       { boolean: true }
     ])
     return cb instanceof Error ? cb : true

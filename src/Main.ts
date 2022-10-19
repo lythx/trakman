@@ -1,4 +1,3 @@
-import './Trakman.js'
 import { Client } from './client/Client.js'
 import { Database } from './database/DB.js'
 import { Logger } from './Logger.js'
@@ -14,7 +13,7 @@ import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
 import config from '../config/Server.js'
-await import('../Plugins.js')
+import './Trakman.js'
 
 async function main(): Promise<void> {
   await Logger.initialize()
@@ -25,7 +24,7 @@ async function main(): Promise<void> {
   Logger.trace('Authenticating...')
   if (config.superAdminName === undefined) { await Logger.fatal('superAdminName is undefined. Check your server config file') }
   if (config.superAdminPassword === undefined) { await Logger.fatal('superAdminPassword is undefined. Check your server config file') }
-  const authenticationStatus: any[] | Error = await Client.call('Authenticate', [
+  const authenticationStatus: any | Error = await Client.call('Authenticate', [
     { string: config.superAdminName },
     { string: config.superAdminPassword }
   ])
@@ -34,6 +33,8 @@ async function main(): Promise<void> {
   Logger.trace('Initializing database...')
   Database.initialize()
   Logger.trace('Database initialized...')
+  // import plugins after initializing database to avoid process exiting with no error in case of query on inexistent table
+  await import('../Plugins.js') 
   await fixRankCoherence()
   Logger.trace('Retrieving game info...')
   await GameService.initialize()

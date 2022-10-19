@@ -38,7 +38,8 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 tm.addListener('PlayerJoin', (info) => {
   const login = info.login
   const visits = info.visits
-  if (topList.length < config.visitsCount && visits <= topList[topList.length - 1].visits) { return }
+  if (topList.length !== 0 && topList.length < config.visitsCount && 
+    visits <= topList[topList.length - 1].visits) { return }
   const entry = topList.find(a => a.login === login)
   let obj: typeof topList[number]
   if (entry !== undefined) {
