@@ -39,7 +39,8 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 tm.addListener('RanksAndAveragesUpdated', async (info) => {
   const updated: typeof topList = []
   for (const e of info) {
-    if (topList.length < config.averagesCount && e.average >= topList[topList.length - 1].average) { return }
+    if (topList.length !== 0 && topList.length < config.averagesCount &&
+      e.average >= topList[topList.length - 1].average) { return }
     const entry = topList.find(a => a.login === e.login)
     if (entry !== undefined) {
       entry.average = e.average

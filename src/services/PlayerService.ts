@@ -47,15 +47,15 @@ export class PlayerService {
       return
     }
     for (const player of playerList) {
-      const info: any[] | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
+      const info: any | Error = await Client.call('GetDetailedPlayerInfo', [{ string: player.Login }])
       if (info instanceof Error) {
         Logger.fatal(`Error when fetching player information from the server for ${Utils.strip(player.NickName)} (${player.Login})`, info.message)
         return
       }
       // OnlineRights is 0 for nations and 3 for united ?XD
-      await this.join(player.Login, player.NickName, info[0].Path, info[0].IsSpectator,
-        info[0].PlayerId, info[0].IPAddress.split(':')[0], info[0].OnlineRights === 3,
-        info[0].LadderStats.PlayerRankings[0].Score, info[0].LadderStats.PlayerRankings[0].Ranking, true)
+      await this.join(player.Login, player.NickName, info.Path, info.IsSpectator,
+        info.PlayerId, info.IPAddress.split(':')[0], info.OnlineRights === 3,
+        info.LadderStats.PlayerRankings[0].Score, info.LadderStats.PlayerRankings[0].Ranking, true)
     }
   }
 

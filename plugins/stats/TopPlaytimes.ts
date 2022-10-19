@@ -41,7 +41,8 @@ tm.addListener('EndMap', () => {
   const updated: typeof topList = []
   for (const e of players) {
     const pt = e.timePlayed + Date.now() - e.joinTimestamp
-    if (topList.length < config.playtimesCount && pt <= topList[topList.length - 1].playtime) { return }
+    if (topList.length !== 0 && topList.length < config.playtimesCount && 
+      pt <= topList[topList.length - 1].playtime) { return }
     const entry = topList.find(a => a.login === e.login)
     if (entry !== undefined) {
       entry.playtime = pt

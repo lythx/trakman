@@ -54,7 +54,7 @@ export class ClientSocket extends net.Socket {
   * Poll dedicated server response
   * @returns array of values returned by server or error
   */
-  async awaitResponse(id: number, method: string): Promise<any[] | Error> {
+  async awaitResponse(id: number, method: string): Promise<any | Error> {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
       const poll = (): void => {
@@ -64,7 +64,7 @@ export class ClientSocket extends net.Socket {
             resolve(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
           }
-          resolve(response.json)
+          resolve(response.json(method))
           return
         }
         if (Date.now() - startTimestamp > 30000) {
@@ -115,14 +115,14 @@ export class ClientSocket extends net.Socket {
     if (this.response.status === 'overloaded') {
       const nextResponseBuffer: Buffer = this.response.extractOverload()
       if (this.response.isEvent) {
-        Events.emit(this.response.eventName as keyof tm.Events, this.response.json)
+        Events.emit(this.response.eventName as keyof tm.Events, this.response.json())
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array
       }
       this.handleResponseStart(nextResponseBuffer) // start new response if buffer was overloaded
     } else if (this.response.status === 'completed') {
       if (this.response.isEvent) {
-        Events.emit(this.response.eventName as keyof tm.Events, this.response.json)
+        Events.emit(this.response.eventName as keyof tm.Events, this.response.json())
       } else {
         this.responses.unshift(this.response) // put completed response at the start of responses array
       }

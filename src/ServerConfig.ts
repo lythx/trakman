@@ -35,16 +35,17 @@ export class ServerConfig {
     }
     const res = await Client.call('system.multicall',
       [{ method: 'GetServerOptions' },
-      { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes[0].ServerLogin }] },
+      { method: 'GetDetailedPlayerInfo', params: [{ string: systemRes.ServerLogin }] },
       { method: 'GetVersion' }]
     )
     if (res instanceof Error) {
       Logger.error('Failed to fetch server info', res.message)
       return
     }
-    const options: any[] | Error = res[0] instanceof Error ? res[0] : res[0].params
-    const loginInfo: any[] | Error = res[1] instanceof Error ? res[1] : res[1].params
-    const version: any[] | Error = res[2] instanceof Error ? res[2] : res[2].params
+    const options: any | Error = res[0] instanceof Error ? res[0] : res[0].params
+    const loginInfo: any | Error = res[1] instanceof Error ? res[1] : res[1].params
+    const version: any | Error = res[2] instanceof Error ? res[2] : res[2].params
+    console.log(loginInfo)
     if (options instanceof Error) {
       Logger.error(`Failed to fetch server options.`, options.message)
       return
@@ -59,35 +60,35 @@ export class ServerConfig {
     }
     this._config = {
       // server options
-      name: options[0].Name,
-      comment: options[0].Comment,
-      password: options[0].Password,
-      passwordForSpectator: options[0].PasswordForSpectator,
-      currentMaxPlayers: options[0].CurrentMaxPlayers,
-      nextMaxPlayers: options[0].NextMaxPlayers,
-      currentMaxSpectators: options[0].CurrentMaxSpectators,
-      nextMaxSpectators: options[0].NextMaxSpectators,
-      isP2PUpload: options[0].IsP2PUpload,
-      isP2PDownload: options[0].IsP2PDownload,
-      currentLadderMode: options[0].CurrentLadderMode,
-      nextLadderMode: options[0].NextLadderMode,
-      currentVehicleNetQuality: options[0].CurrentVehicleNetQuality,
-      nextVehicleNetQuality: options[0].NextVehicleNetQuality,
-      currentCallVoteTimeOut: options[0].CurrentCallVoteTimeOut,
-      nextCallVoteTimeOut: options[0].NextCallVoteTimeOut,
-      callVoteRatio: options[0].CallVoteRatio,
-      allowMapDownload: options[0].AllowChallengeDownload,
-      autoSaveReplays: options[0].AutoSaveReplays,
+      name: options.Name,
+      comment: options.Comment,
+      password: options.Password,
+      passwordForSpectator: options.PasswordForSpectator,
+      currentMaxPlayers: options.CurrentMaxPlayers,
+      nextMaxPlayers: options.NextMaxPlayers,
+      currentMaxSpectators: options.CurrentMaxSpectators,
+      nextMaxSpectators: options.NextMaxSpectators,
+      isP2PUpload: options.IsP2PUpload,
+      isP2PDownload: options.IsP2PDownload,
+      currentLadderMode: options.CurrentLadderMode,
+      nextLadderMode: options.NextLadderMode,
+      currentVehicleNetQuality: options.CurrentVehicleNetQuality,
+      nextVehicleNetQuality: options.NextVehicleNetQuality,
+      currentCallVoteTimeOut: options.CurrentCallVoteTimeOut,
+      nextCallVoteTimeOut: options.NextCallVoteTimeOut,
+      callVoteRatio: options.CallVoteRatio,
+      allowMapDownload: options.AllowChallengeDownload,
+      autoSaveReplays: options.AutoSaveReplays,
       // Stuff from PlayerInfo
-      login: loginInfo[0].Login,
-      id: loginInfo[0].PlayerId, // Always 0
-      zone: loginInfo[0].Path.substring(6), // Remove "World"
-      ipAddress: loginInfo[0].IPAddress.split(':')[0], // Throw port away
-      isUnited: loginInfo[0].OnlineRights === 3 ? true : false,
+      login: loginInfo.Login,
+      id: loginInfo.PlayerId, // Always 0
+      zone: loginInfo.Path.substring(6), // Remove "World"
+      ipAddress: loginInfo.IPAddress.split(':')[0], // Throw port away
+      isUnited: loginInfo.OnlineRights === 3 ? true : false,
       // Stuff from GetVersion
-      game: version[0].Name,
-      version: version[0].Version,
-      build: version[0].Build
+      game: version.Name,
+      version: version.Version,
+      build: version.Build
     }
   }
 

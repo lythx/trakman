@@ -187,13 +187,13 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.coppers.notUnited, info.login)
         return
       }
-      const coppers: any[] | Error = await tm.client.call('GetServerCoppers')
+      const coppers: any | Error = await tm.client.call('GetServerCoppers')
       if (coppers instanceof Error) {
         tm.log.error(`Couldn't retrieve the coppers amount.`, coppers.message)
         tm.sendMessage(config.coppers.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.coppers.text, { value: coppers[0] }), config.coppers.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.coppers.text, { value: coppers }), config.coppers.public ? undefined : info.login)
     },
     privilege: config.coppers.privilege
   }

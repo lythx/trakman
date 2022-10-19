@@ -267,7 +267,7 @@ namespace trakman {
       return GameService.remainingResultTime
     },
 
-    get current(): "race" | "result" {
+    get current(): "race" | "result" | "transition" {
       return GameService.state
     },
 

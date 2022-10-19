@@ -107,7 +107,8 @@ tm.addListener('LocalRecord', info => {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.amount++
-    if (topList.length < config.recordsCount && obj.amount <= topList[topList.length - 1].amount) { return }
+    if (topList.length !== 0 && topList.length < config.recordsCount &&
+      obj.amount <= topList[topList.length - 1].amount) { return }
     const entry = topList.find(a => a.login === info.login)
     if (entry !== undefined) {
       entry.amount = obj.amount

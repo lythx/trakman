@@ -78,13 +78,14 @@ export class ClientResponse {
   }
 
   /**
-   * @returns {any[]} array created from server response
+   * @param method Optional method call
+   * @returns Server response
    */
-  get json(): any[] {
+  json(method?: string): any {
     if (this._isEvent === true) {
       return this.fixNesting(this._json.methodCall)
     } else {
-      return this.fixNesting(this._json.methodResponse)
+      return this.fixNesting(this._json.methodResponse, method === 'system.multicall')
     }
   }
 
@@ -131,9 +132,9 @@ export class ClientResponse {
   }
 
   // i hate XML
-  private fixNesting(obj: any): any[] {
+  private fixNesting(obj: any, isMulticall?: boolean): any {
     const arr: any[] = []
-    const changeType: any = (value: any, type: string): any => {
+    const parseType = (value: any, type: string): any => {
       const arr: any[] = []
       const obj: any = {}
       switch (type) {
@@ -150,15 +151,17 @@ export class ClientResponse {
             const key: any = el.name[0]
             const t: string = Object.keys(el.value[0])[0]
             const val: any = el.value[0][t][0]
-            obj[key] = changeType(val, t)
+            obj[key] = parseType(val, t)
           }
           return obj
         case 'array':
           for (const el of value.data) {
             if (el.value === undefined) { continue } // NADEO SOMETIMES SENDS AN ARRAY WITH NO VALUES BECAUSE WHY THE FUCK NOT
-            const t: string = Object.keys(el.value[0])[0]
-            const val: any = el.value[0][t][0]
-            arr.push(changeType(val, t))
+            for (const e of el.value) {
+              const t: string = Object.keys(e)[0]
+              const val: any = e[t][0]
+              arr.push(parseType(val, t))
+            }
           }
           return arr
         default:
@@ -169,42 +172,28 @@ export class ClientResponse {
     if (obj?.params?.[0]?.param === undefined) {
       return [] // some callbacks don't return params. NICE!!!!
     }
+    if (isMulticall === true) {
+      const values = obj.params[0].param[0].value[0].array[0].data[0].value
+      for (const value of values) {
+        const element = value.array[0].data[0].value[0]
+        const type = Object.keys(element)[0]
+        arr.push(parseType(element[type][0], type))
+      }
+      return arr
+    }
     for (const param of obj.params) {
-      for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
-        const value: any = p.value[0]
-        if (Object.keys(value)[0] === 'array') {
-          for (const el of value.array) {
-            if (el?.data[0]?.value === undefined) { // some methods dont return value here too
-              arr.push([])
-              continue
-            }
-            for (const val of el.data[0].value) {
-              const type: string = Object.keys(val)[0]
-              arr.push(changeType(val[type][0], type))
-            }
-          }
-        } else if (Object.keys(value)[0] === 'struct') {
-          const obj: any = {}
-          for (const el of value.struct[0].member) {
-            const key: any = el.name[0]
-            const type: string = Object.keys(el.value[0])[0]
-            obj[key] = changeType(el.value[0][type][0], type)
-          }
-          arr.push(obj)
-        } else if (Object.keys(value)[0] === 'boolean') {
-          arr.push(changeType(value.boolean[0], 'boolean'))
-        } else if (Object.keys(value)[0] === 'int' || Object.keys(value)[0] === 'i4') {
-          arr.push(changeType(value[Object.keys(value)[0]][0], Object.keys(value)[0]))
-        } else if (Object.keys(value)[0] === 'double') {
-          arr.push(changeType(value.float[0], 'double'))
-        } else if (Object.keys(value)[0] === 'string') {
-          arr.push(changeType(value.string[0], 'string'))
-        } else if (Object.keys(value)[0] === 'base64') {
-          arr.push(changeType(value.string[0], 'base64'))
+      if (param.param.length === 1) {
+        const element: any = param.param[0].value[0]
+        const type = Object.keys(element)[0]
+        return parseType(element[type][0], type)
+      } else {
+        for (const p of param.param) { // some callbacks return multiple values instead of an array. NICE!!!!
+          const element: any = p.value[0]
+          const type = Object.keys(element)[0]
+          arr.push(parseType(element[type][0], type))
         }
       }
     }
-    if(Array.isArray(arr[0]) && arr.length === 1 && arr[0].length === 0){ return []}
     return arr
   }
 

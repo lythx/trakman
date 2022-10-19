@@ -163,7 +163,7 @@ export const Utils = {
   },
 
   async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
-    const billId: any[] | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
+    const billId: any | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
@@ -178,12 +178,12 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId[0], callback })
+      bills.push({ id: billId, callback })
     })
   },
 
   async payCoppers(targetLogin: string, amount: number, message: string): Promise<true | Error> {
-    const billId: any[] | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
+    const billId: any | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
@@ -198,7 +198,7 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId[0], callback })
+      bills.push({ id: billId, callback })
     })
   },
 

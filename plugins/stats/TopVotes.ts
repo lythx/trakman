@@ -62,18 +62,16 @@ tm.addListener('KarmaVote', (info): void => {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.count++
-    const topIndex: number = topList.findIndex(a => a.login === info.login)
-    if (topIndex === -1 && obj.count > topList[topList.length - 1].count) {
-      topList.splice(topList.findIndex(a => a.count < obj.count), 0, obj)
+    if (topList.length !== 0 && topList.length < config.votesCount &&
+      obj.count <= topList[topList.length - 1].count) { return }
+    const entry = topList.find(a => a.login === obj.login)
+    if (entry !== undefined) {
+      entry.count = obj.count
+      topList.sort((a, b) => b.count - a.count)
+    } else {
+      topList.push(obj)
+      topList.sort((a, b) => b.count - a.count)
       topList.length = Math.min(config.votesCount, topList.length)
-    } else if (topIndex !== -1) {
-      const newIndex: number = topList.findIndex(a => a.count < obj.count)
-      if (newIndex < topIndex) {
-        topList.splice(topIndex, 1)
-        topList.splice(newIndex, 0, obj)
-      } else {
-        topList[topIndex].count++
-      }
     }
     for (const e of updateListeners) {
       e([obj])

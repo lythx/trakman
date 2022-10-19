@@ -56,9 +56,9 @@ export class MapService {
       return
     }
     // Add current map to maplist if its not present there
-    if (!mapList.some(a => a.UId === current[0].UId)) {
-      mapList.unshift(current[0])
-      const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: current[0].FileName }])
+    if (!mapList.some(a => a.UId === current.UId)) {
+      mapList.unshift(current)
+      const insert: any | Error = await Client.call('InsertChallenge', [{ string: current.FileName }])
       if (insert instanceof Error) { await Logger.fatal('Failed to insert current challenge') }
     }
     const DBMapList: tm.Map[] = (await this.repo.getAll())
@@ -70,13 +70,13 @@ export class MapService {
     // Fetch info and add all maps which were not present in the database
     const voteRatios = await this.repo.getVoteCountAndRatio(mapsNotInDB.map(a => a.UId))
     for (const c of mapsNotInDB) {
-      const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
+      const res: any | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
       if (res instanceof Error) {
         Logger.fatal(`Unable to retrieve map info for map id: ${c.UId}, filename: ${c.FileName}`, res.message)
         return
       }
       const v = voteRatios.find(a => a.uid === c.UId)
-      mapsNotInDBObjects.push(({ ...this.constructNewMapObject(res[0]), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
+      mapsNotInDBObjects.push(({ ...this.constructNewMapObject(res), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
     }
     const mapsInMapList: tm.Map[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
@@ -95,12 +95,12 @@ export class MapService {
    */
   static async setCurrent(): Promise<void> {
     // Get current map id from dedicated server
-    const res: any[] | Error = await Client.call('GetCurrentChallengeInfo')
+    const res: any | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const mapInfo: tm.Map | undefined = this._maps.find(a => a.id === res[0].UId)
+    const mapInfo: tm.Map | undefined = this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
       return
@@ -108,8 +108,8 @@ export class MapService {
     // Set checkpointAmount and lapsAmount in runtime memory and database 
     // (this information can be acquired only if the map is currently played on the server so it is undefined if map was never played)
     if (mapInfo.checkpointsAmount === undefined || mapInfo.lapsAmount === undefined) {
-      mapInfo.checkpointsAmount = res[0].NbCheckpoints
-      mapInfo.lapsAmount = res[0].NbLaps
+      mapInfo.checkpointsAmount = res.NbCheckpoints
+      mapInfo.lapsAmount = res.NbLaps
     }
     this._current = mapInfo as any
     void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
@@ -149,18 +149,18 @@ export class MapService {
    * @returns Added map object or error if unsuccessful
    */
   static async add(filename: string, caller?: { login: string, nickname: string }): Promise<tm.Map | Error> {
-    const insert: any[] | Error = await Client.call('InsertChallenge', [{ string: filename }])
+    const insert: any | Error = await Client.call('InsertChallenge', [{ string: filename }])
     if (insert instanceof Error) { return insert }
-    if (insert[0] === false) { return new Error(`Failed to insert map ${filename}`) }
+    if (insert === false) { return new Error(`Failed to insert map ${filename}`) }
     const dbEntry: tm.Map | undefined = await this.repo.getByFilename(filename)
     let obj: tm.Map
     if (dbEntry !== undefined) { // If map is present in the database use the database info
       obj = { ...dbEntry }
     } else { // Otherwise fetch the info from server and save it in the database
-      const res: any[] | Error = await Client.call('GetChallengeInfo', [{ string: filename }])
+      const res: any | Error = await Client.call('GetChallengeInfo', [{ string: filename }])
       if (res instanceof Error) { return res }
-      const voteRatios = await this.repo.getVoteCountAndRatio(res[0].UId)
-      const serverData = this.constructNewMapObject(res[0])
+      const voteRatios = await this.repo.getVoteCountAndRatio(res.UId)
+      const serverData = this.constructNewMapObject(res)
       obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
       void this.repo.add(obj)
     }
@@ -188,9 +188,9 @@ export class MapService {
   static async remove(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
     if (map === undefined) { return false }
-    const remove: any[] | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
+    const remove: any | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
     if (remove instanceof Error) { return remove }
-    if (remove[0] === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
+    if (remove === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
     this._maps = this._maps.filter(a => a.id !== id)
     void this.repo.remove(id)
     if (caller !== undefined) {
@@ -226,7 +226,7 @@ export class MapService {
     const id: string = this._queue[0].map.id
     const map: tm.Map | undefined = this._maps.find(a => a.id === id)
     if (map === undefined) { throw new Error(`Cant find map with id ${id} in memory`) }
-    let res: any[] | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+    let res: any | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
     let i = 1
     while (res instanceof Error) {
       if (i === 4) {

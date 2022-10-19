@@ -38,7 +38,8 @@ tm.addListener('EndMap', async (info) => {
   const login = info.winnerLogin
   const wins = info.winnerWins
   if (wins === undefined || login === undefined
-    || (topList.length < config.winsCount && wins <= topList[topList.length - 1].wins)) { return }
+    || (topList.length !== 0 && topList.length < config.winsCount
+      && wins <= topList[topList.length - 1].wins)) { return }
   const entry = topList.find(a => a.login === login)
   let obj: typeof topList[number]
   if (entry !== undefined) {

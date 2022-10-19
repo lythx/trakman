@@ -21,7 +21,7 @@ export class DedimaniaClient {
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
-    const packmask: [string] | Error = await tm.client.call('GetServerPackMask') as any
+    const packmask: string | Error = await tm.client.call('GetServerPackMask') as any
     if (packmask instanceof Error) {
       tm.log.error('Failed to fetch server packmask', packmask.message)
       return packmask
@@ -34,7 +34,7 @@ export class DedimaniaClient {
         Tool: { string: 'Trakman' },
         Version: { string: tm.config.version },
         Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) },
-        Packmask: { string: packmask[0] }
+        Packmask: { string: packmask }
       }
     }])
     this.receivingResponse = true

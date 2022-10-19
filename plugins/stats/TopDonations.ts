@@ -40,9 +40,10 @@ tm.addListener('PlayerInfoUpdated', (info) => {
 donations.onDonation((info) => {
   const login = info.login
   const amount = info.sum
-  if (topList.length < config.donationsCount && amount <= topList[topList.length - 1].amount) { return }
+  if (topList.length !== 0 && topList.length < config.donationsCount &&
+    amount <= topList[topList.length - 1].amount) { return }
   const entry = topList.find(a => a.login === login)
-  const updated: typeof topList= []
+  const updated: typeof topList = []
   if (entry !== undefined) {
     entry.amount = amount
     updated.push(entry)

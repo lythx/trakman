@@ -3,6 +3,7 @@ import { VoteRepository } from "../database/VoteRepository.js"
 import { MapService } from "./MapService.js"
 import { Logger } from "../Logger.js"
 import { Utils } from '../Utils.js'
+import { GameService } from "./GameService.js"
 
 export abstract class VoteService {
 
@@ -40,6 +41,7 @@ export abstract class VoteService {
    * @param vote Vote value 
    */
   static add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
+    if (GameService.state === 'transition') { return }
     const date: Date = new Date()
     const map = MapService.current
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
