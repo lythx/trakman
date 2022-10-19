@@ -52,7 +52,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerDisconnect',
-      callback: ([login]: tm.Events['TrackMania.PlayerDisconnect']): void => {
+      callback: (login: tm.Events['TrackMania.PlayerDisconnect']): void => {
         // [0] = Login
         if (AdministrationService.banlist.some(a => a.login === login)) {
           return
@@ -194,7 +194,6 @@ export class Listeners {
       event: 'TrackMania.EndChallenge',
       callback: async ([winner, map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
-        console.log(winner, map, wasWarmUp, continuesOnNextMap, restart)
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         // Set game state to 'result'
@@ -266,7 +265,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerInfoChanged',
-      callback: ([playerInfo]: tm.Events['TrackMania.PlayerInfoChanged']): void => {
+      callback: (playerInfo: tm.Events['TrackMania.PlayerInfoChanged']): void => {
         // [0] = PlayerInfo
         const spec: any = playerInfo.SpectatorStatus.toString()
         const flags: any = playerInfo.Flags.toString()

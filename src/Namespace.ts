@@ -355,11 +355,11 @@ declare global {
         readonly country?: { readonly name: string, readonly code: string, readonly region: string }
       }[]>
       "TrackMania.PlayerConnect": [string, boolean]
-      "TrackMania.PlayerDisconnect": [string]
+      "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": [number, string, string, boolean]
       "TrackMania.PlayerCheckpoint": [number, string, number, number, number]
       "TrackMania.PlayerFinish": [number, string, number]
-      "TrackMania.BeginRace": [any]
+      "TrackMania.BeginRace": any
       "TrackMania.EndRace": [any[], any]
       "TrackMania.BeginRound": []
       "TrackMania.EndRound": []
@@ -369,7 +369,7 @@ declare global {
       "TrackMania.PlayerManialinkPageAnswer": [number, string, any]
       "TrackMania.BillUpdated": [number, number, string, number]
       "TrackMania.ChallengeListModified": [number, number, any]
-      "TrackMania.PlayerInfoChanged": [any]
+      "TrackMania.PlayerInfoChanged": any
       "TrackMania.PlayerIncoherence": [number, string]
       "TrackMania.Echo": [any, any]
       "TrackMania.VoteUpdated": [string, string, string, any]
