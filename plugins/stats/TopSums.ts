@@ -67,6 +67,7 @@ const initialize = async () => {
   topList.sort((a, b) => b.sums[1] - a.sums[1])
   topList.sort((a, b) => b.sums[0] - a.sums[0])
   topList.length = Math.min(config.sumsCount, topList.length)
+  console.log('init')
   for (const e of updateListeners) { e(topList) }
 }
 
@@ -125,6 +126,11 @@ tm.addListener('LocalRecord', (info) => {
       updated.push(obj)
     }
   }
+  topList.sort((a, b) => b.sums[3] - a.sums[3])
+  topList.sort((a, b) => b.sums[2] - a.sums[2])
+  topList.sort((a, b) => b.sums[1] - a.sums[1])
+  topList.sort((a, b) => b.sums[0] - a.sums[0])
+  topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(updated) }
 })
 
