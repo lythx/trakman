@@ -250,16 +250,22 @@ namespace trakman {
   export const state = {
 
     /**
-     * @returns remaining map time in seconds
+     * Remaining map time in seconds
      */
     get remainingMapTime(): number {
       return GameService.remainingMapTime
     },
 
+    /**
+     * Remaining result screen time in seconds
+     */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
     },
 
+    /**
+     * Server state
+     */
     get current(): "race" | "result" | "transition" {
       return GameService.state
     },

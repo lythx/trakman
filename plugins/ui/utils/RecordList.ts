@@ -15,8 +15,14 @@ type Marker = 'faster' | 'slower' | 'you' | null
 
 type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
+/**
+ * Util to display record data in manialinks. 
+ * It has index, name and time columns, but it also can display more data on click eg. checkpoints.
+ * Records and time colours are displayed relative to players personal record
+ */
 export default class RecordList {
 
+  // TODO
   readonly iCols: number
   readonly iColW: number
   readonly iIconW: number
@@ -46,7 +52,7 @@ export default class RecordList {
   readonly noRecordEntry: boolean
   readonly getColoursFromPb: boolean
   readonly downloadIcon: string
-  readonly clickListeners: Function[] = []
+  readonly clickListeners: ((info: tm.ManialinkClickInfo) => void)[] = []
   readonly timeColours: {
     slower: string,
     faster: string,
@@ -54,7 +60,21 @@ export default class RecordList {
     top: string
   }
 
-  constructor(id: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
+  /**
+   * Util to display record data in manialinks. 
+   * It has index, name and time columns, but it also can display more data on click eg. checkpoints.
+   * Records and time colours are displayed relative to players personal record.
+   * @param parentId Parent element manialink ID
+   * @param width List width
+   * @param height List height
+   * @param rows List row count
+   * @param side Side on which list is positioned needed for click info display (true is right)
+   * @param topCount Number of records which are always displayed regardless of player personal record
+   * @param maxCount Max record count needed for click actionIds
+   * @param noRecordEntry If true a placeholder entry gets displayed at the end of the list if player has no personal record
+   * @param options Optional parameters
+   */
+  constructor(parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
     options?: { getColoursFromPb?: true, resultMode?: true }) {
     this.config = options?.resultMode === true ? resultConfig : raceConfig
     const INFO = this.config.info
@@ -69,7 +89,7 @@ export default class RecordList {
     this.iconHPadding = this.config.iconHorizontalPadding
     this.downloadIcon = this.config.downloadIcon
     this.timeColours = this.config.timeColours
-    this.id = id
+    this.id = parentId
     this.rows = rows
     this.rowHeight = (height + this.rowGap) / rows
     this.width = width
@@ -89,36 +109,46 @@ export default class RecordList {
     this.format = this.config.format
   }
 
-  onClick(callback: Function): void {
+  /**
+   * Registers a callback function to execute on record click
+   * @param callback Callback function, it takes ManialinkClickInfo as a parameter
+   */
+  onClick(callback: (info: tm.ManialinkClickInfo) => void): void {
     this.clickListeners.push(callback)
   }
 
+  /**
+   * Constructs record list XML for given player from passed array of record objects
+   * @param login Player login
+   * @param allRecords Array of record objects
+   * @returns Record list XML string
+   */
   constructXml(login: string, allRecords: UiRecord[]): string {
     const cpAmount: number = allRecords?.[0]?.checkpoints?.length ?? 0
     this.iRows = Math.ceil(cpAmount / this.iCols) + 1
-    const records = this.getDisplayedRecords(login, allRecords)
+    const parsedRecs = this.getDisplayedRecords(login, allRecords)
     const info = this.infos.find(a => a.login === login)
-    const [infos, infoPositions, cpTypes] = info !== undefined ? this.getInfos(login, cpAmount, info, records) : [[], [], []]
-    const playerIndex: number = records.map(a => a.record).findIndex(a => a.login === login)
-    const markers: Marker[] = this.getMarkers(playerIndex, infoPositions, records.map(a => a.record))
-    const timeColours = this.getTimeColours(login, playerIndex, records.map(a => a.record))
+    const [infos, infoPositions, cpTypes] = info !== undefined ? this.getInfos(login, cpAmount, info, parsedRecs) : [[], [], []]
+    const playerIndex: number = parsedRecs.map(a => a.record).findIndex(a => a.login === login)
+    const markers: Marker[] = this.getMarkers(playerIndex, infoPositions, parsedRecs.map(a => a.record))
+    const timeColours = this.getTimeColours(login, playerIndex, parsedRecs.map(a => a.record))
     let ret: string = `<quad posn="-70 50 -100" sizen="140 100" action="${IDS.ClearAlerts}"/>`
     for (let i: number = 0; i < this.rows; i++) {
       const info = infos.find(a => a.index === i)
       ret += `<frame posn="0 ${-(this.rowHeight * i)} 1">`
-      if (records?.[i]?.record?.time === -1) {
+      if (parsedRecs?.[i]?.record?.time === -1) {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id}"/>`
       } else {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id + 2 + i}"/>`
       }
-      if (info !== undefined && records?.[i] !== undefined && records?.[i]?.record?.time !== -1) {
-        ret += this.constructInfo(info.offset, records?.[i]?.record, cpTypes?.[i])
+      if (info !== undefined && parsedRecs?.[i] !== undefined && parsedRecs?.[i]?.record?.time !== -1) {
+        ret += this.constructInfo(info.offset, parsedRecs?.[i]?.record, cpTypes?.[i])
       } else {
         ret += this.constructMarker(markers?.[i])
       }
-      ret += this.constructIndex(records?.[i]?.index) +
-        this.constructTime(records?.[i]?.record?.time, timeColours?.[i]) +
-        this.constructName(records?.[i]?.record?.name) +
+      ret += this.constructIndex(parsedRecs?.[i]?.index) +
+        this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i]) +
+        this.constructName(parsedRecs?.[i]?.record?.name) +
         '</frame>'
     }
     return ret

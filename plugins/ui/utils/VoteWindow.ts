@@ -4,6 +4,9 @@ import { Vote } from '../../vote/Vote.js'
 import { StaticHeader } from '../UiUtils.js'
 import config from './VoteWindow.config.js'
 
+/**
+ * Util to manage votes and render vote manialink window
+ */
 export default class VoteWindow {
 
   private vote: Vote
@@ -25,16 +28,26 @@ export default class VoteWindow {
   private readonly leftW = this.width - this.rightW
   private readonly chatMessage: string
 
-  constructor(callerLogin: string, goal: number, message: string, chatMessage: string, seconds: number, iconUrl: string) {
+  /**
+   * Util to manage votes and render vote manialink window
+   * @param callerLogin Login of the player who called the vote
+   * @param goal Ratio of votes needed to pass the vote (must be between 0 and 1)
+   * @param headerMessage Message displayed in vote window header
+   * @param chatMessage Chat message sent to chat on vote start
+   * @param seconds Amount of time to vote
+   * @param iconUrl Icon image url
+   */
+  constructor(callerLogin: string, goal: number, headerMessage: string, chatMessage: string, seconds: number, iconUrl: string) {
     this.vote = new Vote(callerLogin, goal, seconds)
     this.chatMessage = chatMessage
-    this.message = message
+    this.message = headerMessage
     this.icon = iconUrl
   }
 
   /**
-   * @param eligibleLogins list of logins of players that can vote
-   * @returns undefined if there is another vote running, Error with reason if someone cancelled the vote or vote result
+   * @param eligibleLogins List of logins of players that can vote
+   * @returns Vote result as boolean if time ran out or all the players voted, object containing result and optional caller player object
+   * if vote got passed or cancelled, undefined if there is another vote running
    */
   startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
     return new Promise((resolve) => {
@@ -59,10 +72,18 @@ export default class VoteWindow {
     })
   }
 
+  /**
+   * Passes the vote
+   * @param caller Caller player object
+   */
   pass(caller?: tm.Player): void {
     this.vote.pass(caller)
   }
 
+  /**
+   * Cancels the vote
+   * @param caller Caller player object
+   */
   cancel(caller?: tm.Player): void {
     this.vote.cancel(caller)
   }

@@ -166,7 +166,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount}`, info.privilege)
+    this.displayToPlayer(info.login, { page, privilege: info.privilege }, `${page} /${this.paginator.pageCount}`, info.privilege)
   }
 
   private reRender(): void {
@@ -174,7 +174,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     for (const player of players) {
       const page = this.paginator.getPageByLogin(player.login)
       const privilege = tm.players.get(player.login)?.privilege ?? 0
-      this.displayToPlayer(player.login, { page, privilege }, `${page}/${this.paginator.pageCount}`, privilege)
+      this.displayToPlayer(player.login, { page, privilege }, `${page}/${this.paginator.pageCount} `, privilege)
     }
   }
 
@@ -214,14 +214,14 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         + players[i + index].privilege.toString(), w, h)
     }
     const kickCell: GridCellFunction = (i, j, w, h) => {
-      let actionStr = ` action="${this.openId + i + this.actions.kick + index}"`
+      let actionStr = ` action = "${this.openId + i + this.actions.kick + index}"`
       let cover = ''
       if (params.privilege < config.kickPrivilege) {
         actionStr = ''
-        cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
+        cover = `< quad posn = "0 0 4" sizen = "${w} ${h}" bgcolor = "${config.disabledColour}" /> `
       }
-      return `${cover}<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.icons.kick}"
-      imagefocus="${config.hoverIcons.kick}" halign="center" valign="center"${actionStr}/>`
+      return `${cover} <quad posn="${w / 2} ${-h / 2} 1" sizen = "${config.iconWidth} ${config.iconHeight}" image = "${config.icons.kick}"
+    imagefocus = "${config.hoverIcons.kick}" halign = "center" valign = "center"${actionStr} />`
     }
     const muteCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.mute + index}"`

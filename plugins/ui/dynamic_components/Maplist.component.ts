@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js"
-import { centeredText, closeButton, Grid, IDS, verticallyCenteredText, addManialinkListener } from '../UiUtils.js'
+import { centeredText, closeButton, Grid, IDS, leftAlignedText, addManialinkListener } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js"
 import { maplist } from '../../maplist/Maplist.js'
 import config from './Maplist.config.js'
@@ -105,7 +105,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
     const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1 / ${paginator.pageCount} `)
   }
 
   private getPaginator(login: string, list: readonly tm.Map[]) {
@@ -117,7 +117,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page}/${pageCount}`)
+        { page, paginator, list }, `${page} /${pageCount}`)
       paginator.setPageCount(pageCount)
     } else {
       paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
@@ -203,7 +203,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
              sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[1]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${verticallyCenteredText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width,
+              ${leftAlignedText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width,
         rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>
@@ -213,7 +213,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
              sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[2]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${verticallyCenteredText(tm.utils.safeString(maps[index].author), width, rowH - this.margin, { textScale: config.textScale })}
+              ${leftAlignedText(tm.utils.safeString(maps[index].author), width, rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 3} 2">
@@ -319,7 +319,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${(height / 4) - this.margin * 3}" image="${config.icons[0]}"/>
           <frame posn="${config.iconWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width - (this.margin * 2 + config.queueWidth + config.queueNumberWidth)} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${verticallyCenteredText(`${config.texts.map}${mapIndex + 1}`, width - (this.margin * 2 + config.queueWidth) + config.queueNumberWidth, height / 4 - this.margin, { textScale: config.textScale })}
+            ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width - (this.margin * 2 + config.queueWidth) + config.queueNumberWidth, height / 4 - this.margin, { textScale: config.textScale })}
           </frame>
           <frame posn="${config.iconWidth + width - (config.queueWidth + config.queueNumberWidth)} 0 1">
             <quad posn="0 0 3" sizen="${config.queueWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
@@ -338,7 +338,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
            image="${config.icons[0]}"/>
           <frame posn="${config.iconWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${verticallyCenteredText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
+            ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
           </frame>`
   }
 

@@ -1,12 +1,21 @@
 import utilIds from '../config/UtilIds.js'
 
-
 let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
 
+/**
+ * Registers a callback function to execute on given key press
+ * @param key Key to register listener on
+ * @param callback Function to execute on key press, it takes ManialinkClickInfo as a parameter
+ * @param importance Importance index - only the function with highest importance index will get executed
+ */
 export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void, importance: number) => {
   keyListeners.unshift({ callback, key, importance })
 }
 
+/**
+ * Removes a key listener
+ * @param callback Reference to function to remove
+ */
 export const removeKeyListener = (callback: (info: tm.ManialinkClickInfo) => void) => {
   keyListeners = keyListeners.filter(a => callback !== a.callback)
 }
@@ -38,8 +47,6 @@ tm.addListener('PlayerJoin', (info) => {
   </manialink>
   </manialinks>`, info.login)
 })
-
-
 
 tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo) => {
   switch (info.actionId) {

@@ -56,7 +56,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const pageCount: number = Math.ceil(commands.length / config.entries)
       const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.footerHeight, pageCount)
       paginator.onPageChange = (login: string, page: number): void => {
-        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page}/${paginator.pageCount}`)
+        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page} /${paginator.pageCount}`)
       }
       this.paginators.push(paginator)
     }
@@ -75,7 +75,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         this.displayToPlayer(info.login, {
           paginator: entry[0], commands: entry[1],
           page, privilege: info.privilege, singleType: true
-        }, `${page}/${entry[0].pageCount}`)
+        }, `${page}/${entry[0].pageCount} `)
       }
     })
     tm.addListener("PrivilegeChanged", (info) => {
@@ -85,7 +85,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
           const paginator: Paginator = this.paginators[info.newPrivilege]
           const commands: tm.Command[] = this.commandLists[info.newPrivilege]
           const page = paginator.getPageByLogin(info.login)
-          this.displayToPlayer(info.login, { page, commands, paginator, privilege: info.newPrivilege }, `${page}/${paginator.pageCount}`)
+          this.displayToPlayer(info.login, { page, commands, paginator, privilege: info.newPrivilege }, `${page} /${paginator.pageCount}`)
         } else {
           this.displayToPlayer(info.login, { ...p.params, privilege: info.newPrivilege })
         }
@@ -134,8 +134,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(text, true))}" valign = "center" halign = "center" /> `
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
@@ -149,19 +149,19 @@ export default class CommandList extends PopupWindow<DisplayParams> {
             text += `[`
             hasOptionals = true
           }
-          if (i === 0) { text += `${e.name}<${e.type ?? 'string'}>` }
-          else { text += `, ${e.name}<${e.type ?? 'string'}>` }
+          if (i === 0) { text += `${e.name} < ${e.type ?? 'string'} > ` }
+          else { text += `, ${e.name} < ${e.type ?? 'string'} > ` }
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(text, true))}" valign = "center" halign = "center" /> `
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign = "center" halign = "center" /> `
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)

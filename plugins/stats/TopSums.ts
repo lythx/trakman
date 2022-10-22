@@ -67,7 +67,6 @@ const initialize = async () => {
   topList.sort((a, b) => b.sums[1] - a.sums[1])
   topList.sort((a, b) => b.sums[0] - a.sums[0])
   topList.length = Math.min(config.sumsCount, topList.length)
-  console.log('init')
   for (const e of updateListeners) { e(topList) }
 }
 

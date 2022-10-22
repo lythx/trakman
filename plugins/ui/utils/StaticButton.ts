@@ -1,6 +1,19 @@
 import { horizontallyCenteredText } from './TextUtils.js'
 import config from './StaticButton.config.js'
 
+/**
+ * Constructs button manialink used in static UI
+ * @param iconUrl Button image url
+ * @param text1 Top text
+ * @param text2 Bottom text
+ * @param width Button width
+ * @param height Button height
+ * @param iconWidth Button image width
+ * @param iconHeight Button image height
+ * @param topPadding Gap between icon and top border // TODO maybe optionals
+ * @param options Optional parameters
+ * @returns Button XML string
+ */
 export default function (iconUrl: string, text1: string, text2: string, width: number, height: number, iconWidth: number,
   iconHeight: number, topPadding: number, options?: { equalTexts?: true, actionId?: number, link?: string }): string {
   const t1: string = options?.equalTexts ?
