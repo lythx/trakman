@@ -233,14 +233,7 @@ namespace trakman {
 
   export const karma = {
 
-    /**
-     * Adds a player vote to the database and to Maniakarma service if its running
-     * @param player Player object containing login and nickname
-     * @param vote Player vote
-     */
-    add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
-      VoteService.add(player, vote)
-    },
+    add: VoteService.add.bind(VoteService),
 
     fetch: VoteService.fetch.bind(VoteService),
 

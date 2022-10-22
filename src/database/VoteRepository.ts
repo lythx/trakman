@@ -31,7 +31,7 @@ export class VoteRepository extends Repository {
       Logger.error(`Failed to get ids for maps or players ${votes
         .filter(a => !(mapIds.some(b => b.uid === a.mapId)
           && playerIds.some(b => b.login === a.login)))
-          .map(a => `(${a.login}, ${a.mapId})`).join(', ')} while inserting into votes table`)
+        .map(a => `(${a.login}, ${a.mapId})`).join(', ')} while inserting into votes table`)
     }
     if (arr.length === 0) { return }
     const query = `INSERT INTO votes(map_id, player_id, vote, date) 
@@ -44,16 +44,36 @@ export class VoteRepository extends Repository {
     await this.query(query, ...values)
   }
 
-  async update(mapUid: string, login: string, vote: number, date: Date): Promise<void> {
-    const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
+  async update(mapUid: string, objects: { login: string, vote: number, date: Date }[]): Promise<void>
+  async update(mapUid: string, login: string, vote: number, date: Date): Promise<void>
+  async update(mapUid: string,
+    arg: string | { login: string, vote: number, date: Date }[], vote?: number, date?: Date): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
-    const playerId = await playerRepo.getId(login)
-    if (mapId === undefined || playerId === undefined) {
-      Logger.error(`Failed to get mapId or playerId (${login},${mapUid}) while updating votes table`)
+    if (typeof arg === 'string') {
+      const login = arg
+      const query: string = 'UPDATE votes SET vote=$1, date=$2 WHERE map_id=$3 AND player_id=$4;'
+      const playerId = await playerRepo.getId(login ?? '')
+      if (mapId === undefined || playerId === undefined) {
+        Logger.error(`Failed to get mapId or playerId (${login},${mapUid}) while updating votes table`)
+        return
+      }
+      const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote)?.[0])
+      await this.query(query, parsedVote, date, mapId, playerId)
       return
     }
-    const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote)?.[0])
-    await this.query(query, parsedVote, date, mapId, playerId)
+    const playerIds = await playerRepo.getId(arg.map(a => a.login))
+    const arr = arg.filter(a => playerIds.some(b => b.login === a.login))
+    if (arr.length !== arg.length) {
+      Logger.error(`Failed to get ids for players ${arg.filter(a => !playerIds.some(b => b.login === a.login))
+        .map(a => `${a.login}`).join(', ')} while inserting into votes table`)
+    }
+    const query: string = `UPDATE votes SET 
+    vote=v.vote, date=v.date
+    FROM (VALUES
+    ${arr.map(a => `(${a.vote}, ${a.date}, ${mapId}, ${playerIds.find(a => a.login)?.id}),`).join('').slice(0, -1)}
+    ) AS v(vote, date, map_id, player_id)
+    WHERE v.map_id=votes.map_id AND v.player_id=votes.player_id;`
+    await this.query(query)
   }
 
   async getOne(mapUid: string, login: string): Promise<tm.Vote | undefined> {

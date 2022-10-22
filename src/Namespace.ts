@@ -331,7 +331,7 @@ declare global {
       "PlayerCheckpoint": CheckpointInfo
       "BeginMap": BeginMapInfo
       "EndMap": EndMapInfo
-      "KarmaVote": KarmaVoteInfo
+      "KarmaVote": KarmaVoteInfo[]
       "RecordsPrefetch": Readonly<Record>[]
       "VotesPrefetch": Readonly<Vote>[]
       "MapAdded": MapAddedInfo

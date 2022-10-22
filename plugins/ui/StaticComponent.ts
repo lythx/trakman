@@ -1,40 +1,31 @@
 import RaceUi from "./config/RaceUi.js"
 import ResultUi from "./config/ResultUi.js"
 
+type DisplayMode = 'race' | 'result' | 'always' | 'none'
+
 export default abstract class StaticComponent {
 
-  displayMode: 'race' | 'result' | 'always' | 'none'
+  displayMode: DisplayMode
   private _isDisplayed: boolean = true
   readonly id: number
+  readonly dislayStates: { [mode in DisplayMode]: typeof tm.state.current[] } = {
+    none: [],
+    always: ['race', 'result', 'transition'],
+    race: ['race', 'transition'],
+    result: ['result']
+  }
 
-  constructor(id: number, displayMode: 'race' | 'result' | 'always' | 'none') {
+  constructor(id: number, displayMode: DisplayMode) {
     this.id = id
     this.displayMode = displayMode
-    switch (displayMode) {
-      case 'race':
-        tm.addListener('BeginMap', async () => {
-          this._isDisplayed = true
-          await this.display()
-        })
-        tm.addListener('EndMap', () => {
-          this._isDisplayed = false
-          this.hide()
-        }, true)
-        break
-      case 'result':
-        tm.addListener('EndMap', async () => {
-          this._isDisplayed = true
-          await this.display()
-        })
-        tm.addListener('BeginMap', () => {
-          this._isDisplayed = false
-          this.hide()
-        }, true)
-    }
+    tm.addListener(['EndMap', 'BeginMap'], () => {
+      this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
+      this._isDisplayed ? this.display() : this.hide()
+    }, true)
     tm.addListener('PlayerJoin', async (info: tm.JoinInfo) => {
-      if (this._isDisplayed === true) { await this.displayToPlayer(info.login) }
+      if (this._isDisplayed === true) { this.displayToPlayer(info.login) }
     })
-    if (tm.state.current !== this.displayMode && this.displayMode !== 'always') {
+    if (!this.dislayStates[displayMode].includes(tm.state.current)) {
       this._isDisplayed = false
     }
   }
@@ -62,9 +53,9 @@ export default abstract class StaticComponent {
     return this._isDisplayed
   }
 
-  abstract display(params?: any): void | Promise<void>
+  abstract display(params?: any): void
 
-  abstract displayToPlayer(login: string, params?: any): void | Promise<void>
+  abstract displayToPlayer(login: string, params?: any): void
 
   hide(): void {
     this._isDisplayed = false
