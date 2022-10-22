@@ -281,6 +281,7 @@ export class AdministrationService {
    * @param caller Optional caller player object
    */
   static async setPrivilege(login: string, privilege: number, caller?: { login: string, nickname: string }): Promise<void> {
+    if (login.length > 25) { return }
     const player: tm.Player | undefined = PlayerService.get(login)
     if (player !== undefined) { player.privilege = privilege }
     if (caller !== undefined) {
@@ -323,7 +324,7 @@ export class AdministrationService {
    */
   static async ban(ip: string, login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
-    if (caller.privilege < this.banPrivilege) { return false }
+    if (caller.privilege < this.banPrivilege || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
     const date: Date = new Date()
@@ -412,7 +413,7 @@ export class AdministrationService {
    */
   static async addToBlacklist(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean | Error> {
-    if (caller.privilege < this.blacklistPrivilege) { return false }
+    if (caller.privilege < this.blacklistPrivilege || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
     const date: Date = new Date()
@@ -487,7 +488,7 @@ export class AdministrationService {
    */
   static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
-    if (caller.privilege < this.mutePrivilege) { return false }
+    if (caller.privilege < this.mutePrivilege || login.length > 25) { return false }
     const date: Date = new Date()
     let entry = this.muteOnJoin.find(a => a.login === login)
     if (entry === undefined) {
@@ -565,7 +566,7 @@ export class AdministrationService {
    */
   static async addGuest(login: string, caller: { login: string, privilege: number, nickname: string }, nickname?: string):
     Promise<boolean | 'Already guest' | Error> {
-    if (caller.privilege < this.addGuestPrivilege) { return false }
+    if (caller.privilege < this.addGuestPrivilege || login.length > 25) { return false }
     const date: Date = new Date()
     const entry = this._guestlist.find(a => a.login === login)
     if (entry !== undefined) { return 'Already guest' }
