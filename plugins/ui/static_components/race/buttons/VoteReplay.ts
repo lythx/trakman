@@ -2,8 +2,10 @@ import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import { VoteWindow } from "../../../UiUtils.js"
+import messages from './Messages.config.js'
 
 const cfg = config.voteReplay
+const msg = messages.voteReplay
 
 export class VoteReplay extends UiButton {
 
@@ -49,39 +51,34 @@ export class VoteReplay extends UiButton {
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isReplay === true || this.isSkip === true) { return }
     if (tm.state.remainingMapTime <= cfg.minimumRemainingTime) {
-      tm.sendMessage(`${tm.utils.palette.error}It's too late for replay vote.`, login)
+      tm.sendMessage(msg.tooLate, login)
       return
     }
     if (Date.now() / 1000 - this.failedVoteTimestamp < cfg.timeout) {
-      tm.sendMessage(`${tm.utils.palette.error}Vote failed recently, wait a bit.`, login)
+      tm.sendMessage(msg.failedRecently, login)
       return
     }
     if (this.triesCount >= cfg.triesLimit) {
-      tm.sendMessage(`${tm.utils.palette.error}Too many votes failed.`, login)
+      tm.sendMessage(msg.tooManyFailed, login)
       return
     }
-    const startMsg: string = `${tm.utils.palette.server}»» ${tm.utils.palette.highlight + tm.utils.strip(nickname)} `
-      + `${tm.utils.palette.vote}started a vote to ${tm.utils.palette.highlight}replay ${tm.utils.palette.vote}the ongoing map.`
-    const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal,
-      `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
-      startMsg, cfg.time, cfg.voteIcon)
+    const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
+    const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
-      tm.sendMessage(`${tm.utils.palette.server}» ${tm.utils.palette.error}A vote is already running.`, login)
+      tm.sendMessage(msg.alreadyRunning, login)
       return
     }
     if (result === false) {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}replay `
-        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}did not pass${tm.utils.palette.vote}.`)
+      tm.sendMessage(msg.didntPass)
     } else if (result === true) {
       this.replayCount++
       this.isReplay = true
       this.handleMapReplay()
       this.emitReplay()
-      tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.vote}Vote to ${tm.utils.palette.highlight}replay `
-        + `${tm.utils.palette.vote}the ongoing map ${tm.utils.palette.highlight}has passed${tm.utils.palette.vote}.`)
+      tm.sendMessage(msg.success)
       tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
     } else if (result.result === true) {
       this.replayCount++
@@ -89,20 +86,24 @@ export class VoteReplay extends UiButton {
       this.handleMapReplay()
       this.emitReplay()
       if (result.caller === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map passed.`)
+        tm.sendMessage(msg.success)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has passed the vote to replay the ongoing map.`)
+        tm.sendMessage(tm.utils.strVar(msg.forcePass, {
+          title: result.caller.title,
+          nickname: tm.utils.strip(result.caller.nickname, true)
+        }))
         tm.jukebox.add(tm.maps.current.id, undefined, true)
       }
     } else {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
       if (result.caller === undefined) {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin} Vote to replay the ongoing map was cancelled.`)
+        tm.sendMessage(msg.cancelled)
       } else {
-        tm.sendMessage(`${tm.utils.palette.server}»» ${tm.utils.palette.admin}${result.caller.title} `
-          + `${tm.utils.palette.highlight + tm.utils.strip(result.caller.nickname, true)}${tm.utils.palette.admin} has cancelled the vote to replay the ongoing map.`)
+        tm.sendMessage(tm.utils.strVar(msg.cancelledBy, {
+          title: result.caller.title,
+          nickname: tm.utils.strip(result.caller.nickname, true)
+        }))
       }
     }
   }
