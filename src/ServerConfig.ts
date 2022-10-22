@@ -45,7 +45,6 @@ export class ServerConfig {
     const options: any | Error = res[0] instanceof Error ? res[0] : res[0].params
     const loginInfo: any | Error = res[1] instanceof Error ? res[1] : res[1].params
     const version: any | Error = res[2] instanceof Error ? res[2] : res[2].params
-    console.log(loginInfo)
     if (options instanceof Error) {
       Logger.error(`Failed to fetch server options.`, options.message)
       return

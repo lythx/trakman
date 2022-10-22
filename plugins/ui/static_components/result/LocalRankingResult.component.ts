@@ -10,7 +10,7 @@ export default class LocalRankingResult extends StaticComponent {
   private readonly recordList: RecordList
 
   constructor() {
-    super(IDS.locals, 'result')
+    super(IDS.localsResult, 'result')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

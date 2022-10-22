@@ -17,7 +17,7 @@ export default class MapWidgetResult extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.map, 'result')
+    super(IDS.mapResult, 'result')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

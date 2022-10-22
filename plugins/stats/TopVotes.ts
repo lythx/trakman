@@ -56,10 +56,10 @@ tm.addListener('BeginMap', (): void => {
   initialVotes = tm.karma.current
 })
 
-tm.addListener('KarmaVote', (info): void => {
-  if (!initialVotes.some(a => a.login === info.login)) {
-    initialVotes.push(info)
-    const obj = onlineList.find(a => a.login === info.login)
+const handleVote = (vote: tm.Vote) => {
+  if (!initialVotes.some(a => a.login === vote.login)) {
+    initialVotes.push(vote)
+    const obj = onlineList.find(a => a.login === vote.login)
     if (obj === undefined) { return }
     obj.count++
     if (topList.length !== 0 && topList.length < config.votesCount &&
@@ -77,6 +77,10 @@ tm.addListener('KarmaVote', (info): void => {
       e([obj])
     }
   }
+}
+
+tm.addListener('KarmaVote', (info): void => {
+  for (const e of info) { handleVote(e) }
 })
 
 tm.addListener('PlayerJoin', async (info): Promise<void> => {
