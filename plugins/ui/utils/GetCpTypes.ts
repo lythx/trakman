@@ -1,3 +1,8 @@
+/**
+ * Finds best, equal and worst times for each checkpoint
+ * @param checkpoints 2D array containing checkpoint times
+ * @returns 2D array containing checkpoint types
+ */
 export const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal' | undefined)[][] => {
     if (checkpoints.length === 0 || checkpoints?.[0]?.length === 0) {
       return []

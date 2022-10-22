@@ -43,7 +43,7 @@ export default class TopVisits extends PopupWindow<number> {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
+      this.displayToPlayer(login, page, `${page} /${this.paginator.pageCount}`)
     }
   }
 
@@ -63,7 +63,7 @@ export default class TopVisits extends PopupWindow<number> {
     const nicknameCell: GridCellFunction = (i, j, w, h) =>
       centeredText(tm.utils.safeString(tm.utils.strip(this.ranks[getIndex(i, j)].nickname, false)), w, h)
     const loginCell: GridCellFunction = (i, j, w, h) => {
-      const colour = this.ranks[getIndex(i, j)].login === login ? `$${config.selfColour}` : ''
+      const colour = this.ranks[getIndex(i, j)].login === login ? `$${config.selfColour} ` : ''
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
     const averageCell: GridCellFunction = (i, j, w, h) =>

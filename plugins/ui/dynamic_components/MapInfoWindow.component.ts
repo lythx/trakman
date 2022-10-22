@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js"
-import { IDS, Grid, GridCellFunction, centeredText, closeButton, verticallyCenteredText, GridCellObject } from '../UiUtils.js'
+import { IDS, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js"
 import config from './MapInfoWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
@@ -40,7 +40,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
+      this.displayToPlayer(login, page, `${page} /${this.paginator.pageCount}`)
     }
   }
 
@@ -63,12 +63,12 @@ export default class TMXWindow extends PopupWindow<number> {
       const index = Math.ceil((currentPage - (page + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.history?.[index + 2], tm.jukebox.history?.[index + 1], tm.jukebox.history?.[index]]
       TMXMaps = [tmx.history?.[index + 2], tmx.history?.[index + 1], tmx.history?.[index]]
-      titles = [`${config.titles.previous} #${index + 3}`, `${config.titles.previous} #${index + 2}`, `${config.titles.previous} #${index + 1}`]
+      titles = [`${config.titles.previous} #${index + 3} `, `${config.titles.previous} #${index + 2} `, `${config.titles.previous} #${index + 1} `]
     } else {
       const index = Math.ceil((page - (currentPage + 1)) * config.itemsPerPage) + 1
       maps = [tm.jukebox.queue?.[index], tm.jukebox.queue?.[index + 1], tm.jukebox.queue?.[index + 2]]
       TMXMaps = [tmx.queue?.[index], tmx.queue?.[index + 1], tmx.queue?.[index + 2]]
-      titles = [`${config.titles.next} #${index + 1}`, `${config.titles.next} #${index + 2}`, `${config.titles.next} #${index + 3}`]
+      titles = [`${config.titles.next} #${index + 1} `, `${config.titles.next} #${index + 2} `, `${config.titles.next} #${index + 3} `]
     }
     const m = maps.filter(a => a !== undefined).map(a => (a as any).id)
     const allRecords: Readonly<tm.Record[]> = [...tm.records.getFromHistory(...m), ...tm.records.local, ...tm.records.getFromQueue(...m)]
@@ -89,7 +89,7 @@ export default class TMXWindow extends PopupWindow<number> {
       const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, TMXMap?.validReplays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
     }
-    return `<format textsize="3"/>` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))
+    return `< format textsize = "3" /> ` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))
   }
 
   protected constructFooter(login: string, page: number): string {
@@ -98,17 +98,17 @@ export default class TMXWindow extends PopupWindow<number> {
 
   private constructHeader(width: number, height: number, title: string, map: tm.Map, TMXMap?: tm.TMXMap): string {
     const icon = (x: number, y: number, image: string, url: string): string => {
-      return `<quad posn="${x + config.margin} ${-(y + config.margin)} 3" 
-       sizen="${config.iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}" url="${url}"/>
-      <quad posn="${x + config.margin * 2} ${-(y + config.margin * 2)} 5" 
-       sizen="${config.iconWidth - config.margin * 2} ${height - config.margin * 4}" 
-       image="${image}" url="${url}"/>`
+      return `< quad posn = "${x + config.margin} ${-(y + config.margin)} 3"
+sizen = "${config.iconWidth} ${height - config.margin * 2}" bgcolor = "${config.iconBackground}" url = "${url}" />
+  <quad posn="${x + config.margin * 2} ${-(y + config.margin * 2)} 5"
+sizen = "${config.iconWidth - config.margin * 2} ${height - config.margin * 4}"
+image = "${image}" url = "${url}" /> `
     }
     if (TMXMap === undefined) {
       return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin), height, config.iconWidth)}
-        <frame posn="${width - (config.iconWidth + config.margin * 2)} 0 4">
-          ${icon(0, 0, config.icons.dedimania, tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
-        </frame>`
+<frame posn="${width - (config.iconWidth + config.margin * 2)} 0 4" >
+  ${icon(0, 0, config.icons.dedimania, tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
+</frame>`
     }
     return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin) * 3, height, config.iconWidth)}
     <frame posn="${width - ((config.iconWidth + config.margin) * 3 + config.margin)} 0 4">
@@ -124,7 +124,7 @@ export default class TMXWindow extends PopupWindow<number> {
       <frame posn="${iconWidth + config.margin * 2} ${-config.margin} 4">
         <quad posn="0 0 3" sizen="${width - (iconWidth + config.margin * 3)} ${height - config.margin * 2}" bgcolor="${config.gridBackground}"/>
         ${useCenteredText === true ? centeredText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale }) :
-        verticallyCenteredText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale })}
+        leftAlignedText(text, width - (iconWidth + config.margin * 3), height - config.margin * 2, { textScale: config.textscale })}
       </frame>`
   }
 
@@ -154,7 +154,7 @@ export default class TMXWindow extends PopupWindow<number> {
         (index > count || index === -1)) {
         nickname = tm.players.get(login)?.nickname
       }
-      return verticallyCenteredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultText, false)), w, h, options)
+      return leftAlignedText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultText, false)), w, h, options)
     }
     const timeCell: GridCellFunction = (i, j, w, h) => centeredText(records[i - 1] !== undefined ?
       tm.utils.getTimeString(records[i - 1]?.time) : config.defaultTime, w, h, options)
@@ -249,7 +249,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const timeCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
     const nameCell: GridCellFunction = (i, j, w, h) =>
-      verticallyCenteredText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultText), w, h, options)
+      leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultText), w, h, options)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultText, w, h, options)
     const downloadCell: GridCellObject = {

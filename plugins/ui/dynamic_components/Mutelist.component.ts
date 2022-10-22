@@ -51,14 +51,14 @@ export default class Mutelist extends PopupWindow<number> {
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
+    this.displayToPlayer(info.login, page, `${page} /${this.paginator.pageCount}`, info.privilege)
   }
 
   private reRender(): void {
     const players = this.getPlayersWithWindowOpen(true)
     for (const player of players) {
       const page = this.paginator.getPageByLogin(player.login)
-      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount}`, tm.players.get(player.login)?.privilege ?? 0)
+      this.displayToPlayer(player.login, page, `${page}/${this.paginator.pageCount} `, tm.players.get(player.login)?.privilege ?? 0)
     }
   }
 
@@ -90,8 +90,8 @@ export default class Mutelist extends PopupWindow<number> {
     }
     const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(mutelist[i + index].callerNickname, false)), w, h)
     const unmuteButton: GridCellFunction = (i, j, w, h) => {
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unmuteIcon}"
-      imagefocus="${config.unmuteIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}"/>`
+      return `< quad posn = "${w / 2} ${-h / 2} 1" sizen = "${config.iconWidth} ${config.iconHeight}" image = "${config.unmuteIcon}"
+    imagefocus = "${config.unmuteIconHover}" halign = "center" valign = "center" action = "${this.openId + i + 1000 + index}" /> `
     }
     const rows = Math.min(config.entries, mutelist.length - (index + 1))
     const arr = headers
