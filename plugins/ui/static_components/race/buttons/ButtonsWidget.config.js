@@ -84,6 +84,7 @@ export default {
       { 0: "$E22DISABLED", 1: "DUE TO RES", equal: true },
       { 0: "MAP IS", 1: "$E22SKIPPED", equal: true },
     ],
+    header: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.red}SKIP${tm.utils.palette.highlight} the ongoing map`,
     icon: icons.voteSkip,
     voteIcon: icons.voteSkip,
     triesLimit: 3,
@@ -104,6 +105,7 @@ export default {
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true }
     ],
+    header: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
     icon: icons.voteReplay,
     voteIcon: icons.voteReplay,
     replayLimit: 5,
