@@ -50,7 +50,7 @@ export abstract class VoteService {
     { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[], vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
     if (GameService.state === 'transition') { return }
     const date: Date = new Date()
-    const map = MapService.current
+    const map = { ...MapService.current }
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
     if (voteArr === undefined) { return }
     if (Array.isArray(arg)) {
