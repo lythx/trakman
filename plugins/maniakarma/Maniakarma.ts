@@ -289,7 +289,12 @@ function getNewVote(logins: string | string[]): MKVote | MKVote[] | undefined {
   return newVotes.filter(a => logins.includes(a.login))
 }
 
-
+/**
+ * Fetches and sends maniakarma votes.
+ * Provides utilities for accessing maniakarma votes related data.
+ * @author lythx & wiseraven
+ * @since 0.1
+ */
 export const maniakarma = {
 
   /**
@@ -320,18 +325,30 @@ export const maniakarma = {
 
   getNewVote,
 
+  /**
+   * Current map maniakarma votes
+   */
   get votes(): Readonly<MKVote>[] {
     return [...playerVotes]
   },
 
+  /**
+   * Current map new maniakarma votes
+   */
   get newVotes(): Readonly<MKVote>[] {
     return [...newVotes]
   },
 
+  /**
+   * Current map maniakarma vote count
+   */
   get voteCount(): number {
     return playerVotes.length
   },
 
+  /**
+   * Current map new maniakarma vote count
+   */
   get newVoteCount(): number {
     return newVotes.length
   },
@@ -341,14 +358,23 @@ export const maniakarma = {
    */
   isEnabled: config.isEnabled,
 
+  /**
+   * Current map karma value
+   */
   get mapKarmaRatio(): number {
     return mapKarmaValue
   },
 
+  /**
+   * Object containing vote counts for each vote type
+   */
   get mapKarma(): MKMapVotes {
     return mapKarma
   },
 
+  /**
+   * True if controller is connected to maniakarma server
+   */
   get isConnected(): boolean {
     return isConnected
   }

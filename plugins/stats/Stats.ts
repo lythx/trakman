@@ -7,6 +7,12 @@ import { topRecords } from './TopRecords.js'
 import { topPlaytimes } from './TopPlaytimes.js'
 import { topSums } from './TopSums.js'
 
+/**
+ * Registers and stores sector records for every player.
+ * Provides utilities for accessing sector records related data TODO
+ * @author lythx
+ * @since 0.3
+ */
 export const stats = {
   votes: topVotes,
   wins: topWins,

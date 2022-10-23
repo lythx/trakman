@@ -91,10 +91,11 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     maplist.onJukeboxUpdate(() => this.reRender())
   }
 
-  async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma' | 'short' | 'long' | 'best' | 'worst' | 'worstkarma'): Promise<void> {
+  openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
+    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma'): void {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
-      list = await maplist.getByPosition(login, option)
+      list = maplist.getByPosition(login, option)
     } else {
       list = maplist.get(option)
     }

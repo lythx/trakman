@@ -194,7 +194,7 @@ export const donations = {
   },
 
   /**
-   * @returns Donators who are currently online
+   * Donators who are currently online
    */
   get onlineList() {
     return [...onlineDonators]
