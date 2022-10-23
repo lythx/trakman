@@ -61,6 +61,11 @@ tm.addListener('RanksAndAveragesUpdated', async (info) => {
   for (const e of updateListeners) { e(updated) }
 })
 
+/**
+ * Creates and provides utilities for accessing players average rank ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topAverages = {
 
   /**

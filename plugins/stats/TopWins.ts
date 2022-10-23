@@ -59,6 +59,11 @@ tm.addListener('EndMap', async (info) => {
   for (const e of updateListeners) { e([obj]) }
 })
 
+/**
+ * Creates and provides utilities for accessing players wins count ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topWins = {
 
   /**

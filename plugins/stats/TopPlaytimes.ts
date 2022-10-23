@@ -59,6 +59,11 @@ tm.addListener('EndMap', () => {
   for (const e of updateListeners) { e(updated) }
 })
 
+/**
+ * Creates and provides utilities for accessing players playtime ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topPlaytimes = {
 
   /**

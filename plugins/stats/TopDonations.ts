@@ -58,6 +58,11 @@ donations.onDonation((info) => {
   for (const e of updateListeners) { e(updated) }
 })
 
+/**
+ * Creates and provides utilities for accessing players donations ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topDonations = {
 
   /**

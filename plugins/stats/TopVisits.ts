@@ -57,6 +57,11 @@ tm.addListener('PlayerJoin', (info) => {
   }
 })
 
+/**
+ * Creates and provides utilities for accessing players visit count ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topVisits = {
 
   /**

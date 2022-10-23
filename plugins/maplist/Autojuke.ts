@@ -1,3 +1,9 @@
+/**
+ * Adds commands used to quickly add maps to queue based on given conditions
+ * @author lythx
+ * @since 0.4
+ */
+
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 

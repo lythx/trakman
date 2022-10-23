@@ -124,6 +124,11 @@ tm.addListener('LocalRecord', info => {
   }
 })
 
+/**
+ * Creates and provides utilities for accessing players record count ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topRecords = {
 
   /**
