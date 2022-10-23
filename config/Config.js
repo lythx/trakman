@@ -1,5 +1,5 @@
 export default {
-  localRecordsLimit: 30,
+  localRecordsLimit: 25,
   chatMessagesInRuntime: 250,
   jukeboxQueueSize: 30,
   jukeboxHistorySize: 30,
