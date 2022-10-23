@@ -90,8 +90,8 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs an error message into the console and exits the process
-   * @param lines Error messages
+   * Outputs an fatal error message into the console and exits the process
+   * @param lines Message lines
    */
   static async fatal(...lines: any[]): Promise<void> {
     if (this.crashed === true) { return }
@@ -105,7 +105,7 @@ export abstract class Logger {
 
   /**
    * Outputs an error message into the console
-   * @param lines Error messages
+   * @param lines Message lines
    */
   static error(...lines: any[]): void {
     if (this.crashed === true) { return }
@@ -115,6 +115,10 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
+  /**
+   * Outputs a warn message into the console
+   * @param lines Message lines
+   */
   static warn(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date: string = new Date().toUTCString()
@@ -123,6 +127,10 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
+  /**
+   * Outputs an info message into the console
+   * @param lines Message lines
+   */
   static info(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date: string = new Date().toUTCString()
@@ -131,6 +139,10 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
+  /**
+   * Outputs a debug message into the console
+   * @param lines Message lines
+   */
   static debug(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date: string = new Date().toUTCString()
@@ -139,6 +151,10 @@ export abstract class Logger {
     void this.writeLog(tag, location, date, lines)
   }
 
+  /**
+   * Outputs a trace message into the console
+   * @param lines Message lines
+   */
   static trace(...lines: any[]): void {
     if (this.crashed === true) { return }
     const date: string = new Date().toUTCString()

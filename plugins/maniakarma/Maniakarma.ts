@@ -129,7 +129,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   return ret
 }
 
-const sendVotes = async (): Promise<void> => {
+const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
   if (newVotes.length === 0) { return }
   const url: string = `${apiUrl}?Action=Vote&${new URLSearchParams({
     login: tm.state.serverConfig.login,
@@ -143,7 +143,7 @@ const sendVotes = async (): Promise<void> => {
     nbchecks: lastMap.checkpointsAmount.toString(),
     mood: lastMap.mood,
     env: lastMap.environment,
-    votes: getVoteString(),
+    votes: getVoteString(newVotes),
     tmx: '' // LEFTOVER FROM TM2
   })}`
   const res = await fetch(url).catch((err: Error) => err)
@@ -165,14 +165,14 @@ const storePlayerVotes = (login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void =
   })
 }
 
-const getVoteString = (): string => {
+const getVoteString = (newVotes: MKVote[]): string => {
   let voteString: string[] = []
   const count: any = {}
   for (const player of newVotes) {
     count[player.login] = (count[player.login] ?? 0) + 1
   }
-  const newVotesCopy: MKVote[] = newVotes.filter(a => count[a.login]-- === 1)
-  for (const vote of newVotesCopy) {
+  const filteredVotes: MKVote[] = newVotes.filter(a => count[a.login]-- === 1)
+  for (const vote of filteredVotes) {
     voteString.push(vote.login + `=` + vote.vote)
   }
   return voteString.join('|')
@@ -255,8 +255,15 @@ const fixCoherence = async (): Promise<void> => {
 }
 
 const onBeginMap = async (isRestart: boolean): Promise<void> => {
-  emitMapFetch([], 0, defaultKarmaObject) // Reset the votes on before fetch
-  await sendVotes()
+  const newV = newVotes
+  if (isRestart === false) { // Reset the votes on before fetch
+    playerVotes.length = 0
+    newVotes.length = 0
+    mapKarmaValue = 0
+    mapKarma = { ...defaultKarmaObject }
+    emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
+  }
+  await sendVotes(newV)
   if (isRestart === false) {
     await fetchVotes(...tm.players.list.map(a => a.login))
   }
@@ -368,7 +375,6 @@ export const maniakarma = {
    * Current map maniakarma votes
    */
   get votes(): Readonly<MKVote>[] {
-    if (tm.state.current === 'transition') { return [] }
     return [...playerVotes]
   },
 
@@ -376,7 +382,6 @@ export const maniakarma = {
    * Current map new maniakarma votes
    */
   get newVotes(): Readonly<MKVote>[] {
-    if (tm.state.current === 'transition') { return [] }
     return [...newVotes]
   },
 
@@ -384,7 +389,6 @@ export const maniakarma = {
    * Current map maniakarma vote count
    */
   get voteCount(): number {
-    if (tm.state.current === 'transition') { return 0 }
     return playerVotes.length
   },
 
@@ -392,7 +396,6 @@ export const maniakarma = {
    * Current map new maniakarma vote count
    */
   get newVoteCount(): number {
-    if (tm.state.current === 'transition') { return 0 }
     return newVotes.length
   },
 
@@ -405,7 +408,6 @@ export const maniakarma = {
    * Current map karma value
    */
   get mapKarmaRatio(): number {
-    if (tm.state.current === 'transition') { return 0 }
     return mapKarmaValue
   },
 
@@ -413,7 +415,6 @@ export const maniakarma = {
    * Object containing vote counts for each vote type
    */
   get mapKarma(): MKMapVotes {
-    if (tm.state.current === 'transition') { return defaultKarmaObject }
     return mapKarma
   },
 

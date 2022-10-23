@@ -72,7 +72,9 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.forcespec.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.forcespec.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, 
+        adminName: tm.utils.strip(info.nickname),
+        name: tm.utils.strip(targetInfo.nickname) }), config.forcespec.public ? undefined : info.login)
       tm.client.callNoRes('system.multicall',
         [{
           method: 'ForceSpectator',
