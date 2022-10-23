@@ -8,8 +8,7 @@ import { topPlaytimes } from './TopPlaytimes.js'
 import { topSums } from './TopSums.js'
 
 /**
- * Registers and stores sector records for every player.
- * Provides utilities for accessing sector records related data TODO
+ * Creates and provides utilities for accessing rankings for various player stats
  * @author lythx
  * @since 0.3
  */

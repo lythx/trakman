@@ -335,34 +335,65 @@ export const Utils = {
 
 }
 
-// TODO
-function matchString(searchString: string, possibleMatches: string[]): { str: string, value: number }[]
-
+/**
+ * Checks similarity of given strings, returns best matches sorted based on similarity
+ * @param searchString String to compare possible matches to
+ * @param possibleMatches Array of strings to sort by similarity
+ * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
+ * @returns Array of objects containing string and its similarity value
+ */
+function matchString(searchString: string, possibleMatches: string[], stripSpecialChars?: true): { str: string, value: number }[]
+/**
+ * Checks similarity of given strings in an array of objects, returns best matches sorted based on similarity
+ * @param searchString String to compare possible matches to
+ * @param possibleMatches Array of objects to sort by similarity
+ * @param key Key in objects containing the string to compare
+ * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
+ * @returns Array of objects containing object and its similarity value
+ */
 function matchString<T extends { [key: string]: any }>
   (searchString: string, possibleMatches: T[], key: keyof T, stripSpecialChars?: true): { obj: T, value: number }[]
-
 function matchString<T extends { [key: string]: any }>
-  (searchString: string, possibleMatches: string[] | T[], key?: keyof T, stripSpecialChars?: true)
+  (searchString: string, possibleMatches: string[] | T[], arg?: keyof T | true, stripSpecialChars?: true)
   : { str: string, value: number }[] | { obj: T, value: number }[] {
   if (possibleMatches.length === 0) { return [] }
-  if (key === undefined) {
+  if (arg === undefined || typeof arg === 'boolean') {
+    const stripSpecialChars = arg
     const arr: { str: string, value: number }[] = []
     for (const e of possibleMatches) {
-      arr.push({ str: e as any, value: dsc.twoStrings(searchString, e) })
+      arr.push({
+        str: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
+          Utils.stripSpecialChars(Utils.strip(e as string)) : e)
+      })
     }
     return arr.sort((a, b): number => b.value - a.value)
   } else {
+    const key = arg
     const arr: { obj: T, value: number }[] = []
     for (const e of possibleMatches) {
-      arr.push({ obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ? Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key]) })
+      arr.push({
+        obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
+          Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key])
+      })
     }
     return arr.sort((a, b): number => b.value - a.value)
   }
 }
 
-// TODO
-function strVar(str: string, variables: any[]): string
+/** 
+ * Replaces #{variableName} in string with given variables
+ * @param str String to replace #{variableName} in
+ * @param variables Object containing values for variable names (key is variableName)
+ * @returns String with replaced variables
+ */
 function strVar(str: string, variables: { [name: string]: any }): string
+/** 
+ * Replaces #{variableName} in string with given variables
+ * @param str String to replace #{variableName} in
+ * @param variables Array containing values for variables in order
+ * @returns String with replaced variables
+ */
+function strVar(str: string, variables: any[]): string
 function strVar(str: string, vars: { [name: string]: any }): string {
   if (Array.isArray(vars)) {
     for (const e of vars) {
