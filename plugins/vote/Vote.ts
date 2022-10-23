@@ -2,31 +2,53 @@ import { addKeyListener } from "../ui/utils/KeyListener.js"
 import IDS from '../ui/config/UtilIds.js'
 import config from './Config.js'
 
+/**
+ * Provides utilites for in-game votes
+ * @author lythx
+ * @since 0.1
+ */
 export class Vote {
 
   private static isListenerAdded: boolean = false
   private static isDisplayed: boolean = false
+  /** Manialink action ID of yes vote */
   readonly yesId: number = IDS.VoteWindow.voteYes
+  /** Manialink action ID of no vote */
   readonly noId: number = IDS.VoteWindow.voteNo
+  /** Manialink action ID of yes vote */
   readonly goal: number
   private readonly votes: { login: string, vote: boolean }[] = []
-  static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
-  static endMapListener: () => void = () => undefined
-  static startMapListener: () => void = () => undefined
-  static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
-  static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  static onInterrupt: ((info: {
+  private static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
+  private static endMapListener: () => void = () => undefined
+  private static startMapListener: () => void = () => undefined
+  private static onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
+  private static onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  private static onInterrupt: ((info: {
     caller?: tm.Player,
     result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
-  static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  private static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  /** 
+   * Callback function to execute on vote ratio update. It takes votes array, seconds left, and ManialinkClickInfo as parameters
+   */
   onUpdate: ((votes: { login: string, vote: boolean }[], seconds: number, info: tm.ManialinkClickInfo) => void) = () => undefined
+  /** 
+   * Callback function to execute on vote end. It takes result and votes array as parameters
+   */
   onEnd: ((result: boolean, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  /** 
+   * Callback function to execute on vote interrupt. It takes object containing result, optional player interrupting the vote
+   * and votes array as parameters
+   */
   onInterrupt: ((info: {
     caller?: tm.Player,
     result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  /** 
+   * Callback function to execute on vote seconds left change. It takes seconds amount and votes array as parameters
+   */
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  /** Logins of players who can vote */
   loginList: string[] = []
   private isActive: boolean = false
   private seconds: number
@@ -34,13 +56,20 @@ export class Vote {
   private readonly cancelOnRoundEnd: boolean
   private readonly cancelOnRoundStart: boolean
 
-  constructor(callerLogin: string, goal: number, seconds: number, dontCancelOnRoundEnd?: true, dontCancelOnRoundStart?: true) {
+  /**
+   * Util to manage votes and render vote manialink window
+   * @param callerLogin Login of the player who called the vote
+   * @param goal Ratio of votes needed to pass the vote (must be between 0 and 1)
+   * @param seconds Amount of time to vote
+   * @param options Optional parameters
+   */
+  constructor(callerLogin: string, goal: number, seconds: number, options?: { dontCancelOnRoundEnd?: true, dontCancelOnRoundStart?: true }) {
     if (goal <= 0 || goal >= 1) { throw new Error(`Vote goal has to be between 0 and 1`) }
     this.goal = goal
     this.votes.push({ login: callerLogin, vote: true })
     this.seconds = seconds
-    this.cancelOnRoundEnd = dontCancelOnRoundEnd === undefined
-    this.cancelOnRoundStart = dontCancelOnRoundStart === undefined
+    this.cancelOnRoundEnd = options?.dontCancelOnRoundEnd === undefined
+    this.cancelOnRoundStart = options?.dontCancelOnRoundStart === undefined
     if (Vote.isListenerAdded === false) {
       Vote.isListenerAdded = true
       tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => Vote.listener(info))
@@ -67,8 +96,9 @@ export class Vote {
   }
 
   /**
-   * @param eligibleLogins list of logins of players that can vote
-   * @returns false if there is another vote running, true if vote gets started successfully
+   * Starts the vote timer and activates listeners
+   * @param eligibleLogins List of logins of players that can vote
+   * @returns False if there is another vote running, true if vote gets started successfully
    */
   start(eligibleLogins: string[]): boolean {
     if (Vote.isDisplayed === true) { return false }
@@ -88,6 +118,9 @@ export class Vote {
           else if (info.actionId === this.noId) { vote.vote = false }
         }
         Vote.onUpdate(this.votes, this.seconds, info)
+        if (this.votes.length === this.loginList.length) {
+          this.conclude()
+        }
       }
     }
     Vote.startMapListener = (): void => {
@@ -130,17 +163,25 @@ export class Vote {
     return (yesVotes / allVotes) > this.goal
   }
 
+  /**
+   * Passes the vote
+   * @param caller Caller player object
+   */
   pass(caller?: tm.Player): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: true }
   }
 
+  /**
+   * Cancels the vote
+   * @param caller Caller player object
+   */
   cancel(caller?: tm.Player): void {
     if (this.isActive === false) { return }
     this.interrupted = { caller, result: false }
   }
 
-  clearListeners(): void {
+  private clearListeners(): void {
     Vote.onUpdate = () => undefined
     Vote.onEnd = () => undefined
     Vote.onInterrupt = () => undefined

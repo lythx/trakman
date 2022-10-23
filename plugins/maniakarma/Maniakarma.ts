@@ -15,6 +15,14 @@ let lastMap: Readonly<tm.CurrentMap>
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
 const voteListeners: ((votes: MKVote[]) => void)[] = []
 const playerFetchListeners: ((vote: MKVote) => void)[] = []
+const defaultKarmaObject: Readonly<MKMapVotes> = {
+  fantastic: 0,
+  beautiful: 0,
+  good: 0,
+  bad: 0,
+  poor: 0,
+  waste: 0
+}
 
 const emitMapFetch = (votes: MKVote[], ratio: number, karma: MKMapVotes): void => {
   for (const e of mapFetchListeners) { e({ votes, ratio, karma }) }
@@ -247,6 +255,7 @@ const fixCoherence = async (): Promise<void> => {
 }
 
 const onBeginMap = async (isRestart: boolean): Promise<void> => {
+  emitMapFetch([], 0, defaultKarmaObject) // Reset the votes on before fetch
   await sendVotes()
   if (isRestart === false) {
     await fetchVotes(...tm.players.list.map(a => a.login))
@@ -359,6 +368,7 @@ export const maniakarma = {
    * Current map maniakarma votes
    */
   get votes(): Readonly<MKVote>[] {
+    if (tm.state.current === 'transition') { return [] }
     return [...playerVotes]
   },
 
@@ -366,6 +376,7 @@ export const maniakarma = {
    * Current map new maniakarma votes
    */
   get newVotes(): Readonly<MKVote>[] {
+    if (tm.state.current === 'transition') { return [] }
     return [...newVotes]
   },
 
@@ -373,6 +384,7 @@ export const maniakarma = {
    * Current map maniakarma vote count
    */
   get voteCount(): number {
+    if (tm.state.current === 'transition') { return 0 }
     return playerVotes.length
   },
 
@@ -380,6 +392,7 @@ export const maniakarma = {
    * Current map new maniakarma vote count
    */
   get newVoteCount(): number {
+    if (tm.state.current === 'transition') { return 0 }
     return newVotes.length
   },
 
@@ -392,6 +405,7 @@ export const maniakarma = {
    * Current map karma value
    */
   get mapKarmaRatio(): number {
+    if (tm.state.current === 'transition') { return 0 }
     return mapKarmaValue
   },
 
@@ -399,6 +413,7 @@ export const maniakarma = {
    * Object containing vote counts for each vote type
    */
   get mapKarma(): MKMapVotes {
+    if (tm.state.current === 'transition') { return defaultKarmaObject }
     return mapKarma
   },
 
