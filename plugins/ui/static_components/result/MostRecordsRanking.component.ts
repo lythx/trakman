@@ -1,4 +1,4 @@
-import { IDS, List, StaticHeader } from '../../UiUtils.js'
+import { componentIds, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './MostRecordsRanking.config.js'
@@ -10,7 +10,7 @@ export default class MostRecordsRanking extends StaticComponent {
   private xml = ''
 
   constructor() {
-    super(IDS.mostRecordsRanking, 'result')
+    super(componentIds.mostRecordsRanking, 'result')
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })

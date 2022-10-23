@@ -1,4 +1,4 @@
-import { IDS, List, StaticHeader } from '../../UiUtils.js'
+import { componentIds, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './VotersRanking.config.js'
@@ -13,7 +13,7 @@ export default class VotersRanking extends StaticComponent {
   private xml = ''
 
   constructor() {
-    super(IDS.votersRanking, 'result')
+    super(componentIds.votersRanking, 'result')
     const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y

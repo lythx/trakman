@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
 import config from './SectorRecords.config.js'
 
@@ -9,7 +9,7 @@ export default class SectorRecords extends PopupWindow {
   private readonly paginator: Paginator
 
   constructor() {
-    super(IDS.sectorRecords, config.icon, config.title, config.navbar)
+    super(componentIds.sectorRecords, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries + 2).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,

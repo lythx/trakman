@@ -1,5 +1,5 @@
 import StaticComponent from '../../StaticComponent.js'
-import { IDS, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader } from '../../UiUtils.js'
+import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader } from '../../UiUtils.js'
 import config from './BestCps.config.js'
 
 export default class BestCps extends StaticComponent {
@@ -15,7 +15,7 @@ export default class BestCps extends StaticComponent {
   private grid: Grid
 
   constructor() {
-    super(IDS.bestCps, 'race')
+    super(componentIds.bestCps, 'race')
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height

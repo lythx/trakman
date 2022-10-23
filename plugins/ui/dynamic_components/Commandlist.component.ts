@@ -1,4 +1,4 @@
-import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction, addManialinkListener } from "../UiUtils.js"
+import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener } from "../UiUtils.js"
 import PopupWindow from "../PopupWindow.js"
 import config from './Commandlist.config.js'
 
@@ -27,7 +27,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   private readonly ownerCommands: tm.Command[]
 
   constructor() {
-    super(IDS.commandList, config.icon, config.title, config.navbar)
+    super(componentIds.commandList, config.icon, config.title, config.navbar)
     const commandList = tm.commands.list
     this.userCommands = commandList.filter(a => a.help !== undefined && a.privilege === 0)
     this.opCommands = commandList.filter(a => a.help !== undefined && a.privilege === 1)

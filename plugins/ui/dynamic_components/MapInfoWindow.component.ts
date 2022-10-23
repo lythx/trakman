@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js"
-import { IDS, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject } from '../UiUtils.js'
+import { componentIds, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js"
 import config from './MapInfoWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
@@ -11,7 +11,7 @@ export default class TMXWindow extends PopupWindow<number> {
   private historyCount = 0
 
   constructor() {
-    super(IDS.TMXWindow, config.icon, config.title, config.navbar)
+    super(componentIds.TMXWindow, config.icon, config.title, config.navbar)
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(config.queueCount / config.itemsPerPage))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)

@@ -1,5 +1,5 @@
 import StaticComponent from '../../StaticComponent.js'
-import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
+import { componentIds, StaticHeader, centeredText } from '../../UiUtils.js'
 import config from './CpCounter.config.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 
@@ -9,7 +9,7 @@ export default class CpCounter extends StaticComponent {
   private prevTimes: { login: string, best?: number, current: number, isFinish: boolean }[] = []
 
   constructor() {
-    super(IDS.cpCounter, 'race')
+    super(componentIds.cpCounter, 'race')
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
     tm.addListener('PlayerCheckpoint', (info) => {
       const local = tm.records.getLocal(info.player.login)

@@ -1,6 +1,6 @@
 import StaticComponent from '../../StaticComponent.js'
 import { donations } from '../../../donations/Donations.js'
-import { IDS, StaticHeader, centeredText } from '../../UiUtils.js'
+import { componentIds, StaticHeader, centeredText } from '../../UiUtils.js'
 import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {
@@ -12,7 +12,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.liveCheckpoint, 'race')
+    super(componentIds.liveCheckpoint, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

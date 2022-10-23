@@ -1,4 +1,4 @@
-import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './LiveRanking.config.js'
 
@@ -11,7 +11,7 @@ export default class LiveRanking extends StaticComponent {
   private readonly recordList: RecordList
 
   constructor() {
-    super(IDS.live, 'race')
+    super(componentIds.live, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -48,7 +48,7 @@ export default class LiveRanking extends StaticComponent {
     tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: IDS.liveCps })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.liveCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, tm.records.live.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
         </frame>

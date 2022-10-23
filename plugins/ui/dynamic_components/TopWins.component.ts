@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js"
 import { stats } from "../../stats/Stats.js"
-import { IDS, centeredText } from '../UiUtils.js'
+import { componentIds, centeredText } from '../UiUtils.js'
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
 import config from './TopWins.config.js'
 
@@ -11,7 +11,7 @@ export default class TopWins extends PopupWindow<number> {
   private ranks: readonly { login: string, nickname: string, wins: number }[]
 
   constructor() {
-    super(IDS.topWins, config.icon, config.title, config.navbar)
+    super(componentIds.topWins, config.icon, config.title, config.navbar)
     this.ranks = stats.wins.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)

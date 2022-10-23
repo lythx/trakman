@@ -1,4 +1,4 @@
-import { List, IDS, StaticHeader } from '../../UiUtils.js'
+import { List, componentIds, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './RoundAveragesRanking.config.js'
 
@@ -13,7 +13,7 @@ export default class RoundAveragesRanking extends StaticComponent {
   private averages: { nickname: string, login: string, average: number, finishcount: number }[] = []
 
   constructor() {
-    super(IDS.roundAveragesRanking, 'result')
+    super(componentIds.roundAveragesRanking, 'result')
     const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y

@@ -1,4 +1,4 @@
-import { IDS, Grid, staticButton, GridCellFunction } from '../../../UiUtils.js'
+import { componentIds, Grid, staticButton, GridCellFunction } from '../../../UiUtils.js'
 import StaticComponent from '../../../StaticComponent.js'
 import { VisitCounter } from './VisitCounter.js'
 import { TimeButton } from './TimeButton.js'
@@ -26,7 +26,7 @@ export default class ButtonsWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.buttons, 'race')
+    super(componentIds.buttons, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -76,7 +76,8 @@ export default class ButtonsWidget extends StaticComponent {
       const data = e.buttonData
       arr.push((i, j, w, h) =>
         staticButton(data.icon, data.text1, data.text2, w - config.margin,
-          h - config.margin, data.iconWidth, data.iconHeight, data.padding, {
+          h - config.margin, {
+          iconWidth: data.iconWidth, iconHeight: data.iconHeight, topPadding: data.padding,
           equalTexts: data.equalTexts === true ? true : undefined,
           actionId: data.actionId, link: data.link
         }))

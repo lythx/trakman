@@ -1,4 +1,4 @@
-import { IDS, RecordList, StaticHeader } from '../../UiUtils.js'
+import { componentIds, RecordList, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 
 import config from './NextMapRecords.config.js'
@@ -13,7 +13,7 @@ export default class NextMapRecords extends StaticComponent {
   private readonly list: RecordList
 
   constructor() {
-    super(IDS.nextMapRecords, 'result')
+    super(componentIds.nextMapRecords, 'result')
     const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y

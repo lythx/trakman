@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { IDS, Grid, centeredText, closeButton, Paginator, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction } from '../UiUtils.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{ page: number, privilege: number }> {
@@ -16,7 +16,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
   }
 
   constructor() {
-    super(IDS.playerList, config.icon, config.title, config.navbar)
+    super(componentIds.playerList, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,

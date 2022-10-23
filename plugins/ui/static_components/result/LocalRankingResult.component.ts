@@ -1,4 +1,4 @@
-import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './LocalRankingResult.config.js'
 
@@ -10,7 +10,7 @@ export default class LocalRankingResult extends StaticComponent {
   private readonly recordList: RecordList
 
   constructor() {
-    super(IDS.localsResult, 'result')
+    super(componentIds.localsResult, 'result')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -45,7 +45,7 @@ export default class LocalRankingResult extends StaticComponent {
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: IDS.localCps })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, tm.records.local
       .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))

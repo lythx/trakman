@@ -1,4 +1,4 @@
-import { IDS, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
+import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './AdminPanel.config.js'
 
@@ -21,7 +21,7 @@ export default class AdminPanel extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(IDS.admin, 'race')
+    super(componentIds.admin, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -53,10 +53,10 @@ export default class AdminPanel extends StaticComponent {
       await tm.jukebox.add(tm.jukebox.history[0].id, info)
     })
     addManialinkListener(this.id + this.actions.players, info => {
-      tm.openManialink(IDS.playerList, info.login)
+      tm.openManialink(componentIds.playerList, info.login)
     })
     addManialinkListener(this.id + this.actions.jukebox, info => {
-      tm.openManialink(IDS.jukebox, info.login)
+      tm.openManialink(componentIds.jukebox, info.login)
     })
     addManialinkListener(this.id + this.actions.restart, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.restart, {

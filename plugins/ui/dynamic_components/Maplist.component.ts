@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js"
-import { centeredText, closeButton, Grid, IDS, leftAlignedText, addManialinkListener } from '../UiUtils.js'
+import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener } from '../UiUtils.js'
 import { Paginator } from "../UiUtils.js"
 import { maplist } from '../../maplist/Maplist.js'
 import config from './Maplist.config.js'
@@ -15,7 +15,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private nextPaginatorId = 0
 
   constructor() {
-    super(IDS.mapList, config.icon, config.title, config.navbar)
+    super(componentIds.mapList, config.icon, config.title, config.navbar)
     const pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
     this.paginator.onPageChange = (login: string, page: number) => {
@@ -37,7 +37,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       if (gotQueued === false) { return }
       this.reRender()
     })
-    addManialinkListener(IDS.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
+    addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
     tm.commands.add({
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.',

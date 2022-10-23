@@ -1,4 +1,4 @@
-import { IDS, Grid, StaticHeader } from '../../UiUtils.js'
+import { componentIds, Grid, StaticHeader } from '../../UiUtils.js'
 import flags from '../../config/FlagIcons.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
@@ -16,7 +16,7 @@ export default class MapWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.map, 'race')
+    super(componentIds.map, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -93,7 +93,7 @@ export default class MapWidget extends StaticComponent {
     const arr: any[] = new Array(this.rows).fill(cell)
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
-        <quad posn="0 0 8" sizen="${config.width} ${config.height}" action="${IDS.TMXWindow}"/>
+        <quad posn="0 0 8" sizen="${config.width} ${config.height}" action="${componentIds.TMXWindow}"/>
         <format textsize="1" textcolor="FFFF"/> 
         ${this.grid.constructXml(arr)}
       </frame>

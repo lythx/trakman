@@ -1,5 +1,5 @@
 import StaticComponent from '../../StaticComponent.js'
-import { IDS, Grid, centeredText, leftAlignedText, StaticHeader } from '../../UiUtils.js'
+import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader } from '../../UiUtils.js'
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {
@@ -13,7 +13,7 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(IDS.bestFinishes, 'race')
+    super(componentIds.bestFinishes, 'race')
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height

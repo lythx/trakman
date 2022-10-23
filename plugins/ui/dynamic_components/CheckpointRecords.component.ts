@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { closeButton, IDS, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 import config from './CheckpointRecords.config.js'
 
@@ -14,7 +14,7 @@ export default class CheckpointRecords extends PopupWindow {
   }
 
   constructor() {
-    super(IDS.checkpointRecords, config.icon, config.title, config.navbar)
+    super(componentIds.checkpointRecords, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {

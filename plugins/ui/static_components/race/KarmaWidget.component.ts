@@ -1,4 +1,4 @@
-import { centeredText, Grid, GridCellFunction, IDS, StaticHeader, addManialinkListener } from '../../UiUtils.js'
+import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener } from '../../UiUtils.js'
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './KarmaWidget.config.js'
@@ -14,7 +14,7 @@ export default class KarmaWidget extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(IDS.karma, 'race')
+    super(componentIds.karma, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

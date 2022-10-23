@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { Grid, IDS, GridCellFunction, centeredText } from '../UiUtils.js'
+import { Grid, componentIds, GridCellFunction, centeredText } from '../UiUtils.js'
 import config from './WelcomeWindow.config.js'
 
 export default class WelcomeWindow extends PopupWindow {
@@ -8,7 +8,7 @@ export default class WelcomeWindow extends PopupWindow {
   readonly welcomedPlayers: string[] = []
 
   constructor() {
-    super(IDS.welcomeWindow, config.icon, config.title, config.navbar)
+    super(componentIds.welcomeWindow, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, [1, 1], [1], config.grid)
     tm.addListener('PlayerJoin', (info) => {
       if (this.welcomedPlayers.includes(info.login) === false) {

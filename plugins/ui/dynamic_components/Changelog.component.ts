@@ -1,11 +1,11 @@
 import PopupWindow from '../PopupWindow.js'
-import { Grid, IDS, GridCellFunction, centeredText, closeButton } from '../UiUtils.js'
+import { Grid, componentIds, GridCellFunction, centeredText, closeButton } from '../UiUtils.js'
 import config from './Changelog.config.js'
 
 export default class Changelog extends PopupWindow {
 
   constructor() {
-    super(IDS.changelog, config.icon, config.title, config.navbar)
+    super(componentIds.changelog, config.icon, config.title, config.navbar)
     tm.commands.add({
       aliases: ['changes', 'changelog'],
       help: 'Display list of controller changes',
@@ -45,10 +45,10 @@ export default class Changelog extends PopupWindow {
     const image = imageUrl === undefined ? '' :
       `<quad posn="${config.marginBig} ${config.marginBig - imageHeight} 6" sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + imageHeight)}" image="${imageUrl}"/>`
     return `<format textsize="1"/>
-      <quad posn="0 0 3" sizen="${versioW} ${headerH}" bgcolor="${this.headerBg}"/>
+      <quad posn="0 0 3" sizen="${versioW} ${headerH}" bgcolor="${this.headerBackground}"/>
       ${centeredText(`$s$${tm.utils.palette.green}${title}`, versioW, headerH, { padding: this.margin, textScale: config.textScale })}
       <frame posn="${versioW + this.margin} 0 2">
-        <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBg}"/>
+        <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBackground}"/>
         ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale })}
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
