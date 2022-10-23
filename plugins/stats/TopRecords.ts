@@ -115,14 +115,11 @@ tm.addListener('PlayerLeave', info => {
 
 tm.addListener('LocalRecord', info => {
   if (info.previousPosition === -1) {
-    console.log(info.login)
     const obj = onlineList.find(a => a.login === info.login)
-    console.log(obj)
     if (obj === undefined) { return }
     obj.amount++
     if (topList.length !== 0 && topList.length >= config.recordsCount &&
       obj.amount <= topList[topList.length - 1].amount) { return }
-    console.log(info.login)
     const entry = topList.find(a => a.login === info.login)
     if (entry !== undefined) {
       entry.amount = obj.amount
