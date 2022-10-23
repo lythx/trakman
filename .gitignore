@@ -6,6 +6,7 @@
 
 # Config files
 **/[Cc]onfig/*
+**Config.js
 
 # Temp files
 **/temp
