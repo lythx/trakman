@@ -98,6 +98,11 @@ tm.addListener('PlayerLeave', (info): void => {
   onlineList = onlineList.filter(a => a.login !== info.login)
 })
 
+/**
+ * Creates and provides utilities for accessing players vote count ranking
+ * @author lythx
+ * @since 0.3
+ */
 export const topVotes = {
 
   /**
