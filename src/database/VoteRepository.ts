@@ -41,7 +41,11 @@ export class VoteRepository extends Repository {
       const parsedVote = Number(Object.entries(tableVotes).find(a => a[1] === vote.vote)?.[0])
       values.push(mapIds[i].id, playerIds[i].id, parsedVote, vote.date)
     }
-    await this.query(query, ...values)
+    try { // TODO Rarely service calls this method while the same entry exists therefore causing controller to crash
+      await this.query(query, ...values)
+    } catch(err) {
+      Logger.debug(`Error while adding votes`, JSON.stringify(votes, null, 2))
+    }
   }
 
   async update(mapUid: string, objects: { login: string, vote: number, date: Date }[]): Promise<void>
