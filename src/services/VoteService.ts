@@ -28,7 +28,7 @@ export abstract class VoteService {
   }
 
   /**
-   * Fetches new map and deletes the last map in array from memory
+   * Updates map prefetch and sets the current map
    */
   static async nextMap(): Promise<void> {
     await this.updatePrefetch()
@@ -40,30 +40,61 @@ export abstract class VoteService {
    * @param player Player object
    * @param vote Vote value 
    */
-  static add(player: { login: string, nickname: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void {
+  static add(player: { login: string, nickname?: string }, vote: -3 | -2 | -1 | 1 | 2 | 3): void
+  /**
+   * Adds multiple votes on the current map to runtime memory and database
+   * @param votes Vote objects 
+   */
+  static add(votes: { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
+  static add(arg: { login: string, nickname?: string } |
+    { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[], vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
     if (GameService.state === 'transition') { return }
     const date: Date = new Date()
-    const map = MapService.current
+    const map = { ...MapService.current }
     const voteArr = this._votes.find(a => a.uid === map.id)?.votes
     if (voteArr === undefined) { return }
-    const v = voteArr?.find(a => a.login === player.login)
-    if (v?.vote === vote) {
-      return // Return if same vote already exists
-    }
-    Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
-    if (v !== undefined) {
-      v.date = date
-      v.vote = vote
-      void this.repo.update(map.id, player.login, vote, date)
+    if (Array.isArray(arg)) {
+      const updated: tm.Vote[] = []
+      const added: tm.Vote[] = []
+      for (const e of arg) {
+        const v = voteArr.find(a => a.login === e.login)
+        if (v?.vote === vote) { return }
+        if (v !== undefined) {
+          v.vote = e.vote
+          v.date = date
+          added.push(v)
+        } else {
+          const obj = { login: e.login, mapId: map.id, date, vote: e.vote }
+          voteArr.push(obj)
+          updated.push(obj)
+        }
+      }
+      void this.repo.add(...added)
+      void this.repo.update(map.id, updated)
       this.updateMapVoteData(map.id, voteArr)
-      Events.emit('KarmaVote', v)
+      Events.emit('KarmaVote', [...added, ...updated])
       return
+    } else if (vote !== undefined) {
+      const player = arg
+      const v = voteArr.find(a => a.login === player.login)
+      if (v?.vote === vote) {
+        return // Return if same vote already exists
+      }
+      Logger.trace(`${Utils.strip(player?.nickname ?? player.login)} (${player.login}) has voted ${vote} for map ${Utils.strip(map.name)} (${map.id})`)
+      if (v !== undefined) {
+        v.date = date
+        v.vote = vote
+        void this.repo.update(map.id, player.login, vote, date)
+        this.updateMapVoteData(map.id, voteArr)
+        Events.emit('KarmaVote', [v])
+        return
+      }
+      const obj = { login: player.login, mapId: map.id, date, vote }
+      voteArr.push(obj)
+      void this.repo.add(obj)
+      this.updateMapVoteData(map.id, voteArr)
+      Events.emit('KarmaVote', [obj])
     }
-    const obj = { login: player.login, mapId: map.id, date, vote }
-    voteArr.push(obj)
-    void this.repo.add(obj)
-    this.updateMapVoteData(map.id, voteArr)
-    Events.emit('KarmaVote', obj)
   }
 
   private static async updatePrefetch(): Promise<void> {
