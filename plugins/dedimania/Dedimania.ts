@@ -4,7 +4,7 @@ import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
-let isFailedAuthentication = false
+let isFailedAuthentication: boolean = false
 const client: DedimaniaClient = new DedimaniaClient()
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
@@ -37,7 +37,7 @@ const initialize = async (): Promise<void> => {
     return
   }
   updateServerPlayers()
-  const current = tm.maps.current
+  const current: Readonly<tm.CurrentMap> = tm.maps.current
   await getRecords(current.id, current.name, current.environment, current.author)
   tm.log.trace('Connected to Dedimania')
 }
@@ -50,7 +50,7 @@ const reinitialize = async (): Promise<void> => {
   } while (status !== true)
   tm.log.info('Initialized dedimania after an error')
   updateServerPlayers()
-  const current = tm.maps.current
+  const current: Readonly<tm.CurrentMap> = tm.maps.current
   await getRecords(current.id, current.name, current.environment, current.author)
 }
 
@@ -291,35 +291,35 @@ const getLogString = (previousPosition: number, position: number, previousTime: 
 
 if (config.isEnabled === true) {
 
-  tm.addListener('Startup', () => {
+  tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Dedimania...')
     void initialize()
   }, true)
 
-  tm.addListener('BeginMap', (info) => {
+  tm.addListener('BeginMap', (info): void => {
     void getRecords(info.id, info.name, info.environment, info.author)
   }, true)
 
-  tm.addListener('EndMap', (info) => {
+  tm.addListener('EndMap', (info): void => {
     void sendRecords(info.id, info.name, info.environment, info.author, info.checkpointsAmount)
   })
 
-  tm.addListener('PlayerJoin', (info) => {
+  tm.addListener('PlayerJoin', (info): void => {
     void playerJoin(info)
   })
 
-  tm.addListener('PlayerLeave', (info) => {
+  tm.addListener('PlayerLeave', (info): void => {
     void playerLeave(info)
   })
 
-  tm.addListener('PlayerFinish', (info) => {
+  tm.addListener('PlayerFinish', (info): void => {
     void addRecord(info, info.time, info.checkpoints)
   }, true)
 
-  tm.addListener('PlayerInfoUpdated', (info) => {
+  tm.addListener('PlayerInfoUpdated', (info): void => {
     const changedObjects: DediRecord[] = []
     for (const e of currentDedis) {
-      const newNickname = info.find(a => a.login === e.login)?.nickname
+      const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
       if (newNickname !== undefined) {
         e.nickname = newNickname
         changedObjects.push(e)

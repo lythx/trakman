@@ -89,7 +89,7 @@ namespace trakman {
     /**
      * Number of online players
      */
-    get count() { return PlayerService.playerCount }
+    get count(): number { return PlayerService.playerCount }
 
   }
 
@@ -121,15 +121,15 @@ namespace trakman {
 
     getRank: RecordService.getRank.bind(RecordService),
 
-    get local() { return RecordService.localRecords },
+    get local(): Readonly<tm.LocalRecord>[] { return RecordService.localRecords },
 
-    get localCount() { return RecordService.localRecordCount },
+    get localCount(): number { return RecordService.localRecordCount },
 
-    get live() { return RecordService.liveRecords },
+    get live(): Readonly<tm.FinishInfo>[] { return RecordService.liveRecords },
 
-    get liveCount() { return RecordService.liveRecordsCount },
+    get liveCount(): number { return RecordService.liveRecordsCount },
 
-    get maxLocalsAmount() { return RecordService.maxLocalsAmount }
+    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount }
 
   }
 
@@ -141,7 +141,7 @@ namespace trakman {
 
     get: ChatService.get.bind(ChatService),
 
-    get list() { return ChatService._messages }
+    get list(): tm.Message[] { return ChatService._messages }
 
   }
 
@@ -149,7 +149,7 @@ namespace trakman {
 
     add: ChatService.addCommand.bind(ChatService),
 
-    get list() { return ChatService.commandList }
+    get list(): tm.Command[] { return ChatService.commandList }
 
   }
 
@@ -173,11 +173,11 @@ namespace trakman {
 
     remove: MapService.remove.bind(MapService),
 
-    get list() { return MapService.maps },
+    get list(): Readonly<tm.Map>[] { return MapService.maps },
 
-    get current() { return MapService.current },
+    get current(): Readonly<tm.CurrentMap> { return MapService.current },
 
-    get count() { return MapService.mapCount }
+    get count(): number { return MapService.mapCount }
 
   }
 
@@ -213,19 +213,19 @@ namespace trakman {
 
     getFromHistory: MapService.getFromHistory.bind(MapService),
 
-    get queueCount() { return MapService.queueSize },
+    get queueCount(): number { return MapService.queueSize },
 
-    get historyCount() { return MapService.historyCount },
+    get historyCount(): number { return MapService.historyCount },
 
-    get maxHistoryCount() { return MapService.historySize },
+    get maxHistoryCount(): number { return MapService.historySize },
 
-    get jukedCount() { return MapService.jukeboxCount },
+    get jukedCount(): number { return MapService.jukeboxCount },
 
-    get queue() { return MapService.queue },
+    get queue(): Readonly<tm.Map>[] { return MapService.queue },
 
-    get history() { return MapService.history },
+    get history(): Readonly<tm.Map>[] { return MapService.history },
 
-    get current() { return MapService.current },
+    get current(): Readonly<tm.CurrentMap> { return MapService.current },
 
     get juked() { return MapService.jukebox }
 
@@ -239,9 +239,9 @@ namespace trakman {
 
     get: VoteService.get.bind(VoteService),
 
-    get current() { return VoteService.current },
+    get current(): Readonly<tm.Vote>[] { return VoteService.current },
 
-    get currentCount() { return VoteService.currentCount },
+    get currentCount(): number { return VoteService.currentCount },
 
     get list() { return VoteService.votes }
 
@@ -308,21 +308,21 @@ namespace trakman {
 
     getGuest: AdministrationService.getGuest.bind(AdministrationService),
 
-    get banlist() { return AdministrationService.banlist },
+    get banlist(): Readonly<tm.BanlistEntry>[] { return AdministrationService.banlist },
 
-    get blacklist() { return AdministrationService.blacklist },
+    get blacklist(): Readonly<tm.BlacklistEntry>[] { return AdministrationService.blacklist },
 
-    get mutelist() { return AdministrationService.mutelist },
+    get mutelist(): Readonly<tm.MutelistEntry>[] { return AdministrationService.mutelist },
 
-    get guestlist() { return AdministrationService.guestlist },
+    get guestlist(): Readonly<tm.GuestlistEntry>[] { return AdministrationService.guestlist },
 
-    get banCount() { return AdministrationService.banCount },
+    get banCount(): number { return AdministrationService.banCount },
 
-    get blacklistCount() { return AdministrationService.blacklistCount },
+    get blacklistCount(): number { return AdministrationService.blacklistCount },
 
-    get muteCount() { return AdministrationService.muteCount },
+    get muteCount(): number { return AdministrationService.muteCount },
 
-    get guestCount() { return AdministrationService.guestCount }
+    get guestCount(): number { return AdministrationService.guestCount }
 
   }
 

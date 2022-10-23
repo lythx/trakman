@@ -20,23 +20,23 @@ await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
   PRIMARY KEY(player_id, date)
 );`)
 
-tm.addListener("Startup", async () => {
+tm.addListener("Startup", async (): Promise<void> => {
   onlineDonators = await getFromDB(tm.players.list.map(a => a.login))
 })
 
-tm.addListener("PlayerJoin", async (info) => {
-  const res = await getFromDB(info.login)
+tm.addListener("PlayerJoin", async (info): Promise<void> => {
+  const res: DonationInfo | undefined = await getFromDB(info.login)
   if (res !== undefined) { onlineDonators.push(res) }
 })
 
-tm.addListener('PlayerLeave', (info) => {
+tm.addListener('PlayerLeave', (info): void => {
   onlineDonators = onlineDonators.filter(a => a.login !== info.login)
 })
 
-tm.addListener('PlayerInfoUpdated', (info) => {
+tm.addListener('PlayerInfoUpdated', (info): void => {
   const changedObjects: DonationInfo[] = []
   for (const e of onlineDonators) {
-    const newNickname = info.find(a => a.login === e.login)?.nickname
+    const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
       e.nickname = newNickname
       changedObjects.push(e)
@@ -63,9 +63,9 @@ async function getFromDB(login: string): Promise<DonationInfo | undefined>
 async function getFromDB(logins: string[]): Promise<DonationInfo[]>
 async function getFromDB(logins: string | string[]): Promise<DonationInfo | undefined | DonationInfo[]> {
   if (typeof logins === 'string') {
-    const id = await tm.db.getPlayerId(logins)
+    const id: number | undefined = await tm.db.getPlayerId(logins)
     if (id === undefined) { return }
-    const res = await tm.db.query(`SELECT nickname, date, amount FROM donations
+    const res: any[] | Error = await tm.db.query(`SELECT nickname, date, amount FROM donations
     JOIN players ON players.id=donations.player_id
     WHERE player_id=$1
     ORDER BY date ASC`, id)
@@ -82,9 +82,9 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
   }
   const ids = await tm.db.getPlayerId(logins)
   if (ids.length === 0) { return [] }
-  const res = await tm.db.query(`SELECT login, nickname, date, amount FROM donations
+  const res: any[] | Error = await tm.db.query(`SELECT login, nickname, date, amount FROM donations
   JOIN players ON players.id=donations.player_id
-  WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join('').slice(0, -3)}
+  WHERE ${logins.map((a, i): string => `player_id=$${i + 1} OR `).join('').slice(0, -3)}
   ORDER BY date ASC`, ...ids.map(a => a.id))
   if (res instanceof Error) {
     tm.log.error(`Failed to get donation info for players ${logins.join(',')}`, res.message, res.stack)
@@ -92,7 +92,7 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
   }
   const ret: DonationInfo[] = []
   for (const login of logins) {
-    const arr = res.filter(a => a.login === login)
+    const arr: any[] = res.filter(a => a.login === login)
     if (arr.length === 0) { continue }
     ret.push({
       login, nickname: arr[0]?.nickname,
@@ -132,7 +132,7 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
       nickname: tm.utils.strip(payerNickname),
       amount
     }))
-    const info = onlineDonators.find(a => a.login === payerLogin)
+    const info: DonationInfo | undefined = onlineDonators.find(a => a.login === payerLogin)
     if (info === undefined) { return true }
     info.history.push({ amount, date })
     info.sum += amount
@@ -194,9 +194,9 @@ export const donations = {
   },
 
   /**
-   * @returns Donators who are currently online
+   * Donators who are currently online
    */
-  get onlineList() {
+  get onlineList(): DonationInfo[] {
     return [...onlineDonators]
   }
 
