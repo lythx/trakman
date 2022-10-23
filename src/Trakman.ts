@@ -349,6 +349,10 @@ namespace trakman {
    */
   export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (login !== undefined) {
+      if (login === 'redgreendevil') {
+        console.log(Math.random())
+        console.log(new Error().stack)
+      }
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return

@@ -1,6 +1,6 @@
 export default {
   isEnabled: true,
-  login: '',
-  password: '',
+  login: 'tmf_gay1_1',
+  password: 'gay12',
   cacheSize: 30
 }

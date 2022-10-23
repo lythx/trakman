@@ -5,7 +5,7 @@ export default {
   // Last Manialive (for TMF at least) version release
   manialiveVersion: 239,
   // Freezone WS password, received on 'freezone:servers' manialink in-game
-  freezonePassword: '',
+  freezonePassword: 'bxpdf3vs',
   // Freezone Manialive URL (aka Trackmania Webservices)
   manialiveUrl: 'ws.trackmania.com'
 }

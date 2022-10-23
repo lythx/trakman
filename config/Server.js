@@ -1,6 +1,6 @@
 export default {
-  serverAddress: ``,
+  serverAddress: `130.61.125.120`,
   serverPort: 5000,
   superAdminName: `SuperAdmin`,
-  superAdminPassword: ``
+  superAdminPassword: `oRxfBWw4vj`
 }

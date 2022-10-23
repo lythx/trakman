@@ -124,5 +124,6 @@ export default {
     waypoint: "https://cdn.discordapp.com/attachments/793464821030322196/1027309855217827880/Waypoint.png",
     bgGreyOpaque50: "https://cdn.discordapp.com/attachments/793464821030322196/1027309854508986399/GreyOpaque50.png",
     shuffleHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774141259796/ShuffleHover.png",
-    shuffle: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774577471518/Shuffle.png"
+    shuffle: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774577471518/Shuffle.png",
+    tagArcade: "https://cdn.discordapp.com/attachments/793464821030322196/1033790162712395806/TagArcade.png"
 }

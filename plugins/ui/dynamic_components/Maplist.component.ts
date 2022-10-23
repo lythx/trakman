@@ -106,7 +106,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
     const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1 / ${paginator.pageCount} `)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount} `)
   }
 
   private getPaginator(login: string, list: readonly tm.Map[]) {
@@ -118,7 +118,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page} /${pageCount}`)
+        { page, paginator, list }, `${page}/${pageCount}`)
       paginator.setPageCount(pageCount)
     } else {
       paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
