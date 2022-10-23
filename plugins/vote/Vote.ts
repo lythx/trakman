@@ -35,6 +35,7 @@ export class Vote {
   private readonly cancelOnRoundStart: boolean
 
   constructor(callerLogin: string, goal: number, seconds: number, dontCancelOnRoundEnd?: true, dontCancelOnRoundStart?: true) {
+    if (goal <= 0 || goal >= 1) { throw new Error(`Vote goal has to be between 0 and 1`) }
     this.goal = goal
     this.votes.push({ login: callerLogin, vote: true })
     this.seconds = seconds

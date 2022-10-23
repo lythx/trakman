@@ -272,6 +272,11 @@ const events: tm.Listener[] = [
 
 for (const event of events) { tm.addListener(event.event, event.callback) }
 
+/**
+ * Renders manialink UI.
+ * @author lythx & Snake
+ * @since 0.1
+ */
 export const ui = {
 
   /**

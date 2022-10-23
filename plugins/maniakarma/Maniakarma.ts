@@ -13,15 +13,15 @@ let newVotes: MKVote[] = []
 let lastMap: Readonly<tm.CurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
-const voteListeners: ((vote: MKVote) => void)[] = []
+const voteListeners: ((votes: MKVote[]) => void)[] = []
 const playerFetchListeners: ((vote: MKVote) => void)[] = []
 
 const emitMapFetch = (votes: MKVote[], ratio: number, karma: MKMapVotes) => {
   for (const e of mapFetchListeners) { e({ votes, ratio, karma }) }
 }
 
-const emitVote = (vote: MKVote) => {
-  for (const e of voteListeners) { e(vote) }
+const emitVote = (...votes: MKVote[]) => {
+  for (const e of voteListeners) { e(votes) }
 }
 
 const emitPlayerFetch = (vote: MKVote) => {
@@ -181,8 +181,38 @@ const getJson = (data: string): any => {
   return json
 }
 
-const addVote = (mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void => {
+function addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void
+function addVote(mapId: string, votes: { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
+function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]
+  , vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
   const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic']
+  if (Array.isArray(arg)) {
+    const updated: MKVote[] = []
+    for (const e of arg) {
+      mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
+      const v = playerVotes.find(a => a.login === e.login)
+      if (v === undefined) {
+        const obj = { mapId, login: e.login, vote: e.vote }
+        playerVotes.push(obj)
+        updated.push(obj)
+      }
+      else {
+        mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
+        v.vote = e.vote
+        updated.push(v)
+      }
+      const newVote = newVotes.find(a => a.login === e.login)
+      if (newVote === undefined) { newVotes.push({ mapId, login: e.login, vote: e.vote }) }
+      else { newVote.vote = e.vote }
+      const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
+      const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
+      mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
+      emitVote(...updated)
+    }
+    return
+  }
+  if (vote === undefined) { return }
+  const login = arg
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v = playerVotes.find(a => a.login === login)
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
@@ -247,7 +277,7 @@ if (config.isEnabled === true) {
     void onBeginMap(info.isRestart)
   }, true)
   tm.addListener('KarmaVote', (info): void => {
-    addVote(tm.maps.current.id, info.login, info.vote)
+    addVote(tm.maps.current.id, info)
   })
 }
 
@@ -301,7 +331,7 @@ export const maniakarma = {
    * Adds a callback function to execute on maniakarma vote
    * @param callback Function to execute on event. It takes new vote object as a parameter
    */
-  onVote(callback: ((vote: MKVote) => void)) {
+  onVote(callback: ((votes: MKVote[]) => void)) {
     voteListeners.push(callback)
   },
 

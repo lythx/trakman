@@ -3,33 +3,61 @@ import IDS from '../config/UtilIds.js'
 
 const ID = IDS.Paginator
 
+/**
+ * Util to manage pagination and render page change buttons.
+ * Remember to use destroy() before deleting the object to avoid memory leaks
+ */
 export default class Paginator {
 
-  buttonCount: number = 0
+  private _buttonCount: number = 0
+  /** Parent element ID */
   readonly parentId: number
-  readonly loginPages: { readonly login: string, page: number }[] = []
+  private readonly loginPages: { readonly login: string, page: number }[] = []
+  /** Default page (will be displayed if no page is specified) */
   readonly defaultPage: number
+  /** Button width */
   readonly buttonW = config.buttonWidth
+  /** Button height */
   readonly buttonH = config.buttonHeight
+  /** Icon padding */
   readonly padding = config.padding
+  /** Margin between buttons */
   readonly margin = config.margin
+  /** Icon width */
   readonly iconW: number = this.buttonW - this.padding * 2
+  /** Icon height */
   readonly iconH: number = this.buttonH - this.padding * 2
-  readonly ids: number[] = []
+  /** Ids used by paginator buttons */
+  readonly ids: readonly number[] = []
+  /** Paginator width */
   readonly width: number
+  /** Paginator height */
   readonly height: number
   private _onPageChange: (login: string, page: number, info: tm.ManialinkClickInfo) => void = () => undefined
   private clickListener: ((params: tm.ManialinkClickInfo) => void) | undefined
-  pageCount: number
-  yPos: number
-  xPos: number[]
-  noMidGap: boolean
+  private _pageCount: number
+  /** Y axis position of paginator buttons */
+  readonly yPos: number
+  /** X axis positions of paginator buttons */
+  readonly xPos: readonly number[]
+  /** If true there is no bonus gap between previous and next buttons */
+  readonly noMidGap: boolean
 
+  /**
+   * Util to manage pagination and render page change buttons.
+   * Remember to use destroy() before deleting the object to avoid memory leaks
+   * @param parentId Parent element manialink id
+   * @param parentWidth Parent element width
+   * @param parentHeight Parent element height
+   * @param pageCount Initial page count
+   * @param defaultPage Default page (will be displayed if no page is specified)
+   * @param noMidGap If true there will be no bonus gap between previous and next buttons
+   */
   constructor(parentId: number, parentWidth: number, parentHeight: number, pageCount: number, defaultPage: number = 1, noMidGap?: true) {
     this.parentId = parentId
     this.width = parentWidth
     this.height = parentHeight
-    this.pageCount = pageCount
+    this._pageCount = pageCount
     this.defaultPage = defaultPage
     this.yPos = -(parentHeight / 2)
     this.noMidGap = noMidGap ?? false
@@ -53,9 +81,9 @@ export default class Paginator {
       ]
     }
     this.ids = Object.entries(ID).map(a => this.parentId + a[1])
-    if (pageCount > 1) { this.buttonCount = 1 }
-    if (pageCount > 3) { this.buttonCount = 2 }
-    if (pageCount > 10) { this.buttonCount = 3 }
+    if (pageCount > 1) { this._buttonCount = 1 }
+    if (pageCount > 3) { this._buttonCount = 2 }
+    if (pageCount > 10) { this._buttonCount = 3 }
     this.clickListener = (info: tm.ManialinkClickInfo): void => {
       if (this.ids.includes(info.actionId)) {
         const playerPage = this.loginPages.find(a => a.login === info.login)
@@ -73,21 +101,39 @@ export default class Paginator {
     tm.addListener('ManialinkClick', this.clickListener)
   }
 
+  /**
+   * Sets function to execute on page change
+   * @param callback Callback function, it takes login, page number, and ManialinkClickInfo as parameters
+   */
   set onPageChange(callback: (login: string, page: number, info: tm.ManialinkClickInfo) => void) {
     this._onPageChange = callback
   }
 
+  /**
+   * Resets current player page positions
+   */
   resetPlayerPages(): void {
     this.loginPages.length = 0
   }
 
+  /**
+   * Gets current page of a given player
+   * @param login Player login
+   * @returns Page number
+   */
   getPageByLogin(login: string): number {
     return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
   }
 
+  /**
+   * Sets page for a given player
+   * @param login Player login
+   * @param page Page number
+   * @returns Page number
+   */
   setPageForLogin(login: string, page: number): number {
     const loginPage = this.loginPages.find(a => a.login === login)
-    if (page > this.pageCount) { page = this.pageCount }
+    if (page > this._pageCount) { page = this._pageCount }
     if (page < 1) { page = 1 }
     if (loginPage === undefined) {
       this.loginPages.push({ login, page })
@@ -97,12 +143,26 @@ export default class Paginator {
     return page
   }
 
+  /**
+   * Sets page count
+   * @param pageCount Page count
+   */
   setPageCount(pageCount: number): void {
-    this.pageCount = pageCount
-    this.buttonCount = 0
-    if (pageCount > 1) { this.buttonCount = 1 }
-    if (pageCount > 3) { this.buttonCount = 2 }
-    if (pageCount > 10) { this.buttonCount = 3 }
+    this._pageCount = pageCount
+    this._buttonCount = 0
+    if (pageCount > 1) { this._buttonCount = 1 }
+    if (pageCount > 3) { this._buttonCount = 2 }
+    if (pageCount > 10) { this._buttonCount = 3 }
+  }
+
+  /** Button count. Button count is dependant on page count. */
+  get buttonCount() {
+    return this._buttonCount
+  }
+
+  /** Page count */
+  get pageCount() {
+    return this._pageCount
   }
 
   private getPageFromClick(id: number, page: number): number {
@@ -112,20 +172,20 @@ export default class Paginator {
         if (page < 1) { return 1 }
         return page
       case this.parentId + ID.next: {
-        const lastPage: number = this.pageCount
+        const lastPage: number = this._pageCount
         page++
         if (page > lastPage) { return lastPage }
         return page
       } case this.parentId + ID.first:
         return 1
       case this.parentId + ID.last:
-        return this.pageCount
+        return this._pageCount
       case this.parentId + ID.jumpBackwards:
         page -= 10
         if (page < 1) { return page = 1 }
         return page
       case this.parentId + ID.jumpForwards: {
-        const lastPage: number = this.pageCount
+        const lastPage: number = this._pageCount
         page += 10
         if (page > lastPage) { return lastPage }
         return page
@@ -135,13 +195,26 @@ export default class Paginator {
     }
   }
 
-  destroy() {
+  /**
+   * Removes click listener. Use this before deleting the object to avoid memory leaks
+   */
+  destroy(): void {
     if (this.clickListener === undefined) { return }
     tm.removeListener(this.clickListener)
     this.clickListener = undefined
   }
 
+  /**
+   * Constructs page change buttons XML for given page number
+   * @param page Page number
+   * @returns Page change buttons XML string
+   */
   constructXml(page: number): string
+  /**
+   * Constructs page change buttons XML for given player login
+   * @param login Player login
+   * @returns Page change buttons XML string
+   */
   constructXml(login: string): string
   constructXml(arg: number | string): string {
     let page: number
@@ -150,7 +223,7 @@ export default class Paginator {
     } else {
       page = arg
     }
-    if (this.buttonCount === 0) {
+    if (this._buttonCount === 0) {
       return ``
     }
     let xml: string = ''
@@ -158,7 +231,7 @@ export default class Paginator {
       xml += `<quad posn="${this.xPos[2]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.previous}" 
         imagefocus="${config.iconsHover[2]}"
         image="${config.icons[2]}"/>`
-      if (this.buttonCount > 2) {
+      if (this._buttonCount > 2) {
         xml += `<quad posn="${this.xPos[0]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
             imagefocus="${config.iconsHover[0]}"
             image="${config.icons[0]}"/>
@@ -166,24 +239,24 @@ export default class Paginator {
             imagefocus="${config.iconsHover[1]}"
             image="${config.icons[1]}"/>`
       }
-      else if (this.buttonCount > 1) {
+      else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[1]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.first}" 
         imagefocus="${config.iconsHover[0]}"
         image="${config.icons[0]}"/>`
       }
     }
     xml += `<quad posn="${this.xPos[2]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
-    if (this.buttonCount > 1) {
+    if (this._buttonCount > 1) {
       xml += `<quad posn="${this.xPos[1]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
-    if (this.buttonCount > 2) {
+    if (this._buttonCount > 2) {
       xml += `<quad posn="${this.xPos[0]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
-    if (page !== this.pageCount) {
+    if (page !== this._pageCount) {
       xml += `<quad posn="${this.xPos[3]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.next}" 
       imagefocus="${config.iconsHover[3]}"
       image="${config.icons[3]}"/>`
-      if (this.buttonCount > 2) {
+      if (this._buttonCount > 2) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.jumpForwards}" 
           imagefocus="${config.iconsHover[4]}"
           image="${config.icons[4]}"/>
@@ -191,17 +264,17 @@ export default class Paginator {
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
       }
-      else if (this.buttonCount > 1) {
+      else if (this._buttonCount > 1) {
         xml += `<quad posn="${this.xPos[4]} ${this.yPos} 3" sizen="${this.iconW} ${this.iconH}" halign="center" valign="center" action="${this.parentId + ID.last}" 
           imagefocus="${config.iconsHover[5]}"
           image="${config.icons[5]}"/>`
       }
     }
     xml += `<quad posn="${this.xPos[3]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
-    if (this.buttonCount > 1) {
+    if (this._buttonCount > 1) {
       xml += `<quad posn="${this.xPos[4]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/>`
     }
-    if (this.buttonCount > 2) {
+    if (this._buttonCount > 2) {
       xml += `<quad posn="${this.xPos[5]} ${this.yPos} 1" sizen="${this.buttonW} ${this.buttonH}" halign="center" valign="center" bgcolor="${config.background}"/> `
     }
     return xml

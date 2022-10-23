@@ -1,5 +1,5 @@
 import StaticComponent from '../../StaticComponent.js'
-import { IDS, Grid, centeredText, verticallyCenteredText, StaticHeader } from '../../UiUtils.js'
+import { IDS, Grid, centeredText, leftAlignedText, StaticHeader } from '../../UiUtils.js'
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {
@@ -99,7 +99,7 @@ export default class BestFinishes extends StaticComponent {
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       return this.bestFinishes[i] === undefined ? '' : bg +
-        (verticallyCenteredText(tm.utils.strip(this.bestFinishes[i].nickname, false), w, h,
+        (leftAlignedText(tm.utils.strip(this.bestFinishes[i].nickname, false), w, h,
           { textScale: config.textScale, padding: config.textPadding }))
     }
 

@@ -1,4 +1,4 @@
-import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction } from "../UiUtils.js"
+import { Paginator, Grid, centeredText, IDS, closeButton, Navbar, GridCellFunction, addManialinkListener } from "../UiUtils.js"
 import PopupWindow from "../PopupWindow.js"
 import config from './Commandlist.config.js'
 
@@ -28,16 +28,17 @@ export default class CommandList extends PopupWindow<DisplayParams> {
 
   constructor() {
     super(IDS.commandList, config.icon, config.title, config.navbar)
-    this.userCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 0)
-    this.opCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 1)
-    this.adminCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 2)
-    this.masteradminCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 3)
-    this.ownerCommands = tm.commands.list.filter(a => a.help !== undefined && a.privilege === 4)
+    const commandList = tm.commands.list
+    this.userCommands = commandList.filter(a => a.help !== undefined && a.privilege === 0)
+    this.opCommands = commandList.filter(a => a.help !== undefined && a.privilege === 1)
+    this.adminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 2)
+    this.masteradminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 3)
+    this.ownerCommands = commandList.filter(a => a.help !== undefined && a.privilege === 4)
     this.userPaginator = new Paginator(this.openId + 100, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
-    this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
-    this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
-    this.masteradminPaginator = new Paginator(this.openId + 400, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
-    this.ownerPaginator = new Paginator(this.openId + 500, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
+    this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.opCommands.length / config.entries))
+    this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.adminCommands.length / config.entries))
+    this.masteradminPaginator = new Paginator(this.openId + 400, this.contentWidth, this.footerHeight, Math.ceil(this.masteradminCommands.length / config.entries))
+    this.ownerPaginator = new Paginator(this.openId + 500, this.contentWidth, this.footerHeight, Math.ceil(this.ownerCommands.length / config.entries))
     const paginators = [this.userPaginator, this.opPaginator, this.adminPaginator, this.masteradminPaginator, this.ownerPaginator]
     const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands]
     for (const e of paginators) {
@@ -55,49 +56,26 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const pageCount: number = Math.ceil(commands.length / config.entries)
       const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.footerHeight, pageCount)
       paginator.onPageChange = (login: string, page: number): void => {
-        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page}/${paginator.pageCount}`)
+        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page} /${paginator.pageCount}`)
       }
       this.paginators.push(paginator)
     }
     this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
-    tm.addListener("ManialinkClick", (info) => {
-      if (info.actionId >= this.openId + 100 && info.actionId <= this.openId + 500) {
-        switch (info.actionId - this.openId) {
-          case 100: {
-            const paginator = this.userPaginator
-            const commands = this.userCommands
-            const page = paginator.getPageByLogin(info.login)
-            this.displayToPlayer(info.login, { paginator, commands, page, privilege: info.privilege, singleType: true }, `${page}/${paginator.pageCount}`)
-            break
-          }
-          case 200: {
-            const paginator = this.opPaginator
-            const commands = this.opCommands
-            const page = paginator.getPageByLogin(info.login)
-            this.displayToPlayer(info.login, { paginator, commands, page, privilege: info.privilege, singleType: true }, `${page}/${paginator.pageCount}`)
-            break
-          }
-          case 300: {
-            const paginator = this.adminPaginator
-            const commands = this.adminCommands
-            const page = paginator.getPageByLogin(info.login)
-            this.displayToPlayer(info.login, { paginator, commands, page, privilege: info.privilege, singleType: true }, `${page}/${paginator.pageCount}`)
-            break
-          }
-          case 400: {
-            const paginator = this.masteradminPaginator
-            const commands = this.masteradminCommands
-            const page = paginator.getPageByLogin(info.login)
-            this.displayToPlayer(info.login, { paginator, commands, page, privilege: info.privilege, singleType: true }, `${page}/${paginator.pageCount}`)
-            break
-          }
-          case 500:
-            const paginator = this.ownerPaginator
-            const commands = this.ownerCommands
-            const page = paginator.getPageByLogin(info.login)
-            this.displayToPlayer(info.login, { paginator, commands, page, privilege: info.privilege, singleType: true }, `${page}/${paginator.pageCount}`)
-            break
-        }
+    addManialinkListener(this.openId, 501, (info, offset) => {
+      const arr: { [id: number]: [Paginator, tm.Command[]] } = {
+        100: [this.userPaginator, this.userCommands],
+        200: [this.opPaginator, this.opCommands],
+        300: [this.adminPaginator, this.adminCommands],
+        400: [this.masteradminPaginator, this.masteradminCommands],
+        500: [this.ownerPaginator, this.ownerCommands]
+      }
+      const entry = arr[offset]
+      if (entry !== undefined) {
+        const page = entry[0].getPageByLogin(info.login)
+        this.displayToPlayer(info.login, {
+          paginator: entry[0], commands: entry[1],
+          page, privilege: info.privilege, singleType: true
+        }, `${page}/${entry[0].pageCount} `)
       }
     })
     tm.addListener("PrivilegeChanged", (info) => {
@@ -107,7 +85,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
           const paginator: Paginator = this.paginators[info.newPrivilege]
           const commands: tm.Command[] = this.commandLists[info.newPrivilege]
           const page = paginator.getPageByLogin(info.login)
-          this.displayToPlayer(info.login, { page, commands, paginator, privilege: info.newPrivilege }, `${page}/${paginator.pageCount}`)
+          this.displayToPlayer(info.login, { page, commands, paginator, privilege: info.newPrivilege }, `${page} /${paginator.pageCount}`)
         } else {
           this.displayToPlayer(info.login, { ...p.params, privilege: info.newPrivilege })
         }
@@ -156,8 +134,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(text, true))}" valign = "center" halign = "center" /> `
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
@@ -171,19 +149,19 @@ export default class CommandList extends PopupWindow<DisplayParams> {
             text += `[`
             hasOptionals = true
           }
-          if (i === 0) { text += `${e.name}<${e.type ?? 'string'}>` }
-          else { text += `, ${e.name}<${e.type ?? 'string'}>` }
+          if (i === 0) { text += `${e.name} < ${e.type ?? 'string'} > ` }
+          else { text += `, ${e.name} < ${e.type ?? 'string'} > ` }
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(text, true))}" valign = "center" halign = "center" /> `
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign="center" halign="center"/>`
+      return `< label posn = "${w / 2} -${h / 2} 4" sizen = "${(w * (1 / config.textScale)) - 1} ${h}" 
+      scale = "${config.textScale}" text = "${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign = "center" halign = "center" /> `
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)

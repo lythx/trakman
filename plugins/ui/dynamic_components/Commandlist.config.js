@@ -15,27 +15,27 @@ export default {
   navbar: [
     {
       name: "All Commands",
-      actionId: 1000
+      actionId: ids.commandList
     },
     {
       name: "User Commands",
-      actionId: 1100
+      actionId: ids.commandList + 100
     },
     {
       name: "Operator Commands",
-      actionId: 1200
+      actionId: ids.commandList + 200
     },
     {
       name: "Admin Commands",
-      actionId: 1300
+      actionId: ids.commandList + 300
     },
     {
       name: "Masteradmin Commands",
-      actionId: 1400
+      actionId: ids.commandList + 400
     },
     {
       name: "Server Owner Commands",
-      actionId: 1500
+      actionId: ids.commandList + 500
     }
   ],
   grid: {
