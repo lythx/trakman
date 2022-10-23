@@ -30,7 +30,7 @@ export class DedimaniaRequest {
     xml += '</params></methodCall>'
     this.xmlBuffer = Buffer.from(xml)
     this.sessionKey = sessionKey
-    const gzip = zlib.gzipSync(this.xmlBuffer)
+    const gzip: Buffer = zlib.gzipSync(this.xmlBuffer)
     if (this.sessionKey === undefined) {
       this._buffer = Buffer.concat([
         this._buffer,

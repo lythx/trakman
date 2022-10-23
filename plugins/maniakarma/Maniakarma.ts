@@ -4,7 +4,7 @@ import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 
 let authCode: string
-let isConnected = false
+let isConnected: boolean = false
 let apiUrl: string
 let mapKarmaValue: number = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
@@ -16,15 +16,15 @@ const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapV
 const voteListeners: ((votes: MKVote[]) => void)[] = []
 const playerFetchListeners: ((vote: MKVote) => void)[] = []
 
-const emitMapFetch = (votes: MKVote[], ratio: number, karma: MKMapVotes) => {
+const emitMapFetch = (votes: MKVote[], ratio: number, karma: MKMapVotes): void => {
   for (const e of mapFetchListeners) { e({ votes, ratio, karma }) }
 }
 
-const emitVote = (...votes: MKVote[]) => {
+const emitVote = (...votes: MKVote[]): void => {
   for (const e of voteListeners) { e(votes) }
 }
 
-const emitPlayerFetch = (vote: MKVote) => {
+const emitPlayerFetch = (vote: MKVote): void => {
   for (const e of playerFetchListeners) { e(vote) }
 }
 
@@ -108,7 +108,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   }
   const ret: MKVote[] = []
   for (const e of json?.result?.players[0]?.player) {
-    const vote = Number(e?.$?.vote)
+    const vote: number = Number(e?.$?.vote)
     const login = e?.$?.login
     const arr: [-3, -2, -1, 1, 2, 3] = [-3, -2, -1, 1, 2, 3]
     const v = arr.find(a => a === vote)
@@ -190,7 +190,7 @@ function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -
     const updated: MKVote[] = []
     for (const e of arg) {
       mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
-      const v = playerVotes.find(a => a.login === e.login)
+      const v: MKVote | undefined = playerVotes.find(a => a.login === e.login)
       if (v === undefined) {
         const obj = { mapId, login: e.login, vote: e.vote }
         playerVotes.push(obj)
@@ -201,31 +201,31 @@ function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -
         v.vote = e.vote
         updated.push(v)
       }
-      const newVote = newVotes.find(a => a.login === e.login)
+      const newVote: MKVote | undefined = newVotes.find(a => a.login === e.login)
       if (newVote === undefined) { newVotes.push({ mapId, login: e.login, vote: e.vote }) }
       else { newVote.vote = e.vote }
       const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
       const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
-      mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
+      mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur): number => acc + cur, 0) / count
       emitVote(...updated)
     }
     return
   }
   if (vote === undefined) { return }
-  const login = arg
+  const login: string = arg
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
-  const v = playerVotes.find(a => a.login === login)
+  const v: MKVote | undefined = playerVotes.find(a => a.login === login)
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
   else {
     mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
     v.vote = vote
   }
-  const newVote = newVotes.find(a => a.login === login)
+  const newVote: MKVote | undefined = newVotes.find(a => a.login === login)
   if (newVote === undefined) { newVotes.push({ mapId, login, vote }) }
   else { newVote.vote = vote }
   const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
   const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
-  mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur) => acc + cur, 0) / count
+  mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur): number => acc + cur, 0) / count
   emitVote({ mapId, login, vote })
 }
 
@@ -233,9 +233,9 @@ const fixCoherence = async (): Promise<void> => {
   const localVotes: tm.Vote[] = tm.karma.current
   const mkVotes: MKVote[] = playerVotes
   for (const e of mkVotes) {
-    const v = localVotes.find(a => a.login === e.login && a.vote === e.vote)
+    const v: tm.Vote | undefined = localVotes.find(a => a.login === e.login && a.vote === e.vote)
     if (v === undefined) {
-      const nickname = tm.players.get(e.login)?.nickname
+      const nickname: string | undefined = tm.players.get(e.login)?.nickname
       tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
     }
   }
@@ -246,7 +246,7 @@ const fixCoherence = async (): Promise<void> => {
   }
 }
 
-const onBeginMap = async (isRestart: boolean) => {
+const onBeginMap = async (isRestart: boolean): Promise<void> => {
   await sendVotes()
   if (isRestart === false) {
     await fetchVotes(...tm.players.list.map(a => a.login))
@@ -255,18 +255,18 @@ const onBeginMap = async (isRestart: boolean) => {
   lastMap = tm.maps.current
 }
 
-const onPlayerJoin = async (login: string) => {
-  const votes = await fetchVotes(login)
+const onPlayerJoin = async (login: string): Promise<void> => {
+  const votes: MKVote[] | Error = await fetchVotes(login)
   if (!(votes instanceof Error)) {
     emitPlayerFetch(votes[0])
   }
 }
 
 if (config.isEnabled === true) {
-  tm.addListener('Startup', () => {
+  tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Maniakarma...')
     void initialize()
-    setInterval(() => {
+    setInterval((): void => {
       if (isConnected === false) { void initialize() }
     }, config.reconnectTimeout * 1000)
   }, true)
