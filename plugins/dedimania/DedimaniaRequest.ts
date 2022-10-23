@@ -5,13 +5,13 @@ export class DedimaniaRequest {
   private sessionKey?: string
   private xmlBuffer: Buffer
   private _buffer: Buffer = Buffer.from(
-    'POST /Dedimania HTTP/1.1\r\n' +
-    'Host: dedimania.net\r\n' +
-    'User-Agent: XMLaccess\r\n' +
-    'Cache-Control: no-cache\r\n' +
+    'POST /Dedimania HTTP/1.1\n' +
+    'Host: dedimania.net\n' +
+    'User-Agent: XMLaccess\n' +
+    'Cache-Control: no-cache\n' +
     'Accept-Encoding: gzip\n' +
-    'Content-Encoding: gzip\r\n' +
-    'Content-type: text/xml; charset=UTF-8\r\n'
+    'Content-Encoding: gzip\n' +
+    'Content-type: text/xml; charset=UTF-8\n'
   )
 
   /**
@@ -30,7 +30,7 @@ export class DedimaniaRequest {
     xml += '</params></methodCall>'
     this.xmlBuffer = Buffer.from(xml)
     this.sessionKey = sessionKey
-    const gzip = zlib.gzipSync(this.xmlBuffer)
+    const gzip: Buffer = zlib.gzipSync(this.xmlBuffer)
     if (this.sessionKey === undefined) {
       this._buffer = Buffer.concat([
         this._buffer,

@@ -7,10 +7,10 @@ import DediConfig from './Config.js'
 export class DedimaniaClient {
 
   private socket = new Socket()
-  private response = new DedimaniaResponse()
-  private receivingResponse = false
-  private sessionId = ''
-  private _connected = false
+  private response: DedimaniaResponse = new DedimaniaResponse()
+  private receivingResponse: boolean = false
+  private sessionId: string = ''
+  private _connected: boolean = false
 
   async connect(host: string, port: number): Promise<true | Error> {
     this.receivingResponse = false
@@ -113,7 +113,7 @@ export class DedimaniaClient {
     })
   }
 
-  get connected() {
+  get connected(): boolean {
     return this._connected
   }
 

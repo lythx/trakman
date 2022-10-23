@@ -14,11 +14,11 @@ export class DedimaniaResponse {
 
   addData(data: Buffer): void {
     this._data = Buffer.concat([this._data, data])
-    const str = this._data.toString()
+    const str: string = this._data.toString()
     const split: string[] = str.split('\n')
-    const resLength = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
-    const index = this._data.indexOf('\r\n\r\n')
-    const content = this._data.slice(index + 4)
+    const resLength: number = Number(split.find(a => a.startsWith('Content-Length'))?.split(' ')[1])
+    const index: number = this._data.indexOf('\r\n\r\n')
+    const content: Buffer = this._data.slice(index + 4)
     if (content.length === resLength) {
       for (const row of split) {
         if (row.includes('Set-Cookie: PHPSESSID=')) { this._sessionId = row.substring(22).split(';')[0] }

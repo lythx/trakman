@@ -1,7 +1,7 @@
 import { maplist } from './Maplist.js'
 import config from './Config.js'
 
-const chooseAndAddMap = (maps: tm.Map[], info: { nickname: string, login: string }, errorMsg: string) => {
+const chooseAndAddMap = (maps: tm.Map[], info: { nickname: string, login: string }, errorMsg: string): void => {
   const eligibleMaps: tm.Map[] = maps.filter(a =>
     !tm.jukebox.juked.some(b => b.map.id === a.id) &&
     !tm.jukebox.history.some(b => b.id === a.id) &&
@@ -26,17 +26,17 @@ const autojuke = async (info: { privilege: number, login: string, nickname: stri
   }
   switch (option) {
     case 'nofinish': case 'nofin': {
-      const mapsNoRec = await maplist.filterNoFinish(info.login)
+      const mapsNoRec: Readonly<tm.Map>[] = await maplist.filterNoFinish(info.login)
       chooseAndAddMap(mapsNoRec, info, config.noFinishError)
       break
     }
     case 'noauthor': {
-      const mapsNoAuthor = await maplist.filterNoAuthor(info.login)
+      const mapsNoAuthor: Readonly<tm.Map>[] = await maplist.filterNoAuthor(info.login)
       chooseAndAddMap(mapsNoAuthor, info, config.noAuthorError)
       break
     }
     case 'norank': {
-      const mapsNoRank = await maplist.filterNoRank(info.login)
+      const mapsNoRank: Readonly<tm.Map>[] = await maplist.filterNoRank(info.login)
       chooseAndAddMap(mapsNoRank, info, config.noRankError)
       break
     }

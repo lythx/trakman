@@ -1,8 +1,14 @@
 import { dedimania } from '../dedimania/Dedimania.js'
 import c from './Config.js'
 
+/**
+ * Sends server messages on events
+ * @author lythx & wiseraven
+ * @since 0.1
+ */
+
 let playerCount: number
-const res = await tm.db.query(`select count(*)::int from players;`)
+const res = await tm.db.query(`SELECT count(*)::int FROM players;`)
 if (res instanceof Error) { await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack) }
 else { playerCount = res[0].count }
 

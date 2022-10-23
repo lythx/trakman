@@ -1,8 +1,7 @@
 import http, { ClientRequest } from 'http'
 import config from './Config.js'
 
-
-let isConnected = false
+let isConnected: boolean = false
 
 const sendLive = async (): Promise<true | Error> => {
   // Request URL
@@ -64,7 +63,7 @@ const initialize = async (): Promise<true | Error> => {
 }
 
 if (config.isEnabled === true) {
-  tm.addListener('Startup', async () => {
+  tm.addListener('Startup', async (): Promise<void> => {
     tm.log.trace('Connecting to ManiaLive...')
     const status: true | Error = await initialize()
     if (status instanceof Error) { tm.log.error(status.message) }
