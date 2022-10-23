@@ -7,6 +7,9 @@
 # Config files
 **/[Cc]onfig/*
 
+# Temp files
+**/temp
+
 # Coverage ???
 /coverage/
 

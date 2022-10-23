@@ -2,10 +2,14 @@ import { Database } from './database/DB.js'
 import { Logger } from "./Logger.js"
 import { Client } from './client/Client.js'
 import config from '../config/Config.js'
+import fs from 'fs/promises'
 
 const db = new Database()
 
 export const fixRankCoherence = async (): Promise<void> => {
+  const access = await fs.readFile(`./src/temp/rank_coherence.txt`).catch((err: Error) => err)
+  if (!(access instanceof Error) && access.toString() === config.localRecordsLimit.toString()) { return }
+  await fs.writeFile('./src/temp/rank_coherence.txt', config.localRecordsLimit.toString())
   const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
   if (mapList instanceof Error) {
     Logger.fatal('Error while getting the map list', mapList.message)
