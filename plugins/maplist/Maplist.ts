@@ -62,17 +62,35 @@ tm.addListener('MapRemoved', (map) => {
   for (const e of updateListeners) { e('remove', map) }
 })
 
+/**
+ * Provides utilities for filtering and sorting maplist
+ * @author lythx
+ * @since TODO
+ */
 export const maplist = {
 
+  /**
+   * Add a callback function to execute on list update
+   * @param callback Functon to execute on event, it takes action type and added od removed map as parameters
+   */
   onListUpdate(callback: (action: 'add' | 'remove', addedOrRemovedMap: Readonly<tm.Map>) => void) {
     updateListeners.push(callback)
   },
 
+  /**
+   * Add a callback function to execute on jukebox update
+   * @param callback Functon to execute on event, it takes updated jukebox as parameter
+   */
   onJukeboxUpdate(callback: (jukebox: readonly Readonly<tm.Map>[]) => void) {
     jukeboxUpdateListeners.push(callback)
   },
 
-  get: (sort?: 'jukebox' | 'name' | 'karma' | 'long' | 'short' | 'worstkarma'): readonly Readonly<tm.Map>[] => {
+  /**
+   * Get maps sorted by given criteria
+   * @param sort Sorting criteria, author by default
+   * @returns Array of map objects
+   */
+  get: (sort?: 'jukebox' | 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'author'): readonly Readonly<tm.Map>[] => {
     switch (sort) {
       case 'jukebox':
         return jukebox
@@ -86,18 +104,25 @@ export const maplist = {
         return atSort
       case 'long':
         return worstAtSort
-      default:
+      case 'author': default:
         return authorSort
     }
   },
 
-  getByPosition: async (login: string, sort: 'best' | 'worst'): Promise<Readonly<tm.Map>[]> => {
+  /**
+   * Get maps sorted by player position
+   * @param login Player login
+   * @param sort Sorting criteria
+   * @returns Array of map objects
+   */
+  getByPosition: (login: string, sort: 'best' | 'worst'): Readonly<tm.Map>[] => {
     if (sort === 'best') {
       let list = cache.find(a => a.query === login && a.type === 'best')?.list
       if (list === undefined) {
         list = []
         const ranks: { mapId: string, rank: number }[] =
-          (await tm.records.getRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => a.rank - b.rank)
+          tm.records.getRank(login, tm.maps.list.map(a => a.id))
+            .sort((a, b): number => a.rank - b.rank)
         for (let i: number = 0; i < ranks.length; i++) {
           const entry = authorSort.find(a => a.id === ranks[i].mapId)
           if (entry !== undefined) { list.push(entry) }
@@ -112,7 +137,8 @@ export const maplist = {
       if (list === undefined) {
         list = []
         const ranks: { mapId: string, rank: number }[] =
-          (await tm.records.getRank(login, tm.maps.list.map(a => a.id))).sort((a, b): number => b.rank - a.rank)
+          tm.records.getRank(login, tm.maps.list.map(a => a.id))
+            .sort((a, b): number => b.rank - a.rank)
         for (let i: number = 0; i < ranks.length; i++) {
           const entry = authorSort.find(a => a.id === ranks[i].mapId)
           if (entry !== undefined) { list.push(entry) }
@@ -124,6 +150,11 @@ export const maplist = {
     }
   },
 
+  /**
+   * Get maps with names matching the query
+   * @param query Search query
+   * @returns Array of map objects
+   */
   searchByName: (query: string): Readonly<tm.Map>[] => {
     let list = cache.find(a => a.query === query && a.type === 'name')?.list
     if (list === undefined) {
@@ -134,6 +165,11 @@ export const maplist = {
     return list
   },
 
+  /**
+   * Get maps with author names matching the query
+   * @param query Search query
+   * @returns Array of map objects
+   */
   searchByAuthor: (query: string): Readonly<tm.Map>[] => {
     let list = cache.find(a => a.query === query && a.type === 'author')?.list
     if (list === undefined) {
@@ -144,6 +180,11 @@ export const maplist = {
     return list
   },
 
+  /**
+   * Get all maps that a given player didn't finish
+   * @param login Player login
+   * @returns Array of map objects
+   */
   filterNoFinish: async (login: string): Promise<Readonly<tm.Map>[]> => {
     let list = cache.find(a => a.query === login && a.type === 'nofin')?.list
     if (list === undefined) {
@@ -155,6 +196,11 @@ export const maplist = {
     return list
   },
 
+  /**
+   * Get all maps that a given player doesn't have a rank on
+   * @param login Player login
+   * @returns Array of map objects
+   */
   filterNoRank: async (login: string): Promise<Readonly<tm.Map>[]> => {
     let list = cache.find(a => a.query === login && a.type === 'norank')?.list
     if (list === undefined) {
@@ -168,6 +214,11 @@ export const maplist = {
     return list
   },
 
+  /**
+   * Get all maps that a given player doesn't have the author medal on
+   * @param login Player login
+   * @returns Array of map objects
+   */
   filterNoAuthor: async (login: string): Promise<Readonly<tm.Map>[]> => {
     let list = cache.find(a => a.query === login && a.type === 'noauthor')?.list
     if (list === undefined) {
