@@ -1,4 +1,4 @@
-import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'
@@ -12,7 +12,7 @@ export default class TMXRanking extends StaticComponent {
   private readonly header: StaticHeader
 
   constructor() {
-    super(IDS.tmx, 'race')
+    super(componentIds.tmx, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

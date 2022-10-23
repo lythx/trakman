@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './Mutelist.config.js'
 
 export default class Mutelist extends PopupWindow<number> {
@@ -8,7 +8,7 @@ export default class Mutelist extends PopupWindow<number> {
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.mutelist, config.icon, config.title, config.navbar)
+    super(componentIds.mutelist, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,

@@ -1,4 +1,4 @@
-import { IDS } from '../../UiUtils.js'
+import { componentIds } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './RankWidget.config.js'
 
@@ -9,7 +9,7 @@ export default class RankWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.rank, 'race')
+    super(componentIds.rank, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

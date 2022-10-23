@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { closeButton, IDS, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
 import config from './Blacklist.config.js'
 
 export default class Blacklist extends PopupWindow<number> {
@@ -8,7 +8,7 @@ export default class Blacklist extends PopupWindow<number> {
   readonly paginator: Paginator
 
   constructor() {
-    super(IDS.blacklist, config.icon, config.title, config.navbar)
+    super(componentIds.blacklist, config.icon, config.title, config.navbar)
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,

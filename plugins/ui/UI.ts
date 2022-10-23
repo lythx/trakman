@@ -5,7 +5,6 @@ STATIC COMPONENTS
 */
 
 import CustomUi from './CustomUi.js'
-//import DayTime from './static_components/DayTime.component.js'
 import RankWidget from './static_components/race/RankWidget.component.js'
 import DediRanking from './static_components/race/DediRanking.component.js'
 import MapWidget from './static_components/race/MapWidget.component.js'
@@ -14,11 +13,9 @@ import KarmaWidget from './static_components/race/KarmaWidget.component.js'
 import TimerWidget from './static_components/race/TimerWidget.component.js'
 import LocalRanking from './static_components/race/LocalRanking.component.js'
 import LiveRanking from './static_components/race/LiveRanking.component.js'
-import StaticComponent from './StaticComponent.js'
 import ButtonsWidget from './static_components/race/buttons/ButtonsWidget.component.js'
 import TMXRanking from './static_components/race/TMXRanking.component.js'
 import AdminPanel from './static_components/race/AdminPanel.component.js'
-//import LiveCheckpoint from './static_components/LiveCheckpoint.component.js'
 import BestCps from './static_components/race/BestCps.component.js'
 import BestFinishes from './static_components/race/BestFinishes.component.js'
 import CpCounter from './static_components/race/CpCounter.component.js'
@@ -46,7 +43,6 @@ DYNAMIC COMPONENTS
 ------------------
 */
 
-import DynamicComponent from './DynamicComponent.js'
 import CommandList from './dynamic_components/Commandlist.component.js'
 import TMXWindow from './dynamic_components/MapInfoWindow.component.js'
 import LocalCps from './dynamic_components/LocalCps.component.js'
@@ -75,6 +71,7 @@ import TopVisits from './dynamic_components/TopVisits.component.js'
 import TopVotes from './dynamic_components/TopVotes.component.js'
 import TopWins from './dynamic_components/TopWins.component.js'
 import TopSums from './dynamic_components/TopSums.component.js'
+
 import icons from './config/Icons.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
@@ -107,7 +104,7 @@ const iconArr = Object.values(icons).map(a =>
 
 const preloadIcons = (login?: string): void => {
   tm.sendManialink(`
-  <manialink id="69696969">
+  <manialink id="preloadIcons">
     ${iconArr}
   </manialink>`, login)
 }
@@ -280,14 +277,14 @@ for (const event of events) { tm.addListener(event.event, event.callback) }
 export const ui = {
 
   /**
-   * Returns an object containing all static component objects
+   * Object containing all static component objects
    */
   get staticComponents() {
     return staticComponents
   },
 
   /**
-   * Returns an object containing all dynamic component objects
+   * Object containing all dynamic component objects
    */
   get dynamicComponents() {
     return dynamicComponents

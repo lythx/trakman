@@ -1,5 +1,5 @@
 import PopupWindow from "../PopupWindow.js"
-import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './LiveCps.config.js'
 
 export default class LiveCps extends PopupWindow {
@@ -17,7 +17,7 @@ export default class LiveCps extends PopupWindow {
   private readonly cpColours = config.cpColours
 
   constructor() {
-    super(IDS.liveCps, config.icon, config.title, config.navbar)
+    super(componentIds.liveCps, config.icon, config.title, config.navbar)
     const records = tm.records.live
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)

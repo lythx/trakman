@@ -22,43 +22,60 @@ type TimeColour = 'slower' | 'faster' | 'top' | 'you'
  */
 export default class RecordList {
 
-  // TODO
-  readonly iCols: number
-  readonly iColW: number
-  readonly iIconW: number
-  readonly iIcon: string
-  readonly iBg: string
-  readonly bg: string
-  readonly headerBg: string
-  readonly colGap: number
-  readonly rowGap: number
-  readonly format: string
+  /** Info grid column count */
+  readonly infoColumns: number
+  /** Info grid column width */
+  readonly infoColumnWidth: number
+  /** Info icon width */
+  readonly infoIconWidth: number
+  /** Info icon url */
+  readonly infoIcon: string
+  /** Info background colour */
+  readonly infoBackground: string
+  /** Background colour */
+  readonly background: string
+  /** Header background colour */
+  readonly headerBackground: string
+  private readonly columnGap: number
+  private readonly rowGap: number
+  /** Marker width */
   readonly markerWidth: number
-  readonly iconVPadding: number
-  readonly iconHPadding: number
-  readonly id: number
+  private readonly iconVerticalPadding: number
+  private readonly iconHorizontalPadding: number
+  /** Parent element manialink ID */
+  readonly parentId: number
+  /** Present config used */
   readonly config
-  iRows: number = 0
-  isFullRow: boolean = false
+  private infoRows: number = 0
+  private isFullRow: boolean = false
+  /** List column widths */
   readonly columnWidths: number[]
+  /** List row count */
   readonly rows: number
+  /** List row height */
   readonly rowHeight: number
+  /** List width */
   readonly width: number
+  /** List side (true is right) */
   readonly side: boolean
+  /** Number of records which are always displayed regardless of player personal record */
   readonly topCount: number
-  readonly maxCount: number
-  readonly infos: { login: string, indexes: number[] }[] = []
+  private readonly maxCount: number
+  private readonly infos: { login: string, indexes: number[] }[] = []
+  /** Marker icons */
   readonly markers: { readonly you: string; readonly faster: string; readonly slower: string; }
-  readonly noRecordEntry: boolean
-  readonly getColoursFromPb: boolean
+  private readonly noRecordEntry: boolean
+  private readonly getColoursFromPb: boolean
+  /** Download icon url */
   readonly downloadIcon: string
-  readonly clickListeners: ((info: tm.ManialinkClickInfo) => void)[] = []
-  readonly timeColours: {
+  private readonly clickListeners: ((info: tm.ManialinkClickInfo) => void)[] = []
+  /** Time string colours */
+  readonly timeColours: Readonly<{
     slower: string,
     faster: string,
     you: string,
     top: string
-  }
+  }>
 
   /**
    * Util to display record data in manialinks. 
@@ -71,25 +88,25 @@ export default class RecordList {
    * @param side Side on which list is positioned needed for click info display (true is right)
    * @param topCount Number of records which are always displayed regardless of player personal record
    * @param maxCount Max record count needed for click actionIds
-   * @param noRecordEntry If true a placeholder entry gets displayed at the end of the list if player has no personal record
+   * @param noRecordEntry If true, a placeholder entry gets displayed at the end of the list if the player has no personal record
    * @param options Optional parameters
    */
   constructor(parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
     options?: { getColoursFromPb?: true, resultMode?: true }) {
     this.config = options?.resultMode === true ? resultConfig : raceConfig
     const INFO = this.config.info
-    this.colGap = this.config.columnGap
+    this.columnGap = this.config.columnGap
     this.rowGap = this.config.rowGap
-    this.iCols = INFO.columns
-    this.iColW = INFO.columnWidth
-    this.iIconW = INFO.iconWidth
-    this.iIcon = INFO.icon
+    this.infoColumns = INFO.columns
+    this.infoColumnWidth = INFO.columnWidth
+    this.infoIconWidth = INFO.iconWidth
+    this.infoIcon = INFO.icon
     this.markerWidth = this.config.markerWidth
-    this.iconVPadding = this.config.iconVerticalPadding
-    this.iconHPadding = this.config.iconHorizontalPadding
+    this.iconVerticalPadding = this.config.iconVerticalPadding
+    this.iconHorizontalPadding = this.config.iconHorizontalPadding
     this.downloadIcon = this.config.downloadIcon
     this.timeColours = this.config.timeColours
-    this.id = parentId
+    this.parentId = parentId
     this.rows = rows
     this.rowHeight = (height + this.rowGap) / rows
     this.width = width
@@ -99,14 +116,13 @@ export default class RecordList {
     this.markers = side ? this.config.markersRight : this.config.markersLeft
     const columnProportions: number[] = this.config.columnProportions
     const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
-    this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.colGap))
+    this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.columnGap))
     this.noRecordEntry = noRecordEntry
     this.getColoursFromPb = options?.getColoursFromPb ?? false
     this.setupListeners()
-    this.iBg = INFO.bgColor
-    this.bg = this.config.background
-    this.headerBg = this.config.headerBackground
-    this.format = this.config.format
+    this.infoBackground = INFO.bgColor
+    this.background = this.config.background
+    this.headerBackground = this.config.headerBackground
   }
 
   /**
@@ -125,7 +141,7 @@ export default class RecordList {
    */
   constructXml(login: string, allRecords: UiRecord[]): string {
     const cpAmount: number = allRecords?.[0]?.checkpoints?.length ?? 0
-    this.iRows = Math.ceil(cpAmount / this.iCols) + 1
+    this.infoRows = Math.ceil(cpAmount / this.infoColumns) + 1
     const parsedRecs = this.getDisplayedRecords(login, allRecords)
     const info = this.infos.find(a => a.login === login)
     const [infos, infoPositions, cpTypes] = info !== undefined ? this.getInfos(login, cpAmount, info, parsedRecs) : [[], [], []]
@@ -137,9 +153,9 @@ export default class RecordList {
       const info = infos.find(a => a.index === i)
       ret += `<frame posn="0 ${-(this.rowHeight * i)} 1">`
       if (parsedRecs?.[i]?.record?.time === -1) {
-        ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id}"/>`
+        ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.parentId}"/>`
       } else {
-        ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.id + 2 + i}"/>`
+        ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.parentId + 2 + i}"/>`
       }
       if (info !== undefined && parsedRecs?.[i] !== undefined && parsedRecs?.[i]?.record?.time !== -1) {
         ret += this.constructInfo(info.offset, parsedRecs?.[i]?.record, cpTypes?.[i])
@@ -165,15 +181,15 @@ export default class RecordList {
           e(info)
         }
       }
-      if (info.actionId > this.id + 1 && info.actionId <= this.id + this.maxCount + 1) {
-        const index: number = info.actionId - this.id - 2
+      if (info.actionId > this.parentId + 1 && info.actionId <= this.parentId + this.maxCount + 1) {
+        const index: number = info.actionId - this.parentId - 2
         const i = this.infos.find(a => a.login === info.login)
         if (i === undefined) {
           this.infos.push({ login: info.login, indexes: [index] })
         } else if (!i.indexes.includes(index)) {
           i.indexes.push(index)
         } else {
-          const index: number = i.indexes.indexOf(info.actionId - this.id - 2)
+          const index: number = i.indexes.indexOf(info.actionId - this.parentId - 2)
           if (index !== -1) {
             i.indexes.splice(index, 1)
           }
@@ -210,7 +226,7 @@ export default class RecordList {
   private getInfos(login: string, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: UiRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
     const cps: number[][] = Array.from(Array(cpAmount), (): never[] => [])
     const infos: { index: number, offset: number }[] = []
-    const infoPositions: boolean[][] = Array.from(Array(records.length), (): any[] => new Array(Math.ceil(cpAmount / this.iCols) + 1).fill(false))
+    const infoPositions: boolean[][] = Array.from(Array(records.length), (): any[] => new Array(Math.ceil(cpAmount / this.infoColumns) + 1).fill(false))
     for (const [i, e] of records.entries()) {
       if (info.indexes.includes(i)) {
         if (e.record.checkpoints !== undefined) {
@@ -220,7 +236,7 @@ export default class RecordList {
         }
         const freeIndex: number = infoPositions[i].indexOf(false)
         infos.push({ index: i, offset: freeIndex })
-        for (let j: number = 0; j < this.iRows; j++) {
+        for (let j: number = 0; j < this.infoRows; j++) {
           if (infoPositions?.[i + j] !== undefined) { infoPositions[i + j][freeIndex] = true }
         }
       }
@@ -337,61 +353,67 @@ export default class RecordList {
 
   private constructInfo(offset: number, record: UiRecord, cpTypes: ("best" | "worst" | "equal" | undefined)[]): string {
     let ret: string = ''
-    const width: number = this.iColW * this.iCols
+    const width: number = this.infoColumnWidth * this.infoColumns
     const h: number = this.rowHeight - this.rowGap
-    const w: number = width - this.iIconW
+    const w: number = width - this.infoIconWidth
     let posX: number
     if (this.side === true) {
-      posX = -(width + (this.colGap * 2) + (offset * (width + this.colGap))) + this.colGap
+      posX = -(width + (this.columnGap * 2) + (offset * (width + this.columnGap))) + this.columnGap
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? tm.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
-      ret += `<quad posn="${posX} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
-      <quad posn="${posX + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.iIcon}"/>`
+      ret += `<quad posn="${posX} 0 1" sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}"/>
+      <quad posn="${posX + this.iconHorizontalPadding} ${-this.iconVerticalPadding} 6" 
+      sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.infoIcon}"/>`
       if (topInfo.length === 3) {
-        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${this.rowHeight}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${this.rowHeight}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${this.iIconW} ${this.rowHeight}" image="${this.iIcon}"/>`
+        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${this.rowHeight}" bgcolor="${this.headerBackground}"/>
+        <quad posn="${posX + this.infoIconWidth + this.columnGap} 0 1" 
+         sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${this.rowHeight}" bgcolor="${this.headerBackground}"/>
+        <quad posn="${posX + ((width - this.infoIconWidth) / 2)} 0 1" 
+         sizen="${this.infoIconWidth} ${this.rowHeight}" image="${this.infoIcon}"/>`
       } else if (topInfo.length === 2 && record.url !== undefined) {
-        ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${width - ((this.iIconW + this.colGap) * 2)} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[0], width - ((this.iIconW * 2) + this.colGap), h, posX + this.iIconW + this.colGap)}
-        <quad posn="${posX + this.iIconW + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
-        <quad posn="${posX + this.iIconW + this.iconHPadding + this.colGap + (width - ((this.iIconW + this.colGap) * 2)) + this.colGap} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.downloadIcon}"/>`
+        ret += `<quad posn="${posX + this.infoIconWidth + this.columnGap} 0 1"
+         sizen="${width - ((this.infoIconWidth + this.columnGap) * 2)} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[0], width - ((this.infoIconWidth * 2) + this.columnGap), h, posX + this.infoIconWidth + this.columnGap)}
+        <quad posn="${posX + this.infoIconWidth + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} 0 1"
+         sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
+        <quad posn="${posX + this.infoIconWidth + this.iconHorizontalPadding + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} ${-this.iconVerticalPadding} 6"
+         sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.downloadIcon}"/>`
       } else if (topInfo.length === 2) {
-        ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX + this.iIconW + this.colGap)}
-        <quad posn="${posX + this.iIconW + this.colGap + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[1], ((width - this.iIconW) / 2) - this.colGap, h, posX + this.iIconW + this.colGap + ((width - this.iIconW) / 2))}`
+        ret += `<quad posn="${posX + this.infoIconWidth + this.columnGap} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[0], ((width - this.infoIconWidth) / 2) - this.columnGap, h, posX + this.infoIconWidth + this.columnGap)}
+        <quad posn="${posX + this.infoIconWidth + this.columnGap + ((width - this.infoIconWidth) / 2)} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[1], ((width - this.infoIconWidth) / 2) - this.columnGap, h, posX + this.infoIconWidth + this.columnGap + ((width - this.infoIconWidth) / 2))}`
       } else {
-        ret += `<quad posn="${posX + this.iIconW + this.colGap} 0 1" sizen="${w - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[0], w - this.colGap, h, posX + this.iIconW + this.colGap)}`
+        ret += `<quad posn="${posX + this.infoIconWidth + this.columnGap} 0 1" sizen="${w - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[0], w - this.columnGap, h, posX + this.infoIconWidth + this.columnGap)}`
       }
     }
     else {
-      posX = this.columnWidths.reduce((acc, cur): number => acc + cur, 0) + (offset * (width + this.colGap))
+      posX = this.columnWidths.reduce((acc, cur): number => acc + cur, 0) + (offset * (width + this.columnGap))
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? tm.utils.formatDate(a, true) : a
       })
       const topInfo: any = arr.filter(a => a !== undefined)
       if (topInfo.length === 3) {
-        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
+        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        <quad posn="${posX + ((width - this.infoIconWidth) / 2)} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        <quad posn="${posX + (width - this.infoIconWidth)} 0 1" sizen="${this.infoIconWidth} ${h}" image="${this.infoIcon}"/>`
       } else if (topInfo.length === 2 && record.url === undefined) {
-        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[0], ((width - this.iIconW) / 2) - this.colGap, h, posX)}
-        <quad posn="${posX + ((width - this.iIconW) / 2)} 0 1" sizen="${((width - this.iIconW) / 2) - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[1], ((width - this.iIconW) / 2) - this.colGap, h, posX + ((width - this.iIconW) / 2))}`
+        ret += `<quad posn="${posX} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[0], ((width - this.infoIconWidth) / 2) - this.columnGap, h, posX)}
+        <quad posn="${posX + ((width - this.infoIconWidth) / 2)} 0 1" sizen="${((width - this.infoIconWidth) / 2) - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[1], ((width - this.infoIconWidth) / 2) - this.columnGap, h, posX + ((width - this.infoIconWidth) / 2))}`
       } else if (topInfo.length === 2) {
-        ret += `<quad posn="${posX} 0 1" sizen="${width - (this.iIconW + this.colGap)} ${h}" bgcolor="${this.headerBg}"/>
-        <quad posn="${posX + (width - this.iIconW)} 0 1" sizen="${this.iIconW} ${h}" image="${this.iIcon}"/>`
+        ret += `<quad posn="${posX} 0 1" sizen="${width - (this.infoIconWidth + this.columnGap)} ${h}" bgcolor="${this.headerBackground}"/>
+        <quad posn="${posX + (width - this.infoIconWidth)} 0 1" sizen="${this.infoIconWidth} ${h}" image="${this.infoIcon}"/>`
       } else if (topInfo.length === 1) {
-        ret += `<quad posn="${posX} 0 1" sizen="${w - this.colGap} ${h}" bgcolor="${this.headerBg}"/>
-        ${this.centeredText(topInfo[0], w - this.colGap, h, posX)}`
+        ret += `<quad posn="${posX} 0 1" sizen="${w - this.columnGap} ${h}" bgcolor="${this.headerBackground}"/>
+        ${this.centeredText(topInfo[0], w - this.columnGap, h, posX)}`
       }
-      ret += `<quad posn="${posX + w} 0 1" sizen="${this.iIconW} ${h}" bgcolor="${this.headerBg}"/>
-      <quad posn="${posX + w + this.iconHPadding} ${-this.iconVPadding} 6" sizen="${this.iIconW - (this.iconHPadding * 2)} ${h - (this.iconVPadding * 2)}" image="${this.iIcon}"/>`
+      ret += `<quad posn="${posX + w} 0 1" sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}"/>
+      <quad posn="${posX + w + this.iconHorizontalPadding} ${-this.iconVerticalPadding} 6" sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.infoIcon}"/>`
     }
     const cps: number[] | undefined = record.checkpoints
     const colours = {
@@ -400,18 +422,18 @@ export default class RecordList {
       equal: `${tm.utils.palette.yellow}F`
     }
     if (cps !== undefined) {
-      for (let i: number = 0; i < cps.length / this.iCols; i++) {
-        for (let j: number = 0; j < this.iCols; j++) {
-          const cp: number = cps[(i * this.iCols) + j]
+      for (let i: number = 0; i < cps.length / this.infoColumns; i++) {
+        for (let j: number = 0; j < this.infoColumns; j++) {
+          const cp: number = cps[(i * this.infoColumns) + j]
           if (cp === undefined) { break }
           let colour: string = 'FFFF'
-          const type = cpTypes?.[(i * this.iCols) + j]
+          const type = cpTypes?.[(i * this.infoColumns) + j]
           if (type !== undefined) {
             colour = (colours as any)[type]
           }
-          ret += `<quad posn="${posX + (this.iColW * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.iColW - this.colGap} ${h}" bgcolor="${this.bg}"/>
+          ret += `<quad posn="${posX + (this.infoColumnWidth * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.infoColumnWidth - this.columnGap} ${h}" bgcolor="${this.background}"/>
           <format textcolor="${colour}"/>
-          ${this.centeredText(tm.utils.getTimeString(cp), this.iColW - this.colGap, h, posX + (this.iColW * j), this.rowHeight * (i + 1))}
+          ${this.centeredText(tm.utils.getTimeString(cp), this.infoColumnWidth - this.columnGap, h, posX + (this.infoColumnWidth * j), this.rowHeight * (i + 1))}
           <format textcolor="FFFF"/>`
         }
       }
@@ -421,7 +443,7 @@ export default class RecordList {
 
   private constructMarker(marker: Marker | undefined): string {
     if (marker === undefined || marker === null) { return '' }
-    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.colGap)
+    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
     if (marker === 'faster') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.faster}"/>`
@@ -430,26 +452,26 @@ export default class RecordList {
     } if (marker === 'you') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.you}"/>`
     }
-    return `<quad posn="${posX} 0 1" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" bgcolor="${this.bg}"/>
+    return `<quad posn="${posX} 0 1" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" bgcolor="${this.background}"/>
     ${icon}`
   }
 
   private constructIndex(index: number | undefined): string {
     const posX: number = 0
     const height: number = this.rowHeight - this.rowGap
-    const width: number = this.columnWidths[0] - this.colGap
+    const width: number = this.columnWidths[0] - this.columnGap
     const n: string = index === undefined ? '' : `${(index + 1)}`
-    return `<quad posn="${posX} 0  1" sizen="${width} ${height}" bgcolor="${this.headerBg}"/>
+    return `<quad posn="${posX} 0  1" sizen="${width} ${height}" bgcolor="${this.headerBackground}"/>
       ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
   }
 
   private constructTime(time: number | undefined, timeColour: TimeColour | undefined): string {
     const posX: number = this.columnWidths[0]
     const height: number = this.rowHeight - this.rowGap
-    const width: number = this.columnWidths[1] - this.colGap
+    const width: number = this.columnWidths[1] - this.columnGap
     const colour: string = timeColour === undefined ? 'FFFF' : (this.timeColours)[timeColour]
     const t: string = (`${time === undefined ? '' : tm.utils.getTimeString(time)}`).toString()
-    return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
+    return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>
     ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}
     <format textsize="1" textcolor="FFFF"/>`
@@ -458,8 +480,8 @@ export default class RecordList {
   private constructName(name: string | undefined): string {
     const posX: number = this.columnWidths[0] + this.columnWidths[1]
     const height: number = this.rowHeight - this.rowGap
-    const width: number = this.columnWidths[2] - this.colGap
-    return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.bg}"/>
+    const width: number = this.columnWidths[2] - this.columnGap
+    return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     ${this.verticallyCenteredText((`${tm.utils.strip(name ?? '', false)}`), width, height, posX)}`
   }
 

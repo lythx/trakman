@@ -1,4 +1,4 @@
-import { IDS, StaticHeader } from '../../UiUtils.js'
+import { componentIds, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './TimerWidget.config.js'
 
@@ -11,7 +11,7 @@ export default class TimerWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(IDS.timer, 'race')
+    super(componentIds.timer, 'race')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y

@@ -1,6 +1,6 @@
 import PopupWindow from "../PopupWindow.js"
 import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
-import { IDS, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
 import config from './DediSectors.config.js'
 
 export default class DediSectors extends PopupWindow {
@@ -18,7 +18,7 @@ export default class DediSectors extends PopupWindow {
   private readonly cpColours = config.cpColours
 
   constructor() {
-    super(IDS.dediSectors, config.icon, config.title, config.navbar)
+    super(componentIds.dediSectors, config.icon, config.title, config.navbar)
     const records = dedimania.records
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)

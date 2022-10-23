@@ -72,9 +72,9 @@ export const Utils = {
   },
 
   stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
-      return [a[0], [a[0], ...a[1]]]
-    }))
+    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] =>
+      [a[0], [a[0], ...a[1]]]
+    ))
     let strippedStr: string = ''
     for (const letter of str) {
       let foundLetter: boolean = false

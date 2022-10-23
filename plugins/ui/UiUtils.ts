@@ -3,7 +3,7 @@ import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
 import Navbar from './utils/Navbar.js'
 import RecordList from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
-import IDS from './config/ComponentIds.js'
+import componentIds from './config/ComponentIds.js'
 import { centeredText, horizontallyCenteredText, leftAlignedText, rightAlignedText } from './utils/TextUtils.js'
 import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
@@ -25,7 +25,7 @@ const fullScreenListener = (actionId: number, zIndex: number = -100): string => 
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  IDS,
+  componentIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText,
   leftAlignedText, addManialinkListener, removeManialinkListener

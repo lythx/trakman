@@ -1,4 +1,4 @@
-import { RecordList, IDS, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import StaticComponent from '../../StaticComponent.js'
 import config from './DediRankingResult.config.js'
@@ -13,7 +13,7 @@ export default class DediRankingResult extends StaticComponent {
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
-    super(IDS.dedisResult, 'result')
+    super(componentIds.dedisResult, 'result')
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -45,7 +45,7 @@ export default class DediRankingResult extends StaticComponent {
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: IDS.dediCps })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.dediCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, dedimania.records.map(a => ({ ...a, name: a.nickname })))}
         </frame>

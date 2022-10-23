@@ -1,4 +1,4 @@
-import { IDS, List, StaticHeader } from '../../UiUtils.js'
+import { componentIds, List, StaticHeader } from '../../UiUtils.js'
 import StaticComponent from '../../StaticComponent.js'
 
 import config from './KarmaRanking.config.js'
@@ -13,7 +13,7 @@ export default class KarmaRanking extends StaticComponent {
   private xml = ''
 
   constructor() {
-    super(IDS.karmaRanking, 'result')
+    super(componentIds.karmaRanking, 'result')
     const pos = this.getRelativePosition()
     this.posX = pos.x
     this.posY = pos.y

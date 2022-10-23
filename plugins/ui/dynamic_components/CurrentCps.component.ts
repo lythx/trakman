@@ -1,5 +1,5 @@
 import PopupWindow from '../PopupWindow.js'
-import { IDS, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
+import { componentIds, Grid, centeredText, closeButton, Paginator } from '../UiUtils.js'
 import config from './CurrentCps.config.js'
 
 interface CurrentCheckpoint {
@@ -20,7 +20,7 @@ export default class CurrentCps extends PopupWindow {
   constructor() {
     // Translate icon name to url
     const iconUrl = config.icon
-    super(IDS.currentCps, iconUrl, config.title, config.navbar)
+    super(componentIds.currentCps, iconUrl, config.title, config.navbar)
     // Create grid object to display the table
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(this.entries).fill(1), config.grid)
     tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {

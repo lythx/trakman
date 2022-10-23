@@ -1,7 +1,7 @@
 import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-import { IDS } from '../../../UiUtils.js'
+import { componentIds } from '../../../UiUtils.js'
 
 const cfg = config.sectorsButton
 
@@ -18,7 +18,7 @@ export class SectorsButton extends UiButton {
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
-      actionId: IDS.sectorRecords,
+      actionId: componentIds.sectorRecords,
       equalTexts: cfg.texts.equal
     }
   }
