@@ -37,14 +37,14 @@ export default class SectorRecords extends PopupWindow {
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
-    this.displayToPlayer(info.login, { page: 1 }, `1 / ${this.paginator.pageCount} `)
+    this.displayToPlayer(info.login, { page: 1 }, `1/${this.paginator.pageCount} `)
   }
 
   private reRender(): void {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, { page }, `${page} /${this.paginator.pageCount}`)
+      this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
   }
 
