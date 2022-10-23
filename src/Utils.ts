@@ -61,6 +61,12 @@ export const Utils = {
     return prefix + pos.toString() + (['st', 'nd', 'rd'][((pos + 90) % 100 - 10) % 10 - 1] || 'th')
   },
 
+  /**
+   * Removes all Trackmania specific formatting (e.g. $w, $fff, etc.) from the supplied string
+   * @param str String to strip formatting from
+   * @param removeColours Whether to remove colours from the string, defaults to true
+   * @returns String without formatting
+   */
   strip(str: string, removeColours: boolean = true): string {
     let regex: RegExp
     if (removeColours) {
@@ -71,6 +77,11 @@ export const Utils = {
     return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
   },
 
+  /**
+   * Attempts to convert supplied string to latin text based on the special charmap
+   * @param str String to convert
+   * @returns Converted string
+   */
   stripSpecialChars(str: string): string {
     const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => {
       return [a[0], [a[0], ...a[1]]]
@@ -110,6 +121,11 @@ export const Utils = {
 
   matchString,
 
+  /**
+   * Gets the country code (non-ISO) for the specified country name
+   * @param country Country name
+   * @returns Country code
+   */
   countryToCode(country: string): string | undefined {
     return countries.find(a => a.name === country)?.code
   },
@@ -162,6 +178,14 @@ export const Utils = {
     return obj
   },
 
+  /**
+   * Sends coppers with specified parameters
+   * @param payerLogin Login of the payee
+   * @param amount Coppers amount
+   * @param message Message to attach in the in-game mail
+   * @param targetLogin Login of the receiver
+   * @returns Whether the payment went through or error
+   */
   async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
     const billId: any | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
     if (billId instanceof Error) { return billId }
@@ -182,6 +206,13 @@ export const Utils = {
     })
   },
 
+  /**
+   * Pays coppers from the server with specified parameters
+   * @param targetLogin Login of the receiver
+   * @param amount Coppers amount
+   * @param message Message to attach in the in-game mail
+   * @returns True on payment success or error
+   */
   async payCoppers(targetLogin: string, amount: number, message: string): Promise<true | Error> {
     const billId: any | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
     if (billId instanceof Error) { return billId }
@@ -304,6 +335,7 @@ export const Utils = {
 
 }
 
+// TODO
 function matchString(searchString: string, possibleMatches: string[]): { str: string, value: number }[]
 
 function matchString<T extends { [key: string]: any }>
@@ -328,6 +360,7 @@ function matchString<T extends { [key: string]: any }>
   }
 }
 
+// TODO
 function strVar(str: string, variables: any[]): string
 function strVar(str: string, variables: { [name: string]: any }): string
 function strVar(str: string, vars: { [name: string]: any }): string {
