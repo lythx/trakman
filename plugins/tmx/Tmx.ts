@@ -116,6 +116,12 @@ function getFromQueue(uids: string | string[]): Readonly<tm.TMXMap> | undefined 
   return queue.filter(a => !(typeof a === 'string') && uids.includes(a.id)) as any
 }
 
+/**
+ * Fetches TMX data for current map and maps in the queue. 
+ * Provides utilities for accessing TMX related data
+ * @author lythx
+ * @since 0.1
+ */
 export const tmx = {
 
   /**

@@ -111,6 +111,12 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
   for (const e of nextAuthorListeners) { e(nextAuthor) }
 })
 
+/**
+ * Provides utilites for fetching player data from Trackmania Webservices.
+ * Fetches and stores current and next map author data
+ * @author lythx & wiseraven
+ * @since 0.1
+ */
 export const webservices = {
 
   fetchPlayer,
@@ -132,14 +138,14 @@ export const webservices = {
   },
 
   /**
-   * @returns current map author webservices data
+   * Current map author webservices data
    */
   get currentAuthor() {
     return curAuthor
   },
 
   /**
-   * @returns next map author webservices data
+   * Next map author webservices data
    */
   get nextAuthor() {
     if (isMapRestart === true) { return curAuthor }
