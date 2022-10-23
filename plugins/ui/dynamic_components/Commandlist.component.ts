@@ -149,8 +149,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
             text += `[`
             hasOptionals = true
           }
-          if (i === 0) { text += `${e.name} < ${e.type ?? 'string'} > ` }
-          else { text += `, ${e.name} < ${e.type ?? 'string'} > ` }
+          if (i === 0) { text += `${e.name} <${e.type ?? 'string'}> ` }
+          else { text += `, ${e.name} <${e.type ?? 'string'}> ` }
         }
       }
       if (hasOptionals === true) { text += ']' }

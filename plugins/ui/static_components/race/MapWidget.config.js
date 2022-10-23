@@ -19,7 +19,7 @@ export default {
     { authors: ['Fwo Niro'], icon: icons.tagRed }, 
     { authors: ['tony89300'], icon: icons.tagPinkCyan },
     { names: [/{Kackiest Kacky}*/], icon: icons.tagKacky },
-    { names: [/{\$w\$i\$f70ARC_}*/], icon: icons.tagArcade }
+    { names: [/\$w\$i\$f70ARC_*/], icon: icons.tagArcade }
   ],
   icons: {
     header: icons.ongoingMap,
