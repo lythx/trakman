@@ -65,7 +65,7 @@ tm.addListener('MapRemoved', (map): void => {
 /**
  * Provides utilities for filtering and sorting maplist
  * @author lythx
- * @since TODO
+ * @since 0.1
  */
 export const maplist = {
 
