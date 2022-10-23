@@ -18,7 +18,7 @@ tm.addListener('Startup', (): void => {
   const arr: tm.Map[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
   authorSort.push(...arr.sort((a, b): number => a.author.localeCompare(b.author)))
   nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
-  const maps = tm.maps.list
+  const maps: Readonly<tm.Map>[] = tm.maps.list
   karmaSort.push(...[...authorSort].sort((a, b): number => {
     const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
     const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
@@ -29,16 +29,16 @@ tm.addListener('Startup', (): void => {
   worstAtSort.push(...[...atSort].reverse())
 })
 
-tm.addListener('JukeboxChanged', (list) => {
+tm.addListener('JukeboxChanged', (list): void => {
   jukebox.length = 0
   jukebox.push(...list)
   for (const e of jukeboxUpdateListeners) { e(list) }
 })
 
-tm.addListener('MapAdded', (map) => {
+tm.addListener('MapAdded', (map): void => {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
-  const ratio = map.voteRatio
+  const ratio: number = map.voteRatio
   karmaSort.splice(karmaSort.findIndex(a => map.author.localeCompare(a.author)
     && map.name.localeCompare(a.name)
     && ratio > map.voteRatio), 0, map)
@@ -51,7 +51,7 @@ tm.addListener('MapAdded', (map) => {
   for (const e of updateListeners) { e('add', map) }
 })
 
-tm.addListener('MapRemoved', (map) => {
+tm.addListener('MapRemoved', (map): void => {
   authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
   nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
   karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)
@@ -117,14 +117,14 @@ export const maplist = {
    */
   getByPosition: (login: string, sort: 'best' | 'worst'): Readonly<tm.Map>[] => {
     if (sort === 'best') {
-      let list = cache.find(a => a.query === login && a.type === 'best')?.list
+      let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === 'best')?.list
       if (list === undefined) {
         list = []
         const ranks: { mapId: string, rank: number }[] =
           tm.records.getRank(login, tm.maps.list.map(a => a.id))
             .sort((a, b): number => a.rank - b.rank)
         for (let i: number = 0; i < ranks.length; i++) {
-          const entry = authorSort.find(a => a.id === ranks[i].mapId)
+          const entry: tm.Map | undefined = authorSort.find(a => a.id === ranks[i].mapId)
           if (entry !== undefined) { list.push(entry) }
         }
         cache.unshift({ query: login, list, type: 'best' })
@@ -133,14 +133,14 @@ export const maplist = {
       return list
     }
     else {
-      let list = cache.find(a => a.query === login && a.type === 'worst')?.list
+      let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === 'worst')?.list
       if (list === undefined) {
         list = []
         const ranks: { mapId: string, rank: number }[] =
           tm.records.getRank(login, tm.maps.list.map(a => a.id))
             .sort((a, b): number => b.rank - a.rank)
         for (let i: number = 0; i < ranks.length; i++) {
-          const entry = authorSort.find(a => a.id === ranks[i].mapId)
+          const entry: tm.Map | undefined = authorSort.find(a => a.id === ranks[i].mapId)
           if (entry !== undefined) { list.push(entry) }
         }
         cache.unshift({ query: login, list, type: 'worst' })
@@ -156,7 +156,7 @@ export const maplist = {
    * @returns Array of map objects
    */
   searchByName: (query: string): Readonly<tm.Map>[] => {
-    let list = cache.find(a => a.query === query && a.type === 'name')?.list
+    let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'name')?.list
     if (list === undefined) {
       list = (tm.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
       cache.unshift({ query, list, type: 'name' })
@@ -171,7 +171,7 @@ export const maplist = {
    * @returns Array of map objects
    */
   searchByAuthor: (query: string): Readonly<tm.Map>[] => {
-    let list = cache.find(a => a.query === query && a.type === 'author')?.list
+    let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'author')?.list
     if (list === undefined) {
       list = (tm.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
       cache.unshift({ query, list, type: 'author' })
@@ -186,7 +186,7 @@ export const maplist = {
    * @returns Array of map objects
    */
   filterNoFinish: async (login: string): Promise<Readonly<tm.Map>[]> => {
-    let list = cache.find(a => a.query === login && a.type === 'nofin')?.list
+    let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === 'nofin')?.list
     if (list === undefined) {
       const mapsWithRec: string[] = (await tm.records.fetchByLogin(login)).map(a => a.map)
       list = authorSort.filter(a => !mapsWithRec.includes(a.id))
@@ -202,7 +202,7 @@ export const maplist = {
    * @returns Array of map objects
    */
   filterNoRank: async (login: string): Promise<Readonly<tm.Map>[]> => {
-    let list = cache.find(a => a.query === login && a.type === 'norank')?.list
+    let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === 'norank')?.list
     if (list === undefined) {
       const mapsWithAuthor: string[] = (await tm.records.fetchByLogin(login))
         .filter(a => authorSort.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time)
@@ -220,9 +220,9 @@ export const maplist = {
    * @returns Array of map objects
    */
   filterNoAuthor: async (login: string): Promise<Readonly<tm.Map>[]> => {
-    let list = cache.find(a => a.query === login && a.type === 'noauthor')?.list
+    let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === 'noauthor')?.list
     if (list === undefined) {
-      const ranks = (await tm.records.getRank(login, authorSort.map(a => a.id)))
+      const ranks = (tm.records.getRank(login, authorSort.map(a => a.id)))
         .filter(a => a.rank <= tm.records.maxLocalsAmount)
       list = authorSort.filter(a => !ranks.some(b => a.id === b.mapId))
       cache.unshift({ query: login, list, type: 'noauthor' })
