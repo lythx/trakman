@@ -13,6 +13,7 @@ export class RecordService {
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: tm.LocalRecord[] = []
   private static _liveRecords: tm.FinishInfo[] = []
+  /** Maximum amount of local records */
   static readonly maxLocalsAmount: number = config.localRecordsLimit
   private static _initialLocals: tm.LocalRecord[] = []
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
@@ -537,28 +538,28 @@ export class RecordService {
   }
 
   /**
-   * @returns Local records array on the current map
+   * Current map local records
    */
   static get localRecords(): Readonly<tm.LocalRecord>[] {
     return [...this._localRecords]
   }
 
   /**
-   * @returns Number of local records on the current map
+   * Number of local records on the current map
    */
   static get localRecordCount(): number {
     return this._localRecords.length
   }
 
   /**
-   * @returns Live records array
+   * Current live records
    */
   static get liveRecords(): Readonly<tm.FinishInfo>[] {
     return [...this._liveRecords]
   }
 
   /**
-   * @returns Number of live records
+   * Number of live records
    */
   static get liveRecordsCount(): number {
     return this._liveRecords.length

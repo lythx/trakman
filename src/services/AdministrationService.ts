@@ -688,56 +688,56 @@ export class AdministrationService {
   }
 
   /**
-   * @returns Array of all ban objects
+   * Banned players.
    */
   static get banlist(): Readonly<tm.BanlistEntry>[] {
     return [...this.serverBanlist, ...this.banOnJoin]
   }
 
   /**
-   * @returns Array of all blacklist objects
+   * Blacklisted players.
    */
   static get blacklist(): Readonly<tm.BlacklistEntry>[] {
     return [...this._blacklist]
   }
 
   /**
-   * @returns Array of all mute objects
+   * Muted players.
    */
   static get mutelist(): Readonly<tm.MutelistEntry>[] {
     return [...this.serverMutelist, ...this.muteOnJoin]
   }
 
   /**
-   * @returns Array of all guest objects
+   * Server guests.
    */
   static get guestlist(): Readonly<tm.GuestlistEntry>[] {
     return [...this._guestlist]
   }
 
   /**
-   * @returns Number of banned players
+   * Number of banned players
    */
   static get banCount(): number {
     return this.serverBanlist.length + this.banOnJoin.length
   }
 
   /**
-   * @returns Number of blacklisted players
+   * Number of blacklisted players
    */
   static get blacklistCount(): number {
     return this._blacklist.length
   }
 
   /**
-   * @returns Number of muted players
+   * \umber of muted players
    */
   static get muteCount(): number {
     return this.serverMutelist.length + this.muteOnJoin.length
   }
 
   /**
-   * @returns Number of guests
+   * \Number of guests
    */
   static get guestCount(): number {
     return this._guestlist.length
