@@ -32,7 +32,7 @@ Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
 export const Utils = {
 
   /**
-   * Formats time for prettier display
+   * Formats time for prettier display.
    * @param time Time to format
    * @returns Formatted time string
    */
@@ -45,7 +45,7 @@ export const Utils = {
   },
 
   /**
-   * Adds an ordinal suffix to numbers
+   * Adds an ordinal suffix to numbers.
    * @param pos Number to add the suffix to
    * @returns Number with the suffix
    */
@@ -62,7 +62,7 @@ export const Utils = {
   },
 
   /**
-   * Removes all Trackmania specific formatting (e.g. $w, $fff, etc.) from the supplied string
+   * Removes all Trackmania specific formatting (e.g. $w, $fff, etc.) from the supplied string.
    * @param str String to strip formatting from
    * @param removeColours Whether to remove colours from the string, defaults to true
    * @returns String without formatting
@@ -78,7 +78,7 @@ export const Utils = {
   },
 
   /**
-   * Attempts to convert supplied string to latin text based on the special charmap
+   * Attempts to convert supplied string to latin text based on the special charmap.
    * @param str String to convert
    * @returns Converted string
    */
@@ -131,13 +131,13 @@ export const Utils = {
   },
 
   /**
- * Gets the appropriate verb and calculates record differences
- * @param prevPos Previous record index
- * @param currPos Current record index
- * @param prevTime Previous record time
- * @param currTime Current record time
- * @returns Object containing the string to use, whether calculation is needed, and the difference
- */
+   * Gets the appropriate verb and calculates record differences.
+   * @param prevPos Previous record index
+   * @param currPos Current record index
+   * @param prevTime Previous record time
+   * @param currTime Current record time
+   * @returns Object containing the string to use, whether calculation is needed, and the difference
+   */
   getRankingString(prevPos: number, currPos: number, prevTime: number, currTime: number): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
     let calc: boolean = false
     const obj: any = {
@@ -179,7 +179,7 @@ export const Utils = {
   },
 
   /**
-   * Sends coppers with specified parameters
+   * Sends coppers with specified parameters.
    * @param payerLogin Login of the payee
    * @param amount Coppers amount
    * @param message Message to attach in the in-game mail
@@ -207,7 +207,7 @@ export const Utils = {
   },
 
   /**
-   * Pays coppers from the server with specified parameters
+   * Pays coppers from the server with specified parameters.
    * @param targetLogin Login of the receiver
    * @param amount Coppers amount
    * @param message Message to attach in the in-game mail
@@ -234,7 +234,7 @@ export const Utils = {
   },
 
   /**
-   * Converts milliseconds to humanly readable time
+   * Converts milliseconds to humanly readable time.
    * @param ms Time to convert (in milliseconds)
    * @returns Humanly readable time string
    */
@@ -261,10 +261,10 @@ export const Utils = {
   },
 
   /**
- * Removes certain HTML tags that may harm XML manialinks
- * @param str Original string
- * @returns Escaped string
- */
+   * Removes certain HTML tags that may harm XML manialinks.
+   * @param str Original string
+   * @returns Escaped string
+   */
   safeString(str: string): string {
     const map = {
       '&': '&amp;',
@@ -274,17 +274,17 @@ export const Utils = {
   },
 
   /**
- * Attempts to convert the player nickname to their login via charmap
- * @param nickname Player nickname
- * @param options Options to modify search similarity goals
- * @returns Possibly matching login or undefined if unsuccessful
- */
+   * Attempts to convert the player nickname to their login via charmap.
+   * @param nickname Player nickname
+   * @param options Options to modify search similarity goals
+   * @returns Possibly matching login or undefined if unsuccessful
+   */
   nicknameToPlayer(nickname: string, options: {
     similarityGoal: number,
-    minimumDifferenceBetweenMatches: number
+    minDifferenceBetweenMatches: number
   } = {
       similarityGoal: config.nicknameToLoginSimilarityGoal,
-      minimumDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
+      minDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
     }): tm.Player | undefined {
     const players = PlayerService.players
     const strippedNicknames: { strippedNickname: string, player: tm.Player }[] = []
@@ -302,14 +302,14 @@ export const Utils = {
       return undefined
     }
     const s = matches.sort((a, b): number => b.value - a.value)
-    if (s[0].value - s?.[1]?.value ?? 0 < options.minimumDifferenceBetweenMatches) {
+    if (s[0].value - s?.[1]?.value ?? 0 < options.minDifferenceBetweenMatches) {
       return undefined
     }
     return s[0].player
   },
 
   /**
-   * Formats date into calendar display
+   * Formats date into calendar display.
    * @param date Date to be formatted
    * @param displayDay Whether to display day
    * @returns Formatted date string
@@ -323,12 +323,21 @@ export const Utils = {
 
   strVar,
 
+  /**
+   * List of colours in Trackmania format (prefixed with $ and in 3 digit hex).
+   */
   get colours() {
     return colours
   },
 
+  /**
+   * Server palette of colours defined in config.
+   */
   palette,
 
+  /**
+   * List of Trackmania countries and country codes.
+   */
   get countries() {
     return countries
   }
@@ -336,7 +345,7 @@ export const Utils = {
 }
 
 /**
- * Checks similarity of given strings, returns best matches sorted based on similarity
+ * Checks similarity of given strings, returns best matches sorted based on similarity.
  * @param searchString String to compare possible matches to
  * @param possibleMatches Array of strings to sort by similarity
  * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
@@ -344,7 +353,7 @@ export const Utils = {
  */
 function matchString(searchString: string, possibleMatches: string[], stripSpecialChars?: true): { str: string, value: number }[]
 /**
- * Checks similarity of given strings in an array of objects, returns best matches sorted based on similarity
+ * Checks similarity of given strings in an array of objects, returns best matches sorted based on similarity.
  * @param searchString String to compare possible matches to
  * @param possibleMatches Array of objects to sort by similarity
  * @param key Key in objects containing the string to compare
@@ -381,7 +390,7 @@ function matchString<T extends { [key: string]: any }>
 }
 
 /** 
- * Replaces #{variableName} in string with given variables
+ * Replaces #{variableName} in string with given variables.
  * @param str String to replace #{variableName} in
  * @param variables Object containing values for variable names (key is variableName)
  * @returns String with replaced variables

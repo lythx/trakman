@@ -457,7 +457,7 @@ namespace trakman {
   }
 
   /**
-   * Adds a listener to an event to execute callbacks
+   * Adds a listener to an event to execute callbacks.
    * @param event Event to register the callback on
    * @param callback Callback to register on given event
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
@@ -465,8 +465,8 @@ namespace trakman {
   export const addListener = Events.addListener
 
   /**
-   * Removes event listener
-   * @param callback Callback function of listener to remove
+   * Removes event listener,
+   * @param callback Callback function of the listener to remove
    */
   export const removeListener = Events.removeListener
 
