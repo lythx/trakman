@@ -6,6 +6,17 @@ let topList: { readonly login: string, nickname: string, count: number }[] = []
 const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, count: number }>[]) => void)[] = []
 const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
 
+const addToOnlineList = async (login: string, nickname: string) => {
+  const id: number | undefined = await tm.db.getPlayerId(login)
+  const res: { count: number }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
+      WHERE player_id=$1`, id)
+  if (res instanceof Error) {
+    tm.log.error(`Failed to fetch vote count for player ${login}`, res.message, res.stack)
+    return
+  }
+  onlineList.push({ login, nickname, count: res[0].count })
+}
+
 const initialize = async () => {
   const res: any[] | Error = await tm.db.query(`SELECT login, nickname, count(players.id)::int
   FROM votes
@@ -21,12 +32,10 @@ const initialize = async () => {
   for (const e of updateListeners) {
     e(topList)
   }
+  for (const e of tm.players.list) {
+    await addToOnlineList(e.login, e.nickname)
+  }
 }
-
-tm.addListener('Startup', async (): Promise<void> => {
-  void initialize()
-  initialVotes = tm.karma.current
-})
 
 tm.addListener('PlayerInfoUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
@@ -62,7 +71,7 @@ const handleVote = (vote: tm.Vote) => {
     const obj = onlineList.find(a => a.login === vote.login)
     if (obj === undefined) { return }
     obj.count++
-    if (topList.length !== 0 && topList.length < config.votesCount &&
+    if (topList.length !== 0 && topList.length >= config.votesCount &&
       obj.count <= topList[topList.length - 1].count) { return }
     const entry = topList.find(a => a.login === obj.login)
     if (entry !== undefined) {
@@ -79,19 +88,17 @@ const handleVote = (vote: tm.Vote) => {
   }
 }
 
+tm.addListener('Startup', async (): Promise<void> => {
+  void initialize()
+  initialVotes = tm.karma.current
+})
+
 tm.addListener('KarmaVote', (info): void => {
   for (const e of info) { handleVote(e) }
 })
 
-tm.addListener('PlayerJoin', async (info): Promise<void> => {
-  const id: number | undefined = await tm.db.getPlayerId(info.login)
-  const res: { count: number }[] | Error = await tm.db.query(`SELECT count(*)::int FROM votes
-      WHERE player_id=$1`, id)
-  if (res instanceof Error) {
-    tm.log.error(`Failed to fetch vote count for player ${info.login}`, res.message, res.stack)
-    return
-  }
-  onlineList.push({ login: info.login, nickname: info.nickname, count: res[0].count })
+tm.addListener('PlayerJoin', (info): void => {
+  void addToOnlineList(info.login, info.nickname)
 })
 
 tm.addListener('PlayerLeave', (info): void => {

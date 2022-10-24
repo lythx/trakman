@@ -40,7 +40,7 @@ export default class TMXWindow extends PopupWindow<number> {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, page, `${page} /${this.paginator.pageCount}`)
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
   }
 
@@ -89,7 +89,7 @@ export default class TMXWindow extends PopupWindow<number> {
       const tmxRecords: GridCellFunction = (ii, jj, ww, hh) => this.counstructTmxRecordsXml(ww, hh, TMXMap?.validReplays)
       return grid.constructXml([header, screenshot, name, author, infos, tmxRecords])
     }
-    return `< format textsize = "3" /> ` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))
+    return `<format textsize="3" /> ` + this.grid.constructXml(new Array(config.itemsPerPage).fill(null).map(() => cell))
   }
 
   protected constructFooter(login: string, page: number): string {
@@ -98,11 +98,11 @@ export default class TMXWindow extends PopupWindow<number> {
 
   private constructHeader(width: number, height: number, title: string, map: tm.Map, TMXMap?: tm.TMXMap): string {
     const icon = (x: number, y: number, image: string, url: string): string => {
-      return `< quad posn = "${x + config.margin} ${-(y + config.margin)} 3"
-sizen = "${config.iconWidth} ${height - config.margin * 2}" bgcolor = "${config.iconBackground}" url = "${url}" />
+      return `<quad posn="${x + config.margin} ${-(y + config.margin)} 3"
+sizen="${config.iconWidth} ${height - config.margin * 2}" bgcolor="${config.iconBackground}" url="${url}" />
   <quad posn="${x + config.margin * 2} ${-(y + config.margin * 2)} 5"
-sizen = "${config.iconWidth - config.margin * 2} ${height - config.margin * 4}"
-image = "${image}" url = "${url}" /> `
+sizen="${config.iconWidth - config.margin * 2} ${height - config.margin * 4}"
+image="${image}" url="${url}" /> `
     }
     if (TMXMap === undefined) {
       return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin), height, config.iconWidth)}

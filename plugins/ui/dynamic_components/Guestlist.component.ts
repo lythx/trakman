@@ -51,7 +51,7 @@ export default class Guestlist extends PopupWindow<number> {
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, page, `${page} /${this.paginator.pageCount}`, info.privilege)
+    this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
   }
 
   private reRender(): void {
@@ -86,8 +86,8 @@ export default class Guestlist extends PopupWindow<number> {
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(guestlist[i + index].date, true), w, h)
     const adminCell: GridCellFunction = (i, j, w, h) => centeredText(guestlist[i + index].callerLogin, w, h)
     const removeGuestbutton: GridCellFunction = (i, j, w, h) => {
-      return `< quad posn = "${w / 2} ${-h / 2} 1" sizen = "${config.iconWidth} ${config.iconHeight}" image = "${config.removeGuestIcon}"
-    imagefocus = "${config.removeGuestIconHover}" halign = "center" valign = "center" action = "${this.openId + i + 1000 + index}" /> `
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.removeGuestIcon}"
+    imagefocus="${config.removeGuestIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
     const rows = Math.min(config.entries, guestlist.length - (index + 1))
     const arr = headers

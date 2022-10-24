@@ -90,8 +90,8 @@ export default class Banlist extends PopupWindow<number> {
     }
     const adminCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.safeString(tm.utils.strip(banlist[i + index].callerNickname, false)), w, h)
     const unbanButton: GridCellFunction = (i, j, w, h) => {
-      return `< quad posn = "${w / 2} ${-h / 2} 1" sizen = "${config.iconWidth} ${config.iconHeight}" image = "${config.unbanIcon}"
-    imagefocus = "${config.unbanIconHover}" halign = "center" valign = "center" action = "${this.openId + i + 1000 + index}" /> `
+      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unbanIcon}"
+    imagefocus="${config.unbanIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
     const rows = Math.min(config.entries, banlist.length - (index + 1))
     const arr = headers

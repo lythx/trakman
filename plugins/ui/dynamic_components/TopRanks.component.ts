@@ -43,7 +43,7 @@ export default class TopRanks extends PopupWindow<number> {
     const players = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const page = this.paginator.getPageByLogin(login)
-      this.displayToPlayer(login, page, `${page} /${this.paginator.pageCount}`)
+      this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
   }
 

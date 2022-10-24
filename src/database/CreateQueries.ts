@@ -1,4 +1,4 @@
-export const createQueries = [ // TODO make plugins not crash
+export const createQueries = [
   `CREATE TABLE IF NOT EXISTS map_ids(
   id INT4 GENERATED ALWAYS AS IDENTITY,
   uid VARCHAR(27) NOT NULL UNIQUE,

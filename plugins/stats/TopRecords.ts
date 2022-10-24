@@ -69,14 +69,18 @@ async function getFromDB(logins: string | string[]):
       tm.log.error(`Failed to get record count info for player ${logins}`, res.message, res.stack)
       return
     }
-    if (res[0] === undefined) { return undefined }
+    if (res[0] === undefined) {
+      const player = await tm.players.fetch(logins)
+      if (player === undefined) { return }
+      return { login: player.login, nickname: player.nickname, amount: 0 }
+    }
     return { login: logins, nickname: res[0].nickname, amount: res[0].amount }
   }
   const ids = await tm.db.getPlayerId(logins)
   if (ids.length === 0) { return [] }
   const mapIds = await tm.db.getMapId(tm.maps.list.map(a => a.id))
   const res = await tm.db.query(`WITH r(player_id, map_id) AS
-    (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+    (SELECT player_id, map_id FROM records WHERE map_id IN(${mapIds.map(a => `${a.id}, `).join('').slice(0, -2)}))
   SELECT login, count(*)::int as amount, nickname FROM r
   JOIN players ON players.id=r.player_id
   WHERE ${logins.map((a, i) => `player_id=$${i + 1} OR `).join('').slice(0, -3)}
@@ -86,7 +90,14 @@ async function getFromDB(logins: string | string[]):
     tm.log.error(`Failed to get record count info for players ${logins.join(',')}`, res.message, res.stack)
     return []
   }
-  return res.map(a => ({ login: a.login, nickname: a.nickname, amount: a.amount }))
+  const ret = res.map(a => ({ login: a.login, nickname: a.nickname, amount: a.amount }))
+  for (const e of logins) {
+    if (!ret.some(a => a.login === e)) {
+      const player = await tm.players.fetch(e)
+      if (player !== undefined) { ret.push({ login: e, nickname: player.nickname, amount: 0 }) }
+    }
+  }
+  return ret
 }
 
 tm.addListener('Startup', (): void => void initialize())
@@ -107,7 +118,7 @@ tm.addListener('LocalRecord', info => {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.amount++
-    if (topList.length !== 0 && topList.length < config.recordsCount &&
+    if (topList.length !== 0 && topList.length >= config.recordsCount &&
       obj.amount <= topList[topList.length - 1].amount) { return }
     const entry = topList.find(a => a.login === info.login)
     if (entry !== undefined) {
