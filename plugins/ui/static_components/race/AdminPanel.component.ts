@@ -119,7 +119,7 @@ export default class AdminPanel extends StaticComponent {
     const skipButton: GridCellFunction = (i, j, w, h) =>
       this.constructButton(w, h, config.icons.skip, config.iconsHover.skip, this.actions.skip)
     const endRoundButton: GridCellFunction = (i, j, w, h) => {
-      if ([1, 4].includes(tm.state.gameConfig.gameMode)) { // Stunts and TA have no rounds
+      if ([1, 4].includes(tm.config.game.gameMode)) { // Stunts and TA have no rounds
         return this.constructButton(w, h, config.icons.jukebox, config.iconsHover.jukebox, this.actions.jukebox)
       }
       return this.constructButton(w, h, config.icons.endRound, config.iconsHover.endRound, this.actions.endRound)

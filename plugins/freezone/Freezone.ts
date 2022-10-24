@@ -8,7 +8,7 @@ const password = process.env.FREEZONE_PASSWORD
 const sendLive = async (): Promise<true | Error> => {
   // Request URL
   const url: string = config.manialiveUrl
-  const cfg: tm.ServerInfo = tm.state.serverConfig
+  const cfg: tm.ServerInfo = tm.config.server
   // Data object in any because TS coping language
   const data = {
     serverLogin: cfg.login,

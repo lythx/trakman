@@ -36,11 +36,11 @@ export class DedimaniaClient {
     const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
       struct: {
         Game: { string: 'TMF' },
-        Login: { string: tm.state.serverConfig.login },
+        Login: { string: tm.config.server.login },
         Password: { string: this.password },
         Tool: { string: 'Trakman' },
-        Version: { string: tm.config.version },
-        Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) },
+        Version: { string: tm.config.controller.version },
+        Nation: { string: tm.utils.countryToCode(tm.config.server.zone.split('|')[0]) },
         Packmask: { string: packmask }
       }
     }])

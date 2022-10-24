@@ -50,7 +50,7 @@ const commands: tm.Command[] = [
     help: 'Set whether the server is in warmup mode.',
     params: [{ name: 'enabled', type: 'boolean' }],
     callback: (info: tm.MessageInfo, enabled: boolean): void => {
-      if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.setwarmup.error, info.login)
         return
       }
@@ -68,7 +68,7 @@ const commands: tm.Command[] = [
     help: 'Set the laps amount in laps mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 3) {
+      if (tm.config.game.gameMode !== 3) {
         tm.sendMessage(config.setlapsamount.error, info.login)
         return
       }
@@ -90,7 +90,7 @@ const commands: tm.Command[] = [
     help: 'Set the laps amount in rounds mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 0) {
+      if (tm.config.game.gameMode !== 0) {
         tm.sendMessage(config.setroundslapsamount.error, info.login)
         return
       }
@@ -112,7 +112,7 @@ const commands: tm.Command[] = [
     help: 'Set the points limit for rounds mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 0) {
+      if (tm.config.game.gameMode !== 0) {
         tm.sendMessage(config.setroundspointlimit.error, info.login)
         return
       }
@@ -134,7 +134,7 @@ const commands: tm.Command[] = [
     help: 'Set the points limit for teams mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 2) {
+      if (tm.config.game.gameMode !== 2) {
         tm.sendMessage(config.setteamspointlimit.error, info.login)
         return
       }
@@ -156,7 +156,7 @@ const commands: tm.Command[] = [
     help: 'Set the max obtainable points per round for teams mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 2) {
+      if (tm.config.game.gameMode !== 2) {
         tm.sendMessage(config.setteamsmaxpoints.error, info.login)
         return
       }
@@ -176,7 +176,7 @@ const commands: tm.Command[] = [
     help: 'Set the points limit for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 5) {
+      if (tm.config.game.gameMode !== 5) {
         tm.sendMessage(config.setcuppointlimit.error, info.login)
         return
       }
@@ -198,7 +198,7 @@ const commands: tm.Command[] = [
     help: 'Set the amount of rounds per map for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 5) {
+      if (tm.config.game.gameMode !== 5) {
         tm.sendMessage(config.setcuproundspermap.error, info.login)
         return
       }
@@ -220,7 +220,7 @@ const commands: tm.Command[] = [
     help: 'Set the amount of rounds in warmup for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 5) {
+      if (tm.config.game.gameMode !== 5) {
         tm.sendMessage(config.setcupwarmuptime.error, info.login)
         return
       }
@@ -242,7 +242,7 @@ const commands: tm.Command[] = [
     help: 'Set the amount of winners for cup mode.',
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.state.gameConfig.gameMode !== 5) {
+      if (tm.config.game.gameMode !== 5) {
         tm.sendMessage(config.setcupwinnersamount.error, info.login)
         return
       }

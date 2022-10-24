@@ -226,7 +226,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const muteCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.mute + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.mute) {
+      if (params.privilege < tm.config.controller.privileges.mute) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -242,7 +242,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const blacklistCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.blacklist + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.blacklist || params.privilege <= players[i + index].privilege) {
+      if (params.privilege < tm.config.controller.privileges.blacklist || params.privilege <= players[i + index].privilege) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -252,7 +252,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const banCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.ban + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.ban || params.privilege <= players[i + index].privilege) {
+      if (params.privilege < tm.config.controller.privileges.ban || params.privilege <= players[i + index].privilege) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -262,7 +262,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const guestCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.addGuest + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.addGuest) {
+      if (params.privilege < tm.config.controller.privileges.addGuest) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }

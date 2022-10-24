@@ -340,14 +340,6 @@ namespace trakman {
      */
     get current(): "race" | "result" | "transition" {
       return GameService.state
-    },
-
-    get gameConfig(): tm.Game {
-      return GameService.config
-    },
-
-    get serverConfig(): tm.ServerInfo {
-      return ServerConfig.config
     }
 
   }
@@ -490,10 +482,24 @@ namespace trakman {
     Events.emit('ManialinkClick', info)
   }
 
-  /**
-   * Controller config
-   */
-  export const config = controllerConfig
+  export const config = {
+
+    /**
+     * Controller config.
+     */
+    controller: controllerConfig,
+
+    /**
+     * Current dedicated server config.
+     */
+    get server() { return ServerConfig.config },
+
+    /**
+     * Current game config.
+     */
+    get game() { return GameService.config }
+
+  }
 }
 
 declare global {

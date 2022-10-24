@@ -16,7 +16,7 @@ const events: tm.Listener[] = [
   {
     event: 'Startup',
     callback: (): void => {
-      tm.sendMessage(tm.utils.strVar(c.startup, { version: tm.config.version }))
+      tm.sendMessage(tm.utils.strVar(c.startup, { version: tm.config.controller.version }))
       tm.sendMessage(c.changelog)
     }
   },
@@ -51,8 +51,8 @@ const events: tm.Listener[] = [
     callback: async (player: tm.JoinInfo): Promise<void> => {
       if (player.visits === 0) { playerCount++ }
       tm.sendMessage(tm.utils.strVar(c.welcome, {
-        name: tm.utils.strip(tm.state.serverConfig.name),
-        version: tm.config.version
+        name: tm.utils.strip(tm.config.server.name),
+        version: tm.config.controller.version
       }), player.login)
       tm.sendMessage(c.changelog, player.login)
       const index: number = tm.records.local.findIndex(a => a.login === player.login)

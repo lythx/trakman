@@ -14,7 +14,7 @@ export class VersionButton extends UiButton {
     super()
     this.buttonData = {
       icon: cfg.icon,
-      text1: tm.utils.strVar(cfg.texts[0], { version: tm.config.version }),
+      text1: tm.utils.strVar(cfg.texts[0], { version: tm.config.controller.version }),
       text2: cfg.texts[1],
       iconWidth: cfg.width,
       iconHeight: cfg.height,

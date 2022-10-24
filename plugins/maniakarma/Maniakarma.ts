@@ -68,11 +68,11 @@ const reinitialize = async (): Promise<void> => {
 
 const authenticate = async (): Promise<true | Error> => {
   const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
-    name: Buffer.from(tm.state.serverConfig.name).toString('base64'),
-    game: tm.state.serverConfig.game,
-    zone: tm.state.serverConfig.zone,
-    nation: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) ?? 'OTH'
+    login: tm.config.server.login,
+    name: Buffer.from(tm.config.server.name).toString('base64'),
+    game: tm.config.server.game,
+    zone: tm.config.server.zone,
+    nation: tm.utils.countryToCode(tm.config.server.zone.split('|')[0]) ?? 'OTH'
   })}`
   const res = await fetch(url).catch((err: Error) => err)
   if (res instanceof Error) {
@@ -92,7 +92,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   playerVotes.length = 0
   if (logins.length === 0) { return [] }
   const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
+    login: tm.config.server.login,
     authcode: authCode,
     uid: tm.maps.current.id,
     map: Buffer.from(tm.maps.current.name).toString('base64'),
@@ -132,7 +132,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
 const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
   if (newVotes.length === 0) { return }
   const url: string = `${apiUrl}?Action=Vote&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
+    login: tm.config.server.login,
     authcode: authCode,
     uid: lastMap.id,
     map: Buffer.from(lastMap.name).toString('base64'),

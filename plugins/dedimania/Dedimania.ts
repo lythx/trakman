@@ -79,7 +79,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
-  const cfg: tm.ServerInfo = tm.state.serverConfig
+  const cfg: tm.ServerInfo = tm.config.server
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
   const players = tm.players.list
   const rawDedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
@@ -89,7 +89,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { string: environment },
       { string: author },
       { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
-      { int: tm.state.gameConfig.gameMode },
+      { int: tm.config.game.gameMode },
       {
         struct: {
           SrvName: { string: cfg.name },
@@ -150,7 +150,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
       { string: environment },
       { string: author },
       { string: 'TMF' },
-      { int: tm.state.gameConfig.gameMode },
+      { int: tm.config.game.gameMode },
       { int: checkpointsAmount },
       { int: config.dediCount },
       { array: recordsArray }
@@ -196,13 +196,13 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>
 const updateServerPlayers = (): void => {
   setInterval(async (): Promise<void> => {
     if (client.connected === false) { return }
-    const cfg: tm.ServerInfo = tm.state.serverConfig
+    const cfg: tm.ServerInfo = tm.config.server
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
     const status: any[] | Error = await client.call('dedimania.UpdateServerPlayers',
       [
         { string: 'TMF' },
-        { int: tm.state.gameConfig.gameMode },
+        { int: tm.config.game.gameMode },
         {
           struct: {
             SrvName: { string: cfg.name },

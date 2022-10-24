@@ -191,7 +191,7 @@ export abstract class Logger {
     }
     if (this.useDiscord === true && this.logTypes[tag].level <= this.discordLogLevel) {
       const embed: EmbedBuilder = new EmbedBuilder()
-        .setTitle(`${tag.toUpperCase()} on server ${tm.state.serverConfig.login}`)
+        .setTitle(`${tag.toUpperCase()} on server ${tm.config.server.login}`)
         .setColor(this.logTypes[tag].discordColour)
         .setTimestamp(new Date())
         .setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
