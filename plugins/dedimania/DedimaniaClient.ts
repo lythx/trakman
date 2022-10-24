@@ -1,8 +1,7 @@
 import { DedimaniaRequest } from './DedimaniaRequest.js'
 import { DedimaniaResponse } from './DedimaniaResponse.js'
 import { Socket } from 'node:net'
-
-import DediConfig from './Config.js'
+import 'dotenv/config'
 
 export class DedimaniaClient {
 
@@ -11,8 +10,16 @@ export class DedimaniaClient {
   private receivingResponse: boolean = false
   private sessionId: string = ''
   private _connected: boolean = false
+  private password: string | undefined
 
-  async connect(host: string, port: number): Promise<true | Error> {
+  async connect(host: string, port: number): Promise<true | { error: Error, isAuthenticationError: boolean }> {
+    if (process.env.DEDIMANIA_PASSWORD === undefined) {
+      return {
+        isAuthenticationError: true,
+        error: new Error(`DEDIMANIA_PASSWORD is undefined. Check your .env file to use the plugin.`)
+      }
+    }
+    this.password = process.env.DEDIMANIA_PASSWORD
     this.receivingResponse = false
     this._connected = false
     this.response = new DedimaniaResponse()
@@ -24,13 +31,13 @@ export class DedimaniaClient {
     const packmask: string | Error = await tm.client.call('GetServerPackMask') as any
     if (packmask instanceof Error) {
       tm.log.error('Failed to fetch server packmask', packmask.message)
-      return packmask
+      return { error: packmask, isAuthenticationError: false }
     }
     const request: DedimaniaRequest = new DedimaniaRequest('dedimania.Authenticate', [{
       struct: {
         Game: { string: 'TMF' },
         Login: { string: tm.state.serverConfig.login },
-        Password: { string: DediConfig.serverPassword },
+        Password: { string: this.password },
         Tool: { string: 'Trakman' },
         Version: { string: tm.config.version },
         Nation: { string: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) },
@@ -46,13 +53,22 @@ export class DedimaniaClient {
         if (this.response.status === 'completed') {
           this.receivingResponse = false
           if (this.response.isError !== null) {
-            resolve(new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`))
+            resolve({
+              error: new Error(`Dedimania server responded with an error ${this.response.errorString} Code: ${this.response.errorCode}`),
+              isAuthenticationError: false
+            })
           } else {
             if (this.response.sessionId === null) {
-              resolve(new Error(`Dedimania server didn't send sessionId. Received: ${this.response.data}`))
+              resolve({
+                error: new Error(`Dedimania server didn't send sessionId. Received: ${this.response.data}`),
+                isAuthenticationError: false
+              })
               return
             } else if (this.response.json[0] === false) {
-              resolve(new Error(`Dedimania authentication failed`))
+              resolve({
+                error: new Error(`Dedimania authentication failed`),
+                isAuthenticationError: true
+              })
               return
             }
             this.sessionId = this.response.sessionId
@@ -63,7 +79,10 @@ export class DedimaniaClient {
         }
         if (Date.now() - 10000 > startDate) { // stop polling after 10 seconds
           this.receivingResponse = false
-          resolve(new Error('No response from dedimania server'))
+          resolve({
+            error: new Error('No response from dedimania server'),
+            isAuthenticationError: false
+          })
           return
         }
         setImmediate(poll)

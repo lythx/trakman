@@ -24,14 +24,13 @@ const emitNicknameUpdateEvent = (updatedRecords: DediRecord[]): void => {
 }
 
 const initialize = async (): Promise<void> => {
-  const status: true | Error = await client.connect(config.host, config.port)
-  if (status instanceof Error) {
-    if (status.message !== 'No response from dedimania server') {
-      tm.log.error('Failed to connect to dedimania', status.message)
+  const status = await client.connect(config.host, config.port)
+  if (status !== true) {
+    if (status.isAuthenticationError === true) {
+      tm.log.error('Failed to connect to dedimania', status.error.message)
       isFailedAuthentication = true
-    }
-    else {
-      tm.log.error(`${status.message}.`, `Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
+    } else {
+      tm.log.error(`${status.error.message}.`, `Attempting to reconnect every ${config.reconnectTimeout} seconds...`)
       void reinitialize()
     }
     return
@@ -43,10 +42,17 @@ const initialize = async (): Promise<void> => {
 }
 
 const reinitialize = async (): Promise<void> => {
-  let status: true | Error
+  let status: true | {
+    error: Error;
+    isAuthenticationError: boolean;
+  }
   do {
     await new Promise((resolve) => setTimeout(resolve, 60000))
     status = await client.connect(config.host, config.port)
+    if (status !== true && status.isAuthenticationError === true) {
+      tm.log.error('Failed to connect to dedimania', status.error.message)
+      return
+    }
   } while (status !== true)
   tm.log.info('Initialized dedimania after an error')
   updateServerPlayers()
@@ -59,10 +65,17 @@ const getRecords = async (id: string, name: string, environment: string, author:
   currentDedis.length = 0
   newDedis.length = 0
   if (client.connected === false) {
-    let status: boolean | Error = false
+    let status: true | {
+      error: Error;
+      isAuthenticationError: boolean;
+    }
     do {
       await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
       status = await client.connect('dedimania.net', config.port)
+      if (status !== true && status.isAuthenticationError === true) {
+        tm.log.error('Failed to connect to dedimania', status.error.message)
+        return
+      }
       if (id !== tm.maps.current.id) { return }
     } while (status !== true)
   }
