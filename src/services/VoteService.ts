@@ -138,13 +138,37 @@ export abstract class VoteService {
     return count === 0 ? 0 : sum / count
   }
 
+  /**
+   * Fetches all the player votes for a given map UID.
+   * @param mapId Map UID
+   * @returns Array of vote objects or undefined if map is not in the database
+   */
   static async fetch(mapId: string): Promise<tm.Vote[] | undefined>
+  /**
+   * Fetches all the player votes for given map UIDs.
+   * @param mapIds Array of Map UIDs
+   * @returns Array of objects containing map UID and vote objects array.
+   * If some map is not in the database it won't be in the returned array.
+   */
   static async fetch(mapIds: string[]): Promise<{ uid: string, votes: tm.Vote[] }[]>
   static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[]> {
     return await this.repo.get(mapIds as any)
   }
 
+  /**
+   * Gets all the player votes for given map UID from the runtime memory.
+   * Only votes for maps in the history, queue and the current map are stored.
+   * @param uid Map UID
+   * @returns Array of vote objects or undefined if map is not in the memory
+   */
   static get(uid: string): tm.Vote[] | undefined
+  /**
+   * Gets all the player votes for given map UIDs from the runtime memory.
+   * Only votes for maps in the history, queue and the current map are stored.
+   * @param uids Array of Map UIDs
+   * @returns Array of objects containing map UID and vote objects array.
+   * If some map is not in the memory it won't be in the returned array.
+   */
   static get(uids: string[]): { uid: string, votes: tm.Vote[] }[]
   static get(uids: string | string[]): tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[] {
     if (typeof uids === 'string') {
@@ -153,14 +177,24 @@ export abstract class VoteService {
     return this._votes.filter(a => uids.includes(a.uid))
   }
 
+  /**
+   * Current map votes.
+   */
   static get current(): Readonly<tm.Vote>[] {
     return this._currentVotes
   }
 
+  /**
+   * Current map vote count.
+   */
   static get currentCount(): number {
     return this._currentVotes.length
   }
 
+  /**
+   * All votes in runtime memory. Only votes for maps in the history, 
+   * queue and the current map are stored.
+   */
   static get votes(): Readonly<{ uid: string, votes: tm.Vote[] }>[] {
     return [...this._votes]
   }

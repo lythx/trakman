@@ -21,7 +21,9 @@ export class MapService {
   private static readonly repo = new MapRepository()
   private static readonly _queue: JukeboxMap[] = []
   private static readonly _history: tm.Map[] = []
+  /** Amout of maps in the queue. */
   static readonly queueSize: number = config.jukeboxQueueSize
+  /** Max amount of maps in the history. */
   static readonly historySize: number = config.jukeboxHistorySize
 
   /**
@@ -486,56 +488,56 @@ export class MapService {
   }
 
   /**
-   * @returns Currently played map
+   * Currently played map.
    */
   static get current(): Readonly<tm.CurrentMap> {
     return this._current
   }
 
   /**
-   * @returns All maps from current playlist
+   * All maps from current playlist.
    */
   static get maps(): Readonly<tm.Map>[] {
     return [...this._maps]
   }
 
   /**
-   * @returns Amount of maps in current playlist
+   * Amount of maps in current playlist.
    */
   static get mapCount(): number {
     return this._maps.length
   }
 
   /**
-   * @returns All maps from jukebox
+   * Maps juked by the players.
    */
   static get jukebox(): ({ map: tm.Map, callerLogin?: string })[] {
     return this._queue.filter(a => a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
   }
 
   /**
-   * @returns Number of maps in jukebox
+   * Amount of maps juked by the players.
    */
   static get jukeboxCount(): number {
     return this._queue.filter(a => a.isForced === true).length
   }
 
   /**
-   * @returns All maps from queue
+   * Map queue (maps juked by the players and the server).
    */
   static get queue(): Readonly<tm.Map>[] {
     return [...this._queue.map(a => a.map)]
   }
 
   /**
-   * @returns All maps from map history
+   * Map history.
    */
   static get history(): Readonly<tm.Map>[] {
     return [...this._history]
   }
 
   /**
-   * @returns Number of maps in map history
+   * Amount of maps in the history.
    */
   static get historyCount(): number {
     return this._history.length

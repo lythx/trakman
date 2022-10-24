@@ -14,7 +14,7 @@ import { prefixes } from '../../config/PrefixesAndPalette.js'
 export abstract class ChatService {
 
   private static readonly messagesArraySize: number = config.chatMessagesInRuntime
-  static readonly _messages: tm.Message[] = []
+  private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
 
@@ -248,14 +248,14 @@ export abstract class ChatService {
   }
 
   /**
-   * @returns Array of message objects
+   * Recent chat messages. Amount of messages depends of TODO
    */
   static get messages(): Readonly<tm.Message>[] {
     return [...this._messages]
   }
 
   /**
-   * @returns Array of command objects
+   * All registered chat commands.
    */
   static get commandList(): tm.Command[] {
     return [...this._commandList]

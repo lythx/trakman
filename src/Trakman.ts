@@ -121,14 +121,30 @@ namespace trakman {
 
     getRank: RecordService.getRank.bind(RecordService),
 
+    /**
+     * Current map local records.
+     */
     get local(): Readonly<tm.LocalRecord>[] { return RecordService.localRecords },
 
+    /**
+     * Number of local records on the current map.
+     */
     get localCount(): number { return RecordService.localRecordCount },
 
+    /**
+     * Current live records.
+     */
     get live(): Readonly<tm.FinishInfo>[] { return RecordService.liveRecords },
 
+    /**
+     * Number of live records.
+     */
     get liveCount(): number { return RecordService.liveRecordsCount },
 
+    /**
+     * Maximum amount of local records. 
+     * All local records get fetched, but only ones below max amount count towards server rank.
+     */
     get maxLocalsAmount(): number { return RecordService.maxLocalsAmount }
 
   }
@@ -141,7 +157,10 @@ namespace trakman {
 
     get: ChatService.get.bind(ChatService),
 
-    get list(): tm.Message[] { return ChatService._messages }
+    /**
+     * Recent chat messages. 
+     */
+    get list(): tm.Message[] { return ChatService.messages }
 
   }
 
@@ -149,6 +168,9 @@ namespace trakman {
 
     add: ChatService.addCommand.bind(ChatService),
 
+    /**
+     * All registered chat commands.
+     */
     get list(): tm.Command[] { return ChatService.commandList }
 
   }
@@ -173,10 +195,19 @@ namespace trakman {
 
     remove: MapService.remove.bind(MapService),
 
+    /**
+     * All maps from current playlist.
+     */
     get list(): Readonly<tm.Map>[] { return MapService.maps },
 
+    /**
+     * Currently played map.
+     */
     get current(): Readonly<tm.CurrentMap> { return MapService.current },
 
+    /**
+     * Amount of maps in current playlist.
+     */
     get count(): number { return MapService.mapCount }
 
   }
@@ -213,20 +244,51 @@ namespace trakman {
 
     getFromHistory: MapService.getFromHistory.bind(MapService),
 
+    /**
+     * Amout of maps in the queue (maps juked by the players and the server). 
+     * This is always equal to maxQueueCount.
+     */
     get queueCount(): number { return MapService.queueSize },
 
+    /**
+     * Amount of maps in the history.
+     */
     get historyCount(): number { return MapService.historyCount },
 
+    /**
+     * Max amount of maps in the queue (maps juked by the players and the server).
+     * This is always equal to queueCount.
+     */
+    get maxQueueCount(): number { return MapService.queueSize },
+
+    /**
+     * Max amount of maps in the history.
+     */
     get maxHistoryCount(): number { return MapService.historySize },
 
+    /**
+     * Amount of maps juked by the players.
+     */
     get jukedCount(): number { return MapService.jukeboxCount },
 
+    /**
+     * Map queue (maps juked by the players and the server).
+     */
     get queue(): Readonly<tm.Map>[] { return MapService.queue },
 
+    /**
+     * Map history.
+     */
     get history(): Readonly<tm.Map>[] { return MapService.history },
 
+    /**
+     * Currently played map.
+     */
     get current(): Readonly<tm.CurrentMap> { return MapService.current },
 
+    /**
+     * Maps juked by the players.
+     */
     get juked() { return MapService.jukebox }
 
   }
@@ -239,11 +301,21 @@ namespace trakman {
 
     get: VoteService.get.bind(VoteService),
 
+    /**
+     * Current map votes.
+     */
     get current(): Readonly<tm.Vote>[] { return VoteService.current },
 
+    /**
+     * Current map vote count.
+     */
     get currentCount(): number { return VoteService.currentCount },
 
-    get list() { return VoteService.votes }
+    /**
+     * All votes in runtime memory. Only votes for maps in the history, 
+     * queue and the current map are stored.
+     */
+    get allVotes() { return VoteService.votes }
 
   }
 
@@ -308,20 +380,44 @@ namespace trakman {
 
     getGuest: AdministrationService.getGuest.bind(AdministrationService),
 
+    /**
+     * Banned players.
+     */
     get banlist(): Readonly<tm.BanlistEntry>[] { return AdministrationService.banlist },
 
+    /**
+     * Blacklisted players.
+     */
     get blacklist(): Readonly<tm.BlacklistEntry>[] { return AdministrationService.blacklist },
 
+    /**
+     * Muted players.
+     */
     get mutelist(): Readonly<tm.MutelistEntry>[] { return AdministrationService.mutelist },
 
+    /**
+     * Server guests.
+     */
     get guestlist(): Readonly<tm.GuestlistEntry>[] { return AdministrationService.guestlist },
 
+    /**
+     * Number of banned players.
+     */
     get banCount(): number { return AdministrationService.banCount },
 
+    /**
+     * Number of blacklisted players.
+     */
     get blacklistCount(): number { return AdministrationService.blacklistCount },
 
+    /**
+     * Number of muted players.
+     */
     get muteCount(): number { return AdministrationService.muteCount },
 
+    /**
+     * Number of guests.
+     */
     get guestCount(): number { return AdministrationService.guestCount }
 
   }
@@ -349,10 +445,6 @@ namespace trakman {
    */
   export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (login !== undefined) {
-      if (login === 'redgreendevil') {
-        console.log(Math.random())
-        console.log(new Error().stack)
-      }
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
