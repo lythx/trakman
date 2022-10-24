@@ -1,7 +1,9 @@
 import http, { ClientRequest } from 'http'
 import config from './Config.js'
+import 'dotenv/config'
 
 let isConnected: boolean = false
+const password = process.env.FREEZONE_PASSWORD
 
 const sendLive = async (): Promise<true | Error> => {
   // Request URL
@@ -25,7 +27,7 @@ const sendLive = async (): Promise<true | Error> => {
     data.serverName = ('Freezone|' + data.serverName).substring(0, 80)
   }
   // Get authentication string
-  const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${config.freezonePassword}`).toString('base64')
+  const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${password}`).toString('base64')
   const options = {
     host: url,
     path: `/freezone/live/`,
@@ -51,6 +53,9 @@ const sendLive = async (): Promise<true | Error> => {
 }
 
 const initialize = async (): Promise<true | Error> => {
+  if (password === undefined) {
+    return new Error('FREEZONE_PASSWORD is undefined. Check your .env file to use the plugin.')
+  }
   const status: true | Error = await sendLive()
   if (status instanceof Error) {
     return new Error('Failed to authenticate on ManiaLive')
