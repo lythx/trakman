@@ -329,7 +329,7 @@ if (config.isEnabled === true) {
     void addRecord(info, info.time, info.checkpoints)
   }, true)
 
-  tm.addListener('PlayerInfoUpdated', (info): void => {
+  tm.addListener('PlayerDataUpdated', (info): void => {
     const changedObjects: DediRecord[] = []
     for (const e of currentDedis) {
       const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname

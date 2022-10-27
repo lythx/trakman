@@ -33,7 +33,7 @@ export default class RoundAveragesRanking extends StaticComponent {
     tm.addListener('BeginMap', () => {
       this.averages.length = 0
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }

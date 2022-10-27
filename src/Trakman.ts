@@ -453,7 +453,7 @@ namespace trakman {
     await PlayerService.updateInfo(...players)
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
-    Events.emit('PlayerInfoUpdated', players)
+    Events.emit('PlayerDataUpdated', players)
   }
 
   /**

@@ -318,6 +318,10 @@ declare global {
       version: string
       build: string
     }
+    export interface PlayerDataUpdatedInfo {
+      readonly login: string, readonly nickname?: string, readonly title?: string,
+      readonly country?: { readonly name: string, readonly code: string, readonly region: string }
+    }
     export interface Events {
       "Startup": 'result' | 'race'
       "PlayerChat": MessageInfo
@@ -331,17 +335,17 @@ declare global {
       "PlayerCheckpoint": CheckpointInfo
       "BeginMap": BeginMapInfo
       "EndMap": EndMapInfo
-      "KarmaVote": KarmaVoteInfo[]
-      "RecordsPrefetch": Readonly<Record>[]
-      "VotesPrefetch": Readonly<Vote>[]
+      "KarmaVote": readonly KarmaVoteInfo[]
+      "RecordsPrefetch":  readonly Readonly<Record>[]
+      "VotesPrefetch": readonly Readonly<Vote>[]
       "MapAdded": MapAddedInfo
       "MapRemoved": MapRemovedInfo
       "BillUpdated": BillUpdatedInfo
-      "MatchSettingsUpdated": Map[]
+      "MatchSettingsUpdated": readonly Readonly<Map>[]
       "PrivilegeChanged": PrivilegeChangedInfo
-      "LocalRecordsRemoved": Record[]
-      "JukeboxChanged": Map[]
-      "RanksAndAveragesUpdated": Readonly<{ login: string, average: number }>[]
+      "LocalRecordsRemoved": readonly Readonly<Record>[]
+      "JukeboxChanged": readonly Readonly<Map>[]
+      "RanksAndAveragesUpdated": readonly Readonly<{ login: string, average: number }>[]
       "Ban": Readonly<BanlistEntry>
       "Unban": Readonly<BanlistEntry>
       "Blacklist": Readonly<BlacklistEntry>
@@ -350,10 +354,7 @@ declare global {
       "Unmute": Readonly<MutelistEntry>
       "AddGuest": Readonly<GuestlistEntry>
       "RemoveGuest": Readonly<GuestlistEntry>
-      "PlayerInfoUpdated": Readonly<{
-        readonly login: string, readonly nickname?: string, readonly title?: string,
-        readonly country?: { readonly name: string, readonly code: string, readonly region: string }
-      }[]>
+      "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
       "TrackMania.PlayerConnect": [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": [number, string, string, boolean]

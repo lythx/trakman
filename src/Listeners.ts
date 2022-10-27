@@ -38,7 +38,7 @@ export class Listeners {
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
         AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
         RecordService.updateInfo({ login, nickname: joinInfo.nickname, region: joinInfo.region, title: joinInfo.title })
-        Events.emit('PlayerInfoUpdated', [{
+        Events.emit('PlayerDataUpdated', [{
           login, nickname: joinInfo.nickname, country: {
             name: joinInfo.country,
             code: joinInfo.countryCode,

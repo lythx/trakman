@@ -42,7 +42,7 @@ export default class BestCps extends StaticComponent {
       this.bestCps.length = 0
       this.display()
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       for (const e of this.bestCps) {
         const newNickname = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }

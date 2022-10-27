@@ -190,8 +190,8 @@ const getJson = (data: string): any => {
 }
 
 function addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void
-function addVote(mapId: string, votes: { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
-function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]
+function addVote(mapId: string, votes: readonly { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
+function addVote(mapId: string, arg: string | readonly { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]
   , vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
   const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic']
   if (Array.isArray(arg)) {
@@ -220,7 +220,7 @@ function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -
     return
   }
   if (vote === undefined) { return }
-  const login: string = arg
+  const login = arg as string
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v: MKVote | undefined = playerVotes.find(a => a.login === login)
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }

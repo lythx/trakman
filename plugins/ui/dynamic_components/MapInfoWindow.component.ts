@@ -33,7 +33,7 @@ export default class TMXWindow extends PopupWindow<number> {
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
 
   private reRender(): void {

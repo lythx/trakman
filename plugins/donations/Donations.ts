@@ -33,7 +33,7 @@ tm.addListener('PlayerLeave', (info): void => {
   onlineDonators = onlineDonators.filter(a => a.login !== info.login)
 })
 
-tm.addListener('PlayerInfoUpdated', (info): void => {
+tm.addListener('PlayerDataUpdated', (info): void => {
   const changedObjects: DonationInfo[] = []
   for (const e of onlineDonators) {
     const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname

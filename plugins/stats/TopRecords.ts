@@ -27,7 +27,7 @@ const initialize = async () => {
   for (const e of nicknameChangeListeners) { e(topList) }
 }
 
-tm.addListener('PlayerInfoUpdated', (info) => {
+tm.addListener('PlayerDataUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname

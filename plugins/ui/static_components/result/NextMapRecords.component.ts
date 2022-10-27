@@ -39,7 +39,7 @@ export default class NextMapRecords extends StaticComponent {
       this.records = tm.records.getFromQueue(mapId)
       this.display()
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('BeginMap', () => {

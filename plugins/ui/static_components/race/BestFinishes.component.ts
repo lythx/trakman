@@ -30,7 +30,7 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       for (const e of this.bestFinishes) {
         const newNickname = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }

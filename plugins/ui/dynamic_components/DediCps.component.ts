@@ -43,7 +43,7 @@ export default class DediCps extends PopupWindow {
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {

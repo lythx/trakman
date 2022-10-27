@@ -36,7 +36,7 @@ export default class Banlist extends PopupWindow<number> {
       this.paginator.setPageCount(Math.ceil(tm.admin.banCount / config.entries))
       this.reRender()
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
     tm.addListener('PrivilegeChanged', (info) => {
       if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
       this.reRender()
