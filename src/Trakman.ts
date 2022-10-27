@@ -458,7 +458,7 @@ namespace trakman {
 
   /**
    * Adds a listener to an event to execute callbacks.
-   * @param event Event to register the callback on
+   * @param event Event or array of events to register the callback on
    * @param callback Callback to register on given event
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
@@ -471,14 +471,16 @@ namespace trakman {
   export const removeListener = Events.removeListener
 
   /**
-   * Handles manialink interaction
+   * Emits ManialinkClick for given player and actionId. 
+   * Used for manialink interaction such as opening UI windows.
    * @param id Manialink ID
    * @param login Player login
    */
   export const openManialink = (id: number, login: string): void => {
-    const temp: any = PlayerService.get(login)
-    temp.actionId = id
-    const info: tm.ManialinkClickInfo = temp
+    const player = PlayerService.get(login)
+    if (player === undefined) { return }
+    const info: tm.ManialinkClickInfo = player as any
+    info.actionId = id
     Events.emit('ManialinkClick', info)
   }
 

@@ -172,7 +172,7 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
-    const status: void | Error = await this.addToJukebox(obj.id, caller, true)
+    const status: true | Error = await this.addToJukebox(obj.id, caller, true)
     if (status instanceof Error) {
       Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
       this.clearJukebox()
@@ -245,8 +245,9 @@ export class MapService {
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player adding the map
    * @param setAsNextMap If true map is going to be placed in front of the queue
+   * @returns True if successfull, Error if map is not in the memory
    */
-  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<void | Error> {
+  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
     const map: tm.Map | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
@@ -258,12 +259,14 @@ export class MapService {
     } else {
       Logger.trace(`Map ${Utils.strip(map.name)} by ${map.author} has been added to the jukebox`)
     }
+    return true
   }
 
   /**
    * Removes a map from the queue
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
+   * @returns True if the map was in the jukebox, false if it wasn't
    */
   static async removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): Promise<boolean> {
     if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
@@ -304,7 +307,7 @@ export class MapService {
 
   /**
    * Randomly changes the order of maps in the maplist
-   * @param caller Object containing login and nickname of player who called the method
+   * @param caller Object containing login and nickname of the player who called the method
    */
   static async shuffle(caller?: { login: string, nickname: string }): Promise<void> {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
@@ -384,7 +387,7 @@ export class MapService {
   static get(uid: string): Readonly<tm.Map> | undefined
   /**
    * Gets multiple maps from current playlist. Playlist is stored in runtime memory.
-   * If some map is not present in memory it won't be returned. Returned array is not in initial order
+   * If some map is not present in memory it won't be returned. Returned array is not in the initial order
    * @param uids Array of map uids
    * @returns Array of map objects
    */
@@ -404,7 +407,7 @@ export class MapService {
   static fetch(uid: string): Promise<tm.Map | undefined>
   /**
    * Fetches multiple maps from the database. This method should be used to get maps which are not in the current Match Settings
-   * If some map is not present in the database it won't be returned. Returned array is not in initial order
+   * If some map is not present in the database it won't be returned. Returned array is not in the initial order
    * @param uids Array of map uids
    * @returns Map objects array
    */
@@ -467,14 +470,14 @@ export class MapService {
   }
 
   /**
-   * Gets a map from jukebox
+   * Gets a map from jukebox.
    * @param uid Map uid
    * @returns jukebox object or undefined if map is not in the jukeboxed
    */
   static getFromJukebox(uid: string): Readonly<{ map: tm.Map, callerLogin?: string }> | undefined
   /**
    * Gets multiple maps from jukebox. If some map is not present in jukebox it won't be returned. 
-   * Returned array is not in initial order
+   * Returned array is not in initial order.
    * @param uids Array of map uids
    * @returns Array of jukebox objects
    */

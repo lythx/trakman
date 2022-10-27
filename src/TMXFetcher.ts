@@ -10,13 +10,16 @@ export abstract class TMXFetcher {
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
 
   /**
-   * Fetches the map from TMX via its UID
+   * Fetches map file from TMX via its UID.
    * @param mapId Map UID
-   * @returns TMX map data or error if unsuccessful
+   * @returns Object containing map name and file content, or Error if unsuccessfull
    */
   static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
   /**
-   * Fetches map gbx file from tmx by TMX id, returns name and file in base64 string
+   * Fetches map file from TMX via its TMX ID.
+   * @param tmxId Map TMX ID
+   * @param site Optional TMX site (TMNF by default)
+   * @returns Object containing map name and file content, or Error if unsuccessfull
    */
   static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
   static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
@@ -72,7 +75,7 @@ export abstract class TMXFetcher {
   }
 
   /**
-   * Fetches TMX for map information
+   * Fetches TMX for map information.
    * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */

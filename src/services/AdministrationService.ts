@@ -673,13 +673,13 @@ export class AdministrationService {
   }
 
   /**
-   * Gets guest information for given login
+   * Gets guest information for given login.
    * @param login Player login
    * @returns Guest object or undefined if the player isn't in the guestlist
    */
   static getGuest(login: string): Readonly<tm.GuestlistEntry> | undefined
   /**
-   * Gets multiple guests information for given logins
+   * Gets multiple guests information for given logins.
    * @param logins Array of player logins
    * @returns Array of guest objects
    */

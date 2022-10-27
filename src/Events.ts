@@ -45,12 +45,15 @@ const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
 }
 
 /**
- * Removes event listener
+ * Removes event listener.
  * @param callback Callback function of the listener to remove
  */
 const removeListener = (callback: Function): void => {
-  const index = eventListeners.findIndex(a => a.callback === callback)
-  if (index !== -1) { eventListeners.splice(index, 1) }
+  let index = eventListeners.findIndex(a => a.callback === callback)
+  while (index !== -1) {
+    eventListeners.splice(index, 1)
+    index = eventListeners.findIndex(a => a.callback === callback)
+  }
 }
 
 /**

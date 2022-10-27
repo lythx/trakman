@@ -230,7 +230,7 @@ export abstract class ChatService {
   }
 
   /**
-   * Fetches chat messages
+   * Fetches chat messages.
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */

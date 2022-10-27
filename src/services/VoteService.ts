@@ -148,7 +148,7 @@ export abstract class VoteService {
    * Fetches all the player votes for given map UIDs.
    * @param mapIds Array of Map UIDs
    * @returns Array of objects containing map UID and vote objects array.
-   * If some map is not in the database it won't be in the returned array.
+   * If some map is not in the database it won't be in the returned array
    */
   static async fetch(mapIds: string[]): Promise<{ uid: string, votes: tm.Vote[] }[]>
   static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[]> {
