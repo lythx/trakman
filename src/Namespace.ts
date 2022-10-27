@@ -322,6 +322,42 @@ declare global {
       readonly login: string, readonly nickname?: string, readonly title?: string,
       readonly country?: { readonly name: string, readonly code: string, readonly region: string }
     }
+    export interface TrackmaniaMapInfo {
+      readonly Uid: string;
+      readonly Name: string;
+      readonly FileName: string;
+      readonly Author: string;
+      readonly Environnement: string;
+      readonly Mood: string;
+      readonly BronzeTime: number;
+      readonly SilverTime: number;
+      readonly GoldTime: number;
+      readonly AuthorTime: number;
+      readonly CopperPrice: number;
+      readonly LapRace: boolean;
+      readonly NbLaps: number;
+      readonly NbCheckpoints: number;
+    }
+    export interface TrackmaniaRankingInfo {
+      readonly Login: string;
+      readonly NickName: string;
+      readonly PlayerId: number;
+      readonly Rank: number;
+      readonly BestTime: number;
+      readonly BestCheckpoints: number[];
+      readonly Score: number;
+      readonly NbrLapsFinished: number;
+      readonly LadderScore: number;
+    }
+    export interface TrackmaniaPlayerInfo {
+      readonly Login: string;
+      readonly NickName: string;
+      readonly PlayerId: number;
+      readonly TeamId: number;
+      readonly SpectatorStatus: number;
+      readonly LadderRanking: number;
+      readonly Flags: number;
+    }
     export interface Events {
       "Startup": 'result' | 'race'
       "PlayerChat": MessageInfo
@@ -336,7 +372,7 @@ declare global {
       "BeginMap": BeginMapInfo
       "EndMap": EndMapInfo
       "KarmaVote": readonly KarmaVoteInfo[]
-      "RecordsPrefetch":  readonly Readonly<Record>[]
+      "RecordsPrefetch": readonly Readonly<Record>[]
       "VotesPrefetch": readonly Readonly<Vote>[]
       "MapAdded": MapAddedInfo
       "MapRemoved": MapRemovedInfo
@@ -360,20 +396,20 @@ declare global {
       "TrackMania.PlayerChat": [number, string, string, boolean]
       "TrackMania.PlayerCheckpoint": [number, string, number, number, number]
       "TrackMania.PlayerFinish": [number, string, number]
-      "TrackMania.BeginRace": any
-      "TrackMania.EndRace": [any[], any]
-      "TrackMania.BeginRound": []
-      "TrackMania.EndRound": []
-      "TrackMania.BeginChallenge": [any, any, any]
-      "TrackMania.EndChallenge": [any, any, boolean, boolean, boolean]
+      "TrackMania.BeginRace": TrackmaniaMapInfo
+      "TrackMania.EndRace": [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo]
+      "TrackMania.BeginRound": void
+      "TrackMania.EndRound": void
+      "TrackMania.BeginChallenge": [TrackmaniaMapInfo, boolean, boolean]
+      "TrackMania.EndChallenge": [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo, boolean, boolean, boolean]
       "TrackMania.StatusChanged": [number, string]
-      "TrackMania.PlayerManialinkPageAnswer": [number, string, any]
+      "TrackMania.PlayerManialinkPageAnswer": [number, string, number]
       "TrackMania.BillUpdated": [number, number, string, number]
-      "TrackMania.ChallengeListModified": [number, number, any]
-      "TrackMania.PlayerInfoChanged": any
+      "TrackMania.ChallengeListModified": [number, number, boolean]
+      "TrackMania.PlayerInfoChanged": TrackmaniaPlayerInfo
       "TrackMania.PlayerIncoherence": [number, string]
-      "TrackMania.Echo": [any, any]
-      "TrackMania.VoteUpdated": [string, string, string, any]
+      "TrackMania.Echo": [string, string]
+      "TrackMania.VoteUpdated": [string, string, string, string]
     }
     export type JoinInfo = Omit<Player, 'currentCheckpoints'> & {
       readonly isSpectator: boolean
