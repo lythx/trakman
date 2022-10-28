@@ -19,8 +19,8 @@ export default class NextMapRecords extends StaticComponent {
     this.posY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.list = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, 5, 5, false, { getColoursFromPb: true, resultMode: true })
+    this.list = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

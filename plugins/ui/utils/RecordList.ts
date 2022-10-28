@@ -81,6 +81,7 @@ export default class RecordList {
    * Util to display record data in manialinks. 
    * It has index, name and time columns, but it also can display more data on click eg. checkpoints.
    * Records and time colours are displayed relative to players personal record.
+   * @param preset Default preset options to use
    * @param parentId Parent element manialink ID
    * @param width List width
    * @param height List height
@@ -91,9 +92,9 @@ export default class RecordList {
    * @param noRecordEntry If true, a placeholder entry gets displayed at the end of the list if the player has no personal record
    * @param options Optional parameters
    */
-  constructor(parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
-    options?: { getColoursFromPb?: true, resultMode?: true }) {
-    this.config = options?.resultMode === true ? resultConfig : raceConfig
+  constructor(preset: 'result' | 'race', parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
+    options?: { getColoursFromPb?: true}) {
+    this.config = preset === 'result' ? resultConfig : raceConfig
     const INFO = this.config.info
     this.columnGap = this.config.columnGap
     this.rowGap = this.config.rowGap

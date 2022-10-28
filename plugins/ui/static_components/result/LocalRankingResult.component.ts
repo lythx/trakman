@@ -16,8 +16,8 @@ export default class LocalRankingResult extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry, { resultMode: true })
+    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

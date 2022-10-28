@@ -45,6 +45,7 @@ export default class VoteWindow {
   }
 
   /**
+   * Starts the vote and awaits result.
    * @param eligibleLogins List of logins of players that can vote
    * @returns Vote result as boolean if time ran out or all the players voted, object containing result and optional caller player object
    * if vote got passed or cancelled, undefined if there is another vote running

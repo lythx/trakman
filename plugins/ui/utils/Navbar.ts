@@ -1,7 +1,7 @@
 import config from './Navbar.config.js'
 
 /**
- * Util to display horizontal navbar, used by popup windows
+ * Util to display horizontal navbar, used by popup windows.
  */
 export default class Navbar {
 
@@ -23,7 +23,8 @@ export default class Navbar {
    * @param background Navbar background
    * @param hoverImgUrl Background image to display on button hover
    */
-  constructor(buttons: { name: string, actionId: number, privilege?: number }[], width: number, height: number | null = config.height,
+  constructor(buttons: { name: string, actionId: number,
+     privilege?: number }[], width: number, height: number | null = config.height,
     background: string = config.background, hoverImgUrl: string = config.hoverImage) {
     this.width = width
     this.height = height ?? config.height
