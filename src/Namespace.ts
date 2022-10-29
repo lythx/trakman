@@ -51,7 +51,7 @@ declare global {
     export interface Player {
       /** 
        * Player server ID (assigned by the dedicated server when the 
-       * player connects). Ranges from 0 to 250 (0 is the server account).
+       * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly id: number
       /** Player login */
@@ -62,7 +62,7 @@ declare global {
       readonly country: string
       /** 3 letter country code ('POL', 'FRA', etc.) */
       readonly countryCode: string
-      /** Player region eg. TODO */
+      /** Player region eg. Russia|Moscow, Serbia|Beograd */
       readonly region: string
       /** Player total playtime (doesn't include current session) */
       readonly timePlayed: number
@@ -105,7 +105,7 @@ declare global {
       readonly country: string
       /** 3 letter country code ('POL', 'FRA', etc.) */
       readonly countryCode: string
-      /** Player region eg. TODO */
+      /** Player region eg. Russia|Moscow, Serbia|Beograd */
       readonly region: string
       /** Player total playtime (doesn't include current session) */
       readonly timePlayed: number
@@ -299,17 +299,17 @@ declare global {
       readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
       /** Map mood ('Sunrise, 'Night', etc.) */
       readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
-      /** Map TMX style (TODO) */
+      /** Map TMX style (eg. Full Speed, LOL) */
       readonly style: string
-      /** Map TMX routes (TODO) */
+      /** Map TMX routes (Single, Multi, Symmetrical) */
       readonly routes: string
-      /** Map TMX length TODO */
+      /** Map TMX length, determined by the map author time eg. 1m30s etc. */
       readonly length: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
       readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
       /** Map TMX leaderboard rating */
       readonly leaderboardRating: number
-      /** TODO */
+      /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
       readonly game: string
       /** Map TMX comment */
       readonly comment: string
@@ -336,7 +336,7 @@ declare global {
     }
     /** TMX replay object */
     export interface TMXReplay {
-      /** TODO */
+      /** TMX replay ID */
       readonly id: number
       /** Player TMX ID */
       readonly userId: number
@@ -348,45 +348,72 @@ declare global {
       readonly recordDate: Date
       /** Date on which the map version the replay was driven on was uploaded to TMX */
       readonly mapDate: Date
-      /** TODO */
+      /** Somehow related to puzzle replays */
       readonly approved: any
       /** Replay TMX leaderobard score */
       readonly leaderboardScore: number
-      /** TODO */
+      /** Somehow related to puzzle replays */
       readonly expires: any
-      /** TODO */
+      /** Replay lock period after upload (puzzle maps only) */
       readonly lockspan: any
       /** Replay file download url */
       readonly url: string
     }
-    // TODO
+    /** Server information object */
     export interface ServerInfo {
+      /** The server name */
       name: string
+      /** The server comment */
       comment: string
+      /** The server player password */
       password: string
+      /** The server spectator password */
       passwordForSpectator: string
+      /** Current round max players amount */
       currentMaxPlayers: number
+      /** Next round max players amount */
       nextMaxPlayers: number
+      /** Current round max spectators amount */
       currentMaxSpectators: number
+      /** Next round max spectators amount */
       nextMaxSpectators: number
+      /** Whether peer-to-peer upload is enabled */
       isP2PUpload: boolean
+      /** Whether peer-to-peer download is enabled */
       isP2PDownload: boolean
+      /** Current round ladder mode (1 = Enabled, 0 = Disabled) */
       currentLadderMode: number
+      /** Next round ladder mode (1 = Enabled, 0 = Disabled) */
       nextLadderMode: number
+      /** Current round vehicle quality (1 = Good, 0 = Bad) */
       currentVehicleNetQuality: number
+      /** Next round vehicle quality (1 = Good, 0 = Bad) */
       nextVehicleNetQuality: number
+      /** Current round callvote timeout time */
       currentCallVoteTimeOut: number
+      /** Next round callvote timeout time */
       nextCallVoteTimeOut: number
+      /** Current callvote ratio */
       callVoteRatio: number
+      /** Whether map downloads are enabled */
       allowMapDownload: boolean
+      /** Whether replay autosaving is enabled */
       autoSaveReplays: boolean
+      /** The server account login */
       login: string
+      /** The server account ID, always 0 */
       id: number
+      /** The server account zone (region) */
       zone: string
+      /** The server public IP address */
       ipAddress: string
+      /** Whether the server account is paid (has the key specified in config) */
       isUnited: boolean
+      /** Dedicated server game version (for TMF, this is always TmForever) */
       game: string
+      /** Dedicated server executable version (for TMF, the latest version is v2011-02-21) */
       version: string
+      /** Dedicated server executable build (for TMF, the latest build is 2.11.26) */
       build: string
     }
     /** Object containing Trackmania coppers bill state information. Created and emitted on the TODO LINK BillUpdated event */
@@ -407,24 +434,35 @@ declare global {
       /** Player nickname */
       readonly nickname: string
       /** Player server ID (assigned by the dedicated server when the 
-       * player connects). Ranges from 0 to 250 (0 is the server account). */
+       * player connects). Ranges from 0 to 250, inclusive (0 is the server account). */
       readonly id: number
-      /** TODO */
+      /** Possibly leftover from earlier versions? Usually undefined or 0. */
       readonly teamId: number
-      /** Player ladder rank TODO maybe ladder points */
+      /** Player ladder rank */
       readonly ladderRanking: number
-      /** TODO */
+      /** The player forcespec mode (TODO CHECK) */
       readonly forceSpectator: number
+      /** Whether the player */
       readonly isReferee: boolean
+      /** Ask Nadeo about this TODO */
       readonly isPodiumReady: boolean
+      /** Whether the player is using 3D mode */
       readonly isUsingStereoscopy: boolean
+      /** Related to relay servers, unsupported */
       readonly isManagedByOtherServer: boolean
+      /** Whether the player is ... the server ..? */
       readonly isServer: boolean
+      /** Whether the player has a reserved player slot */
       readonly hasPlayerSlot: boolean
+      /** Whether the player is a spectator */
       readonly isSpectator: boolean
+      /** Whether the player is in spectator mode temporarily (eg. result screen, TODO? inbetween rounds) */
       readonly isTemporarySpectator: boolean
+      /** TODO FIND OUT */
       readonly isPureSpectator: boolean
+      /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
+      /** Identifier of the player currently being watched by the spectator */
       readonly currentTargetId: number
     }
     /** Object containing player controller privilege information. Created and emitted on the PrivilegeChange event */
@@ -463,61 +501,54 @@ declare global {
       /** Callback function to execute on the event */
       readonly callback: ((params: any) => void)
     }
-    // TODO
+    /** Game information object */
     export interface Game {
+      /** Current server gamemode (Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)) */
       gameMode: number
-      resultTime: number // what the fuck is this
+      /** Amount of time (in msec) to be spent at scoretable */
+      resultTime: number
+      /** Index of the currently played map */
       mapIndex: number
+      /** Amount of points to end the map in rounds mode */
       roundsPointsLimit: number
-      roundsPointSystemType: boolean // or this
+      /** Whether "new rules" are in use TODO (rounds mode)  */
+      roundsPointSystemType: boolean
+      /** Amount of forced laps in rounds mode */
       roundsModeLapsAmount: number
+      /** Amount of time (in msec) to be spent in race */
       timeAttackLimit: number
+      /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
+      /** Amount of points to end the map in teams mode */
       teamPointsLimit: number
+      /** TODO DETERMINE WHAT THIS IS */
       teamMaxPoints: number
-      teamPointSystemType: boolean // or this
-      lapsModeLapsAmount: number // or this
+      /** Whether "new rules" are in use TODO (teams mode) */
+      teamPointSystemType: boolean
+      /** Amount of laps on the current track (laps mode only?) */
+      lapsModeLapsAmount: number
+      /** Amount of time left for players to finish the track after the leader in laps mode */
       lapsModeFinishTimeout: number
+      /** Amount of time left for players to finish the track after the leader in rounds mode */
       roundsModeFinishTimeout: number
+      /** Duration of the warm-up in rounds mode */
       warmUpDuration: number
+      /** Whether disabled respawning on checkpoints is active */
       disableRespawn: boolean
+      /** Whether force display of all opponents is enabled */
       forceShowOpponents: boolean
+      /** Amount of points to end the map in rounds mode when using "new rules" TODO */
       roundsPointLimitSystemType: number
+      /** Amount of points to end the map in teams mode when using "new rules" TODO */
       teamPointLimitSystemType: number
+      /** Amount of points to be gained to win in cup mode */
       cupPointsLimit: number
+      /** Amount of times the map will be replayed until skip in cup mode */
       cupRoundsPerMap: number
+      /** Amount of winners in cup mode */
       cupWinnersAmount: number
+      /** Duration of the warm-up in cup mode */
       cupWarmUpDuration: number
-    }
-    // TODO
-    export interface ServerInfo {
-      name: string
-      comment: string
-      password: string
-      passwordForSpectator: string
-      currentMaxPlayers: number
-      nextMaxPlayers: number
-      currentMaxSpectators: number
-      nextMaxSpectators: number
-      isP2PUpload: boolean
-      isP2PDownload: boolean
-      currentLadderMode: number
-      nextLadderMode: number
-      currentVehicleNetQuality: number
-      nextVehicleNetQuality: number
-      currentCallVoteTimeOut: number
-      nextCallVoteTimeOut: number
-      callVoteRatio: number
-      allowMapDownload: boolean
-      autoSaveReplays: boolean
-      login: string
-      id: number
-      zone: string
-      ipAddress: string
-      isUnited: boolean
-      game: string
-      version: string
-      build: string
     }
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event */
     export interface PlayerDataUpdatedInfo {
@@ -533,7 +564,7 @@ declare global {
         readonly name: string
         /** 3 letter country code ('POL', 'FRA', etc.) */
         readonly code: string
-        /** Player region eg. TODO */
+        /** Player region eg. Russia|Moscow, Serbia|Beograd */
         readonly region: string
       }
     }
@@ -576,20 +607,20 @@ declare global {
       readonly NickName: string;
       /** 
        * Player server ID (assigned by the dedicated server when the 
-       * player connects). Ranges from 0 to 250 (0 is the server account).
+       * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly PlayerId: number;
-      /** TODO */
+      /** Rank on the last race */
       readonly Rank: number;
-      /** Player best finish time TODO */
+      /** Player best finish time */
       readonly BestTime: number;
-      /** Player checkpoint in the best run TODO */
+      /** Player checkpoints in the best run */
       readonly BestCheckpoints: number[];
       /** TODO ???????? */
       readonly Score: number;
-      /** TODO */
+      /** Amount of finished laps */
       readonly NbrLapsFinished: number;
-      /** TODO */
+      /** Player ladderpoints amount */
       readonly LadderScore: number;
     }
     /** Player object received from certain dedicated server callbacks and methods */
@@ -600,14 +631,14 @@ declare global {
       readonly NickName: string;
       /** 
        * Player server ID (assigned by the dedicated server when the 
-       * player connects). Ranges from 0 to 250 (0 is the server account).
+       * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly PlayerId: number;
-      /** TODO */
+      /** Possibly leftover from earlier versions? Usually undefined or 0. */
       readonly TeamId: number;
       /** TODO */
       readonly SpectatorStatus: number;
-      /** TODO */
+      /** Player ladder ranking */
       readonly LadderRanking: number;
       /** TODO */
       readonly Flags: number;
@@ -675,9 +706,9 @@ declare global {
       readonly localRecords: Readonly<Readonly<LocalRecord>[]>
       /** Map live records */
       readonly liveRecords: Readonly<Readonly<FinishInfo>[]>
-      /** TODO */
+      /** Whether the last round played was a warm-up */
       readonly wasWarmUp: boolean
-      /** TODO */
+      /** Whether the race should skip to the next map (cup mode?) */
       readonly continuesOnNextMap: boolean
       /** Login of the winner */
       readonly winnerLogin?: string
