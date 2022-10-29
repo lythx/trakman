@@ -368,7 +368,9 @@ export class RecordService {
    */
   private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
     const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
-    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
+      ` ${Utils.getPositionString(position)} ${recordType} record. Time: ` + `
+    ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
   }
 
   /**

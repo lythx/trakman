@@ -1,5 +1,5 @@
-import { componentIds } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { componentIds, StaticComponent } from '../../UiUtils.js'
+
 import config from './PreviousAndBest.config.js'
 
 export default class PreviousAndBest extends StaticComponent {

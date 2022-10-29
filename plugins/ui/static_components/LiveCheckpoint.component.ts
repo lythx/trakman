@@ -1,4 +1,4 @@
-// import StaticComponent from '../StaticComponent.js'
+// import StaticComponent from '../
 //
 // import { IDS, CONFIG,  staticHeader, stringToObjectProperty, ICONS, centeredText } from '../UiUtils.js'
 

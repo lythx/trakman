@@ -71,7 +71,6 @@ import TopVisits from './dynamic_components/TopVisits.component.js'
 import TopVotes from './dynamic_components/TopVotes.component.js'
 import TopWins from './dynamic_components/TopWins.component.js'
 import TopSums from './dynamic_components/TopSums.component.js'
-
 import icons from './config/Icons.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'

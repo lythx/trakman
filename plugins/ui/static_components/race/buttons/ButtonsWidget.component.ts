@@ -1,5 +1,4 @@
-import { componentIds, Grid, staticButton, GridCellFunction } from '../../../UiUtils.js'
-import StaticComponent from '../../../StaticComponent.js'
+import { componentIds, Grid, staticButton, GridCellFunction, StaticComponent } from '../../../UiUtils.js'
 import { VisitCounter } from './VisitCounter.js'
 import { TimeButton } from './TimeButton.js'
 import { PlayerCounter } from './PlayerCounter.js'

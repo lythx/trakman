@@ -1,6 +1,5 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
-import StaticComponent from '../../StaticComponent.js'
 import config from './DediRankingResult.config.js'
 
 export default class DediRankingResult extends StaticComponent {

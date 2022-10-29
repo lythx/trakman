@@ -1,5 +1,4 @@
-import StaticComponent from '../../StaticComponent.js'
-import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader } from '../../UiUtils.js'
+import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent } from '../../UiUtils.js'
 import config from './BestCps.config.js'
 
 export default class BestCps extends StaticComponent {

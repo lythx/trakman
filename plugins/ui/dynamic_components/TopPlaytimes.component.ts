@@ -1,7 +1,6 @@
-import PopupWindow from "../PopupWindow.js"
 import { stats } from "../../stats/Stats.js"
 import { componentIds, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UiUtils.js"
 import config from './TopPlaytimes.config.js'
 
 export default class TopPlaytimes extends PopupWindow<number> {

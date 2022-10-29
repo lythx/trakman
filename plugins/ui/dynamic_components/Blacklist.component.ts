@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
+
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UiUtils.js'
 import config from './Blacklist.config.js'
 
 export default class Blacklist extends PopupWindow<number> {

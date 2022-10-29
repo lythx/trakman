@@ -12,6 +12,9 @@ import { List } from './utils/List.js'
 import StaticHeader from './utils/StaticHeader.js'
 import staticButton from './utils/StaticButton.js'
 import { addManialinkListener, removeManialinkListener } from './utils/ManialinkListener.js'
+import PopupWindow from './PopupWindow.js'
+import StaticComponent from './StaticComponent.js'
+import DynamicComponent from './DynamicComponent.js'
 
 /**
  * Constructs an invisible manialink covering the entire screen with given actionId and zIndex.
@@ -25,6 +28,7 @@ const fullScreenListener = (actionId: number, zIndex: number = -100): string => 
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
+  PopupWindow, StaticComponent, DynamicComponent,
   componentIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText,

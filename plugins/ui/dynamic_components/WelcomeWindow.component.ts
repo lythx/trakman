@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { Grid, componentIds, GridCellFunction, centeredText } from '../UiUtils.js'
+
+import { Grid, componentIds, GridCellFunction, centeredText, PopupWindow } from '../UiUtils.js'
 import config from './WelcomeWindow.config.js'
 
 export default class WelcomeWindow extends PopupWindow {

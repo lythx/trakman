@@ -1,5 +1,4 @@
-import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener, StaticComponent } from '../../UiUtils.js'
 import config from './AdminPanelResult.config.js'
 
 export default class AdminPanelResult extends StaticComponent {

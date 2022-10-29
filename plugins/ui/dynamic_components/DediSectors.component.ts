@@ -1,6 +1,5 @@
-import PopupWindow from "../PopupWindow.js"
 import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UiUtils.js'
 import config from './DediSectors.config.js'
 
 export default class DediSectors extends PopupWindow {

@@ -1,5 +1,4 @@
-import DynamicComponent from "./DynamicComponent.js"
-import { componentIds } from './UiUtils.js'
+import { componentIds, DynamicComponent } from './UiUtils.js'
 import uitlIds from './config/UtilIds.js'
 import Navbar from './utils/Navbar.js'
 import config from './config/PopupWindow.js'

@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject } from '../UiUtils.js'
+
+import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject, PopupWindow } from '../UiUtils.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 import config from './CheckpointRecords.config.js'
 

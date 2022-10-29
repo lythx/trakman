@@ -1,6 +1,4 @@
-import { componentIds, RecordList, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
-
+import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UiUtils.js'
 import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {

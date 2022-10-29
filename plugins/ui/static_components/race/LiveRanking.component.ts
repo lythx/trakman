@@ -1,5 +1,5 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
+
 import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {

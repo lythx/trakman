@@ -1,5 +1,4 @@
-import { List, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { List, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
 import config from './RoundAveragesRanking.config.js'
 
 export default class RoundAveragesRanking extends StaticComponent {

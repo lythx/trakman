@@ -1,5 +1,4 @@
-import PopupWindow from "../PopupWindow.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UiUtils.js'
 import config from './LiveCps.config.js'
 
 export default class LiveCps extends PopupWindow {

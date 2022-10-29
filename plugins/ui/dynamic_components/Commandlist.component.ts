@@ -1,5 +1,4 @@
-import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener } from "../UiUtils.js"
-import PopupWindow from "../PopupWindow.js"
+import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener, PopupWindow } from "../UiUtils.js"
 import config from './Commandlist.config.js'
 
 interface DisplayParams {

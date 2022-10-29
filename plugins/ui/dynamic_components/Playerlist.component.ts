@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction } from '../UiUtils.js'
+
+import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../UiUtils.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{ page: number, privilege: number }> {
