@@ -1,7 +1,7 @@
 const p = tm.utils.palette
 
 export default {
-  message: `${p.highlight}#{nickname}${p.vote} voted ${p.highlight}#{voteText}${p.vote} for the current map.`,
+  message: `${p.highlight}#{nickname}${p.vote} thinks this map is ${p.highlight}#{voteText}${p.vote}.`,
   voteTexts: {
     '+++': 'fantastic',
     '++': 'beautiful',
