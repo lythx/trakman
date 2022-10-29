@@ -1,4 +1,4 @@
-import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {

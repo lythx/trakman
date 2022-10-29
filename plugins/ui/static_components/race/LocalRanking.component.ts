@@ -1,4 +1,4 @@
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 
 import config from './LocalRanking.config.js'
 

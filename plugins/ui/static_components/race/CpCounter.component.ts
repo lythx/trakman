@@ -1,4 +1,4 @@
-import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UiUtils.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
 import config from './CpCounter.config.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 

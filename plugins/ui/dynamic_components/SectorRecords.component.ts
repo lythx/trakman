@@ -1,5 +1,5 @@
 
-import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject, PopupWindow } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject, PopupWindow } from '../UI.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
 import config from './SectorRecords.config.js'
 

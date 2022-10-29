@@ -1,5 +1,5 @@
 
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UI.js'
 import config from './Guestlist.config.js'
 
 export default class Guestlist extends PopupWindow<number> {

@@ -1,4 +1,4 @@
-import { List, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { List, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './AveragesRanking.config.js'
 

@@ -1,6 +1,6 @@
 
 import { donations } from '../../../donations/Donations.js'
-import { componentIds, StaticHeader, centeredText , StaticComponent} from '../../UiUtils.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
 import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {

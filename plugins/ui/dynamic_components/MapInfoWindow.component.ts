@@ -1,5 +1,5 @@
-import { componentIds, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js"
+import { componentIds, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../UI.js'
+import { Paginator } from "../UI.js"
 import config from './MapInfoWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
 

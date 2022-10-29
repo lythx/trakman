@@ -1,5 +1,5 @@
-import RaceUi from "./config/RaceUi.js"
-import ResultUi from "./config/ResultUi.js"
+import RaceUi from "../config/RaceUi.js"
+import ResultUi from "../config/ResultUi.js"
 
 type DisplayMode = 'race' | 'result' | 'always' | 'none'
 
@@ -19,6 +19,7 @@ export default abstract class StaticComponent {
     race: ['race', 'transition'],
     result: ['result']
   }
+  private static readonly componentCreateListeners: ((component: StaticComponent) => void)[] = []
 
   /**
    * Abstract class for static manialink components
@@ -37,6 +38,9 @@ export default abstract class StaticComponent {
     })
     if (!this.dislayStates[displayMode].includes(tm.state.current)) {
       this._isDisplayed = false
+    }
+    for (const e of StaticComponent.componentCreateListeners) {
+      e(this)
     }
   }
 
@@ -89,6 +93,14 @@ export default abstract class StaticComponent {
   hide(): void {
     this._isDisplayed = false
     tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
+  }
+
+  /**
+   *  Add a callback function to execute when new component object gets created 
+   * @param callback Function to execute on event
+   */
+  static onComponentCreated(callback: (component: StaticComponent) => void) {
+    this.componentCreateListeners.push(callback)
   }
 
 }

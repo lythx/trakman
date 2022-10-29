@@ -1,4 +1,4 @@
-import { componentIds, List, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './MostRecordsRanking.config.js'
 

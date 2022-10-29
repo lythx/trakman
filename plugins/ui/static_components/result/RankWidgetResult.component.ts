@@ -1,4 +1,4 @@
-import { componentIds, StaticComponent } from '../../UiUtils.js'
+import { componentIds, StaticComponent } from '../../UI.js'
 import config from './RankWidgetResult.config.js'
 
 export default class RankWidgetResult extends StaticComponent {

@@ -1,4 +1,4 @@
-import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {
@@ -17,7 +17,7 @@ export default class NextMapRecords extends StaticComponent {
     this.posY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.list = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)

@@ -1,4 +1,4 @@
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UI.js'
 import config from './LocalCps.config.js'
 
 export default class LocalCps extends PopupWindow {

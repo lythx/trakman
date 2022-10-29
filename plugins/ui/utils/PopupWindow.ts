@@ -1,7 +1,8 @@
-import { componentIds, DynamicComponent } from './UiUtils.js'
-import uitlIds from './config/UtilIds.js'
-import Navbar from './utils/Navbar.js'
-import config from './config/PopupWindow.js'
+import { componentIds } from '../UI.js'
+import DynamicComponent from './DynamicComponent.js'
+import uitlIds from '../config/UtilIds.js'
+import Navbar from './Navbar.js'
+import config from '../config/PopupWindow.js'
 
 /**
  * Abstract class for manialink popup windows.

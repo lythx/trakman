@@ -1,4 +1,4 @@
-import { componentIds, StaticComponent } from '../../UiUtils.js'
+import { componentIds, StaticComponent } from '../../UI.js'
 
 import config from './PreviousAndBest.config.js'
 

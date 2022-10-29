@@ -1,5 +1,5 @@
 import { dedimania } from "../../dedimania/Dedimania.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UI.js'
 import config from './DediCps.config.js'
 
 export default class DediCps extends PopupWindow {

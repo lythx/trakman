@@ -1,5 +1,5 @@
 
-import { componentIds, Grid, centeredText, closeButton, Paginator, PopupWindow } from '../UiUtils.js'
+import { componentIds, Grid, centeredText, closeButton, Paginator, PopupWindow } from '../UI.js'
 import config from './CurrentCps.config.js'
 
 interface CurrentCheckpoint {

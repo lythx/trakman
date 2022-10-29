@@ -1,7 +1,7 @@
 import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-import { VoteWindow } from "../../../UiUtils.js"
+import { VoteWindow } from "../../../UI.js"
 import messages from "./Messages.config.js"
 
 const cfg = config.voteSkip

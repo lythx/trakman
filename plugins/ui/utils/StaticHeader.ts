@@ -46,6 +46,10 @@ export default class StaticHeader {
   static raceHeight = raceConfig.height
   /** Defualt height in result preset */
   static resultHeight = resultConfig.height
+  /** Race preset options */
+  static racePreset = raceConfig
+  /** Result preset options */ // TODO DOCUMENT !!!
+  static resultPreset = resultConfig
 
   /**
    * Util to display manialink headers in static UI

@@ -340,6 +340,16 @@ namespace trakman {
      */
     get current(): "race" | "result" | "transition" {
       return GameService.state
+    },
+
+    // TODO DOCUMENT and either rename this or maptime
+    get raceTimeLimit(): number {
+      return GameService.raceTimeLimit
+    },
+
+    // TODO DOCUMENT
+    get resultTimeLimit(): number {
+      return GameService.resultTimeLimit
     }
 
   }

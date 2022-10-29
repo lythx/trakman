@@ -1,5 +1,5 @@
-import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js"
+import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
+import { Paginator } from "../UI.js"
 import { maplist } from '../../maplist/Maplist.js'
 import config from './Maplist.config.js'
 

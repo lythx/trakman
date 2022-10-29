@@ -1,4 +1,4 @@
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'

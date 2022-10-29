@@ -1,5 +1,5 @@
 
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UiUtils.js'
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UI.js'
 import config from './Mutelist.config.js'
 
 export default class Mutelist extends PopupWindow<number> {

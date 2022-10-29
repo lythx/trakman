@@ -1,4 +1,4 @@
-import { RecordList, componentIds, StaticHeader, StaticComponent} from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 
 import config from './DediRanking.config.js'

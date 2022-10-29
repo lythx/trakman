@@ -1,7 +1,7 @@
 import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
-import { componentIds } from '../../../UiUtils.js'
+import { componentIds } from '../../../UI.js'
 
 
 const cfg = config.versionButton

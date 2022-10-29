@@ -1,4 +1,4 @@
-import { componentIds, Grid, StaticHeader, StaticComponent } from '../../UiUtils.js'
+import { componentIds, Grid, StaticHeader, StaticComponent } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'

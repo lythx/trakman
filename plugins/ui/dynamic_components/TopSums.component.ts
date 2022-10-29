@@ -1,6 +1,6 @@
 import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UiUtils.js"
+import { componentIds, centeredText } from '../UI.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UI.js"
 import config from './TopSums.config.js'
 
 export default class TopSums extends PopupWindow<number> {
