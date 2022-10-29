@@ -612,9 +612,10 @@ declare global {
       /** TODO */
       readonly Flags: number;
     }
-    /** TODO */
+    /** Object containing event names and types that get passed as parameters */
     export interface Events {
       "Startup": 'result' | 'race'
+      "ServerStateChanged": ServerState
       "PlayerChat": MessageInfo
       "PlayerJoin": JoinInfo
       "PlayerLeave": LeaveInfo
@@ -646,25 +647,25 @@ declare global {
       "AddGuest": Readonly<GuestlistEntry>
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
-      "TrackMania.PlayerConnect": [string, boolean]
+      "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
-      "TrackMania.PlayerChat": [number, string, string, boolean]
-      "TrackMania.PlayerCheckpoint": [number, string, number, number, number]
-      "TrackMania.PlayerFinish": [number, string, number]
+      "TrackMania.PlayerChat": readonly [number, string, string, boolean]
+      "TrackMania.PlayerCheckpoint": readonly [number, string, number, number, number]
+      "TrackMania.PlayerFinish": readonly [number, string, number]
       "TrackMania.BeginRace": TrackmaniaMapInfo
-      "TrackMania.EndRace": [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo]
+      "TrackMania.EndRace": readonly [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo]
       "TrackMania.BeginRound": void
       "TrackMania.EndRound": void
-      "TrackMania.BeginChallenge": [TrackmaniaMapInfo, boolean, boolean]
-      "TrackMania.EndChallenge": [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo, boolean, boolean, boolean]
-      "TrackMania.StatusChanged": [number, string]
-      "TrackMania.PlayerManialinkPageAnswer": [number, string, number]
-      "TrackMania.BillUpdated": [number, number, string, number]
-      "TrackMania.ChallengeListModified": [number, number, boolean]
+      "TrackMania.BeginChallenge": readonly [TrackmaniaMapInfo, boolean, boolean]
+      "TrackMania.EndChallenge": readonly [readonly TrackmaniaRankingInfo[], TrackmaniaMapInfo, boolean, boolean, boolean]
+      "TrackMania.StatusChanged": readonly [number, string]
+      "TrackMania.PlayerManialinkPageAnswer": readonly [number, string, number]
+      "TrackMania.BillUpdated": readonly [number, number, string, number]
+      "TrackMania.ChallengeListModified": readonly [number, number, boolean]
       "TrackMania.PlayerInfoChanged": TrackmaniaPlayerInfo
-      "TrackMania.PlayerIncoherence": [number, string]
-      "TrackMania.Echo": [string, string]
-      "TrackMania.VoteUpdated": [string, string, string, string]
+      "TrackMania.PlayerIncoherence": readonly [number, string]
+      "TrackMania.Echo": readonly [string, string]
+      "TrackMania.VoteUpdated": readonly [string, string, string, string]
     }
     /** Object containing player information. Created and emitted on the PlayerJoin event */
     export type JoinInfo = Readonly<Omit<Player, 'currentCheckpoints'>>
@@ -745,5 +746,7 @@ declare global {
     export type MessageInfo = Message & Player
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
+    /** Dedicated server state ('result', 'race', 'transition') */
+    export type ServerState = 'result' | 'race' | 'transition'
   }
 }
