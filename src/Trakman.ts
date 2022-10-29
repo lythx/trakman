@@ -479,8 +479,10 @@ namespace trakman {
   export const openManialink = (id: number, login: string): void => {
     const player = PlayerService.get(login)
     if (player === undefined) { return }
-    const info: tm.ManialinkClickInfo = player as any
-    info.actionId = id
+    const info: tm.ManialinkClickInfo = {
+      ...player,
+      actionId: id
+    }
     Events.emit('ManialinkClick', info)
   }
 
