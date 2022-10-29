@@ -76,6 +76,8 @@ import icons from './config/Icons.js'
 import { initialize as initalizeKeyListeners } from './utils/KeyListener.js'
 import modConfig from './config/Mod.js'
 import TestWindow from './test_widgets/TestWindow.js'
+import StaticComponent from './StaticComponent.js'
+import DynamicComponent from './DynamicComponent.js'
 
 let customUi: CustomUi
 const loadMod = (): void => {
@@ -108,6 +110,9 @@ const preloadIcons = (login?: string): void => {
     ${iconArr}
   </manialink>`, login)
 }
+
+const registeredStaticComponents: StaticComponent[] = []
+const registeredDynamicComponents: DynamicComponent[] = []
 
 let staticComponents: {
   readonly rankWidget: RankWidget
@@ -269,6 +274,9 @@ const events: tm.Listener[] = [
 
 for (const event of events) { tm.addListener(event.event, event.callback) }
 
+const isStaticComponent = (component: any): component is StaticComponent =>
+  component.display instanceof Function && component.hide instanceof Function
+
 /**
  * Renders manialink UI.
  * @author lythx & Snake
@@ -277,17 +285,61 @@ for (const event of events) { tm.addListener(event.event, event.callback) }
 export const ui = {
 
   /**
-   * Object containing all static component objects
+   * Registers the UI component.
+   * @param component Static or dynamic UI component
    */
-  get staticComponents() {
-    return staticComponents
+  registerComponent(component: StaticComponent | DynamicComponent): void {
+    if (isStaticComponent(component)) {
+      registeredStaticComponents.push(component)
+    } else {
+      registeredDynamicComponents.push(component)
+    }
+  },
+
+  /** 
+   * Finds a component based on given class name 
+   * @param className Component class name
+   */
+  findComponent(className: string): StaticComponent | DynamicComponent | undefined {
+    return this.componentList.find(a => a.constructor.name === className)
+  },
+
+  /** 
+   * Finds a static component based on given class name 
+   * @param className Component class name
+   */
+  findStaticComponent(className: string): StaticComponent | undefined {
+    return this.staticComponentList.find(a => a.constructor.name === className)
+  },
+
+  /** 
+   * Finds a daynamic component based on given class name 
+   * @param className Component class name
+   */
+  findDynamicComponent(className: string): DynamicComponent | undefined {
+    return this.dynamicComponentList.find(a => a.constructor.name === className)
   },
 
   /**
-   * Object containing all dynamic component objects
+   * All currently registered componenets
    */
-  get dynamicComponents() {
-    return dynamicComponents
+  get componentList(): (StaticComponent | DynamicComponent)[] {
+    return [...Object.values(staticComponents), ...Object.values(dynamicComponents),
+    ...registeredStaticComponents, ...registeredDynamicComponents]
+  },
+
+  /**
+   * All currently registered static componenets
+   */
+  get staticComponentList(): StaticComponent[] {
+    return [...Object.values(staticComponents), ...registeredStaticComponents]
+  },
+
+  /**
+   * All currently registered dynamic componenets
+   */
+  get dynamicComponentList(): DynamicComponent[] {
+    return [...Object.values(dynamicComponents), ...registeredDynamicComponents]
   }
 
 }
