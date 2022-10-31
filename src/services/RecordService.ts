@@ -140,7 +140,6 @@ export class RecordService {
     }
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
-    console.log({ localRecord, finishInfo, liveRecord })
     return { localRecord, finishInfo, liveRecord }
   }
 

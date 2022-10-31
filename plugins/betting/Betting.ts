@@ -39,7 +39,6 @@ export default class BettingWindow extends DynamicComponent {
           this.displayToPlayer(e.login)
         }
         if (tm.state.raceTimeLimit - tm.state.remainingRaceTime < config.time) { return }
-        console.log('asddsa')
         this.iftimehasrunout = true
         if (this.prize === undefined) { // TODO handle one player
           tm.sendMessage(`${p.server}No bets have been placed. Try again next round.`)
