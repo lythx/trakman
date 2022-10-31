@@ -14,7 +14,7 @@ declare global {
       readonly author: string
       /** Map environment ('Stadium', 'Island', etc.) */
       readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
-      /** Map mood ('Sunrise, 'Night', etc.) */
+      /** Map mood ('Sunrise', 'Night', etc.) */
       readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
       /** Bronze medal time */
       readonly bronzeTime: number

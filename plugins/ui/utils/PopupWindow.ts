@@ -151,7 +151,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   /**
-   * Method called on displayToPlayer, by default it constructs navbar from parameters passed to constructor
+   * Method called on displayToPlayer, by default it constructs navbar from parameters passed to constructor.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -162,7 +162,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   /**
-   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window content
+   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window content.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -171,7 +171,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected abstract constructContent(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
 
   /**
-   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer
+   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -180,7 +180,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected abstract constructFooter(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
 
   /**
-   * Displays window to given player based on manialink XML strings returned by construct methods
+   * Displays window to given player based on manialink XML strings returned by construct methods.
    * @param login Player login
    * @param params Display params to be passed to construct methods
    * @param topRightText Text displayed in right part of the header

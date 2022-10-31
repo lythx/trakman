@@ -1,5 +1,5 @@
 /**
- * Abstract class for dynamic manialink components
+ * Abstract class for dynamic manialink components.
  */
 export default abstract class DynamicComponent {
 
@@ -23,8 +23,9 @@ export default abstract class DynamicComponent {
   /**
    * Displays the manialink to given player
    * @param login Player login
+   * @param params Optional params
    */
-  abstract displayToPlayer(login: string): void
+  abstract displayToPlayer(login: string, params?: any): void
 
   /**
    * Hides the manialink for given player

@@ -1,3 +1,112 @@
+# UI Component Templates
+## StaticComponent
+Abstract class for static manialink components.  
+***Methods:***
+- **constructor(id: number, displayMode: DisplayMode)**  
+  - `id` Component manialink ID
+  - `displayMode` Events preset on which manialink will get displayed and hidden
+- **getRelativePosition(): { x: number, y: number, side: boolean }**   
+Gets position relative to other static manialinks based on config.
+  - `Returns` Object containing coordinates and side of the component
+- ***abstract* display(params?: any): void**    
+Displays the manialink to all the players**
+  - `params` Optional params
+- ***abstract* displayToPlayer(login: string, params?: any): void**  
+Displays the manialink to given player
+  - `login` Player login
+  - `params` Optional params
+- **hide(): void**  
+Hides the manialink for all players
+
+***Properties:***
+- `isDisplayed` Boolean indicating whether component should be displayed according to preset display mode.
+- `displayMode` Events preset on which manialink gets displayed and hidden
+- `id` Component manialink ID
+
+## DynamicComponent
+Abstract class for dynamic manialink components.
+
+***Methods:***
+- **constructor(id: number)**  
+  - `id` Component manialink ID
+- ***abstract* displayToPlayer(login: string, params?: any): void**  
+Displays the manialink to given player
+  - `login` Player login
+  - `params` Optional params
+- **hideToPlayer(login: string) : void**  
+Hides the manialink for given player
+  - `login` Player login  
+
+***Properties***:
+- `id` Component manialink ID
+
+## PopupWindow
+Abstract class for manialink popup windows.  
+*generic* `<DisplayParams = any>` DisplayParams is type passed from display function to construct functions.
+
+***Methods:***
+- **constructor(windowId: number, headerIcon: string, title: string, navbar: { name: string, actionId: number, privilege?: number }[] = [], windowHeight: number = config.windowHeight, windowWidth: number = config.windowWidth)**  
+  - `windowId` Window ID. All PopupWindows have the same manialink ID. Use openId to access this property
+  - `headerIcon` Header image url
+  - `title` Header title
+  - `navbar` Array of objects containing navbar entry name, action ID and optional privilege
+  - `windowHeight` Window height
+  - `window` Width Window width
+
+- **displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number): Promise<void>**  
+Displays window to given player based on manialink XML strings returned by construct methods.
+  * @param `login` Player login
+  * @param `params` Display params to be passed to construct methods
+  * @param `topRightText` Text displayed in right part of the header
+  * @param `privilege` Player privilege
+
+- ***abstract* constructContent(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>**  
+Method called on displayToPlayer. It returns manialink XML string to be displayed inside window content.
+  * @param `login` Player login
+  * @param `params` Display params passed to displayToPlayer
+  * @param `privilege` Player privilege
+  * @returns Content XML string
+  
+- ***abstract* constructFooter(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>**  
+Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer.
+  * @param `login` Player login
+  * @param `params` Display params passed to displayToPlayer
+  * @param `privilege` Player privilege
+  * @returns Footer XML string
+
+- **constructNavbar(login: string, params?: DisplayParams, privilege?: number): string**  
+Method called on displayToPlayer, by default it constructs navbar from parameters passed to constructor.
+  * @param `login` Player login
+  * @param `params` Display params passed to displayToPlayer
+  * @param `privilege` Player privilege
+  * @returns Navbar XML string
+
+- **onOpen(info: tm.ManialinkClickInfo): void**  
+Method called on openId action ID. By default it displays the window to the player.
+  * @param `info` Manialink event info
+
+- **onClose(info: tm.ManialinkClickInfo): void**  
+Method called on openId action ID. By default it hides the window to the player.
+  * @param `info` Manialink event info
+
+***Properties:***  
+- `openId` Action ID used to open the window
+- `closeId` Action ID used to close the window
+- `headerIcon` Header image url
+- `title` Header title
+- `navbar` Navbar object
+- `navbarHeight` Navbar height
+- `windowWidth` Full window width
+- `windowHeight` Full window height
+- `contentWidth` Window content width (middle part)
+- `contentHeight` Window content height (middle part)
+- `headerHeight` Header height
+- `headerBackground` Header background colour
+- `background` Background colour
+- `margin` Margin between window parts
+- `footerHeight` Footer height
+- `headerPageWidth` Right header part width (usually used for page display)
+
 # UI Utils
 ## Grid
 Util to display tabular data in manialinks. It's used in almost every popup window and some static manialinks too.  
@@ -72,9 +181,9 @@ Util to display record data in manialinks. It has index, name and time columns, 
 Registers a callback function to execute on record click
   - `callback` Callback function, it takes ManialinkClickInfo as a parameter
 - **constructXml(login: string, allRecords: UiRecord[]): string**  
-Constructs record list XML for given player from passed array of record objects
+Constructs record list XML for given player from passed array of record objects.
   - `login` Player login
-  - `allRecords` Array of record objects
+  - `allRecords` Array of record objects TODO LINK
   - `Returns` Record list XML string
 
 ***Properties***:
@@ -215,3 +324,101 @@ Passes the vote
 - **cancel(caller?: tm.Player): void**  
 Cancels the vote
   - `caller` Caller player object
+
+## closeButton
+**(actionId: number, parentWidth: number, parentHeight: number, options?: CloseButtonOptions): string**  
+Constructs XML string for "X" button manialink. Used in popup windows.
+- `actionId` Action ID to execute on click
+- `parentWidth` Width of parent element
+- `parentHeight` Height of parent element
+- `options` Optional properties TODO LINK
+- `Returns` Button XML string
+
+## fullScreenListener
+**(actionId: number, zIndex: number = -100): string**  
+Constructs an invisible manialink covering the entire screen with given actionId and zIndex.
+- `actionId` Manialink Action ID
+- `zIndex` Manialink Z position 
+- `Returns` Manialink XML string
+
+## getCpTypes
+**(checkpoints: number[][]): ('best' | 'worst' | 'equal' | undefined)[][]**  
+Finds best, equal and worst times for each checkpoint.
+- `checkpoints` 2D array containing checkpoint times
+- `Returns` 2D array containing checkpoint types
+
+## addKeyListener
+**(key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void, importance: number)**  
+Registers a callback function to execute on given key press.
+- `key` Key to register listener on
+- `callback` Function to execute on key press, it takes ManialinkClickInfo as a parameter
+- `importance` Importance index - only the function with highest importance index will get executed
+
+## removeKeyListener
+**(callback: (info: tm.ManialinkClickInfo) => void)**  
+Removes a key listener.
+- `callback` Reference to function to remove
+
+## addManialinkListener
+**(actionId: number, callback: (info: tm.ManialinkClickInfo) => void): void**  
+Adds a callback function to execute on given Action ID.
+- `actionId` Manialink Action ID
+- `callback` Callback function, it takes ManialinkClickInfo as a parameter
+
+**(actionId: number, range: number, callback: (info: tm.ManialinkClickInfo, actionIdOffset: number) => void): void**  
+Adds a callback function to execute on given Action ID range.
+- `actionId` Starting manialink Action ID
+- `range` Range of Action IDs (inludes starting Action ID)
+- `callback` Callback function, it takes ManialinkClickInfo and id offset as a parameter
+
+## removeManialinkListener
+**(callback: (info: tm.ManialinkClickInfo) => void)**  
+Removes a manialink listener.
+- `callback` Reference to function to remove
+
+## staticButton
+**(iconUrl: string, text1: string, text2: string, width: number, height: number, options?: StaticButtonOptions): string**  
+Constructs button manialink used in static UI.
+- `iconUrl` Button image url
+- `text1` Top text
+- `text2` Bottom text
+- `width` Button width
+- `height` Button height
+- `options` Optional parameters TODO LINK
+- `Returns` Button XML string
+
+## centeredText
+**(text: string, parentWidth: number, parentHeight: number, options?: UITextOptions): string**  
+Constructs manialink with centered text.
+- `text` Text to display
+- `parentWidth` Parent element width
+- `parentHeight` Parent element height
+- `options` Optional parameters TODO LINK
+- `Returns` Text XML string
+
+## leftAlignedText
+**(text: string, parentWidth: number, parentHeight: number, options?: UITextOptions): string**  
+Constructs manialink with left aligned and vertically centered text.
+- `text` Text to display
+- `parentWidth` Parent element width
+- `parentHeight` Parent element height
+- `options` Optional parameters
+- `Returns` Text XML string
+
+## rightAlignedText
+**(text: string, parentWidth: number, parentHeight: number, options?: UITextOptions): string**  
+Constructs manialink with right aligned and vertically centered text
+- `text` Text to display
+- `parentWidth` Parent element width
+- `parentHeight` Parent element height
+- `options` Optional parameters
+- `Returns` Text XML string
+
+## horizontallyCenteredText
+**(text: string, parentWidth: number, parentHeight: number, options?: UITextOptions): string**  
+Constructs manialink with horizontally centered text
+- `text` Text to display
+- `parentWidth` Parent element width
+- `parentHeight` Parent element height
+- `options` Optional parameters
+- `Returns` Text XML string

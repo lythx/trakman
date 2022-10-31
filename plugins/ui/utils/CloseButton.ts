@@ -1,5 +1,11 @@
 import config from './CloseButton.config.js'
 
+interface CloseButtonOptions {
+  width?: number,
+  height?: number,
+  padding?: number
+}
+
 /**
  * Constructs XML string for "X" button manialink
  * @param actionId Action ID to execute on click
@@ -9,7 +15,7 @@ import config from './CloseButton.config.js'
  * @returns Button XML string
  */
 export const closeButton = (actionId: number, parentWidth: number,
-  parentHeight: number, options?: { width?: number, height?: number, padding?: number }): string => {
+  parentHeight: number, options?: CloseButtonOptions): string => {
   const width: number = options?.width ?? config.buttonWidth
   const height: number = options?.height ?? config.buttonHeight
   const padding: number = options?.padding ?? config.padding

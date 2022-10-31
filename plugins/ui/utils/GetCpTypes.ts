@@ -1,5 +1,5 @@
 /**
- * Finds best, equal and worst times for each checkpoint
+ * Finds best, equal and worst times for each checkpoint.
  * @param checkpoints 2D array containing checkpoint times
  * @returns 2D array containing checkpoint types
  */

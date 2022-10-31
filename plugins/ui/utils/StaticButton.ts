@@ -1,8 +1,17 @@
 import { horizontallyCenteredText } from './TextUtils.js'
 import config from './StaticButton.config.js'
 
+interface StaticButtonOptions {
+  equalTexts?: boolean,
+  actionId?: number,
+  link?: string,
+  iconWidth?: number,
+  iconHeight?: number,
+  topPadding?: number
+}
+
 /**
- * Constructs button manialink used in static UI
+ * Constructs button manialink used in static UI.
  * @param iconUrl Button image url
  * @param text1 Top text
  * @param text2 Bottom text
@@ -12,7 +21,7 @@ import config from './StaticButton.config.js'
  * @returns Button XML string
  */
 export default function (iconUrl: string, text1: string, text2: string, width: number, height: number,
-   options?: { equalTexts?: true, actionId?: number, link?: string, iconWidth?: number, iconHeight?: number, topPadding?: number }): string {
+  options?: StaticButtonOptions): string {
   const t1: string = options?.equalTexts ?
     horizontallyCenteredText(text1, width, height, { yOffset: config.yOffset, textScale: config.textScale, padding: config.padding }) :
     horizontallyCenteredText(text1, width, height, { yOffset: config.yOffsetBig, textScale: config.textScaleBig, padding: config.padding })

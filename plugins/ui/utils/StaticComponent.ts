@@ -4,12 +4,12 @@ import ResultUi from "../config/ResultUi.js"
 type DisplayMode = 'race' | 'result' | 'always' | 'none'
 
 /**
- * Abstract class for static manialink components
+ * Abstract class for static manialink components.
  */
 export default abstract class StaticComponent {
 
   /** Events preset on which manialink gets displayed and hidden */
-  displayMode: DisplayMode
+  readonly displayMode: DisplayMode
   private _isDisplayed: boolean = true
   /** Component manialink ID */
   readonly id: number
@@ -50,7 +50,7 @@ export default abstract class StaticComponent {
   }
 
   /**
-   * Gets position relative to other static manialinks based on config
+   * Gets position relative to other static manialinks based on config.
    * @returns Object containing coordinates and side of the component
    */
   protected getRelativePosition(): { x: number, y: number, side: boolean } {
@@ -73,7 +73,7 @@ export default abstract class StaticComponent {
   }
 
   /**
-   * Boolean indicating whether component should be displayed according to preset display mode
+   * Boolean indicating whether component should be displayed according to preset display mode.
    */
   get isDisplayed(): boolean {
     return this._isDisplayed
@@ -81,19 +81,19 @@ export default abstract class StaticComponent {
 
   /**
    * Displays the manialink to all the players
-   * @param params Params passed to construct functions
+   * @param params Optional params
    */
   abstract display(params?: any): void
 
   /**
    * Displays the manialink to given player
    * @param login Player login
-   * @param params Params passed to construct functions
+   * @param params Optional params
    */
   abstract displayToPlayer(login: string, params?: any): void
 
   /**
-   * Hides the manialink
+   * Hides the manialink for all players
    */
   hide(): void {
     this._isDisplayed = false
@@ -101,7 +101,7 @@ export default abstract class StaticComponent {
   }
 
   /**
-   *  Add a callback function to execute when new component object gets created 
+   * Add a callback function to execute when new component object gets created 
    * @param callback Function to execute on event
    */
   static onComponentCreated(callback: (component: StaticComponent) => void) {
