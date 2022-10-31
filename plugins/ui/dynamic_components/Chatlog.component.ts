@@ -1,6 +1,6 @@
 
 import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../UI.js'
-import config from './Chatlog.config'
+import config from './Chatlog.config.js'
 
 export default class ChatLog extends PopupWindow<{ page: number }> {
 
