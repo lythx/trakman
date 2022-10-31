@@ -200,10 +200,13 @@ export class Listeners {
         isRestart = restart
         GameService.state = 'result'
         // Get winner login from the callback
-        const login: string | undefined = winner?.Login
+        let login: string | undefined
+        let wins: number | undefined
         // Only update wins if the player is not alone on the server and exists
-        const wins: number | undefined = (login === undefined || PlayerService.players.length === 1
-          || winner?.BestTime === -1) ? undefined : await PlayerService.addWin(login)
+        if (winner?.Login !== undefined && PlayerService.players.length !== 1 && winner?.BestTime !== -1) {
+          login = winner?.Login
+          wins = await PlayerService.addWin(login)
+        }
         const endMapInfo: tm.EndMapInfo = {
           ...MapService.current,
           wasWarmUp: wasWarmUp,

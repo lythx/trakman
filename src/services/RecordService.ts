@@ -24,7 +24,6 @@ export class RecordService {
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
-    await this.updateQueue()
     this._localRecords = await this.repo.getLocalRecords(MapService.current.id)
     this._initialLocals.push(...this._localRecords)
     await this.updateQueue()
@@ -34,6 +33,7 @@ export class RecordService {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
+    Events.addListener('JukeboxChanged', () => this.updateQueue())
     Events.addListener('LocalRecord', (info) => {
       const ranks = this._playerRanks.filter(a => a.mapId === tm.maps.current.id)
       const rec = ranks.find(a => a.login === info.login)
@@ -252,7 +252,7 @@ export class RecordService {
   /**
    * Updates records for maps in queue
    */
-  static async updateQueue(): Promise<void> {
+  private static async updateQueue(): Promise<void> {
     const arr: { mapId: string, records: tm.Record[] }[] = []
     const mapsToFetch: string[] = []
     const queue = MapService.queue
@@ -344,7 +344,7 @@ export class RecordService {
       privilege: player.privilege,
       visits: player.visits,
       position,
-      previous: (previousTime && previousPosition) ? {time: previousTime , position: previousPosition} : undefined,
+      previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited,

@@ -197,8 +197,9 @@ function addVote(mapId: string, arg: string | readonly { login: string, vote: -3
   if (Array.isArray(arg)) {
     const updated: MKVote[] = []
     for (const e of arg) {
-      mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
       const v: MKVote | undefined = playerVotes.find(a => a.login === e.login)
+      if(v?.login === e.login && v?.vote === e.vote) { continue }
+      mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
       if (v === undefined) {
         const obj = { mapId, login: e.login, vote: e.vote }
         playerVotes.push(obj)
@@ -215,14 +216,15 @@ function addVote(mapId: string, arg: string | readonly { login: string, vote: -3
       const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
       const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
       mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur): number => acc + cur, 0) / count
-      emitVote(...updated)
     }
+    emitVote(...updated)
     return
   }
   if (vote === undefined) { return }
   const login = arg as string
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v: MKVote | undefined = playerVotes.find(a => a.login === login)
+  if(v?.login === login && v.vote === vote) { return }
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
   else {
     mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
@@ -247,11 +249,7 @@ const fixCoherence = async (): Promise<void> => {
       tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
     }
   }
-  for (const e of localVotes) {
-    if (!mkVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-      addVote(e.mapId, e.login, e.vote)
-    }
-  }
+  addVote(tm.maps.current.id, localVotes)
 }
 
 const onBeginMap = async (isRestart: boolean): Promise<void> => {

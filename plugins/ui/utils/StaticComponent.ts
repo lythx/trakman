@@ -29,7 +29,12 @@ export default abstract class StaticComponent {
   constructor(id: number, displayMode: DisplayMode) {
     this.id = id
     this.displayMode = displayMode
-    tm.addListener(['EndMap', 'BeginMap'], () => {
+    tm.addListener('EndMap', (info) => {
+      if(info.isRestart && info.winnerLogin === undefined) { return }
+      this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
+      this._isDisplayed ? this.display() : this.hide()
+    }, true)
+    tm.addListener('BeginMap', () => {
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
       this._isDisplayed ? this.display() : this.hide()
     }, true)

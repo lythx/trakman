@@ -19,7 +19,7 @@ export abstract class VoteService {
     const maps = [MapService.current, ...MapService.queue]
     for (let i: number = 0; i < maps.length; i++) {
       const uid: string = maps[i].id
-      this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
+      this._votes.push({ uid, votes: res.filter(a => a.mapId === uid) })
     }
     this._currentVotes = this._votes[0].votes
     Events.addListener('JukeboxChanged', () => {
@@ -181,7 +181,7 @@ export abstract class VoteService {
    * Current map votes.
    */
   static get current(): Readonly<tm.Vote>[] {
-    return this._currentVotes
+    return [...this._currentVotes]
   }
 
   /**
@@ -195,7 +195,7 @@ export abstract class VoteService {
    * All votes in runtime memory. Only votes for maps in the history, 
    * queue and the current map are stored.
    */
-  static get votes(): Readonly<{ uid: string, votes: tm.Vote[] }>[] {
+  static get votes(): Readonly<{ uid: string, readonly votes: Readonly<tm.Vote[]> }>[] {
     return [...this._votes]
   }
 
