@@ -25,7 +25,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       this.displayToPlayer(login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener(['PlayerLeave', 'PlayerJoin', 'PlayerInfoChanged', 'Mute', 'Unmute', 'AddGuest', 'RemoveGuest'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
     tm.addListener('PrivilegeChanged', (info) => {
