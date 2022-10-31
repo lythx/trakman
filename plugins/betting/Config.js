@@ -1,7 +1,7 @@
 import { raceConfig, StaticHeader } from "../ui/UI.js"
 
 export default {
-  enabled: true,
+  enabled: false,
   id: 7777777777,
   posX: raceConfig.leftPosition + raceConfig.width + raceConfig.marginBig,
   posY: raceConfig.topBorder - (raceConfig.leftSideOrder[0].height + raceConfig.leftSideOrder[1].height

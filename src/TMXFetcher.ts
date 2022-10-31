@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
+import config from '../config/Config.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
@@ -8,6 +9,64 @@ export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
+  private static readonly environments = {
+    1: 'Snow',
+    2: 'Desert',
+    3: 'Rally',
+    4: 'Island',
+    5: 'Coast',
+    6: 'Bay',
+    7: 'Stadium'
+  } as const
+  private static readonly difficulties = {
+    0: 'Beginner',
+    1: 'Intermediate',
+    2: 'Expert',
+    3: 'Lunatic'
+  } as const
+  private static readonly moods = {
+    0: 'Sunrise',
+    1: 'Day',
+    2: 'Sunset',
+    3: 'Night'
+  } as const
+  private static readonly routes = {
+    0: 'Single',
+    1: 'Multiple',
+    2: 'Symmetrical'
+  } as const
+  private static readonly mapTypes = {
+    0: 'Race',
+    1: 'Puzzle',
+    2: 'Platform',
+    3: 'Stunts',
+    4: 'Shortcut',
+    5: 'Laps'
+  } as const
+  private static readonly cars = {
+    1: 'SnowCar',
+    2: 'DesertCar',
+    3: 'RallyCar',
+    4: 'IslandCar',
+    5: 'CoastCar',
+    6: 'BayCar',
+    7: 'StadiumCar'
+  } as const
+  private static readonly styles = {
+    0: 'Normal',
+    1: 'Stunt',
+    2: 'Maze',
+    3: 'Offroad',
+    4: 'Laps',
+    5: 'Fullspeed',
+    6: 'LOL',
+    7: 'Tech',
+    8: 'SpeedTech',
+    9: 'RPG',
+    10: 'PressForward',
+    11: 'Trial',
+    12: 'Grass'
+  } as const
 
   /**
    * Fetches map file from TMX via its UID.
@@ -169,8 +228,63 @@ export abstract class TMXFetcher {
     return mapInfo
   }
 
-  private static siteToPrefix(game: tm.TMXSite): TMXPrefix {
-    return this.prefixes[this.sites.indexOf(game)]
+  /**
+   * Searches for maps matching the specified name on TMX,
+   * @param query Search query
+   * @param site TMX Site to fetch from
+   * @param count Number of maps to fetch
+   * @returns An array of searched map objects or Error if unsuccessfull
+   */
+  static async searchForMap(query: string, site: tm.TMXSite = 'TMNF', 
+  count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
+    const prefix = this.siteToPrefix(site)
+    const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
+      ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
+        `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
+      ['count', count.toString()],
+      ['name', query]
+    ])}`
+    const res = await fetch(url).catch((err: Error) => err)
+    if (res instanceof Error) {
+      return res
+    }
+    const data = (await res.json() as any).Results
+    const ret: tm.TMXSearchResult[] = []
+    for (const e of data) {
+      ret.push({
+        id: e.UId,
+        TMXId: e.TrackId,
+        name: e.TrackName,
+        authorId: e.Authors[0].User.UserId,
+        author: e.Authors[0].User.Name,
+        uploadDate: new Date(e.UploadedAt),
+        lastUpdateDate: new Date(e.UpdatedAt),
+        type: this.mapTypes[e.PrimaryType as keyof typeof this.mapTypes],
+        environment: this.environments[e.Environment as keyof typeof this.environments],
+        mood: this.moods[e.Mood as keyof typeof this.moods],
+        style: this.styles[e.Style as keyof typeof this.styles],
+        routes: this.routes[e.Routes as keyof typeof this.routes],
+        difficulty: this.difficulties[e.Difficulty as keyof typeof this.difficulties],
+        game: site,
+        comment: e.AuthorComments,
+        commentsAmount: e.Comments,
+        awards: e.Awards,
+        pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${e.TrackId}`,
+        screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${e.TrackId}`,
+        thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${e.TrackId}`,
+        downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${e.TrackId}`,
+        bronzeTime: e.BronzeTarget,
+        silverTime: e.SilverTarget,
+        goldTime: e.GoldTarget,
+        authorTime: e.AuthorTime,
+        car: this.cars[e.Car as keyof typeof this.cars]
+      })
+    }
+    return ret
+  }
+
+  private static siteToPrefix(site: tm.TMXSite): TMXPrefix {
+    return this.prefixes[this.sites.indexOf(site)]
   }
 
 }

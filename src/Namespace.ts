@@ -359,6 +359,61 @@ declare global {
       /** Replay file download url */
       readonly url: string
     }
+    /** TODO DOCUMENT */
+    export interface TMXSearchResult {
+      /** Map UID */
+      readonly id: string
+      /** Map TMX ID */
+      readonly TMXId: number
+      /** Map name */
+      readonly name: string
+      /** Map author TMX ID */
+      readonly authorId: number
+      /** Map author login */
+      readonly author: string
+      /** Date on which the map was uploaded to TMX */
+      readonly uploadDate: Date
+      /** Date on which the current version of the map was uploaded to TMX */
+      readonly lastUpdateDate: Date
+      /** TMX map type ('Race', 'Stunts', etc.) */
+      readonly type: string
+      /** Map environment ('Stadium', 'Island', etc.) */
+      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      /** Map mood ('Sunrise, 'Night', etc.) */
+      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      /** Map TMX style (eg. Full Speed, LOL) */
+      readonly style: string
+      /** Map TMX routes (Single, Multi, Symmetrical) */
+      readonly routes: string
+      /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
+      readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+      /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
+      readonly game: string
+      /** Map TMX comment */
+      readonly comment: string
+      /** Number of TMX player comments for the map */
+      readonly commentsAmount: number
+      /** Map TMX awards count */
+      readonly awards: number
+      /** Map TMX page url */
+      readonly pageUrl: string
+      /** Map TMX screenshot url */
+      readonly screenshotUrl: string
+      /** Map TMX thumbnail url */
+      readonly thumbnailUrl: string
+      /** Map file download url */
+      readonly downloadUrl: string
+      /** Bronze medal time */
+      readonly bronzeTime: number
+      /** Silver medal time */
+      readonly silverTime: number
+      /** Gold medal time */
+      readonly goldTime: number
+      /** Author medal time */
+      readonly authorTime: number
+      /** Map vehicle */
+      readonly car: string
+    }
     /** Server information object */
     export interface ServerInfo {
       /** The server name */

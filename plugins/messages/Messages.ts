@@ -105,8 +105,8 @@ const events: tm.Listener[] = [
   {
     event: 'LocalRecord',
     callback: (info: tm.RecordInfo): void => {
-      let prevObj: undefined | { time: number, position: number }
-      if (info.previous !== undefined && info.previous.position <= tm.records.maxLocalsAmount) {
+      let prevObj: undefined | { time: number, position: number } = info.previous
+      if (info.previous !== undefined && info.previous.position > tm.records.maxLocalsAmount) {
         prevObj = undefined
       }
       const rs = tm.utils.getRankingString({ time: info.time, position: info.position }, prevObj)

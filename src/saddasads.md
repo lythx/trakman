@@ -54,6 +54,14 @@ Fetches map file from TMX via its TMX ID.
 - ```site``` Optional TMX site (TMNF by default)
 - ```Object``` containing map name and file content, or Error if unsuccessfull
 
+## searchForMap
+**(query: string, site: tm.TMXSite = 'TMNF', count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]>**  
+Searches for maps matching the specified name on TMX.
+- ```query``` Search query
+- ```site``` TMX Site to fetch from
+- ```count``` Number of maps to fetch
+- `Returns` An array of searched map objects or Error if unsuccessfull
+
 ## players
 
 ### get
