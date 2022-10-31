@@ -79,7 +79,7 @@ export default class CheckpointRecords extends PopupWindow {
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
       const str = cps[i + cpIndex - 1]?.login ?? '-'
-      if (str === login) { return `${centeredText(`$0F0${str}`, w, h)}` }
+      if (str === login) { return `${centeredText(`$${config.selfColour + str}`, w, h)}` }
       return centeredText(str, w, h)
     }
 

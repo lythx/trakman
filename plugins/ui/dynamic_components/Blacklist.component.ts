@@ -82,8 +82,7 @@ export default class Blacklist extends PopupWindow<number> {
       const nickname = fetchedPlayers.find(a => a.login === blacklist[i + index].login)?.nickname
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell: GridCellFunction = (i, j, w, h) => blacklist[i + index].login === login ?
-      centeredText('$' + config.selfColour + blacklist[i + index].login, w, h) : centeredText(blacklist[i + index].login, w, h)
+    const loginCell: GridCellFunction = (i, j, w, h) => centeredText(blacklist[i + index].login, w, h)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(blacklist[i + index].date, true), w, h)
     const reasonCell = (i: number, j: number, w: number, h: number) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i - 1]?.reason ?? 'No reason specified')), w, h)
