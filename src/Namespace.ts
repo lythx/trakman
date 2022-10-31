@@ -416,7 +416,7 @@ declare global {
       /** Dedicated server executable build (for TMF, the latest build is 2.11.26) */
       build: string
     }
-    /** Object containing Trackmania coppers bill state information. Created and emitted on the TODO LINK BillUpdated event */
+    /** Object containing Trackmania coppers bill state information. Created and emitted on the BillUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface BillUpdatedInfo {
       /** Bill ID */
       readonly id: number
@@ -427,7 +427,7 @@ declare global {
       /** Transaction ID */
       readonly transactionId: number
     }
-    /** Object containing player state information. Created and emitted on the PlayerInfoChanged event */
+    /** Object containing player state information. Created and emitted on the PlayerInfoChanged event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface InfoChangedInfo {
       /** Player login */
       readonly login: string
@@ -440,11 +440,11 @@ declare global {
       readonly teamId: number
       /** Player ladder rank */
       readonly ladderRanking: number
-      /** The player forcespec mode (TODO CHECK) */
+      /** Player forcespec mode (0 - not forced, 1 - forcespec, 2 - forceplay) */
       readonly forceSpectator: number
       /** Whether the player */
       readonly isReferee: boolean
-      /** Ask Nadeo about this TODO */
+      /** Might be cup mode related */ // TODO CUP
       readonly isPodiumReady: boolean
       /** Whether the player is using 3D mode */
       readonly isUsingStereoscopy: boolean
@@ -456,16 +456,16 @@ declare global {
       readonly hasPlayerSlot: boolean
       /** Whether the player is a spectator */
       readonly isSpectator: boolean
-      /** Whether the player is in spectator mode temporarily (eg. result screen, TODO? inbetween rounds) */
+      /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** TODO FIND OUT */
+      /** Seems to be always the same as isSpectator */ // TODO ROUNDS
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
       /** Identifier of the player currently being watched by the spectator */
       readonly currentTargetId: number
     }
-    /** Object containing player controller privilege information. Created and emitted on the PrivilegeChange event */
+    /** Object containing player controller privilege information. Created and emitted on the PrivilegeChange event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PrivilegeChangedInfo {
       /** Player object (undefined if the player is not in the database) */
       readonly player?: OfflinePlayer
@@ -483,7 +483,7 @@ declare global {
         readonly nickname: string
       }
     }
-    /** Object containing map karma vote information. Created and emitted on the KarmaVote event */
+    /** Object containing map karma vote information. Created and emitted on the KarmaVote event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface KarmaVoteInfo {
       /** Map UID */
       readonly mapId: string
@@ -511,7 +511,7 @@ declare global {
       mapIndex: number
       /** Amount of points to end the map in rounds mode */
       roundsPointsLimit: number
-      /** Whether "new rules" are in use TODO (rounds mode)  */
+      /** Points system type used in rounds mode */ // TODO ROUNDS
       roundsPointSystemType: boolean
       /** Amount of forced laps in rounds mode */
       roundsModeLapsAmount: number
@@ -521,11 +521,11 @@ declare global {
       countdownAdditionalTime: number
       /** Amount of points to end the map in teams mode */
       teamPointsLimit: number
-      /** TODO DETERMINE WHAT THIS IS */
+      /** Teams mode related */ // TODO TEAMS
       teamMaxPoints: number
-      /** Whether "new rules" are in use TODO (teams mode) */
+      /** Points system type used in teams mode */ // TODO TEAMS
       teamPointSystemType: boolean
-      /** Amount of laps on the current track (laps mode only?) */
+      /** Amount of laps in laps mode */ // TODO LAPS
       lapsModeLapsAmount: number
       /** Amount of time left for players to finish the track after the leader in laps mode */
       lapsModeFinishTimeout: number
@@ -537,20 +537,20 @@ declare global {
       disableRespawn: boolean
       /** Whether force display of all opponents is enabled */
       forceShowOpponents: boolean
-      /** Amount of points to end the map in rounds mode when using "new rules" TODO */
+      /** Rounds mode related */ // TODO ROUNDS (Amount of points to end the map in rounds mode when using "new rules")
       roundsPointLimitSystemType: number
-      /** Amount of points to end the map in teams mode when using "new rules" TODO */
+      /** Teams mode related */ // TODO TEAMS (Amount of points to end the map in teams mode when using "new rules")
       teamPointLimitSystemType: number
       /** Amount of points to be gained to win in cup mode */
       cupPointsLimit: number
-      /** Amount of times the map will be replayed until skip in cup mode */
+      /** Amount of times the map will be replayed until skip in cup mode */ // TODO CUP
       cupRoundsPerMap: number
       /** Amount of winners in cup mode */
       cupWinnersAmount: number
       /** Duration of the warm-up in cup mode */
       cupWarmUpDuration: number
     }
-    /** Object containing player information. Created and emitted on the PlayerDataUpdated event */
+    /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PlayerDataUpdatedInfo {
       /** Player login */
       readonly login: string,
@@ -616,7 +616,7 @@ declare global {
       readonly BestTime: number;
       /** Player checkpoints in the best run */
       readonly BestCheckpoints: number[];
-      /** TODO ???????? */
+      /** Probably stunts mode related */ // TODO STUNTS
       readonly Score: number;
       /** Amount of finished laps */
       readonly NbrLapsFinished: number;
@@ -636,11 +636,18 @@ declare global {
       readonly PlayerId: number;
       /** Possibly leftover from earlier versions? Usually undefined or 0. */
       readonly TeamId: number;
-      /** TODO */
+      /** Integer representing the player spectator status .
+       * (isSpectator + isTemporarySpectator * 10 + isPureSpectator * 100 + 
+       * autoTarget * 1000 + currentTargetId * 10000) 
+       */
       readonly SpectatorStatus: number;
       /** Player ladder ranking */
       readonly LadderRanking: number;
-      /** TODO */
+      /** Integer representing player status.
+       * (forceSpectator + isReferee * 10 + isPodiumReady * 100 +
+       * isUsingStereoscopy * 1000 + isManagedByAnOtherServer * 10000 +
+       * isServer * 100000 + hasPlayerSlot * 1000000)
+       */
       readonly Flags: number;
     }
     /** Object containing event names and types that get passed as parameters */
@@ -698,9 +705,9 @@ declare global {
       "TrackMania.Echo": readonly [string, string]
       "TrackMania.VoteUpdated": readonly [string, string, string, string]
     }
-    /** Object containing player information. Created and emitted on the PlayerJoin event */
+    /** Object containing player information. Created and emitted on the PlayerJoin event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type JoinInfo = Readonly<Omit<Player, 'currentCheckpoints'>>
-    /** Object containing map information. Created and emitted on the EndMap event */
+    /** Object containing map information. Created and emitted on the EndMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type EndMapInfo = Readonly<CurrentMap> & {
       /** Map local records */
       readonly localRecords: Readonly<Readonly<LocalRecord>[]>
@@ -717,7 +724,7 @@ declare global {
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
     }
-    /** Object containing map information. Created and emitted on the BeginMap event */
+    /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Map & {
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
@@ -731,14 +738,14 @@ declare global {
     }
     /** Controller local record object */
     export type LocalRecord = Record & OfflinePlayer
-    /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event */
+    /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
       /** Player object */
       readonly player: Player
     }
-    /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events */
+    /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type FinishInfo = Omit<Player & LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'>
-    /** Object containing player information. Created and emitted on the PlayerLeave event */
+    /** Object containing player information. Created and emitted on the PlayerLeave event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LeaveInfo = Omit<Player, 'lastOnline'> & {
       /** Amount of time the player spent on the server in the current session */
       readonly sessionTime: number
@@ -749,31 +756,34 @@ declare global {
       /** Whether the player was in the spectator mode */
       readonly isSpectator: boolean
     }
-    /** Object containing manialink click information. Created and emitted on the ManialinkClick event */
+    /** Object containing manialink click information. Created and emitted on the ManialinkClick event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type ManialinkClickInfo = Player & {
       /** Clicked manialink action ID */
       readonly actionId: number
     }
-    /** Object containing map information. Created and emitted on the MapAdded event */
+    /** Object containing map information. Created and emitted on the MapAdded event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MapAddedInfo = Map & {
       /** Login of the player who added the map */
       readonly callerLogin?: string
     }
-    /** Object containing map information. Created and emitted on the MapRemoved event */
+    /** Object containing map information. Created and emitted on the MapRemoved event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MapRemovedInfo = Map & {
       /** Login of the player who removed the map */
       readonly callerLogin?: string
     }
-    /** Object containing player record information. Created and emitted on the MapRemoved event */
+    /** Object containing player record information. Created and emitted on the MapRemoved event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type RecordInfo = Omit<Player & LocalRecord & {
       /** Player rank in the local records leaderboard */
       readonly position: number
-      /** Previous player rank in the local records leaderboard (TODO OPTIONAL) */
-      readonly previousPosition: number
-      /** Previous player local record time (TODO OPTIONAL) */
-      readonly previousTime: number
+      /** Player previous local record info (undefined if the player didn't have a local record on the map) */
+      readonly previous?: {
+        /** Previous player rank in the local records leaderboard */
+        readonly position: number,
+        /** Previous player local record time */
+        readonly time: number
+      }
     }, 'currentCheckpoints' | 'isSpectator'>
-    /** Object containing chat message information. Created and emitted on the PlayerChat event */
+    /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'

@@ -51,7 +51,7 @@ export class VoteSkip extends UiButton {
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isLastMapReplay === true || this.isReplay === true
       || this.isSkip === true || tm.state.current === 'result') { return }
-    if (tm.state.remainingMapTime <= cfg.minimumRemainingTime) {
+    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
     }
@@ -64,7 +64,7 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.state.remainingMapTime <= 30) { return }
+    if (tm.state.remainingRaceTime <= 30) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {

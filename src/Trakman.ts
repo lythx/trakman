@@ -322,32 +322,36 @@ namespace trakman {
   export const state = {
 
     /**
-     * Remaining map time in seconds
+     * Remaining race time in seconds.
      */
-    get remainingMapTime(): number {
-      return GameService.remainingMapTime
+    get remainingRaceTime(): number {
+      return GameService.remainingRaceTime
     },
 
     /**
-     * Remaining result screen time in seconds
+     * Remaining result screen time in seconds.
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
     },
 
     /**
-     * Server state
+     * Server state.
      */
-    get current(): "race" | "result" | "transition" {
+    get current(): tm.ServerState {
       return GameService.state
     },
 
-    // TODO DOCUMENT and either rename this or maptime
+    /**
+     * Race time limit in the current round.
+     */
     get raceTimeLimit(): number {
       return GameService.raceTimeLimit
     },
 
-    // TODO DOCUMENT
+    /**
+     * Result time limit in the current round.
+     */
     get resultTimeLimit(): number {
       return GameService.resultTimeLimit
     }

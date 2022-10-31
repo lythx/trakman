@@ -50,7 +50,7 @@ export class VoteReplay extends UiButton {
 
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isReplay === true || this.isSkip === true) { return }
-    if (tm.state.remainingMapTime <= cfg.minimumRemainingTime) {
+    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
     }

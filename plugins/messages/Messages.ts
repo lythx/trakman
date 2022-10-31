@@ -105,20 +105,18 @@ const events: tm.Listener[] = [
   {
     event: 'LocalRecord',
     callback: (info: tm.RecordInfo): void => {
-      let prevPos: number = info.previousPosition
-      let prevTime: number = info.previousTime
-      if (info.previousPosition > tm.records.maxLocalsAmount) {
-        prevPos = -1
-        prevTime = -1
+      let prevObj: undefined | { time: number, position: number }
+      if (info.previous !== undefined && info.previous.position <= tm.records.maxLocalsAmount) {
+        prevObj = undefined
       }
-      const rs = tm.utils.getRankingString(prevPos, info.position, prevTime, info.time)
+      const rs = tm.utils.getRankingString({ time: info.time, position: info.position }, prevObj)
       tm.sendMessage(tm.utils.strVar(c.record, {
         nickname: tm.utils.strip(info.nickname, true),
         status: rs.status,
         position: tm.utils.getPositionString(info.position),
         time: tm.utils.getTimeString(info.time),
         difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
-          position: info.previousPosition,
+          position: info.previous?.position,
           time: rs.difference
         }) : ''
       }))
@@ -129,14 +127,14 @@ const events: tm.Listener[] = [
 for (const event of events) { tm.addListener(event.event, event.callback, true) }
 
 dedimania.onRecord((record) => {
-  const rs = tm.utils.getRankingString(record.previousPosition, record.position, record.previousTime, record.time)
+  const rs = tm.utils.getRankingString({ position: record.position, time: record.time }, record.previous)
   tm.sendMessage(tm.utils.strVar(c.dediRecord, {
     nickname: tm.utils.strip(record.nickname, true),
     status: rs.status,
     position: tm.utils.getPositionString(record.position),
     time: tm.utils.getTimeString(record.time),
     difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
-      position: record.previousPosition,
+      position: record.previous?.position,
       time: rs.difference
     }) : ''
   }))

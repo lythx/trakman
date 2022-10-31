@@ -132,33 +132,31 @@ export const Utils = {
 
   /**
    * Gets the appropriate verb and calculates record differences.
-   * @param prevPos Previous record index
-   * @param currPos Current record index
-   * @param prevTime Previous record time
-   * @param currTime Current record time
+   * @param current Object containing current record time and position
+   * @param previous Optional object containing previous record time and position
    * @returns Object containing the string to use, whether calculation is needed, and the difference
    */
-  getRankingString(prevPos: number, currPos: number, prevTime: number, currTime: number): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
+  getRankingString(current: { time: number, position: number}, previous?: {time: number, position: number}): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
     let calc: boolean = false
     const obj: any = {
       status: ``,
       difference: undefined
     }
-    if (prevPos === -1) {
+    if (previous === undefined) {
       obj.status = 'acquired'
       calc = false
-    } else if (prevPos > currPos) {
+    } else if (previous.position > current.position) {
       obj.status = 'obtained'
       calc = true
-    } else if (prevPos === currPos && prevTime === currTime) {
+    } else if (previous.position === current.position && previous.time === current.time) {
       obj.status = 'equaled'
       calc = false
-    } else if (prevPos === currPos) {
+    } else if (previous.position === current.position) {
       obj.status = 'improved'
       calc = true
     }
-    if (calc) {
-      obj.difference = this.getTimeString(prevTime - currTime)
+    if (calc && previous !== undefined) {
+      obj.difference = this.getTimeString(previous.time - current.time)
       let i: number = -1
       while (true) {
         i++

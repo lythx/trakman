@@ -192,7 +192,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async ([winner, map, wasWarmUp, continuesOnNextMap, restart]:
+      callback: async ([[winner], map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
@@ -200,10 +200,10 @@ export class Listeners {
         isRestart = restart
         GameService.state = 'result'
         // Get winner login from the callback
-        const login: string | undefined = winner[0]?.Login
+        const login: string | undefined = winner?.Login
         // Only update wins if the player is not alone on the server and exists
         const wins: number | undefined = (login === undefined || PlayerService.players.length === 1
-          || winner[0]?.BestTime === -1) ? undefined : await PlayerService.addWin(login)
+          || winner?.BestTime === -1) ? undefined : await PlayerService.addWin(login)
         const endMapInfo: tm.EndMapInfo = {
           ...MapService.current,
           wasWarmUp: wasWarmUp,

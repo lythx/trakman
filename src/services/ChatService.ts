@@ -248,7 +248,7 @@ export abstract class ChatService {
   }
 
   /**
-   * Recent chat messages. Amount of messages depends of TODO
+   * Recent chat messages.
    */
   static get messages(): Readonly<tm.Message>[] {
     return [...this._messages]

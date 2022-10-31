@@ -48,7 +48,7 @@ export default class StaticHeader {
   static resultHeight = resultConfig.height
   /** Race preset options */
   static racePreset = raceConfig
-  /** Result preset options */ // TODO DOCUMENT !!!
+  /** Result preset options */
   static resultPreset = resultConfig
 
   /**

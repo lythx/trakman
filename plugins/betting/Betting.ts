@@ -38,7 +38,7 @@ export default class BettingWindow extends DynamicComponent {
         for (const e of unitedPlayers) {
           this.displayToPlayer(e.login)
         }
-        if (tm.state.raceTimeLimit - tm.state.remainingMapTime < config.time) { return }
+        if (tm.state.raceTimeLimit - tm.state.remainingRaceTime < config.time) { return }
         console.log('asddsa')
         this.iftimehasrunout = true
         if (this.prize === undefined) { // TODO handle one player
@@ -118,7 +118,7 @@ export default class BettingWindow extends DynamicComponent {
         ${this.header.constructXml(config.headerText, icons.placeholder, true)}
         <frame posn="${headerW} 0 0">
           <quad posn="0 0 1" sizen="${topRightW} ${this.header.options.height}" bgcolor="${config.background}"/>
-          ${centeredText((tm.state.raceTimeLimit - tm.state.remainingMapTime).toString(), topRightW, StaticHeader.raceHeight)}
+          ${centeredText((tm.state.raceTimeLimit - tm.state.remainingRaceTime).toString(), topRightW, StaticHeader.raceHeight)}
         </frame>
         <frame posn="${-config.margin} ${-StaticHeader.raceHeight} 0">
           ${content}

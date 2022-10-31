@@ -7,6 +7,8 @@ export interface DediRecord {
 
 export type NewDediRecord = Omit<tm.Player & DediRecord & {
   readonly position: number
-  readonly previousPosition: number
-  readonly previousTime: number
+  readonly previous?: {
+    readonly time: number,
+    readonly position: number
+  }
 }, 'currentCheckpoints' | 'isSpectator'>

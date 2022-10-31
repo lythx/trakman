@@ -166,10 +166,10 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
   if (pb === undefined) {
-    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, -1, position, -1)
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, undefined, position, undefined)
     currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
     newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-    tm.log.info(getLogString(-1, position, -1, time, player))
+    tm.log.info(getLogString(undefined, position, undefined, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time === pb) {
     const previousPosition: number = currentDedis.findIndex(a => a.login === currentDedis.find(a => a.login === player.login)?.login) + 1
@@ -286,19 +286,20 @@ const getPlayersArray = (): any[] => {
 }
 
 const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
-  checkpoints: number[], time: number, previousTime: number, position: number, previousPosition: number): NewDediRecord => {
+  checkpoints: number[], time: number, previousTime: number | undefined, position: number, previousPosition: number | undefined): NewDediRecord => {
   return {
     ...player,
     time,
     checkpoints,
     position,
-    previousTime,
-    previousPosition
+    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition} : undefined
   }
 }
 
-const getLogString = (previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }): string[] => {
-  const rs = tm.utils.getRankingString(previousPosition, position, previousTime, time)
+const getLogString = (previousPosition: number | undefined, position: number,
+  previousTime: number | undefined, time: number, player: { login: string, nickname: string }): string[] => {
+  const rs = tm.utils.getRankingString({ position, time }, (previousPosition && previousTime) ?
+    { time: previousTime, position: previousPosition } : undefined)
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
 }
 

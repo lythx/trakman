@@ -140,6 +140,8 @@ Util to display manialink headers in static UI.
   - `options` Header options TODO Interface
   - `raceHeight` Default height in race preset
   - `resultHeight` Defualt height in result preset
+  - `racePreset` Race preset options
+  - `resultPreset` = Result preset options
 
 ## Paginator
 Util to manage pagination and render page change buttons. It's used in almost every popup window. Use the onPageChange property to listen for page changes. Remember to use destroy() before deleting the object to avoid memory leaks.  

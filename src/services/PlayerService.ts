@@ -27,7 +27,8 @@ export class PlayerService {
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('LocalRecord', (info: tm.RecordInfo): void => {
-      if (info.previousPosition > RecordService.maxLocalsAmount && info.position <= RecordService.maxLocalsAmount) {
+      if ((info.previous?.position === undefined || 
+        info.previous?.position > RecordService.maxLocalsAmount) && info.position <= RecordService.maxLocalsAmount) {
         this.newLocalsAmount++
       }
     })

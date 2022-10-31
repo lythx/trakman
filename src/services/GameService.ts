@@ -62,7 +62,7 @@ export class GameService {
     this._timerStartTimestamp = Date.now()
   }
 
-  static get remainingMapTime(): number {
+  static get remainingRaceTime(): number {
     if (this._state === 'result' || this.state === 'transition') { return 0 }
     return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
@@ -72,7 +72,7 @@ export class GameService {
     return Math.round((this.config.resultTime - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
-  static get state(): 'race' | 'result' | 'transition' {
+  static get state(): tm.ServerState {
     return this._state
   }
 

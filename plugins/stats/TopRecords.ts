@@ -114,7 +114,7 @@ tm.addListener('PlayerLeave', info => {
 })
 
 tm.addListener('LocalRecord', info => {
-  if (info.previousPosition === -1) {
+  if (info.previous === undefined) {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.amount++
