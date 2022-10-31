@@ -255,10 +255,24 @@ export abstract class ChatService {
   }
 
   /**
+   * Number of recent chat messages.
+   */
+  static get messageCount(): number {
+    return this._messages.length
+  }
+
+  /**
    * All registered chat commands.
    */
   static get commandList(): tm.Command[] {
     return [...this._commandList]
+  }
+  
+  /**
+   * Number of commands.
+   */
+  static get commandCount(): number {
+    return this._commandList.length
   }
 
 }

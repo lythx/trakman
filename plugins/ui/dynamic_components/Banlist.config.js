@@ -11,7 +11,6 @@ export default {
   unbanIcon: icons.unban,
   unbanIconHover: icons.unbanHover,
   entries: 15,
-  selfColour: `${p.green}0`,
   defaultNickname: 'N/A',
   columnProportions: [
     0.6,

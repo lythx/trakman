@@ -7,5 +7,6 @@ export default {
   windowWidth: 90,
   headerHeight: 4,
   footerHeight: 4,
-  headerPageWidth: 10
+  headerPageWidth: 10,
+  textScale: 1
 }

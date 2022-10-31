@@ -227,6 +227,12 @@ Gets recent chat messages written by specified player.
 - ```login``` Player login
 - ```Returns``` Array of message objects
 
+### list
+Recent chat messages.  
+
+### count
+Number of recent chat messages.  
+
 ## commands
 
 ### add
@@ -236,6 +242,9 @@ Adds chat commands to the server.
 
 ### list
 All registered chat commands.
+
+### count
+Number of commands.
 
 ## client
 

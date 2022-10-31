@@ -12,7 +12,7 @@ export default class Mutelist extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.admin.muteCount / config.entries))
+      Math.ceil(tm.admin.muteCount / (config.entries - 1)))
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
@@ -33,7 +33,7 @@ export default class Mutelist extends PopupWindow<number> {
       }
     })
     tm.addListener(['Mute', 'Unmute'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / (config.entries - 1)))
       this.reRender()
     })
     tm.addListener('PrivilegeChanged', (info) => {
@@ -63,7 +63,7 @@ export default class Mutelist extends PopupWindow<number> {
   }
 
   protected async constructContent(login: string, page: number = 1): Promise<string> {
-    const index = (page - 1) * config.entries - 1
+    const index = (page - 1) * (config.entries - 1) - 1
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),
@@ -93,7 +93,7 @@ export default class Mutelist extends PopupWindow<number> {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unmuteIcon}"
     imagefocus="${config.unmuteIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
-    const rows = Math.min(config.entries, mutelist.length - (index + 1))
+    const rows = Math.min((config.entries - 1), mutelist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unmuteButton)

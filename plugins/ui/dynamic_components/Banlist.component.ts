@@ -12,7 +12,7 @@ export default class Banlist extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.admin.banCount / config.entries))
+      Math.ceil(tm.admin.banCount /(config.entries - 1)))
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
@@ -33,7 +33,7 @@ export default class Banlist extends PopupWindow<number> {
       }
     })
     tm.addListener(['Ban', 'Unban'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.banCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.admin.banCount / (config.entries - 1)))
       this.reRender()
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
@@ -63,7 +63,7 @@ export default class Banlist extends PopupWindow<number> {
   }
 
   protected async constructContent(login: string, page: number = 1): Promise<string> {
-    const index = (page - 1) * config.entries - 1
+    const index = (page - 1) * (config.entries - 1) - 1
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),
@@ -82,8 +82,7 @@ export default class Banlist extends PopupWindow<number> {
       const nickname = fetchedPlayers.find(a => a.login === banlist[i + index].login)?.nickname
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell: GridCellFunction = (i, j, w, h) => banlist[i + index].login === login ?
-      centeredText('$' + config.selfColour + banlist[i + index].login, w, h) : centeredText(banlist[i + index].login, w, h)
+    const loginCell: GridCellFunction = (i, j, w, h) => centeredText(banlist[i + index].login, w, h)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(banlist[i + index].date, true), w, h)
     const reasonCell = (i: number, j: number, w: number, h: number) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(banlist[i - 1]?.reason ?? 'No reason specified')), w, h)
@@ -93,7 +92,7 @@ export default class Banlist extends PopupWindow<number> {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unbanIcon}"
     imagefocus="${config.unbanIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
-    const rows = Math.min(config.entries, banlist.length - (index + 1))
+    const rows = Math.min(config.entries - 1, banlist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unbanButton)

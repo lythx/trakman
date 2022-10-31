@@ -62,5 +62,6 @@ export default {
   topSums: 300000,
   mutelist: 310000,
   cpTime: 320000,
-  jukebox: 330000
+  jukebox: 330000,
+  chatlog: 340000,
 }

@@ -160,7 +160,12 @@ namespace trakman {
     /**
      * Recent chat messages. 
      */
-    get list(): tm.Message[] { return ChatService.messages }
+    get list(): tm.Message[] { return ChatService.messages },
+
+    /**
+     * Number of recent chat messages.
+     */
+    get count(): number { return ChatService.messageCount }
 
   }
 
@@ -171,7 +176,12 @@ namespace trakman {
     /**
      * All registered chat commands.
      */
-    get list(): tm.Command[] { return ChatService.commandList }
+    get list(): tm.Command[] { return ChatService.commandList },
+
+    /**
+     * Number of commands.
+     */
+    get count(): number { return ChatService.commandCount }
 
   }
 
