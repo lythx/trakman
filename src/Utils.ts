@@ -136,7 +136,7 @@ export const Utils = {
    * @param previous Optional object containing previous record time and position
    * @returns Object containing the string to use, whether calculation is needed, and the difference
    */
-  getRankingString(current: { time: number, position: number}, previous?: {time: number, position: number}): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
+  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
     let calc: boolean = false
     const obj: any = {
       status: ``,

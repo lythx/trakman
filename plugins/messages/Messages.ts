@@ -49,7 +49,7 @@ const events: tm.Listener[] = [
   {
     event: 'PlayerJoin',
     callback: async (player: tm.JoinInfo): Promise<void> => {
-      if (player.visits === 0) { playerCount++ }
+      if (player.visits === 1) { playerCount++ }
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.config.server.name),
         version: tm.config.controller.version

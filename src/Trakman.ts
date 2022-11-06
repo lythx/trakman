@@ -207,6 +207,8 @@ namespace trakman {
 
     remove: MapService.remove.bind(MapService),
 
+    writeFileAndAdd: MapService.writeFileAndAdd.bind(MapService),
+
     /**
      * All maps from current playlist.
      */

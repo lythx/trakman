@@ -41,6 +41,10 @@ Client queries are handled by a separate thread which makes them a bit faster. U
 Fetches TMX for map information.
 - ```mapId``` map UID
 - ```Returns``` Map info from TMX or error if unsuccessful
+**static async fetchMapInfo(tmxId: number, prefix: TMXPrefix): Promise<Omit<tm.TMXMap, 'id'> | Error>**  
+Fetches TMX for map information.
+- ```tmxId``` Map TMX ID
+- ```Returns``` Map info from TMX or error if unsuccessful
 
 ### fetchMapFile
 **(mapId: string): Promise<{ name: string, content: Buffer } | Error>**  
@@ -54,12 +58,12 @@ Fetches map file from TMX via its TMX ID.
 - ```site``` Optional TMX site (TMNF by default)
 - ```Object``` containing map name and file content, or Error if unsuccessfull
 
-## searchForMap
-**(query: string, site: tm.TMXSite = 'TMNF', count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]>**  
+### searchForMap
+**(query?: string, site: tm.TMXSite = 'TMNF', count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]>**  
 Searches for maps matching the specified name on TMX.
-- ```query``` Search query
-- ```site``` TMX Site to fetch from
-- ```count``` Number of maps to fetch
+- `query` Search query
+- `site` TMX Site to fetch from
+- `count` Number of maps to fetch
 - `Returns` An array of searched map objects or Error if unsuccessfull
 
 ## players
@@ -235,12 +239,6 @@ Gets recent chat messages written by specified player.
 - ```login``` Player login
 - ```Returns``` Array of message objects
 
-### list
-Recent chat messages.  
-
-### count
-Number of recent chat messages.  
-
 ## commands
 
 ### add
@@ -250,9 +248,6 @@ Adds chat commands to the server.
 
 ### list
 All registered chat commands.
-
-### count
-Number of commands.
 
 ## client
 
@@ -311,11 +306,21 @@ Fetches multiple maps from the database. This method should be used to get maps 
 - ```Returns``` Map objects array
 
 ### add
-**(filename: string, caller?: { login: string, nickname: string }): Promise<tm.Map | Error>**  
-Adds a map to the server.
+**(filename: string, caller?: { login: string, nickname: string }, dontJuke: boolean = false): Promise<tm.Map | Error>**  
+Adds a map to the server. Map needs to be present in the server files.
 - ```filename``` Path to the map file
 - ```caller``` Object containing login and nickname of the player who is adding the map
+- ```dontJuke``` If true the map doesn't get enqueued, false by default
 - ```Returns``` Added map object or error if unsuccessful
+
+### writeFileAndAdd
+**(fileName: string, file: Buffer, caller?: { nickname: string, login: string }, dontJuke: boolean = false): Promise<{ map: tm.Map, wasAlreadyAdded: boolean } | Error>**  
+Writes a map file to the server, adds it to the current Match Settings and to the jukebox.
+- `fileName` Map file name (file will be saved with this name on the server)
+- `file` Map file buffer
+- `caller` Object containing login and nickname of the player who is adding the map
+- `dontJuke` If true the map doesn't get enqueued, false by default
+- `Returns` Error if unsuccessfull, object containing map object and boolean indicating whether the map was already on the server
 
 ### remove
 **(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error>**  
@@ -724,11 +729,11 @@ Gets the country code (non-ISO) for the specified country name
 - ```Returns``` Country code
 
 ### getRankingString
-**(prevPos: number, currPos: number, prevTime: number, currTime: number): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string }**
+**(current: { time: number, position: number }, previous?: { time: number, position: number }): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string }**  
 Gets the appropriate verb and calculates record differences.
 - `current` Object containing current record time and position
 - `previous` Optional object containing previous record time and position
-- ```Returns``` Object containing the string to use, whether calculation is needed, and the difference
+- `Returns` Object containing the string to use, whether calculation is needed, and the difference
 
 ### sendCoppers
 **(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error>**  

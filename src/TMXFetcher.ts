@@ -138,26 +138,53 @@ export abstract class TMXFetcher {
    * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */
-  static async fetchMapInfo(mapId: string): Promise<tm.TMXMap | Error> {
+  static async fetchMapInfo(mapId: string): Promise<tm.TMXMap | Error>
+  /**
+   * Fetches TMX for map information.
+   * @param tmxId Map TMX ID
+   * @returns Map info from TMX or error if unsuccessful
+   */
+  static async fetchMapInfo(tmxId: number, prefix: TMXPrefix): Promise<Omit<tm.TMXMap, 'id'> | Error>
+  static async fetchMapInfo(arg: string | number, prefix?: TMXPrefix | undefined): Promise<tm.TMXMap | Error> {
     let data: string = ''
-    let prefix: TMXPrefix | undefined
-    for (const p of this.prefixes) { // Search for right prefix
-      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+    let mapId: string | undefined
+    if (typeof arg === 'number') {
+      const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&id=${arg}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
-        continue
+        return new Error(`Error while fetching map info from TMX (url: ${url})`)
       }
       data = await res.text()
-      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
-        prefix = p
-        break
+      if (res.ok === false || data === '') {
+        return new Error('Cannot fetch map data from TMX')
+      }
+    } else {
+      mapId = arg
+      for (const p of this.prefixes) { // Search for right prefix
+        const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+        const res = await fetch(url).catch((err: Error) => err)
+        if (res instanceof Error) {
+          Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
+          continue
+        }
+        data = await res.text()
+        if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+          prefix = p
+          break
+        }
       }
     }
     if (prefix === undefined) {
       return new Error('Cannot fetch map data from TMX')
     }
-    const s: string[] = data.split('\t')
+    return await this.parseOldApiResponse(prefix, data, mapId as any)
+  }
+
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string): Promise<Omit<tm.TMXMap, 'id'>>
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string, mapId: string): Promise<tm.TMXMap>
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string, mapId?: string): Promise<tm.TMXMap | Omit<tm.TMXMap, 'id'>> {
+    const s: string[] = response.split('\t')
     if (s.length !== 19) { // \t can be in comment thank you tmx developers
       const start = s.slice(0, 16)
       const comment = s.slice(16, -2).join('\t')
@@ -168,12 +195,13 @@ export abstract class TMXFetcher {
     const TMXId: number = Number(s[0])
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
+    let replaysData: string[] = []
     if (replaysRes instanceof Error) {
       Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
-      return replaysRes
+    } else {
+      replaysData = (await replaysRes.text()).split('\r\n')
+      replaysData.pop()
     }
-    const replaysData: string[] = (await replaysRes.text()).split('\r\n')
-    replaysData.pop()
     const replays: tm.TMXReplay[] = []
     for (const r of replaysData) {
       const rs: string[] = r.split('\t')
@@ -194,7 +222,7 @@ export abstract class TMXFetcher {
     const lastUpdateDate = new Date(s[5])
     const validReplays = replays.filter(a => a.mapDate.getTime() === lastUpdateDate.getTime())
     const awards = Number(s[18].split('<BR>')[0])
-    const mapInfo: tm.TMXMap = {
+    const mapInfo: Omit<tm.TMXMap, 'id'> | tm.TMXMap = {
       id: mapId,
       TMXId,
       name: s[1],
@@ -224,25 +252,28 @@ export abstract class TMXFetcher {
       replays,
       validReplays
     }
-    void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    if (mapId !== undefined) {
+      void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    }
     return mapInfo
   }
 
   /**
-   * Searches for maps matching the specified name on TMX,
+   * Searches for maps matching the specified name on TMX.
    * @param query Search query
    * @param site TMX Site to fetch from
    * @param count Number of maps to fetch
    * @returns An array of searched map objects or Error if unsuccessfull
    */
-  static async searchForMap(query: string, site: tm.TMXSite = 'TMNF', 
-  count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
+  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
+    count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
+    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
+    if (query === undefined) { params.pop() }
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
       ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
-      ['count', count.toString()],
-      ['name', query]
+      ...params
     ])}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {

@@ -64,4 +64,5 @@ export default {
   cpTime: 320000,
   jukebox: 330000,
   chatlog: 340000,
+  TMXSearchWindow: 350000,
 }

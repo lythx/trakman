@@ -106,7 +106,7 @@ for (const event of events) { tm.addListener(event.event, event.callback) }
 
 /**
  * Manialink UI components.
- * @author lythx & Snake
+ * @author lythx & Snake & wiseraven
  * @since 0.1
  */
 const components = {

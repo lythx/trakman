@@ -71,6 +71,7 @@ import TopVotes from './dynamic_components/TopVotes.component.js'
 import TopWins from './dynamic_components/TopWins.component.js'
 import TopSums from './dynamic_components/TopSums.component.js'
 import ChatLog from './dynamic_components/Chatlog.component.js'
+import TMXSearchWindow from './dynamic_components/TMXSearchWindow.component.js'
 
 tm.addListener(`Startup`, () => {
   new RankWidget()
@@ -133,4 +134,5 @@ tm.addListener(`Startup`, () => {
   new TopWins()
   new TopSums()
   new ChatLog()
+  new TMXSearchWindow()
 }, true)

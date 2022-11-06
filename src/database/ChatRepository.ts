@@ -57,7 +57,8 @@ export class ChatRepository extends Repository {
       return
     }
     const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
-    await this.query(query, id, text, date)
+    // Slice multibyte characters
+    await this.query(query, id, text.slice(0, 150), date)
   }
 
 }

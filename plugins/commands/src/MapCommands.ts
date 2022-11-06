@@ -30,45 +30,23 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.add.fetchError, info.login)
         return
       }
-      const base64String: string = file.content.toString('base64')
-      const write: any | Error = await tm.client.call('WriteFile', [{ string: file.name }, { base64: base64String }])
-      if (write instanceof Error) {
-        tm.log.warn(`Server failed to write map file ${file.name}.`)
-        tm.sendMessage(config.add.writeError, info.login)
+      const obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
+      if (obj instanceof Error) {
+        tm.log.warn(obj.message)
+        tm.sendMessage(config.add.addError, info.login)
         return
+      } else if (obj.wasAlreadyAdded === true) {
+        tm.sendMessage(tm.utils.strVar(config.add.alreadyAdded, {
+          map: tm.utils.strip(obj.map.name, false),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.add.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.add.added, {
+          title: info.title,
+          map: tm.utils.strip(obj.map.name, false),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.add.public ? undefined : info.login)
       }
-      const map: tm.Map | Error = await tm.maps.add(file.name, info)
-      if (map instanceof Error) {
-        // Yes we actually need to do this in order to juke a map if it was on the server already
-        if (map.message.trim() === 'Challenge already added. Code: -1000') {
-          const content: string = file.content.toString()
-          let i: number = 0
-          while (i < content.length) {
-            if (content.substring(i, i + 12) === `<ident uid="`) {
-              const id: string = content.substring(i + 12, i + 12 + 27)
-              const map: tm.Map | undefined = tm.maps.list.find(a => a.id === id)
-              if (map === undefined) {
-                tm.sendMessage(config.add.queueError, info.login)
-                return
-              }
-              tm.sendMessage(tm.utils.strVar(config.add.alreadyAdded, {
-                map: tm.utils.strip(map.name, false),
-                nickname: tm.utils.strip(info.nickname, true)
-              }), config.add.public ? undefined : info.login)
-              tm.jukebox.add(id, info)
-              return
-            }
-            i++
-          }
-        }
-        tm.sendMessage(config.add.queueError, info.login)
-        return
-      }
-      tm.sendMessage(tm.utils.strVar(config.add.added, {
-        title: info.title,
-        map: tm.utils.strip(map.name, false),
-        nickname: tm.utils.strip(info.nickname, true)
-      }), config.add.public ? undefined : info.login)
     },
     privilege: config.add.privilege
   },
@@ -86,7 +64,7 @@ const commands: tm.Command[] = [
         title: info.title,
         map: tm.utils.strip(map.name, false),
         nickname: tm.utils.strip(info.nickname, true)
-      }), config.add.public ? undefined : info.login)
+      }), config.addlocal.public ? undefined : info.login)
     },
     privilege: config.addlocal.privilege
   },
@@ -116,48 +94,25 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.addfromurl.fetchError, info.login)
         return
       }
-      const buffer = await file.arrayBuffer()
-      const base64String: string = Buffer.from(buffer).toString('base64')
-      const finalFilename = filename ?? url
-      const write: any | Error = await tm.client.call('WriteFile',
-        [{ string: `${finalFilename}.Challenge.Gbx` }, { base64: base64String }])
-      if (write instanceof Error) {
-        tm.log.warn(`Server failed to write map file ${finalFilename}.`)
-        tm.sendMessage(config.addfromurl.writeError, info.login)
+      const arrayBuffer = await file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      const obj = await tm.maps.writeFileAndAdd(filename ?? url, buffer, info)
+      if (obj instanceof Error) {
+        tm.log.warn(obj.message)
+        tm.sendMessage(config.addfromurl.addError, info.login)
         return
+      } else if (obj.wasAlreadyAdded === true) {
+        tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
+          map: tm.utils.strip(obj.map.name, false),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.addfromurl.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
+          title: info.title,
+          map: tm.utils.strip(obj.map.name, false),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.addfromurl.public ? undefined : info.login)
       }
-      const map: tm.Map | Error = await tm.maps.add(finalFilename, info)
-      if (map instanceof Error) {
-        // Yes we actually need to do this in order to juke a map if it was on the server already
-        if (map.message.trim() === 'Challenge already added. Code: -1000') {
-          const content: string = file.toString()
-          let i: number = 0
-          while (i < content.length) {
-            if (content.substring(i, i + 12) === `<ident uid="`) {
-              const id: string = content.substring(i + 12, i + 12 + 27)
-              const map: tm.Map | undefined = tm.maps.list.find(a => a.id === id)
-              if (map === undefined) {
-                tm.sendMessage(config.addfromurl.queueError, info.login)
-                return
-              }
-              tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
-                map: tm.utils.strip(map.name, false),
-                nickname: tm.utils.strip(info.nickname, true)
-              }), config.addfromurl.public ? undefined : info.login)
-              tm.jukebox.add(id, info)
-              return
-            }
-            i++
-          }
-        }
-        tm.sendMessage(config.addfromurl.queueError, info.login)
-        return
-      }
-      tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
-        title: info.title,
-        map: tm.utils.strip(map.name, false),
-        nickname: tm.utils.strip(info.nickname, true)
-      }), config.addfromurl.public ? undefined : info.login)
     },
     privilege: config.addfromurl.privilege
   },
