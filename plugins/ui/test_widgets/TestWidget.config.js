@@ -1,6 +1,5 @@
 export default {
-  isEnabled: false,
+  isEnabled: true,
   file: 'test.xml',
-  refreshTimeout: 1000,
-  playersToDisplay: ['login']
+  refreshTimeout: 1000
 }

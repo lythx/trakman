@@ -1,6 +1,4 @@
-import { componentIds, List, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
-
+import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './KarmaRanking.config.js'
 
 export default class KarmaRanking extends StaticComponent {

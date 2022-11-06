@@ -3,15 +3,40 @@ import raceConfig from './StaticHeaderRace.config.js'
 import resultConfig from './StaticHeaderResult.config.js'
 
 interface StaticHeaderOptions {
-  height: number, iconWidth: number, iconHeight: number, actionId?: number
-  textScale: number, rectangleWidth: number, horizontalPadding: number, verticalPadding: number,
-  iconVerticalPadding: number, iconHorizontalPadding: number, centerText: boolean,
-  iconBackground: string, textBackground: string,
-  squareWidth: number, margin: number
+  /** Header height */
+  height: number,
+  /** Image width */
+  iconWidth: number,
+  /** Image height */
+  iconHeight: number,
+  /** Click action ID */
+  actionId?: number
+  /** Header text scale */
+  textScale: number,
+  /** Width of the rectangle containing text */
+  rectangleWidth: number,
+  /** Text horizontal padding */
+  horizontalPadding: number,
+  /** Text vertical padding */
+  verticalPadding: number,
+  /** Image vertical padding */
+  iconVerticalPadding: number,
+  /** Image horizontal padding */
+  iconHorizontalPadding: number,
+  /** If true the text will be centered */
+  centerText: boolean,
+  /** Image background */
+  iconBackground: string,
+  /** Header text background */
+  textBackground: string,
+  /** Width of the square containing the image */
+  squareWidth: number,
+  /** Margin between the square and the rectangle */
+  margin: number
 }
 
 /**
- * Util to display manialink headers in static UI
+ * Util to display manialink headers in static UI.
  */
 export default class StaticHeader {
 
@@ -21,6 +46,10 @@ export default class StaticHeader {
   static raceHeight = raceConfig.height
   /** Defualt height in result preset */
   static resultHeight = resultConfig.height
+  /** Race preset options */
+  static racePreset = raceConfig
+  /** Result preset options */
+  static resultPreset = resultConfig
 
   /**
    * Util to display manialink headers in static UI

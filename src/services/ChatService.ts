@@ -230,7 +230,7 @@ export abstract class ChatService {
   }
 
   /**
-   * Fetches chat messages
+   * Fetches chat messages.
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
@@ -248,10 +248,17 @@ export abstract class ChatService {
   }
 
   /**
-   * Recent chat messages. Amount of messages depends of TODO
+   * Recent chat messages.
    */
   static get messages(): Readonly<tm.Message>[] {
     return [...this._messages]
+  }
+
+  /**
+   * Number of recent chat messages.
+   */
+  static get messageCount(): number {
+    return this._messages.length
   }
 
   /**
@@ -259,6 +266,13 @@ export abstract class ChatService {
    */
   static get commandList(): tm.Command[] {
     return [...this._commandList]
+  }
+  
+  /**
+   * Number of commands.
+   */
+  static get commandCount(): number {
+    return this._commandList.length
   }
 
 }

@@ -1,6 +1,9 @@
 import config from './Config.js'
 import http from 'http'
 
+const wsLogin = process.env.WEBSERVICES_LOGIN
+const wsPassword = process.env.WEBSERVICES_PASSWORD
+
 interface WebservicesInfo {
   id: number,
   login: string,
@@ -30,7 +33,7 @@ const fetchWebservices = async (login: string): Promise<{
   if (config.isEnabled === false) {
     return new Error('Use webservices is set to false')
   }
-  const au: string = "Basic " + Buffer.from(`${config.login}:${config.password}`).toString('base64')
+  const au: string = "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64')
   const options = {
     host: `ws.trackmania.com`,
     path: `/tmf/players/${login}/`,
@@ -83,6 +86,14 @@ const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
 }
 
 tm.addListener('Startup', async (): Promise<void> => {
+  if (wsLogin === undefined) {
+    tm.log.error('WEBSERVICES_LOGIN is undefined. Check your .env file to use the plugin.')
+    return
+  }
+  if (wsPassword === undefined) {
+    tm.log.error('WEBSERVICES_PASSWORD is undefined. Check your .env file to use the plugin.')
+    return
+  }
   const curRes = await fetchPlayer(tm.maps.current.author)
   if (!(curRes instanceof Error)) { curAuthor = curRes }
   for (const e of currentAuthorListeners) { e(curAuthor) }

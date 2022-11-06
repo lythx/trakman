@@ -94,7 +94,7 @@ export abstract class Client {
   }
 
   /**
- * Adds a callback listener which will be executed when one of the specified dedicated methods gets called
+ * Adds a callback listener which will be executed when one of the specified dedicated server methods gets called
  * @param methods Array of dedicated server methods
  * @param callback Callback to execute
  */

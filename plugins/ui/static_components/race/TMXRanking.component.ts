@@ -1,5 +1,5 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'
 
@@ -18,7 +18,7 @@ export default class TMXRanking extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -27,10 +27,10 @@ export default class TMXRanking extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.displayToPlayer(info.login) }
+      this.displayToPlayer(info.login)
     })
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (tmx.current?.validReplays?.some(a => a.login === info.login)) { this.displayToPlayer(info.login) }
+      this.displayToPlayer(info.login)
     })
     tmx.onMapChange(() => this.display())
     tmx.onQueueChange(() => this.display())
@@ -48,7 +48,7 @@ export default class TMXRanking extends StaticComponent {
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {
-      replays = tmxInfo.validReplays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, login: a.login, url: a.url }))
+      replays = tmxInfo.validReplays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, url: a.url }))
     }
     tm.sendManialink(`<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">

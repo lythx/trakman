@@ -1,6 +1,5 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
-import StaticComponent from '../../StaticComponent.js'
 import config from './DediRankingResult.config.js'
 
 export default class DediRankingResult extends StaticComponent {
@@ -19,8 +18,8 @@ export default class DediRankingResult extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry, { resultMode: true })
+    this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

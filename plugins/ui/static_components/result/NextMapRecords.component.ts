@@ -1,6 +1,4 @@
-import { componentIds, RecordList, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
-
+import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {
@@ -19,8 +17,8 @@ export default class NextMapRecords extends StaticComponent {
     this.posY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.list = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, 5, 5, false, { getColoursFromPb: true, resultMode: true })
+    this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -39,7 +37,7 @@ export default class NextMapRecords extends StaticComponent {
       this.records = tm.records.getFromQueue(mapId)
       this.display()
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('BeginMap', () => {

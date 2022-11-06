@@ -55,10 +55,10 @@ export default {
     2
   ],
   navbar: [
-    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.privileges.ban },
-    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.privileges.blacklist },
-    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute },
-    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest }
+    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.controller.privileges.ban },
+    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.controller.privileges.blacklist },
+    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.controller.privileges.mute },
+    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.controller.privileges.addGuest }
   ],
   selfColour: `${p.green}`,
   grid: {

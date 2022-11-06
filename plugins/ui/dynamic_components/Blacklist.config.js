@@ -3,7 +3,7 @@ import icons from '../config/Icons.js'
 const p = tm.utils.palette
 
 export default {
-  privilege: tm.config.privileges.blacklist,
+  privilege: tm.config.controller.privileges.blacklist,
   title: " Blacklisted Players ",
   icon: icons.blacklist,
   iconWidth: 2,
@@ -11,7 +11,6 @@ export default {
   unblacklistIcon: icons.unblacklist,
   unblacklistIconHover: icons.unblacklistHover,
   entries: 15,
-  selfColour: `${p.green}0`,
   defaultNickname: 'N/A',
   columnProportions: [
     0.6,
@@ -23,10 +22,10 @@ export default {
     1.1
   ],
   navbar: [
-    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.privileges)) },
-    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.privileges.ban },
-    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute },
-    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.privileges.addGuest },
+    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.controller.privileges)) },
+    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.controller.privileges.ban },
+    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.controller.privileges.mute },
+    { name: 'Guestlist', actionId: ids.guestlist, privilege: tm.config.controller.privileges.addGuest },
   ],
   grid: {
     background: "9996",

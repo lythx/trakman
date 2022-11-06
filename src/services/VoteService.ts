@@ -19,7 +19,7 @@ export abstract class VoteService {
     const maps = [MapService.current, ...MapService.queue]
     for (let i: number = 0; i < maps.length; i++) {
       const uid: string = maps[i].id
-      this._votes.unshift({ uid, votes: res.filter(a => a.mapId === uid) })
+      this._votes.push({ uid, votes: res.filter(a => a.mapId === uid) })
     }
     this._currentVotes = this._votes[0].votes
     Events.addListener('JukeboxChanged', () => {
@@ -148,7 +148,7 @@ export abstract class VoteService {
    * Fetches all the player votes for given map UIDs.
    * @param mapIds Array of Map UIDs
    * @returns Array of objects containing map UID and vote objects array.
-   * If some map is not in the database it won't be in the returned array.
+   * If some map is not in the database it won't be in the returned array
    */
   static async fetch(mapIds: string[]): Promise<{ uid: string, votes: tm.Vote[] }[]>
   static async fetch(mapIds: string | string[]): Promise<tm.Vote[] | undefined | { uid: string, votes: tm.Vote[] }[]> {
@@ -181,7 +181,7 @@ export abstract class VoteService {
    * Current map votes.
    */
   static get current(): Readonly<tm.Vote>[] {
-    return this._currentVotes
+    return [...this._currentVotes]
   }
 
   /**
@@ -195,7 +195,7 @@ export abstract class VoteService {
    * All votes in runtime memory. Only votes for maps in the history, 
    * queue and the current map are stored.
    */
-  static get votes(): Readonly<{ uid: string, votes: tm.Vote[] }>[] {
+  static get votes(): Readonly<{ uid: string, readonly votes: Readonly<tm.Vote[]> }>[] {
     return [...this._votes]
   }
 

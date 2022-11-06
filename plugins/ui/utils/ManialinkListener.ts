@@ -1,13 +1,13 @@
 let listeners: { callback: ((info: tm.ManialinkClickInfo, actionIdOffset: number) => void), actionId: number, range?: number }[] = []
 
 /**
- * Adds a callback function to execute on given Action ID
+ * Adds a callback function to execute on given Action ID.
  * @param actionId Manialink Action ID
  * @param callback Callback function, it takes ManialinkClickInfo as a parameter
  */
 function addManialinkListener(actionId: number, callback: (info: tm.ManialinkClickInfo) => void): void
 /**
- * Adds a callback function to execute on given Action ID range
+ * Adds a callback function to execute on given Action ID range.
  * @param actionId Starting manialink Action ID
  * @param range Range of Action IDs (inludes starting Action ID)
  * @param callback Callback function, it takes ManialinkClickInfo and id offset as a parameter
@@ -24,7 +24,7 @@ function addManialinkListener(actionId: number, rangeOrCallback: ((info: tm.Mani
 }
 
 /**
- * Removes a manialink listener
+ * Removes a manialink listener.
  * @param callback Reference to function to remove
  */
 const removeManialinkListener = (callback: (info: tm.ManialinkClickInfo) => void) => {

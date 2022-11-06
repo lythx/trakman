@@ -1,5 +1,4 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './LocalRankingResult.config.js'
 
 export default class LocalRankingResult extends StaticComponent {
@@ -16,8 +15,8 @@ export default class LocalRankingResult extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry, { resultMode: true })
+    this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -27,7 +26,7 @@ export default class LocalRankingResult extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())

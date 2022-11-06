@@ -3,7 +3,7 @@ import icons from '../config/Icons.js'
 const p = tm.utils.palette
 
 export default {
-  privilege: tm.config.privileges.addGuest,
+  privilege: tm.config.controller.privileges.addGuest,
   title: " Guests ",
   icon: icons.guestlist,
   iconWidth: 2,
@@ -22,10 +22,10 @@ export default {
     1
   ],
   navbar: [
-    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.privileges)) },
-    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.privileges.ban },
-    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.privileges.blacklist },
-    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.privileges.mute }
+    { name: 'Playerlist', actionId: ids.playerList, privilege: Math.min(...Object.values(tm.config.controller.privileges)) },
+    { name: 'Banlist', actionId: ids.banlist, privilege: tm.config.controller.privileges.ban },
+    { name: 'Blacklist', actionId: ids.blacklist, privilege: tm.config.controller.privileges.blacklist },
+    { name: 'Mutelist', actionId: ids.mutelist, privilege: tm.config.controller.privileges.mute }
   ],
   grid: {
     background: "9996",

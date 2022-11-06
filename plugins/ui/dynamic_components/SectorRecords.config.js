@@ -29,5 +29,6 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
-  }
+  },
+  selfColour: tm.utils.palette.green
 }

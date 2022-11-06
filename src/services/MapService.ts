@@ -145,12 +145,13 @@ export class MapService {
   }
 
   /**
-   * Adds a map to the server
+   * Adds a map to the server and to the jukebox. Map needs to be present in the server files.
    * @param filename Path to the map file
    * @param caller Object containing login and nickname of the player who is adding the map
+   * @param dontJuke If true the map doesn't get enqueued, false by default
    * @returns Added map object or error if unsuccessful
    */
-  static async add(filename: string, caller?: { login: string, nickname: string }): Promise<tm.Map | Error> {
+  static async add(filename: string, caller?: { login: string, nickname: string }, dontJuke: boolean = false): Promise<tm.Map | Error> {
     const insert: any | Error = await Client.call('InsertChallenge', [{ string: filename }])
     if (insert instanceof Error) { return insert }
     if (insert === false) { return new Error(`Failed to insert map ${filename}`) }
@@ -172,13 +173,56 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
-    const status: void | Error = await this.addToJukebox(obj.id, caller, true)
-    if (status instanceof Error) {
-      Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
-      this.clearJukebox()
+    if(!dontJuke) {
+      const status: true | Error = await this.addToJukebox(obj.id, caller, true)
+      if (status instanceof Error) {
+        Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
+        this.clearJukebox()
+      }
     }
     Events.emit('MapAdded', { ...obj, callerLogin: caller?.login })
     return obj
+  }
+
+  /**
+   * Writes a map file to the server, adds it to the current Match Settings and to the jukebox.
+   * @param fileName Map file name (file will be saved with this name on the server)
+   * @param file Map file buffer
+   * @param caller Object containing login and nickname of the player who is adding the map
+   * @param dontJuke If true the map doesn't get enqueued, false by default
+   * @returns Error if unsuccessfull, object containing map object and boolean indicating whether the map was already on the server
+   */
+  static async writeFileAndAdd(fileName: string, file: Buffer, caller?: { nickname: string, login: string }, dontJuke: boolean = false):
+    Promise<{ map: tm.Map, wasAlreadyAdded: boolean } | Error> {
+    const base64String: string = file.toString('base64')
+    const write: any | Error = await Client.call('WriteFile', [{ string: fileName }, { base64: base64String }])
+    if (write instanceof Error) {
+      return new Error(`Failed to write map file ${fileName}.`)
+    }
+    const map: tm.Map | Error = await this.add(fileName, caller, dontJuke)
+    if (map instanceof Error) {
+      // Yes we actually need to do this in order to juke a map if it was on the server already
+      if (map.message.trim() === 'Challenge already added. Code: -1000') {
+        const content: string = file.toString()
+        let i: number = 0
+        while (i < content.length) {
+          if (content.substring(i, i + 12) === `<ident uid="`) {
+            const id: string = content.substring(i + 12, i + 12 + 27)
+            const map: tm.Map | undefined = this._maps.find(a => a.id === id)
+            if (map === undefined) {
+              return new Error(`Failed to queue map ${fileName}`)
+            }
+            if(!dontJuke) {
+              this.addToJukebox(id, caller)
+            }
+            return { wasAlreadyAdded: true, map }
+          }
+          i++
+        }
+      }
+      return new Error(`Failed to queue map ${fileName}`)
+    }
+    return { wasAlreadyAdded: false, map }
   }
 
   /**
@@ -245,8 +289,9 @@ export class MapService {
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player adding the map
    * @param setAsNextMap If true map is going to be placed in front of the queue
+   * @returns True if successfull, Error if map is not in the memory
    */
-  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<void | Error> {
+  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
     const map: tm.Map | undefined = MapService.maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
@@ -258,12 +303,14 @@ export class MapService {
     } else {
       Logger.trace(`Map ${Utils.strip(map.name)} by ${map.author} has been added to the jukebox`)
     }
+    return true
   }
 
   /**
    * Removes a map from the queue
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
+   * @returns True if the map was in the jukebox, false if it wasn't
    */
   static async removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): Promise<boolean> {
     if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
@@ -304,7 +351,7 @@ export class MapService {
 
   /**
    * Randomly changes the order of maps in the maplist
-   * @param caller Object containing login and nickname of player who called the method
+   * @param caller Object containing login and nickname of the player who called the method
    */
   static async shuffle(caller?: { login: string, nickname: string }): Promise<void> {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
@@ -384,7 +431,7 @@ export class MapService {
   static get(uid: string): Readonly<tm.Map> | undefined
   /**
    * Gets multiple maps from current playlist. Playlist is stored in runtime memory.
-   * If some map is not present in memory it won't be returned. Returned array is not in initial order
+   * If some map is not present in memory it won't be returned. Returned array is not in the initial order
    * @param uids Array of map uids
    * @returns Array of map objects
    */
@@ -404,7 +451,7 @@ export class MapService {
   static fetch(uid: string): Promise<tm.Map | undefined>
   /**
    * Fetches multiple maps from the database. This method should be used to get maps which are not in the current Match Settings
-   * If some map is not present in the database it won't be returned. Returned array is not in initial order
+   * If some map is not present in the database it won't be returned. Returned array is not in the initial order
    * @param uids Array of map uids
    * @returns Map objects array
    */
@@ -467,14 +514,14 @@ export class MapService {
   }
 
   /**
-   * Gets a map from jukebox
+   * Gets a map from jukebox.
    * @param uid Map uid
    * @returns jukebox object or undefined if map is not in the jukeboxed
    */
   static getFromJukebox(uid: string): Readonly<{ map: tm.Map, callerLogin?: string }> | undefined
   /**
    * Gets multiple maps from jukebox. If some map is not present in jukebox it won't be returned. 
-   * Returned array is not in initial order
+   * Returned array is not in initial order.
    * @param uids Array of map uids
    * @returns Array of jukebox objects
    */

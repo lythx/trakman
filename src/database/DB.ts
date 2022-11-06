@@ -1,4 +1,4 @@
-import config from '../../config/Database.js'
+import 'dotenv/config'
 import postgres from 'pg'
 import { createQueries } from './CreateQueries.js'
 import { Logger } from '../Logger.js'
@@ -8,11 +8,11 @@ const { Pool } = postgres
 export class Database {
 
   private static readonly pool: postgres.Pool = new Pool({
-    user: config.dbUser,
-    password: config.dbPassword,
-    database: config.dbName,
-    host: config.dbAddress,
-    port: config.dbPort
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_IP,
+    port: Number(process.env.DB_PORT)
   })
   private client: postgres.Pool | postgres.PoolClient = Database.pool
 

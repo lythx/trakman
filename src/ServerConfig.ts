@@ -91,6 +91,9 @@ export class ServerConfig {
     }
   }
 
+  /**
+   * Current dedicated server config
+   */
   static get config(): tm.ServerInfo {
     return { ...this._config }
   }

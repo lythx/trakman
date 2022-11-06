@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
+
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UI.js'
 import config from './Blacklist.config.js'
 
 export default class Blacklist extends PopupWindow<number> {
@@ -12,7 +12,7 @@ export default class Blacklist extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.admin.blacklistCount / config.entries))
+      Math.ceil(tm.admin.blacklistCount / (config.entries - 1)))
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
@@ -33,10 +33,10 @@ export default class Blacklist extends PopupWindow<number> {
       }
     })
     tm.addListener(['Blacklist', 'Unblacklist'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.blacklistCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.admin.blacklistCount / (config.entries - 1)))
       this.reRender()
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
     tm.addListener('PrivilegeChanged', (info) => {
       if (info.newPrivilege < config.privilege) { this.hideToPlayer(info.login) }
       this.reRender()
@@ -63,7 +63,7 @@ export default class Blacklist extends PopupWindow<number> {
   }
 
   protected async constructContent(login: string, page: number = 1): Promise<string> {
-    const index = (page - 1) * config.entries - 1
+    const index = (page - 1) * (config.entries - 1) - 1
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),
@@ -82,8 +82,7 @@ export default class Blacklist extends PopupWindow<number> {
       const nickname = fetchedPlayers.find(a => a.login === blacklist[i + index].login)?.nickname
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
-    const loginCell: GridCellFunction = (i, j, w, h) => blacklist[i + index].login === login ?
-      centeredText('$' + config.selfColour + blacklist[i + index].login, w, h) : centeredText(blacklist[i + index].login, w, h)
+    const loginCell: GridCellFunction = (i, j, w, h) => centeredText(blacklist[i + index].login, w, h)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(tm.utils.formatDate(blacklist[i + index].date, true), w, h)
     const reasonCell = (i: number, j: number, w: number, h: number) => {
       return centeredText(tm.utils.safeString(tm.utils.strip(blacklist[i - 1]?.reason ?? 'No reason specified')), w, h)
@@ -93,7 +92,7 @@ export default class Blacklist extends PopupWindow<number> {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.unblacklistIcon}"
     imagefocus="${config.unblacklistIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
-    const rows = Math.min(config.entries, blacklist.length - (index + 1))
+    const rows = Math.min(config.entries - 1, blacklist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, reasonCell, adminCell, unblacklistButton)

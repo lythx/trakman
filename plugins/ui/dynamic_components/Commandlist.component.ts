@@ -1,5 +1,4 @@
-import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener } from "../UiUtils.js"
-import PopupWindow from "../PopupWindow.js"
+import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener, PopupWindow } from "../UI.js"
 import config from './Commandlist.config.js'
 
 interface DisplayParams {
@@ -134,8 +133,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
       const text: string = command.aliases.join(', ')
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center"/>`
+      return centeredText(tm.utils.safeString(tm.utils.strip(text, true)), w, h)
     }
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
@@ -154,14 +152,12 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }
       }
       if (hasOptionals === true) { text += ']' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(text, true))}" valign="center" halign="center" /> `
+      return centeredText(tm.utils.safeString(tm.utils.strip(text, true)), w, h)
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
-      return `<label posn="${w / 2} -${h / 2} 4" sizen="${(w * (1 / config.textScale)) - 1} ${h}" 
-      scale="${config.textScale}" text="${tm.utils.safeString(tm.utils.strip(command.help ?? '', true))}" valign="center" halign="center" /> `
+      return centeredText(tm.utils.safeString(tm.utils.strip(command.help ?? '', true)), w, h)
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)

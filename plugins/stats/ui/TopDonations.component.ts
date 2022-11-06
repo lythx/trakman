@@ -1,27 +1,26 @@
-import PopupWindow from "../PopupWindow.js"
-import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
-import config from './TopVotes.config.js'
+import { stats } from "../Stats.js"
+import { componentIds, centeredText } from '../../ui/UI.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../../ui/UI.js"
+import config from './TopDonations.config.js'
 
-export default class TopVisits extends PopupWindow<number> {
+export default class TopDonations extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: readonly { login: string, nickname: string, count: number }[]
+  private ranks: readonly { login: string, nickname: string, amount: number }[]
 
   constructor() {
-    super(componentIds.topVotes, config.icon, config.title, config.navbar)
-    this.ranks = stats.votes.list
+    super(componentIds.topDonations, config.icon, config.title, config.navbar)
+    this.ranks = stats.donations.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.votes.onUpdate(() => {
-      this.ranks = stats.votes.list
+    stats.donations.onUpdate(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    stats.votes.onNicknameChange(() => {
-      this.ranks = stats.votes.list
+    stats.donations.onNicknameChange(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -30,8 +29,8 @@ export default class TopVisits extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['votes', 'topvotes'],
-      help: 'Display top vote amounts.',
+      aliases: ['dons', 'topdons', 'donations'],
+      help: 'Display top donations.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
@@ -67,7 +66,7 @@ export default class TopVisits extends PopupWindow<number> {
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
     const averageCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(this.ranks[getIndex(i, j)].count.toString(), w, h)
+      centeredText(this.ranks[getIndex(i, j)].amount.toString(), w, h)
     const emptyCell: GridCellObject = {
       callback: (i, j, w, h) => '',
       background: undefined

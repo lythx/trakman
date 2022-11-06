@@ -27,7 +27,7 @@ const initialize = async () => {
   for (const e of nicknameChangeListeners) { e(topList) }
 }
 
-tm.addListener('PlayerInfoUpdated', (info) => {
+tm.addListener('PlayerDataUpdated', (info) => {
   const changedObjects: { login: string, nickname: string }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname
@@ -114,7 +114,7 @@ tm.addListener('PlayerLeave', info => {
 })
 
 tm.addListener('LocalRecord', info => {
-  if (info.previousPosition === -1) {
+  if (info.previous === undefined) {
     const obj = onlineList.find(a => a.login === info.login)
     if (obj === undefined) { return }
     obj.amount++

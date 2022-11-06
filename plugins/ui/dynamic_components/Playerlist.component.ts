@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction } from '../UiUtils.js'
+
+import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../UI.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{ page: number, privilege: number }> {
@@ -25,7 +25,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       this.displayToPlayer(login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     tm.addListener(['PlayerLeave', 'PlayerJoin', 'PlayerInfoChanged', 'Mute', 'Unmute', 'AddGuest', 'RemoveGuest'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.players.count / config.entries))
       this.reRender()
     })
     tm.addListener('PrivilegeChanged', (info) => {
@@ -38,7 +38,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
     tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {
       if (info.actionId >= this.openId + this.actions.kick
         && info.actionId < this.openId + this.actions.kick + 1000) { // Kick
@@ -226,7 +226,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const muteCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.mute + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.mute) {
+      if (params.privilege < tm.config.controller.privileges.mute) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -242,7 +242,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const blacklistCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.blacklist + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.blacklist || params.privilege <= players[i + index].privilege) {
+      if (params.privilege < tm.config.controller.privileges.blacklist || params.privilege <= players[i + index].privilege) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -252,7 +252,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const banCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.ban + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.ban || params.privilege <= players[i + index].privilege) {
+      if (params.privilege < tm.config.controller.privileges.ban || params.privilege <= players[i + index].privilege) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }
@@ -262,7 +262,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     const guestCell: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + this.actions.addGuest + index}"`
       let cover = ''
-      if (params.privilege < tm.config.privileges.addGuest) {
+      if (params.privilege < tm.config.controller.privileges.addGuest) {
         actionStr = ''
         cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
       }

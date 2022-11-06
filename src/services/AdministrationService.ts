@@ -1,7 +1,7 @@
 import { Logger } from "../Logger.js"
 import { Client } from "../client/Client.js"
 import config from "../../config/Config.js"
-import dbConfig from '../../config/Database.js'
+import 'dotenv/config'
 import { PrivilegeRepository } from "../database/PrivilegeRepository.js"
 import { BanlistRepository } from '../database/BanlistRepository.js'
 import { BlacklistRepository } from '../database/BlacklistRepository.js'
@@ -101,8 +101,12 @@ export class AdministrationService {
    * Sets the server owner to login specified in .env file and removes previous owner if it changed
    */
   private static async setOwner(): Promise<void> {
+    if (process.env.OWNER_LOGIN === undefined) {
+      Logger.warn('OWNER_LOGIN not specified. Change your .env file to use owner privileges')
+      return
+    }
     const oldOwnerLogin: string | undefined = await this.privilegeRepo.getOwner()
-    const newOwnerLogin: string = dbConfig.serverOwnerLogin
+    const newOwnerLogin: string = process.env.OWNER_LOGIN
     if (oldOwnerLogin !== newOwnerLogin) {
       if (oldOwnerLogin !== undefined) { await this.privilegeRepo.removeOwner() }
       await this.setPrivilege(newOwnerLogin, 4)
@@ -669,13 +673,13 @@ export class AdministrationService {
   }
 
   /**
-   * Gets guest information for given login
+   * Gets guest information for given login.
    * @param login Player login
    * @returns Guest object or undefined if the player isn't in the guestlist
    */
   static getGuest(login: string): Readonly<tm.GuestlistEntry> | undefined
   /**
-   * Gets multiple guests information for given logins
+   * Gets multiple guests information for given logins.
    * @param logins Array of player logins
    * @returns Array of guest objects
    */

@@ -1,6 +1,6 @@
-import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener } from '../../UiUtils.js'
+import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
 import { maniakarma } from '../../../maniakarma/Maniakarma.js'
-import StaticComponent from '../../StaticComponent.js'
+
 import config from './KarmaWidget.config.js'
 
 export default class KarmaWidget extends StaticComponent {

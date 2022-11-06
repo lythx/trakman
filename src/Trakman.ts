@@ -71,7 +71,9 @@ namespace trakman {
 
     fetchMapInfo: TMXFetcher.fetchMapInfo.bind(TMXFetcher),
 
-    fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher)
+    fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher),
+
+    searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher)
 
   }
 
@@ -160,7 +162,12 @@ namespace trakman {
     /**
      * Recent chat messages. 
      */
-    get list(): tm.Message[] { return ChatService.messages }
+    get list(): tm.Message[] { return ChatService.messages },
+
+    /**
+     * Number of recent chat messages.
+     */
+    get count(): number { return ChatService.messageCount }
 
   }
 
@@ -171,7 +178,12 @@ namespace trakman {
     /**
      * All registered chat commands.
      */
-    get list(): tm.Command[] { return ChatService.commandList }
+    get list(): tm.Command[] { return ChatService.commandList },
+
+    /**
+     * Number of commands.
+     */
+    get count(): number { return ChatService.commandCount }
 
   }
 
@@ -194,6 +206,8 @@ namespace trakman {
     add: MapService.add.bind(MapService),
 
     remove: MapService.remove.bind(MapService),
+
+    writeFileAndAdd: MapService.writeFileAndAdd.bind(MapService),
 
     /**
      * All maps from current playlist.
@@ -322,32 +336,38 @@ namespace trakman {
   export const state = {
 
     /**
-     * Remaining map time in seconds
+     * Remaining race time in seconds.
      */
-    get remainingMapTime(): number {
-      return GameService.remainingMapTime
+    get remainingRaceTime(): number {
+      return GameService.remainingRaceTime
     },
 
     /**
-     * Remaining result screen time in seconds
+     * Remaining result screen time in seconds.
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
     },
 
     /**
-     * Server state
+     * Server state.
      */
-    get current(): "race" | "result" | "transition" {
+    get current(): tm.ServerState {
       return GameService.state
     },
 
-    get gameConfig(): tm.Game {
-      return GameService.config
+    /**
+     * Race time limit in the current round.
+     */
+    get raceTimeLimit(): number {
+      return GameService.raceTimeLimit
     },
 
-    get serverConfig(): tm.ServerInfo {
-      return ServerConfig.config
+    /**
+     * Result time limit in the current round.
+     */
+    get resultTimeLimit(): number {
+      return GameService.resultTimeLimit
     }
 
   }
@@ -461,39 +481,57 @@ namespace trakman {
     await PlayerService.updateInfo(...players)
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
-    Events.emit('PlayerInfoUpdated', players)
+    Events.emit('PlayerDataUpdated', players)
   }
 
   /**
-   * Adds a listener to an event to execute callbacks
-   * @param event Event to register the callback on
+   * Adds a listener to an event to execute callbacks.
+   * @param event Event or array of events to register the callback on
    * @param callback Callback to register on given event
    * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
    */
   export const addListener = Events.addListener
 
   /**
-   * Removes event listener
-   * @param callback Callback function of listener to remove
+   * Removes event listener,
+   * @param callback Callback function of the listener to remove
    */
   export const removeListener = Events.removeListener
 
   /**
-   * Handles manialink interaction
+   * Emits ManialinkClick for given player and actionId. 
+   * Used for manialink interaction such as opening UI windows.
    * @param id Manialink ID
    * @param login Player login
    */
   export const openManialink = (id: number, login: string): void => {
-    const temp: any = PlayerService.get(login)
-    temp.actionId = id
-    const info: tm.ManialinkClickInfo = temp
+    const player = PlayerService.get(login)
+    if (player === undefined) { return }
+    const info: tm.ManialinkClickInfo = {
+      ...player,
+      actionId: id
+    }
     Events.emit('ManialinkClick', info)
   }
 
-  /**
-   * Controller config
-   */
-  export const config = controllerConfig
+  export const config = {
+
+    /**
+     * Controller config.
+     */
+    controller: controllerConfig,
+
+    /**
+     * Current dedicated server config.
+     */
+    get server() { return ServerConfig.config },
+
+    /**
+     * Current game config.
+     */
+    get game() { return GameService.config }
+
+  }
 }
 
 declare global {

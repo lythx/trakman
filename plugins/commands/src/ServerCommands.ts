@@ -32,7 +32,7 @@ const commands: tm.Command[] = [
     params: [{ name: 'amount', type: 'int' }, { name: 'login', optional: true }, { name: 'message', optional: true }],
     callback: async (info: tm.MessageInfo, amount: number, login?: string, message?: string): Promise<void> => {
       const status = await tm.utils.payCoppers(login ?? info.login, amount,
-        message ?? tm.utils.strVar(config.pay.defaultMessage, { coppers: amount, server: tm.state.serverConfig.name }))
+        message ?? tm.utils.strVar(config.pay.defaultMessage, { coppers: amount, server: tm.config.server.name }))
       if (status instanceof Error) {
         tm.sendMessage(tm.utils.strVar(config.pay.error, { login: login ?? info.login }), info.login)
       } else {

@@ -59,7 +59,7 @@ const commands: tm.Command[] = [
     aliases: ['er', 'endround'],
     help: 'End the ongoing round in rounds-based gamemodes.',
     callback: (info: tm.MessageInfo): void => {
-      if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.endround.error, info.login)
         return
       }
@@ -73,7 +73,7 @@ const commands: tm.Command[] = [
     help: 'Force a player into the specified team.',
     params: [{ name: 'player' }, { name: 'team', validValues: ['blue', 'red'] }],
     callback: async (info: tm.MessageInfo, player: string, team: string): Promise<void> => {
-      if (tm.state.gameConfig.gameMode === 1 || tm.state.gameConfig.gameMode === 4) { // TimeAttack & Stunts
+      if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.forceteam.notRounds, info.login)
         return
       }

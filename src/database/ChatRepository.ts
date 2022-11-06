@@ -19,7 +19,7 @@ export class ChatRepository extends Repository {
       limitStr = `LIMIT $${i}`
       params.push(options.limit)
     }
-    const query: string = `SELECT login, nickname, message, date FROM chat 
+    const query: string = `SELECT login, nickname, message as text, date FROM chat 
     JOIN players ON players.id=chat.player_id
     ORDER BY date DESC 
     ${dateStr}
@@ -41,7 +41,7 @@ export class ChatRepository extends Repository {
       limitStr = `LIMIT $${i}`
       params.push(options.limit)
     }
-    const query: string = `SELECT login, nickname, message, date FROM chat 
+    const query: string = `SELECT login, nickname, message as text, date FROM chat 
     JOIN players ON players.id=chat.player_id
     ORDER BY date DESC 
     WHERE login=$1${dateStr}
@@ -57,7 +57,8 @@ export class ChatRepository extends Repository {
       return
     }
     const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
-    await this.query(query, id, text, date)
+    // Slice multibyte characters
+    await this.query(query, id, text.slice(0, 150), date)
   }
 
 }

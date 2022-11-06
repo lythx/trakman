@@ -1,7 +1,8 @@
+import { centeredText } from '../UI.js'
 import config from './Navbar.config.js'
 
 /**
- * Util to display horizontal navbar, used by popup windows
+ * Util to display horizontal navbar, used by popup windows.
  */
 export default class Navbar {
 
@@ -23,7 +24,10 @@ export default class Navbar {
    * @param background Navbar background
    * @param hoverImgUrl Background image to display on button hover
    */
-  constructor(buttons: { name: string, actionId: number, privilege?: number }[], width: number, height: number | null = config.height,
+  constructor(buttons: {
+    name: string, actionId: number,
+    privilege?: number
+  }[], width: number, height: number | null = config.height,
     background: string = config.background, hoverImgUrl: string = config.hoverImage) {
     this.width = width
     this.height = height ?? config.height
@@ -54,7 +58,7 @@ export default class Navbar {
       xml += `<frame posn="${w * i} 0 1">
             <quad posn="0 0 3" sizen="${w - config.margin} ${this.height}" image="f" imagefocus="${this.hoverImage}" action="${e.actionId}"/>
             <quad posn="0 0 2" sizen="${w - config.margin} ${this.height}" bgcolor="${this.background}"/>
-            <label posn="${w / 2} -${(this.height / 2)} 9" sizen="${(w * (1 / config.textScale)) - (config.padding * 2)} ${this.height}" scale="${config.textScale}" text="${tm.utils.safeString(e.name)}" valign="center" halign="center"/>
+            ${centeredText(tm.utils.safeString(e.name), w, this.height)}
             </frame>`
     }
     return xml

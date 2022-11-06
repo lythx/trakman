@@ -119,7 +119,9 @@ export class Vote {
         }
         Vote.onUpdate(this.votes, this.seconds, info)
         if (this.votes.length === this.loginList.length) {
-          this.conclude()
+          Vote.onEnd(this.conclude(), this.votes)
+          this.clearListeners()
+          Vote.isDisplayed = false
         }
       }
     }
@@ -146,8 +148,8 @@ export class Vote {
         if (this.seconds === -1) {
           Vote.onEnd(this.conclude(), this.votes)
           this.clearListeners()
-          clearInterval(interval)
           Vote.isDisplayed = false
+          clearInterval(interval)
           return
         }
         Vote.onSecondsChanged(this.seconds, this.votes)

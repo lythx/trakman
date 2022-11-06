@@ -1,6 +1,5 @@
-import PopupWindow from "../PopupWindow.js"
-import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener } from '../UiUtils.js'
-import { Paginator } from "../UiUtils.js"
+import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
+import { Paginator } from "../UI.js"
 import { maplist } from '../../maplist/Maplist.js'
 import config from './Maplist.config.js'
 
@@ -9,7 +8,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private readonly paginator: Paginator
   private readonly mapAddId = 1000
   private readonly grid: Grid
-  private readonly challengeActionIds: string[] = []
+  private readonly mapActionIds: string[] = []
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string }[] = []
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
@@ -27,7 +26,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
     addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex) => {
-      const mapId = this.challengeActionIds[mapIndex]
+      const mapId = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
         tm.log.error('Error while adding map to queue from jukebox', `Map index out of range`)
@@ -42,7 +41,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       aliases: ['l', 'ml', 'list'],
       help: 'Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.',
       params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
+      callback: (info: tm.MessageInfo, query?: string): void => {
         if (query === undefined) {
           tm.openManialink(this.openId, info.login)
           return
@@ -52,7 +51,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
-          await this.openWithOption(info.login, o)
+          this.openWithOption(info.login, o)
           return
         }
         if (query.startsWith('$a')) {
@@ -66,24 +65,24 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     tm.commands.add({
       aliases: ['best'],
       help: 'Display list of maps sorted by rank ascending.',
-      callback: async (info: tm.MessageInfo): Promise<void> => {
-        await this.openWithOption(info.login, 'best')
+      callback: (info: tm.MessageInfo): void => {
+        this.openWithOption(info.login, 'best')
       },
       privilege: 0
     })
     tm.commands.add({
       aliases: ['worst'],
       help: 'Display list of maps sorted by rank descending.',
-      callback: async (info: tm.MessageInfo): Promise<void> => {
-        await this.openWithOption(info.login, 'worst')
+      callback: (info: tm.MessageInfo): void => {
+        this.openWithOption(info.login, 'worst')
       },
       privilege: 0
     })
     tm.commands.add({
       aliases: ['jb', 'jukebox'],
       help: 'Display jukebox.',
-      callback: async (info: tm.MessageInfo): Promise<void> => {
-        await this.openWithOption(info.login, 'jukebox')
+      callback: (info: tm.MessageInfo): void => {
+        this.openWithOption(info.login, 'jukebox')
       },
       privilege: 0
     })
@@ -106,7 +105,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
     const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount} `)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
   }
 
   private getPaginator(login: string, list: readonly tm.Map[]) {
@@ -259,7 +258,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     const map = maplist.get().find(a => a.id === mapId)
     if (map === undefined) {
       tm.sendMessage(config.messages.error, login)
-      tm.log.error('Error while adding map to queue from jukebox', `Can't find challenge with id ${mapId} in memory`)
+      tm.log.error('Error while adding map to queue from jukebox', `Can't find map with id ${mapId} in memory`)
       return false
     }
     if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
@@ -291,11 +290,11 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private getActionId(mapId: string): number {
-    const challengeActionId = this.challengeActionIds.indexOf(mapId)
-    if (challengeActionId !== -1) { return challengeActionId + this.openId + this.mapAddId }
+    const mapActionId = this.mapActionIds.indexOf(mapId)
+    if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId }
     else {
-      this.challengeActionIds.push(mapId)
-      return this.challengeActionIds.length - 1 + this.openId + this.mapAddId
+      this.mapActionIds.push(mapId)
+      return this.mapActionIds.length + this.openId + this.mapAddId - 1
     }
   }
 

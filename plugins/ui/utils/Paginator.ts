@@ -110,14 +110,14 @@ export default class Paginator {
   }
 
   /**
-   * Resets current player page positions
+   * Resets current player page positions.
    */
   resetPlayerPages(): void {
     this.loginPages.length = 0
   }
 
   /**
-   * Gets current page of a given player
+   * Gets current page of a given player.
    * @param login Player login
    * @returns Page number
    */
@@ -155,12 +155,12 @@ export default class Paginator {
     if (pageCount > 10) { this._buttonCount = 3 }
   }
 
-  /** Button count. Button count is dependant on page count. */
+  /** Amount of currently displayed buttons. It's relative to the page count */
   get buttonCount() {
     return this._buttonCount
   }
 
-  /** Page count */
+  /** Amount of pages */
   get pageCount() {
     return this._pageCount
   }
@@ -196,7 +196,7 @@ export default class Paginator {
   }
 
   /**
-   * Removes click listener. Use this before deleting the object to avoid memory leaks
+   * Removes click listener. Use this before deleting the object to avoid memory leaks.
    */
   destroy(): void {
     if (this.clickListener === undefined) { return }

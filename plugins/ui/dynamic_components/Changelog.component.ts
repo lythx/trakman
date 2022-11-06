@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { Grid, componentIds, GridCellFunction, centeredText, closeButton } from '../UiUtils.js'
+
+import { Grid, componentIds, GridCellFunction, centeredText, closeButton, PopupWindow } from '../UI.js'
 import config from './Changelog.config.js'
 
 export default class Changelog extends PopupWindow {

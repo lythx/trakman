@@ -1,5 +1,4 @@
-import PopupWindow from "../PopupWindow.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction } from '../UiUtils.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../UI.js'
 import config from './LocalSectors.config.js'
 
 export default class LocalSectors extends PopupWindow {
@@ -42,7 +41,7 @@ export default class LocalSectors extends PopupWindow {
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: 0
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {

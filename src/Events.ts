@@ -27,10 +27,10 @@ const initialize = async () => {
 }
 
 /**
- * Add callback function to execute on given event
- * @param event dedicated server callback event
- * @param callback function to execute on event
- * @param prepend if set to true puts the listener on the beggining of the array (it will get executed before other listeners)
+ * Add callback function to execute on given event.
+ * @param event Dedicated server callback event
+ * @param callback Function to execute on event
+ * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
  */
 const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
   callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any)
@@ -45,12 +45,15 @@ const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
 }
 
 /**
- * Removes event listener
- * @param callback Callback function of listener to remove
+ * Removes event listener.
+ * @param callback Callback function of the listener to remove
  */
 const removeListener = (callback: Function): void => {
-  const index = eventListeners.findIndex(a => a.callback === callback)
-  if (index !== -1) { eventListeners.splice(index, 1) }
+  let index = eventListeners.findIndex(a => a.callback === callback)
+  while (index !== -1) {
+    eventListeners.splice(index, 1)
+    index = eventListeners.findIndex(a => a.callback === callback)
+  }
 }
 
 /**

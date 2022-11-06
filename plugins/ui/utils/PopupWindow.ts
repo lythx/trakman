@@ -1,8 +1,9 @@
-import DynamicComponent from "./DynamicComponent.js"
-import { componentIds } from './UiUtils.js'
-import uitlIds from './config/UtilIds.js'
-import Navbar from './utils/Navbar.js'
-import config from './config/PopupWindow.js'
+import { componentIds } from '../UI.js'
+import DynamicComponent from './DynamicComponent.js'
+import uitlIds from '../config/UtilIds.js'
+import Navbar from './Navbar.js'
+import config from '../config/PopupWindow.js'
+import { centeredText } from '../UI.js'
 
 /**
  * Abstract class for manialink popup windows.
@@ -118,7 +119,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
             <quad posn="0 0 2" sizen="${this.headerHeight} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.headerHeight - this.margin * 2} ${this.headerHeight - this.margin * 2}" image="${this.headerIcon}"/>
             <quad posn="${this.headerHeight + this.margin} 0 2" sizen="${this.windowWidth - (this.headerHeight + this.headerPageWidth + this.margin * 2)} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
-            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="1" text="${tm.utils.safeString(this.title)}" valign="center" halign="center"/>
+            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(this.title)}" valign="center" halign="center"/>
             <frame posn="${this.headerHeight + this.windowWidth - (this.headerHeight + this.headerPageWidth)} 0 4">
               <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`,
       `
@@ -151,7 +152,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   /**
-   * Method called on displayToPlayer, by default it constructs navbar from parameters passed to constructor
+   * Method called on displayToPlayer, by default it constructs navbar from parameters passed to constructor.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -162,7 +163,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   }
 
   /**
-   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window content
+   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window content.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -171,7 +172,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected abstract constructContent(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
 
   /**
-   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer
+   * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer.
    * @param login Player login
    * @param params Display params passed to displayToPlayer
    * @param privilege Player privilege
@@ -180,7 +181,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected abstract constructFooter(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
 
   /**
-   * Displays window to given player based on manialink XML strings returned by construct methods
+   * Displays window to given player based on manialink XML strings returned by construct methods.
    * @param login Player login
    * @param params Display params to be passed to construct methods
    * @param topRightText Text displayed in right part of the header
@@ -196,9 +197,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     const noNavbar = this.navbar.getButtonCount(privilege) === 0
     PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
     tm.sendManialink(`${this.headerLeft}
-    <label posn="${this.headerPageWidth / 2} ${-(this.headerHeight - this.margin) / 2} 3" 
-    sizen="${this.headerPageWidth} ${this.headerHeight - this.margin}" scale="1" text="${topRightText ?? ''}" 
-    valign="center" halign="center"/>
+    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale})}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
     ${noNavbar === true ? this.noNavbarMidTop : this.frameMidTop}

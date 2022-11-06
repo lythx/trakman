@@ -1,5 +1,5 @@
-import { RecordList, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+
 import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {
@@ -17,7 +17,7 @@ export default class LiveRanking extends StaticComponent {
     this.positionY = pos.y
     this.side = pos.side
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList(this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, config.maxRecordsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -31,7 +31,7 @@ export default class LiveRanking extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (tm.records.live.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }

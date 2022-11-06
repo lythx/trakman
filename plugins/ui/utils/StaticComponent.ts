@@ -1,15 +1,15 @@
-import RaceUi from "./config/RaceUi.js"
-import ResultUi from "./config/ResultUi.js"
+import RaceUi from "../config/RaceUi.js"
+import ResultUi from "../config/ResultUi.js"
 
 type DisplayMode = 'race' | 'result' | 'always' | 'none'
 
 /**
- * Abstract class for static manialink components
+ * Abstract class for static manialink components.
  */
 export default abstract class StaticComponent {
 
   /** Events preset on which manialink gets displayed and hidden */
-  displayMode: DisplayMode
+  readonly displayMode: DisplayMode
   private _isDisplayed: boolean = true
   /** Component manialink ID */
   readonly id: number
@@ -19,6 +19,7 @@ export default abstract class StaticComponent {
     race: ['race', 'transition'],
     result: ['result']
   }
+  private static readonly componentCreateListeners: ((component: StaticComponent) => void)[] = []
 
   /**
    * Abstract class for static manialink components
@@ -28,7 +29,12 @@ export default abstract class StaticComponent {
   constructor(id: number, displayMode: DisplayMode) {
     this.id = id
     this.displayMode = displayMode
-    tm.addListener(['EndMap', 'BeginMap'], () => {
+    tm.addListener('EndMap', (info) => {
+      if(info.isRestart && info.winnerLogin === undefined) { return }
+      this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
+      this._isDisplayed ? this.display() : this.hide()
+    }, true)
+    tm.addListener('BeginMap', () => {
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
       this._isDisplayed ? this.display() : this.hide()
     }, true)
@@ -38,10 +44,13 @@ export default abstract class StaticComponent {
     if (!this.dislayStates[displayMode].includes(tm.state.current)) {
       this._isDisplayed = false
     }
+    for (const e of StaticComponent.componentCreateListeners) {
+      e(this)
+    }
   }
 
   /**
-   * Gets position relative to other static manialinks based on config
+   * Gets position relative to other static manialinks based on config.
    * @returns Object containing coordinates and side of the component
    */
   protected getRelativePosition(): { x: number, y: number, side: boolean } {
@@ -64,7 +73,7 @@ export default abstract class StaticComponent {
   }
 
   /**
-   * Boolean indicating whether component should be displayed according to preset display mode
+   * Boolean indicating whether component should be displayed according to preset display mode.
    */
   get isDisplayed(): boolean {
     return this._isDisplayed
@@ -72,23 +81,31 @@ export default abstract class StaticComponent {
 
   /**
    * Displays the manialink to all the players
-   * @param params Params passed to construct functions
+   * @param params Optional params
    */
   abstract display(params?: any): void
 
   /**
    * Displays the manialink to given player
    * @param login Player login
-   * @param params Params passed to construct functions
+   * @param params Optional params
    */
   abstract displayToPlayer(login: string, params?: any): void
 
   /**
-   * Hides the manialink
+   * Hides the manialink for all players
    */
   hide(): void {
     this._isDisplayed = false
     tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
+  }
+
+  /**
+   * Add a callback function to execute when new component object gets created 
+   * @param callback Function to execute on event
+   */
+  static onComponentCreated(callback: (component: StaticComponent) => void) {
+    this.componentCreateListeners.push(callback)
   }
 
 }

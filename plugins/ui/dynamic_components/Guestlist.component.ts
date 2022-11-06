@@ -1,5 +1,5 @@
-import PopupWindow from '../PopupWindow.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator } from '../UiUtils.js'
+
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../UI.js'
 import config from './Guestlist.config.js'
 
 export default class Guestlist extends PopupWindow<number> {
@@ -12,7 +12,7 @@ export default class Guestlist extends PopupWindow<number> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.admin.guestCount / config.entries))
+      Math.ceil(tm.admin.guestCount / (config.entries - 1)))
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
@@ -33,7 +33,7 @@ export default class Guestlist extends PopupWindow<number> {
       }
     })
     tm.addListener(['AddGuest', 'RemoveGuest'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.admin.guestCount / config.entries))
+      this.paginator.setPageCount(Math.ceil(tm.admin.guestCount / (config.entries - 1)))
       this.reRender()
     })
     tm.addListener('PrivilegeChanged', (info) => {
@@ -46,7 +46,7 @@ export default class Guestlist extends PopupWindow<number> {
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
       privilege: config.privilege
     })
-    tm.addListener('PlayerInfoUpdated', () => this.reRender())
+    tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
@@ -63,7 +63,7 @@ export default class Guestlist extends PopupWindow<number> {
   }
 
   protected async constructContent(login: string, page: number = 1): Promise<string> {
-    const index = (page - 1) * config.entries - 1
+    const index = (page - 1) *(config.entries - 1) - 1
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),
@@ -89,7 +89,7 @@ export default class Guestlist extends PopupWindow<number> {
       return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${config.removeGuestIcon}"
     imagefocus="${config.removeGuestIconHover}" halign="center" valign="center" action="${this.openId + i + 1000 + index}" /> `
     }
-    const rows = Math.min(config.entries, guestlist.length - (index + 1))
+    const rows = Math.min((config.entries - 1), guestlist.length - (index + 1))
     const arr = headers
     for (let i = 0; i < rows; i++) {
       arr.push(indexCell, nicknameCell, loginCell, dateCell, adminCell, removeGuestbutton)

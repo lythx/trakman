@@ -1,27 +1,25 @@
-import PopupWindow from "../PopupWindow.js"
 import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UiUtils.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject } from "../UiUtils.js"
-import config from './TopRecords.config.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
+import config from './TopPlaytimes.config.js'
 
-export default class TopRecords extends PopupWindow<number> {
+export default class TopPlaytimes extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: readonly { login: string, nickname: string, amount: number }[]
+  private ranks: readonly { login: string, nickname: string, playtime: number }[]
 
   constructor() {
-    super(componentIds.topRecords, config.icon, config.title, config.navbar)
-    this.ranks = stats.records.list
+    super(componentIds.topPlaytimes, config.icon, config.title, config.navbar)
+    this.ranks = stats.playtimes.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.records.onUpdate(() => {
-      this.ranks = stats.records.list
+    stats.playtimes.onUpdate(() => {
+      this.ranks = stats.playtimes.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    stats.records.onNicknameChange(() => {
-      this.ranks = stats.records.list
+    stats.playtimes.onNicknameChange(() => {
+      this.ranks = stats.playtimes.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -30,8 +28,8 @@ export default class TopRecords extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['toprecs', 'toprecords'],
-      help: 'Display top record amounts.',
+      aliases: ['toppt', 'playtimes'],
+      help: 'Display top playtimes.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
@@ -67,7 +65,7 @@ export default class TopRecords extends PopupWindow<number> {
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
     const averageCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(this.ranks[getIndex(i, j)].amount.toString(), w, h)
+      centeredText((this.ranks[getIndex(i, j)].playtime / (60 * 60 * 1000)).toFixed(0), w, h)
     const emptyCell: GridCellObject = {
       callback: (i, j, w, h) => '',
       background: undefined

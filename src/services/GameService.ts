@@ -1,3 +1,4 @@
+import { Events } from '../Events.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 
@@ -27,7 +28,7 @@ export class GameService {
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
   ]
-  private static _state: 'race' | 'result' | 'transition'
+  private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
 
   static async initialize(): Promise<void> {
@@ -52,15 +53,16 @@ export class GameService {
     this.startTimer()
   }
 
-  static set state(state: 'race' | 'result' | 'transition') {
+  static set state(state: tm.ServerState) {
     this._state = state
+    Events.emit('ServerStateChanged', state)
   }
 
   static startTimer(): void {
     this._timerStartTimestamp = Date.now()
   }
 
-  static get remainingMapTime(): number {
+  static get remainingRaceTime(): number {
     if (this._state === 'result' || this.state === 'transition') { return 0 }
     return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
@@ -70,8 +72,16 @@ export class GameService {
     return Math.round((this.config.resultTime - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
-  static get state(): 'race' | 'result' | 'transition' {
+  static get state(): tm.ServerState {
     return this._state
+  }
+
+  static get resultTimeLimit(): number {
+    return ~~(this.config.resultTime / 1000)
+  }
+
+  static get raceTimeLimit(): number {
+    return ~~(this.config.timeAttackLimit / 1000)
   }
 
   static async update(): Promise<void> {

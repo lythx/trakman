@@ -40,7 +40,7 @@ if (config.isEnabled === true) {
     await onMapStart()
   }, true)
 
-  tm.addListener('PlayerInfoUpdated', (info) => {
+  tm.addListener('PlayerDataUpdated', (info) => {
     const changedObjects: { login: string; nickname: string; }[] = []
     for (const e of currentBestCps) {
       if (e === undefined) { continue }

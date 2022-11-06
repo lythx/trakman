@@ -68,11 +68,11 @@ const reinitialize = async (): Promise<void> => {
 
 const authenticate = async (): Promise<true | Error> => {
   const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
-    name: Buffer.from(tm.state.serverConfig.name).toString('base64'),
-    game: tm.state.serverConfig.game,
-    zone: tm.state.serverConfig.zone,
-    nation: tm.utils.countryToCode(tm.state.serverConfig.zone.split('|')[0]) ?? 'OTH'
+    login: tm.config.server.login,
+    name: Buffer.from(tm.config.server.name).toString('base64'),
+    game: tm.config.server.game,
+    zone: tm.config.server.zone,
+    nation: tm.utils.countryToCode(tm.config.server.zone.split('|')[0]) ?? 'OTH'
   })}`
   const res = await fetch(url).catch((err: Error) => err)
   if (res instanceof Error) {
@@ -92,7 +92,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   playerVotes.length = 0
   if (logins.length === 0) { return [] }
   const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
+    login: tm.config.server.login,
     authcode: authCode,
     uid: tm.maps.current.id,
     map: Buffer.from(tm.maps.current.name).toString('base64'),
@@ -132,7 +132,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
 const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
   if (newVotes.length === 0) { return }
   const url: string = `${apiUrl}?Action=Vote&${new URLSearchParams({
-    login: tm.state.serverConfig.login,
+    login: tm.config.server.login,
     authcode: authCode,
     uid: lastMap.id,
     map: Buffer.from(lastMap.name).toString('base64'),
@@ -190,15 +190,16 @@ const getJson = (data: string): any => {
 }
 
 function addVote(mapId: string, login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void
-function addVote(mapId: string, votes: { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
-function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]
+function addVote(mapId: string, votes: readonly { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]): void
+function addVote(mapId: string, arg: string | readonly { login: string, vote: -3 | -2 | -1 | 1 | 2 | 3 }[]
   , vote?: -3 | -2 | -1 | 1 | 2 | 3): void {
   const voteNames: string[] = ['waste', 'poor', 'bad', 'good', 'beautiful', 'fantastic']
   if (Array.isArray(arg)) {
     const updated: MKVote[] = []
     for (const e of arg) {
-      mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
       const v: MKVote | undefined = playerVotes.find(a => a.login === e.login)
+      if(v?.login === e.login && v?.vote === e.vote) { continue }
+      mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
       if (v === undefined) {
         const obj = { mapId, login: e.login, vote: e.vote }
         playerVotes.push(obj)
@@ -215,14 +216,15 @@ function addVote(mapId: string, arg: string | { login: string, vote: -3 | -2 | -
       const voteValues = { waste: 0, poor: 20, bad: 40, good: 60, beautiful: 80, fantastic: 100 }
       const count = Object.values(mapKarma).reduce((acc, cur) => acc + cur, 0)
       mapKarmaValue = Object.entries(mapKarma).map(a => (voteValues as any)[a[0]] * a[1]).reduce((acc, cur): number => acc + cur, 0) / count
-      emitVote(...updated)
     }
+    emitVote(...updated)
     return
   }
   if (vote === undefined) { return }
-  const login: string = arg
+  const login = arg as string
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v: MKVote | undefined = playerVotes.find(a => a.login === login)
+  if(v?.login === login && v.vote === vote) { return }
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
   else {
     mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
@@ -247,11 +249,7 @@ const fixCoherence = async (): Promise<void> => {
       tm.karma.add({ login: e.login, nickname: nickname ?? e.login }, e.vote)
     }
   }
-  for (const e of localVotes) {
-    if (!mkVotes.some(a => a.login === e.login && a.vote === e.vote)) {
-      addVote(e.mapId, e.login, e.vote)
-    }
-  }
+  addVote(tm.maps.current.id, localVotes)
 }
 
 const onBeginMap = async (isRestart: boolean): Promise<void> => {

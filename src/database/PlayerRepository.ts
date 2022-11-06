@@ -18,7 +18,7 @@ interface TableEntry {
 export class PlayerRepository extends Repository {
 
   readonly cachedIds: { login: string, id: number }[] = []
-  
+
   async get(login: string): Promise<tm.OfflinePlayer | undefined>
   async get(logins: string[]): Promise<tm.OfflinePlayer[]>
   async get(logins: string | string[]): Promise<tm.OfflinePlayer | tm.OfflinePlayer[] | undefined> {
@@ -53,9 +53,14 @@ export class PlayerRepository extends Repository {
     await this.query(query, average, login)
   }
 
-  async updateNicknameAndRegion(login: string, nickname: string, region: string): Promise<void> {
-    const query: string = `UPDATE players SET nickname=$1, region=$2 WHERE login=$3;`
-    await this.query(query, nickname, region, login)
+  async updateNickname(login: string, nickname: string): Promise<void> {
+    const query: string = `UPDATE players SET nickname=$1 WHERE login=$2;`
+    await this.query(query, nickname, login)
+  }
+
+  async updateRegion(login: string, region: string): Promise<void> {
+    const query: string = `UPDATE players SET region=$1 WHERE login=$2;`
+    await this.query(query, region, login)
   }
 
   async updateOnWin(login: string, wins: number): Promise<void> {

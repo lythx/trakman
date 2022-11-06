@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import { Logger } from './Logger.js'
 import { MapService } from './services/MapService.js'
+import config from '../config/Config.js'
 
 type TMXPrefix = 'tmnforever' | 'united' | 'nations' | 'original' | 'sunrise'
 
@@ -8,15 +9,76 @@ export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
+  private static readonly environments = {
+    1: 'Snow',
+    2: 'Desert',
+    3: 'Rally',
+    4: 'Island',
+    5: 'Coast',
+    6: 'Bay',
+    7: 'Stadium'
+  } as const
+  private static readonly difficulties = {
+    0: 'Beginner',
+    1: 'Intermediate',
+    2: 'Expert',
+    3: 'Lunatic'
+  } as const
+  private static readonly moods = {
+    0: 'Sunrise',
+    1: 'Day',
+    2: 'Sunset',
+    3: 'Night'
+  } as const
+  private static readonly routes = {
+    0: 'Single',
+    1: 'Multiple',
+    2: 'Symmetrical'
+  } as const
+  private static readonly mapTypes = {
+    0: 'Race',
+    1: 'Puzzle',
+    2: 'Platform',
+    3: 'Stunts',
+    4: 'Shortcut',
+    5: 'Laps'
+  } as const
+  private static readonly cars = {
+    1: 'SnowCar',
+    2: 'DesertCar',
+    3: 'RallyCar',
+    4: 'IslandCar',
+    5: 'CoastCar',
+    6: 'BayCar',
+    7: 'StadiumCar'
+  } as const
+  private static readonly styles = {
+    0: 'Normal',
+    1: 'Stunt',
+    2: 'Maze',
+    3: 'Offroad',
+    4: 'Laps',
+    5: 'Fullspeed',
+    6: 'LOL',
+    7: 'Tech',
+    8: 'SpeedTech',
+    9: 'RPG',
+    10: 'PressForward',
+    11: 'Trial',
+    12: 'Grass'
+  } as const
 
   /**
-   * Fetches the map from TMX via its UID
+   * Fetches map file from TMX via its UID.
    * @param mapId Map UID
-   * @returns TMX map data or error if unsuccessful
+   * @returns Object containing map name and file content, or Error if unsuccessfull
    */
   static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
   /**
-   * Fetches map gbx file from tmx by TMX id, returns name and file in base64 string
+   * Fetches map file from TMX via its TMX ID.
+   * @param tmxId Map TMX ID
+   * @param site Optional TMX site (TMNF by default)
+   * @returns Object containing map name and file content, or Error if unsuccessfull
    */
   static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
   static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
@@ -72,30 +134,57 @@ export abstract class TMXFetcher {
   }
 
   /**
-   * Fetches TMX for map information
+   * Fetches TMX for map information.
    * @param mapId Map UID
    * @returns Map info from TMX or error if unsuccessful
    */
-  static async fetchMapInfo(mapId: string): Promise<tm.TMXMap | Error> {
+  static async fetchMapInfo(mapId: string): Promise<tm.TMXMap | Error>
+  /**
+   * Fetches TMX for map information.
+   * @param tmxId Map TMX ID
+   * @returns Map info from TMX or error if unsuccessful
+   */
+  static async fetchMapInfo(tmxId: number, prefix: TMXPrefix): Promise<Omit<tm.TMXMap, 'id'> | Error>
+  static async fetchMapInfo(arg: string | number, prefix?: TMXPrefix | undefined): Promise<tm.TMXMap | Error> {
     let data: string = ''
-    let prefix: TMXPrefix | undefined
-    for (const p of this.prefixes) { // Search for right prefix
-      const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+    let mapId: string | undefined
+    if (typeof arg === 'number') {
+      const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&id=${arg}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
-        continue
+        return new Error(`Error while fetching map info from TMX (url: ${url})`)
       }
       data = await res.text()
-      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
-        prefix = p
-        break
+      if (res.ok === false || data === '') {
+        return new Error('Cannot fetch map data from TMX')
+      }
+    } else {
+      mapId = arg
+      for (const p of this.prefixes) { // Search for right prefix
+        const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
+        const res = await fetch(url).catch((err: Error) => err)
+        if (res instanceof Error) {
+          Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
+          continue
+        }
+        data = await res.text()
+        if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+          prefix = p
+          break
+        }
       }
     }
     if (prefix === undefined) {
       return new Error('Cannot fetch map data from TMX')
     }
-    const s: string[] = data.split('\t')
+    return await this.parseOldApiResponse(prefix, data, mapId as any)
+  }
+
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string): Promise<Omit<tm.TMXMap, 'id'>>
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string, mapId: string): Promise<tm.TMXMap>
+  private static async parseOldApiResponse(prefix: TMXPrefix, response: string, mapId?: string): Promise<tm.TMXMap | Omit<tm.TMXMap, 'id'>> {
+    const s: string[] = response.split('\t')
     if (s.length !== 19) { // \t can be in comment thank you tmx developers
       const start = s.slice(0, 16)
       const comment = s.slice(16, -2).join('\t')
@@ -106,12 +195,13 @@ export abstract class TMXFetcher {
     const TMXId: number = Number(s[0])
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
+    let replaysData: string[] = []
     if (replaysRes instanceof Error) {
       Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
-      return replaysRes
+    } else {
+      replaysData = (await replaysRes.text()).split('\r\n')
+      replaysData.pop()
     }
-    const replaysData: string[] = (await replaysRes.text()).split('\r\n')
-    replaysData.pop()
     const replays: tm.TMXReplay[] = []
     for (const r of replaysData) {
       const rs: string[] = r.split('\t')
@@ -132,7 +222,7 @@ export abstract class TMXFetcher {
     const lastUpdateDate = new Date(s[5])
     const validReplays = replays.filter(a => a.mapDate.getTime() === lastUpdateDate.getTime())
     const awards = Number(s[18].split('<BR>')[0])
-    const mapInfo: tm.TMXMap = {
+    const mapInfo: Omit<tm.TMXMap, 'id'> | tm.TMXMap = {
       id: mapId,
       TMXId,
       name: s[1],
@@ -141,8 +231,8 @@ export abstract class TMXFetcher {
       uploadDate: new Date(s[4]),
       lastUpdateDate,
       type: s[7],
-      environment: s[8],
-      mood: s[9],
+      environment: s[8] as any,
+      mood: s[9] as any,
       style: s[10],
       routes: s[11],
       length: s[12],
@@ -162,12 +252,70 @@ export abstract class TMXFetcher {
       replays,
       validReplays
     }
-    void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    if (mapId !== undefined) {
+      void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
+    }
     return mapInfo
   }
 
-  private static siteToPrefix(game: tm.TMXSite): TMXPrefix {
-    return this.prefixes[this.sites.indexOf(game)]
+  /**
+   * Searches for maps matching the specified name on TMX.
+   * @param query Search query
+   * @param site TMX Site to fetch from
+   * @param count Number of maps to fetch
+   * @returns An array of searched map objects or Error if unsuccessfull
+   */
+  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
+    count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
+    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
+    if (query === undefined) { params.pop() }
+    const prefix = this.siteToPrefix(site)
+    const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
+      ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
+        `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
+      ...params
+    ])}`
+    const res = await fetch(url).catch((err: Error) => err)
+    if (res instanceof Error) {
+      return res
+    }
+    const data = (await res.json() as any).Results
+    const ret: tm.TMXSearchResult[] = []
+    for (const e of data) {
+      ret.push({
+        id: e.UId,
+        TMXId: e.TrackId,
+        name: e.TrackName,
+        authorId: e.Authors[0].User.UserId,
+        author: e.Authors[0].User.Name,
+        uploadDate: new Date(e.UploadedAt),
+        lastUpdateDate: new Date(e.UpdatedAt),
+        type: this.mapTypes[e.PrimaryType as keyof typeof this.mapTypes],
+        environment: this.environments[e.Environment as keyof typeof this.environments],
+        mood: this.moods[e.Mood as keyof typeof this.moods],
+        style: this.styles[e.Style as keyof typeof this.styles],
+        routes: this.routes[e.Routes as keyof typeof this.routes],
+        difficulty: this.difficulties[e.Difficulty as keyof typeof this.difficulties],
+        game: site,
+        comment: e.AuthorComments,
+        commentsAmount: e.Comments,
+        awards: e.Awards,
+        pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${e.TrackId}`,
+        screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${e.TrackId}`,
+        thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${e.TrackId}`,
+        downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${e.TrackId}`,
+        bronzeTime: e.BronzeTarget,
+        silverTime: e.SilverTarget,
+        goldTime: e.GoldTarget,
+        authorTime: e.AuthorTime,
+        car: this.cars[e.Car as keyof typeof this.cars]
+      })
+    }
+    return ret
+  }
+
+  private static siteToPrefix(site: tm.TMXSite): TMXPrefix {
+    return this.prefixes[this.sites.indexOf(site)]
   }
 
 }

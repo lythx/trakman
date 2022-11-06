@@ -1,5 +1,4 @@
-import StaticComponent from '../../StaticComponent.js'
-import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader } from '../../UiUtils.js'
+import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {
@@ -30,7 +29,7 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       for (const e of this.bestFinishes) {
         const newNickname = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }

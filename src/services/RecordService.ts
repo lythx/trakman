@@ -24,7 +24,6 @@ export class RecordService {
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
-    await this.updateQueue()
     this._localRecords = await this.repo.getLocalRecords(MapService.current.id)
     this._initialLocals.push(...this._localRecords)
     await this.updateQueue()
@@ -34,6 +33,7 @@ export class RecordService {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
+    Events.addListener('JukeboxChanged', () => this.updateQueue())
     Events.addListener('LocalRecord', (info) => {
       const ranks = this._playerRanks.filter(a => a.mapId === tm.maps.current.id)
       const rec = ranks.find(a => a.login === info.login)
@@ -43,7 +43,7 @@ export class RecordService {
         this._playerRanks.push({ login: info.login, rank: info.position, mapId: info.map })
       }
       for (const e of ranks) {
-        if (e.rank > info.position && e.rank < info.previousPosition) {
+        if (e.rank > info.position && (info.previous === undefined || e.rank < info.previous.position)) {
           e.rank++
         }
       }
@@ -187,9 +187,9 @@ export class RecordService {
     // If player gets the worst record on the server set position to array length + 1
     if (position === 0) { position = this._localRecords.length + 1 }
     if (previousIndex === -1) {
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
       this._localRecords.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(-1, position, -1, time, player, 'local'))
+      Logger.info(...this.getLogString(undefined, position, undefined, time, player, 'local'))
       void this.repo.add(recordInfo)
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
@@ -223,9 +223,9 @@ export class RecordService {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
     const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
     if (pb === undefined) {
-      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, -1, position, -1)
+      const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
       this._liveRecords.splice(position - 1, 0, recordInfo)
-      Logger.trace(...this.getLogString(-1, position, -1, time, player, 'live'))
+      Logger.trace(...this.getLogString(undefined, position, undefined, time, player, 'live'))
       return recordInfo
     }
     if (time === pb) {
@@ -252,7 +252,7 @@ export class RecordService {
   /**
    * Updates records for maps in queue
    */
-  static async updateQueue(): Promise<void> {
+  private static async updateQueue(): Promise<void> {
     const arr: { mapId: string, records: tm.Record[] }[] = []
     const mapsToFetch: string[] = []
     const queue = MapService.queue
@@ -327,7 +327,7 @@ export class RecordService {
    * @returns Record object
    */
   private static constructRecordObject(player: tm.Player, mapId: string, date: Date, checkpoints: number[],
-    time: number, previousTime: number, position: number, previousPosition: number): tm.RecordInfo {
+    time: number, previousTime: number | undefined, position: number, previousPosition: number | undefined): tm.RecordInfo {
     return {
       id: player.id,
       map: mapId,
@@ -344,8 +344,7 @@ export class RecordService {
       privilege: player.privilege,
       visits: player.visits,
       position,
-      previousTime,
-      previousPosition,
+      previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined,
       ip: player.ip,
       region: player.region,
       isUnited: player.isUnited,
@@ -366,9 +365,12 @@ export class RecordService {
    * @param recordType Record type ('live' or 'local')
    * @returns Array of strings formatted for Logger output
    */
-  private static getLogString(previousPosition: number, position: number, previousTime: number, time: number, player: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
-    const rs = Utils.getRankingString(previousPosition, position, previousTime, time)
-    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${Utils.getPositionString(position)} ${recordType} record. Time: ${Utils.getTimeString(time)}${rs.difference !== undefined ? rs.difference : ``}`]
+  private static getLogString(previousPosition: number | undefined, position: number,
+    previousTime: number | undefined, time: number, player: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
+    const rs = Utils.getRankingString({ time, position }, (previousPosition && previousTime) ? { position: previousPosition, time: previousTime } : undefined)
+    return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
+      ` ${Utils.getPositionString(position)} ${recordType} record. Time: ` + `
+    ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
   }
 
   /**

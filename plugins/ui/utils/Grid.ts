@@ -8,7 +8,7 @@ export interface GridCellObject {
 }
 
 /**
- * Util to display tabular data in manialinks
+ * Util to display tabular data in manialinks.
  */
 export class Grid {
 
@@ -32,7 +32,7 @@ export class Grid {
   readonly headerBg: string | undefined
 
   /**
-   * Util to display tabular data in manialinks
+   * Util to display tabular data in manialinks.
    * @param width Grid width
    * @param height Grid height
    * @param columnProportions Grid column proportions (proportions are relative to eachother like in CSS flexbox)
@@ -54,7 +54,7 @@ export class Grid {
   }
 
   /**
-   * Creates grid XML string from passed callback functions. Use GridCellObjects if you want to change
+   * Creates grid XML string from passed callback functions. Use GridCellObjects if you want to change.
    * some property for specific grid cell eg. rowspan
    * @param objectsOrFunctions Array of GridCellFunctions functions or GridCellObjects
    * @returns Grid XML string

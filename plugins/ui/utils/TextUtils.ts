@@ -1,7 +1,15 @@
 import config from './TextUtils.config.js'
 
+interface UITextOptions { 
+  textScale?: number, 
+  padding?: number, 
+  xOffset?: number, 
+  yOffset?: number, 
+  specialFont?: true 
+}
+
 /**
- * Constructs manialink with centered text
+ * Constructs manialink with centered text.
  * @param text Text to display
  * @param parentWidth Parent element width
  * @param parentHeight Parent element height
@@ -9,7 +17,7 @@ import config from './TextUtils.config.js'
  * @returns Text XML string
  */
 const centeredText = (text: string, parentWidth: number, parentHeight: number,
-  options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number, specialFont?: true }): string => {
+  options?: UITextOptions): string => {
   const textScale: number = options?.textScale ?? config.textScale
   const padding: number = options?.padding ?? config.padding
   const posX: number = parentWidth / 2 + (options?.xOffset ?? 0)
@@ -20,7 +28,7 @@ const centeredText = (text: string, parentWidth: number, parentHeight: number,
 }
 
 /**
- * Constructs manialink with left aligned and vertically centered text
+ * Constructs manialink with left aligned and vertically centered text.
  * @param text Text to display
  * @param parentWidth Parent element width
  * @param parentHeight Parent element height
@@ -28,7 +36,7 @@ const centeredText = (text: string, parentWidth: number, parentHeight: number,
  * @returns Text XML string
  */
 const leftAlignedText = (text: string, parentWidth: number, parentHeight: number,
-  options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  options?: UITextOptions): string => {
   const textScale: number = options?.textScale ?? config.textScale
   const padding: number = options?.padding ?? config.padding
   const posX: number = options?.xOffset ?? 0
@@ -46,7 +54,7 @@ const leftAlignedText = (text: string, parentWidth: number, parentHeight: number
  * @returns Text XML string
  */
 const horizontallyCenteredText = (text: string, parentWidth: number, parentHeight: number,
-  options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  options?: UITextOptions): string => {
   const textScale: number = options?.textScale ?? config.textScale
   const padding: number = options?.padding ?? config.padding
   const posX: number = parentWidth / 2 + (options?.xOffset ?? 0)
@@ -64,7 +72,7 @@ const horizontallyCenteredText = (text: string, parentWidth: number, parentHeigh
  * @returns Text XML string
  */
 const rightAlignedText = (text: string, parentWidth: number, parentHeight: number,
-  options?: { textScale?: number, padding?: number, xOffset?: number, yOffset?: number }): string => {
+  options?: UITextOptions): string => {
   const textScale: number = options?.textScale ?? config.textScale
   const padding: number = options?.padding ?? config.padding
   const posX: number = parentWidth + (options?.xOffset ?? 0)

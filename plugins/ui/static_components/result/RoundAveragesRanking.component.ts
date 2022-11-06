@@ -1,5 +1,4 @@
-import { List, componentIds, StaticHeader } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { List, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './RoundAveragesRanking.config.js'
 
 export default class RoundAveragesRanking extends StaticComponent {
@@ -33,7 +32,7 @@ export default class RoundAveragesRanking extends StaticComponent {
     tm.addListener('BeginMap', () => {
       this.averages.length = 0
     })
-    tm.addListener('PlayerInfoUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info) => {
       if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }

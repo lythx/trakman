@@ -183,7 +183,7 @@ const commands: tm.Command[] = [
     aliases: ['ccs', 'coppers', 'checkcoppers'],
     help: 'Check the amount of coppers the server account currently has.',
     callback: async (info: tm.MessageInfo): Promise<void> => {
-      if (tm.state.serverConfig.isUnited === false) {
+      if (tm.config.server.isUnited === false) {
         tm.sendMessage(config.coppers.notUnited, info.login)
         return
       }

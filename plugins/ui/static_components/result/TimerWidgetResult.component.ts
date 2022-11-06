@@ -1,5 +1,4 @@
-import { componentIds } from '../../UiUtils.js'
-import StaticComponent from '../../StaticComponent.js'
+import { componentIds, StaticComponent } from '../../UI.js'
 import config from './TimerWidgetResult.config.js'
 
 export default class TimerWidgetResult extends StaticComponent {
