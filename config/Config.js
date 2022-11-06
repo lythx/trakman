@@ -24,5 +24,5 @@ export default {
   // Represents minimal similarity difference between best and second-best match at which translation will be successfull.
   // 0.15 is default value
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
-  version: "0.6"
+  version: "1.0"
 }

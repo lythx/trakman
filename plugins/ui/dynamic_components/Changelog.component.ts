@@ -1,8 +1,17 @@
 
-import { Grid, componentIds, GridCellFunction, centeredText, closeButton, PopupWindow } from '../UI.js'
+import { Grid, componentIds, GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
 import config from './Changelog.config.js'
+import fs from 'fs/promises'
 
-export default class Changelog extends PopupWindow {
+export default class Changelog extends PopupWindow<{ page: number }> {
+
+  private readonly versions: {
+    version: string
+    date: string
+    content: string
+  }[] = []
+  private readonly paginator: Paginator
+  private readonly grid: Grid
 
   constructor() {
     super(componentIds.changelog, config.icon, config.title, config.navbar)
@@ -14,52 +23,78 @@ export default class Changelog extends PopupWindow {
       },
       privilege: 0
     })
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, 1, 1)
+    this.paginator.onPageChange = (login, page) => {
+      this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
+    }
+    this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.entries).fill(1), [1], { margin: config.marginBig })
+    this.readChangelog()
+  }
+
+  private async readChangelog() {
+    const file: Buffer | Error = await fs.readFile('./CHANGELOG.md').catch(err => err)
+    if (file instanceof Error) {
+      tm.log.warn(`Can't read CHANGELOG.md file`)
+      return
+    }
+    const split = file.toString().split('## ')
+    for (let i = split.length - 1; i > 0; i--) {
+      const lines = split[i].split('\n')
+      const version = lines[0].trim()
+      const date = lines[1].split('**')[1]
+      const content = lines.map(a => {
+        if (a.length > config.lineCharacterLimit) {
+          a = a.slice(0, config.lineCharacterLimit)
+          return a.split(' ').slice(0, -1).join(' ') + '...'
+        } else {
+          return a
+        }
+      }).slice(2, 2 + config.lineCount).join('\n')
+      if (![version, date, content].includes(undefined as any)) {
+        this.versions.push({ version, date, content })
+      }
+    }
+    this.paginator.setPageCount(Math.ceil(this.versions.length / config.entries))
+    this.paginator.defaultPage = this.paginator.pageCount
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
-    this.displayToPlayer(info.login, null, `1/1`)
+    const page = this.paginator.getPageByLogin(info.login)
+    this.displayToPlayer(info.login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected constructContent(): string {
-    const grid = new Grid(this.contentWidth, this.contentHeight, [1, 1, 1, 1], [1, 1], { margin: config.marginBig })
-    const entries: GridCellFunction[] = [
-      (i, j, w, h) => this.constructEntry('0.1', '27/07/2022', 'First public release on\nOldschool Loltards server', w, h, `https://cdn.discordapp.com/attachments/800663457779023872/999374713312776372/unknown.png`, 7),
-      (i, j, w, h) => this.constructEntry('0.2', '28/07/2022',
-        `- Added player votes to skip\n  and replay maps\n- Added freezone plugin\n- Implemented player rank\n  averages\n- Fixed a ton of bugs`, w, h),
-      (i, j, w, h) => this.constructEntry('0.3', '31/07/2022',
-        `- Added changelog\n- Added sector records\n- Added checkpoint records\n- Implemented player ranks\n- Implemented reconnect on\n  dedimania server restart\n- Fixed a ton of bugs`, w, h),
-      (i, j, w, h) => this.constructEntry('0.4', '10/08/2022',
-        `- Added map list utilites\n- Added autojuke\n- Added endscreen ui\n- Implemented donations table\n- Fixed a ton ton ton of bugs`, w, h),
-      (i, j, w, h) => this.constructEntry('0.5', '04/09/2022',
-        `- Added map info window\n- Fixed tmx and karma bugs\n- Fixed endscreen ui bugs\n- Fixed dedimania info bugs`, w, h),
-      (i, j, w, h) => this.constructEntry('0.6', '29/09/2022',
-        `- Added cp counter\n- Added player stats windows\n- Added admin panel and\n  windows\n- Improved karma system`, w, h)
-    ]
-    return grid.constructXml(entries)
+  protected constructContent(login: string, { page }: { page: number }): string {
+    const index = config.entries * (page - 1)
+    const cells: GridCellFunction[] = []
+    const cell: GridCellFunction = (i, j, w, h) => {
+      const el = this.versions[j + index]
+      return this.constructEntry(el.version, el.date, el.content, w, h)
+    }
+    for (let i = 0; i < Math.min(config.entries, this.versions.length - index); i++) {
+      cells.push(cell)
+    }
+    return this.grid.constructXml(cells)
   }
 
-  private constructEntry(title: string, date: string, text: string, w: number, h: number, imageUrl?: string, imageHeight: number = 0) {
-    const versioW = 6
-    const headerH = 3
-    const dateW = w - (versioW + this.margin)
-    const image = imageUrl === undefined ? '' :
-      `<quad posn="${config.marginBig} ${config.marginBig - imageHeight} 6" sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + imageHeight)}" image="${imageUrl}"/>`
+  private constructEntry(title: string, date: string, text: string, w: number, h: number) {
+    const versionWidth = config.versionWidth
+    const headerH = config.headerHeight
+    const dateW = w - (versionWidth + this.margin)
     return `<format textsize="1"/>
-      <quad posn="0 0 3" sizen="${versioW} ${headerH}" bgcolor="${this.headerBackground}"/>
-      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versioW, headerH, { padding: this.margin, textScale: config.textScale })}
-      <frame posn="${versioW + this.margin} 0 2">
+      <quad posn="0 0 3" sizen="${versionWidth} ${headerH}" bgcolor="${this.headerBackground}"/>
+      ${centeredText(`$s$${tm.utils.palette.green}${title}`, versionWidth, headerH, { padding: this.margin, textScale: config.textScale })}
+      <frame posn="${versionWidth + this.margin} 0 2">
         <quad posn="0 0 2" sizen="${dateW} ${headerH}" bgcolor="${this.headerBackground}"/>
         ${centeredText(`$s${date}`, dateW, headerH, { padding: this.margin, textScale: config.textScale })}
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
         <quad posn="0 0 2" sizen="${w} ${h - (headerH + this.margin)}" bgcolor="${config.tileBackground}"/>
-        ${image}
         <label posn="${config.marginBig} ${-config.marginBig} 5" sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + config.marginBig * 2)}" scale="1.15" text="$s${text}"/>
       </frame>`
   }
 
-  protected constructFooter(): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight)
+  protected constructFooter(login: string, { page }: { page: number }): string {
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(page)
   }
 
 }

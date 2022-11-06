@@ -93,7 +93,7 @@ export const createQueries = [
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller_id INT4 NOT NULL,
-    reason VARCHAR(250),
+    reason VARCHAR(150),
     expires TIMESTAMP,
     PRIMARY KEY(ip, login),
     CONSTRAINT fk_caller_id
@@ -105,7 +105,7 @@ export const createQueries = [
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller_id INT4 NOT NULL,
-    reason VARCHAR(250),
+    reason VARCHAR(150),
     expires TIMESTAMP,
     PRIMARY KEY(login),
     CONSTRAINT fk_caller_id
@@ -117,7 +117,7 @@ export const createQueries = [
     login VARCHAR(25) NOT NULL,
     date TIMESTAMP NOT NULL,
     caller_id INT4 NOT NULL,
-    reason VARCHAR(250),
+    reason VARCHAR(150),
     expires TIMESTAMP,
     PRIMARY KEY(login),
     CONSTRAINT fk_caller_id

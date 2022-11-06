@@ -14,7 +14,7 @@ export default class Paginator {
   readonly parentId: number
   private readonly loginPages: { readonly login: string, page: number }[] = []
   /** Default page (will be displayed if no page is specified) */
-  readonly defaultPage: number
+  defaultPage: number
   /** Button width */
   readonly buttonW = config.buttonWidth
   /** Button height */

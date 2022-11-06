@@ -1,6 +1,7 @@
 # Changelog
-Shorter changelog can be found in the controller (/changes)
+Changelog can be found in the controller (/changes)
 ## 0.6
+**29/09/2022**
 - Removed dotenv dependency
 - Removed json files and configs
 - Added player stats windows and related commands
@@ -27,6 +28,7 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed controller crash on stats update due to hardcoded limit
 - Fixed controller crash on double vote (perhaps)
 ## 0.5
+**04/09/2022**
 - Removed unnecessary things from source
 - Added actual plugin system
 - Added config files for each plugin/window/command
@@ -41,6 +43,7 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed chat commands being categorised in a silly way
 - Fixed recordlist crash on new map
 ## 0.4
+**10/08/2022**
 - Removed unused dependencies
 - Removed the sole broken test
 - Added result UI
@@ -65,6 +68,7 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed wins being incremented without player finish
 - Fixed various messages display
 ## 0.3
+**31/07/2022**
 - Added vote class
 - Added vote window
 - Added skip/res votes
@@ -88,6 +92,7 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed record position string function being a scattered mess
 - Fixed dedimania reconnection not working
 ## 0.2
+**28/07/2022**
 - Fixed client splitting the chunk in very specific circumstances
 - Fixed UI marker display
 - Fixed nickname display in administration windows
@@ -99,6 +104,7 @@ Shorter changelog can be found in the controller (/changes)
 - Added PB messages
 - Added plain X to the welcome window, as the image might not load instantly
 ## 0.1
+**27/07/2022**
 - First public release
 - Most basic functionality, e.g. record storage and most basic chat commands
 - Most plugins' functionality, albeit in form of services, thus not actual 'plugins'
