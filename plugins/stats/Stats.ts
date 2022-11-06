@@ -6,6 +6,7 @@ import { topDonations } from './TopDonations.js'
 import { topRecords } from './TopRecords.js'
 import { topPlaytimes } from './TopPlaytimes.js'
 import { topSums } from './TopSums.js'
+import './ui/StatsUi.js'
 
 /**
  * Creates and provides utilities for accessing rankings for various player stats

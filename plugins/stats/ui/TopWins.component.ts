@@ -1,6 +1,5 @@
 import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UI.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UI.js"
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
 import config from './TopWins.config.js'
 
 export default class TopWins extends PopupWindow<number> {

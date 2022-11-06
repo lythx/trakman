@@ -1,19 +1,17 @@
-import icons from '../config/Icons.js'
-import ids from '../config/ComponentIds.js'
+import { icons, componentIds as ids } from '../../ui/UI.js'
 
 export default {
-  title: "Top Sums",
+  title: "Top Visits",
   icon: icons.cash,
-  gridColumns: [0.8, 4, 3, 1, 1, 1, 1.3, 0.8, 4, 3, 1, 1, 1, 1.3],
-  headers: ['Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other',
-    'Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other',],
+  gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
+  headers: ['Lp.', 'Nickname', 'Login', 'Visits', 'Lp.', 'Nickname', 'Login', 'Visits'],
   entries: 30, // Has to be even number
   navbar: [
     { name: "Top Donations", actionId: ids.topDonations },
     { name: "Top Playtimes", actionId: ids.topPlaytimes },
     { name: "Top Ranks", actionId: ids.topRanks },
     { name: "Top Records", actionId: ids.topRecords },
-    { name: "Top Visits", actionId: ids.topVisits },
+    { name: "Top Sums", actionId: ids.topSums },
     { name: "Top Votes", actionId: ids.topVotes },
     { name: "Top Wins", actionId: ids.topWins }
   ],
@@ -22,10 +20,5 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: tm.utils.palette.green,
-  colours: {
-    gold: 'FD0',
-    silver: 'CCC',
-    bronze: 'C73'
-  }
+  selfColour: tm.utils.palette.green
 }

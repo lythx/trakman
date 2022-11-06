@@ -1,5 +1,4 @@
-import icons from '../config/Icons.js'
-import ids from '../config/ComponentIds.js'
+import { icons, componentIds as ids } from '../../ui/UI.js'
 
 export default {
   title: "Top Votes",

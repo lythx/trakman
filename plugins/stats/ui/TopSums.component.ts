@@ -1,26 +1,25 @@
 import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UI.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UI.js"
-import config from './TopVisits.config.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
+import config from './TopSums.config.js'
 
-export default class TopVisits extends PopupWindow<number> {
+export default class TopSums extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: readonly { login: string, nickname: string, visits: number }[]
+  private ranks: readonly { login: string, nickname: string, sums: Readonly<[number, number, number, number]> }[]
 
   constructor() {
-    super(componentIds.topVisits, config.icon, config.title, config.navbar)
-    this.ranks = stats.visits.list
+    super(componentIds.topSums, config.icon, config.title, config.navbar)
+    this.ranks = stats.sums.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.visits.onUpdate(() => {
-      this.ranks = stats.visits.list
+    stats.sums.onUpdate(() => {
+      this.ranks = stats.sums.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    stats.visits.onNicknameChange(() => {
-      this.ranks = stats.visits.list
+    stats.sums.onNicknameChange(() => {
+      this.ranks = stats.sums.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -29,8 +28,8 @@ export default class TopVisits extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['visits', 'topvisits'],
-      help: 'Display top visits.',
+      aliases: ['sums', 'topsums'],
+      help: 'Display top sums.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
@@ -53,7 +52,7 @@ export default class TopVisits extends PopupWindow<number> {
 
   protected constructContent(login: string, page?: number): string {
     const columns = 2
-    const leftColumns = 3
+    const leftColumns = 6
     const offset = (((page ?? 1) - 1) * config.entries) - 1
     const getIndex = (i: number, j: number) => i + offset + (j > leftColumns ? (config.entries / columns) : 0)
     const arr: (GridCellFunction | GridCellObject)[] = config.headers.map((a) =>
@@ -65,8 +64,14 @@ export default class TopVisits extends PopupWindow<number> {
       const colour = this.ranks[getIndex(i, j)].login === login ? `$${config.selfColour} ` : ''
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
-    const averageCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(this.ranks[getIndex(i, j)].visits.toString(), w, h)
+    const firstCell: GridCellFunction = (i, j, w, h) =>
+      centeredText('$' + config.colours.gold + this.ranks[getIndex(i, j)].sums[0].toString(), w, h)
+    const secondCell: GridCellFunction = (i, j, w, h) =>
+      centeredText('$' + config.colours.silver + this.ranks[getIndex(i, j)].sums[1].toString(), w, h)
+    const thirdCell: GridCellFunction = (i, j, w, h) =>
+      centeredText('$' + config.colours.bronze + this.ranks[getIndex(i, j)].sums[2].toString(), w, h)
+    const otherCell: GridCellFunction = (i, j, w, h) =>
+      centeredText(this.ranks[getIndex(i, j)].sums[3].toString(), w, h)
     const emptyCell: GridCellObject = {
       callback: (i, j, w, h) => '',
       background: undefined
@@ -74,9 +79,9 @@ export default class TopVisits extends PopupWindow<number> {
     for (let i = 0; i < config.entries / columns; i++) {
       for (let j = 0; j < columns; j++) {
         if (this.ranks[i + offset + 1 + (j === 1 ? (config.entries / columns) : 0)] === undefined) {
-          arr.push(emptyCell, emptyCell, emptyCell, emptyCell)
+          arr.push(emptyCell, emptyCell, emptyCell, emptyCell, emptyCell, emptyCell, emptyCell)
         } else {
-          arr.push(indexCell, nicknameCell, loginCell, averageCell)
+          arr.push(indexCell, nicknameCell, loginCell, firstCell, secondCell, thirdCell, otherCell)
         }
       }
     }

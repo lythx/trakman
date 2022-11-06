@@ -1,26 +1,26 @@
-import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UI.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UI.js"
-import config from './TopRecords.config.js'
+import { stats } from "../Stats.js"
+import { componentIds, centeredText } from '../../ui/UI.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../../ui/UI.js"
+import config from './TopDonations.config.js'
 
-export default class TopRecords extends PopupWindow<number> {
+export default class TopDonations extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
   private ranks: readonly { login: string, nickname: string, amount: number }[]
 
   constructor() {
-    super(componentIds.topRecords, config.icon, config.title, config.navbar)
-    this.ranks = stats.records.list
+    super(componentIds.topDonations, config.icon, config.title, config.navbar)
+    this.ranks = stats.donations.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.records.onUpdate(() => {
-      this.ranks = stats.records.list
+    stats.donations.onUpdate(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    stats.records.onNicknameChange(() => {
-      this.ranks = stats.records.list
+    stats.donations.onNicknameChange(() => {
+      this.ranks = stats.donations.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -29,8 +29,8 @@ export default class TopRecords extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['toprecs', 'toprecords'],
-      help: 'Display top record amounts.',
+      aliases: ['dons', 'topdons', 'donations'],
+      help: 'Display top donations.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },

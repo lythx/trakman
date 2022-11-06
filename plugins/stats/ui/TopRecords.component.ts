@@ -1,26 +1,25 @@
 import { stats } from "../../stats/Stats.js"
-import { componentIds, centeredText } from '../UI.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../UI.js"
-import config from './TopDonations.config.js'
+import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
+import config from './TopRecords.config.js'
 
-export default class TopDonations extends PopupWindow<number> {
+export default class TopRecords extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
   private ranks: readonly { login: string, nickname: string, amount: number }[]
 
   constructor() {
-    super(componentIds.topDonations, config.icon, config.title, config.navbar)
-    this.ranks = stats.donations.list
+    super(componentIds.topRecords, config.icon, config.title, config.navbar)
+    this.ranks = stats.records.list
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.gridColumns,
       new Array((config.entries / 2) + 1).fill(1), config.grid)
-    stats.donations.onUpdate(() => {
-      this.ranks = stats.donations.list
+    stats.records.onUpdate(() => {
+      this.ranks = stats.records.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    stats.donations.onNicknameChange(() => {
-      this.ranks = stats.donations.list
+    stats.records.onNicknameChange(() => {
+      this.ranks = stats.records.list
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
@@ -29,8 +28,8 @@ export default class TopDonations extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['dons', 'topdons', 'donations'],
-      help: 'Display top donations.',
+      aliases: ['toprecs', 'toprecords'],
+      help: 'Display top record amounts.',
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },

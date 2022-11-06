@@ -168,9 +168,12 @@ export class PlayerService {
       if (obj === undefined) { continue }
       if (p.title !== undefined) { obj.title = p.title }
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
-      if (p.nickname !== undefined || countryCode !== undefined) {
+      if (p.nickname !== undefined) {
+        await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
+      }
+      if (countryCode !== undefined) {
         const r = countryCode === undefined ? obj.region : region // Set only if region is valid
-        await this.repo.updateNicknameAndRegion(p.login, p.nickname ?? obj.nickname, r)
+        await this.repo.updateRegion(p.login, r)
       }
     }
   }
