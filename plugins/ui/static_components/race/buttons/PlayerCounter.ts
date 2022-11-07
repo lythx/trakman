@@ -2,7 +2,6 @@ import { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 
-
 const cfg = config.playerCounter
 
 export class PlayerCounter extends UiButton {

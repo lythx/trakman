@@ -292,7 +292,7 @@ const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'i
     time,
     checkpoints,
     position,
-    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition} : undefined
+    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined
   }
 }
 

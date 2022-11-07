@@ -1,5 +1,5 @@
 import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
-import { maniakarma } from '../../../maniakarma/Maniakarma.js'
+import { maniakarma, MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidgetResult.config.js'
 
 export default class KarmaWidgetResult extends StaticComponent {
@@ -41,19 +41,19 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructXml(login: string): string {
-    let max = 0
+    let max: number = 0
     const votes: tm.Vote[] = tm.karma.current
     const karma: number = tm.maps.current.voteRatio
     const voteAmounts: number[] = []
-    const mkVotes = maniakarma.mapKarma
+    const mkVotes: MKMapVotes = maniakarma.mapKarma
     const mkKarma: number = maniakarma.mapKarmaRatio
     const mkVoteAmounts: number[] = []
-    let mkVoteCount = 0
-    for (let i = 0; i < this.options.length; i++) {
+    let mkVoteCount: number = 0
+    for (let i: number = 0; i < this.options.length; i++) {
       voteAmounts[i] = votes.filter(a => a.vote === this.options[i]).length
       mkVoteAmounts[i] = mkVotes[this.mkOptions[i]]
       mkVoteCount += mkVoteAmounts[i]
-      const sum = mkVoteAmounts[i] + voteAmounts[i]
+      const sum: number = mkVoteAmounts[i] + voteAmounts[i]
       if (sum > max) { max = sum }
     }
     const personalVote = votes.find(a => a.login === login)?.vote
@@ -79,7 +79,7 @@ export default class KarmaWidgetResult extends StaticComponent {
     let ret: string = `<quad posn="0 0 1" sizen="${width} ${config.height - (this.headerH + config.margin)}" bgcolor="${config.background}"/>`
     const w: number = width - (config.margin * 2)
     const h: number = (config.height - (this.headerH + config.margin * 2)) / this.options.length
-    for (let i = 0; i < voteAmounts.length; i++) {
+    for (let i: number = 0; i < voteAmounts.length; i++) {
       const barW: number = max === 0 ? 0 : (voteAmounts[i] / max) * w
       const mkBarW: number = max === 0 ? 0 : (mkVoteAmounts[i] / max) * w
       ret += `<quad posn="${config.margin} -${config.margin + h * i} 3" sizen="${barW} ${h - config.margin}" bgcolor="${config.colours[i]}"/>
@@ -89,25 +89,25 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
   private constructInfo(voteCount: number, karma: number, mkVoteCount: number, mkKarma: number): string {
-    const karmaStr = karma !== -1 ? (~~karma).toString() : config.defaultText
+    const karmaStr: string = karma !== -1 ? (~~karma).toString() : config.defaultText
     const mkKarmaStr: string = mkVoteCount !== 0 ? (~~mkKarma).toString() : config.defaultText
     const mkCountStr: string = maniakarma.isEnabled ? mkVoteCount.toString() : config.defaultText
     const options = { padding: config.textPadding, textScale: config.textScale }
     const arr: GridCellFunction[] = [
-      (i, j, w, h) => ``,
-      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
+      (i, j, w, h): string => ``,
+      (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4" 
       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[0]}"/>`,
-      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4"
+      (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4"
        sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[1]}"/>`,
 
-      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" 
+      (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4" 
       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[2]}"/>`,
-      (i, j, w, h) => centeredText(karmaStr, w, h, options),
-      (i, j, w, h) => centeredText(mkKarmaStr, w, h, options),
+      (i, j, w, h): string => centeredText(karmaStr, w, h, options),
+      (i, j, w, h): string => centeredText(mkKarmaStr, w, h, options),
 
-      (i, j, w, h) => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,
-      (i, j, w, h) => centeredText(voteCount.toString(), w, h, options),
-      (i, j, w, h) => centeredText(mkCountStr, w, h, options),
+      (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,
+      (i, j, w, h): string => centeredText(voteCount.toString(), w, h, options),
+      (i, j, w, h): string => centeredText(mkCountStr, w, h, options),
     ]
     return this.grid.constructXml(arr)
   }
@@ -128,4 +128,3 @@ export default class KarmaWidgetResult extends StaticComponent {
   }
 
 }
-

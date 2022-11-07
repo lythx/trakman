@@ -64,7 +64,7 @@ import Changelog from './dynamic_components/Changelog.component.js'
 import ChatLog from './dynamic_components/Chatlog.component.js'
 import TMXSearchWindow from './dynamic_components/TMXSearchWindow.component.js'
 
-tm.addListener(`Startup`, () => {
+tm.addListener(`Startup`, (): void => {
   new RankWidget()
   new DediRanking()
   new MapWidget()

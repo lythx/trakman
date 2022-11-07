@@ -1,4 +1,4 @@
-import { componentIds, Grid, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
@@ -6,7 +6,7 @@ import config from './MapWidget.config.js'
 
 export default class MapWidget extends StaticComponent {
 
-  private readonly rows = 4
+  private readonly rows: number = 4
   private readonly positionX: number
   private readonly positionY: number
   private readonly side: boolean
@@ -22,11 +22,11 @@ export default class MapWidget extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
-    webservices.onCurrentAuthorChange(() => {
+    webservices.onCurrentAuthorChange((): void => {
       void this.display()
     })
-    tmx.onMapChange(() => this.display())
-    tmx.onQueueChange(() => this.display())
+    tmx.onMapChange((): void => this.display())
+    tmx.onQueueChange((): void => this.display())
   }
 
   display(): void {
@@ -41,12 +41,12 @@ export default class MapWidget extends StaticComponent {
   }
 
   private updateXML(): void {
-    const map = tm.maps.current
+    const map: Readonly<tm.CurrentMap> = tm.maps.current
     const author: string = webservices.currentAuthor?.nickname ?? map.author
-    const TMXMap = tmx.current
+    const TMXMap: Readonly<tm.TMXMap> | null = tmx.current
     const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
-    let authorIcon = ic.author
+    let authorIcon: string = ic.author
     if (webservices.currentAuthor !== undefined) {
       authorIcon = (flags as any)[webservices.currentAuthor.countryCode] // cope typescript
     }
@@ -57,7 +57,7 @@ export default class MapWidget extends StaticComponent {
       [tm.utils.getTimeString(map.authorTime), ic.authorTime],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]
     ]
-    const headerCfg = this.header.options
+    const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 3) {
         return `

@@ -47,17 +47,17 @@ export class List {
   constructXml(col1: string[], col2: string[]): string {
 
     const index: GridCellObject = {
-      callback: (i, j, w, h) =>
+      callback: (i, j, w, h): string =>
         centeredText((col1[i] === undefined || col2[i] === undefined) ? '' : (i + 1).toString(), w, h, { textScale: config.textScale }),
       background: this.headerBg
     }
 
-    const col1Function: GridCellFunction = (i, j, w, h) => centeredText(col1[i] ?? '', w, h, { textScale: config.textScale })
+    const col1Function: GridCellFunction = (i, j, w, h): string => centeredText(col1[i] ?? '', w, h, { textScale: config.textScale })
 
-    const col2Function: GridCellFunction = (i, j, w, h) => leftAlignedText(col2[i] ?? '', w, h, { textScale: config.textScale })
+    const col2Function: GridCellFunction = (i, j, w, h): string => leftAlignedText(col2[i] ?? '', w, h, { textScale: config.textScale })
 
     const arr: (GridCellFunction | GridCellObject)[] = []
-    for (let i = 0; i < this.entries; i++) {
+    for (let i: number = 0; i < this.entries; i++) {
       arr.push(index, col1Function, col2Function)
     }
 

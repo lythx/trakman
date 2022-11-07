@@ -62,18 +62,18 @@ export class Grid {
   constructXml(objectsOrFunctions: (GridCellFunction | GridCellObject)[]): string {
     let xml: string = ``
     let map: boolean[][] = Array.from(new Array(this.columns), () => new Array(this.rows).fill(false))
-    let indexOffset = 0
+    let indexOffset: number = 0
     for (let i: number = 0; i < this.rows; i++) {
       for (let j: number = 0; j < this.columns; j++) {
         if (map[j][i] === true) {
           indexOffset++
           continue
         }
-        const obj = objectsOrFunctions[(i * this.columns) + j - indexOffset]
+        const obj: GridCellFunction | GridCellObject = objectsOrFunctions[(i * this.columns) + j - indexOffset]
         if (obj === undefined) { break }
         let callback: (i: number, j: number, w: number, h: number) => string
-        let rowspan = 1
-        let colspan = 1
+        let rowspan: number = 1
+        let colspan: number = 1
         let background: string | undefined
         if (this.checkConstructFunctionType(obj)) {
           callback = obj.callback
@@ -86,12 +86,12 @@ export class Grid {
         const posY: number = -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc += cur, 0) - this.margin
         const posX: number = this.columnWidths.filter((val, index): boolean => index < j).reduce((acc, cur): number => acc += cur, 0) + this.margin
         let h: number = -this.margin
-        for (let k = i; k < i + rowspan; k++) {
+        for (let k: number = i; k < i + rowspan; k++) {
           h += this.rowHeights[k]
           map[j][k] = true
         }
         let w: number = -this.margin
-        for (let k = j; k < j + colspan; k++) {
+        for (let k: number = j; k < j + colspan; k++) {
           w += this.columnWidths[k]
           map[k][i] = true
         }

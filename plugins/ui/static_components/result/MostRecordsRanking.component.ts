@@ -6,7 +6,7 @@ export default class MostRecordsRanking extends StaticComponent {
 
   private readonly list: List
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.mostRecordsRanking, 'result')
@@ -14,11 +14,11 @@ export default class MostRecordsRanking extends StaticComponent {
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     this.constructXml()
-    tm.addListener('EndMap', () => {
+    tm.addListener('EndMap', (): void => {
       this.constructXml()
     })
-    stats.records.onUpdate(() => this.display())
-    stats.records.onNicknameChange(() => this.display())
+    stats.records.onUpdate((): void => this.display())
+    stats.records.onNicknameChange((): void => this.display())
   }
 
   display(): void {
@@ -32,7 +32,7 @@ export default class MostRecordsRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     const list = stats.records.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>

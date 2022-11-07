@@ -47,7 +47,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   /** Margin between window parts */
   protected readonly margin: number = config.margin
   /** Footer height */
-  protected readonly footerHeight = config.footerHeight
+  protected readonly footerHeight: number = config.footerHeight
   /** Right header part width (usually used for page display) */
   protected readonly headerPageWidth: number = config.headerPageWidth
   private static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
@@ -80,15 +80,15 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId === this.openId) { this.onOpen(info) }
       else if (info.actionId === this.closeId) {
-        const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+        const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
         if (index !== -1) {
           PopupWindow.playersWithWindowOpen.splice(index, 1)
         }
         this.onClose(info)
       }
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo) => {
-      const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
+      const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
       }
@@ -190,14 +190,14 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number): Promise<void> {
     const content: string = await this.constructContent(login, params, privilege)
     const footer: string = await this.constructFooter(login, params, privilege)
-    const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
+    const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
     if (index !== -1) {
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
-    const noNavbar = this.navbar.getButtonCount(privilege) === 0
+    const noNavbar: boolean = this.navbar.getButtonCount(privilege) === 0
     PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
     tm.sendManialink(`${this.headerLeft}
-    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale})}
+    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale })}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
     ${noNavbar === true ? this.noNavbarMidTop : this.frameMidTop}

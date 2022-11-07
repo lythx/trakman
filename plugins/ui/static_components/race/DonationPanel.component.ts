@@ -1,4 +1,3 @@
-
 import { donations } from '../../../donations/Donations.js'
 import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
 import config from './DonationPanel.config.js'
@@ -19,9 +18,9 @@ export default class DonationPanel extends StaticComponent {
     this.side = pos.side
     this.header = new StaticHeader('race')
     this.constructXML()
-    tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo) => {
+    tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId > this.id && info.actionId <= this.id + config.amounts.length) {
-        const amount = config.amounts[info.actionId - (this.id + 1)]
+        const amount: number = config.amounts[info.actionId - (this.id + 1)]
         void donations.donate(info.login, info.nickname, amount)
       }
     })

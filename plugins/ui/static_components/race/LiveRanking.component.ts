@@ -31,7 +31,7 @@ export default class LiveRanking extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tm.records.live.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('PlayerDataUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.live.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }
