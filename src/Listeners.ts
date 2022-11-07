@@ -10,6 +10,7 @@ import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import config from '../config/Config.js'
+import { Utils } from './Utils.js'
 
 let isRestart: boolean = false
 
@@ -33,7 +34,7 @@ export class Listeners {
         const ip: string = playerInfo.IPAddress.split(':')[0]
         const canJoin = await AdministrationService.handleJoin(login, ip)
         if (canJoin === false) {
-          Logger.info(`Player ${playerInfo.Login} (${tm.utils.strip(playerInfo.NickName)}) attempted to join, forbidden.`)
+          Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
         const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
@@ -186,6 +187,8 @@ export class Listeners {
           await MapService.update()
           await VoteService.nextMap()
           await RecordService.nextMap()
+        } else {
+          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.` )
         }
         // Update server config
         await ServerConfig.update()
@@ -251,7 +254,6 @@ export class Listeners {
         const temp: any = PlayerService.get(login)
         temp.actionId = answer
         const info: tm.ManialinkClickInfo = temp
-        Logger.trace(`Player ${tm.utils.strip(temp.nickname)} (${temp.login}) interacted with manialink ID ${temp.actionId}.`)
         Events.emit('ManialinkClick', info)
       }
     },

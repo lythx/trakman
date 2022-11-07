@@ -78,7 +78,10 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     [this.headerLeft, this.headerRight, this.frameMidTop,
     this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
-      if (info.actionId === this.openId) { this.onOpen(info) }
+      if (info.actionId === this.openId) {
+        tm.log.trace(`Player ${tm.utils.strip(info.nickname)} (${info.login}) opened ${this.constructor.name}.`)
+        this.onOpen(info)
+      }
       else if (info.actionId === this.closeId) {
         const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
         if (index !== -1) {

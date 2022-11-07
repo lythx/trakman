@@ -114,7 +114,12 @@ export class MapService {
       mapInfo.lapsAmount = res.NbLaps
     }
     this._current = mapInfo as any
-    Logger.info(`Current map set to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}.`)
+    if (this._history[0] === undefined) {
+      Logger.info(`Current map set to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}`)
+    } else {
+      Logger.info(`Current map changed to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}` +
+        ` from ${Utils.strip(this._history[0].name)} by ${this._history[0].author}.`)
+    }
     void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
   }
 

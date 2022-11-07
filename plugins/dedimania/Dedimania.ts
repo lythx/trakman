@@ -335,10 +335,11 @@ if (config.isEnabled === true) {
     for (const e of currentDedis) {
       const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
       if (newNickname !== undefined) {
-        // todo include login
-        tm.log.trace(`Updated nickname for ${tm.utils.strip(newNickname)} from Dedimania.`)
-        e.nickname = newNickname
-        changedObjects.push(e)
+        if (e.nickname !== newNickname) {
+          tm.log.trace(`Updated nickname for ${tm.utils.strip(newNickname)} (${e.login}) from Dedimania.`)
+          e.nickname = newNickname
+          changedObjects.push(e)
+        }
       }
     }
     if (changedObjects.length !== 0) {
