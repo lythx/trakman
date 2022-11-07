@@ -5,7 +5,6 @@ export default {
   title: "Changelog",
   icon: icons.codeBranch,
   navbar: [
-    { name: 'Info', actionId: ids.welcomeWindow },
     { name: 'Command List', actionId: ids.commandList }
   ],
   textScale: 1.4,
