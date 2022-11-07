@@ -193,6 +193,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param params Display params to be passed to construct methods
    * @param topRightText Text displayed in right part of the header
    * @param privilege Player privilege
+   * @param title If set given title is displayed instead of the title passed in constructor
    */
   async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number, title?: string): Promise<void> {
     const content: string = await this.constructContent(login, params, privilege)
