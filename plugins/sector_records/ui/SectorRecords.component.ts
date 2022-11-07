@@ -106,11 +106,11 @@ class SectorRecords extends PopupWindow {
         if (sectors?.[i + sectorIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sector), w, h)
@@ -146,11 +146,11 @@ class SectorRecords extends PopupWindow {
         const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
         const difference = bestSum - sum
         if (difference > 0) {
-          differenceString = `(${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sum), w, h)
