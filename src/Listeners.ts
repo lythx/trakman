@@ -10,6 +10,7 @@ import { VoteService } from './services/VoteService.js'
 import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import config from '../config/Config.js'
+import { Utils } from './Utils.js'
 
 let isRestart: boolean = false
 
@@ -32,7 +33,10 @@ export class Listeners {
         }
         const ip: string = playerInfo.IPAddress.split(':')[0]
         const canJoin = await AdministrationService.handleJoin(login, ip)
-        if (canJoin === false) { return }
+        if (canJoin === false) {
+          Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
+          return
+        }
         const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
           playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
@@ -183,6 +187,8 @@ export class Listeners {
           await MapService.update()
           await VoteService.nextMap()
           await RecordService.nextMap()
+        } else {
+          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.` )
         }
         // Update server config
         await ServerConfig.update()

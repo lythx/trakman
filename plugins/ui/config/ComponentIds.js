@@ -48,7 +48,6 @@ export default {
   guestlist: 160000,
   sectorRecords: 170000,
   checkpointRecords: 180000,
-  welcomeWindow: 190000,
   changelog: 200000,
   cpCounter: 210000,
   commandList: 220000,

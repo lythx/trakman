@@ -1,4 +1,9 @@
-import { stats } from "../../stats/Stats.js"
+/**
+ * @author lythx
+ * @since 0.6
+ */
+
+ import { stats } from "../../stats/Stats.js"
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
 import config from './TopRanks.config.js'
 

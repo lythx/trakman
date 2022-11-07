@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './KarmaRanking.config.js'
 
@@ -8,7 +13,7 @@ export default class KarmaRanking extends StaticComponent {
   private readonly side: boolean
   private readonly list: List
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.karmaRanking, 'result')
@@ -19,7 +24,7 @@ export default class KarmaRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    tm.addListener('KarmaVote', () => {
+    tm.addListener('KarmaVote', (): void => {
       this.display()
     })
   }
@@ -35,8 +40,8 @@ export default class KarmaRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
-    const list = tm.maps.list.sort((a, b) => b.voteRatio - a.voteRatio).filter(a => a.voteCount > config.minimumVotes).slice(0, config.entries)
+  constructXml(): void {
+    const list: Readonly<tm.Map>[] = tm.maps.list.sort((a, b): number => b.voteRatio - a.voteRatio).filter(a => a.voteCount > config.minimumVotes).slice(0, config.entries)
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">

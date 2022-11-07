@@ -1,18 +1,23 @@
-import { componentIds, Grid, StaticHeader, StaticComponent } from '../../UI.js'
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
+import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import { webservices } from '../../../webservices/Webservices.js'
+import { webservices, WebservicesInfo } from '../../../webservices/Webservices.js'
 import config from './MapWidgetResult.config.js'
 
 export default class MapWidgetResult extends StaticComponent {
 
-  private readonly rows = 5
+  private readonly rows: number = 5
   private readonly positionX: number
   private readonly positionY: number
   private readonly side: boolean
   private readonly header: StaticHeader
   private readonly grid: Grid
-  private isRestart = false
+  private isRestart: boolean = false
   private xml: string = ''
 
   constructor() {
@@ -24,16 +29,16 @@ export default class MapWidgetResult extends StaticComponent {
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled === true) {
-      webservices.onCurrentAuthorChange(() => {
+      webservices.onCurrentAuthorChange((): void => {
         void this.display()
       })
     }
-    tm.addListener('JukeboxChanged', () => {
+    tm.addListener('JukeboxChanged', (): void => {
       void this.display()
     })
-    tmx.onMapChange(() => this.display())
-    tmx.onQueueChange(() => this.display())
-    tm.addListener('EndMap', (info) => {
+    tmx.onMapChange((): void => this.display())
+    tmx.onQueueChange((): void => this.display())
+    tm.addListener('EndMap', (info): void => {
       this.isRestart = info.isRestart
     }, true)
   }
@@ -50,13 +55,13 @@ export default class MapWidgetResult extends StaticComponent {
   }
 
   private updateXML(): void {
-    const map = this.isRestart ? tm.jukebox.current : tm.jukebox.queue[0]
-    const authorData = this.isRestart ? webservices.currentAuthor : webservices.nextAuthor
+    const map: Readonly<tm.Map> = this.isRestart ? tm.jukebox.current : tm.jukebox.queue[0]
+    const authorData: WebservicesInfo | undefined = this.isRestart ? webservices.currentAuthor : webservices.nextAuthor
     const author: string = authorData?.nickname ?? map.author
-    const TMXMap = this.isRestart ? tmx.current : tmx.queue[0]
+    const TMXMap: Readonly<tm.TMXMap> | null = this.isRestart ? tmx.current : tmx.queue[0]
     const date: Date | undefined = TMXMap?.lastUpdateDate
     const ic = config.icons
-    let authorIcon = ic.author
+    let authorIcon: string = ic.author
     if (authorData !== undefined) {
       authorIcon = (flags as any)[authorData.countryCode] // cope typescript
     }
@@ -70,7 +75,7 @@ export default class MapWidgetResult extends StaticComponent {
       [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
       [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
     ]
-    const headerCfg = this.header.options
+    const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 4) {
         return `<frame posn="0 0 1">
@@ -131,8 +136,8 @@ export default class MapWidgetResult extends StaticComponent {
   }
 
   private getTagAndAward(map: tm.Map, TMXMap?: tm.TMXMap): { tag: string, award: string } {
-    let tag = config.icons.tags.normal
-    let award = config.icons.awards.normal
+    let tag: string = config.icons.tags.normal
+    let award: string = config.icons.awards.normal
     if (map.isNadeo === true) {
       tag = config.icons.tags.nadeo
       award = config.icons.awards.nadeo

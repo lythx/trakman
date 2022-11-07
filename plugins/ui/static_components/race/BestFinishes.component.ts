@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './BestFinishes.config.js'
 
@@ -19,8 +24,8 @@ export default class BestFinishes extends StaticComponent {
     this.contentHeight = config.height - (config.margin + this.headerHeight)
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
-    tm.addListener('PlayerFinish', (info: tm.FinishInfo) => {
-      let index = this.bestFinishes.findIndex(a => a.time > info.time)
+    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
+      let index: number = this.bestFinishes.findIndex(a => a.time > info.time)
       if (index === -1) { index = this.bestFinishes.length }
       if (index < config.entries) {
         this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickname })
@@ -29,14 +34,14 @@ export default class BestFinishes extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('PlayerDataUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info): void => {
       for (const e of this.bestFinishes) {
-        const newNickname = info.find(a => a.login === e.login)?.nickname
+        const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }
       }
       this.display()
     })
-    tm.addListener('BeginMap', () => {
+    tm.addListener('BeginMap', (): void => {
       this.newestFinish = -1
       this.bestFinishes.length = 0
       this.display()
@@ -90,7 +95,7 @@ export default class BestFinishes extends StaticComponent {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       const fin = this.bestFinishes[i]
       if (fin === undefined) { return '' }
-      let format = fin.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
+      let format: string = fin.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
       if (i === this.newestFinish) { format = `<format textcolor="${config.newestColour}"/>` }
       return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, { textScale: config.textScale, padding: config.textPadding })
     }
@@ -103,11 +108,10 @@ export default class BestFinishes extends StaticComponent {
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []
-    for (let i = 0; i < this.bestFinishes.length; i++) {
+    for (let i: number = 0; i < this.bestFinishes.length; i++) {
       arr.push(indexCell, timeCell, nicknameCell)
     }
     return this.grid.constructXml(arr)
   }
 
 }
-

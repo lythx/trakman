@@ -177,7 +177,7 @@ export abstract class ChatService {
     const messageInfo: tm.MessageInfo & { aliasUsed: string } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
-      aliasUsed
+      aliasUsed: aliasUsed.slice(1)
     }
     command.callback(messageInfo, ...parsedParams)
   }
@@ -267,7 +267,7 @@ export abstract class ChatService {
   static get commandList(): tm.Command[] {
     return [...this._commandList]
   }
-  
+
   /**
    * Number of commands.
    */

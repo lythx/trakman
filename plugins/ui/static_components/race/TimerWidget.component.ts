@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './TimerWidget.config.js'
 

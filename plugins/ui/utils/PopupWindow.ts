@@ -47,7 +47,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   /** Margin between window parts */
   protected readonly margin: number = config.margin
   /** Footer height */
-  protected readonly footerHeight = config.footerHeight
+  protected readonly footerHeight: number = config.footerHeight
   /** Right header part width (usually used for page display) */
   protected readonly headerPageWidth: number = config.headerPageWidth
   private static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
@@ -78,17 +78,20 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     [this.headerLeft, this.headerRight, this.frameMidTop,
     this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
-      if (info.actionId === this.openId) { this.onOpen(info) }
+      if (info.actionId === this.openId) {
+        tm.log.trace(`Player ${tm.utils.strip(info.nickname)} (${info.login}) opened ${this.constructor.name} manialink.`)
+        this.onOpen(info)
+      }
       else if (info.actionId === this.closeId) {
-        const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+        const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
         if (index !== -1) {
           PopupWindow.playersWithWindowOpen.splice(index, 1)
         }
         this.onClose(info)
       }
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo) => {
-      const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
+    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
+      const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
       }
@@ -111,17 +114,21 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.hideToPlayer(info.login)
   }
 
-  private constructFrame(): string[] {
-    return [
-      `<manialink id="${this.id}">
+  private _constructHeader(title?: string) {
+    return `<manialink id="${this.id}">
         <frame posn="-${this.windowWidth / 2} ${this.windowHeight / 2} 5">
           <frame posn="0 0 5">
             <quad posn="0 0 2" sizen="${this.headerHeight} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.headerHeight - this.margin * 2} ${this.headerHeight - this.margin * 2}" image="${this.headerIcon}"/>
             <quad posn="${this.headerHeight + this.margin} 0 2" sizen="${this.windowWidth - (this.headerHeight + this.headerPageWidth + this.margin * 2)} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
-            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(this.title)}" valign="center" halign="center"/>
+            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(title ?? this.title)}" valign="center" halign="center"/>
             <frame posn="${this.headerHeight + this.windowWidth - (this.headerHeight + this.headerPageWidth)} 0 4">
-              <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`,
+              <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`
+  }
+
+  private constructFrame(): string[] {
+    return [
+      this._constructHeader(),
       `
             </frame>
           </frame>
@@ -186,18 +193,19 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param params Display params to be passed to construct methods
    * @param topRightText Text displayed in right part of the header
    * @param privilege Player privilege
+   * @param title If set given title is displayed instead of the title passed in constructor
    */
-  async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number): Promise<void> {
+  async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number, title?: string): Promise<void> {
     const content: string = await this.constructContent(login, params, privilege)
     const footer: string = await this.constructFooter(login, params, privilege)
-    const index = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
+    const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
     if (index !== -1) {
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
-    const noNavbar = this.navbar.getButtonCount(privilege) === 0
+    const noNavbar: boolean = this.navbar.getButtonCount(privilege) === 0
     PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
-    tm.sendManialink(`${this.headerLeft}
-    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale})}
+    tm.sendManialink(`${title !== undefined ? this._constructHeader(title) : this.headerLeft}
+    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale })}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
     ${noNavbar === true ? this.noNavbarMidTop : this.frameMidTop}

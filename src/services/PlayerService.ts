@@ -27,7 +27,7 @@ export class PlayerService {
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
     Events.addListener('LocalRecord', (info: tm.RecordInfo): void => {
-      if ((info.previous?.position === undefined || 
+      if ((info.previous?.position === undefined ||
         info.previous?.position > RecordService.maxLocalsAmount) && info.position <= RecordService.maxLocalsAmount) {
         this.newLocalsAmount++
       }
@@ -261,6 +261,7 @@ export class PlayerService {
       player = await this.fetch(login)
     }
     await this.repo.updateOnWin(login, ++player.wins)
+    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getPositionString(player.wins)} time.`)
     return player.wins
   }
 
@@ -292,6 +293,10 @@ export class PlayerService {
     }
     // Get ranks for all players
     this.ranks = await this.repo.getRanks()
+    for (const e of this._players) {
+      const index = this.ranks.indexOf(e.login)
+      e.rank = index === -1 ? undefined : index
+    }
     Events.emit("RanksAndAveragesUpdated", arr)
   }
 

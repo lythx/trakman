@@ -1,22 +1,42 @@
 # Changelog
-Shorter changelog can be found in the controller (/changes)
+Changelog can also be found in the controller (/changes)
+
+## 1.0
+**07/11/2022**
+- Removed the redundant welcome window
+- Removed UI utils (merged into UI)
+- Added chatlog
+- Added TMX search (aka /xlist)
+- Added configurable karma messages
+- Added more logging
+- Added docs to almost everything in the code
+- Added wiki with up-to-date information
+- Added new TMX API to TMX fetcher
+- Fixed player data not updating in database
+- Fixed some stupid variable names
+- Fixed incorrect window colours
+- Fixed outdated code in early windows
+- Fixed stats UI being outside of stats plugin
+- Fixed database crash on too long chat string
+- Fixed multibyte characters breaking manialinks
+
 ## 0.6
-- Removed dotenv dependency
-- Removed json files and configs
+**29/09/2022**
+- Removed JSON files and configs
 - Added player stats windows and related commands
 - Added player ladder rank to player object
-- Added gzip compression for dedimania request and response
+- Added GZip compression for Dedimania request and response
 - Added enums to command params
 - Added time difference to checkpoint counter
 - Added cache to maplist
 - Added karma vote transfer among the two systems
 - Added coppers payment from the server
 - Added name sync across all systems
-- Added name sync from dedimania records
-- Added global trakman object/namespace for ease of access and types
+- Added name sync from Dedimania records
+- Added global namespace for ease of access and types
 - Added admin panel basic functionality
 - Fixed checkpoint counter only updating on finish
-- Fixed maniakarma returned value potentially being not a number
+- Fixed Maniakarma returned value potentially being NaN
 - Fixed gitignore like twenty times
 - Fixed broken actions in administration service
 - Fixed socket response being interpreted incorrectly
@@ -26,7 +46,9 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed controller crash on too big time param
 - Fixed controller crash on stats update due to hardcoded limit
 - Fixed controller crash on double vote (perhaps)
+
 ## 0.5
+**04/09/2022**
 - Removed unnecessary things from source
 - Added actual plugin system
 - Added config files for each plugin/window/command
@@ -35,12 +57,14 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed karma service
 - Fixed karma service crashing when no people are on the server
 - Fixed map service history not working properly
-- Fixed dedimania nation display for players/server
-- Fixed dedimania sending records when there are none
-- Fixed dedimania gamemode display
+- Fixed Dedimania nation display for players/server
+- Fixed Dedimania sending records when there are none
+- Fixed Dedimania gamemode display
 - Fixed chat commands being categorised in a silly way
 - Fixed recordlist crash on new map
+
 ## 0.4
+**10/08/2022**
 - Removed unused dependencies
 - Removed the sole broken test
 - Added result UI
@@ -64,7 +88,9 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed time consuming operations being unnecessarily awaited
 - Fixed wins being incremented without player finish
 - Fixed various messages display
+
 ## 0.3
+**31/07/2022**
 - Added vote class
 - Added vote window
 - Added skip/res votes
@@ -86,8 +112,12 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed webservices nickname fetching
 - Fixed wins being counted for the player that's alone on the server
 - Fixed record position string function being a scattered mess
-- Fixed dedimania reconnection not working
+- Fixed Dedimania reconnection not working
+
 ## 0.2
+**28/07/2022**
+- Added PB messages
+- Added plain "X" to the welcome window, as the image might not load instantly
 - Fixed client splitting the chunk in very specific circumstances
 - Fixed UI marker display
 - Fixed nickname display in administration windows
@@ -96,10 +126,14 @@ Shorter changelog can be found in the controller (/changes)
 - Fixed incorrect length for map author name column (40 in TMN)
 - Fixed local records crashing the server in certain circumstances
 - Fixed local records display when the record index is above the configured threshold
-- Added PB messages
-- Added plain X to the welcome window, as the image might not load instantly
+
 ## 0.1
-- First public release
-- Most basic functionality, e.g. record storage and most basic chat commands
-- Most plugins' functionality, albeit in form of services, thus not actual 'plugins'
+**27/07/2022**
+- First "public" testing release
+- Working record storage & other databases
+- Working chat commands
+- Working UI system
+- Basic plugins system in form of services
 - Repo structure is still chaotic
+- Many things are TODO and don't work
+- Documentation is lacking

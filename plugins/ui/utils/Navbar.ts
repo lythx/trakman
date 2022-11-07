@@ -53,7 +53,7 @@ export default class Navbar {
   constructXml(privilege: number = 0): string {
     let xml: string = ``
     const arr = this.buttons.filter(a => a.privilege <= privilege)
-    const w = (this.width + config.margin) / arr.length
+    const w: number = (this.width + config.margin) / arr.length
     for (const [i, e] of arr.entries()) {
       xml += `<frame posn="${w * i} 0 1">
             <quad posn="0 0 3" sizen="${w - config.margin} ${this.height}" image="f" imagefocus="${this.hoverImage}" action="${e.actionId}"/>

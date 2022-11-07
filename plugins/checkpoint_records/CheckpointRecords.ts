@@ -1,6 +1,7 @@
 import config from './Config.js'
 import { addListener } from './CheckpointEvents.js'
 import { getMapCheckpoints, getPlayerCheckpoints } from './CheckpointListeners.js'
+import './ui/CheckpointRecords.component.js'
 
 /**
  * Registers and stores checkpoint records for every player.

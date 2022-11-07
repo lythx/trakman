@@ -2,7 +2,7 @@ import { leftAlignedText, centeredText, rightAlignedText } from './TextUtils.js'
 import raceConfig from './StaticHeaderRace.config.js'
 import resultConfig from './StaticHeaderResult.config.js'
 
-interface StaticHeaderOptions {
+export interface StaticHeaderOptions {
   /** Header height */
   height: number,
   /** Image width */
@@ -43,9 +43,9 @@ export default class StaticHeader {
   /** Header options */
   options: StaticHeaderOptions
   /** Default height in race preset */
-  static raceHeight = raceConfig.height
+  static raceHeight: number = raceConfig.height
   /** Defualt height in result preset */
-  static resultHeight = resultConfig.height
+  static resultHeight: number = resultConfig.height
   /** Race preset options */
   static racePreset = raceConfig
   /** Result preset options */

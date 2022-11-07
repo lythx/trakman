@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './DonatorsRanking.config.js'
@@ -6,15 +11,15 @@ export default class DonatorsRanking extends StaticComponent {
 
   private readonly list: List
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.donatorsRanking, 'result')
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.donations.onUpdate(() => this.display())
-    stats.donations.onNicknameChange(() => this.display())
+    stats.donations.onUpdate((): void => this.display())
+    stats.donations.onNicknameChange((): void => this.display())
   }
 
   display(): void {
@@ -28,7 +33,7 @@ export default class DonatorsRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     const list = stats.donations.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>

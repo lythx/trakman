@@ -5,7 +5,7 @@ import { GameService } from './services/GameService.js'
 const eventListeners: { event: keyof tm.Events, callback: ((params: any) => void | Promise<void>) }[] = []
 let controllerReady: boolean = false
 
-const initialize = async () => {
+const initialize = async (): Promise<void> => {
   const res = await Client.call('GetStatus')
   if (res instanceof Error) {
     await Logger.fatal('Failed to get server status', res.message, res.stack)
@@ -49,7 +49,7 @@ const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
  * @param callback Callback function of the listener to remove
  */
 const removeListener = (callback: Function): void => {
-  let index = eventListeners.findIndex(a => a.callback === callback)
+  let index: number = eventListeners.findIndex(a => a.callback === callback)
   while (index !== -1) {
     eventListeners.splice(index, 1)
     index = eventListeners.findIndex(a => a.callback === callback)

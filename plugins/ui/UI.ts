@@ -1,5 +1,5 @@
 /**
- * Renders default server UI and provides utilities for creating manialinks.
+ * Renders server UI and provides utilities for creating manialinks.
  * @author lythx & Snake & wiseraven
  * @since 0.1
  */
@@ -10,7 +10,6 @@ import modConfig from './config/Mod.js'
 import TestWindow from './test_widgets/TestWindow.js'
 import StaticComponent from './utils/StaticComponent.js'
 import DynamicComponent from './utils/DynamicComponent.js'
-import './Imports.js'
 import CustomUi from './CustomUi.js'
 import Paginator from './utils/Paginator.js'
 import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
@@ -23,7 +22,7 @@ import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
 import { List } from './utils/List.js'
-import StaticHeader from './utils/StaticHeader.js'
+import StaticHeader, { StaticHeaderOptions } from './utils/StaticHeader.js'
 import staticButton from './utils/StaticButton.js'
 import { addManialinkListener, removeManialinkListener } from './utils/ManialinkListener.js'
 import PopupWindow from './utils/PopupWindow.js'
@@ -68,6 +67,7 @@ const preloadIcons = (login?: string): void => {
 const loadListeners: Function[] = []
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
+// TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
 
@@ -153,10 +153,12 @@ const addLoadListener = (callback: Function): void => {
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  PopupWindow, StaticComponent, DynamicComponent, 
+  PopupWindow, StaticComponent, DynamicComponent, StaticHeaderOptions,
   components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText, addLoadListener,
   leftAlignedText, addManialinkListener, removeManialinkListener
 }
 
+// Has to be like that due to circular dependencies
+import './Imports.js'

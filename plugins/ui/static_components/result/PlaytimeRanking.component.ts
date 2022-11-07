@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
 import { stats } from '../../../stats/Stats.js'
 import config from './PlaytimeRanking.config.js'
@@ -6,15 +11,15 @@ export default class PlaytimeRanking extends StaticComponent {
 
   private readonly list: List
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.playtimeRanking, 'result')
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.playtimes.onUpdate(() => this.display())
-    stats.playtimes.onNicknameChange(() => this.display())
+    stats.playtimes.onUpdate((): void => this.display())
+    stats.playtimes.onNicknameChange((): void => this.display())
   }
 
   display(): void {

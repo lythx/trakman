@@ -33,7 +33,7 @@ export class BanlistRepository extends Repository {
       Logger.error(`Failed to get callerId for player ${login} while inserting into banlist table`)
       return
     }
-    await this.query(query, ip, login, date, callerId, reason, expireDate)
+    await this.query(query, ip, login, date, callerId, reason?.slice(0, 150), expireDate)
   }
 
   async update(ip: string, login: string, date: Date, callerLogin: string, reason?: string, expireDate?: Date): Promise<void> {

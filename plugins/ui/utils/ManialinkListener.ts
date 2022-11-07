@@ -31,9 +31,9 @@ const removeManialinkListener = (callback: (info: tm.ManialinkClickInfo) => void
   listeners = listeners.filter(a => callback !== a.callback)
 }
 
-tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo) => {
+tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
   for (const e of listeners) {
-    const range = e.range ?? 1
+    const range: number = e.range ?? 1
     if (info.actionId >= e.actionId && info.actionId < e.actionId + range) {
       e.callback(info, info.actionId - e.actionId)
     }

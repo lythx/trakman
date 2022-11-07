@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './LocalRankingResult.config.js'
 
@@ -26,7 +31,7 @@ export default class LocalRankingResult extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
-    tm.addListener('PlayerDataUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
