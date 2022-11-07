@@ -1,44 +1,47 @@
 import colours from '../src/data/Colours.js'
 
+/** Controller messages palette object */
 export const palette = {
-  // All admin commands
+  /** All admin commands */
   admin: colours.erin,
-  // Dedi record messages
+  /** Dedi record messages */
   dedirecord: colours.darkpastelgreen,
-  // Dedi misc messages
+  /** Dedi misc messages */
   dedimessage: colours.kellygreen,
-  // Donation messages
+  /** Donation messages */
   donation: colours.brilliantrose,
-  // Error messages
+  /** Error messages */
   error: colours.red,
-  // General highlighting colour
+  /** General highlighting colour */
   highlight: colours.white,
-  // Karma messages
+  /** Karma messages */
   karma: colours.greenyellow,
-  // Server messages
+  /** Server messages */
   servermsg: colours.erin,
-  // Misc messages
+  /** Misc messages */
   message: colours.lightseagreen,
-  // Rank highlighting colour
+  /** Rank highlighting colour */
   rank: colours.icterine,
-  // Record messages
+  /** Record messages */
   record: colours.erin,
-  // Server message prefix colour
+  /** Server message prefix colour */
   server: colours.yellow,
-  // Voting messages
+  /** Voting messages */
   vote: colours.chartreuse,
-  // Green
+  /** Green */
   green: 'af4',
-  // Red
+  /** Red */
   red: 'e22',
-  // Yellow
+  /** Yellow */
   yellow: 'fc1',
-  // Purple
+  /** Purple */
   purple: '4af'
 }
 
 export const prefixes = {
+  /** Characters with which every message sent to individual players will be prefixed (e.g. ChatSendServerMessageToLogin) */
   serverToPlayer: `${colours.yellow}» `,
+  /** Characters with which every message sent in public will be prefixed (e.g. ChatSendServerMessage) */
   serverToAll: `${colours.yellow}»» `
 }
 
