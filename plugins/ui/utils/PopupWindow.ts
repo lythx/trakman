@@ -114,17 +114,21 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.hideToPlayer(info.login)
   }
 
-  private constructFrame(): string[] {
-    return [
-      `<manialink id="${this.id}">
+  private _constructHeader(title?: string) {
+    return `<manialink id="${this.id}">
         <frame posn="-${this.windowWidth / 2} ${this.windowHeight / 2} 5">
           <frame posn="0 0 5">
             <quad posn="0 0 2" sizen="${this.headerHeight} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.headerHeight - this.margin * 2} ${this.headerHeight - this.margin * 2}" image="${this.headerIcon}"/>
             <quad posn="${this.headerHeight + this.margin} 0 2" sizen="${this.windowWidth - (this.headerHeight + this.headerPageWidth + this.margin * 2)} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
-            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(this.title)}" valign="center" halign="center"/>
+            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(title ?? this.title)}" valign="center" halign="center"/>
             <frame posn="${this.headerHeight + this.windowWidth - (this.headerHeight + this.headerPageWidth)} 0 4">
-              <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`,
+              <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`
+  }
+
+  private constructFrame(): string[] {
+    return [
+      this._constructHeader(),
       `
             </frame>
           </frame>
@@ -190,7 +194,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param topRightText Text displayed in right part of the header
    * @param privilege Player privilege
    */
-  async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number): Promise<void> {
+  async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number, title?: string): Promise<void> {
     const content: string = await this.constructContent(login, params, privilege)
     const footer: string = await this.constructFooter(login, params, privilege)
     const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === login)
@@ -199,7 +203,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     }
     const noNavbar: boolean = this.navbar.getButtonCount(privilege) === 0
     PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
-    tm.sendManialink(`${this.headerLeft}
+    tm.sendManialink(`${title !== undefined ? this._constructHeader(title) : this.headerLeft}
     ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale })}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
