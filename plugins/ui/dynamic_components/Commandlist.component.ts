@@ -1,3 +1,7 @@
+/**
+ * @author lythx
+ */
+
 import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener, PopupWindow } from "../UI.js"
 import config from './Commandlist.config.js'
 

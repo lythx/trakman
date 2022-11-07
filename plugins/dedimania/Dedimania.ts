@@ -1,6 +1,8 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
+import './ui/DediCps.component.js'
+import './ui/DediSectors.component.js'
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []

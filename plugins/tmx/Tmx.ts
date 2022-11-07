@@ -1,5 +1,6 @@
 import config from './Config.js'
 import { TMXMapChangedInfo } from './TmxTypes.js'
+import './ui/TMXWindow.component.js'
 
 // fill with empty strings at start to avoid undefined error on startup
 const history: (tm.TMXMap | string)[] = []

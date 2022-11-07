@@ -1,6 +1,7 @@
 import config from './Config.js'
 import { addListener } from './SectorEvents.js'
 import { getMapSectors, getPlayerSectors } from './SectorListeners.js'
+import './ui/SectorRecords.component.js'
 
 /**
  * Registers and stores sector records for every player.

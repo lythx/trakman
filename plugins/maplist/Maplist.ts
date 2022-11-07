@@ -1,4 +1,5 @@
 import config from './Config.js'
+import './ui/Maplist.component.js'
 
 const authorSort: tm.Map[] = []
 const nameSort: tm.Map[] = []

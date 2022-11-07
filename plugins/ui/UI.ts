@@ -1,5 +1,5 @@
 /**
- * Renders default server UI and provides utilities for creating manialinks.
+ * Renders server UI and provides utilities for creating manialinks.
  * @author lythx & Snake & wiseraven
  * @since 0.1
  */
@@ -68,6 +68,7 @@ const preloadIcons = (login?: string): void => {
 const loadListeners: Function[] = []
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
+// TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
 
