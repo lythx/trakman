@@ -1,3 +1,7 @@
+/**
+ * @author lythx
+ */
+
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
 import { Paginator } from "../UI.js"
 import config from './TMXSearchWindow.config.js'

@@ -1,3 +1,6 @@
+/**
+ * @author lythx & wiseraven
+ */
 
 import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../UI.js'
 import config from './Chatlog.config.js'

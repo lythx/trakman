@@ -1,3 +1,6 @@
+/**
+ * @author lythx & Snake
+ */
 
 import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../../UI.js'
 import config from './Playerlist.config.js'

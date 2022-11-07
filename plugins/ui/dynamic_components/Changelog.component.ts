@@ -1,3 +1,6 @@
+/**
+ * @author lythx
+ */
 
 import { Grid, componentIds, GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
 import config from './Changelog.config.js'

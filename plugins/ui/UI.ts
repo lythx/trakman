@@ -1,5 +1,5 @@
 /**
- * Renders default server UI and provides utilities for creating manialinks.
+ * Renders server UI and provides utilities for creating manialinks.
  * @author lythx & Snake & wiseraven
  * @since 0.1
  */
