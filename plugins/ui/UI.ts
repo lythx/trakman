@@ -68,6 +68,7 @@ const preloadIcons = (login?: string): void => {
 const loadListeners: Function[] = []
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
+// TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
 
@@ -153,7 +154,7 @@ const addLoadListener = (callback: Function): void => {
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  PopupWindow, StaticComponent, DynamicComponent, 
+  PopupWindow, StaticComponent, DynamicComponent,
   components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText, addLoadListener,

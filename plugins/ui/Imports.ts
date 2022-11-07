@@ -43,23 +43,16 @@ DYNAMIC COMPONENTS
 */
 
 import CommandList from './dynamic_components/Commandlist.component.js'
-import TMXWindow from './dynamic_components/MapInfoWindow.component.js'
-import LocalCps from './dynamic_components/LocalCps.component.js'
-import DediCps from './dynamic_components/DediCps.component.js'
-import LiveCps from './dynamic_components/LiveSectors.component.js'
-import DediSectors from './dynamic_components/DediSectors.component.js'
-import LocalSectors from './dynamic_components/LocalSectors.component.js'
-import LiveSectors from './dynamic_components/LiveCps.component.js'
-import MapList from './dynamic_components/Maplist.component.js'
+import LocalCps from './dynamic_components/checkpoint_windows/LocalCps.component.js'
+import LiveSectors from './dynamic_components/checkpoint_windows/LiveSectors.component.js'
+import LocalSectors from './dynamic_components/checkpoint_windows/LocalSectors.component.js'
+import LiveCps from './dynamic_components/checkpoint_windows/LiveCps.component.js'
 import DonationPanel from './static_components/race/DonationPanel.component.js'
-import PlayerList from './dynamic_components/Playerlist.component.js'
-import Banlist from './dynamic_components/Banlist.component.js'
-import Blacklist from './dynamic_components/Blacklist.component.js'
-import Guestlist from './dynamic_components/Guestlist.component.js'
-import Mutelist from './dynamic_components/Mutelist.component.js'
-import SectorRecords from './dynamic_components/SectorRecords.component.js'
-import CheckpointRecords from './dynamic_components/CheckpointRecords.component.js'
-import WelcomeWindow from './dynamic_components/WelcomeWindow.component.js'
+import PlayerList from './dynamic_components/admin_windows/Playerlist.component.js'
+import Banlist from './dynamic_components/admin_windows/Banlist.component.js'
+import Blacklist from './dynamic_components/admin_windows/Blacklist.component.js'
+import Guestlist from './dynamic_components/admin_windows/Guestlist.component.js'
+import Mutelist from './dynamic_components/admin_windows/Mutelist.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
 import ChatLog from './dynamic_components/Chatlog.component.js'
 import TMXSearchWindow from './dynamic_components/TMXSearchWindow.component.js'
@@ -97,12 +90,9 @@ tm.addListener(`Startup`, () => {
   new AdminPanelResult()
   new WinnersRanking()
   new MostRecordsRanking()
-  new MapList()
   new CommandList()
-  new DediCps()
   new LiveCps()
   new LocalCps()
-  new DediSectors()
   new LocalSectors()
   new LiveSectors()
   new PlayerList()
@@ -110,11 +100,7 @@ tm.addListener(`Startup`, () => {
   new Blacklist()
   new Guestlist()
   new Mutelist()
-  new SectorRecords()
-  new CheckpointRecords()
-  new WelcomeWindow()
   new Changelog()
-  new TMXWindow()
   new ChatLog()
   new TMXSearchWindow()
 }, true)

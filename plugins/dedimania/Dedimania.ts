@@ -1,6 +1,8 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import config from './Config.js'
 import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
+import './ui/DediCps.component.js'
+import './ui/DediSectors.component.js'
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
@@ -292,7 +294,7 @@ const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'i
     time,
     checkpoints,
     position,
-    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition} : undefined
+    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined
   }
 }
 
