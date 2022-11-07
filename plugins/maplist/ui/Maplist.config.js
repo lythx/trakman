@@ -9,6 +9,9 @@ export default {
   overlayBackground: '7777',
   defaultText: '-',
   colour: p.green,
+  optionTitles: {
+    jukebox: 'Jukebox'
+  },
   texts: {
     map: 'Map #',
     queued: 'Queued',

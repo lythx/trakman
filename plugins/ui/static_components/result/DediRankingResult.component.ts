@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 import config from './DediRankingResult.config.js'

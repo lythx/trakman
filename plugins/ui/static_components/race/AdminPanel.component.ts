@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
 import config from './AdminPanel.config.js'
 

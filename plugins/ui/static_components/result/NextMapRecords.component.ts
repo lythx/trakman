@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 

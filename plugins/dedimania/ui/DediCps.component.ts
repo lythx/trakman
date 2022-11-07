@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { dedimania } from "../../dedimania/Dedimania.js"
 import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../../ui/UI.js'
 import config from './DediCps.config.js'

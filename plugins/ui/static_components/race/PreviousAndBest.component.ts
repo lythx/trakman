@@ -1,5 +1,9 @@
-import { componentIds, StaticComponent } from '../../UI.js'
+/**
+ * @author lythx
+ * @since 0.1
+ */
 
+import { componentIds, StaticComponent } from '../../UI.js'
 import config from './PreviousAndBest.config.js'
 
 export default class PreviousAndBest extends StaticComponent {

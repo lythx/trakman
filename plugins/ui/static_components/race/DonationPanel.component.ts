@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { donations } from '../../../donations/Donations.js'
 import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
 import config from './DonationPanel.config.js'

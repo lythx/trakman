@@ -1,5 +1,9 @@
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+/**
+ * @author lythx
+ * @since 0.1
+ */
 
+import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {

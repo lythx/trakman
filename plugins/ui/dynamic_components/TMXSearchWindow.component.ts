@@ -1,5 +1,6 @@
 /**
  * @author lythx
+ * @since 1.0
  */
 
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'

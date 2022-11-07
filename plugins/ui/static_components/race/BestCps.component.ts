@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
 import config from './BestCps.config.js'
 

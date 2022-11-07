@@ -1,5 +1,6 @@
 /**
  * @author lythx & Snake
+ * @since 0.1
  */
 
 import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../../UI.js'

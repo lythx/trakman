@@ -10,7 +10,6 @@ import modConfig from './config/Mod.js'
 import TestWindow from './test_widgets/TestWindow.js'
 import StaticComponent from './utils/StaticComponent.js'
 import DynamicComponent from './utils/DynamicComponent.js'
-import './Imports.js'
 import CustomUi from './CustomUi.js'
 import Paginator from './utils/Paginator.js'
 import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
@@ -161,3 +160,5 @@ export {
   leftAlignedText, addManialinkListener, removeManialinkListener
 }
 
+// Has to be like that due to circular dependencies
+import './Imports.js'

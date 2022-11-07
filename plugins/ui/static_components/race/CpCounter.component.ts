@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { componentIds, StaticHeader, centeredText, StaticComponent, StaticHeaderOptions } from '../../UI.js'
 import config from './CpCounter.config.js'
 import { dedimania, DediRecord } from '../../../dedimania/Dedimania.js'

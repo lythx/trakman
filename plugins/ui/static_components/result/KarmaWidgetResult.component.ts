@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.4
+ */
+
 import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
 import { maniakarma, MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidgetResult.config.js'

@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.6
+ */
+
 import { stats } from "../Stats.js"
 import { componentIds, centeredText } from '../../ui/UI.js'
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../../ui/UI.js"

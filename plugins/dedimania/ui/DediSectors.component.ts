@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
 import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../../ui/UI.js'
 import config from './DediSectors.config.js'
@@ -177,7 +182,7 @@ export default class DediSectors extends PopupWindow {
     return cpPages
   }
 
-} 
+}
 
 tm.addListener('Startup', () => {
   new DediSectors()

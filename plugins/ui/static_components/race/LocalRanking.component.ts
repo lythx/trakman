@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 
 import config from './LocalRanking.config.js'

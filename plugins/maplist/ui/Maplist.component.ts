@@ -1,3 +1,8 @@
+/**
+ * @author lythx
+ * @since 0.1
+ */
+
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow, Paginator } from '../../ui/UI.js'
 import { maplist } from '../Maplist.js'
 import config from './Maplist.config.js'
@@ -8,7 +13,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private readonly mapAddId = 1000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
-  private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string }[] = []
+  private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
 
@@ -97,17 +102,18 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     } else {
       list = maplist.get(option)
     }
-    const paginator = this.getPaginator(login, list)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
+    const paginator = this.getPaginator(login, list, option)
+    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`,
+      undefined, config.optionTitles[option as keyof typeof config.optionTitles])
   }
 
   openWithQuery(login: string, query: string, searchByAuthor?: true) {
     const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
-    const paginator = this.getPaginator(login, list)
+    const paginator = this.getPaginator(login, list, query)
     this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
   }
 
-  private getPaginator(login: string, list: readonly tm.Map[]) {
+  private getPaginator(login: string, list: readonly tm.Map[], option: string) {
     const pageCount = Math.ceil(list.length / (config.rows * config.columns))
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
@@ -116,16 +122,18 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page}/${pageCount}`)
+        { page, paginator, list }, `${page}/${pageCount}`, undefined,
+        config.optionTitles[option as keyof typeof config.optionTitles])
       paginator.setPageCount(pageCount)
     } else {
       paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
         this.windowWidth, this.footerHeight, pageCount)
       this.nextPaginatorId += 10
       this.nextPaginatorId = this.nextPaginatorId % 3000
-      this.playerQueries.push({ paginator, login, list })
+      this.playerQueries.push({ paginator, login, list, query: option })
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page}/${pageCount}`)
+        { page, paginator, list }, `${page}/${pageCount}`, undefined,
+        config.optionTitles[option as keyof typeof config.optionTitles])
     }
     return paginator
   }
@@ -136,18 +144,20 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
       let list = maplist.get()
+      let query: string | undefined
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
+        query = obj.query
       }
       const page = paginator.getPageByLogin(login)
       let pageCount = Math.ceil(list.length / (config.rows * config.columns))
       if (pageCount === 0) { pageCount++ }
       if (page === undefined) {
-        this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`)
+        this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`, undefined, query)
         return
       }
-      this.displayToPlayer(login, { page, paginator, list }, `${page}/${pageCount}`)
+      this.displayToPlayer(login, { page, paginator, list }, `${page}/${pageCount}`, undefined, query)
     }
   }
 
@@ -341,7 +351,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>`
   }
 
-} 
+}
 
 tm.addListener('Startup', () => {
   new MapList()

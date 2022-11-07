@@ -26,6 +26,7 @@ export default class TestWindow {
       callback: (info): void => {
         const entry = this.intervals.find(a => a.login === info.login)
         if (entry !== undefined) {
+          this.hideToPlayer(entry.login)
           clearInterval(entry.interval)
           this.intervals = this.intervals.filter(a => a.login !== info.login)
         }
@@ -38,7 +39,11 @@ export default class TestWindow {
     if (config.isEnabled === false) { return }
     const file: Buffer | Error = await fs.readFile(`./plugins/ui/test_widgets/${config.file}`).catch((err: Error) => err)
     if (file instanceof Error) { return }
-    tm.sendManialink(file.toString(), login)
+    tm.sendManialink(`<manialink id="test">${file.toString()}</manialink>`, login)
+  }
+
+  hideToPlayer(login: string): void {
+    tm.sendManialink(`<manialink id="test"></manialink>`)
   }
 
 }

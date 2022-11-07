@@ -1,8 +1,11 @@
+/**
+ * @author lythx
+ * @since 0.5
+ */
+
 import { componentIds, Paginator, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../../ui/UI.js'
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
-
-// TODO MAYBE RENAME FILE AND CLASS
 
 class TMXWindow extends PopupWindow<number> {
 

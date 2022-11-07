@@ -1,3 +1,7 @@
+/**
+ * @author lythx
+ * @since 0.3
+ */
 
 import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject, PopupWindow } from '../../ui//UI.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
