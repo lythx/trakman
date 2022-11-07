@@ -25,10 +25,10 @@ export class AdministrationService {
   private static _guestlist: tm.GuestlistEntry[] = []
   private static readonly blacklistFile: string = config.blacklistFile
   private static readonly guestlistFile: string = config.guestlistFile
-  static readonly banPrivilege = config.privileges.ban
-  static readonly blacklistPrivilege = config.privileges.blacklist
-  static readonly mutePrivilege = config.privileges.mute
-  static readonly addGuestPrivilege = config.privileges.addGuest
+  static readonly banPrivilege: number = config.privileges.ban
+  static readonly blacklistPrivilege: number = config.privileges.blacklist
+  static readonly mutePrivilege: number = config.privileges.mute
+  static readonly addGuestPrivilege: number = config.privileges.addGuest
 
   static async initialize(): Promise<void> {
     void this.setOwner()

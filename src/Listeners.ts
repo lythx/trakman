@@ -32,7 +32,10 @@ export class Listeners {
         }
         const ip: string = playerInfo.IPAddress.split(':')[0]
         const canJoin = await AdministrationService.handleJoin(login, ip)
-        if (canJoin === false) { return }
+        if (canJoin === false) {
+          Logger.info(`Player ${playerInfo.Login} (${tm.utils.strip(playerInfo.NickName)}) attempted to join, forbidden.`)
+          return
+        }
         const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
           playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
@@ -248,6 +251,7 @@ export class Listeners {
         const temp: any = PlayerService.get(login)
         temp.actionId = answer
         const info: tm.ManialinkClickInfo = temp
+        Logger.trace(`Player ${tm.utils.strip(temp.nickname)} (${temp.login}) interacted with manialink ID ${temp.actionId}.`)
         Events.emit('ManialinkClick', info)
       }
     },
