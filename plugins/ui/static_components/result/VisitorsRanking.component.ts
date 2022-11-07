@@ -9,7 +9,7 @@ export default class VisitorsRanking extends StaticComponent {
   private readonly side: boolean
   private readonly header: StaticHeader
   private readonly list: List
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.visitorsRanking, 'result')
@@ -20,8 +20,8 @@ export default class VisitorsRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.visits.onUpdate(() => this.display())
-    stats.visits.onNicknameChange(() => this.display())
+    stats.visits.onUpdate((): void => this.display())
+    stats.visits.onNicknameChange((): void => this.display())
   }
 
   display(): void {
@@ -35,7 +35,7 @@ export default class VisitorsRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     const list = stats.visits.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>

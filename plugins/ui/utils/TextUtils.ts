@@ -1,11 +1,11 @@
 import config from './TextUtils.config.js'
 
-interface UITextOptions { 
-  textScale?: number, 
-  padding?: number, 
-  xOffset?: number, 
-  yOffset?: number, 
-  specialFont?: true 
+interface UITextOptions {
+  textScale?: number,
+  padding?: number,
+  xOffset?: number,
+  yOffset?: number,
+  specialFont?: true
 }
 
 /**

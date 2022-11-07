@@ -29,16 +29,16 @@ export default abstract class StaticComponent {
   constructor(id: number, displayMode: DisplayMode) {
     this.id = id
     this.displayMode = displayMode
-    tm.addListener('EndMap', (info) => {
-      if(info.isRestart && info.winnerLogin === undefined) { return }
+    tm.addListener('EndMap', (info): void => {
+      if (info.isRestart && info.winnerLogin === undefined) { return }
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
       this._isDisplayed ? this.display() : this.hide()
     }, true)
-    tm.addListener('BeginMap', () => {
+    tm.addListener('BeginMap', (): void => {
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
       this._isDisplayed ? this.display() : this.hide()
     }, true)
-    tm.addListener('PlayerJoin', async (info: tm.JoinInfo) => {
+    tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
       if (this._isDisplayed === true) { this.displayToPlayer(info.login) }
     })
     if (!this.dislayStates[displayMode].includes(tm.state.current)) {
@@ -54,14 +54,14 @@ export default abstract class StaticComponent {
    * @returns Object containing coordinates and side of the component
    */
   protected getRelativePosition(): { x: number, y: number, side: boolean } {
-    const widgetName = this.constructor.name
+    const widgetName: string = this.constructor.name
     let cfg: typeof RaceUi | typeof ResultUi
     if (this.displayMode === 'result') {
       cfg = ResultUi
     } else {
       cfg = RaceUi
     }
-    let side = false
+    let side: boolean = false
     if (cfg.rightSideOrder.some(a => a.name === widgetName)) { side = true }
     const order: { name: string; height: number; }[] = side ? cfg.rightSideOrder : cfg.leftSideOrder
     let positionSum: number = 0

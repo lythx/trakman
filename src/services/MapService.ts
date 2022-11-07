@@ -114,6 +114,12 @@ export class MapService {
       mapInfo.lapsAmount = res.NbLaps
     }
     this._current = mapInfo as any
+    if (this._history[0] === undefined) {
+      Logger.info(`Current map set to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}`)
+    } else {
+      Logger.info(`Current map changed to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}` +
+        ` from ${Utils.strip(this._history[0].name)} by ${this._history[0].author}.`)
+    }
     void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
   }
 
@@ -173,7 +179,7 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
-    if(!dontJuke) {
+    if (!dontJuke) {
       const status: true | Error = await this.addToJukebox(obj.id, caller, true)
       if (status instanceof Error) {
         Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
@@ -212,7 +218,7 @@ export class MapService {
             if (map === undefined) {
               return new Error(`Failed to queue map ${fileName}`)
             }
-            if(!dontJuke) {
+            if (!dontJuke) {
               this.addToJukebox(id, caller)
             }
             return { wasAlreadyAdded: true, map }

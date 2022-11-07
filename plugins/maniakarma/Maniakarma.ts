@@ -198,7 +198,7 @@ function addVote(mapId: string, arg: string | readonly { login: string, vote: -3
     const updated: MKVote[] = []
     for (const e of arg) {
       const v: MKVote | undefined = playerVotes.find(a => a.login === e.login)
-      if(v?.login === e.login && v?.vote === e.vote) { continue }
+      if (v?.login === e.login && v?.vote === e.vote) { continue }
       mapKarma[voteNames[e.vote > 0 ? e.vote + 2 : e.vote + 3] as keyof typeof mapKarma]++
       if (v === undefined) {
         const obj = { mapId, login: e.login, vote: e.vote }
@@ -224,7 +224,7 @@ function addVote(mapId: string, arg: string | readonly { login: string, vote: -3
   const login = arg as string
   mapKarma[voteNames[vote > 0 ? vote + 2 : vote + 3] as keyof typeof mapKarma]++
   const v: MKVote | undefined = playerVotes.find(a => a.login === login)
-  if(v?.login === login && v.vote === vote) { return }
+  if (v?.login === login && v.vote === vote) { return }
   if (v === undefined) { playerVotes.push({ mapId, login, vote }) }
   else {
     mapKarma[voteNames[v.vote > 0 ? v.vote + 2 : v.vote + 3] as keyof typeof mapKarma]--
@@ -424,3 +424,5 @@ export const maniakarma = {
   }
 
 }
+
+export { MKMapVotes, MKVote }

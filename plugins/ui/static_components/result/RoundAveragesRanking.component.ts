@@ -8,7 +8,7 @@ export default class RoundAveragesRanking extends StaticComponent {
   private readonly list: List
   private readonly side: boolean
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
   private averages: { nickname: string, login: string, average: number, finishcount: number }[] = []
 
   constructor() {
@@ -20,7 +20,7 @@ export default class RoundAveragesRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    tm.addListener('PlayerFinish', async (info) => {
+    tm.addListener('PlayerFinish', async (info): Promise<void> => {
       const entry = this.averages.find(a => a.login === info.login)
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
@@ -29,10 +29,10 @@ export default class RoundAveragesRanking extends StaticComponent {
         entry.finishcount++
       }
     })
-    tm.addListener('BeginMap', () => {
+    tm.addListener('BeginMap', (): void => {
       this.averages.length = 0
     })
-    tm.addListener('PlayerDataUpdated', (info) => {
+    tm.addListener('PlayerDataUpdated', (info): void => {
       if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }
@@ -48,7 +48,7 @@ export default class RoundAveragesRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.posX} ${this.posY} 2">

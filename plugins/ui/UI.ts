@@ -23,7 +23,7 @@ import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
 import { List } from './utils/List.js'
-import StaticHeader from './utils/StaticHeader.js'
+import StaticHeader, { StaticHeaderOptions } from './utils/StaticHeader.js'
 import staticButton from './utils/StaticButton.js'
 import { addManialinkListener, removeManialinkListener } from './utils/ManialinkListener.js'
 import PopupWindow from './utils/PopupWindow.js'
@@ -154,7 +154,7 @@ const addLoadListener = (callback: Function): void => {
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  PopupWindow, StaticComponent, DynamicComponent,
+  PopupWindow, StaticComponent, DynamicComponent, StaticHeaderOptions,
   components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText, addLoadListener,

@@ -16,13 +16,13 @@ export default class Paginator {
   /** Default page (will be displayed if no page is specified) */
   defaultPage: number
   /** Button width */
-  readonly buttonW = config.buttonWidth
+  readonly buttonW: number = config.buttonWidth
   /** Button height */
-  readonly buttonH = config.buttonHeight
+  readonly buttonH: number = config.buttonHeight
   /** Icon padding */
-  readonly padding = config.padding
+  readonly padding: number = config.padding
   /** Margin between buttons */
-  readonly margin = config.margin
+  readonly margin: number = config.margin
   /** Icon width */
   readonly iconW: number = this.buttonW - this.padding * 2
   /** Icon height */
@@ -156,12 +156,12 @@ export default class Paginator {
   }
 
   /** Amount of currently displayed buttons. It's relative to the page count */
-  get buttonCount() {
+  get buttonCount(): number {
     return this._buttonCount
   }
 
   /** Amount of pages */
-  get pageCount() {
+  get pageCount(): number {
     return this._pageCount
   }
 

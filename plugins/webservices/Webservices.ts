@@ -1,10 +1,10 @@
 import config from './Config.js'
 import http from 'http'
 
-const wsLogin = process.env.WEBSERVICES_LOGIN
-const wsPassword = process.env.WEBSERVICES_PASSWORD
+const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
+const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD
 
-interface WebservicesInfo {
+export interface WebservicesInfo {
   id: number,
   login: string,
   united: boolean,
@@ -19,7 +19,7 @@ const currentAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = [
 const nextAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
 let curAuthor: WebservicesInfo | undefined
 let nextAuthor: WebservicesInfo | undefined
-let isMapRestart = false
+let isMapRestart: boolean = false
 const cachedAuthors: WebservicesInfo[] = []
 
 const fetchWebservices = async (login: string): Promise<{
@@ -60,7 +60,7 @@ const fetchWebservices = async (login: string): Promise<{
  * @returns Player information object or error if unsuccessful
  */
 const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
-  const cacheEntry = cachedAuthors.find(a => a.login === login)
+  const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find(a => a.login === login)
   if (cacheEntry !== undefined) { return cacheEntry }
   if (regex.test(login) === true) { return new Error(`Login doesn't pass regex test`) }
   const player = await fetchWebservices(login)
@@ -94,28 +94,28 @@ tm.addListener('Startup', async (): Promise<void> => {
     tm.log.error('WEBSERVICES_PASSWORD is undefined. Check your .env file to use the plugin.')
     return
   }
-  const curRes = await fetchPlayer(tm.maps.current.author)
+  const curRes: WebservicesInfo | Error = await fetchPlayer(tm.maps.current.author)
   if (!(curRes instanceof Error)) { curAuthor = curRes }
   for (const e of currentAuthorListeners) { e(curAuthor) }
-  const nextRes = await fetchPlayer(tm.jukebox.queue[0].id)
+  const nextRes: WebservicesInfo | Error = await fetchPlayer(tm.jukebox.queue[0].id)
   if (!(nextRes instanceof Error)) { nextAuthor = nextRes }
   for (const e of nextAuthorListeners) { e(nextAuthor) }
 })
 
 tm.addListener('EndMap', (info): void => { isMapRestart = info.isRestart })
-tm.addListener('BeginMap', () => { isMapRestart = false })
+tm.addListener('BeginMap', (): void => { isMapRestart = false })
 
 tm.addListener('JukeboxChanged', async (): Promise<void> => {
-  const curLogin = tm.maps.current.author
+  const curLogin: string = tm.maps.current.author
   if (curAuthor?.login !== curLogin) {
-    const res = await fetchPlayer(curLogin)
+    const res: WebservicesInfo | Error = await fetchPlayer(curLogin)
     if (res instanceof Error) { curAuthor = undefined }
     else { curAuthor = res }
   }
   for (const e of currentAuthorListeners) { e(curAuthor) }
-  const nextLogin = tm.jukebox.queue[0].author
+  const nextLogin: string = tm.jukebox.queue[0].author
   if (nextAuthor?.login !== nextLogin) {
-    const res = await fetchPlayer(nextLogin)
+    const res: WebservicesInfo | Error = await fetchPlayer(nextLogin)
     if (res instanceof Error) { nextAuthor = undefined }
     else { nextAuthor = res }
   }
@@ -151,14 +151,14 @@ export const webservices = {
   /**
    * Current map author webservices data
    */
-  get currentAuthor() {
+  get currentAuthor(): WebservicesInfo | undefined {
     return curAuthor
   },
 
   /**
    * Next map author webservices data
    */
-  get nextAuthor() {
+  get nextAuthor(): WebservicesInfo | undefined {
     if (isMapRestart === true) { return curAuthor }
     return nextAuthor
   },

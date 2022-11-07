@@ -6,15 +6,15 @@ export default class WinnersRanking extends StaticComponent {
 
   private readonly header: StaticHeader
   private readonly list: List
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.winnersRanking, 'result')
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.wins.onUpdate(() => this.display())
-    stats.wins.onNicknameChange(() => this.display())
+    stats.wins.onUpdate((): void => this.display())
+    stats.wins.onNicknameChange((): void => this.display())
   }
 
   display(): void {
@@ -28,7 +28,7 @@ export default class WinnersRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     const list = stats.wins.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>

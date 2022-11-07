@@ -20,7 +20,7 @@ export const removeKeyListener = (callback: (info: tm.ManialinkClickInfo) => voi
   keyListeners = keyListeners.filter(a => callback !== a.callback)
 }
 
-export const initialize = () => {
+export const initialize = (): void => {
   tm.sendManialink(`<manialinks>
 <manialink id="${utilIds.F5}">
   <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${utilIds.F5}"/>
@@ -34,7 +34,7 @@ export const initialize = () => {
 </manialinks>`)
 }
 
-tm.addListener('PlayerJoin', (info) => {
+tm.addListener('PlayerJoin', (info): void => {
   tm.sendManialink(`<manialinks>
   <manialink id="${utilIds.F5}">
     <quad posn="0 0 0" sizen="0 0" actionkey="1" action="${utilIds.F5}"/>
@@ -48,7 +48,7 @@ tm.addListener('PlayerJoin', (info) => {
   </manialinks>`, info.login)
 })
 
-tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo) => {
+tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
   switch (info.actionId) {
     case utilIds.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)

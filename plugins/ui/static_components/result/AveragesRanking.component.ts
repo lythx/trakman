@@ -9,7 +9,7 @@ export default class AveragesRanking extends StaticComponent {
   private readonly side: boolean
   private readonly list: List
   private readonly header: StaticHeader
-  private xml = ''
+  private xml: string = ''
 
   constructor() {
     super(componentIds.averagesRanking, 'result')
@@ -21,8 +21,8 @@ export default class AveragesRanking extends StaticComponent {
     this.list = new List(config.entries, config.width,
       config.height - (this.header.options.height + config.margin), config.columnProportions,
       { background: config.background, headerBg: this.header.options.textBackground })
-    stats.averages.onUpdate(() => this.display())
-    stats.averages.onNicknameChange(() => this.display())
+    stats.averages.onUpdate((): void => this.display())
+    stats.averages.onNicknameChange((): void => this.display())
   }
 
   display(): void {
@@ -36,7 +36,7 @@ export default class AveragesRanking extends StaticComponent {
     tm.sendManialink(this.xml, login)
   }
 
-  constructXml() {
+  constructXml(): void {
     const list = stats.averages.list
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>

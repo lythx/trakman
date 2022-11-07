@@ -1,10 +1,9 @@
 import config from './config/CustomUi.js'
 
-
 export default class CustomUi {
 
   constructor() {
-    tm.addListener('PlayerJoin', (info) => this.displayToPlayer(info.login))
+    tm.addListener('PlayerJoin', (info): void => this.displayToPlayer(info.login))
   }
 
   display(): void {
