@@ -13,7 +13,6 @@ export const fixRankCoherence = async (): Promise<void> => {
     return
   }
   Logger.info(`Recalculating ranks...`)
-  await fs.writeFile('./src/temp/rank_coherence.txt', config.localRecordsLimit.toString())
   const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
   if (mapList instanceof Error) {
     Logger.fatal('Error while getting the map list', mapList.message)
@@ -47,12 +46,14 @@ export const fixRankCoherence = async (): Promise<void> => {
     sum += (maps.length - indexes.length) * limit
     sums[i] = { average: sum / maps.length, id: playerIds[i] }
   }
-  if (sums.length === 0) { return }
-  await db.query(`UPDATE players AS p SET
-  average = v.average
-  FROM (VALUES
-    ${sums.map(a => `(${a.id}, ${a.average}),`).join('').slice(0, -1)}
-  ) AS v(id, average) 
-  WHERE v.id = p.id;`)
+  if (sums.length !== 0) {
+    await db.query(`UPDATE players AS p SET
+    average = v.average
+    FROM (VALUES
+      ${sums.map(a => `(${a.id}, ${a.average}),`).join('').slice(0, -1)}
+    ) AS v(id, average) 
+    WHERE v.id = p.id;`)
+  }
+  await fs.writeFile('./src/temp/rank_coherence.txt', config.localRecordsLimit.toString())
 }
 

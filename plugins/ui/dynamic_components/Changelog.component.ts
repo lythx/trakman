@@ -93,7 +93,9 @@ export default class Changelog extends PopupWindow<{ page: number }> {
       </frame>
       <frame posn="0 ${-headerH - this.margin} 2">
         <quad posn="0 0 2" sizen="${w} ${h - (headerH + this.margin)}" bgcolor="${config.tileBackground}"/>
-        <label posn="${config.marginBig} ${-config.marginBig} 5" sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + config.marginBig * 2)}" scale="1.15" text="$s${text}"/>
+        <label posn="${config.marginBig} ${-config.marginBig} 5" 
+        sizen="${w - config.marginBig * 2} ${h - (headerH + this.margin + config.marginBig * 2)}" 
+        scale="1.15" text="$s${tm.utils.safeString(text)}"/>
       </frame>`
   }
 
