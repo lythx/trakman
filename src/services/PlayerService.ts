@@ -295,7 +295,7 @@ export class PlayerService {
     this.ranks = await this.repo.getRanks()
     for (const e of this._players) {
       const index = this.ranks.indexOf(e.login)
-      e.rank = index === -1 ? undefined : index
+      e.rank = index === -1 ? undefined : (index + 1)
     }
     Events.emit("RanksAndAveragesUpdated", arr)
   }
