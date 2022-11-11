@@ -7,7 +7,7 @@ const history: (tm.TMXMap | string)[] = []
 let current: tm.TMXMap | string = ''
 const queueSize: number = config.queueCount
 const historySize: number = config.historyCount
-const queue: (tm.TMXMap | string)[] = new Array(queueSize).fill('')
+let queue: (tm.TMXMap | string)[] = new Array(queueSize).fill('')
 
 const queueListeners: ((queue: (tm.TMXMap | null)[]) => void)[] = []
 const mapListeners: ((info: TMXMapChangedInfo) => void)[] = []
@@ -26,6 +26,8 @@ const emitMapChangeEvent = () => {
   }
 }
 
+const getUid = (map: tm.TMXMap | string): string => typeof map === 'string' ? map : map.id
+
 const initialize = async (): Promise<void> => {
   if (queueSize > tm.jukebox.queueCount) {
     await tm.log.fatal(`jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
@@ -42,32 +44,36 @@ const initialize = async (): Promise<void> => {
   tm.log.trace('TMX plugin instantiated')
 }
 
-const update = async (): Promise<void> => {
+const nextMap = async (): Promise<void> => {
+  history.unshift(current)
+  history.length = Math.min(history.length, historySize)
+  update(true)
+}
+
+const update = async (updateCurrent?: true): Promise<void> => {
   const fetchedMaps = [...queue, current, ...history]
-  const newQueue = tm.jukebox.queue.slice(0, queueSize).map(a => a.id)
+  const newQueueUids = tm.jukebox.queue.slice(0, queueSize).map(a => a.id)
   const curId = tm.maps.current.id
-  if (curId !== (typeof current === 'string' ? current : current.id)) {
-    history.unshift(current)
-    history.length = Math.min(historySize, history.length)
-    const entry = fetchedMaps.find(a => typeof a === 'string' ? a === curId : a.id === curId)
-    if (entry !== undefined) {
-      current = entry
-    }
+  if (updateCurrent) {
+    const entry = fetchedMaps.find(a => getUid(a) === curId)
+    if (entry !== undefined) { current = entry }
     else {
       const res = await tm.tmx.fetchMapInfo(curId)
       current = res instanceof Error ? curId : res
     }
     emitMapChangeEvent()
   }
-  for (const [i, e] of newQueue.entries()) {
-    const entry = fetchedMaps.find(a => typeof a === 'string' ? a === e : a.id === e)
+  const newQueue: typeof queue = []
+  for (const e of newQueueUids) {
+    const entry = fetchedMaps.find(a => getUid(a) === e)
     if (entry !== undefined) {
-      queue[i] === entry
+      newQueue.push(entry)
     } else {
       const res = await tm.tmx.fetchMapInfo(e)
-      queue[i] = res instanceof Error ? e : res
+      newQueue.push(res instanceof Error ? e : res)
     }
   }
+  queue = newQueue
   emitQueueChangeEvent()
 }
 
@@ -77,6 +83,9 @@ if (config.isEnabled === true) {
     void initialize()
   })
   tm.addListener('JukeboxChanged', () => void update())
+  tm.addListener('BeginMap', info => {
+    if (!info.isRestart) { void nextMap() }
+  })
 }
 
 /**

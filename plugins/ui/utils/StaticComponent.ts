@@ -30,7 +30,7 @@ export default abstract class StaticComponent {
     this.id = id
     this.displayMode = displayMode
     tm.addListener('EndMap', (info): void => {
-      if (info.isRestart && info.winnerLogin === undefined) { return }
+      if (info.isRestart && tm.records.liveCount === 0) { return } // ignore the short restart
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
       this._isDisplayed ? this.display() : this.hide()
     }, true)
