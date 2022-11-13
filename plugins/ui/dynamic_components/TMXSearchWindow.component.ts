@@ -38,7 +38,7 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
       callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
         const maps = await tm.tmx.searchForMap(query)
         if (maps instanceof Error) {
-          tm.sendMessage(config.messages.searchError)
+          tm.sendMessage(config.messages.searchError, info.login)
           return
         }
         const paginator = this.getPaginator(info.login, maps)
@@ -83,7 +83,7 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
   protected async onOpen(info: tm.ManialinkClickInfo): Promise<void> {
     const maps = await tm.tmx.searchForMap()
     if (maps instanceof Error) {
-      tm.sendMessage(config.messages.searchError)
+      tm.sendMessage(config.messages.searchError, info.login)
       return
     }
     const paginator = this.getPaginator(info.login, maps)
@@ -191,14 +191,14 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
     if (map instanceof Error) {
       this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
       this.reRender()
-      tm.sendMessage(config.messages.fetchError)
+      tm.sendMessage(config.messages.fetchError, login)
       return false
     }
     const status = await tm.maps.writeFileAndAdd(map.name, map.content, { login, nickname })
     if (status instanceof Error) {
       this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
       this.reRender()
-      tm.sendMessage(config.messages.error)
+      tm.sendMessage(config.messages.error, login)
       return false
     }
     if (status.wasAlreadyAdded === true) {

@@ -67,6 +67,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
   currentDedis.length = 0
   newDedis.length = 0
   if (client.connected === false) {
+    emitFetchEvent(currentDedis)
     let status: true | {
       error: Error;
       isAuthenticationError: boolean;
