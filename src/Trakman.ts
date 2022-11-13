@@ -464,6 +464,7 @@ namespace trakman {
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
   export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
+    if (tm.players.count === 0) { return }
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])

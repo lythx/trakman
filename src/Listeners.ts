@@ -188,7 +188,8 @@ export class Listeners {
           await VoteService.nextMap()
           await RecordService.nextMap()
         } else {
-          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.` )
+          RecordService.restartMap()
+          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.`)
         }
         // Update server config
         await ServerConfig.update()
