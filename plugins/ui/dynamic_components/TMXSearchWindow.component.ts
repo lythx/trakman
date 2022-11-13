@@ -7,12 +7,22 @@ import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addMani
 import { Paginator } from "../UI.js"
 import config from './TMXSearchWindow.config.js'
 
-export default class TMXSearchWindow extends PopupWindow<{ page: number, paginator: Paginator, list: tm.TMXSearchResult[] }> {
+export default class TMXSearchWindow extends PopupWindow<{
+  page: number,
+  paginator: Paginator,
+  list: tm.TMXSearchResult[],
+  privilege: number
+}> {
 
   private readonly mapAddId = 1000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
-  private readonly playerQueries: { paginator: Paginator, list: tm.TMXSearchResult[], login: string }[] = []
+  private readonly playerQueries: {
+    paginator: Paginator,
+    list: tm.TMXSearchResult[],
+    login: string,
+    privilege: number
+  }[] = []
   private readonly paginatorIdOffset = 7000
   private nextPaginatorId = 0
   private requestedMaps: string[] = []
@@ -41,14 +51,14 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
           tm.sendMessage(config.messages.searchError)
           return
         }
-        const paginator = this.getPaginator(info.login, maps)
-        this.displayToPlayer(info.login, { page: 1, paginator, list: maps }, `1/${paginator.pageCount}`)
+        const paginator = this.getPaginator(info.login, info.privilege, maps)
+        this.displayToPlayer(info.login, { page: 1, paginator, list: maps, privilege: info.privilege }, `1/${paginator.pageCount}`)
       },
       privilege: 0
     })
   }
 
-  private getPaginator(login: string, list: tm.TMXSearchResult[]) {
+  private getPaginator(login: string, privilege: number, list: tm.TMXSearchResult[]) {
     const pageCount = Math.ceil(list.length / (config.rows * config.columns))
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
@@ -57,16 +67,16 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page}/${pageCount}`)
+        { page, paginator, list, privilege }, `${page}/${pageCount}`)
       paginator.setPageCount(pageCount)
     } else {
       paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
         this.windowWidth, this.footerHeight, pageCount)
       this.nextPaginatorId += 10
       this.nextPaginatorId = this.nextPaginatorId % 3000
-      this.playerQueries.push({ paginator, login, list })
+      this.playerQueries.push({ paginator, login, list, privilege })
       paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
-        { page, paginator, list }, `${page}/${pageCount}`)
+        { page, paginator, list, privilege }, `${page}/${pageCount}`)
     }
     return paginator
   }
@@ -76,7 +86,9 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       if (obj === undefined) { continue }
-      this.displayToPlayer(login, { page: 1, paginator: obj.paginator, list: obj.list }, `1/${obj.paginator.pageCount}`)
+      this.displayToPlayer(login, {
+        page: 1, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
+      }, `1/${obj.paginator.pageCount}`)
     }
   }
 
@@ -86,8 +98,8 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
       tm.sendMessage(config.messages.searchError)
       return
     }
-    const paginator = this.getPaginator(info.login, maps)
-    this.displayToPlayer(info.login, { page: 1, paginator, list: maps }, `1/${paginator.pageCount}`)
+    const paginator = this.getPaginator(info.login, info.privilege, maps)
+    this.displayToPlayer(info.login, { page: 1, paginator, list: maps, privilege: info.privilege }, `1/${paginator.pageCount}`)
   }
 
   protected onClose(info: tm.ManialinkClickInfo): void {
@@ -102,7 +114,7 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
   private isMultiByte = (str: string) =>
     [...str].some(c => (c.codePointAt(0) ?? 0) > 255)
 
-  protected async constructContent(login: string, params?: { page: number, list?: tm.TMXSearchResult[] }): Promise<string> {
+  protected async constructContent(login: string, params?: { page: number, privilege: number, list?: tm.TMXSearchResult[] }): Promise<string> {
     const maps = params?.list ?? []
     const startIndex = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
     const mapsToDisplay = Math.min(maps.length - startIndex, config.rows * config.columns)
@@ -118,7 +130,7 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
         author = ''
       }
       const actionId = this.getActionId(maps[index].id)
-      const header = this.getHeader(index, maps[index].id, actionId, w, h, maps[index].pageUrl)
+      const header = this.getHeader(index, maps[index].id, actionId, w, h, maps[index].pageUrl, params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth
       const dateW = width - (config.timeWidth + config.awardsWidth + this.margin * 4 + config.iconWidth * 2)
@@ -224,12 +236,12 @@ export default class TMXSearchWindow extends PopupWindow<{ page: number, paginat
     }
   }
 
-  private getHeader(mapIndex: number, mapId: string, actionId: number, w: number, h: number, url: string): string {
+  private getHeader(mapIndex: number, mapId: string, actionId: number, w: number, h: number, url: string, privilege: number): string {
     const width = (w - this.margin * 4) - config.iconWidth * 2
     const height = h - this.margin
     const isInMapList = (tm.maps.get(mapId) !== undefined) || this.requestedMaps.includes(mapId)
     let overlay: string | undefined
-    if (isInMapList) {
+    if (isInMapList || privilege < config.addPrivilege) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
       <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }
