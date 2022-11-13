@@ -51,6 +51,15 @@ export class RecordService {
   }
 
   /**
+   * Resets the live and initial local records for the restarted map
+   */
+  static restartMap(): void {
+    this._liveRecords.length = 0
+    this._initialLocals.length = 0
+    this._initialLocals.push(...this._localRecords)
+  }
+
+  /**
    * Fetches and stores records for current map
    */
   static async nextMap(): Promise<void> {
