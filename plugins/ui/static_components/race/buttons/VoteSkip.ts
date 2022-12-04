@@ -55,7 +55,7 @@ export class VoteSkip extends UiButton {
       tm.sendMessage(msg.tooLate, login)
       return
     }
-    if (Date.now() / 1000 - this.failedVoteTimestamp < cfg.timeout) {
+    if (Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
