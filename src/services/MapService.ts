@@ -298,7 +298,7 @@ export class MapService {
    * @returns True if successfull, Error if map is not in the memory
    */
   static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
-    const map: tm.Map | undefined = MapService.maps.find(a => a.id === mapId)
+    const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })

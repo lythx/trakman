@@ -92,10 +92,11 @@ export abstract class TMXFetcher {
       prefix = res.prefix
     }
     const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
-    const res = await fetch(url).catch((err: Error) => err)
-    if (res instanceof Error) {
-      Logger.error(`Error while fetching map file from TMX (url: ${url})`, res.message)
-      return res
+    const res = await fetch(url)
+    if (!res.ok) {
+      const error = new Error(`Error while fetching map file from TMX (url: ${url})`)
+      Logger.error(error.message)
+      return error
     }
     const nameHeader: string | null = res.headers.get('content-disposition')
     if (nameHeader === null) { return new Error('Cannot read map name') }
@@ -116,13 +117,13 @@ export abstract class TMXFetcher {
     let prefix: TMXPrefix | undefined
     for (const p of this.prefixes) {
       const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
-      const res = await fetch(url).catch((err: Error) => err)
-      if (res instanceof Error) {
-        Logger.error(`Error while fetching map info by uuid from TMX (url: ${url})`, res.message)
+      const res = await fetch(url)
+      if (!res.ok) {
+        Logger.error(`Error while fetching map info by uuid from TMX (url: ${url})`)
         continue
       }
       data = await res.text()
-      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+      if (data !== '') { // They send empty page instead of error for some reason. NICE!!!!
         prefix = p
         break
       }
@@ -150,33 +151,37 @@ export abstract class TMXFetcher {
     let mapId: string | undefined
     if (typeof arg === 'number') {
       const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&id=${arg}`
-      const res = await fetch(url).catch((err: Error) => err)
-      if (res instanceof Error) {
-        Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
-        return new Error(`Error while fetching map info from TMX (url: ${url})`)
+      const res = await fetch(url)
+      if (!res.ok) {
+        const error = new Error(`Error while fetching map info from TMX (url: ${url})`)
+        Logger.error(error.message)
+        return error
       }
       data = await res.text()
-      if (res.ok === false || data === '') {
-        return new Error('Cannot fetch map data from TMX')
+      if (data === '') {
+        const error = new Error(`Error while fetching map info from TMX (url: ${url})`)
+        Logger.error(error.message)
+        return error
       }
     } else {
       mapId = arg
       for (const p of this.prefixes) { // Search for right prefix
         const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
-        const res = await fetch(url).catch((err: Error) => err)
-        if (res instanceof Error) {
-          Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
+        const res = await fetch(url)
+        if (!res.ok) {
           continue
         }
         data = await res.text()
-        if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+        if (data !== '') { // They send empty page instead of error for some reason. NICE!!!!
           prefix = p
           break
         }
       }
     }
     if (prefix === undefined) {
-      return new Error('Cannot fetch map data from TMX')
+      const error = new Error(`Cannot fetch map info from TMX (map UID: ${mapId})`)
+      Logger.error(error.message)
+      return error
     }
     return await this.parseOldApiResponse(prefix, data, mapId as any)
   }
@@ -194,10 +199,10 @@ export abstract class TMXFetcher {
     }
     const TMXId: number = Number(s[0])
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
-    const replaysRes = await fetch(url).catch((err: Error) => err)
+    const replaysRes = await fetch(url)
     let replaysData: string[] = []
-    if (replaysRes instanceof Error) {
-      Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
+    if (!replaysRes.ok) {
+      Logger.error(`Error while fetching replays info from TMX (url: ${url})`)
     } else {
       replaysData = (await replaysRes.text()).split('\r\n')
       replaysData.pop()
@@ -275,9 +280,11 @@ export abstract class TMXFetcher {
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
       ...params
     ])}`
-    const res = await fetch(url).catch((err: Error) => err)
-    if (res instanceof Error) {
-      return res
+    const res = await fetch(url)
+    if (!res.ok) {
+      const error = new Error(`Error while searching for map on TMX (url: ${url})`)
+      Logger.error(error.message)
+      return error
     }
     const data = (await res.json() as any).Results
     const ret: tm.TMXSearchResult[] = []
