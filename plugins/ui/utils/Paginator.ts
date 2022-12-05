@@ -122,7 +122,8 @@ export default class Paginator {
    * @returns Page number
    */
   getPageByLogin(login: string): number {
-    return this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
+    const playerPage = this.loginPages.find(a => a.login === login)?.page ?? this.defaultPage
+    return (playerPage > this._pageCount ? this.defaultPage : playerPage)
   }
 
   /**
