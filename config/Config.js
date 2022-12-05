@@ -16,6 +16,8 @@ export default {
     mute: 1,
     addGuest: 1
   },
+  /** TODO DOCUMENT */
+  defaultTimeAttackTimeLimit: 300000,
   /** Relative path (/GameData/Config/) to the blacklist file */
   blacklistFile: "blacklist.txt",
   /** Relative path (/GameData/Config/) to the guestlist file */

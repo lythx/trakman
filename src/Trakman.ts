@@ -335,6 +335,14 @@ namespace trakman {
 
   export const state = {
 
+    enableFlexiTime() {
+
+    },
+
+    disableFlexiTime() {
+
+    },
+
     /**
      * Remaining race time in seconds.
      */
