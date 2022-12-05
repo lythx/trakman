@@ -48,7 +48,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
         && info.actionId < this.openId + this.actions.kick + 1000) { // Kick
         const target = tm.players.list[info.actionId - this.openId - this.actions.kick]
         if (target === undefined) { return }
-        tm.client.callNoRes('Kick', [{ string: info.login }])
+        tm.client.callNoRes('Kick', [{ string: target.login }])
         tm.sendMessage(tm.utils.strVar(config.messages.kick, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
