@@ -286,6 +286,7 @@ export class MapService {
       }
       Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
       res = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+      i++
     }
     Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author}`)
   }
