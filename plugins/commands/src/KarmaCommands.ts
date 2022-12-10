@@ -26,8 +26,8 @@ tm.addListener('PlayerChat', (info): void => {
 
 tm.commands.add(
   {
-    aliases: ['+++', '++', '+', '-', '--', '---'],
-    help: 'Vote for a map.',
+    aliases: config.aliases,
+    help: config.help,
     callback: async (info): Promise<void> => {
       processVote(info.aliasUsed as keyof typeof options, info)
     },

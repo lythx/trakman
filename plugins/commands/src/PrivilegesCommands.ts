@@ -2,8 +2,8 @@ import config from '../config/PrivilegesCommands.config.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: ['mad', 'masteradmin'],
-    help: 'Change player privilege to Masteradmin.',
+    aliases: config.masteradmin.aliases,
+    help: config.masteradmin.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
@@ -30,8 +30,8 @@ const commands: tm.Command[] = [
     privilege: config.masteradmin.privilege
   },
   {
-    aliases: ['ad', 'admin'],
-    help: 'Change player privilege to Admin.',
+    aliases: config.admin.aliases,
+    help: config.admin.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
@@ -65,8 +65,8 @@ const commands: tm.Command[] = [
     privilege: 3
   },
   {
-    aliases: ['op', 'operator'],
-    help: 'Change player privilege to Operator.',
+    aliases: config.operator.aliases,
+    help: config.operator.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login
@@ -100,8 +100,8 @@ const commands: tm.Command[] = [
     privilege: 2
   },
   {
-    aliases: ['rp', 'user'],
-    help: 'Remove player priveleges.',
+    aliases: config.user.aliases,
+    help: config.user.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetLogin: string = login

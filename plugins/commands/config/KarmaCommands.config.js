@@ -10,5 +10,7 @@ export default {
     '--': 'poor',
     '---': 'waste'
   },
-  public: true
+  public: true,
+  aliases: ['+++', '++', '+', '-', '--', '---'], // DONT TOUCH THIS OR YOU DIE
+  help: `Vote for a map.`
 }
