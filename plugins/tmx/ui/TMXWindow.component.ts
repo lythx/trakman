@@ -31,10 +31,10 @@ class TMXWindow extends PopupWindow<number> {
     })
     tm.addListener('RecordsPrefetch', () => this.reRender())
     tm.commands.add({
-      aliases: ['tmxinfo'],
-      help: 'Display TMX info.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }

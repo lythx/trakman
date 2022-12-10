@@ -2,8 +2,8 @@ import config from '../config/ServerCommands.config.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: ['srp', 'setrefpwd', 'setrefereepassword'],
-    help: 'Set the referee password.',
+    aliases: config.setrefpwd.aliases,
+    help: config.setrefpwd.help,
     params: [{ name: 'password', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
@@ -17,8 +17,8 @@ const commands: tm.Command[] = [
     privilege: config.setrefpwd.privilege
   },
   {
-    aliases: ['srm', 'setrefmode', 'setrefereemode'],
-    help: 'Set the referee mode.',
+    aliases: config.setrefmode.aliases,
+    help: config.setrefmode.help,
     params: [{ name: 'mode', type: 'boolean' }],
     callback: (info: tm.MessageInfo, mode: boolean): void => {
       tm.sendMessage(tm.utils.strVar(config.setrefmode.text, { title: info.title, adminName: tm.utils.strip(info.nickname), mode: mode ? 'ALL' : 'TOP3' }), config.setrefmode.public ? undefined : info.login)
@@ -27,8 +27,8 @@ const commands: tm.Command[] = [
     privilege: config.setrefmode.privilege
   },
   {
-    aliases: ['pay'],
-    help: 'Pay coppers from server account.',
+    aliases: config.pay.aliases,
+    help: config.pay.help,
     params: [{ name: 'amount', type: 'int' }, { name: 'login', optional: true }, { name: 'message', optional: true }],
     callback: async (info: tm.MessageInfo, amount: number, login?: string, message?: string): Promise<void> => {
       const status = await tm.utils.payCoppers(login ?? info.login, amount,
@@ -57,8 +57,8 @@ const commands: tm.Command[] = [
     privilege: config.pay.privilege
   },
   {
-    aliases: ['ssn', 'setservername'],
-    help: 'Set the server name.',
+    aliases: config.setservername.aliases,
+    help: config.setservername.help,
     params: [{ name: 'name', type: 'multiword' }],
     callback: (info: tm.MessageInfo, name: string): void => {
       tm.sendMessage(tm.utils.strVar(config.setservername.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: name.length === 0 ? `the server login` : name }), config.setservername.public ? undefined : info.login)
@@ -67,8 +67,8 @@ const commands: tm.Command[] = [
     privilege: config.setservername.privilege
   },
   {
-    aliases: ['sc', 'setcomment'],
-    help: 'Set the server comment.',
+    aliases: config.setcomment.aliases,
+    help: config.setcomment.help,
     params: [{ name: 'comment', type: 'multiword' }],
     callback: (info: tm.MessageInfo, comment: string): void => {
       tm.sendMessage(tm.utils.strVar(config.setcomment.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: comment.length === 0 ? `absolutely nothing` : comment }), config.setcomment.public ? undefined : info.login)
@@ -77,8 +77,8 @@ const commands: tm.Command[] = [
     privilege: config.setcomment.privilege
   },
   {
-    aliases: ['sp', 'setpwd', 'setpassword'],
-    help: 'Set the player password.',
+    aliases: config.setpassword.aliases,
+    help: config.setpassword.help,
     params: [{ name: 'password', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
@@ -92,8 +92,8 @@ const commands: tm.Command[] = [
     privilege: config.setpassword.privilege
   },
   {
-    aliases: ['ssp', 'setspecpwd', 'setspecpassword'],
-    help: 'Set the spectator password.',
+    aliases: config.setspecpassword.aliases,
+    help: config.setspecpassword.help,
     params: [{ name: 'password', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, password?: string): void => {
       const regex: RegExp = /[\p{ASCII}]+/u // Passwords outside of ASCII range cannot be entered in the field
@@ -107,8 +107,8 @@ const commands: tm.Command[] = [
     privilege: config.setspecpassword.privilege
   },
   {
-    aliases: ['smp', 'setmaxplayers'],
-    help: 'Set the max players amount.',
+    aliases: config.setmaxplayers.aliases,
+    help: config.setmaxplayers.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setmaxplayers.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: amount }), config.setmaxplayers.public ? undefined : info.login)
@@ -117,8 +117,8 @@ const commands: tm.Command[] = [
     privilege: config.setmaxplayers.privilege
   },
   {
-    aliases: ['sms', 'setmaxspecs'],
-    help: 'Set the max spectators amount.',
+    aliases: config.setmaxspecs.aliases,
+    help: config.setmaxspecs.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setmaxspecs.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: amount }), config.setmaxspecs.public ? undefined : info.login)
@@ -127,8 +127,8 @@ const commands: tm.Command[] = [
     privilege: config.setmaxspecs.privilege
   },
   {
-    aliases: ['stl', 'settimelimit'],
-    help: 'Set the time you spend gaming.',
+    aliases: config.settimelimit.aliases,
+    help: config.settimelimit.help,
     params: [{ name: 'time', type: 'int' }],
     callback: (info: tm.MessageInfo, time: number): void => {
       tm.sendMessage(tm.utils.strVar(config.settimelimit.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: time }), config.settimelimit.public ? undefined : info.login)
@@ -137,13 +137,13 @@ const commands: tm.Command[] = [
     privilege: config.settimelimit.privilege
   },
   {
-    aliases: ['sn', 'sendnotice'],
-    help: 'Send a notice. If the last word in notice is a login players avatar will be displayed.',
+    aliases: config.sendnotice.aliases,
+    help: config.sendnotice.help,
     params: [{ name: 'time', type: 'time' }, { name: 'notice', type: 'multiword' }],
     callback: (info: tm.MessageInfo, time: number, notice: string): void => {
-      const s = notice.split(' ').filter(a => a !== '')
+      const s: string[] = notice.split(' ').filter(a => a !== '')
       const player = tm.players.get(s[s.length - 1])
-      let loginAvatar = ''
+      let loginAvatar: string = ''
       if (player !== undefined) {
         notice = s.slice(0, -1).join(' ')
         loginAvatar = player.login
@@ -157,8 +157,8 @@ const commands: tm.Command[] = [
     privilege: config.sendnotice.privilege
   },
   {
-    aliases: ['amdl', 'allowmapdownload'],
-    help: 'Set whether map download is enabled.',
+    aliases: config.allowmapdownload.aliases,
+    help: config.allowmapdownload.help,
     params: [{ name: 'status', type: 'boolean' }],
     callback: (info: tm.MessageInfo, status: boolean): void => {
       tm.sendMessage(tm.utils.strVar(config.allowmapdownload.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'allowed' : 'disallowed' }), config.allowmapdownload.public ? undefined : info.login)
@@ -167,12 +167,12 @@ const commands: tm.Command[] = [
     privilege: config.allowmapdownload.privilege
   },
   {
-    aliases: ['shs', 'sethideserver'],
-    help: 'Set whether the server is hidden.',
+    aliases: config.sethideserver.aliases,
+    help: config.sethideserver.help,
     params: [{ name: 'value', validValues: ['hidden', 'visible', 'notmnf'] }],
     callback: (info: tm.MessageInfo, value: string): void => {
-      let status = ''
-      let hideInt = 0
+      let status: string = ''
+      let hideInt: number = 0
       switch (value) {
         case 'visible':
           status = config.sethideserver.status.visible
@@ -195,8 +195,8 @@ const commands: tm.Command[] = [
     privilege: config.sethideserver.privilege
   },
   {
-    aliases: ['asr', 'autosavereplays'],
-    help: 'Set whether replays should be autosaved by the server.',
+    aliases: config.autosavereplays.aliases,
+    help: config.autosavereplays.help,
     params: [{ name: 'status', type: 'boolean' }],
     callback: (info: tm.MessageInfo, status: boolean): void => {
       tm.sendMessage(tm.utils.strVar(config.autosavereplays.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'enabled' : 'disabled' }), config.autosavereplays.public ? undefined : info.login)
@@ -205,8 +205,8 @@ const commands: tm.Command[] = [
     privilege: config.autosavereplays.privilege
   },
   {
-    aliases: ['asvr', 'autosavevalreplays'],
-    help: 'Set whether validation replays should be autosaved by the server.',
+    aliases: config.autosavevalreplays.aliases,
+    help: config.autosavevalreplays.help,
     params: [{ name: 'status', type: 'boolean' }],
     callback: (info: tm.MessageInfo, status: boolean): void => {
       tm.sendMessage(tm.utils.strVar(config.autosavevalreplays.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'enabled' : 'disabled' }), config.autosavevalreplays.public ? undefined : info.login)
@@ -215,8 +215,8 @@ const commands: tm.Command[] = [
     privilege: config.autosavevalreplays.privilege
   },
   {
-    aliases: ['kc', 'killcontroller'],
-    help: 'Kill the server controller.',
+    aliases: config.killcontroller.aliases,
+    help: config.killcontroller.help,
     callback: (info: tm.MessageInfo): never => {
       tm.sendMessage(tm.utils.strVar(config.killcontroller.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.killcontroller.public ? undefined : info.login)
       process.exit(0)
@@ -224,8 +224,8 @@ const commands: tm.Command[] = [
     privilege: config.killcontroller.privilege
   },
   {
-    aliases: ['sd', 'shutdown'],
-    help: 'Stop the dedicated server.',
+    aliases: config.shutdown.aliases,
+    help: config.shutdown.help,
     callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.shutdown.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.shutdown.public ? undefined : info.login)
       tm.client.callNoRes(`StopServer`)

@@ -42,10 +42,10 @@ export default class DediSectors extends PopupWindow {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['dsc', 'dedisectms'],
-      help: 'Display current map dedimania sectors.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }

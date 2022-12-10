@@ -2,8 +2,8 @@ import config from '../config/RaceCommands.config.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: ['s', 'skip'],
-    help: 'Skip to the next map.',
+    aliases: config.skip.aliases,
+    help: config.skip.help,
     callback: (info: tm.MessageInfo): void => {
       if (tm.state.current === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
@@ -15,8 +15,8 @@ const commands: tm.Command[] = [
     privilege: config.skip.privilege
   },
   {
-    aliases: ['r', 'res', 'restart'],
-    help: 'Restart the current map.',
+    aliases: config.res.aliases,
+    help: config.res.help,
     callback: (info: tm.MessageInfo): void => {
       if (tm.state.current === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.res.text, {
@@ -28,8 +28,8 @@ const commands: tm.Command[] = [
     privilege: config.res.privilege
   },
   {
-    aliases: ['pt', 'prev', 'previous'],
-    help: 'Requeue the previously played map.',
+    aliases: config.prev.aliases,
+    help: config.prev.help,
     callback: async (info: tm.MessageInfo): Promise<void> => {
       if (tm.jukebox.history[0] === undefined) {
         tm.sendMessage(config.prev.error, info.login)
@@ -44,8 +44,8 @@ const commands: tm.Command[] = [
     privilege: config.prev.privilege
   },
   {
-    aliases: ['rq', 'requeue', 'replay'],
-    help: 'Requeue the ongoing map.',
+    aliases: config.replay.aliases,
+    help: config.replay.help,
     callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.replay.text, {
         title: info.title,
@@ -56,8 +56,8 @@ const commands: tm.Command[] = [
     privilege: config.replay.privilege
   },
   {
-    aliases: ['er', 'endround'],
-    help: 'End the ongoing round in rounds-based gamemodes.',
+    aliases: config.endround.aliases,
+    help: config.endround.help,
     callback: (info: tm.MessageInfo): void => {
       if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
         tm.sendMessage(config.endround.error, info.login)
@@ -69,8 +69,8 @@ const commands: tm.Command[] = [
     privilege: config.endround.privilege
   },
   {
-    aliases: ['fpt', 'forceteam', 'forceplayerteam'],
-    help: 'Force a player into the specified team.',
+    aliases: config.forceteam.aliases,
+    help: config.forceteam.help,
     params: [{ name: 'player' }, { name: 'team', validValues: ['blue', 'red'] }],
     callback: async (info: tm.MessageInfo, player: string, team: string): Promise<void> => {
       if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
@@ -82,8 +82,8 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.forceteam.playerOffline, info.login)
         return
       }
-      let teamInt = 0
-      let teamColour = ''
+      let teamInt: number = 0
+      let teamColour: string = ''
       switch (team.toLowerCase()) {
         case 'blue':
           teamInt = 0

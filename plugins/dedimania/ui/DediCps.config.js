@@ -26,5 +26,10 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
+  },
+  command: {
+    aliases: ['dcp', 'dedicptms', 'dedirecs'],
+    help: `Display current map dedimania checkpoints.`,
+    privilege: 0
   }
 }

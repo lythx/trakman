@@ -51,5 +51,27 @@ export default {
     noPermission: `${p.error}You can't add more than one map to the queue.`,
     remove: `${p.highlight}#{player} ${p.vote}removed ${p.highlight}#{map}${p.vote} from the queue.`,
     add: `${p.highlight}#{player} ${p.vote}added ${p.highlight}#{map}${p.vote} to the queue.`
+  },
+  commands: {
+    list: {
+      aliases: ['l', 'ml', 'list'],
+      help: `Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
+      privilege: 0
+    },
+    best: {
+      aliases: ['best'],
+      help: `Display list of maps sorted by rank ascending.`,
+      privilege: 0
+    },
+    worst: {
+      aliases: ['worst'],
+      help: `Display list of maps sorted by rank descending.`,
+      privilege: 0
+    },
+    jukebox: {
+      aliases: ['jb', 'jukebox'],
+      help: `Display jukebox.`,
+      privilege: 0
+    }
   }
 }

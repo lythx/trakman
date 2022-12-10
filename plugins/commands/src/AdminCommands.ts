@@ -2,8 +2,8 @@ import config from '../config/AdminCommands.config.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: ['k', 'kick'],
-    help: 'Kick a specific player.',
+    aliases: config.kick.aliases,
+    help: config.kick.help,
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, login: string, reason?: string): void => {
       const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -18,8 +18,8 @@ const commands: tm.Command[] = [
     privilege: config.kick.privilege
   },
   {
-    aliases: ['m', 'mute'],
-    help: 'Mute a specific player.',
+    aliases: config.mute.aliases,
+    help: config.mute.help,
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
@@ -39,8 +39,8 @@ const commands: tm.Command[] = [
     privilege: config.mute.privilege
   },
   {
-    aliases: ['um', 'unmute'],
-    help: 'Unmute a specific player.',
+    aliases: config.unmute.aliases,
+    help: config.unmute.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
@@ -63,8 +63,8 @@ const commands: tm.Command[] = [
     privilege: config.unmute.privilege
   },
   {
-    aliases: ['fs', 'forcespec'],
-    help: 'Force a player into spectator mode.',
+    aliases: config.forcespec.aliases,
+    help: config.forcespec.help,
     params: [{ name: 'login' }],
     callback: (info: tm.MessageInfo, login: string): void => {
       const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -91,8 +91,8 @@ const commands: tm.Command[] = [
     privilege: config.forcespec.privilege
   },
   {
-    aliases: ['fp', 'forceplay'],
-    help: 'Force a player into player mode.',
+    aliases: config.forceplay.aliases,
+    help: config.forceplay.help,
     params: [{ name: 'login' }],
     callback: (info: tm.MessageInfo, login: string): void => {
       const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -119,8 +119,8 @@ const commands: tm.Command[] = [
     privilege: config.forceplay.privilege
   },
   {
-    aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
-    help: 'Manipulate every soul on the server that you kicked someone.',
+    aliases: config.kickghost.aliases,
+    help: config.kickghost.help,
     params: [{ name: 'login' }],
     callback: (info: tm.MessageInfo, login: string): void => {
       tm.sendMessage(tm.utils.strVar(config.kickghost.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: login }), config.kickghost.public ? undefined : info.login)
@@ -129,8 +129,8 @@ const commands: tm.Command[] = [
     privilege: config.kickghost.privilege
   },
   {
-    aliases: ['b', 'ban'],
-    help: 'Ban a specific player.',
+    aliases: config.ban.aliases,
+    help: config.ban.help,
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -147,8 +147,8 @@ const commands: tm.Command[] = [
     privilege: config.ban.privilege
   },
   {
-    aliases: ['ub', 'unban'],
-    help: 'Unban a specific player.',
+    aliases: config.unban.aliases,
+    help: config.unban.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
@@ -168,8 +168,8 @@ const commands: tm.Command[] = [
     privilege: config.unban.privilege
   },
   {
-    aliases: ['bl', 'blacklist'],
-    help: 'Blacklist a specific player.',
+    aliases: config.blacklist.aliases,
+    help: config.blacklist.help,
     params: [{ name: 'login' }, { name: 'duration', type: 'time', optional: true }, { name: 'reason', type: 'multiword', optional: true }],
     callback: async (info: tm.MessageInfo, login: string, duration?: number, reason?: string): Promise<void> => {
       let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
@@ -191,8 +191,8 @@ const commands: tm.Command[] = [
     privilege: config.blacklist.privilege
   },
   {
-    aliases: ['ubl', 'unblacklist'],
-    help: 'Remove a specific player from the blacklist.',
+    aliases: config.unblacklist.aliases,
+    help: config.unblacklist.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
@@ -212,8 +212,8 @@ const commands: tm.Command[] = [
     privilege: config.unblacklist.privilege
   },
   {
-    aliases: ['ag', 'addguest'],
-    help: 'Add a player to the guestlist',
+    aliases: config.addguest.aliases,
+    help: config.addguest.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
@@ -236,8 +236,8 @@ const commands: tm.Command[] = [
     privilege: config.addguest.privilege
   },
   {
-    aliases: ['rg', 'rmguest', 'removeguest'],
-    help: 'Remove a player from the guestlist',
+    aliases: config.rmguest.aliases,
+    help: config.rmguest.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
       let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)

@@ -25,12 +25,12 @@ class CheckpointRecords extends PopupWindow {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['cpr', 'cprecs'],
-      help: 'Displays the checkpoint records on the current map.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {

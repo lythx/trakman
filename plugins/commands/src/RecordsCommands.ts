@@ -1,19 +1,19 @@
 import config from '../config/RecordsCommands.config.js'
 
 const commands: tm.Command[] = [{
-  aliases: ['dr', 'delrec', 'deleterecord'],
-  help: 'Remove a player\'s record on the ongoing map.',
+  aliases: config.delrec.aliases,
+  help: config.delrec.help,
   params: [{ name: 'indexOrValue' }],
   callback: (info: tm.MessageInfo, indexOrValue: string): void => {
     let playerRecord: tm.LocalRecord | undefined
-    const list = tm.records.local
-    const index = Number(indexOrValue) - 1
+    const list: Readonly<tm.LocalRecord>[] = tm.records.local
+    const index: number = Number(indexOrValue) - 1
     if (!isNaN(index) && index < list.length && index >= 0) {
       playerRecord = list[index]
     } else {
       playerRecord = tm.records.getLocal(indexOrValue)
       if (playerRecord === undefined) {
-        if (index < tm.records.maxLocalsAmount) {
+        if (index <= tm.records.maxLocalsAmount) {
           tm.sendMessage(tm.utils.strVar(config.delrec.outOfRange, { index: indexOrValue }), info.login)
         } else {
           tm.sendMessage(tm.utils.strVar(config.delrec.noPlayerRecord, { login: indexOrValue }), info.login)
@@ -27,8 +27,8 @@ const commands: tm.Command[] = [{
   privilege: config.delrec.privilege
 },
 {
-  aliases: ['pr', 'prunerecs', 'prunerecords'],
-  help: 'Remove all records on the ongoing map.',
+  aliases: config.prunerecs.aliases,
+  help: config.prunerecs.help,
   callback: (info: tm.MessageInfo): void => {
     tm.sendMessage(tm.utils.strVar(config.prunerecs.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.prunerecs.public ? undefined : info.login)
     tm.records.removeAll(tm.maps.current.id, info)

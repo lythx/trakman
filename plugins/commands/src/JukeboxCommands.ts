@@ -1,8 +1,8 @@
 import config from '../config/JukeboxCommands.config.js'
 
 const commands: tm.Command[] = [{
-  aliases: ['dq', 'djb', 'dropqueue', 'dropjukebox'],
-  help: 'Drop the specified track from the map queue',
+  aliases: config.dropjukebox.aliases,
+  help: config.dropjukebox.help,
   params: [{ name: 'index', type: 'int' }],
   callback: (info: tm.MessageInfo, index: number): void => {
     const map: tm.Map | undefined = tm.jukebox.juked[index - 1]?.map
@@ -16,8 +16,8 @@ const commands: tm.Command[] = [{
   privilege: config.dropjukebox.privilege
 },
 {
-  aliases: ['cq', 'cjb', 'clearqueue', 'clearjukebox'],
-  help: 'Clear the entirety of the current map queue',
+  aliases: config.clearjukebox.aliases,
+  help: config.clearjukebox.help,
   callback: (info: tm.MessageInfo): void => {
     if (tm.jukebox.juked.length === 0) {
       tm.sendMessage(config.clearjukebox.error, info.login)
@@ -31,8 +31,8 @@ const commands: tm.Command[] = [{
   privilege: config.clearjukebox.privilege
 },
 {
-  aliases: ['shuf', 'shuffle'],
-  help: 'Shuffle the map queue.',
+  aliases: config.shuffle.aliases,
+  help: config.shuffle.help,
   callback: async (info: tm.MessageInfo): Promise<void> => {
     tm.sendMessage(tm.utils.strVar(config.shuffle.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.shuffle.public ? undefined : info.login)
     tm.jukebox.shuffle(info)

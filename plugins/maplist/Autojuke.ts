@@ -53,9 +53,9 @@ const autojuke = async (info: { privilege: number, login: string, nickname: stri
 }
 
 tm.commands.add({
-  aliases: ['aj', 'autojuke'],
-  help: 'Juke a random map. Options: nofinish(nofin), norank, noauthor',
+  aliases: config.autojuke.aliases,
+  help: config.autojuke.help,
   params: [{ name: 'option', optional: true }],
   callback: autojuke,
-  privilege: 0
+  privilege: config.autojuke.privilege
 })

@@ -42,8 +42,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     })
     addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
     tm.commands.add({
-      aliases: ['l', 'ml', 'list'],
-      help: 'Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.',
+      aliases: config.commands.list.aliases,
+      help: config.commands.list.help,
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: (info: tm.MessageInfo, query?: string): void => {
         if (query === undefined) {
@@ -64,31 +64,31 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           this.openWithQuery(info.login, query)
         }
       },
-      privilege: 0
+      privilege: config.commands.list.privilege
     })
     tm.commands.add({
-      aliases: ['best'],
-      help: 'Display list of maps sorted by rank ascending.',
+      aliases: config.commands.best.aliases,
+      help: config.commands.best.help,
       callback: (info: tm.MessageInfo): void => {
         this.openWithOption(info.login, 'best')
       },
-      privilege: 0
+      privilege: config.commands.best.privilege
     })
     tm.commands.add({
-      aliases: ['worst'],
-      help: 'Display list of maps sorted by rank descending.',
+      aliases: config.commands.worst.aliases,
+      help: config.commands.worst.help,
       callback: (info: tm.MessageInfo): void => {
         this.openWithOption(info.login, 'worst')
       },
-      privilege: 0
+      privilege: config.commands.worst.privilege
     })
     tm.commands.add({
-      aliases: ['jb', 'jukebox'],
-      help: 'Display jukebox.',
+      aliases: config.commands.jukebox.aliases,
+      help: config.commands.jukebox.help,
       callback: (info: tm.MessageInfo): void => {
         this.openWithOption(info.login, 'jukebox')
       },
-      privilege: 0
+      privilege: config.commands.jukebox.privilege
     })
     maplist.onListUpdate(() => this.reRender())
     maplist.onJukeboxUpdate(() => this.reRender())
