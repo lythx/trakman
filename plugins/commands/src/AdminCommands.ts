@@ -72,9 +72,11 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.forcespec.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.forcespec.text, { title: info.title, 
+      tm.sendMessage(tm.utils.strVar(config.forcespec.text, {
+        title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        name: tm.utils.strip(targetInfo.nickname) }), config.forcespec.public ? undefined : info.login)
+        name: tm.utils.strip(targetInfo.nickname)
+      }), config.forcespec.public ? undefined : info.login)
       tm.client.callNoRes('system.multicall',
         [{
           method: 'ForceSpectator',
@@ -256,6 +258,23 @@ const commands: tm.Command[] = [
       tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
     },
     privilege: config.rmguest.privilege
+  },
+  {
+    aliases: ['flex'],
+    callback() {
+      console.log('flexer')
+      tm.state.enableFlexiTime()
+    },
+    privilege: 0
+  },
+  {
+    aliases: ['flexset'],
+    params: [{ type: 'time', name: 'time' }],
+    callback(info, time: number) {
+      console.log('XDXDXDDX')
+      tm.state.setFlexiTime(time)
+    },
+    privilege: 0
   }
 ]
 

@@ -31,7 +31,7 @@ export class GameService {
   ]
   private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
-  private static _flexiTimeEnabled = false // todo make rememberer
+  private static _flexiTimeEnabled = false
   private static flexiTimeOnNextRound = false
   private static timeAttackLimit = config.defaultTimeAttackTimeLimit
   private static remainingFlexiTime: number = config.defaultTimeAttackTimeLimit
@@ -58,6 +58,10 @@ export class GameService {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
     })
+    await this.update()
+    if (this._game.timeAttackLimit === 0) {
+      this._enableFlexiTime()
+    }
     this.startTimer()
   }
 
@@ -69,10 +73,7 @@ export class GameService {
 
   static disableFlexiTime(): void {
     if (!this.flexiTimeOnNextRound) { return }
-    this.timeAttackLimit = this._game.timeAttackLimit
-    const limit = this.timeAttackLimit !== 0 ? this.timeAttackLimit :
-      config.defaultTimeAttackTimeLimit
-    Client.call(`SetTimeAttackLimit`, [{ int: limit }])
+    Client.call(`SetTimeAttackLimit`, [{ int: this.timeAttackLimit }])
     this.flexiTimeOnNextRound = false
   }
 
@@ -85,16 +86,35 @@ export class GameService {
     Events.emit('ServerStateChanged', state)
   }
 
-  static startTimer(): void {
-    this._timerStartTimestamp = Date.now()
-    if (!this.flexiTimeEnabled) { return }
-    this.remainingFlexiTime = this.timeAttackLimit
+  private static _enableFlexiTime(): void {
+    this._flexiTimeEnabled = true
+    this.flexiTimeOnNextRound = true
+    console.log('enableflex')
     this.flexiTimeInterval = setInterval(() => {
-      if (!this.flexiTimePaused) { return }
+      if (this.flexiTimePaused) { return }
       const date = Date.now()
       this.lastFlexiTimeUpdate = date
       this.remainingFlexiTime -= date - this.lastFlexiTimeUpdate
-    }, 500)
+    }, 300)
+  }
+
+  private static _disableFlexiTime(): void {
+    this._flexiTimeEnabled = false
+    this.flexiTimeOnNextRound = false
+    clearInterval(this.flexiTimeInterval)
+  }
+
+  static startTimer(): void {
+    if (this.flexiTimeOnNextRound && !this.flexiTimeEnabled) {
+      this._enableFlexiTime()
+    } else if (!this.flexiTimeOnNextRound && this.flexiTimeEnabled) {
+      this._disableFlexiTime()
+    }
+    if (this.flexiTimeEnabled) {
+      this._timerStartTimestamp = Date.now()
+    } else {
+      this.remainingFlexiTime = this.timeAttackLimit
+    }
   }
 
   static pauseFlexiTime(): boolean {
@@ -109,14 +129,27 @@ export class GameService {
     return true
   }
 
+  static setFlexiTime(miliseconds: number): boolean {
+    if (!this.flexiTimeEnabled) { return false }
+    this.remainingFlexiTime = miliseconds
+    return true
+  }
+
   static addFlexiTime(miliseconds: number): boolean {
     if (!this.flexiTimeEnabled) { return false }
     this.remainingFlexiTime += miliseconds
     return true
   }
 
+  static subtractFlexiTime(miliseconds: number): boolean {
+    if (!this.flexiTimeEnabled) { return false }
+    this.remainingFlexiTime -= miliseconds
+    return true
+  }
+
   static get remainingRaceTime(): number {
     if (this.flexiTimeEnabled) {
+      if (this.remainingFlexiTime < 0) { return 0 }
       return this.remainingFlexiTime
     }
     if (this._state === 'result' || this.state === 'transition') { return 0 }
@@ -125,6 +158,7 @@ export class GameService {
 
   static get remainingResultTime(): number {
     if (this.flexiTimeEnabled) {
+      if (this.remainingFlexiTime < 0) { return 0 }
       return this.remainingFlexiTime
     }
     if (this._state === 'race' || this.state === 'transition') { return 0 }
@@ -135,12 +169,16 @@ export class GameService {
     return this._state
   }
 
+  static get isFlexiTimePaused(): boolean {
+    return this.flexiTimePaused
+  }
+
   static get resultTimeLimit(): number {
-    return ~~(this.config.resultTime / 1000)
+    return ~~(this._game.resultTime / 1000)
   }
 
   static get raceTimeLimit(): number {
-    return ~~(this.config.timeAttackLimit / 1000)
+    return ~~(this._game.timeAttackLimit / 1000)
   }
 
   static async update(): Promise<void> {
@@ -174,9 +212,7 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
-    if (!this.flexiTimeEnabled) {
-      this.timeAttackLimit = this._game.timeAttackLimit
-    }
+    this.timeAttackLimit = this._game.timeAttackLimit
   }
 
   static get config(): tm.Game {

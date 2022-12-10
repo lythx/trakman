@@ -335,12 +335,14 @@ namespace trakman {
 
   export const state = {
 
-    enableFlexiTime() {
+    enableFlexiTime: GameService.enableFlexiTime.bind(GameService),
 
-    },
+    disableFlexiTime: GameService.disableFlexiTime.bind(GameService), // TODO DOCUMENTATION
 
-    disableFlexiTime() {
+    setFlexiTime: GameService.setFlexiTime.bind(GameService),
 
+    get flexiTimeEnabled(): boolean {
+      return GameService.flexiTimeEnabled
     },
 
     /**
