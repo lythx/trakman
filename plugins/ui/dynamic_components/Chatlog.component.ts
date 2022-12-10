@@ -25,10 +25,10 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['chatlog', 'cl'],
-      help: 'Display the chat log.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.privilege
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }

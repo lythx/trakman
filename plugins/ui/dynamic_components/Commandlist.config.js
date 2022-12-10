@@ -42,5 +42,10 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
+  },
+  command: {
+    aliases: ['h', 'help', 'helpall'],
+    help: `Display the list of controller commands.`,
+    privilege: 0
   }
 }

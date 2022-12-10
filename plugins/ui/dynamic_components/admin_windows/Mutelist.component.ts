@@ -45,10 +45,10 @@ export default class Mutelist extends PopupWindow<number> {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['mutel', 'mutelist'],
-      help: 'Display mutelist.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.privilege
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }

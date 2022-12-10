@@ -20,12 +20,12 @@ export default class Changelog extends PopupWindow<{ page: number }> {
   constructor() {
     super(componentIds.changelog, config.icon, config.title, config.navbar)
     tm.commands.add({
-      aliases: ['changes', 'changelog'],
-      help: 'Display list of controller changes',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, 1, 1)
     this.paginator.onPageChange = (login, page) => {

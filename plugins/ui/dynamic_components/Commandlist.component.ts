@@ -96,10 +96,10 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       }
     })
     tm.commands.add({
-      aliases: ['h', 'help', 'helpall'],
-      help: 'Display the commands list.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.command.privilege
     },)
   }
 

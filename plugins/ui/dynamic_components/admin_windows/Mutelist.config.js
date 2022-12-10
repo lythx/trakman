@@ -37,5 +37,10 @@ export default {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unmuted ${p.highlight}#{name}${p.admin}.`,
     error: `${p.error}Could not unmute ${p.highlight}#{login}${p.error}.`,
     public: true
+  },
+  command: {
+    aliases: ['mutel', 'mutelist'],
+    help: `Display the muted players list.`,
+    privilege: tm.config.controller.privileges.mute
   }
 }
