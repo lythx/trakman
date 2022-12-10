@@ -22,12 +22,12 @@ class SectorRecords extends PopupWindow {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['secr', 'secrecs'],
-      help: 'Displays the sector records on the current map.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
     sectorRecords.addListener('NicknameUpdated', () => this.reRender())
     sectorRecords.addListener('BestSector', () => this.reRender())
