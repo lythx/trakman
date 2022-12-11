@@ -31,12 +31,12 @@ export class VoteSkip extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.commands.add({
-      aliases: ['s', 'skip'],
-      help: 'Start a vote to skip the ongoing map',
+      aliases: cfg.command.aliases,
+      help: cfg.command.help,
       callback: info => {
         this.handleClick(info.login, info.nickname)
       },
-      privilege: 0
+      privilege: cfg.command.privilege
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {

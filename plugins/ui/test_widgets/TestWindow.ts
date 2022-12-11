@@ -6,33 +6,35 @@ export default class TestWindow {
   private intervals: { login: string, interval: NodeJS.Timer }[] = []
 
   constructor() {
-    tm.commands.add({
-      aliases: ['displaytest'],
-      help: 'Displays current test window',
-      callback: (info): void => {
-        if (this.intervals.some(a => a.login === info.login)) { return }
-        this.intervals.push({
-          interval: setInterval((): void => {
-            this.displayToPlayer(info.login)
-          }, config.refreshTimeout),
-          login: info.login
-        })
+    tm.commands.add(
+      {
+        aliases: config.commands.displaytest.aliases,
+        help: config.commands.displaytest.help,
+        callback: (info): void => {
+          if (this.intervals.some(a => a.login === info.login)) { return }
+          this.intervals.push({
+            interval: setInterval((): void => {
+              this.displayToPlayer(info.login)
+            }, config.refreshTimeout),
+            login: info.login
+          })
+        },
+        privilege: config.commands.displaytest.privilege
       },
-      privilege: 3
-    })
-    tm.commands.add({
-      aliases: ['hidetest'],
-      help: 'Hides current test window',
-      callback: (info): void => {
-        const entry = this.intervals.find(a => a.login === info.login)
-        if (entry !== undefined) {
-          this.hideToPlayer(entry.login)
-          clearInterval(entry.interval)
-          this.intervals = this.intervals.filter(a => a.login !== info.login)
-        }
-      },
-      privilege: 3
-    })
+      {
+        aliases: config.commands.hidetest.aliases,
+        help: config.commands.hidetest.help,
+        callback: (info): void => {
+          const entry = this.intervals.find(a => a.login === info.login)
+          if (entry !== undefined) {
+            this.hideToPlayer(entry.login)
+            clearInterval(entry.interval)
+            this.intervals = this.intervals.filter(a => a.login !== info.login)
+          }
+        },
+        privilege: config.commands.hidetest.privilege
+      }
+    )
   }
 
   async displayToPlayer(login: string): Promise<void> {
@@ -43,7 +45,7 @@ export default class TestWindow {
   }
 
   hideToPlayer(login: string): void {
-    tm.sendManialink(`<manialink id="test"></manialink>`)
+    tm.sendManialink(`<manialink id="test"></manialink>`, login)
   }
 
 }

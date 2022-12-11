@@ -20,5 +20,10 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: tm.utils.palette.green
+  selfColour: tm.utils.palette.green,
+  command: {
+    aliases: ['toppt', 'playtimes', 'active'], // it's /active in YOU KNOW WHERE dunno why
+    help: `Display top playtimes.`,
+    privilege: 0
+  }
 }

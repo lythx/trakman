@@ -28,5 +28,10 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
+  },
+  command: {
+    aliases: ['st', 'sectms'],
+    help: `Display current map local sectors.`,
+    privilege: 0
   }
 }

@@ -80,5 +80,10 @@ export default {
     blacklist: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has blacklisted ${p.highlight}#{name}${p.admin}.`,
     blacklistError: `${p.error}Could not blacklist ${p.highlight}#{login}${p.error}.`,
     ban: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has banned ${p.highlight}#{name}${p.admin}.`
+  },
+  command: {
+    aliases: ['players', 'playerl', 'playerlist'],
+    help: `Display the players list.`,
+    privilege: 1
   }
 }

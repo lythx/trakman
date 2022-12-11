@@ -41,55 +41,57 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
-    tm.commands.add({
-      aliases: config.commands.list.aliases,
-      help: config.commands.list.help,
-      params: [{ name: 'query', optional: true, type: 'multiword' }],
-      callback: (info: tm.MessageInfo, query?: string): void => {
-        if (query === undefined) {
-          tm.openManialink(this.openId, info.login)
-          return
-        }
-        if (query === 'jb') { query = 'jukebox' }
-        const option = query.split(' ').filter(a => a !== '')[0]
-        const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
-        const o = arr.find(a => a === option)
-        if (o !== undefined) {
-          this.openWithOption(info.login, o)
-          return
-        }
-        if (query.startsWith('$a')) {
-          this.openWithQuery(info.login, query.slice(2), true)
-        } else {
-          this.openWithQuery(info.login, query)
-        }
+    tm.commands.add(
+      {
+        aliases: config.commands.list.aliases,
+        help: config.commands.list.help,
+        params: [{ name: 'query', optional: true, type: 'multiword' }],
+        callback: (info: tm.MessageInfo, query?: string): void => {
+          if (query === undefined) {
+            tm.openManialink(this.openId, info.login)
+            return
+          }
+          if (query === 'jb') { query = 'jukebox' }
+          const option = query.split(' ').filter(a => a !== '')[0]
+          const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
+          const o = arr.find(a => a === option)
+          if (o !== undefined) {
+            this.openWithOption(info.login, o)
+            return
+          }
+          if (query.startsWith('$a')) {
+            this.openWithQuery(info.login, query.slice(2), true)
+          } else {
+            this.openWithQuery(info.login, query)
+          }
+        },
+        privilege: config.commands.list.privilege
       },
-      privilege: config.commands.list.privilege
-    })
-    tm.commands.add({
-      aliases: config.commands.best.aliases,
-      help: config.commands.best.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'best')
+      {
+        aliases: config.commands.best.aliases,
+        help: config.commands.best.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'best')
+        },
+        privilege: config.commands.best.privilege
       },
-      privilege: config.commands.best.privilege
-    })
-    tm.commands.add({
-      aliases: config.commands.worst.aliases,
-      help: config.commands.worst.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'worst')
+      {
+        aliases: config.commands.worst.aliases,
+        help: config.commands.worst.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'worst')
+        },
+        privilege: config.commands.worst.privilege
       },
-      privilege: config.commands.worst.privilege
-    })
-    tm.commands.add({
-      aliases: config.commands.jukebox.aliases,
-      help: config.commands.jukebox.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'jukebox')
-      },
-      privilege: config.commands.jukebox.privilege
-    })
+      {
+        aliases: config.commands.jukebox.aliases,
+        help: config.commands.jukebox.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'jukebox')
+        },
+        privilege: config.commands.jukebox.privilege
+      }
+    )
     maplist.onListUpdate(() => this.reRender())
     maplist.onJukeboxUpdate(() => this.reRender())
   }

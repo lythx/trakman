@@ -37,10 +37,10 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['players', 'playerl', 'playerlist'],
-      help: 'Display playerlist.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: config.privilege
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
     tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {

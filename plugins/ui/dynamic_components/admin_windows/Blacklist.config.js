@@ -36,5 +36,10 @@ export default {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name}${p.admin} from the blacklist.`,
     error: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the blacklist.`,
     public: true
+  },
+  command: {
+    aliases: ['blackl', 'blacklist'],
+    help: `Display the blacklisted players list.`,
+    privilege: tm.config.controller.privileges.blacklist // literally useless
   }
 }

@@ -42,8 +42,8 @@ export default class TMXSearchWindow extends PopupWindow<{
       if (gotQueued === false) { return }
     })
     tm.commands.add({
-      aliases: ['xlist', 'searchtmx', 'searchmap'],
-      help: 'Search for maps matching the specified name on TMX and display them in a window.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
         const maps = await tm.tmx.searchForMap(query)
@@ -54,7 +54,7 @@ export default class TMXSearchWindow extends PopupWindow<{
         const paginator = this.getPaginator(info.login, info.privilege, maps)
         this.displayToPlayer(info.login, { page: 1, paginator, list: maps, privilege: info.privilege }, `1/${paginator.pageCount}`)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
   }
 

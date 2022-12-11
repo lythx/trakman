@@ -26,4 +26,9 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
+  command: {
+    aliases: ['chatlog', 'cl'],
+    help: `Display the chat history.`,
+    privilege: 0
+  }
 }

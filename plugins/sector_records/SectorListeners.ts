@@ -127,77 +127,77 @@ if (config.isEnabled === true) {
     currentPlayerSecs.push(...playerSecs)
   })
 
-  tm.commands.add({
-    aliases: ['delmysec', 'deletemysector'],
-    help: 'Delete player personal sectors or one sector on the current map. Index is 1 based.',
-    params: [{ name: 'sectorIndex', type: 'int', optional: true }],
-    callback(info, sectorIndex?: number) {
-      const secs = currentPlayerSecs.find(a => a.login === info.login)
-      if (secs === undefined) {
-        tm.sendMessage(config.noSectorRecords, info.login)
-        return
-      }
-      if (sectorIndex === undefined) {
-        const arr: number[] = secs.sectors.filter(a => a !== undefined) as any
-        secs.sectors.length = 0
-        tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
-        emitEvent('DeletePlayerSector', { ...info, deletedSectors: arr.map((a, i) => ({ time: a, index: i })) })
-        void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
-      } else {
-        if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
-          tm.sendMessage(config.outOfRange, info.login)
+  tm.commands.add(
+    {
+      aliases: config.commands.deletemysector.aliases,
+      help: config.commands.deletemysector.help,
+      params: [{ name: 'sectorIndex', type: 'int', optional: true }],
+      callback(info, sectorIndex?: number) {
+        const secs = currentPlayerSecs.find(a => a.login === info.login)
+        if (secs === undefined) {
+          tm.sendMessage(config.noSectorRecords, info.login)
           return
         }
-        const deleted = secs.sectors[sectorIndex - 1]
-        secs.sectors[sectorIndex - 1] = undefined
-        tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
-        if (deleted !== undefined) {
-          emitEvent('DeletePlayerSector', { ...info, deletedSectors: [{ time: deleted, index: sectorIndex }] })
+        if (sectorIndex === undefined) {
+          const arr: number[] = secs.sectors.filter(a => a !== undefined) as any
+          secs.sectors.length = 0
+          tm.sendMessage(config.allPlayerSectorsRemoved, info.login)
+          emitEvent('DeletePlayerSector', { ...info, deletedSectors: arr.map((a, i) => ({ time: a, index: i })) })
+          void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
+        } else {
+          if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount) {
+            tm.sendMessage(config.outOfRange, info.login)
+            return
+          }
+          const deleted = secs.sectors[sectorIndex - 1]
+          secs.sectors[sectorIndex - 1] = undefined
+          tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
+          if (deleted !== undefined) {
+            emitEvent('DeletePlayerSector', { ...info, deletedSectors: [{ time: deleted, index: sectorIndex }] })
+          }
+          void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
         }
-        void allSecsDB.update(currentMapDBId, info.login, secs.sectors.map(a => a === undefined ? -1 : a))
-      }
+      },
+      privilege: config.commands.deletemysector.privilege
     },
-    privilege: 0
-  })
-
-  tm.commands.add({
-    aliases: ['delsec', 'deletesector'],
-    help: 'Delete all sector records or one sector record on current map. Index is 1 based.',
-    params: [{ name: 'sectorIndex', type: 'int', optional: true }],
-    callback(info, sectorIndex?: number) {
-      if (sectorIndex === undefined) {
-        const arr: {
-          login: string,
-          nickname: string,
-          sector: number,
-          date: Date
-        }[] = currentBestSecs.filter(a => a !== undefined) as any
-        currentBestSecs.length = 0
-        tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
-          { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
-        emitEvent('DeleteBestSector', arr.map((a, i) => ({ ...a, index: i })))
-        void bestSecsDB.delete(currentMapDBId)
-      } else {
-        if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
-          tm.sendMessage(config.outOfRange, info.login)
-          return
+    {
+      aliases: config.commands.deletesector.aliases,
+      help: config.commands.deletesector.help,
+      params: [{ name: 'sectorIndex', type: 'int', optional: true }],
+      callback(info, sectorIndex?: number) {
+        if (sectorIndex === undefined) {
+          const arr: {
+            login: string,
+            nickname: string,
+            sector: number,
+            date: Date
+          }[] = currentBestSecs.filter(a => a !== undefined) as any
+          currentBestSecs.length = 0
+          tm.sendMessage(tm.utils.strVar(config.allBestSectorsRemoved,
+            { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
+          emitEvent('DeleteBestSector', arr.map((a, i) => ({ ...a, index: i })))
+          void bestSecsDB.delete(currentMapDBId)
+        } else {
+          if (sectorIndex < 1 || sectorIndex > tm.maps.current.checkpointsAmount + 1) {
+            tm.sendMessage(config.outOfRange, info.login)
+            return
+          }
+          const deleted = currentBestSecs[sectorIndex - 1]
+          currentBestSecs[sectorIndex - 1] = undefined
+          tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
+            title: info.title,
+            nickname: tm.utils.strip(info.nickname, true),
+            index: tm.utils.getPositionString(sectorIndex)
+          }), config.commands.deletesector.public === false ? info.login : undefined)
+          if (deleted !== undefined) {
+            emitEvent('DeleteBestSector', [{ ...deleted, index: sectorIndex }])
+          }
+          void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
         }
-        const deleted = currentBestSecs[sectorIndex - 1]
-        currentBestSecs[sectorIndex - 1] = undefined
-        tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
-          title: info.title,
-          nickname: tm.utils.strip(info.nickname, true),
-          index: tm.utils.getPositionString(sectorIndex)
-        }))
-        if (deleted !== undefined) {
-          emitEvent('DeleteBestSector', [{ ...deleted, index: sectorIndex }])
-        }
-        void bestSecsDB.delete(currentMapDBId, sectorIndex - 1)
-      }
-    },
-    privilege: 2
-  })
-
+      },
+      privilege: config.commands.deletesector.privilege
+    }
+  )
 }
 
 const getMapSectors = (): ({ login: string, nickname: string, sector: number, date: Date } | null)[] => {

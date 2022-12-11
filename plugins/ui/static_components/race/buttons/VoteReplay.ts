@@ -31,12 +31,12 @@ export class VoteReplay extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.commands.add({
-      aliases: ['r', 'res', 'replay'],
-      help: 'Start a vote to replay the ongoing map',
+      aliases: cfg.command.aliases,
+      help: cfg.command.help,
       callback: info => {
         this.handleClick(info.login, info.nickname)
       },
-      privilege: 0
+      privilege: cfg.command.privilege
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
