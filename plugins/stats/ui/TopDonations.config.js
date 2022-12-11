@@ -20,5 +20,10 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: tm.utils.palette.green
+  selfColour: tm.utils.palette.green,
+  command: {
+    aliases: ['dons', 'topdons', 'donations'],
+    help: `Display top donations.`,
+    privilege: 0
+  }
 }

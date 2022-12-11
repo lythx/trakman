@@ -96,7 +96,12 @@ export default {
     height: 1.8,
     padding: 0.2,
     countdown: 5,
-    actionId: 1
+    actionId: 1,
+    command: {
+      aliases: ['s', 'skip'],
+      help: `Start a vote to skip the ongoing map.`,
+      privilege: 0
+    }
   },
   voteReplay: {
     texts: [
@@ -117,7 +122,12 @@ export default {
     width: 1.8,
     height: 1.8,
     padding: 0.2,
-    actionId: 2
+    actionId: 2,
+    command: {
+      aliases: ['r', 'res', 'replay'],
+      help: `Start a vote to replay the ongoing map.`,
+      privilege: 0
+    }
   },
   paySkip: {
     texts: [

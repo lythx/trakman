@@ -26,5 +26,10 @@ export default {
     gold: 'FD0',
     silver: 'CCC',
     bronze: 'C73'
+  },
+  command: {
+    aliases: ['sums', 'topsums'],
+    help: `Display top record summaries.`,
+    privilege: 0
   }
 }

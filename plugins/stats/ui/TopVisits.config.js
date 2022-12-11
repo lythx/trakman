@@ -20,5 +20,10 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: tm.utils.palette.green
+  selfColour: tm.utils.palette.green,
+  command: {
+    aliases: ['visits', 'topvisits', 'visitors', 'topvisitors'],
+    help: `Display top visitors.`,
+    privilege: 0
+  }
 }

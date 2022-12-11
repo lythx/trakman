@@ -20,5 +20,10 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  selfColour: tm.utils.palette.green
+  selfColour: tm.utils.palette.green,
+  command: {
+    aliases: ['votes', 'topvotes', 'voters', 'topvoters'],
+    help: `Display top vote amounts.`,
+    privilege: 0
+  }
 }
