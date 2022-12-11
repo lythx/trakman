@@ -1,6 +1,99 @@
 import config from '../config/ServerCommands.config.js'
 
+const pauseTimer = (info: tm.Player) => {
+  if (!tm.state.flexiTimeEnabled) {
+    tm.sendMessage(config.pauseTimer.notDynamic, info.login)
+    return
+  }
+  tm.state.pauseFlexiTime()
+  tm.sendMessage(tm.utils.strVar(config.pauseTimer.text, {
+    title: info.title,
+    adminName: tm.utils.strip(info.nickname)
+  }))
+}
+
 const commands: tm.Command[] = [
+  {
+    aliases: config.timelimit.aliases,
+    help: config.timelimit.help,
+    params: [{ name: 'action' }],
+    callback(info, actionStr: string) {
+      if (!tm.state.flexiTimeEnabled) {
+        tm.sendMessage(config.timelimit.notDynamic, info.login)
+        return
+      }
+      if (actionStr.startsWith('pause')) {
+        pauseTimer(info)
+        return
+      }
+      if (actionStr.startsWith('resume')) {
+        return
+      }
+      let action: 'set' | 'add' | 'subtract'
+      let time: number | Error
+      if (actionStr.startsWith('+')) {
+        action = 'add'
+        time = tm.utils.parseTimeString(actionStr.slice(1))
+      } else if (actionStr.startsWith('-')) {
+        action = 'subtract'
+        time = tm.utils.parseTimeString(actionStr.slice(1))
+      } else {
+        action = 'set'
+        time = tm.utils.parseTimeString(actionStr)
+      }
+      if (time instanceof Error) {
+
+        return
+      }
+      if (action === 'set') {
+        tm.state.setFlexiTime(time)
+        tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+          time: tm.utils.msToTime(time)
+        }))
+      }
+    },
+    privilege: config.timelimit.privilege
+  },
+  {
+    aliases: config.pauseTimer.aliases,
+    help: config.pauseTimer.help,
+    callback: (info) => pauseTimer(info),
+    privilege: config.timelimit.privilege
+  },
+  {
+    aliases: config.enabledynamictimer.aliases,
+    help: config.enabledynamictimer.help,
+    callback(info) {
+      if (tm.state.flexiTimeOnNextRound) {
+        tm.sendMessage(config.enabledynamictimer.alreadyEnabled, info.login)
+        return
+      }
+      tm.state.enableFlexiTime()
+      tm.sendMessage(tm.utils.strVar(config.enabledynamictimer.text, {
+        title: info.title,
+        adminName: tm.utils.strip(info.nickname)
+      }))
+    },
+    privilege: config.enabledynamictimer.privilege
+  },
+  {
+    aliases: config.disabledynamictimer.aliases,
+    help: config.disabledynamictimer.help,
+    callback(info) {
+      if (!tm.state.flexiTimeOnNextRound) {
+        tm.sendMessage(config.disabledynamictimer.alreadyDisabled, info.login)
+        return
+      }
+      tm.state.disableFlexiTime()
+      tm.sendMessage(tm.utils.strVar(config.disabledynamictimer.text, {
+        title: info.title,
+        adminName: tm.utils.strip(info.nickname)
+      }))
+    },
+    privilege: config.disabledynamictimer.privilege
+  },
   {
     aliases: config.setrefpwd.aliases,
     help: config.setrefpwd.help,
@@ -231,7 +324,7 @@ const commands: tm.Command[] = [
       tm.client.callNoRes(`StopServer`)
     },
     privilege: config.shutdown.privilege
-  },
+  }
 ]
 
 tm.commands.add(...commands)

@@ -740,6 +740,7 @@ declare global {
       "AddGuest": Readonly<GuestlistEntry>
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
+      "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]

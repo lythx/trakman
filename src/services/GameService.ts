@@ -32,7 +32,7 @@ export class GameService {
   private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
   private static _flexiTimeEnabled = false
-  private static flexiTimeOnNextRound = false
+  private static _flexiTimeOnNextRound = false
   private static timeAttackLimit = config.defaultTimeAttackTimeLimit
   private static remainingFlexiTime: number = config.defaultTimeAttackTimeLimit
   private static flexiTimeInterval: NodeJS.Timer
@@ -66,19 +66,23 @@ export class GameService {
   }
 
   static async enableFlexiTime(): Promise<void> {
-    if (this.flexiTimeOnNextRound) { return }
+    if (this._flexiTimeOnNextRound) { return }
     Client.callNoRes(`SetTimeAttackLimit`, [{ int: 0 }])
-    this.flexiTimeOnNextRound = true
+    this._flexiTimeOnNextRound = true
   }
 
   static disableFlexiTime(): void {
-    if (!this.flexiTimeOnNextRound) { return }
+    if (!this._flexiTimeOnNextRound) { return }
     Client.call(`SetTimeAttackLimit`, [{ int: this.timeAttackLimit }])
-    this.flexiTimeOnNextRound = false
+    this._flexiTimeOnNextRound = false
   }
 
   static get flexiTimeEnabled() {
     return this._flexiTimeEnabled
+  }
+
+  static get flexiTimeOnNextRound() {
+    return this._flexiTimeOnNextRound
   }
 
   static set state(state: tm.ServerState) {
@@ -88,32 +92,42 @@ export class GameService {
 
   private static _enableFlexiTime(): void {
     this._flexiTimeEnabled = true
-    this.flexiTimeOnNextRound = true
-    console.log('enableflex')
+    this._flexiTimeOnNextRound = true
+    this.lastFlexiTimeUpdate = Date.now()
     this.flexiTimeInterval = setInterval(() => {
       if (this.flexiTimePaused) { return }
       const date = Date.now()
-      this.lastFlexiTimeUpdate = date
       this.remainingFlexiTime -= date - this.lastFlexiTimeUpdate
+      this.lastFlexiTimeUpdate = date
+      console.log(this.remainingFlexiTime, 'rft')
+      if (this.remainingFlexiTime < 0) {
+        Client.call('NextChallenge')
+      }
     }, 300)
   }
 
   private static _disableFlexiTime(): void {
     this._flexiTimeEnabled = false
-    this.flexiTimeOnNextRound = false
+    this._flexiTimeOnNextRound = false
     clearInterval(this.flexiTimeInterval)
   }
 
   static startTimer(): void {
-    if (this.flexiTimeOnNextRound && !this.flexiTimeEnabled) {
+    let stateChange: 'enabled' | 'disabled' | undefined
+    if (this._flexiTimeOnNextRound && !this.flexiTimeEnabled) {
       this._enableFlexiTime()
-    } else if (!this.flexiTimeOnNextRound && this.flexiTimeEnabled) {
+      stateChange = 'enabled'
+    } else if (!this._flexiTimeOnNextRound && this.flexiTimeEnabled) {
       this._disableFlexiTime()
+      stateChange = 'disabled'
     }
     if (this.flexiTimeEnabled) {
-      this._timerStartTimestamp = Date.now()
-    } else {
       this.remainingFlexiTime = this.timeAttackLimit
+    } else {
+      this._timerStartTimestamp = Date.now()
+    }
+    if (stateChange !== undefined) {
+      Events.emit('DynamicTimerStateChanged', stateChange)
     }
   }
 
@@ -212,7 +226,9 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
-    this.timeAttackLimit = this._game.timeAttackLimit
+    if (this._game.timeAttackLimit !== 0) {
+      this.timeAttackLimit = this._game.timeAttackLimit
+    }
   }
 
   static get config(): tm.Game {

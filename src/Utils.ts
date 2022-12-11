@@ -306,6 +306,42 @@ export const Utils = {
     return s[0].player
   },
 
+  /** TODO DOCUMENTATE */
+  parseTimeString(dateStr: string): number | Error {
+    if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
+      if (isNaN(new Date(Number(dateStr)).getTime())) {
+        return new Error(`Time amount too big`)
+      }
+      return Number(dateStr) * 1000 * 60
+    } // If there's no modifier then time is treated as minutes
+    const unit: string = dateStr.substring(dateStr.length - 1).toLowerCase()
+    const time: number = Number(dateStr.substring(0, dateStr.length - 1))
+    if (isNaN(time) || time < 0) {
+      return new Error(`Invalid time string`)
+    }
+    let parsedTime: number
+    switch (unit) {
+      case 's':
+        parsedTime = time * 1000
+        break
+      case 'm':
+        parsedTime = time * 1000 * 60
+        break
+      case 'h':
+        parsedTime = time * 1000 * 60 * 60
+        break
+      case 'd':
+        parsedTime = time * 1000 * 60 * 60 * 24
+        break
+      default:
+        return new Error(`Invalid time string`)
+    }
+    if (isNaN(new Date(parsedTime).getTime())) {
+      return new Error(`Time amount too big`)
+    }
+    return parsedTime
+  },
+
   /**
    * Formats date into calendar display.
    * @param date Date to be formatted

@@ -1,6 +1,39 @@
 const p = tm.utils.palette
 
 export default {
+  timelimit: {
+    set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}s${p.admin}.`,
+    notDynamic: `${p.error}Dynamic timer is disabled.`,
+    invalidParam: `${p.error}Invalid action. Actions: [time] (set), +[time] (add), -[time] (subtract), pause|stop (pause), resume|start (resume).`,
+    public: true,
+    privilege: 1,
+    aliases: ['tl', 'timelimit'],
+    help: 'Set, add, subtract, pause, or resume the remaining time of the current round.' //TODO FIX XLIST LINK
+  },
+  pauseTimer: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}paused ${p.admin}the timer.`,
+    notDynamic: `${p.error}Dynamic timer is disabled.`,
+    public: true,
+    privilege: 1,
+    aliases: ['pause', 'rt', 'setremainingtime'],
+    help: 'Pause the game time'
+  },
+  enabledynamictimer: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}enabled ${p.admin}the dynamic timer. It will be enabled after map change.`,
+    alreadyEnabled: `${p.error}The dynamic timer is already enabled.`,
+    public: true,
+    privilege: 2,
+    aliases: ['edt', 'enabledynamictimer'],
+    help: 'Enable dynamic time limits.'
+  },
+  disabledynamictimer: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}disabled ${p.admin}the dynamic timer. It will be disabled after map change.`,
+    alreadyDisabled: `${p.error}The dynamic timer is already disabled.`,
+    public: true,
+    privilege: 2,
+    aliases: ['ddt', 'disabledynamictimer'],
+    help: 'Disable dynamic time limits.'
+  },
   setrefpwd: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the referee password to ${p.highlight}#{password}${p.admin}.`,
     error: `${p.error}Invalid password.`,

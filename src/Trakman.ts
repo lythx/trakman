@@ -341,8 +341,14 @@ namespace trakman {
 
     setFlexiTime: GameService.setFlexiTime.bind(GameService),
 
+    pauseFlexiTime: GameService.pauseFlexiTime.bind(GameService),
+
     get flexiTimeEnabled(): boolean {
       return GameService.flexiTimeEnabled
+    },
+
+    get flexiTimeOnNextRound(): boolean {
+      return GameService.flexiTimeOnNextRound
     },
 
     /**
