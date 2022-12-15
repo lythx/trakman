@@ -1,4 +1,15 @@
 <frame posn="0 0 1">
   <quad posn="0 0 1" sizen="20 5" bgcolor="333C" valign="center" halign="center"/>
   <label posn="0 0 1" sizen="20 5" text="Test Window" valign="center" halign="center"/>
+  <quad posn="10.950000000000001 0 0" sizen="1.8 2.17" bgcolor="000a"
+  action="71"/>
+  <quad posn="11.250000000000002 -0.3 1" sizen="1.2000000000000002 1.5699999999999998"
+   imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/1052977016967798814/PauseHover.png"
+    image="https://cdn.discordapp.com/attachments/793464821030322196/1052977016678400070/Pause.png"/>
+  <quad posn="-11.250000000000002 -0.3 10" sizen="1.2000000000000002 1.5699999999999998" halign="center" valign="center"
+        imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/1001566170840842260/PageDoubleLeftHover.png"
+        image="https://cdn.discordapp.com/attachments/793464821030322196/1001566170526253076/PageDoubleLeft.png"/>
+        <quad posn="0.15 -0.15 2"
+sizen="2.016666666666667 2.2300000000000004"
+image="https://cdn.discordapp.com/attachments/793464821030322196/1001863463372587008/PlayerList.png" imagefocus="https://cdn.discordapp.com/attachments/793464821030322196/1027309810548486204/PlayerListHover.png" />
 </frame>

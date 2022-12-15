@@ -18,6 +18,8 @@ export default {
   },
   /** TODO DOCUMENT */
   defaultTimeAttackTimeLimit: 300000,
+  /** TODO DOCUMENT */
+  dynamicTimerSubtractionLimit: 30000,
   /** Relative path (/GameData/Config/) to the blacklist file */
   blacklistFile: "blacklist.txt",
   /** Relative path (/GameData/Config/) to the guestlist file */

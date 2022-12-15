@@ -335,20 +335,30 @@ namespace trakman {
 
   export const state = {
 
-    enableFlexiTime: GameService.enableFlexiTime.bind(GameService),
+    enableDynamicTimer: GameService.enableDynamicTimer.bind(GameService),
 
-    disableFlexiTime: GameService.disableFlexiTime.bind(GameService), // TODO DOCUMENTATION
+    disableDynamicTimer: GameService.disableDynamicTimer.bind(GameService), // TODO DOCUMENTATION
 
-    setFlexiTime: GameService.setFlexiTime.bind(GameService),
+    setTime: GameService.setTime.bind(GameService),
 
-    pauseFlexiTime: GameService.pauseFlexiTime.bind(GameService),
+    addTime: GameService.addTime.bind(GameService),
 
-    get flexiTimeEnabled(): boolean {
-      return GameService.flexiTimeEnabled
+    subtractTime: GameService.subtractTime.bind(GameService),
+
+    resumeTimer: GameService.resumeTimer.bind(GameService),
+
+    pauseTimer: GameService.pauseTimer.bind(GameService),
+
+    get isTimerPaused(): boolean {
+      return GameService.isTimerPaused
     },
 
-    get flexiTimeOnNextRound(): boolean {
-      return GameService.flexiTimeOnNextRound
+    get dynamicTimerEnabled(): boolean {
+      return GameService.dynamicTimerEnabled
+    },
+
+    get dynamicTimerOnNextRound(): boolean {
+      return GameService.dynamicTimerOnNextRound
     },
 
     /**

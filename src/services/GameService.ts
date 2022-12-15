@@ -31,13 +31,13 @@ export class GameService {
   ]
   private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
-  private static _flexiTimeEnabled = false
-  private static _flexiTimeOnNextRound = false
+  private static _dynamicTimerEnabled = false
+  private static _dynamicTimerOnNextRound = false
   private static timeAttackLimit = config.defaultTimeAttackTimeLimit
-  private static remainingFlexiTime: number = config.defaultTimeAttackTimeLimit
-  private static flexiTimeInterval: NodeJS.Timer
-  private static lastFlexiTimeUpdate = 0
-  private static flexiTimePaused = false
+  private static remainingDynamicTime: number = config.defaultTimeAttackTimeLimit
+  private static dynamicTimerInterval: NodeJS.Timer
+  private static lastDynamicTimerUpdate = 0
+  private static dynamicTimerPaused = false
 
   static async initialize(): Promise<void> {
     Client.callNoRes(`SetCallVoteRatios`,
@@ -60,29 +60,29 @@ export class GameService {
     })
     await this.update()
     if (this._game.timeAttackLimit === 0) {
-      this._enableFlexiTime()
+      this._enableDynamicTimer()
     }
     this.startTimer()
   }
 
-  static async enableFlexiTime(): Promise<void> {
-    if (this._flexiTimeOnNextRound) { return }
+  static async enableDynamicTimer(): Promise<void> {
+    if (this._dynamicTimerOnNextRound) { return }
     Client.callNoRes(`SetTimeAttackLimit`, [{ int: 0 }])
-    this._flexiTimeOnNextRound = true
+    this._dynamicTimerOnNextRound = true
   }
 
-  static disableFlexiTime(): void {
-    if (!this._flexiTimeOnNextRound) { return }
+  static disableDynamicTimer(): void {
+    if (!this._dynamicTimerOnNextRound) { return }
     Client.call(`SetTimeAttackLimit`, [{ int: this.timeAttackLimit }])
-    this._flexiTimeOnNextRound = false
+    this._dynamicTimerOnNextRound = false
   }
 
-  static get flexiTimeEnabled() {
-    return this._flexiTimeEnabled
+  static get dynamicTimerEnabled() {
+    return this._dynamicTimerEnabled
   }
 
-  static get flexiTimeOnNextRound() {
-    return this._flexiTimeOnNextRound
+  static get dynamicTimerOnNextRound() {
+    return this._dynamicTimerOnNextRound
   }
 
   static set state(state: tm.ServerState) {
@@ -90,39 +90,38 @@ export class GameService {
     Events.emit('ServerStateChanged', state)
   }
 
-  private static _enableFlexiTime(): void {
-    this._flexiTimeEnabled = true
-    this._flexiTimeOnNextRound = true
-    this.lastFlexiTimeUpdate = Date.now()
-    this.flexiTimeInterval = setInterval(() => {
-      if (this.flexiTimePaused) { return }
+  private static _enableDynamicTimer(): void {
+    this._dynamicTimerEnabled = true
+    this._dynamicTimerOnNextRound = true
+    this.lastDynamicTimerUpdate = Date.now()
+    this.dynamicTimerInterval = setInterval(() => {
+      if (this.dynamicTimerPaused) { return }
       const date = Date.now()
-      this.remainingFlexiTime -= date - this.lastFlexiTimeUpdate
-      this.lastFlexiTimeUpdate = date
-      console.log(this.remainingFlexiTime, 'rft')
-      if (this.remainingFlexiTime < 0) {
+      this.remainingDynamicTime -= date - this.lastDynamicTimerUpdate
+      this.lastDynamicTimerUpdate = date
+      if (this.remainingDynamicTime < 0) {
         Client.call('NextChallenge')
       }
     }, 300)
   }
 
-  private static _disableFlexiTime(): void {
-    this._flexiTimeEnabled = false
-    this._flexiTimeOnNextRound = false
-    clearInterval(this.flexiTimeInterval)
+  private static _disableDynamicTimer(): void {
+    this._dynamicTimerEnabled = false
+    this._dynamicTimerOnNextRound = false
+    clearInterval(this.dynamicTimerInterval)
   }
 
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
-    if (this._flexiTimeOnNextRound && !this.flexiTimeEnabled) {
-      this._enableFlexiTime()
+    if (this._dynamicTimerOnNextRound && !this.dynamicTimerEnabled) {
+      this._enableDynamicTimer()
       stateChange = 'enabled'
-    } else if (!this._flexiTimeOnNextRound && this.flexiTimeEnabled) {
-      this._disableFlexiTime()
+    } else if (!this._dynamicTimerOnNextRound && this.dynamicTimerEnabled) {
+      this._disableDynamicTimer()
       stateChange = 'disabled'
     }
-    if (this.flexiTimeEnabled) {
-      this.remainingFlexiTime = this.timeAttackLimit
+    if (this.dynamicTimerEnabled) {
+      this.remainingDynamicTime = this.timeAttackLimit
     } else {
       this._timerStartTimestamp = Date.now()
     }
@@ -131,49 +130,55 @@ export class GameService {
     }
   }
 
-  static pauseFlexiTime(): boolean {
-    if (!this.flexiTimeEnabled) { return false }
-    this.flexiTimePaused = true
+  static pauseTimer(): boolean {
+    if (!this.dynamicTimerEnabled) { return false }
+    this.dynamicTimerPaused = true
     return true
   }
 
-  static resumeFlexiTime(): boolean {
-    if (!this.flexiTimeEnabled) { return false }
-    this.flexiTimePaused = false
+  static resumeTimer(): boolean {
+    if (!this.dynamicTimerEnabled) { return false }
+    this.dynamicTimerPaused = false
     return true
   }
 
-  static setFlexiTime(miliseconds: number): boolean {
-    if (!this.flexiTimeEnabled) { return false }
-    this.remainingFlexiTime = miliseconds
+  static setTime(miliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled ||
+      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit) { return false }
+    this.remainingDynamicTime = miliseconds
+    this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
+      this.remainingDynamicTime)
     return true
   }
 
-  static addFlexiTime(miliseconds: number): boolean {
-    if (!this.flexiTimeEnabled) { return false }
-    this.remainingFlexiTime += miliseconds
+  static addTime(miliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || miliseconds <= 0) { return false }
+    this.remainingDynamicTime += miliseconds
     return true
   }
 
-  static subtractFlexiTime(miliseconds: number): boolean {
-    if (!this.flexiTimeEnabled) { return false }
-    this.remainingFlexiTime -= miliseconds
+  static subtractTime(miliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || miliseconds <= 0 ||
+      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit) { return false }
+    this.remainingDynamicTime -= miliseconds
+    this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
+      this.remainingDynamicTime)
     return true
   }
 
   static get remainingRaceTime(): number {
-    if (this.flexiTimeEnabled) {
-      if (this.remainingFlexiTime < 0) { return 0 }
-      return this.remainingFlexiTime
+    if (this.dynamicTimerEnabled) {
+      if (this.remainingDynamicTime < 0) { return 0 }
+      return this.remainingDynamicTime
     }
     if (this._state === 'result' || this.state === 'transition') { return 0 }
     return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
   }
 
   static get remainingResultTime(): number {
-    if (this.flexiTimeEnabled) {
-      if (this.remainingFlexiTime < 0) { return 0 }
-      return this.remainingFlexiTime
+    if (this.dynamicTimerEnabled) {
+      if (this.remainingDynamicTime < 0) { return 0 }
+      return this.remainingDynamicTime
     }
     if (this._state === 'race' || this.state === 'transition') { return 0 }
     return Math.round((this.config.resultTime - (Date.now() - this._timerStartTimestamp)) / 1000)
@@ -183,8 +188,8 @@ export class GameService {
     return this._state
   }
 
-  static get isFlexiTimePaused(): boolean {
-    return this.flexiTimePaused
+  static get isTimerPaused(): boolean {
+    return this.dynamicTimerPaused
   }
 
   static get resultTimeLimit(): number {

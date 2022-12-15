@@ -2,7 +2,7 @@ const p = tm.utils.palette
 
 export default {
   timelimit: {
-    set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}s${p.admin}.`,
+    set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`,
     notDynamic: `${p.error}Dynamic timer is disabled.`,
     invalidParam: `${p.error}Invalid action. Actions: [time] (set), +[time] (add), -[time] (subtract), pause|stop (pause), resume|start (resume).`,
     public: true,
