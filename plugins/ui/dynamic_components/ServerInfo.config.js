@@ -43,7 +43,7 @@ export default {
     ` System Architecture `,
     ` System CPU `,
     ` System CPU Load `,
-    ` System RAM `,
+    ` System Free RAM `,
     ` System Kernel `,
     ` Trakman Version `,
     ` Trakman Uptime `,
