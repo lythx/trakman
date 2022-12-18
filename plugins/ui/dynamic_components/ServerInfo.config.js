@@ -19,11 +19,6 @@ export default {
     2,
     2
   ],
-  textScale: 1.4,
-  tileBackground: "9996",
-  marginBig: 1,
-  entries: 4,
-  headerHeight: 3,
   serverCells: [
     ` Dedicated Server Uptime `,
     ` Dedicated Server Version `,
