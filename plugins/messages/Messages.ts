@@ -7,6 +7,12 @@ import c from './Config.js'
  * @since 0.1
  */
 
+// TODO: put playercount in playerservice
+let playerCount: number
+const res: any[] | Error = await tm.db.query(`SELECT count(*)::int FROM players;`)
+if (res instanceof Error) { await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack) }
+else { playerCount = res[0].count }
+
 const events: tm.Listener[] = [
   {
     event: 'Startup',
@@ -35,7 +41,7 @@ const events: tm.Listener[] = [
         } else {
           tm.sendMessage(tm.utils.strVar(c.rank, {
             rank: tm.utils.getPositionString(playerRank),
-            total: tm.players.count
+            total: playerCount
           }), player.login)
         }
       }
@@ -44,7 +50,7 @@ const events: tm.Listener[] = [
   {
     event: 'PlayerJoin',
     callback: async (player: tm.JoinInfo): Promise<void> => {
-      //if (player.visits === 1) { playerCount++ }
+      if (player.visits === 1) { playerCount++ }
       tm.sendMessage(tm.utils.strVar(c.welcome, {
         name: tm.utils.strip(tm.config.server.name),
         version: tm.config.controller.version
@@ -66,7 +72,7 @@ const events: tm.Listener[] = [
       } else {
         tm.sendMessage(tm.utils.strVar(c.rank, {
           rank: tm.utils.getPositionString(playerRank),
-          total: tm.players.count
+          total: playerCount
         }), player.login)
       }
       tm.sendMessage(tm.utils.strVar(c.join, {
