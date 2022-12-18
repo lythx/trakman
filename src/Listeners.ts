@@ -235,11 +235,11 @@ export class Listeners {
       callback: (params: tm.Events['TrackMania.StatusChanged']): void => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
-        if (params[0] === 4 || params[0] === 5) {
-          GameService.startTimer()
-        }
         if (params[0] === 4) {
           GameService.state = 'race'
+        }
+        if (params[0] === 4 || params[0] === 5) {
+          GameService.startTimer()
         }
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play

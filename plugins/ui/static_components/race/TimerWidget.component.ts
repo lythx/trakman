@@ -66,7 +66,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime)
+        time: tm.utils.msToTime(tm.state.remainingRaceTime * 1000)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -81,7 +81,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime)
+        time: tm.utils.msToTime(tm.state.remainingRaceTime * 1000)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -130,10 +130,10 @@ export default class TimerWidget extends StaticComponent {
         } else if (time < config.colourChangeThresholds[0]) {
           timeColour = config.timeColours[1]
         }
-        const hoursAmount = ~~(time / (60 * 60 * 1000))
+        const hoursAmount = ~~(time / (60 * 60))
         const hours = hoursAmount === 0 ? '' : `${hoursAmount.toString()}:`
-        const minutes = (~~(time / (60 * 1000)) % 60).toString().padStart(2, '0')
-        const seconds = (~~(time / 1000) % 60).toString().padStart(2, '0')
+        const minutes = (~~(time / 60) % 60).toString().padStart(2, '0')
+        const seconds = (time % 60).toString().padStart(2, '0')
         const timeStr = hoursAmount < 100 ? `${hours}${minutes}:${seconds}` : `${hoursAmount} hours`
         timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH, { specialFont: true, yOffset: -0.3 })
       }

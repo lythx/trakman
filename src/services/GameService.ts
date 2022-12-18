@@ -86,6 +86,7 @@ export class GameService {
   }
 
   static set state(state: tm.ServerState) {
+    if (state === 'result') { this.pauseTimer() }
     this._state = state
     Events.emit('ServerStateChanged', state)
   }
@@ -122,6 +123,7 @@ export class GameService {
     }
     if (this.dynamicTimerEnabled) {
       this.remainingDynamicTime = this.timeAttackLimit
+      this.resumeTimer()
     } else {
       this._timerStartTimestamp = Date.now()
     }
@@ -131,36 +133,40 @@ export class GameService {
   }
 
   static pauseTimer(): boolean {
-    if (!this.dynamicTimerEnabled) { return false }
+    if (!this.dynamicTimerEnabled || tm.state.current !== 'race') { return false }
     this.dynamicTimerPaused = true
     return true
   }
 
   static resumeTimer(): boolean {
-    if (!this.dynamicTimerEnabled) { return false }
+    if (!this.dynamicTimerEnabled || tm.state.current !== 'race') { return false }
+    this.lastDynamicTimerUpdate = Date.now()
     this.dynamicTimerPaused = false
     return true
   }
 
-  static setTime(miliseconds: number): boolean {
+  static setTime(seconds: number): boolean {
     if (!this.dynamicTimerEnabled ||
-      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit) { return false }
-    this.remainingDynamicTime = miliseconds
+      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
+      || tm.state.current !== 'race') { return false }
+    this.remainingDynamicTime = seconds * 1000
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
   }
 
-  static addTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0) { return false }
-    this.remainingDynamicTime += miliseconds
+  static addTime(seconds: number): boolean {
+    if (!this.dynamicTimerEnabled || seconds <= 0
+      || tm.state.current !== 'race') { return false }
+    this.remainingDynamicTime += seconds * 1000
     return true
   }
 
-  static subtractTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0 ||
-      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit) { return false }
-    this.remainingDynamicTime -= miliseconds
+  static subtractTime(seconds: number): boolean {
+    if (!this.dynamicTimerEnabled || seconds <= 0 ||
+      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
+      || tm.state.current !== 'race') { return false }
+    this.remainingDynamicTime -= seconds * 1000
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
@@ -169,7 +175,7 @@ export class GameService {
   static get remainingRaceTime(): number {
     if (this.dynamicTimerEnabled) {
       if (this.remainingDynamicTime < 0) { return 0 }
-      return this.remainingDynamicTime
+      return ~~(this.remainingDynamicTime / 1000)
     }
     if (this._state === 'result' || this.state === 'transition') { return 0 }
     return Math.round((this.config.timeAttackLimit - (Date.now() - this._timerStartTimestamp)) / 1000)
@@ -178,7 +184,7 @@ export class GameService {
   static get remainingResultTime(): number {
     if (this.dynamicTimerEnabled) {
       if (this.remainingDynamicTime < 0) { return 0 }
-      return this.remainingDynamicTime
+      return this.remainingDynamicTime // TODO FIX
     }
     if (this._state === 'race' || this.state === 'transition') { return 0 }
     return Math.round((this.config.resultTime - (Date.now() - this._timerStartTimestamp)) / 1000)
@@ -193,11 +199,11 @@ export class GameService {
   }
 
   static get resultTimeLimit(): number {
-    return ~~(this._game.resultTime / 1000)
+    return ~~(this._game.resultTime / 1000) // TODO DYNAMIC
   }
 
   static get raceTimeLimit(): number {
-    return ~~(this._game.timeAttackLimit / 1000)
+    return ~~(this.timeAttackLimit / 1000)
   }
 
   static async update(): Promise<void> {

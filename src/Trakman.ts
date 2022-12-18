@@ -390,7 +390,7 @@ namespace trakman {
     },
 
     /**
-     * Result time limit in the current round.
+     * Result time limit in the current round in seconds. // TODO UPDATE DOCUMENTATION
      */
     get resultTimeLimit(): number {
       return GameService.resultTimeLimit

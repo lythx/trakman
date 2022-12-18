@@ -46,7 +46,7 @@ const commands: tm.Command[] = [
         return
       }
       if (action === 'set') {
-        tm.state.setTime(time)
+        tm.state.setTime(time / 1000)
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
@@ -196,7 +196,7 @@ const commands: tm.Command[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.setspecpassword.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: password !== undefined ? password : 'none (disabled)' }), config.setspecpassword.public ? undefined : info.login)
       tm.client.callNoRes(`SetServerPasswordForSpectator`, [{ string: password === undefined ? '' : password }])
-    },
+    }, // TODO FIX ALL PLAYER AMOUNT ON JOIN
     privilege: config.setspecpassword.privilege
   },
   {
