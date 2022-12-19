@@ -2,7 +2,7 @@ const p = tm.utils.palette
 
 export default {
   enabled: false,
-  betTimeSeconds: 2, // TODO
+  betTimeSeconds: 30, // TODO
   messages: {
     noBets: `${p.server}No bets have been placed. Try again next round.`,
     timeRunOut: `${p.server}Time to accept the bet has run out.`,

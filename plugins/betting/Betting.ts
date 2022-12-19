@@ -4,20 +4,27 @@ import config from './Config.js'
 
 const betLogins: string[] = []
 let prize: number | undefined
+let betPlaceInterval: NodeJS.Timer
 
 const betPlaceWindow = new BetPlaceWindow()
 const betInfoWidget = new BetInfoWidget()
 
-const onTimeRunOut = () => {
+const onTimeRunOut = (wasInterrupted: boolean = false) => {
+  clearInterval(betPlaceInterval)
+  const unitedPlayers = tm.players.list.filter(a => a.isUnited)
+  for (const e of unitedPlayers) {
+    betPlaceWindow.hideToPlayer(e.login)
+  }
+  if (wasInterrupted) { return }
   if (prize === undefined || tm.players.count < 2) {
     prize = undefined
     tm.sendMessage(config.messages.noBets)
   } else {
     tm.sendMessage(config.messages.timeRunOut)
-  }
-  for (const e of tm.players.list.filter(a => a.isUnited)) {
-    betPlaceWindow.hideToPlayer(e.login)
-    betInfoWidget.displayToPlayer(e.login)
+    betInfoWidget.totalPrize = prize * betLogins.length
+    for (const e of unitedPlayers) {
+      betInfoWidget.displayToPlayer(e.login)
+    }
   }
 }
 
@@ -34,10 +41,9 @@ tm.addListener('ServerStateChanged', (state) => {
   }
   const betStartTimestamp = Date.now()
   let lastRemainingSeconds = -1
-  const interval = setInterval(() => {
+  betPlaceInterval = setInterval(() => {
     const remainingSeconds = config.betTimeSeconds - ~~((Date.now() - betStartTimestamp) / 1000)
     if (remainingSeconds < 0) {
-      clearInterval(interval)
       onTimeRunOut()
       return
     }
@@ -53,6 +59,7 @@ tm.addListener('ServerStateChanged', (state) => {
 })
 
 tm.addListener('EndMap', () => {
+  onTimeRunOut(true)
   if (prize === undefined) { return }
   const bestRecord = tm.records.live.find(a => betLogins.includes(a.login))
   if (bestRecord === undefined) {

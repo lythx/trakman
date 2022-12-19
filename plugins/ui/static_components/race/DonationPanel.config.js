@@ -3,7 +3,7 @@ import icons from '../../config/Icons.js'
 
 export default {
   title: "Donations",
-  height: 8,
+  height: 4.49,
   width: cfg.width,
   icon: icons.cash,
   margin: cfg.margin,
