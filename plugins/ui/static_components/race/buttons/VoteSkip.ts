@@ -64,7 +64,7 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.state.remainingRaceTime <= 30) { return }
+    if (tm.state.remainingRaceTime <= 30000) { return } // todo config????
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {

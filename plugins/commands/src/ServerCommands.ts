@@ -46,7 +46,7 @@ const commands: tm.Command[] = [
         return
       }
       if (action === 'set') {
-        tm.state.setTime(time / 1000)
+        tm.state.setTime(time)
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),

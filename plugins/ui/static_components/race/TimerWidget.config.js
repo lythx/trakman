@@ -26,10 +26,10 @@ export default {
     subtract: icons.minusGreen
   },
   timeColours: ['FFF', tm.utils.palette.yellow, tm.utils.palette.red],
-  colourChangeThresholds: [180, 60], // sec
+  colourChangeThresholds: [180000, 60000], //msec
   iconPadding: 0.3,
-  timeAddedOnClick: 5 * 60, //sec
-  timeSubtractedOnClick: 5 * 60, //sec
+  timeAddedOnClick: 5 * 60 * 1000, //msec
+  timeSubtractedOnClick: 5 * 60 * 1000, //msec
   pause: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}paused ${p.admin}the timer.`,
   resume: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}resumed ${p.admin}the timer.`,
   set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`,

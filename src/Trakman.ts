@@ -362,14 +362,14 @@ namespace trakman {
     },
 
     /**
-     * Remaining race time in seconds.
+     * Remaining race time in miliseconds. // TODO UPDATE DOCS
      */
     get remainingRaceTime(): number {
       return GameService.remainingRaceTime
     },
 
     /**
-     * Remaining result screen time in seconds.
+     * Remaining result screen time in miliseconds. // TODO UPDATE DOCS
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime

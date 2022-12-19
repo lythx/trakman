@@ -90,7 +90,7 @@ export default {
     triesLimit: 3,
     timeout: 30,
     time: 30,
-    minimumRemainingTime: 30,
+    minimumRemainingTime: 30000, // msec
     goal: 0.5,
     width: 1.8,
     height: 1.8,
@@ -111,7 +111,7 @@ export default {
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true },
       { 0: "VOTE TO", 1: "$AF4EXTEND", equal: true }
     ],
-    timeExtension: 1000 * 60 * 5,
+    timeExtension: 1000 * 60 * 5, // 5 minutes
     resHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
     extendHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}EXTEND${tm.utils.palette.highlight} the time on the ongoing map`,
     icon: icons.voteReplay,
@@ -120,7 +120,7 @@ export default {
     triesLimit: 3,
     timeout: 30,
     time: 30,
-    minimumRemainingTime: 30,
+    minimumRemainingTime: 30000, //msec
     goal: 0.5,
     width: 1.8,
     height: 1.8,

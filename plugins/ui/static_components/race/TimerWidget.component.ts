@@ -66,7 +66,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime * 1000)
+        time: tm.utils.msToTime(tm.state.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -81,7 +81,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime * 1000)
+        time: tm.utils.msToTime(tm.state.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -123,7 +123,7 @@ export default class TimerWidget extends StaticComponent {
         // TODO CONFIG
         timeXml = centeredText("PAUSED", config.width, bottomH, { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
       } else {
-        const time = tm.state.remainingRaceTime
+        const time = ~~(tm.state.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
         if (time < config.colourChangeThresholds[1]) {
           timeColour = config.timeColours[2]
