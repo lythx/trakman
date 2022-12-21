@@ -41,32 +41,37 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
-    tm.commands.add(
-      {
-        aliases: config.commands.list.aliases,
-        help: config.commands.list.help,
-        params: [{ name: 'query', optional: true, type: 'multiword' }],
-        callback: (info: tm.MessageInfo, query?: string): void => {
-          if (query === undefined) {
-            tm.openManialink(this.openId, info.login)
-            return
-          }
-          if (query === 'jb') { query = 'jukebox' }
-          const option = query.split(' ').filter(a => a !== '')[0]
-          const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
-          const o = arr.find(a => a === option)
-          if (o !== undefined) {
-            this.openWithOption(info.login, o)
-            return
-          }
-          if (query.startsWith('$a')) {
-            this.openWithQuery(info.login, query.slice(2), true)
-          } else {
-            this.openWithQuery(info.login, query)
-          }
-        },
-        privilege: config.commands.list.privilege
+    tm.commands.add({
+      aliases: config.commands.list.aliases,
+      help: config.commands.list.help,
+      params: [{ name: 'query', optional: true, type: 'multiword' }],
+      callback: (info: tm.MessageInfo, query?: string): void => {
+        if (query === undefined) {
+          tm.openManialink(this.openId, info.login)
+          return
+        }
+        if (query === 'jb') { query = 'jukebox' }
+        const option = query.split(' ').filter(a => a !== '')[0]
+        const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
+        const o = arr.find(a => a === option)
+        if (o !== undefined) {
+          void this.openWithOption(info.login, o)
+          return
+        }
+        if (['nofin', 'nofinish'].includes(option)) {
+          void this.openWithOption(info.login, 'nofinish')
+        } else if (option === 'noauthor') {
+          void this.openWithOption(info.login, 'noauthor')
+        } else if (option === 'norank') {
+          void this.openWithOption(info.login, 'norank')
+        } else if (query.startsWith('$a')) {
+          void this.openWithQuery(info.login, query.slice(2), true)
+        } else {
+          void this.openWithQuery(info.login, query)
+        }
       },
+      privilege: config.commands.list.privilege
+    },
       {
         aliases: config.commands.best.aliases,
         help: config.commands.best.help,
@@ -96,11 +101,13 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     maplist.onJukeboxUpdate(() => this.reRender())
   }
 
-  openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
-    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma'): void {
+  async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
+    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish' | 'norank' | 'noauthor'): Promise<void> {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = maplist.getByPosition(login, option)
+    } else if (option === 'nofinish' || option === 'norank' || option === 'noauthor') {
+      list = await maplist.getFiltered(login, option)
     } else {
       list = maplist.get(option)
     }

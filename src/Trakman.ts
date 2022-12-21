@@ -349,14 +349,23 @@ namespace trakman {
 
     pauseTimer: GameService.pauseTimer.bind(GameService),
 
+    /**
+     * Boolean indicating whether the dynamic timer is paused.
+     */
     get isTimerPaused(): boolean {
       return GameService.isTimerPaused
     },
 
+    /**
+     * Boolean indicating whether the dynamic timer is enabled.
+     */
     get dynamicTimerEnabled(): boolean {
       return GameService.dynamicTimerEnabled
     },
 
+    /**
+     * Boolean indicating whether the dynamic will be enabled in the next round.
+     */
     get dynamicTimerOnNextRound(): boolean {
       return GameService.dynamicTimerOnNextRound
     },

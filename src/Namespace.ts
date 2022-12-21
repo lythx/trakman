@@ -359,7 +359,7 @@ declare global {
       /** Replay file download url */
       readonly url: string
     }
-    /** TODO DOCUMENT */
+    // TODO DOCUMENT
     export interface TMXSearchResult {
       /** Map UID */
       readonly id: string

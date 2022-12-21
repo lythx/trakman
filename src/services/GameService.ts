@@ -246,7 +246,7 @@ export class GameService {
   }
 
   /**
-   * Current server state.
+   * Server state.
    */
   static get state(): tm.ServerState {
     return this._state

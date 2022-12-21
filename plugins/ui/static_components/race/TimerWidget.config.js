@@ -26,7 +26,7 @@ export default {
     subtract: icons.minusGreen
   },
   timeColours: ['FFF', tm.utils.palette.yellow, tm.utils.palette.red],
-  colourChangeThresholds: [180000, 60000], //msec
+  colourChangeThresholds: [180, 60], //sec
   iconPadding: 0.3,
   timeAddedOnClick: 5 * 60 * 1000, //msec
   timeSubtractedOnClick: 5 * 60 * 1000, //msec
