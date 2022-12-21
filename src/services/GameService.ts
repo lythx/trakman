@@ -237,10 +237,6 @@ export class GameService {
    * Remaining result screen time in miliseconds.
    */
   static get remainingResultTime(): number {
-    if (this.dynamicTimerEnabled) {
-      if (this.remainingDynamicTime < 0) { return 0 }
-      return this.remainingDynamicTime // TODO FIX
-    }
     if (this._state === 'race' || this.state === 'transition') { return 0 }
     return (this.config.resultTime - (Date.now() - this._timerStartTimestamp))
   }

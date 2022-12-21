@@ -13,6 +13,7 @@ export default {
   buttonWidth: 1.8,
   notDynamic: `${p.error}Dynamic timer is disabled.`,
   buttonOrder: ['pause', 'add', 'subtract'],
+  pausedText: 'PAUSED',
   icons: {
     pause: icons.pause,
     resume: icons.play,

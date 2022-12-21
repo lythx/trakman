@@ -18,6 +18,7 @@ export default class TimerWidget extends StaticComponent {
   private readonly pauseButtonId = this.id + 1
   private readonly addButtonid = this.id + 2
   private readonly subtractButtonId = this.id + 3
+  private isOnRestart = false
 
   constructor() {
     super(componentIds.timer, 'race')
@@ -37,6 +38,16 @@ export default class TimerWidget extends StaticComponent {
       } else {
         clearInterval(this.flexiTimeInterval)
       }
+    })
+    tm.addListener('EndMap', (info) => {
+      if (info.isRestart) {
+        this.isOnRestart = true
+        this.display()
+      }
+    })
+    tm.addListener('BeginMap', () => {
+      this.isOnRestart = false
+      this.display()
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -118,10 +129,10 @@ export default class TimerWidget extends StaticComponent {
       this.header.constructXml(config.title, config.icon, this.side)
     let timeXml = ''
     const bottomH = config.height - (headerHeight + config.margin)
-    if (tm.state.dynamicTimerEnabled) {
+    if (tm.state.dynamicTimerEnabled && !this.isOnRestart) {
       if (tm.state.isTimerPaused) {
-        // TODO CONFIG
-        timeXml = centeredText("PAUSED", config.width, bottomH, { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
+        timeXml = centeredText(config.pausedText, config.width, bottomH,
+          { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
       } else {
         const time = ~~(tm.state.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
