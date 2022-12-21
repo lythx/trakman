@@ -69,6 +69,39 @@ const commands: tm.Command[] = [
     privilege: config.addlocal.privilege
   },
   {
+    aliases: config.addrandom.aliases,
+    help: config.addrandom.help,
+    params: [{ name: 'tmxSite', optional: true }],
+    callback: async (info: tm.MessageInfo, tmxSite?: string): Promise<void> => {
+      let obj: { map: tm.Map; wasAlreadyAdded: boolean; } | Error
+      let iteration = 0
+      do {
+        const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+        const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
+        let file: { name: string, content: Buffer } | Error =
+          await tm.tmx.fetchRandomMapFile(site).catch((err: Error) => err)
+        if (file instanceof Error) {
+          tm.sendMessage(config.addrandom.fetchError, info.login)
+          return
+        }
+        obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
+        iteration++
+      } while (!(obj instanceof Error) && obj.wasAlreadyAdded === true && iteration < 10)
+      if (obj instanceof Error) {
+        tm.log.warn(obj.message)
+        tm.sendMessage(config.addrandom.addError, info.login)
+        return
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.addrandom.added, {
+          title: info.title,
+          map: tm.utils.strip(obj.map.name, true),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.addrandom.public ? undefined : info.login)
+      }
+    },
+    privilege: config.addrandom.privilege
+  },
+  {
     aliases: config.remove.aliases,
     help: config.remove.help,
     callback: (info): void => {

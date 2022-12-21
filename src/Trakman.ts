@@ -73,7 +73,9 @@ namespace trakman {
 
     fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher),
 
-    searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher)
+    searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher),
+    
+    fetchRandomMapFile: TMXFetcher.fetchRandomMapFile.bind(TMXFetcher)
 
   }
 

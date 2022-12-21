@@ -20,6 +20,16 @@ export default {
     aliases: ['addlocal', 'al'],
     help: `Add a map from local files.`
   },
+  addrandom: {
+    fetchError: `${p.error} Failed to fetch random map from TMX.`,
+    addError: `${p.error} Failed to add the map.`,
+    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued` +
+      ` ${p.highlight}#{map}${p.admin} from TMX random.`,
+    public: true,
+    privilege: 1,
+    aliases: ['ar', 'addr', 'addrandom'],
+    help: `Add a random map from TMX.`
+  },
   remove: {
     text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed the current map.`,
     error: `${p.error} The map is already getting removed.`,
