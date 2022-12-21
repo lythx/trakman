@@ -74,7 +74,7 @@ namespace trakman {
     fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher),
 
     searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher),
-    
+
     fetchRandomMapFile: TMXFetcher.fetchRandomMapFile.bind(TMXFetcher)
 
   }
@@ -93,7 +93,12 @@ namespace trakman {
     /**
      * Number of online players
      */
-    get count(): number { return PlayerService.playerCount }
+    get count(): number { return PlayerService.playerCount },
+    // TODO DOCUMENT
+    /**
+     * Number of all players who visited the server
+     */
+    get totalCount(): number { return PlayerService.totalPlayerCount }
 
   }
 

@@ -19,6 +19,7 @@ export class PlayerService {
   private static readonly privilegeRepo = new PrivilegeRepository()
   private static newLocalsAmount = 0
   private static ranks: string[]
+  private static _totalPlayerCount: number
 
   /**
    * Fetches ranks, players and creates playerlist
@@ -26,6 +27,9 @@ export class PlayerService {
   static async initialize(): Promise<void> {
     this.ranks = await this.repo.getRanks()
     await this.addAllFromList()
+    const res: any[] | Error = await tm.db.query(`SELECT count(*)::int FROM players;`)
+    if (res instanceof Error) { await tm.log.fatal(`Failed to fetch player count.`, res.message, res.stack) }
+    else { this._totalPlayerCount = res[0].count }
     Events.addListener('LocalRecord', (info: tm.RecordInfo): void => {
       if ((info.previous?.position === undefined ||
         info.previous?.position > RecordService.maxLocalsAmount) && info.position <= RecordService.maxLocalsAmount) {
@@ -123,6 +127,7 @@ export class PlayerService {
         rank: index === -1 ? undefined : (index + 1),
         title: this.getTitle(login, privilege, country, countryCode)
       }
+      this._totalPlayerCount++
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
     } else {
       player = {
@@ -350,6 +355,13 @@ export class PlayerService {
    */
   static get playerCount(): number {
     return this._players.length
+  }
+
+  /**
+   * Number of all players who visited the server
+   */
+  static get totalPlayerCount(): number {
+    return this._totalPlayerCount
   }
 
 }
