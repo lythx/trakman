@@ -194,7 +194,6 @@ export abstract class Logger {
         .setTitle(`${tag.toUpperCase()} on server ${tm.config.server.login}`)
         .setColor(this.logTypes[tag].discordColour)
         .setTimestamp(new Date())
-        .setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
         .addFields([
           {
             name: location,
@@ -202,6 +201,9 @@ export abstract class Logger {
           }
         ]
         )
+      if (this.thumbs.length !== 0) {
+        embed.setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
+      }
       const separator: string | undefined = this.isFirstLog === false ? undefined : '---------------------------------------------'
       if (tag === 'fatal') {
         await this.webhook.send({
