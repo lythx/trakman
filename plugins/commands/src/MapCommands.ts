@@ -90,7 +90,7 @@ const commands: tm.Command[] = [
     params: [{ name: 'url' }, { name: 'filename', optional: true }],
     callback: async (info: tm.MessageInfo, url: string, filename?: string): Promise<void> => {
       const file = await fetch(url).catch((err: Error) => err)
-      if (file instanceof Error) {
+      if (file instanceof Error || !file.ok) {
         tm.sendMessage(config.addfromurl.fetchError, info.login)
         return
       }
