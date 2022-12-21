@@ -33,13 +33,28 @@ const commands: tm.Command[] = [
     privilege: config.setgamemode.privilege
   },
   {
+    aliases: config.settimelimit.aliases,
+    help: config.settimelimit.help,
+    params: [{ name: 'time', type: 'time' }],
+    callback: (info: tm.MessageInfo, time: number): void => {
+      tm.sendMessage(tm.utils.strVar(config.settimelimit.text,
+        {
+          title: info.title, adminName: tm.utils.strip(info.nickname),
+          time: tm.utils.msToTime(time)
+        }),
+        config.settimelimit.public ? undefined : info.login)
+      tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
+    },
+    privilege: config.settimelimit.privilege
+  },
+  {
     aliases: config.setchattime.aliases,
     help: config.setchattime.help,
-    params: [{ name: 'time', type: 'int' }],
+    params: [{ name: 'time', type: 'time' }],
     callback: (info: tm.MessageInfo, time: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setchattime.text, {
         title: info.title,
-        adminName: tm.utils.strip(info.nickname), value: time
+        adminName: tm.utils.strip(info.nickname), time: tm.utils.msToTime(time)
       }), config.setchattime.public ? undefined : info.login)
       tm.client.callNoRes(`SetChatTime`, [{ int: time }])
     },
@@ -216,7 +231,7 @@ const commands: tm.Command[] = [
     privilege: config.setcuproundspermap.privilege
   },
   {
-    aliases: config.setcupwarmuptime.aliases,
+    aliases: config.setcupwarmuptime.aliases, // todo it says time but then it says rounds????
     help: config.setcupwarmuptime.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {

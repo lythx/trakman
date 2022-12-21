@@ -220,16 +220,6 @@ const commands: tm.Command[] = [
     privilege: config.setmaxspecs.privilege
   },
   {
-    aliases: config.settimelimit.aliases,
-    help: config.settimelimit.help,
-    params: [{ name: 'time', type: 'int' }],
-    callback: (info: tm.MessageInfo, time: number): void => {
-      tm.sendMessage(tm.utils.strVar(config.settimelimit.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: time }), config.settimelimit.public ? undefined : info.login)
-      tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
-    },
-    privilege: config.settimelimit.privilege
-  },
-  {
     aliases: config.sendnotice.aliases,
     help: config.sendnotice.help,
     params: [{ name: 'time', type: 'time' }, { name: 'notice', type: 'multiword' }],

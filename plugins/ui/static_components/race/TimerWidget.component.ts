@@ -146,7 +146,8 @@ export default class TimerWidget extends StaticComponent {
         const minutes = (~~(time / 60) % 60).toString().padStart(2, '0')
         const seconds = (time % 60).toString().padStart(2, '0')
         const timeStr = hoursAmount < 100 ? `${hours}${minutes}:${seconds}` : `${hoursAmount} hours`
-        timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH, { specialFont: true, yOffset: -0.3 })
+        timeXml = centeredText('$' + timeColour + timeStr, config.width, bottomH,
+          { specialFont: true, yOffset: config.textYOffset })
       }
     }
     return `

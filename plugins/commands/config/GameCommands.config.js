@@ -8,8 +8,15 @@ export default {
     aliases: ['sgm', 'setgamemode'],
     help: `Change the gamemode.`
   },
+  settimelimit: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the time limit to ${p.highlight}#{time}${p.admin}.`,
+    public: true,
+    privilege: 3,
+    aliases: ['stl', 'settimelimit'],
+    help: `Set the time you spend gaming.`
+  },
   setchattime: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the podium time to ${p.highlight}#{value} ${p.admin}seconds.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the podium time to ${p.highlight}#{time}${p.admin}.`,
     public: true,
     privilege: 3,
     aliases: ['sct', 'setchattime'],

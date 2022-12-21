@@ -105,13 +105,6 @@ export default {
     aliases: ['sms', 'setmaxspecs'],
     help: `Set the max spectators amount.`
   },
-  settimelimit: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the time limit to ${p.highlight}#{value} ${p.admin}seconds.`,
-    public: true,
-    privilege: 3,
-    aliases: ['stl', 'settimelimit'],
-    help: `Set the time you spend gaming.`
-  },
   sendnotice: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the notice to ${p.highlight}#{value}${p.admin}.`,
     public: false,
