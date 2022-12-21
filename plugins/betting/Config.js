@@ -4,13 +4,12 @@ export default {
   enabled: false,
   betTimeSeconds: 30, // TODO
   messages: {
-    noBets: `${p.server}No bets have been placed. Try again next round.`,
-    timeRunOut: `${p.server}Time to accept the bet has run out.`,
-    noWinner: `${p.server}No player has won the bet. Bet amounts have been returned.`,
-    win: `${p.admin}#{name} ${p.server}Has won ${p.admin}#{prize} ${p.server}coppers.`,
-    start: `${p.server}#{name} ${p.server}Has started a bet with ${p.admin}#{prize} ${p.server}coppers.`,
-    begin: 'betting has doing the begun',
-    accept: `${p.admin}#{name} ${p.server}has accepted the bet.`
+    noPlayers: `${p.donation}Bet cancelled due to lack of players. Coppers will be returned.`,
+    noWinner: `${p.donation}No player has won the bet. Bet coppers will be returned.`,
+    win: `${p.highlight}#{name} ${p.donation}has won ${p.highlight}#{prize} ${p.donation}coppers from the bet.`,
+    start: `${p.highlight}#{name} ${p.donation}has started a bet with ${p.highlight}#{prize} ${p.donation}coppers.`,
+    begin: `${p.donation}Bets are open.`,
+    accept: `${p.highlight}#{name} ${p.donation}has accepted the bet.`
   },
   copperReturnMessage: 'maybe finish next time if you plan on betting??',
   winMessage: 'GG FOR BET',

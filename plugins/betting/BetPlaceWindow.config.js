@@ -8,7 +8,7 @@ export default {
   headerText: `Bet`,
   height: StaticHeader.raceHeight * 3 + raceConfig.margin * 2,
   width: 10,
-  options: [2, 200, 300, 500, 1000, 10000], //todo
+  options: [100, 200, 300, 500, 1000, 10000],
   margin: raceConfig.margin,
   background: StaticHeader.racePreset.iconBackground,
   actionIdOffset: 30,

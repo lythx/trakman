@@ -16,11 +16,12 @@ const onTimeRunOut = (wasInterrupted: boolean = false) => {
     betPlaceWindow.hideToPlayer(e.login)
   }
   if (wasInterrupted) { return }
-  if (prize === undefined || tm.players.count < 2) {
+  if (prize === undefined) {
     prize = undefined
-    tm.sendMessage(config.messages.noBets)
+  } else if (tm.players.count < 2) {
+    prize = undefined
+    tm.sendMessage(config.messages.noPlayers)
   } else {
-    tm.sendMessage(config.messages.timeRunOut)
     betInfoWidget.totalPrize = prize * betLogins.length
     for (const e of unitedPlayers) {
       betInfoWidget.displayToPlayer(e.login)
@@ -30,13 +31,15 @@ const onTimeRunOut = (wasInterrupted: boolean = false) => {
 
 tm.addListener('ServerStateChanged', (state) => {
   if (state !== 'race') { return }
-  tm.sendMessage(config.messages.begin)
+  const unitedLogins = tm.players.list.filter(a => a.isUnited).map(a => a.login)
+  if (unitedLogins.length < 2) { return }
+  tm.sendMessage(config.messages.begin, unitedLogins)
   betLogins.length = 0
   prize = undefined
-  for (const e of tm.players.list.filter(a => a.isUnited)) {
-    betPlaceWindow.displayToPlayer(e.login, {
+  for (const e of unitedLogins) {
+    betPlaceWindow.displayToPlayer(e, {
       seconds: config.betTimeSeconds,
-      placedBet: betLogins.includes(e.login)
+      placedBet: false
     })
   }
   const betStartTimestamp = Date.now()
