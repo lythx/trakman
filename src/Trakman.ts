@@ -476,33 +476,36 @@ namespace trakman {
     get guestCount(): number { return AdministrationService.guestCount }
 
   }
-
-  /**
+  //TODO UPDATE DOCS
+  /** 
   * Sends a server message
   * @param message Message to be sent
-  * @param login Optional player login (or comma-joined list of logins)
+  * @param login Optional player login or array of logins
   */
-  export const sendMessage = (message: string, login?: string, prefix: boolean = true): void => {
+  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message }, { string: login }])
+        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message },
+        { string: typeof login === 'string' ? login : login.join(',') }])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
   }
-
+  //TODO UPDATE DOCS
   /**
    * Sends a server manialink
    * @param manialink Manialink XML to be sent
-   * @param login Optional player login (or comma-joined list of logins)
+   * @param login Optional player login or array of logins
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
+  export const sendManialink = (manialink: string, login?: string | string[],
+    deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (tm.players.count === 0) { return }
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
-        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+        { string: typeof login === 'string' ? login : login.join(',') },
+        { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
     }
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
