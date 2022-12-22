@@ -38,6 +38,7 @@ export default class TimerWidget extends StaticComponent {
       } else {
         clearInterval(this.flexiTimeInterval)
       }
+      this.display()
     })
     tm.addListener('EndMap', (info) => {
       if (info.isRestart) {
@@ -123,13 +124,13 @@ export default class TimerWidget extends StaticComponent {
     }
   }
 
-  private constructXml(constructButtons: boolean): string {
+  private constructXml(isDynamic: boolean): string {
     const headerHeight: number = this.header.options.height
-    let headerXml = constructButtons ? this.getButtonsXml() :
+    let headerXml = isDynamic ? this.getButtonsXml() :
       this.header.constructXml(config.title, config.icon, this.side)
     let timeXml = ''
     const bottomH = config.height - (headerHeight + config.margin)
-    if (tm.state.dynamicTimerEnabled && !this.isOnRestart) {
+    if (isDynamic && !this.isOnRestart) {
       if (tm.state.isTimerPaused) {
         timeXml = centeredText(config.pausedText, config.width, bottomH,
           { specialFont: true, yOffset: -0.3, xOffset: 0.2 })

@@ -50,10 +50,6 @@ export class GameService {
         }]
       }]
     )
-    const status: Promise<void> = this.update()
-    if (status instanceof Error) {
-      await Logger.fatal('Failed to retrieve game info. Error:', status.message)
-    }
     Client.addProxy(this.proxyMethods, async (method: string, params: tm.CallParams[]): Promise<void> => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
       await this.update()
@@ -67,10 +63,10 @@ export class GameService {
 
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
-    if (this._dynamicTimerOnNextRound && !this.dynamicTimerEnabled) {
+    if (this._game.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
       this._enableDynamicTimer()
       stateChange = 'enabled'
-    } else if (!this._dynamicTimerOnNextRound && this.dynamicTimerEnabled) {
+    } else if (this._game.timeAttackLimit !== 0 && this.dynamicTimerEnabled) {
       this._disableDynamicTimer()
       stateChange = 'disabled'
     }
@@ -130,7 +126,6 @@ export class GameService {
   static get config(): tm.Game {
     return this._game
   }
-
 
   /**
    * Enables the dynamic timer after map change. Dynamic timer 
