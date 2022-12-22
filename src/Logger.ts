@@ -113,6 +113,8 @@ export abstract class Logger {
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'fatal'
+    // In case discord message hangs the process it exits after 10 seconds anyway
+    setTimeout(() => process.exit(1), 10000)
     await this.writeLog(tag, location, date, lines)
     process.exit(1)
   }
@@ -181,13 +183,13 @@ export abstract class Logger {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr: string = this.getLogfileString(tag, lines, location, date)
     console.log(this.getConsoleString(tag, lines, location, date))
+    for (const file of this.logTypes[tag].files) {
+      await fs.appendFile(file, logStr)
+    }
     // This in theory should work but regex is weird. Maybe just remove the characters then?
     let str: string = lines.join('\n').replace(/[_*~|>`]/g, '\\$&')
     if (str.length > 500) {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
-    }
-    for (const file of this.logTypes[tag].files) {
-      await fs.appendFile(file, logStr)
     }
     if (this.useDiscord === true && this.logTypes[tag].level <= this.discordLogLevel) {
       const embed: EmbedBuilder = new EmbedBuilder()
