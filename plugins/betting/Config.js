@@ -2,7 +2,7 @@ const p = tm.utils.palette
 
 export default {
   enabled: false,
-  betTimeSeconds: 30, // TODO
+  betTimeSeconds: 30,
   messages: {
     noPlayers: `${p.donation}Bet cancelled due to lack of players. Coppers will be returned.`,
     noWinner: `${p.donation}No player has won the bet. Bet coppers will be returned.`,
@@ -11,8 +11,8 @@ export default {
     begin: `${p.donation}Bets are open.`,
     accept: `${p.highlight}#{name} ${p.donation}has accepted the bet.`
   },
-  copperReturnMessage: 'maybe finish next time if you plan on betting??',
-  winMessage: 'GG FOR BET',
-  betStartPromptMessage: 'GG',
-  betAcceptPropmtMessage: `GG`,
+  copperReturnMessage: '$FFFReturned #{amount} coppers for unsuccessfull bet on #{serverName}$FFF server.',
+  winMessage: '$FFFYou won #{amount} coppers from bet on #{serverName}$FFF server. GG!',
+  betStartPromptMessage: 'Pay to start a bet with #{amount} coppers',
+  betAcceptPropmtMessage: `Pay to accept the bet`,
 }

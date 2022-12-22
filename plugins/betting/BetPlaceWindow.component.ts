@@ -20,7 +20,7 @@ export default class BetPlaceWindow extends DynamicComponent {
       config.timerWidth + StaticHeader.racePreset.margin * 2)
     this.header = new StaticHeader('race', { rectangleWidth: this.headerRectW })
     this.grid = new Grid(config.width + config.margin * 2,
-      config.height - StaticHeader.raceHeight, [1, 1, 1], [1, 1], {
+      config.height + config.margin - StaticHeader.raceHeight, [1, 1, 1], [1, 1], {
       background: config.background, margin: config.margin // TODO FIX STL
     })
     addManialinkListener(this.id + config.actionIdOffset,
@@ -42,17 +42,17 @@ export default class BetPlaceWindow extends DynamicComponent {
       const h = this.grid.height - this.grid.margin
       content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${h}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
-      ${centeredText(`Bet accepted`, config.width, h / 2, { textScale: 1, yOffset: -0.05 })}
+      ${centeredText(`Bet accepted`, config.width, h / 2, { textScale: 1, yOffset: -0.03 })}
       ${centeredText(`Prize: $${tm.utils.palette.green}${(this.prize ?? 0) * this.betLogins.length}C`, config.width,
-        h / 2, { yOffset: h / 2 + 0.05, textScale: 1.1 })}`
+        h / 2, { yOffset: h / 2 + 0.03, textScale: 1.1 })}`
     } else if (this.prize === undefined) {
       const cells: GridCellFunction[] = []
       for (let i = 0; i < config.options.length; i++) { cells.push(cell) }
       content = this.grid.constructXml(cells)
     } else {
-      content = `<quad posn="${config.margin} 0 0" sizen="${config.width} ${this.grid.height}" 
+      content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${this.grid.height}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
-      ${centeredText(`Bet ${this.prize}`, config.width, this.grid.height)}`
+      ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, this.grid.height, { textScale: 1.3 })}`
     }
     const headerW = this.header.options.squareWidth + this.headerRectW + config.margin * 2
     const topRightW = config.width - headerW
