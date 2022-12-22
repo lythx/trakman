@@ -199,10 +199,11 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async ([[winner], map, wasWarmUp, continuesOnNextMap, restart]:
+      callback: async ([rankings, map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
+        const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart
         GameService.state = 'result'
@@ -222,6 +223,7 @@ export class Listeners {
           liveRecords: RecordService.liveRecords,
           winnerLogin: login,
           winnerWins: wins,
+          serverSideRankings: rankings,
           isRestart
         }
         // Update the player record averages, this can take a long time
