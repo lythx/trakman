@@ -6,6 +6,7 @@ const betLogins: string[] = []
 let prize: number | undefined
 let betPlaceInterval: NodeJS.Timer
 let isActive = config.isActive && config.isEnabled
+let isOpen = false
 
 const betPlaceWindow = new BetPlaceWindow()
 const betInfoWidget = new BetInfoWidget()
@@ -25,6 +26,7 @@ const returnCoppers = (login: string) => {
 
 const onTimeRunOut = (wasInterrupted: boolean = false) => {
   clearInterval(betPlaceInterval)
+  isOpen = false
   const unitedPlayers = tm.players.list.filter(a => a.isUnited)
   for (const e of unitedPlayers) {
     betPlaceWindow.hideToPlayer(e.login)
@@ -44,9 +46,9 @@ const onTimeRunOut = (wasInterrupted: boolean = false) => {
   }
 }
 
-betPlaceWindow.onBetStart = async (player, amount) => {
+const startBet = async (player: tm.Player, amount: number) => {
   const status = await tm.utils.sendCoppers(player.login, amount,
-    tm.utils.strVar(config.betStartPromptMessage, { amount: prize })) // TODO check
+    tm.utils.strVar(config.betStartPromptMessage, { amount })) // TODO check
   if (status === true) {
     betLogins.push(player.login)
     prize = amount
@@ -57,9 +59,9 @@ betPlaceWindow.onBetStart = async (player, amount) => {
     betPlaceWindow.prize = prize
     betPlaceWindow.betLogins = betLogins
   }
-} // TODO FIX TIMER NOPRIVILEGE
+}
 
-betPlaceWindow.onBetAccept = async (player) => {
+const acceptBet = async (player: tm.Player) => {
   if (prize === undefined) { return }
   const paymentStatus = await tm.utils.sendCoppers(player.login, prize, config.betAcceptPropmtMessage)
   if (paymentStatus === true) {
@@ -71,17 +73,22 @@ betPlaceWindow.onBetAccept = async (player) => {
   }
 }
 
+betPlaceWindow.onBetStart = startBet// TODO FIX TIMER NOPRIVILEGE
+
+betPlaceWindow.onBetAccept = acceptBet
+
 if (config.isEnabled) {
   tm.addListener('Startup', () => {
     const msg = isActive ? config.messages.startupEnabled : config.messages.startupDisabled
     for (const e of tm.players.list.filter(a => a.privilege >= config.activatePrivilege))
       tm.sendMessage(msg, e.login)
   })
-  
+
   tm.addListener('ServerStateChanged', (state) => {
     if (!isActive || state !== 'race') { return }
     const unitedLogins = tm.players.list.filter(a => a.isUnited).map(a => a.login)
     tm.sendMessage(config.messages.begin, unitedLogins)
+    isOpen = true
     betLogins.length = 0
     prize = undefined
     betPlaceWindow.prize = undefined
@@ -109,7 +116,7 @@ if (config.isEnabled) {
       }
     }, 400)
   })
-  
+
   tm.addListener('EndMap', () => {
     if (!isActive) { return }
     onTimeRunOut(true)
@@ -166,6 +173,34 @@ if (config.isEnabled) {
       }), config.deactivate.public ? undefined : info.login)
     },
     privilege: config.activatePrivilege
+  })
+
+  tm.commands.add({
+    aliases: config.bet.aliases,
+    help: config.bet.help,
+    params: [{ name: 'prize', type: 'int', optional: true }],
+    callback(info, newPrize?: number) {
+      if(!isOpen) {
+        tm.sendMessage(config.messages.closed, info.login)
+        return
+      }
+      if (prize !== undefined && newPrize !== undefined) {
+        tm.sendMessage(tm.utils.strVar(config.bet.noPrizeNeeded, { prize }), info.login)
+        acceptBet(info)
+      } else if (newPrize !== undefined) {
+        if (newPrize < config.minimumAmount) {
+          tm.sendMessage(tm.utils.strVar(config.messages.amountTooLow,
+            { minimum: config.minimumAmount }), info.login)
+          return
+        }
+        startBet(info, newPrize)
+      } else if (prize !== undefined) {
+        acceptBet(info)
+      } else {
+        tm.sendMessage(config.bet.prizeNeeded, info.login)
+      }
+    },
+    privilege: config.bet.privilege
   })
 }
 
