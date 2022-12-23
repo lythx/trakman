@@ -1,7 +1,10 @@
 const p = tm.utils.palette
 
 export default {
-  enabled: false,
+  // If false plugin cant be activated
+  isEnabled: true,
+  // This can be changed using an ingame command
+  isActive: false,
   betTimeSeconds: 30,
   messages: {
     noPlayers: `${p.donation}Bet cancelled due to lack of players. Coppers will be returned.`,
@@ -9,10 +12,29 @@ export default {
     win: `${p.highlight}#{name} ${p.donation}has won ${p.highlight}#{prize} ${p.donation}coppers from the bet.`,
     start: `${p.highlight}#{name} ${p.donation}has started a bet with ${p.highlight}#{prize} ${p.donation}coppers.`,
     begin: `${p.donation}Bets are open.`,
-    accept: `${p.highlight}#{name} ${p.donation}has accepted the bet.`
+    accept: `${p.highlight}#{name} ${p.donation}has accepted the bet.`,
+    startupEnabled: `${p.donation}Betting plugin is ${p.highlight}enabled${p.donation}.`
+      + ` Use ${p.highlight}//dbet ${p.donation}if you want to disable it.`,
+    startupDisabled: `${p.donation}Betting plugin is ${p.highlight}disabled${p.donation}.`
+      + ` Use ${p.highlight}//ebet ${p.donation}if you want to enable it.`
   },
-  copperReturnMessage: '$FFFReturned #{amount} coppers for unsuccessfull bet on #{serverName}$FFF server.',
-  winMessage: '$FFFYou won #{amount} coppers from bet on #{serverName}$FFF server. GG!',
+  copperReturnMessage: '$FFFReturned #{amount} coppers for unsuccessfull bet on #{serverName}$FFF server. (Nadeo tax deducted)',
+  winMessage: '$FFFYou won #{amount} coppers from bet on #{serverName}$FFF server. GG! (Nadeo tax deducted)',
   betStartPromptMessage: 'Pay to start a bet with #{amount} coppers',
   betAcceptPropmtMessage: `Pay to accept the bet`,
+  activatePrivilege: 3,
+  activate: {
+    aliases: ['ebet', 'enablebets'],
+    help: `Enable the betting plugin.`,
+    public: true,
+    success: `${p.donation}#{title} ${p.highlight}#{name} ${p.donation}has ${p.highlight}enabled ${p.donation}the betting plugin.`,
+    alreadyActive: `${p.error}Betting plugin is already enabled.`
+  },
+  deactivate: {
+    aliases: ['dbet', 'disablebets'],
+    help: `Disable the betting plugin.`,
+    public: true,
+    success: `${p.donation}#{title} ${p.highlight}#{name} ${p.donation}has ${p.highlight}disabled ${p.donation}the betting plugin.`,
+    alreadyNotActive: `${p.error}Betting plugin is already disabled.`
+  }
 }
