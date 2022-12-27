@@ -340,11 +340,11 @@ namespace trakman {
 
   }
 
-  export const state = {
+  export const timer = {
 
-    enableDynamicTimer: GameService.enableDynamicTimer.bind(GameService),
+    enableDynamic: GameService.enableDynamicTimer.bind(GameService),
 
-    disableDynamicTimer: GameService.disableDynamicTimer.bind(GameService), // TODO DOCUMENTATION
+    disableDynamic: GameService.disableDynamicTimer.bind(GameService), // TODO DOCUMENTATION
 
     setTime: GameService.setTime.bind(GameService),
 
@@ -352,9 +352,9 @@ namespace trakman {
 
     subtractTime: GameService.subtractTime.bind(GameService),
 
-    resumeTimer: GameService.resumeTimer.bind(GameService),
+    resume: GameService.resumeTimer.bind(GameService),
 
-    pauseTimer: GameService.pauseTimer.bind(GameService),
+    pause: GameService.pauseTimer.bind(GameService),
 
     /**
      * TODO DOCUMENT 
@@ -366,21 +366,21 @@ namespace trakman {
     /**
      * Boolean indicating whether the dynamic timer is paused.
      */
-    get isTimerPaused(): boolean {
+    get isPaused(): boolean {
       return GameService.isTimerPaused
     },
 
     /**
      * Boolean indicating whether the dynamic timer is enabled.
      */
-    get dynamicTimerEnabled(): boolean {
+    get isDynamic(): boolean {
       return GameService.dynamicTimerEnabled
     },
 
     /**
      * Boolean indicating whether the dynamic will be enabled in the next round.
      */
-    get dynamicTimerOnNextRound(): boolean {
+    get isDynamicOnNextRound(): boolean {
       return GameService.dynamicTimerOnNextRound
     },
 
@@ -396,13 +396,6 @@ namespace trakman {
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
-    },
-
-    /**
-     * Server state.
-     */
-    get current(): tm.ServerState {
-      return GameService.state
     },
 
     /**
@@ -535,6 +528,13 @@ namespace trakman {
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
     Events.emit('PlayerDataUpdated', players)
+  }
+
+  /**
+   * Gets current server state. ('result', 'race', 'transition')
+   */
+  export const getState = (): tm.ServerState => {
+    return GameService.state
   }
 
   /**

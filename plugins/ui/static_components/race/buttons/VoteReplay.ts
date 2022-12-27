@@ -41,8 +41,8 @@ export class VoteReplay extends UiButton {
 
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isReplay === true || this.isSkip === true) { return }
-    const action = tm.state.dynamicTimerEnabled ? msg.extendStr : msg.replayStr
-    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
+    const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(tm.utils.strVar(msg.tooLate, { action }), login)
       return
     }
@@ -55,7 +55,7 @@ export class VoteReplay extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })
-    const header = tm.state.dynamicTimerEnabled ? cfg.extendHeader : cfg.resHeader
+    const header = tm.timer.isDynamic ? cfg.extendHeader : cfg.resHeader
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
@@ -100,8 +100,8 @@ export class VoteReplay extends UiButton {
   }
 
   private replayOrExtendTime(): void {
-    if (tm.state.dynamicTimerEnabled) {
-      tm.state.addTime(cfg.timeExtension)
+    if (tm.timer.isDynamic) {
+      tm.timer.addTime(cfg.timeExtension)
     } else {
       this.handleMapReplay()
       this.emitReplay()
@@ -132,7 +132,7 @@ export class VoteReplay extends UiButton {
   }
 
   private displayDefaultButtonText() {
-    if (tm.state.dynamicTimerEnabled) {
+    if (tm.timer.isDynamic) {
       this.buttonData = {
         icon: cfg.icon,
         text1: cfg.texts[4][0],

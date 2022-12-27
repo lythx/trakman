@@ -50,8 +50,8 @@ export class VoteSkip extends UiButton {
 
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isLastMapReplay === true || this.isReplay === true
-      || this.isSkip === true || tm.state.current === 'result') { return }
-    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
+      || this.isSkip === true || tm.getState() === 'result') { return }
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
     }
@@ -64,7 +64,7 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.state.remainingRaceTime <= 30000) { return } // todo config????
+    if (tm.timer.remainingRaceTime <= 30000) { return } // todo config????
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
@@ -142,7 +142,7 @@ export class VoteSkip extends UiButton {
     this.emitUpdate()
     this.emitSkip()
     const interval = setInterval(async (): Promise<void> => {
-      if (tm.state.current === 'result') {
+      if (tm.getState() === 'result') {
         this.handleSkipNoCountdown()
         clearInterval(interval)
         return

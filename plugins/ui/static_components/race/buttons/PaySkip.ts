@@ -39,7 +39,7 @@ export class PaySkip extends UiButton {
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
     if (this.isLastMapReplay === true || this.isReplay === true
-      || this.isSkip === true || tm.state.current === 'result') { return }
+      || this.isSkip === true || tm.getState() === 'result') { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail)
@@ -57,7 +57,7 @@ export class PaySkip extends UiButton {
       this.emitUpdate()
       this.emitSkip()
       const interval = setInterval(async (): Promise<void> => {
-        if (tm.state.current === 'result') {
+        if (tm.getState() === 'result') {
           this.handleSkipNoCountdown()
           clearInterval(interval)
           return

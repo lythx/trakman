@@ -154,7 +154,7 @@ export class GameService {
    * @returns Boolean indicating whether the timer got paused
    */
   static pauseTimer(): boolean {
-    if (!this.dynamicTimerEnabled || tm.state.current !== 'race'
+    if (!this.dynamicTimerEnabled || tm.getState() !== 'race'
       || this.dynamicTimerPaused) { return false }
     this.dynamicTimerPaused = true
     return true
@@ -165,7 +165,7 @@ export class GameService {
    * @returns Boolean indicating whether the timer got resumed
    */
   static resumeTimer(): boolean {
-    if (!this.dynamicTimerEnabled || tm.state.current !== 'race'
+    if (!this.dynamicTimerEnabled || tm.getState() !== 'race'
       || !this.dynamicTimerPaused) { return false }
     this.lastDynamicTimerUpdate = Date.now()
     this.dynamicTimerPaused = false
@@ -182,7 +182,7 @@ export class GameService {
   static setTime(miliseconds: number): boolean {
     if (!this.dynamicTimerEnabled ||
       this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
-      || tm.state.current !== 'race') { return false }
+      || tm.getState() !== 'race') { return false }
     this.remainingDynamicTime = miliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
@@ -196,7 +196,7 @@ export class GameService {
    */
   static addTime(miliseconds: number): boolean {
     if (!this.dynamicTimerEnabled || miliseconds <= 0
-      || tm.state.current !== 'race') { return false }
+      || tm.getState() !== 'race') { return false }
     this.remainingDynamicTime += miliseconds
     return true
   }
@@ -211,7 +211,7 @@ export class GameService {
   static subtractTime(miliseconds: number): boolean {
     if (!this.dynamicTimerEnabled || miliseconds <= 0 ||
       this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
-      || tm.state.current !== 'race') { return false }
+      || tm.getState() !== 'race') { return false }
     this.remainingDynamicTime -= miliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)

@@ -1,11 +1,11 @@
 import config from '../config/ServerCommands.config.js'
 
 const pauseTimer = (info: tm.Player) => {
-  if (!tm.state.dynamicTimerEnabled) {
+  if (!tm.timer.isDynamic) {
     tm.sendMessage(config.pauseTimer.notDynamic, info.login)
     return
   }
-  tm.state.pauseTimer()
+  tm.timer.pause()
   tm.sendMessage(tm.utils.strVar(config.pauseTimer.text, {
     title: info.title,
     adminName: tm.utils.strip(info.nickname)
@@ -18,7 +18,7 @@ const commands: tm.Command[] = [
     help: config.timelimit.help,
     params: [{ name: 'action' }],
     callback(info, actionStr: string) {
-      if (!tm.state.dynamicTimerEnabled) {
+      if (!tm.timer.isDynamic) {
         tm.sendMessage(config.timelimit.notDynamic, info.login)
         return
       }
@@ -46,7 +46,7 @@ const commands: tm.Command[] = [
         return
       }
       if (action === 'set') {
-        tm.state.setTime(time)
+        tm.timer.setTime(time)
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
@@ -66,11 +66,11 @@ const commands: tm.Command[] = [
     aliases: config.enabledynamictimer.aliases,
     help: config.enabledynamictimer.help,
     callback(info) {
-      if (tm.state.dynamicTimerOnNextRound) {
+      if (tm.timer.isDynamicOnNextRound) {
         tm.sendMessage(config.enabledynamictimer.alreadyEnabled, info.login)
         return
       }
-      tm.state.enableDynamicTimer()
+      tm.timer.enableDynamic()
       tm.sendMessage(tm.utils.strVar(config.enabledynamictimer.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -82,11 +82,11 @@ const commands: tm.Command[] = [
     aliases: config.disabledynamictimer.aliases,
     help: config.disabledynamictimer.help,
     callback(info) {
-      if (!tm.state.dynamicTimerOnNextRound) {
+      if (!tm.timer.isDynamicOnNextRound) {
         tm.sendMessage(config.disabledynamictimer.alreadyDisabled, info.login)
         return
       }
-      tm.state.disableDynamicTimer()
+      tm.timer.disableDynamic()
       tm.sendMessage(tm.utils.strVar(config.disabledynamictimer.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)

@@ -13,7 +13,7 @@ export default abstract class StaticComponent {
   private _isDisplayed: boolean = true
   /** Component manialink ID */
   readonly id: number
-  private readonly dislayStates: { [mode in DisplayMode]: typeof tm.state.current[] } = {
+  private readonly dislayStates: { [mode in DisplayMode]: ReturnType<typeof tm.getState>[] } = {
     none: [],
     always: ['race', 'result', 'transition'],
     race: ['race', 'transition'],
@@ -30,19 +30,19 @@ export default abstract class StaticComponent {
     this.id = id
     this.displayMode = displayMode
     tm.addListener('EndMap', (info): void => {
-      
+
       if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
-      this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
+      this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
       this._isDisplayed ? this.display() : this.hide()
     }, true)
     tm.addListener('BeginMap', (): void => {
-      this._isDisplayed = this.dislayStates[displayMode].includes(tm.state.current)
+      this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
       this._isDisplayed ? this.display() : this.hide()
     }, true)
     tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
       if (this._isDisplayed === true) { this.displayToPlayer(info.login) }
     })
-    if (!this.dislayStates[displayMode].includes(tm.state.current)) {
+    if (!this.dislayStates[displayMode].includes(tm.getState())) {
       this._isDisplayed = false
     }
     for (const e of StaticComponent.componentCreateListeners) {

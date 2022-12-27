@@ -180,7 +180,7 @@ const commands: tm.Command[] = [
     help: config.playtime.help,
     callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.playtime.text,
-        { time: tm.utils.msToTime(Date.now() - tm.state.mapStartTimestamp) }),
+        { time: tm.utils.msToTime(Date.now() - tm.timer.mapStartTimestamp) }),
         info.login)
     },
     privilege: config.playtime.privilege

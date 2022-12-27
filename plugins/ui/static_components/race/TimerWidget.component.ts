@@ -29,7 +29,7 @@ export default class TimerWidget extends StaticComponent {
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
-    if (tm.state.dynamicTimerEnabled) {
+    if (tm.timer.isDynamic) {
       this.startDynamicTimerInterval()
     }
     tm.addListener('DynamicTimerStateChanged', (state) => {
@@ -54,7 +54,7 @@ export default class TimerWidget extends StaticComponent {
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
-      if (!tm.state.dynamicTimerEnabled) {
+      if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
@@ -62,40 +62,40 @@ export default class TimerWidget extends StaticComponent {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }
-      if (tm.state.isTimerPaused) {
+      if (tm.timer.isPaused) {
         tm.sendMessage(tm.utils.strVar(config.resume, strObject))
-        tm.state.resumeTimer()
+        tm.timer.resume()
       } else {
         tm.sendMessage(tm.utils.strVar(config.pause, strObject))
-        tm.state.pauseTimer()
+        tm.timer.pause()
       }
     })
     addManialinkListener(this.addButtonid, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
-      if (!tm.state.dynamicTimerEnabled) {
+      if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
-      tm.state.addTime(config.timeAddedOnClick)
+      tm.timer.addTime(config.timeAddedOnClick)
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime)
+        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
     addManialinkListener(this.subtractButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
-      if (!tm.state.dynamicTimerEnabled) {
+      if (!tm.timer.isDynamic) {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
-      const subtracted = tm.state.subtractTime(config.timeSubtractedOnClick)
+      const subtracted = tm.timer.subtractTime(config.timeSubtractedOnClick)
       if (subtracted === false) { return }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.state.remainingRaceTime)
+        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -119,7 +119,7 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (this.isDisplayed === false) { return }
-    if (!tm.state.dynamicTimerEnabled || (privilege ?? 0) < config.timerActionsPrivilege) {
+    if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)
@@ -132,12 +132,12 @@ export default class TimerWidget extends StaticComponent {
       this.header.constructXml(config.title, config.icon, this.side)
     let timeXml = ''
     const bottomH = config.height - (headerHeight + config.margin)
-    if (tm.state.dynamicTimerEnabled && !this.isOnRestart) {
-      if (tm.state.isTimerPaused) {
+    if (tm.timer.isDynamic && !this.isOnRestart) {
+      if (tm.timer.isPaused) {
         timeXml = centeredText(config.pausedText, config.width, bottomH,
           { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
       } else {
-        const time = ~~(tm.state.remainingRaceTime / 1000)
+        const time = ~~(tm.timer.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
         if (time < config.colourChangeThresholds[1]) {
           timeColour = config.timeColours[2]
@@ -180,8 +180,8 @@ export default class TimerWidget extends StaticComponent {
       let hoverIcon!: string
       let id!: number
       if (e === 'pause') {
-        icon = tm.state.isTimerPaused ? config.icons.resume : config.icons.pause
-        hoverIcon = tm.state.isTimerPaused ? config.iconsHover.resume : config.iconsHover.pause
+        icon = tm.timer.isPaused ? config.icons.resume : config.icons.pause
+        hoverIcon = tm.timer.isPaused ? config.iconsHover.resume : config.iconsHover.pause
         id = this.pauseButtonId
       } else if (e === 'add') {
         icon = config.icons.add

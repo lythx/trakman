@@ -5,7 +5,7 @@ const commands: tm.Command[] = [
     aliases: config.skip.aliases,
     help: config.skip.help,
     callback: (info: tm.MessageInfo): void => {
-      if (tm.state.current === 'result') { return }
+      if (tm.getState() === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.skip.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
@@ -18,7 +18,7 @@ const commands: tm.Command[] = [
     aliases: config.res.aliases,
     help: config.res.help,
     callback: (info: tm.MessageInfo): void => {
-      if (tm.state.current === 'result') { return }
+      if (tm.getState() === 'result') { return }
       tm.sendMessage(tm.utils.strVar(config.res.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
