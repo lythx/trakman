@@ -129,6 +129,29 @@ export default {
     aliases: ['pm', 'dm'],
     help: `Message a player.`
   },
+  playtime: {
+    text: `${p.servermsg}Current map was played for${p.highlight}: #{time}${p.servermsg}.`,
+    privilege: 0,
+    aliases: ['pt', 'playtime'],
+    help: `Find out about the current map playtime.`
+  },
+  laston: {
+    text: `${p.servermsg}Player ${p.highlight}#{name} ${p.servermsg}was last` +
+      ` active on${p.highlight} #{time}${p.servermsg}.`,
+    error: `${p.error}Unknown player ${p.highlight}#{name}${p.error}.`,
+    privilege: 0,
+    aliases: ['lo', 'laston'],
+    help: `Enlighten yourself with the last visit date of the specifed specimen.`
+  },
+  sessiontime: {
+    text: `${p.servermsg}Current session time of ${p.highlight}#{name}${p.servermsg}` +
+      ` is${p.highlight} #{time}${p.servermsg}.`,
+    selfText: `${p.servermsg}Your current session time is ${p.highlight}#{time}${p.servermsg}.`,
+    error: `${p.error}Player ${p.highlight}#{name}${p.error} is not online.`,
+    privilege: 0,
+    aliases: ['st', 'session', 'sessiontime'],
+    help: `Find out about current session time of specified player.`
+  },
   admin: {
     text: `${p.error}Use //[command] for admin commands.`,
     privilege: 0,

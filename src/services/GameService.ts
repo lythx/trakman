@@ -38,6 +38,7 @@ export class GameService {
   private static dynamicTimerInterval: NodeJS.Timer
   private static lastDynamicTimerUpdate = 0
   private static dynamicTimerPaused = false
+  private static _mapStartTimestamp: number
 
   static async initialize(): Promise<void> {
     Client.callNoRes(`SetCallVoteRatios`,
@@ -59,10 +60,12 @@ export class GameService {
       this._enableDynamicTimer()
     }
     this.startTimer()
+    this._mapStartTimestamp = Date.now()
   }
 
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
+    this._mapStartTimestamp = Date.now()
     if (this._game.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
       this._enableDynamicTimer()
       stateChange = 'enabled'
@@ -277,6 +280,10 @@ export class GameService {
    */
   static get dynamicTimerOnNextRound() {
     return this._dynamicTimerOnNextRound
+  }
+
+  static get mapStartTimestamp(): number {
+    return this._mapStartTimestamp
   }
 
   private static _enableDynamicTimer(): void {

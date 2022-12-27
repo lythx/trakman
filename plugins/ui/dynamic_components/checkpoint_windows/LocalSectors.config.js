@@ -30,7 +30,7 @@ export default {
     headerBackground: "333C"
   },
   command: {
-    aliases: ['st', 'sectms'],
+    aliases: ['sc', 'sectms'],
     help: `Display current map local sectors.`,
     privilege: 0
   }

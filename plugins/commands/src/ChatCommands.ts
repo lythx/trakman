@@ -135,7 +135,11 @@ const commands: tm.Command[] = [
     aliases: config.time.aliases,
     help: config.time.help,
     callback: (info: tm.MessageInfo): void => {
-      tm.sendMessage(tm.utils.strVar(config.time.text, { time: new Date().toString() }), info.login)
+      const date = new Date()
+      tm.sendMessage(tm.utils.strVar(config.time.text,
+        {
+          time: date.toLocaleString('EU')
+        }), info.login)
     },
     privilege: config.time.privilege
   },
@@ -170,6 +174,60 @@ const commands: tm.Command[] = [
       tm.sendMessage(tm.utils.strVar(config.pm.text, { sender: tm.utils.strip(info.nickname, false), recipient: tm.utils.strip(playerInfo.nickname, false), message: text }), [info.login, playerInfo.login].join())
     },
     privilege: config.pm.privilege
+  },
+  {
+    aliases: config.playtime.aliases,
+    help: config.playtime.help,
+    callback: (info: tm.MessageInfo): void => {
+      tm.sendMessage(tm.utils.strVar(config.playtime.text,
+        { time: tm.utils.msToTime(Date.now() - tm.state.mapStartTimestamp) }),
+        info.login)
+    },
+    privilege: config.playtime.privilege
+  },
+  {
+    aliases: config.laston.aliases,
+    help: config.laston.help,
+    params: [{ name: 'login' }],
+    callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      const res = await tm.db.query(`SELECT last_online, nickname FROM players WHERE login=$1`, login) as any[]
+      if (res[0] === undefined) {
+        tm.sendMessage(tm.utils.strVar(config.laston.error, { name: login }))
+        return
+      }
+      const lastOnline: number = res[0].last_online
+      const nickname: string = res[0].nickname
+      tm.sendMessage(tm.utils.strVar(config.laston.text, {
+        name: tm.utils.strip(nickname),
+        time: new Date(lastOnline).toLocaleString('EU')
+      }), info.login)
+    },
+    privilege: config.laston.privilege
+  },
+  {
+    aliases: config.sessiontime.aliases,
+    help: config.sessiontime.help,
+    params: [{ name: 'login', optional: true }],
+    callback: async (info: tm.MessageInfo, login?: string): Promise<void> => {
+      if (login === undefined || login === info.login) {
+        tm.sendMessage(tm.utils.strVar(config.sessiontime.selfText, {
+          time: tm.utils.msToTime(Date.now() - info.joinTimestamp)
+        }), info.login)
+        return
+      }
+      const player = tm.players.get(login)
+      if (player === undefined) {
+        tm.sendMessage(tm.utils.strVar(config.sessiontime.error, {
+          name: login
+        }), info.login)
+        return
+      }
+      tm.sendMessage(tm.utils.strVar(config.sessiontime.text, {
+        name: tm.utils.strip(player.nickname),
+        time: tm.utils.msToTime(Date.now() - player.joinTimestamp)
+      }), info.login)
+    },
+    privilege: config.sessiontime.privilege
   },
   {
     aliases: ['admin', 'a'],

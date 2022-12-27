@@ -357,6 +357,13 @@ namespace trakman {
     pauseTimer: GameService.pauseTimer.bind(GameService),
 
     /**
+     * TODO DOCUMENT 
+     */
+    get mapStartTimestamp(): number {
+      return GameService.mapStartTimestamp
+    },
+
+    /**
      * Boolean indicating whether the dynamic timer is paused.
      */
     get isTimerPaused(): boolean {
