@@ -297,6 +297,11 @@ export abstract class TMXFetcher {
       s.push(...start, comment, ...end)
     }
     const TMXId: number = Number(s[0])
+    if (isNaN(TMXId)) { // Weird bug that happened once
+      Logger.debug(`TMX ID undefined in parseOldApiResponse.`,
+        ` Prefix: ${prefix}, response: ${response}, mapId: ${mapId}`)
+      return new Error(`Error while parsing API response.`) as any
+    }
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
     let replaysData: string[] = []
