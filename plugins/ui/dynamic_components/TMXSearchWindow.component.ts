@@ -130,7 +130,8 @@ export default class TMXSearchWindow extends PopupWindow<{
         author = ''
       }
       const actionId = this.getActionId(maps[index].id)
-      const header = this.getHeader(index, maps[index].id, actionId, w, h, maps[index].pageUrl, params?.privilege ?? 0)
+      const header = this.getHeader(index, maps[index].id, actionId, w, h, 
+        maps[index].pageUrl.replace(/^https:\/\//, ''), params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth
       const dateW = width - (config.timeWidth + config.awardsWidth + this.margin * 4 + config.iconWidth * 2)

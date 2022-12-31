@@ -306,7 +306,7 @@ export const Utils = {
     return s[0].player
   },
 
-  /** TODO DOCUMENTATE */
+  // TODO DOCUMENTATE AND USE IN SERVICE
   parseTimeString(dateStr: string): number | Error {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
       if (isNaN(new Date(Number(dateStr)).getTime())) {

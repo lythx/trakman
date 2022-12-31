@@ -4,19 +4,27 @@ export default {
   timelimit: {
     set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`,
     notDynamic: `${p.error}Dynamic timer is disabled.`,
+    notRaceMode: `${p.error}Time can be modified only during race.`,
     invalidParam: `${p.error}Invalid action. Actions: [time] (set), +[time] (add), -[time] (subtract), pause|stop (pause), resume|start (resume).`,
+    tooLow: `${p.error}Timelimit too low to subtract time.`,
     public: true,
     privilege: 1,
     aliases: ['tl', 'timelimit'],
-    help: 'Set, add, subtract, pause, or resume the remaining time of the current round.' //TODO FIX XLIST LINK
+    help: 'Set, add, subtract, pause, or resume the remaining time of the current round.' 
   },
   pauseTimer: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}paused ${p.admin}the timer.`,
-    notDynamic: `${p.error}Dynamic timer is disabled.`,
     public: true,
     privilege: 1,
-    aliases: ['pause', 'rt', 'setremainingtime'],
+    aliases: ['pause', 'stop'],
     help: 'Pause the game time'
+  },
+  resumeTimer: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}resumed ${p.admin}the timer.`,
+    public: true,
+    privilege: 1,
+    aliases: ['resume', 'start', 'unpause'],
+    help: 'Resume the game time'
   },
   enabledynamictimer: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}enabled ${p.admin}the dynamic timer. It will be enabled after map change.`,

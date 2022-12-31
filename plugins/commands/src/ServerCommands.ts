@@ -1,12 +1,32 @@
 import config from '../config/ServerCommands.config.js'
 
 const pauseTimer = (info: tm.Player) => {
+  if (tm.getState() !== 'race') {
+    tm.sendMessage(config.timelimit.notRaceMode)
+    return
+  }
   if (!tm.timer.isDynamic) {
-    tm.sendMessage(config.pauseTimer.notDynamic, info.login)
+    tm.sendMessage(config.timelimit.notDynamic, info.login)
     return
   }
   tm.timer.pause()
   tm.sendMessage(tm.utils.strVar(config.pauseTimer.text, {
+    title: info.title,
+    adminName: tm.utils.strip(info.nickname)
+  }))
+}
+
+const resumeTimer = (info: tm.Player) => {
+  if (tm.getState() !== 'race') {
+    tm.sendMessage(config.timelimit.notRaceMode)
+    return
+  }
+  if (!tm.timer.isDynamic) {
+    tm.sendMessage(config.timelimit.notDynamic, info.login)
+    return
+  }
+  tm.timer.resume()
+  tm.sendMessage(tm.utils.strVar(config.resumeTimer.text, {
     title: info.title,
     adminName: tm.utils.strip(info.nickname)
   }))
@@ -18,6 +38,10 @@ const commands: tm.Command[] = [
     help: config.timelimit.help,
     params: [{ name: 'action' }],
     callback(info, actionStr: string) {
+      if (tm.getState() !== 'race') {
+        tm.sendMessage(config.timelimit.notRaceMode)
+        return
+      }
       if (!tm.timer.isDynamic) {
         tm.sendMessage(config.timelimit.notDynamic, info.login)
         return
@@ -27,6 +51,7 @@ const commands: tm.Command[] = [
         return
       }
       if (actionStr.startsWith('resume')) {
+        resumeTimer(info)
         return
       }
       let action: 'set' | 'add' | 'subtract'
@@ -42,16 +67,25 @@ const commands: tm.Command[] = [
         time = tm.utils.parseTimeString(actionStr)
       }
       if (time instanceof Error) {
-
+        tm.sendMessage(config.timelimit.invalidParam)
         return
       }
+      let wasSet = true
       if (action === 'set') {
-        tm.timer.setTime(time)
+        wasSet = tm.timer.setTime(time)
+      } else if (action === 'add') {
+        tm.timer.addTime(time) // can always add time
+      } else if (action === 'subtract') {
+        wasSet = tm.timer.subtractTime(time)
+      }
+      if (wasSet) {
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
-          time: tm.utils.msToTime(time)
+          time: tm.utils.msToTime(tm.timer.remainingRaceTime)
         }))
+      } else {
+        tm.sendMessage(config.timelimit.tooLow)
       }
     },
     privilege: config.timelimit.privilege
@@ -60,7 +94,13 @@ const commands: tm.Command[] = [
     aliases: config.pauseTimer.aliases,
     help: config.pauseTimer.help,
     callback: (info) => pauseTimer(info),
-    privilege: config.timelimit.privilege
+    privilege: config.pauseTimer.privilege
+  },
+  {
+    aliases: config.resumeTimer.aliases,
+    help: config.resumeTimer.help,
+    callback: (info) => resumeTimer(info),
+    privilege: config.resumeTimer.privilege
   },
   {
     aliases: config.enabledynamictimer.aliases,

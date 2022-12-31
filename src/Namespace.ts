@@ -359,7 +359,7 @@ declare global {
       /** Replay file download url */
       readonly url: string
     }
-    // TODO DOCUMENT
+    /** TMX map search result object */
     export interface TMXSearchResult {
       /** Map UID */
       readonly id: string
@@ -779,7 +779,6 @@ declare global {
       readonly winnerWins?: number,
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
-      // TODO DOCUMENT
       /** Server side ranking objects. 
        * (Can differ from controller rankings only if it was restarted during the map) */
       readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]

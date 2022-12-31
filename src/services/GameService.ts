@@ -177,6 +177,7 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
+   * @param miliseconds Amount of time to set in miliseconds
    * @returns Boolean indicating whether the time got set
    */
   static setTime(miliseconds: number): boolean {
@@ -192,6 +193,7 @@ export class GameService {
   /**
    * Adds remaining race time. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
+   * @param miliseconds Amount of time to add in miliseconds
    * @returns Boolean indicating whether the time got added
    */
   static addTime(miliseconds: number): boolean {
@@ -206,6 +208,7 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
+   * @param miliseconds Amount of time to subtract in miliseconds
    * @returns Boolean indicating whether the time got subtracted
    */
   static subtractTime(miliseconds: number): boolean {
@@ -218,7 +221,6 @@ export class GameService {
     return true
   }
 
-  // TODO UPDATE DOCUMENTATION
   /** 
    * Remaining race time in miliseconds.
    */
@@ -258,7 +260,7 @@ export class GameService {
    * Result time limit in the current round in miliseconds.
    */
   static get resultTimeLimit(): number {
-    return this._game.resultTime // TODO DYNAMIC
+    return this._game.resultTime
   }
 
   /**
@@ -276,12 +278,15 @@ export class GameService {
   }
 
   /**
-   * Boolean indicating whether the dynamic will be enabled in the next round.
+   * Boolean indicating whether the dynamic timer will be enabled in the next round.
    */
   static get dynamicTimerOnNextRound() {
     return this._dynamicTimerOnNextRound
   }
 
+  /**
+   * Timestamp at which the current map has started.
+   */
   static get mapStartTimestamp(): number {
     return this._mapStartTimestamp
   }

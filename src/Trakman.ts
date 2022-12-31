@@ -94,7 +94,7 @@ namespace trakman {
      * Number of online players
      */
     get count(): number { return PlayerService.playerCount },
-    // TODO DOCUMENT
+
     /**
      * Number of all players who visited the server
      */
@@ -344,7 +344,7 @@ namespace trakman {
 
     enableDynamic: GameService.enableDynamicTimer.bind(GameService),
 
-    disableDynamic: GameService.disableDynamicTimer.bind(GameService), // TODO DOCUMENTATION
+    disableDynamic: GameService.disableDynamicTimer.bind(GameService),
 
     setTime: GameService.setTime.bind(GameService),
 
@@ -357,7 +357,35 @@ namespace trakman {
     pause: GameService.pauseTimer.bind(GameService),
 
     /**
-     * TODO DOCUMENT 
+     * Remaining race time in miliseconds. 
+     */
+    get remainingRaceTime(): number {
+      return GameService.remainingRaceTime
+    },
+
+    /**
+     * Remaining result screen time in miliseconds.
+     */
+    get remainingResultTime(): number {
+      return GameService.remainingResultTime
+    },
+
+    /**
+     * Race time limit in the current round in miliseconds.
+     */
+    get raceTimeLimit(): number {
+      return GameService.raceTimeLimit
+    },
+
+    /**
+     * Result time limit in the current round in miliseconds.
+     */
+    get resultTimeLimit(): number {
+      return GameService.resultTimeLimit
+    },
+
+    /**
+     * Timestamp at which the current map has started.
      */
     get mapStartTimestamp(): number {
       return GameService.mapStartTimestamp
@@ -378,38 +406,10 @@ namespace trakman {
     },
 
     /**
-     * Boolean indicating whether the dynamic will be enabled in the next round.
+     * Boolean indicating whether the dynamic timer will be enabled in the next round.
      */
     get isDynamicOnNextRound(): boolean {
       return GameService.dynamicTimerOnNextRound
-    },
-
-    /**
-     * Remaining race time in miliseconds. // TODO UPDATE DOCS
-     */
-    get remainingRaceTime(): number {
-      return GameService.remainingRaceTime
-    },
-
-    /**
-     * Remaining result screen time in miliseconds. // TODO UPDATE DOCS
-     */
-    get remainingResultTime(): number {
-      return GameService.remainingResultTime
-    },
-
-    /**
-     * Race time limit in the current round.
-     */
-    get raceTimeLimit(): number {
-      return GameService.raceTimeLimit
-    },
-
-    /**
-     * Result time limit in the current round in seconds. // TODO UPDATE DOCUMENTATION
-     */
-    get resultTimeLimit(): number {
-      return GameService.resultTimeLimit
     }
 
   }
@@ -483,14 +483,14 @@ namespace trakman {
     get guestCount(): number { return AdministrationService.guestCount }
 
   }
-  //TODO UPDATE DOCS
+
   /** 
   * Sends a server message
   * @param message Message to be sent
   * @param login Optional player login or array of logins
-  */
-  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
+  */  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
+
       Client.callNoRes('ChatSendServerMessageToLogin',
         [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message },
         { string: typeof login === 'string' ? login : login.join(',') }])
@@ -498,7 +498,7 @@ namespace trakman {
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
   }
-  //TODO UPDATE DOCS
+
   /**
    * Sends a server manialink
    * @param manialink Manialink XML to be sent

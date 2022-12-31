@@ -73,7 +73,7 @@ const acceptBet = async (player: tm.Player) => {
   }
 }
 
-betPlaceWindow.onBetStart = startBet// TODO FIX TIMER NOPRIVILEGE
+betPlaceWindow.onBetStart = startBet
 
 betPlaceWindow.onBetAccept = acceptBet
 

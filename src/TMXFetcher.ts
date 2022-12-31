@@ -43,7 +43,7 @@ export abstract class TMXFetcher {
     4: 'Shortcut',
     5: 'Laps'
   } as const
-  private static readonly cars = {
+  private static readonly cars = { // TODO MAKE TYPE USE ENUM
     1: 'SnowCar',
     2: 'DesertCar',
     3: 'RallyCar',
@@ -256,7 +256,6 @@ export abstract class TMXFetcher {
     return ret
   }
 
-  // TODO DOCUMENT
   /**
    * Fetches a random map file from TMX.
    * @param site Optional TMX site (TMNF by default)

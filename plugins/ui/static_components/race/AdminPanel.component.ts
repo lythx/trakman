@@ -13,7 +13,7 @@ export default class AdminPanel extends StaticComponent {
   private readonly side: boolean
   private readonly header: StaticHeader
   private xml: string = ''
-  private readonly actions = { // todo player list privilege checking
+  private readonly actions = {
     skip: 10,
     requeue: 20,
     previous: 30,

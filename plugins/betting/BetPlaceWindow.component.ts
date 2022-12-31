@@ -21,7 +21,7 @@ export default class BetPlaceWindow extends DynamicComponent {
     this.header = new StaticHeader('race', { rectangleWidth: this.headerRectW })
     this.grid = new Grid(config.width + config.margin * 2,
       config.height + config.margin - StaticHeader.raceHeight, [1, 1, 1], [1, 1], {
-      background: config.background, margin: config.margin // TODO FIX STL
+      background: config.background, margin: config.margin
     })
     addManialinkListener(this.id + config.actionIdOffset,
       config.options.length, (info, offset) => {
