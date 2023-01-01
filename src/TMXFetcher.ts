@@ -94,13 +94,13 @@ export abstract class TMXFetcher {
     const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.error(`Error while fetching map file from TMX (url: ${url}).`, res.message)
+      Logger.warn(`Error while fetching map file from TMX (url: ${url}).`, res.message)
       return res
     }
     if (!res.ok) {
       const error = new Error(`Error while fetching map file from TMX` +
         ` (url: ${url}).\nCode: ${res.status} Text: ${res.statusText}`)
-      Logger.error(error.message)
+      Logger.warn(error.message)
       return error
     }
     const nameHeader: string | null = res.headers.get('content-disposition')
@@ -155,19 +155,19 @@ export abstract class TMXFetcher {
       const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&id=${arg}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
-        Logger.error(`Error while fetching map info from TMX (url: ${url}).`, res.message)
+        Logger.warn(`Error while fetching map info from TMX (url: ${url}).`, res.message)
         return res
       }
       if (!res.ok) {
         const error = new Error(`Error while fetching map info from TMX`
           + ` (url: ${url}).\nCode: ${res.status} Text: ${res.statusText}`)
-        Logger.error(error.message)
+        Logger.warn(error.message)
         return error
       }
       data = await res.text()
       if (data === '') {
         const error = new Error(`Error while fetching map info from TMX (url: ${url})`)
-        Logger.error(error.message)
+        Logger.warn(error.message)
         return error
       }
     } else {
@@ -187,7 +187,7 @@ export abstract class TMXFetcher {
     }
     if (prefix === undefined) {
       const error = new Error(`Cannot fetch map info from TMX (map UID: ${mapId})`)
-      Logger.error(error.message)
+      Logger.warn(error.message)
       return error
     }
     return await this.parseOldApiResponse(prefix, data, mapId as any)
@@ -212,13 +212,13 @@ export abstract class TMXFetcher {
     ])}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.error(`Error while searching for map on TMX (url: ${url}).`, res.message)
+      Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)
       return res
     }
     if (!res.ok) {
       const error = new Error(`Error while searching for map on TMX (url: ${url}).`
         + `\nCode: ${res.status} Text: ${res.statusText}`)
-      Logger.error(error.message)
+      Logger.warn(error.message)
       return error
     }
     const data = (await res.json() as any).Results
@@ -265,20 +265,20 @@ export abstract class TMXFetcher {
     const prefix = this.siteToPrefix(site)
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackrandom`).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.error(`Error while fetching random TMX map.`, res.message)
+      Logger.warn(`Error while fetching random TMX map.`, res.message)
       return res
     }
     if (!res.ok) {
       const error = new Error(`Error while fetching random TMX map.`
         + `\nCode: ${res.status} Text: ${res.statusText}`)
-      Logger.error(error.message)
+      Logger.warn(error.message)
       return error
     }
     const split = res.url.split('/')
     const id = Number(split[split.length - 1])
     if (isNaN(id)) {
       const err = new Error(`Error while fetching random TMX map. No map ID in the url ${res.url}`)
-      Logger.error(err)
+      Logger.warn(err)
       return err
     }
     return await this.fetchMapFile(id, site)
@@ -305,9 +305,9 @@ export abstract class TMXFetcher {
     const replaysRes = await fetch(url).catch((err: Error) => err)
     let replaysData: string[] = []
     if (replaysRes instanceof Error) {
-      Logger.error(`Error while fetching replays info from TMX (url: ${url}).`, replaysRes.message)
+      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).`, replaysRes.message)
     } else if (!replaysRes.ok) {
-      Logger.error(`Error while fetching replays info from TMX (url: ${url}).` +
+      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).` +
         `\nCode: ${replaysRes.status} Text: ${replaysRes.statusText}`)
     } else {
       replaysData = (await replaysRes.text()).split('\r\n')
