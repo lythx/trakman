@@ -5,7 +5,7 @@ interface UITextOptions {
   padding?: number,
   xOffset?: number,
   yOffset?: number,
-  specialFont?: true
+  specialFont?: boolean
 }
 
 /**

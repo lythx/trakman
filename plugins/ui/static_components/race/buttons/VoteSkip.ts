@@ -64,14 +64,13 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.timer.remainingRaceTime <= 30000) { return } // todo config????
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return } 
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
       tm.sendMessage(msg.alreadyRunning, login)
       return
     }
-    this.triesCount++
     if (result === false) {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
@@ -128,6 +127,7 @@ export class VoteSkip extends UiButton {
       }
       this.isLastMapReplay = true
     }
+    this.triesCount = 0
     this.isSkip = false
     this.isReplay = false
     this.emitUpdate()

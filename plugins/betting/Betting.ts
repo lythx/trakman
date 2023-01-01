@@ -11,8 +11,6 @@ let isOpen = false
 const betPlaceWindow = new BetPlaceWindow()
 const betInfoWidget = new BetInfoWidget()
 
-// TODO ADD COMMANDS
-
 const returnCoppers = (login: string) => {
   if (prize === undefined) {
     throw new Error(`Prize undefined while returning coppers in betting plugin`)
@@ -21,7 +19,7 @@ const returnCoppers = (login: string) => {
     {
       amount: prize,
       serverName: tm.utils.strip(tm.config.server.name, false)
-    })) // todo check * 0,75
+    })) // todo maybe implement a function to get more accurate nadeo tax return instead of putting 0.75
 }
 
 const onTimeRunOut = (wasInterrupted: boolean = false) => {
@@ -48,7 +46,7 @@ const onTimeRunOut = (wasInterrupted: boolean = false) => {
 
 const startBet = async (player: tm.Player, amount: number) => {
   const status = await tm.utils.sendCoppers(player.login, amount,
-    tm.utils.strVar(config.betStartPromptMessage, { amount })) // TODO check
+    tm.utils.strVar(config.betStartPromptMessage, { amount }))
   if (status === true) {
     betLogins.push(player.login)
     prize = amount

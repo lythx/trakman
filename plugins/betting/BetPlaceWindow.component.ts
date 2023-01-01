@@ -38,13 +38,13 @@ export default class BetPlaceWindow extends DynamicComponent {
       ${centeredText(config.options[j + (i * 3)].toString(), w, h)}`
     }
     let content: string
-    if (params.placedBet) { // TODO CONFIG 
+    if (params.placedBet) {
       const h = this.grid.height - this.grid.margin
       content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${h}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
-      ${centeredText(`Bet accepted`, config.width, h / 2, { textScale: 1, yOffset: -0.03 })}
+      ${centeredText(`Bet accepted`, config.width, h / 2, config.betAcceptedText)}
       ${centeredText(`Prize: $${tm.utils.palette.green}${(this.prize ?? 0) * this.betLogins.length}C`, config.width,
-        h / 2, { yOffset: h / 2 + 0.03, textScale: 1.1 })}`
+        h / 2, { yOffset: h / 2 + config.prizeText.yOffset, textScale: config.prizeText.scale })}`
     } else if (this.prize === undefined) {
       const cells: GridCellFunction[] = []
       for (let i = 0; i < config.options.length; i++) { cells.push(cell) }
@@ -52,7 +52,7 @@ export default class BetPlaceWindow extends DynamicComponent {
     } else {
       content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${this.grid.height}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
-      ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, this.grid.height, { textScale: 1.3 })}`
+      ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, this.grid.height, config.betAmountText)}`
     }
     const headerW = this.header.options.squareWidth + this.headerRectW + config.margin * 2
     const topRightW = config.width - headerW
@@ -66,7 +66,7 @@ export default class BetPlaceWindow extends DynamicComponent {
           <quad posn="0 0 1" sizen="${topRightW} ${this.header.options.height}" 
           bgcolor="${this.header.options.iconBackground}"/>
           ${centeredText('$' + countdownColour + params.seconds.toString(),
-      topRightW, StaticHeader.raceHeight, { specialFont: true, textScale: 0.27 })}
+      topRightW, StaticHeader.raceHeight, config.countdownText)}
         </frame>
         <frame posn="${-config.margin} ${-StaticHeader.raceHeight} 0">
           ${content}

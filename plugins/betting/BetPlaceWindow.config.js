@@ -19,5 +19,20 @@ export default {
     colours: ['FFF', p.yellow, p.red],
     colourChanges: [10, 3]
   },
-  prizeColour: tm.utils.palette.green
+  prizeColour: tm.utils.palette.green,
+  betAcceptedText: {
+    scale: 1,
+    yOffset: -0.03
+  },
+  prizeText: {
+    scale: 1.1,
+    yOffset: -0.03
+  },
+  betAmountText: {
+    textScale: 1.3
+  },
+  countdownText: {
+    specialFont: true,
+    textScale: 0.27
+  }
 }
