@@ -31,10 +31,10 @@ class TMXWindow extends PopupWindow<number> {
     })
     tm.addListener('RecordsPrefetch', () => this.reRender())
     tm.commands.add({
-      aliases: ['tmxinfo'],
-      help: 'Display TMX info.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }
@@ -209,7 +209,7 @@ image="${image}" url="${url}" /> `
       [map.voteRatio === -1 ? config.defaultText : map.voteRatio.toFixed(0), ic.voteRatio],
       [map.copperPrice.toString(), ic.copperPrice],
       [map.environment, ic.environment],
-      [map?.checkpointsAmount !== undefined ? `${map.checkpointsAmount} CPs` : config.defaultText, ic.checkpointsAmount],
+      [map?.checkpointsAmount !== undefined ? `${map.checkpointsAmount - 1} CPs` : config.defaultText, ic.checkpointsAmount],
       [map.voteCount.toString(), ic.voteCount],
       [(TMXMap?.awards?.toString() ?? map?.awards?.toString()) ?? config.defaultText, awardsIcon],
       [TMXMap?.author ?? config.defaultText, ic.tmxAuthor],

@@ -33,12 +33,12 @@ export default class TopPlaytimes extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['toppt', 'playtimes'],
-      help: 'Display top playtimes.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
   }
 

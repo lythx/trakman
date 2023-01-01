@@ -31,12 +31,12 @@ export class VoteSkip extends UiButton {
       equalTexts: cfg.texts[0].equal
     }
     tm.commands.add({
-      aliases: ['s', 'skip'],
-      help: 'Start a vote to skip the ongoing map',
+      aliases: cfg.command.aliases,
+      help: cfg.command.help,
       callback: info => {
         this.handleClick(info.login, info.nickname)
       },
-      privilege: 0
+      privilege: cfg.command.privilege
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -50,12 +50,12 @@ export class VoteSkip extends UiButton {
 
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isLastMapReplay === true || this.isReplay === true
-      || this.isSkip === true || tm.state.current === 'result') { return }
-    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
+      || this.isSkip === true || tm.getState() === 'result') { return }
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
     }
-    if (Date.now() / 1000 - this.failedVoteTimestamp < cfg.timeout) {
+    if (Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
@@ -64,14 +64,13 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.state.remainingRaceTime <= 30) { return }
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return } 
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
       tm.sendMessage(msg.alreadyRunning, login)
       return
     }
-    this.triesCount++
     if (result === false) {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
@@ -128,6 +127,7 @@ export class VoteSkip extends UiButton {
       }
       this.isLastMapReplay = true
     }
+    this.triesCount = 0
     this.isSkip = false
     this.isReplay = false
     this.emitUpdate()
@@ -142,7 +142,7 @@ export class VoteSkip extends UiButton {
     this.emitUpdate()
     this.emitSkip()
     const interval = setInterval(async (): Promise<void> => {
-      if (tm.state.current === 'result') {
+      if (tm.getState() === 'result') {
         this.handleSkipNoCountdown()
         clearInterval(interval)
         return

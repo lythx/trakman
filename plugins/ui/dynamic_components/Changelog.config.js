@@ -14,5 +14,10 @@ export default {
   versionWidth: 6,
   headerHeight: 3,
   lineCount: 19,
-  lineCharacterLimit: 60
+  lineCharacterLimit: 60,
+  command: {
+    aliases: ['changes', 'changelog'],
+    help: `Display the controller changelog.`,
+    privilege: 0
+  }
 }

@@ -80,16 +80,18 @@ export class Vote {
       }
       addKeyListener(config.yesKey as any, (info): void => Vote.listener({ ...info, actionId: this.yesId }), config.keyListenerImportance)
       addKeyListener(config.noKey as any, (info): void => Vote.listener({ ...info, actionId: this.noId }), config.keyListenerImportance)
-      tm.commands.add({
-        aliases: ['y', 'yes'],
-        callback: (info): void => tm.openManialink(this.yesId, info.login),
-        privilege: 0
-      })
-      tm.commands.add({
-        aliases: ['n', 'no'],
-        callback: (info): void => tm.openManialink(this.noId, info.login),
-        privilege: 0
-      })
+      tm.commands.add(
+        {
+          aliases: config.commands.yes.aliases,
+          callback: (info): void => tm.openManialink(this.yesId, info.login),
+          privilege: config.commands.yes.privilege
+        },
+        {
+          aliases: config.commands.no.aliases,
+          callback: (info): void => tm.openManialink(this.noId, info.login),
+          privilege: config.commands.no.privilege
+        }
+      )
       tm.addListener("EndMap", (): void => Vote.endMapListener())
       tm.addListener('BeginMap', (): void => Vote.startMapListener())
     }

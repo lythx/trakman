@@ -78,6 +78,9 @@ const authenticate = async (): Promise<true | Error> => {
   if (res instanceof Error) {
     return res
   }
+  if (!res.ok) {
+    return new Error(`Maniakarma failed to authenticate. Code: ${res.status} Text: ${res.statusText}`)
+  }
   const json: any = getJson(await res.text())
   if (checkResError(json)) {
     return new Error('Maniakarma failed to authenticate')
@@ -105,10 +108,17 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
     tm.log.error(`Failed to fetch maniakarma votes`, res.message)
     return res
   }
+  if (!res.ok) {
+    const err = new Error(`Failed to fetch maniakarma votes. Code: ${res.status} Text: ${res.statusText}`)
+    tm.log.error(err.message)
+    return err
+  }
   const json: any = getJson(await res.text())
   if (checkResError(json)) {
-    tm.log.error(`Failed to fetch maniakarma votes, received response:`, JSON.stringify(json, null, 2))
-    return new Error(`Failed to fetch maniakarma votes`)
+    const err = new Error(`Failed to fetch maniakarma votes, received` +
+      ` response:\n${JSON.stringify(json, null, 2)}`)
+    tm.log.error(err.message)
+    return err
   }
   mapKarmaValue = Number(json?.result?.votes?.[0]?.karma?.[0])
   for (const key of Object.keys(mapKarma)) {
@@ -148,7 +158,12 @@ const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
   })}`
   const res = await fetch(url).catch((err: Error) => err)
   if (res instanceof Error) {
-    tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}`, res.message)
+    tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}.`, res.message)
+    return
+  }
+  if (!res.ok) {
+    tm.log.error(`Failed to send maniakarma votes for map ${lastMap.id}.`,
+      `Code: ${res.status} Text: ${res.status}`)
     return
   }
   const json = getJson(await res.text())

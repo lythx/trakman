@@ -73,7 +73,9 @@ namespace trakman {
 
     fetchMapFile: TMXFetcher.fetchMapFile.bind(TMXFetcher),
 
-    searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher)
+    searchForMap: TMXFetcher.searchForMap.bind(TMXFetcher),
+
+    fetchRandomMapFile: TMXFetcher.fetchRandomMapFile.bind(TMXFetcher)
 
   }
 
@@ -91,7 +93,12 @@ namespace trakman {
     /**
      * Number of online players
      */
-    get count(): number { return PlayerService.playerCount }
+    get count(): number { return PlayerService.playerCount },
+
+    /**
+     * Number of all players who visited the server
+     */
+    get totalCount(): number { return PlayerService.totalPlayerCount }
 
   }
 
@@ -333,41 +340,76 @@ namespace trakman {
 
   }
 
-  export const state = {
+  export const timer = {
+
+    enableDynamic: GameService.enableDynamicTimer.bind(GameService),
+
+    disableDynamic: GameService.disableDynamicTimer.bind(GameService),
+
+    setTime: GameService.setTime.bind(GameService),
+
+    addTime: GameService.addTime.bind(GameService),
+
+    subtractTime: GameService.subtractTime.bind(GameService),
+
+    resume: GameService.resumeTimer.bind(GameService),
+
+    pause: GameService.pauseTimer.bind(GameService),
 
     /**
-     * Remaining race time in seconds.
+     * Remaining race time in miliseconds. 
      */
     get remainingRaceTime(): number {
       return GameService.remainingRaceTime
     },
 
     /**
-     * Remaining result screen time in seconds.
+     * Remaining result screen time in miliseconds.
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
     },
 
     /**
-     * Server state.
-     */
-    get current(): tm.ServerState {
-      return GameService.state
-    },
-
-    /**
-     * Race time limit in the current round.
+     * Race time limit in the current round in miliseconds.
      */
     get raceTimeLimit(): number {
       return GameService.raceTimeLimit
     },
 
     /**
-     * Result time limit in the current round.
+     * Result time limit in the current round in miliseconds.
      */
     get resultTimeLimit(): number {
       return GameService.resultTimeLimit
+    },
+
+    /**
+     * Timestamp at which the current map has started.
+     */
+    get mapStartTimestamp(): number {
+      return GameService.mapStartTimestamp
+    },
+
+    /**
+     * Boolean indicating whether the dynamic timer is paused.
+     */
+    get isPaused(): boolean {
+      return GameService.isTimerPaused
+    },
+
+    /**
+     * Boolean indicating whether the dynamic timer is enabled.
+     */
+    get isDynamic(): boolean {
+      return GameService.dynamicTimerEnabled
+    },
+
+    /**
+     * Boolean indicating whether the dynamic timer will be enabled in the next round.
+     */
+    get isDynamicOnNextRound(): boolean {
+      return GameService.dynamicTimerOnNextRound
     }
 
   }
@@ -442,15 +484,16 @@ namespace trakman {
 
   }
 
-  /**
+  /** 
   * Sends a server message
   * @param message Message to be sent
-  * @param login Optional player login (or comma-joined list of logins)
-  */
-  export const sendMessage = (message: string, login?: string, prefix: boolean = true): void => {
+  * @param login Optional player login or array of logins
+  */  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
+
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message }, { string: login }])
+        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message },
+        { string: typeof login === 'string' ? login : login.join(',') }])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
@@ -459,15 +502,17 @@ namespace trakman {
   /**
    * Sends a server manialink
    * @param manialink Manialink XML to be sent
-   * @param login Optional player login (or comma-joined list of logins)
+   * @param login Optional player login or array of logins
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  export const sendManialink = (manialink: string, login?: string, deleteOnClick: boolean = false, expireTime: number = 0): void => {
+  export const sendManialink = (manialink: string, login?: string | string[],
+    deleteOnClick: boolean = false, expireTime: number = 0): void => {
     if (tm.players.count === 0) { return }
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
-        { string: login }, { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+        { string: typeof login === 'string' ? login : login.join(',') },
+        { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
       return
     }
     Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
@@ -483,6 +528,13 @@ namespace trakman {
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
     Events.emit('PlayerDataUpdated', players)
+  }
+
+  /**
+   * Gets current server state. ('result', 'race', 'transition')
+   */
+  export const getState = (): tm.ServerState => {
+    return GameService.state
   }
 
   /**

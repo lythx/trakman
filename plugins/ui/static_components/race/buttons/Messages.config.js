@@ -28,15 +28,17 @@ export default {
     cancelledBy: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has cancelled the vote to skip the ongoing map.`
   },
   voteReplay: {
-    start: `${p.highlight}#{nickname} ${p.vote}started a vote to ${p.highlight}replay ${p.vote}the ongoing map.`,
+    replayStr: `${p.highlight}replay${p.vote}`,
+    extendStr: `${p.highlight}extend${p.vote} the time on`,
+    start: `${p.highlight}#{nickname} ${p.vote}started a vote to #{action} the ongoing map.`,
     tooLate: `${p.error}It's too late for replay vote.`,
     failedRecently: `${p.error}Vote failed recently, wait a bit.`,
     tooManyFailed: `${p.error}Too many votes failed.`,
     alreadyRunning: `${p.error}A vote is already running.`,
-    didntPass: `${p.vote}Vote to ${p.highlight}replay ${p.vote}the ongoing map ${p.highlight}did not pass${p.vote}.`,
-    success: `${p.vote}Vote to ${p.highlight}replay ${p.vote}the ongoing map ${p.highlight}has passed${p.vote}.`,
-    forcePass: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has passed the vote to replay the ongoing map.`,
-    cancelled: `${p.admin} Vote to replay the ongoing map was cancelled.`,
-    cancelledBy: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has cancelled the vote to replay the ongoing map.`
+    didntPass: `${p.vote}Vote to #{action} the ongoing map ${p.highlight}did not pass${p.vote}.`,
+    success: `${p.vote}Vote to #{action} the ongoing map ${p.highlight}has passed${p.vote}.`,
+    forcePass: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has passed the vote to #{action} the ongoing map.`,
+    cancelled: `${p.admin} Vote to #{action} the ongoing map was cancelled.`,
+    cancelledBy: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has cancelled the vote to #{action} the ongoing map.`
   }
 } 

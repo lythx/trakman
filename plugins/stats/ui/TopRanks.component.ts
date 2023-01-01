@@ -3,7 +3,7 @@
  * @since 0.6
  */
 
- import { stats } from "../../stats/Stats.js"
+import { stats } from "../../stats/Stats.js"
 import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow, componentIds, centeredText } from "../../ui/UI.js"
 import config from './TopRanks.config.js'
 
@@ -33,12 +33,12 @@ export default class TopRanks extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['ranks', 'topranks', 'top100', 'top10'],
-      help: 'Display top average ranks.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
   }
 

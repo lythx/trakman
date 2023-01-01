@@ -45,5 +45,10 @@ export default {
     alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by #{nickname}${p.admin} is already on the server, ` +
       `it will be ${p.admin}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`
+  },
+  command: {
+    aliases: ['xlist', 'searchtmx', 'searchmap'],
+    help: `Search for maps matching the specified name on TMX and display them in a window.`,
+    privilege: 0
   }
 }

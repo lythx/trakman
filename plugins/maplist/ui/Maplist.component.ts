@@ -42,8 +42,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     })
     addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
     tm.commands.add({
-      aliases: ['l', 'ml', 'list'],
-      help: 'Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.',
+      aliases: config.commands.list.aliases,
+      help: config.commands.list.help,
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: (info: tm.MessageInfo, query?: string): void => {
         if (query === undefined) {
@@ -55,50 +55,59 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
-          this.openWithOption(info.login, o)
+          void this.openWithOption(info.login, o)
           return
         }
-        if (query.startsWith('$a')) {
-          this.openWithQuery(info.login, query.slice(2), true)
+        if (['nofin', 'nofinish'].includes(option)) {
+          void this.openWithOption(info.login, 'nofinish')
+        } else if (option === 'noauthor') {
+          void this.openWithOption(info.login, 'noauthor')
+        } else if (option === 'norank') {
+          void this.openWithOption(info.login, 'norank')
+        } else if (query.startsWith('$a')) {
+          void this.openWithQuery(info.login, query.slice(2), true)
         } else {
-          this.openWithQuery(info.login, query)
+          void this.openWithQuery(info.login, query)
         }
       },
-      privilege: 0
-    })
-    tm.commands.add({
-      aliases: ['best'],
-      help: 'Display list of maps sorted by rank ascending.',
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'best')
+      privilege: config.commands.list.privilege
+    },
+      {
+        aliases: config.commands.best.aliases,
+        help: config.commands.best.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'best')
+        },
+        privilege: config.commands.best.privilege
       },
-      privilege: 0
-    })
-    tm.commands.add({
-      aliases: ['worst'],
-      help: 'Display list of maps sorted by rank descending.',
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'worst')
+      {
+        aliases: config.commands.worst.aliases,
+        help: config.commands.worst.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'worst')
+        },
+        privilege: config.commands.worst.privilege
       },
-      privilege: 0
-    })
-    tm.commands.add({
-      aliases: ['jb', 'jukebox'],
-      help: 'Display jukebox.',
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'jukebox')
-      },
-      privilege: 0
-    })
+      {
+        aliases: config.commands.jukebox.aliases,
+        help: config.commands.jukebox.help,
+        callback: (info: tm.MessageInfo): void => {
+          this.openWithOption(info.login, 'jukebox')
+        },
+        privilege: config.commands.jukebox.privilege
+      }
+    )
     maplist.onListUpdate(() => this.reRender())
     maplist.onJukeboxUpdate(() => this.reRender())
   }
 
-  openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
-    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma'): void {
+  async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
+    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish' | 'norank' | 'noauthor'): Promise<void> {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = maplist.getByPosition(login, option)
+    } else if (option === 'nofinish' || option === 'norank' || option === 'noauthor') {
+      list = await maplist.getFiltered(login, option)
     } else {
       list = maplist.get(option)
     }

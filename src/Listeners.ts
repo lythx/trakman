@@ -199,10 +199,11 @@ export class Listeners {
     },
     {
       event: 'TrackMania.EndChallenge',
-      callback: async ([[winner], map, wasWarmUp, continuesOnNextMap, restart]:
+      callback: async ([rankings, map, wasWarmUp, continuesOnNextMap, restart]:
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
+        const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart
         GameService.state = 'result'
@@ -222,6 +223,7 @@ export class Listeners {
           liveRecords: RecordService.liveRecords,
           winnerLogin: login,
           winnerWins: wins,
+          serverSideRankings: rankings,
           isRestart
         }
         // Update the player record averages, this can take a long time
@@ -235,11 +237,11 @@ export class Listeners {
       callback: (params: tm.Events['TrackMania.StatusChanged']): void => {
         // [0] = StatusCode, [1] = StatusName
         // [1] = Waiting, [2] = Launching, [3] = Running - Synchronization, [4] = Running - Play, [5] = Running - Finish
-        if (params[0] === 4 || params[0] === 5) {
-          GameService.startTimer()
-        }
         if (params[0] === 4) {
           GameService.state = 'race'
+        }
+        if (params[0] === 4 || params[0] === 5) {
+          GameService.startTimer()
         }
         // Handle server changing status, e.g. from Sync to Play
         // IIRC it's important that we don't start the controller before server switches to Play

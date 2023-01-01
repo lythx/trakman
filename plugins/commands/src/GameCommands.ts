@@ -2,8 +2,8 @@ import config from '../config/GameCommands.config.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: ['sgm', 'setgamemode'],
-    help: 'Change the gamemode.',
+    aliases: config.setgamemode.aliases,
+    help: config.setgamemode.help,
     params: [{
       name: 'mode', validValues: ['round', 'ta', 'team', 'lap', 'stunt', 'cup',
         'rounds', 'timeattack', 'teams', 'laps', 'stunts']
@@ -33,21 +33,36 @@ const commands: tm.Command[] = [
     privilege: config.setgamemode.privilege
   },
   {
-    aliases: ['sct', 'setchattime'],
-    help: 'Set the time you spend on the podium screen.',
-    params: [{ name: 'time', type: 'int' }],
+    aliases: config.settimelimit.aliases,
+    help: config.settimelimit.help,
+    params: [{ name: 'time', type: 'time' }],
+    callback: (info: tm.MessageInfo, time: number): void => {
+      tm.sendMessage(tm.utils.strVar(config.settimelimit.text,
+        {
+          title: info.title, adminName: tm.utils.strip(info.nickname),
+          time: tm.utils.msToTime(time)
+        }),
+        config.settimelimit.public ? undefined : info.login)
+      tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
+    },
+    privilege: config.settimelimit.privilege
+  },
+  {
+    aliases: config.setchattime.aliases,
+    help: config.setchattime.help,
+    params: [{ name: 'time', type: 'time' }],
     callback: (info: tm.MessageInfo, time: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setchattime.text, {
         title: info.title,
-        adminName: tm.utils.strip(info.nickname), value: time
+        adminName: tm.utils.strip(info.nickname), time: tm.utils.msToTime(time)
       }), config.setchattime.public ? undefined : info.login)
       tm.client.callNoRes(`SetChatTime`, [{ int: time }])
     },
     privilege: config.setchattime.privilege
   },
   {
-    aliases: ['swu', 'setwarmup'],
-    help: 'Set whether the server is in warmup mode.',
+    aliases: config.setwarmup.aliases,
+    help: config.setwarmup.help,
     params: [{ name: 'enabled', type: 'boolean' }],
     callback: (info: tm.MessageInfo, enabled: boolean): void => {
       if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
@@ -64,8 +79,8 @@ const commands: tm.Command[] = [
     privilege: config.setwarmup.privilege
   },
   {
-    aliases: ['sla', 'setlapsamount'],
-    help: 'Set the laps amount in laps mode.',
+    aliases: config.setlapsamount.aliases,
+    help: config.setlapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 3) {
@@ -86,8 +101,8 @@ const commands: tm.Command[] = [
     privilege: config.setlapsamount.privilege
   },
   {
-    aliases: ['srla', 'setroundslapsamount'],
-    help: 'Set the laps amount in rounds mode.',
+    aliases: config.setroundslapsamount.aliases,
+    help: config.setroundslapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 0) {
@@ -108,8 +123,8 @@ const commands: tm.Command[] = [
     privilege: config.setroundslapsamount.privilege
   },
   {
-    aliases: ['srpl', 'setroundspointlimit'],
-    help: 'Set the points limit for rounds mode.',
+    aliases: config.setroundspointlimit.aliases,
+    help: config.setroundspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 0) {
@@ -130,8 +145,8 @@ const commands: tm.Command[] = [
     privilege: config.setroundspointlimit.privilege
   },
   {
-    aliases: ['stpl', 'setteamspointlimit'],
-    help: 'Set the points limit for teams mode.',
+    aliases: config.setteamspointlimit.aliases,
+    help: config.setteamspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 2) {
@@ -152,8 +167,8 @@ const commands: tm.Command[] = [
     privilege: config.setteamspointlimit.privilege
   },
   {
-    aliases: ['stmp', 'setteamsmaxpoints'],
-    help: 'Set the max obtainable points per round for teams mode.',
+    aliases: config.setteamsmaxpoints.aliases,
+    help: config.setteamsmaxpoints.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 2) {
@@ -172,8 +187,8 @@ const commands: tm.Command[] = [
     privilege: config.setteamsmaxpoints.privilege
   },
   {
-    aliases: ['scpl', 'setcuppointlimit'],
-    help: 'Set the points limit for cup mode.',
+    aliases: config.setcuppointlimit.aliases,
+    help: config.setcuppointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 5) {
@@ -194,8 +209,8 @@ const commands: tm.Command[] = [
     privilege: config.setcuppointlimit.privilege
   },
   {
-    aliases: ['scrpm', 'setcuproundspermap'],
-    help: 'Set the amount of rounds per map for cup mode.',
+    aliases: config.setcuproundspermap.aliases,
+    help: config.setcuproundspermap.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 5) {
@@ -216,8 +231,8 @@ const commands: tm.Command[] = [
     privilege: config.setcuproundspermap.privilege
   },
   {
-    aliases: ['scwt', 'setcupwarmuptime'],
-    help: 'Set the amount of rounds in warmup for cup mode.',
+    aliases: config.setcupwarmuptime.aliases, // todo it says time but then it says rounds????
+    help: config.setcupwarmuptime.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 5) {
@@ -238,8 +253,8 @@ const commands: tm.Command[] = [
     privilege: config.setcupwarmuptime.privilege
   },
   {
-    aliases: ['scwa', 'setcupwinnersamount'],
-    help: 'Set the amount of winners for cup mode.',
+    aliases: config.setcupwinnersamount.aliases,
+    help: config.setcupwinnersamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
       if (tm.config.game.gameMode !== 5) {
@@ -260,8 +275,8 @@ const commands: tm.Command[] = [
     privilege: config.setcupwinnersamount.privilege
   },
   {
-    aliases: ['fso', 'forceshowopp', 'forceshowopponents'],
-    help: 'Set whether forced opponent display is enabled.',
+    aliases: config.forceshowopp.aliases,
+    help: config.forceshowopp.help,
     params: [{ name: 'status', type: 'boolean' }, { name: 'amount', type: 'int', optional: true }],
     callback: (info: tm.MessageInfo, status: boolean, amount?: number): void => {
       let n: number
@@ -272,8 +287,8 @@ const commands: tm.Command[] = [
     privilege: config.forceshowopp.privilege
   },
   {
-    aliases: ['drp', 'disablerespawn'],
-    help: 'Set whether checkpoint respawning is enabled.',
+    aliases: config.disablerespawn.aliases,
+    help: config.disablerespawn.help,
     params: [{ name: 'status', type: 'boolean' }],
     callback: (info: tm.MessageInfo, status: boolean): void => {
       tm.sendMessage(tm.utils.strVar(config.disablerespawn.text, { title: info.title, adminName: tm.utils.strip(info.nickname), value: status ? 'disabled' : 'enabled' }), config.disablerespawn.public ? undefined : info.login)

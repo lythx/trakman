@@ -9,7 +9,7 @@ const msg = messages.voteReplay
 
 export class VoteReplay extends UiButton {
 
-  buttonData: ButtonData
+  buttonData!: ButtonData
   replayCount = 0
   triesCount = 0
   failedVoteTimestamp = 0
@@ -20,23 +20,14 @@ export class VoteReplay extends UiButton {
   constructor(parentId: number) {
     super()
     this.parentId = parentId
-    this.buttonData = {
-      icon: cfg.icon,
-      text1: cfg.texts[0][0],
-      text2: cfg.texts[0][1],
-      iconWidth: cfg.width,
-      iconHeight: cfg.height,
-      padding: cfg.padding,
-      actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0].equal
-    }
+    this.displayDefaultButtonText()
     tm.commands.add({
-      aliases: ['r', 'res', 'replay'],
-      help: 'Start a vote to replay the ongoing map',
+      aliases: cfg.command.aliases,
+      help: cfg.command.help,
       callback: info => {
         this.handleClick(info.login, info.nickname)
       },
-      privilege: 0
+      privilege: cfg.command.privilege
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -50,11 +41,12 @@ export class VoteReplay extends UiButton {
 
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isReplay === true || this.isSkip === true) { return }
-    if (tm.state.remainingRaceTime <= cfg.minimumRemainingTime) {
-      tm.sendMessage(msg.tooLate, login)
+    const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
+      tm.sendMessage(tm.utils.strVar(msg.tooLate, { action }), login)
       return
     }
-    if (Date.now() / 1000 - this.failedVoteTimestamp < cfg.timeout) {
+    if (Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
@@ -62,8 +54,9 @@ export class VoteReplay extends UiButton {
       tm.sendMessage(msg.tooManyFailed, login)
       return
     }
-    const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
+    const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })
+    const header = tm.timer.isDynamic ? cfg.extendHeader : cfg.resHeader
+    const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
     if (result === undefined) {
       tm.sendMessage(msg.alreadyRunning, login)
@@ -72,39 +65,47 @@ export class VoteReplay extends UiButton {
     if (result === false) {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
-      tm.sendMessage(msg.didntPass)
+      tm.sendMessage(tm.utils.strVar(msg.didntPass, { action }))
     } else if (result === true) {
       this.replayCount++
       this.isReplay = true
-      this.handleMapReplay()
-      this.emitReplay()
-      tm.sendMessage(msg.success)
-      tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
+      tm.sendMessage(tm.utils.strVar(msg.success, { action }))
+      this.replayOrExtendTime()
     } else if (result.result === true) {
       this.replayCount++
       this.isReplay = true
-      this.handleMapReplay()
-      this.emitReplay()
       if (result.caller === undefined) {
-        tm.sendMessage(msg.success)
+        tm.sendMessage(tm.utils.strVar(msg.success, { action }))
       } else {
         tm.sendMessage(tm.utils.strVar(msg.forcePass, {
           title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true)
+          nickname: tm.utils.strip(result.caller.nickname, true),
+          action
         }))
-        tm.jukebox.add(tm.maps.current.id, undefined, true)
       }
+      this.replayOrExtendTime()
     } else {
       this.failedVoteTimestamp = Date.now()
       this.triesCount++
       if (result.caller === undefined) {
-        tm.sendMessage(msg.cancelled)
+        tm.sendMessage(tm.utils.strVar(msg.cancelled, { action }))
       } else {
         tm.sendMessage(tm.utils.strVar(msg.cancelledBy, {
           title: result.caller.title,
-          nickname: tm.utils.strip(result.caller.nickname, true)
+          nickname: tm.utils.strip(result.caller.nickname, true),
+          action
         }))
       }
+    }
+  }
+
+  private replayOrExtendTime(): void {
+    if (tm.timer.isDynamic) {
+      tm.timer.addTime(cfg.timeExtension)
+    } else {
+      this.handleMapReplay()
+      this.emitReplay()
+      tm.jukebox.add(tm.maps.current.id, undefined, true)
     }
   }
 
@@ -122,6 +123,27 @@ export class VoteReplay extends UiButton {
         actionId: cfg.actionId + this.parentId
       }
     } else {
+      this.displayDefaultButtonText()
+    }
+    this.triesCount = 0
+    this.isReplay = false
+    this.isSkip = false
+    this.emitUpdate()
+  }
+
+  private displayDefaultButtonText() {
+    if (tm.timer.isDynamic) {
+      this.buttonData = {
+        icon: cfg.icon,
+        text1: cfg.texts[4][0],
+        text2: cfg.texts[4][1],
+        iconWidth: cfg.width,
+        iconHeight: cfg.height,
+        padding: cfg.padding,
+        equalTexts: cfg.texts[4].equal,
+        actionId: cfg.actionId + this.parentId
+      }
+    } else {
       this.buttonData = {
         icon: cfg.icon,
         text1: cfg.texts[0][0],
@@ -133,10 +155,6 @@ export class VoteReplay extends UiButton {
         actionId: cfg.actionId + this.parentId
       }
     }
-    this.triesCount = 0
-    this.isReplay = false
-    this.isSkip = false
-    this.emitUpdate()
   }
 
   private handleMapReplay(): void {

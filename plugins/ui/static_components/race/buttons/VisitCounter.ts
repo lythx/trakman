@@ -23,13 +23,8 @@ export class VisitCounter extends UiButton {
   }
 
   private async initialize(): Promise<void> {
-    const res: { count: number }[] | Error = await tm.db.query('SELECT count(*)::int FROM players;')
-    if (res instanceof Error) {
-      await tm.log.fatal('Failed to fetch players from database.', res.message, res.stack)
-      return
-    }
-    this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], { count: res[0].count.toString() })
-    this.buttonData.text2 = tm.utils.strVar(cfg.texts[1], { plural: res[0].count > 1 ? 'S' : '' })
+    this.buttonData.text1 = tm.utils.strVar(cfg.texts[0], { count: tm.players.totalCount.toString() })
+    this.buttonData.text2 = tm.utils.strVar(cfg.texts[1], { plural: tm.players.totalCount > 1 ? 'S' : '' })
     void this.emitUpdate()
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (info.visits === 1) {

@@ -25,12 +25,12 @@ class CheckpointRecords extends PopupWindow {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['cpr', 'cprecs'],
-      help: 'Displays the checkpoint records on the current map.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
     checkpointRecords.addListener('BestCheckpoint', () => this.reRender())
     checkpointRecords.addListener('CheckpointsFetch', () => {
@@ -109,11 +109,11 @@ class CheckpointRecords extends PopupWindow {
         if (cps?.[i + cpIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `(${this.diffColours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${this.diffColours.better}-$${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
-          differenceString = `(${this.diffColours.equal}${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${this.diffColours.equal + tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `(${this.diffColours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${this.diffColours.worse}+$${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)

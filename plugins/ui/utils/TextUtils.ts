@@ -5,7 +5,7 @@ interface UITextOptions {
   padding?: number,
   xOffset?: number,
   yOffset?: number,
-  specialFont?: true
+  specialFont?: boolean
 }
 
 /**
@@ -41,8 +41,9 @@ const leftAlignedText = (text: string, parentWidth: number, parentHeight: number
   const padding: number = options?.padding ?? config.padding
   const posX: number = options?.xOffset ?? 0
   const posY: number = parentHeight / 2 + (options?.yOffset ?? config.yOffset)
+  const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${padding + posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" 
-  scale="${textScale}" text="${config.format}${text}" valign="center"/>`
+  scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center"/>`
 }
 
 /**
@@ -59,8 +60,9 @@ const horizontallyCenteredText = (text: string, parentWidth: number, parentHeigh
   const padding: number = options?.padding ?? config.padding
   const posX: number = parentWidth / 2 + (options?.xOffset ?? 0)
   const posY: number = options?.yOffset ?? 0
+  const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" 
-  scale="${textScale}" text="${config.format}${text}" halign="center"/>`
+  scale="${textScale}" ${styleStr} text="${config.format}${text}" halign="center"/>`
 }
 
 /**
@@ -77,8 +79,9 @@ const rightAlignedText = (text: string, parentWidth: number, parentHeight: numbe
   const padding: number = options?.padding ?? config.padding
   const posX: number = parentWidth + (options?.xOffset ?? 0)
   const posY: number = parentHeight / 2 + (options?.yOffset ?? config.yOffset)
+  const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${posX - padding} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}"
-   scale="${textScale}" text="${config.format}${text}" valign="center" halign="right"/>`
+   scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center" halign="right"/>`
 }
 
 export { centeredText, leftAlignedText, horizontallyCenteredText, rightAlignedText }

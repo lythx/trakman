@@ -41,10 +41,10 @@ export default class LocalSectors extends PopupWindow {
       this.reRender()
     })
     tm.commands.add({
-      aliases: ['sc', 'sectms'],
-      help: 'Display current map local sectors.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
   }

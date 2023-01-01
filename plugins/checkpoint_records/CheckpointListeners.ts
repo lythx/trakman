@@ -98,77 +98,77 @@ if (config.isEnabled === true) {
     currentPlayerCps.push(...playerCps)
   })
 
-  tm.commands.add({
-    aliases: ['delmycp', 'deletemycp'],
-    help: 'Delete personal cp records or one cp on the current map. Index is 1 based',
-    params: [{ name: 'cpIndex', type: 'int', optional: true }],
-    callback(info, cpIndex?: number) {
-      const cps = currentPlayerCps.find(a => a.login === info.login)
-      if (cps === undefined) {
-        tm.sendMessage(config.noCpRecords, info.login)
-        return
-      }
-      if (cpIndex === undefined) {
-        const arr: number[] = cps.checkpoints.filter(a => a !== undefined) as any
-        cps.checkpoints.length = 0
-        tm.sendMessage(config.allPlayerCpsRemoved, info.login)
-        emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: arr.map((a, i) => ({ time: a, index: i })) })
-        void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
-      } else {
-        if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
-          tm.sendMessage(config.outOfRange, info.login)
+  tm.commands.add(
+    {
+      aliases: config.commands.deletemycp.aliases,
+      help: config.commands.deletemycp.help,
+      params: [{ name: 'cpIndex', type: 'int', optional: true }],
+      callback(info, cpIndex?: number) {
+        const cps = currentPlayerCps.find(a => a.login === info.login)
+        if (cps === undefined) {
+          tm.sendMessage(config.noCpRecords, info.login)
           return
         }
-        const deleted = cps.checkpoints[cpIndex - 1]
-        cps.checkpoints[cpIndex - 1] = undefined
-        tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
-        if (deleted !== undefined) {
-          emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: [{ time: deleted, index: cpIndex }] })
+        if (cpIndex === undefined) {
+          const arr: number[] = cps.checkpoints.filter(a => a !== undefined) as any
+          cps.checkpoints.length = 0
+          tm.sendMessage(config.allPlayerCpsRemoved, info.login)
+          emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: arr.map((a, i) => ({ time: a, index: i })) })
+          void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
+        } else {
+          if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
+            tm.sendMessage(config.outOfRange, info.login)
+            return
+          }
+          const deleted = cps.checkpoints[cpIndex - 1]
+          cps.checkpoints[cpIndex - 1] = undefined
+          tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
+          if (deleted !== undefined) {
+            emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: [{ time: deleted, index: cpIndex }] })
+          }
+          void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
         }
-        void allCpsDB.update(currentMapDBId, info.login, cps.checkpoints.map(a => a === undefined ? -1 : a))
-      }
+      },
+      privilege: config.commands.deletemycp.privilege
     },
-    privilege: 0
-  })
-
-  tm.commands.add({
-    aliases: ['delcp', 'deletecp'],
-    help: 'Delete all best cp records or one cp record on current map. Index is 1 based',
-    params: [{ name: 'cpIndex', type: 'int', optional: true }],
-    callback(info, cpIndex?: number) {
-      if (cpIndex === undefined) {
-        const arr: {
-          login: string,
-          nickname: string,
-          checkpoint: number,
-          date: Date
-        }[] = currentBestCps.filter(a => a !== undefined) as any
-        currentBestCps.length = 0
-        tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved,
-          { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
-        emitEvent('DeleteBestCheckpoint', arr.map((a, i) => ({ ...a, index: i })))
-        void bestCpsDB.delete(currentMapDBId)
-      } else {
-        if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
-          tm.sendMessage(config.outOfRange, info.login)
-          return
+    {
+      aliases: config.commands.deletecp.aliases,
+      help: config.commands.deletecp.help,
+      params: [{ name: 'cpIndex', type: 'int', optional: true }],
+      callback(info, cpIndex?: number) {
+        if (cpIndex === undefined) {
+          const arr: {
+            login: string,
+            nickname: string,
+            checkpoint: number,
+            date: Date
+          }[] = currentBestCps.filter(a => a !== undefined) as any
+          currentBestCps.length = 0
+          tm.sendMessage(tm.utils.strVar(config.allBestCpsRemoved,
+            { title: info.title, nickname: tm.utils.strip(info.nickname, true) }))
+          emitEvent('DeleteBestCheckpoint', arr.map((a, i) => ({ ...a, index: i })))
+          void bestCpsDB.delete(currentMapDBId)
+        } else {
+          if (cpIndex < 1 || cpIndex > tm.maps.current.checkpointsAmount) {
+            tm.sendMessage(config.outOfRange, info.login)
+            return
+          }
+          const deleted = currentBestCps[cpIndex - 1]
+          currentBestCps[cpIndex - 1] = undefined
+          tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
+            title: info.title,
+            nickname: tm.utils.strip(info.nickname, true),
+            index: tm.utils.getPositionString(cpIndex)
+          }), config.commands.deletecp.public === false ? info.login : undefined)
+          if (deleted !== undefined) {
+            emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])
+          }
+          void bestCpsDB.delete(currentMapDBId, cpIndex - 1)
         }
-        const deleted = currentBestCps[cpIndex - 1]
-        currentBestCps[cpIndex - 1] = undefined
-        tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
-          title: info.title,
-          nickname: tm.utils.strip(info.nickname, true),
-          index: tm.utils.getPositionString(cpIndex)
-        }))
-        if (deleted !== undefined) {
-          emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])
-        }
-        void bestCpsDB.delete(currentMapDBId, cpIndex - 1)
-      }
-    },
-    privilege: 2
-  })
-
+      },
+      privilege: config.commands.deletecp.privilege
+    }
+  )
 }
 
 const getMapCheckpoints = (): ({ login: string, nickname: string, checkpoint: number, date: Date } | null)[] => {

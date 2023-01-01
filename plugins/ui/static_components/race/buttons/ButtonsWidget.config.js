@@ -90,34 +90,47 @@ export default {
     triesLimit: 3,
     timeout: 30,
     time: 30,
-    minimumRemainingTime: 30,
+    minimumRemainingTime: 30000, // msec
     goal: 0.5,
     width: 1.8,
     height: 1.8,
     padding: 0.2,
     countdown: 5,
-    actionId: 1
+    actionId: 1,
+    command: {
+      aliases: ['s', 'skip'],
+      help: `Start a vote to skip the ongoing map.`,
+      privilege: 0
+    }
   },
   voteReplay: {
     texts: [
       { 0: " VOTE ", 1: "TO $AF4RES", equal: false },
       { 0: "$AF4RES$z$s LIMIT", 1: "REACHED", equal: true },
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
-      { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true }
+      { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true },
+      { 0: "VOTE TO", 1: "$AF4EXTEND", equal: true }
     ],
-    header: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
+    timeExtension: 1000 * 60 * 5, // 5 minutes
+    resHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
+    extendHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}EXTEND${tm.utils.palette.highlight} the time on the ongoing map`,
     icon: icons.voteReplay,
     voteIcon: icons.voteReplay,
     replayLimit: 5,
     triesLimit: 3,
     timeout: 30,
     time: 30,
-    minimumRemainingTime: 30,
+    minimumRemainingTime: 30000, //msec
     goal: 0.5,
     width: 1.8,
     height: 1.8,
     padding: 0.2,
-    actionId: 2
+    actionId: 2,
+    command: {
+      aliases: ['r', 'res', 'replay'],
+      help: `Start a vote to replay the ongoing map.`,
+      privilege: 0
+    }
   },
   paySkip: {
     texts: [

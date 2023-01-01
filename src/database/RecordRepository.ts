@@ -91,7 +91,7 @@ export class RecordRepository extends Repository {
   }
 
   async getByLogin(...logins: string[]): Promise<tm.Record[]> {
-    const playerIds = await mapIdsRepo.get(logins)
+    const playerIds = await playerRepo.getId(logins)
     if (playerIds.length === 0) { return [] }
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
     JOIN map_ids ON map_ids.id=records.map_id

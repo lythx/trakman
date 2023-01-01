@@ -64,4 +64,7 @@ export default {
   jukebox: 330000,
   chatlog: 340000,
   TMXSearchWindow: 350000,
+  serverInfoWindow: 360000,
+  betPlaceWindow: 370000,
+  betInfoWidget: 375000,
 }

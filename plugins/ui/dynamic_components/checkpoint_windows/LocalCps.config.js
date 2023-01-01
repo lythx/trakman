@@ -28,5 +28,10 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
+  },
+  command: {
+    aliases: ['cp', 'cptms', 'recs'],
+    help: `Display current map local checkpoints.`,
+    privilege: 0
   }
 }

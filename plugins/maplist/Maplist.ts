@@ -182,6 +182,22 @@ export const maplist = {
   },
 
   /**
+   * Get maplist filtered by given criteria
+   * @param login Player login
+   * @param filterCriteria Criteria to filter the maplist by
+   * @returns Array of map objects
+   */
+  getFiltered(login: string, filterCriteria: 'nofinish' | 'norank' | 'noauthor'): Promise<Readonly<tm.Map>[]> {
+    if (filterCriteria === 'nofinish') {
+      return this.filterNoFinish(login)
+    } else if (filterCriteria === 'norank') {
+      return this.filterNoRank(login)
+    } else {
+      return this.filterNoAuthor(login)
+    }
+  },
+
+  /**
    * Get all maps that a given player didn't finish
    * @param login Player login
    * @returns Array of map objects

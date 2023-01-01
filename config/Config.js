@@ -16,6 +16,10 @@ export default {
     mute: 1,
     addGuest: 1
   },
+  /** TODO DOCUMENT */
+  defaultTimeAttackTimeLimit: 300000,
+  /** TODO DOCUMENT */
+  dynamicTimerSubtractionLimit: 30000,
   /** Relative path (/GameData/Config/) to the blacklist file */
   blacklistFile: "blacklist.txt",
   /** Relative path (/GameData/Config/) to the guestlist file */
@@ -37,5 +41,7 @@ export default {
    * Used in nickname to login translation in commands. 0.15 is default value */
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.0"
+  version: "1.1",
+  /** Controller repository link */
+  repo: "github.com/lythx/trakman",
 }

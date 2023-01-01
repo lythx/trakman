@@ -112,6 +112,16 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
   await tm.db.query('INSERT INTO donations(player_id, amount, date) VALUES($1, $2, $3)', id, amount, date)
 }
 
+tm.commands.add({
+  aliases: ['donate'],
+  help: 'Donate coppers to the server.',
+  params: [{ name: 'amount', type: 'int' }],
+  callback(info, amount: number) {
+    donate(info.login, info.nickname, amount)
+  },
+  privilege: 0
+})
+
 /**
  * Donate coppers to server
  * @param payerLogin Login of the player 
@@ -120,6 +130,10 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
  * @returns True if successfull, false if player refuses payment, Error if dedicated server call fails
  */
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<boolean | Error> => {
+  if(amount < config.minimalAmount) { 
+    tm.sendMessage(config.amountTooLow, payerLogin)
+    return new Error(`Coppers amount too low`)
+  }
   const status: boolean | Error = await tm.utils.sendCoppers(payerLogin, amount, 'Donation')
   const date: Date = new Date()
   if (status instanceof Error) {

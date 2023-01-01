@@ -125,5 +125,13 @@ export default {
     bgGreyOpaque50: "https://cdn.discordapp.com/attachments/793464821030322196/1027309854508986399/GreyOpaque50.png",
     shuffleHover: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774141259796/ShuffleHover.png",
     shuffle: "https://cdn.discordapp.com/attachments/793464821030322196/1027311774577471518/Shuffle.png",
-    tagArcade: "https://cdn.discordapp.com/attachments/793464821030322196/1033790162712395806/TagArcade.png"
+    tagArcade: "https://cdn.discordapp.com/attachments/793464821030322196/1033790162712395806/TagArcade.png",
+    pause: "https://cdn.discordapp.com/attachments/793464821030322196/1052977016678400070/Pause.png",
+    pauseGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1052977016967798814/PauseHover.png",
+    minus: "https://cdn.discordapp.com/attachments/793464821030322196/1052977016095383682/Minus.png",
+    minusGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1052977016380592148/MinusHover.png",
+    plus: "https://cdn.discordapp.com/attachments/793464821030322196/1052977017223647323/Plus.png",
+    plusGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1052977017542426665/PlusHover.png",
+    play: "https://cdn.discordapp.com/attachments/793464821030322196/1053005812253069372/Play.png",
+    playGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1053005812651544657/PlayHover.png"
 }

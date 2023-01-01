@@ -56,6 +56,7 @@ import Mutelist from './dynamic_components/admin_windows/Mutelist.component.js'
 import Changelog from './dynamic_components/Changelog.component.js'
 import ChatLog from './dynamic_components/Chatlog.component.js'
 import TMXSearchWindow from './dynamic_components/TMXSearchWindow.component.js'
+import ServerInfoWindow from './dynamic_components/ServerInfo.component.js'
 
 tm.addListener(`Startup`, (): void => {
   new RankWidget()
@@ -102,5 +103,6 @@ tm.addListener(`Startup`, (): void => {
   new Mutelist()
   new Changelog()
   new ChatLog()
-  new TMXSearchWindow()
+  new TMXSearchWindow(),
+    new ServerInfoWindow()
 }, true)

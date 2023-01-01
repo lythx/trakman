@@ -359,7 +359,7 @@ declare global {
       /** Replay file download url */
       readonly url: string
     }
-    /** TODO DOCUMENT */
+    /** TMX map search result object */
     export interface TMXSearchResult {
       /** Map UID */
       readonly id: string
@@ -740,6 +740,7 @@ declare global {
       "AddGuest": Readonly<GuestlistEntry>
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
+      "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]
@@ -778,6 +779,9 @@ declare global {
       readonly winnerWins?: number,
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
+      /** Server side ranking objects. 
+       * (Can differ from controller rankings only if it was restarted during the map) */
+      readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Map & {

@@ -180,7 +180,7 @@ export class MapService {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
     if (!dontJuke) {
-      const status: true | Error = await this.addToJukebox(obj.id, caller, true)
+      const status: true | Error = await this.addToJukebox(obj.id, caller)
       if (status instanceof Error) {
         Logger.error(`Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
         this.clearJukebox()
@@ -286,6 +286,7 @@ export class MapService {
       }
       Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
       res = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
+      i++
     }
     Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author}`)
   }
@@ -298,7 +299,7 @@ export class MapService {
    * @returns True if successfull, Error if map is not in the memory
    */
   static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
-    const map: tm.Map | undefined = MapService.maps.find(a => a.id === mapId)
+    const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })

@@ -33,12 +33,12 @@ export default class TopWins extends PopupWindow<number> {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
     tm.commands.add({
-      aliases: ['wins', 'topwins'],
-      help: 'Display top wins.',
+      aliases: config.command.aliases,
+      help: config.command.help,
       callback: (info) => {
         tm.openManialink(this.openId, info.login)
       },
-      privilege: 0
+      privilege: config.command.privilege
     })
   }
 

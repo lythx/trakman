@@ -1,17 +1,34 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
-
+## 1.1
+**01/01/2023**
++ Added the dynamic timer feature
++ Added the Server Info window
++ Added aliases & help messages to configs of each command
++ Added the betting plugin (disabled by default)
++ Added more filters to the /list search command
++ Added the ability to specify arrays in send message/manialink functions
++ Added //addrandom map command
+- Fixed TMX errors getting logged twice
+- Fixed the server process being unable to quit after a fatal error
+- Fixed crashes related to TMX fetch errors
+- Fixed the incorrect CP amount in TMX Window
+- Fixed the infinite loop on map queue error
+- Fixed the vote timeout
+- Fixed formatting in various windows
+- Fixed the window pagination in specific cases
+- Fixed order of the maps added to the queue via //add
 ## 1.0
 **07/11/2022**
-- Removed the redundant welcome window
-- Removed UI utils (merged into UI)
-- Added chatlog
-- Added TMX search (aka /xlist)
-- Added configurable karma messages
-- Added more logging
-- Added docs to almost everything in the code
-- Added wiki with up-to-date information
-- Added new TMX API to TMX fetcher
+× Removed the redundant welcome window
+× Removed UI utils (merged into UI)
++ Added Chat Log
++ Added TMX Search (aka /xlist)
++ Added configurable karma messages
++ Added more logging
++ Added docs to almost everything in the code
++ Added wiki with up-to-date information
++ Added new TMX API to TMX fetcher
 - Fixed player data not updating in database
 - Fixed some stupid variable names
 - Fixed incorrect window colours
@@ -22,19 +39,19 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.6
 **29/09/2022**
-- Removed JSON files and configs
-- Added player stats windows and related commands
-- Added player ladder rank to player object
-- Added GZip compression for Dedimania request and response
-- Added enums to command params
-- Added time difference to checkpoint counter
-- Added cache to maplist
-- Added karma vote transfer among the two systems
-- Added coppers payment from the server
-- Added name sync across all systems
-- Added name sync from Dedimania records
-- Added global namespace for ease of access and types
-- Added admin panel basic functionality
+× Removed JSON files and configs
++ Added player stats windows and related commands
++ Added player ladder rank to player object
++ Added GZip compression for Dedimania request and response
++ Added enums to command params
++ Added time difference to checkpoint counter
++ Added cache to Map List
++ Added karma vote transfer among the two systems
++ Added coppers payment from the server
++ Added name sync across all systems
++ Added name sync from Dedimania records
++ Added global namespace for ease of access and types
++ Added admin panel basic functionality
 - Fixed checkpoint counter only updating on finish
 - Fixed Maniakarma returned value potentially being NaN
 - Fixed gitignore like twenty times
@@ -49,10 +66,10 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.5
 **04/09/2022**
-- Removed unnecessary things from source
-- Added actual plugin system
-- Added config files for each plugin/window/command
-- Added tmx (map info) window and related commands
+× Removed unnecessary things from source
++ Added actual plugin system
++ Added config files for each plugin/window/command
++ Added TMX (Map Info) Window and related commands
 - Fixed administration services
 - Fixed karma service
 - Fixed karma service crashing when no people are on the server
@@ -65,19 +82,18 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.4
 **10/08/2022**
-- Removed unused dependencies
-- Removed the sole broken test
-- Added result UI
-- Added result display support to static component
-- Added scripts for easier build/startup
-- Added autojuke and related commands
-- Added donations functionality
-- Added maplist sorting options
-- Added some commands
-- Added player stats widgets
-- Added checkpoint counter
-- Added player ranking prefetch
-- Added controller check for startup
+× Removed unused dependencies
+× Removed the sole broken test
++ Added result UI
++ Added result display support to static component
++ Added scripts for easier build/startup
++ Added autojuke and related commands
++ Added donations functionality
++ Added Map List sorting options
++ Added player stats widgets
++ Added checkpoint counter
++ Added player ranking prefetch
++ Added controller check for startup
 - Fixed players and player_ids tables being split
 - Fixed trakman object being a big mess
 - Fixed //ffdb creating same filenames on map fetch
@@ -91,17 +107,17 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.3
 **31/07/2022**
-- Added vote class
-- Added vote window
-- Added skip/res votes
-- Added player wins
-- Added ranking system
-- Added proxy for system.multicall
-- Added ability to specify multiple events in addListener 
-- Added checkpoint records and related windows, commands
-- Added sector records and related windows, commands
-- Added changelog window
-- Added some user commands
++ Added vote class
++ Added vote window
++ Added skip/res votes
++ Added player wins
++ Added ranking system
++ Added proxy for system.multicall
++ Added ability to specify multiple events in addListener 
++ Added checkpoint records and related windows, commands
++ Added sector records and related windows, commands
++ Added changelog window
++ Added some user commands
 - Fixed database query missing a space
 - Fixed some errors being fatal for no reason
 - Fixed maplist sorting
@@ -116,8 +132,8 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.2
 **28/07/2022**
-- Added PB messages
-- Added plain "X" to the welcome window, as the image might not load instantly
++ Added PB messages
++ Added plain "X" to the welcome window, as the image might not load instantly
 - Fixed client splitting the chunk in very specific circumstances
 - Fixed UI marker display
 - Fixed nickname display in administration windows

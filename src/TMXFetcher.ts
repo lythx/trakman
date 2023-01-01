@@ -43,7 +43,7 @@ export abstract class TMXFetcher {
     4: 'Shortcut',
     5: 'Laps'
   } as const
-  private static readonly cars = {
+  private static readonly cars = { // TODO MAKE TYPE USE ENUM
     1: 'SnowCar',
     2: 'DesertCar',
     3: 'RallyCar',
@@ -94,8 +94,14 @@ export abstract class TMXFetcher {
     const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.error(`Error while fetching map file from TMX (url: ${url})`, res.message)
+      Logger.warn(`Error while fetching map file from TMX (url: ${url}).`, res.message)
       return res
+    }
+    if (!res.ok) {
+      const error = new Error(`Error while fetching map file from TMX` +
+        ` (url: ${url}).\nCode: ${res.status} Text: ${res.statusText}`)
+      Logger.warn(error.message)
+      return error
     }
     const nameHeader: string | null = res.headers.get('content-disposition')
     if (nameHeader === null) { return new Error('Cannot read map name') }
@@ -117,12 +123,9 @@ export abstract class TMXFetcher {
     for (const p of this.prefixes) {
       const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
       const res = await fetch(url).catch((err: Error) => err)
-      if (res instanceof Error) {
-        Logger.error(`Error while fetching map info by uuid from TMX (url: ${url})`, res.message)
-        continue
-      }
+      if (res instanceof Error || !res.ok) { continue }
       data = await res.text()
-      if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+      if (data !== '') { // They send empty page instead of error for some reason. NICE!!!!
         prefix = p
         break
       }
@@ -152,33 +155,133 @@ export abstract class TMXFetcher {
       const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackinfo&id=${arg}`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
-        Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
-        return new Error(`Error while fetching map info from TMX (url: ${url})`)
+        Logger.warn(`Error while fetching map info from TMX (url: ${url}).`, res.message)
+        return res
+      }
+      if (!res.ok) {
+        const error = new Error(`Error while fetching map info from TMX`
+          + ` (url: ${url}).\nCode: ${res.status} Text: ${res.statusText}`)
+        Logger.warn(error.message)
+        return error
       }
       data = await res.text()
-      if (res.ok === false || data === '') {
-        return new Error('Cannot fetch map data from TMX')
+      if (data === '') {
+        const error = new Error(`Error while fetching map info from TMX (url: ${url})`)
+        Logger.warn(error.message)
+        return error
       }
     } else {
       mapId = arg
       for (const p of this.prefixes) { // Search for right prefix
         const url: string = `https://${p}.tm-exchange.com/apiget.aspx?action=apitrackinfo&uid=${mapId}`
         const res = await fetch(url).catch((err: Error) => err)
-        if (res instanceof Error) {
-          Logger.error(`Error while fetching map info from TMX (url: ${url})`, res.message)
+        if (res instanceof Error || !res.ok) {
           continue
         }
         data = await res.text()
-        if (res.ok === true && data !== '') { // They send empty page instead of error for some reason. NICE!!!!
+        if (data !== '') { // They send empty page instead of error for some reason. NICE!!!!
           prefix = p
           break
         }
       }
     }
     if (prefix === undefined) {
-      return new Error('Cannot fetch map data from TMX')
+      const error = new Error(`Cannot fetch map info from TMX (map UID: ${mapId})`)
+      Logger.warn(error.message)
+      return error
     }
     return await this.parseOldApiResponse(prefix, data, mapId as any)
+  }
+
+  /**
+  * Searches for maps matching the specified name on TMX.
+  * @param query Search query
+  * @param site TMX Site to fetch from
+  * @param count Number of maps to fetch
+  * @returns An array of searched map objects or Error if unsuccessfull
+  */
+  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
+    count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
+    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
+    if (query === undefined) { params.pop() }
+    const prefix = this.siteToPrefix(site)
+    const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
+      ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
+        `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
+      ...params
+    ])}`
+    const res = await fetch(url).catch((err: Error) => err)
+    if (res instanceof Error) {
+      Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)
+      return res
+    }
+    if (!res.ok) {
+      const error = new Error(`Error while searching for map on TMX (url: ${url}).`
+        + `\nCode: ${res.status} Text: ${res.statusText}`)
+      Logger.warn(error.message)
+      return error
+    }
+    const data = (await res.json() as any).Results
+    const ret: tm.TMXSearchResult[] = []
+    for (const e of data) {
+      ret.push({
+        id: e.UId,
+        TMXId: e.TrackId,
+        name: e.TrackName,
+        authorId: e.Authors[0].User.UserId,
+        author: e.Authors[0].User.Name,
+        uploadDate: new Date(e.UploadedAt),
+        lastUpdateDate: new Date(e.UpdatedAt),
+        type: this.mapTypes[e.PrimaryType as keyof typeof this.mapTypes],
+        environment: this.environments[e.Environment as keyof typeof this.environments],
+        mood: this.moods[e.Mood as keyof typeof this.moods],
+        style: this.styles[e.Style as keyof typeof this.styles],
+        routes: this.routes[e.Routes as keyof typeof this.routes],
+        difficulty: this.difficulties[e.Difficulty as keyof typeof this.difficulties],
+        game: site,
+        comment: e.AuthorComments,
+        commentsAmount: e.Comments,
+        awards: e.Awards,
+        pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${e.TrackId}`,
+        screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${e.TrackId}`,
+        thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${e.TrackId}`,
+        downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${e.TrackId}`,
+        bronzeTime: e.BronzeTarget,
+        silverTime: e.SilverTarget,
+        goldTime: e.GoldTarget,
+        authorTime: e.AuthorTime,
+        car: this.cars[e.Car as keyof typeof this.cars]
+      })
+    }
+    return ret
+  }
+
+  /**
+   * Fetches a random map file from TMX.
+   * @param site Optional TMX site (TMNF by default)
+   * @returns Object containing map name and file content, or Error if unsuccessfull
+   */
+  static async fetchRandomMapFile(site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+    const prefix = this.siteToPrefix(site)
+    const res = await fetch(`https://${prefix}.tm-exchange.com/trackrandom`).catch((err: Error) => err)
+    if (res instanceof Error) {
+      Logger.warn(`Error while fetching random TMX map.`, res.message)
+      return res
+    }
+    if (!res.ok) {
+      const error = new Error(`Error while fetching random TMX map.`
+        + `\nCode: ${res.status} Text: ${res.statusText}`)
+      Logger.warn(error.message)
+      return error
+    }
+    const split = res.url.split('/')
+    const id = Number(split[split.length - 1])
+    if (isNaN(id)) {
+      const err = new Error(`Error while fetching random TMX map. No map ID in the url ${res.url}`)
+      Logger.warn(err)
+      return err
+    }
+    return await this.fetchMapFile(id, site)
   }
 
   private static async parseOldApiResponse(prefix: TMXPrefix, response: string): Promise<Omit<tm.TMXMap, 'id'>>
@@ -193,11 +296,19 @@ export abstract class TMXFetcher {
       s.push(...start, comment, ...end)
     }
     const TMXId: number = Number(s[0])
+    if (isNaN(TMXId)) { // Weird bug that happened once
+      Logger.debug(`TMX ID undefined in parseOldApiResponse.`,
+        ` Prefix: ${prefix}, response: ${response}, mapId: ${mapId}`)
+      return new Error(`Error while parsing API response.`) as any
+    }
     const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${TMXId}`
     const replaysRes = await fetch(url).catch((err: Error) => err)
     let replaysData: string[] = []
     if (replaysRes instanceof Error) {
-      Logger.error(`Error while fetching replays info from TMX (url: ${url})`, replaysRes.message)
+      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).`, replaysRes.message)
+    } else if (!replaysRes.ok) {
+      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).` +
+        `\nCode: ${replaysRes.status} Text: ${replaysRes.statusText}`)
     } else {
       replaysData = (await replaysRes.text()).split('\r\n')
       replaysData.pop()
@@ -256,62 +367,6 @@ export abstract class TMXFetcher {
       void MapService.setAwardsAndLbRating(mapId, mapInfo.awards, mapInfo.leaderboardRating)
     }
     return mapInfo
-  }
-
-  /**
-   * Searches for maps matching the specified name on TMX.
-   * @param query Search query
-   * @param site TMX Site to fetch from
-   * @param count Number of maps to fetch
-   * @returns An array of searched map objects or Error if unsuccessfull
-   */
-  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
-    count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
-    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
-    if (query === undefined) { params.pop() }
-    const prefix = this.siteToPrefix(site)
-    const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
-      ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
-        `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
-      ...params
-    ])}`
-    const res = await fetch(url).catch((err: Error) => err)
-    if (res instanceof Error) {
-      return res
-    }
-    const data = (await res.json() as any).Results
-    const ret: tm.TMXSearchResult[] = []
-    for (const e of data) {
-      ret.push({
-        id: e.UId,
-        TMXId: e.TrackId,
-        name: e.TrackName,
-        authorId: e.Authors[0].User.UserId,
-        author: e.Authors[0].User.Name,
-        uploadDate: new Date(e.UploadedAt),
-        lastUpdateDate: new Date(e.UpdatedAt),
-        type: this.mapTypes[e.PrimaryType as keyof typeof this.mapTypes],
-        environment: this.environments[e.Environment as keyof typeof this.environments],
-        mood: this.moods[e.Mood as keyof typeof this.moods],
-        style: this.styles[e.Style as keyof typeof this.styles],
-        routes: this.routes[e.Routes as keyof typeof this.routes],
-        difficulty: this.difficulties[e.Difficulty as keyof typeof this.difficulties],
-        game: site,
-        comment: e.AuthorComments,
-        commentsAmount: e.Comments,
-        awards: e.Awards,
-        pageUrl: `https://${prefix}.tm-exchange.com/trackshow/${e.TrackId}`,
-        screenshotUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreen&id=${e.TrackId}`,
-        thumbnailUrl: `https://${prefix}.tm-exchange.com/get.aspx?action=trackscreensmall&id=${e.TrackId}`,
-        downloadUrl: `https://${prefix}.tm-exchange.com/trackgbx/${e.TrackId}`,
-        bronzeTime: e.BronzeTarget,
-        silverTime: e.SilverTarget,
-        goldTime: e.GoldTarget,
-        authorTime: e.AuthorTime,
-        car: this.cars[e.Car as keyof typeof this.cars]
-      })
-    }
-    return ret
   }
 
   private static siteToPrefix(site: tm.TMXSite): TMXPrefix {

@@ -84,5 +84,10 @@ export default {
   screenshotWidth: 15,
   tmxRecordCount: 3,
   tmxColumns: [0.7, 2, 3, 3, 0.7],
-  recordTextScale: 0.6
+  recordTextScale: 0.6,
+  command: {
+    aliases: ['tmxinfo'],
+    help: `Display TMX info.`,
+    privilege: 0
+  }
 }
