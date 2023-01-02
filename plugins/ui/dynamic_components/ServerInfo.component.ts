@@ -12,6 +12,7 @@ import 'dotenv/config'
 export default class ServerInfoWindow extends PopupWindow {
 
   private readonly grid: Grid
+  private interval: NodeJS.Timeout | undefined // It can't be undefined, TS is just full of BS
 
   constructor() {
     super(componentIds.serverInfoWindow, config.icon, config.title, config.navbar)
@@ -25,12 +26,6 @@ export default class ServerInfoWindow extends PopupWindow {
     })
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array((config.serverCells.length + config.hostCells.length) / 2 + 1).fill(1), config.grid)
-    setInterval((): void => {
-      if (this.getPlayersWithWindowOpen().length === 0 || tm.players.count === 0) {
-        return
-      }
-      this.reRender()
-    }, 1000)
   }
 
   private async getServerInfo(): Promise<string[]> {
@@ -73,6 +68,23 @@ export default class ServerInfoWindow extends PopupWindow {
     return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
       trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
       postgresVersion, postgresDBSize]
+  }
+
+  protected onOpen(info: tm.ManialinkClickInfo): void {
+    const player: tm.Player | undefined = tm.players.get(info.login)
+    if (player === undefined) { return }
+    this.displayToPlayer(info.login)
+    this.interval = setInterval((): void => { // Start the loop on window open
+      if (this.getPlayersWithWindowOpen().length === 0) { // Impossible condition, but let it be here ig
+        return
+      }
+      this.reRender()
+    }, 1000)
+  }
+
+  protected onClose(info: tm.ManialinkClickInfo): void {
+    this.hideToPlayer(info.login)
+    clearInterval(this.interval)
   }
 
   private reRender(): void {
