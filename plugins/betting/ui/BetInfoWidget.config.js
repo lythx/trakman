@@ -1,4 +1,4 @@
-import { icons, raceConfig } from "../ui/UI.js"
+import { icons, raceConfig } from "../../ui/UI.js"
 
 export default {
   posX: raceConfig.rightPosition,
