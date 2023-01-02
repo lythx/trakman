@@ -1,5 +1,5 @@
-import BetPlaceWindow from './BetPlaceWindow.component.js'
-import BetInfoWidget from './BetInfoWidget.component.js'
+import BetPlaceWindow from './ui/BetPlaceWindow.component.js'
+import BetInfoWidget from './ui/BetInfoWidget.component.js'
 import config from './Config.js'
 
 const betLogins: string[] = []
@@ -178,7 +178,7 @@ if (config.isEnabled) {
     help: config.bet.help,
     params: [{ name: 'prize', type: 'int', optional: true }],
     callback(info, newPrize?: number) {
-      if(!isOpen) {
+      if (!isOpen) {
         tm.sendMessage(config.messages.closed, info.login)
         return
       }
