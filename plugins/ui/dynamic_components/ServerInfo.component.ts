@@ -25,6 +25,12 @@ export default class ServerInfoWindow extends PopupWindow {
     })
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array((config.serverCells.length + config.hostCells.length) / 2 + 1).fill(1), config.grid)
+    setInterval((): void => {
+      if (this.getPlayersWithWindowOpen().length === 0 || tm.players.count === 0) {
+        return
+      }
+      this.reRender()
+    }, 1000)
   }
 
   private async getServerInfo(): Promise<string[]> {
@@ -67,6 +73,13 @@ export default class ServerInfoWindow extends PopupWindow {
     return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
       trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
       postgresVersion, postgresDBSize]
+  }
+
+  private reRender(): void {
+    const players = this.getPlayersWithWindowOpen(true)
+    for (const player of players) {
+      this.displayToPlayer(player.login)
+    }
   }
 
   protected async constructContent(): Promise<string> {
