@@ -12,7 +12,7 @@ import 'dotenv/config'
 export default class ServerInfoWindow extends PopupWindow {
 
   private readonly grid: Grid
-  private intervals: { timeout: NodeJS.Timeout, login: string }[]   // It can't be undefined, TS is just full of BS
+  private reRenderInterval?: NodeJS.Timeout
 
   constructor() {
     super(componentIds.serverInfoWindow, config.icon, config.title, config.navbar)
@@ -26,7 +26,6 @@ export default class ServerInfoWindow extends PopupWindow {
     })
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array((config.serverCells.length + config.hostCells.length) / 2 + 1).fill(1), config.grid)
-    this.intervals = []
   }
 
   private async getServerInfo(): Promise<string[]> {
@@ -72,27 +71,22 @@ export default class ServerInfoWindow extends PopupWindow {
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
-    const player: tm.Player | undefined = tm.players.get(info.login)
-    if (player === undefined) { return }
     this.displayToPlayer(info.login)
-    const interval: NodeJS.Timeout = setInterval((): void => { // Start the loop on window open
+    // If loop was already running no need to start it again
+    if (this.reRenderInterval !== undefined) { return }
+    this.reRenderInterval = setInterval((): void => { // Start the loop on window open
       this.reRender()
+      if (this.getPlayersWithWindowOpen().length === 0) {
+        clearInterval(this.reRenderInterval)
+        this.reRenderInterval = undefined
+      }
     }, 1000)
-    this.intervals.push({ timeout: interval, login: info.login }) // Store this player's interval & info
-  }
-
-  protected onClose(info: tm.ManialinkClickInfo): void {
-    this.hideToPlayer(info.login)
-    const intervalObject = this.intervals[this.intervals.map(a => a.login).indexOf(info.login)]
-    if (intervalObject === undefined) { return } // THIS CANNOT POSSIBLY HAPPEN UNLESS SOMETHING VERY WEIRD POPS UP
-    clearInterval(intervalObject.timeout)
-    this.intervals.splice(this.intervals.indexOf(intervalObject), 1) // Remove player interval from array
   }
 
   private reRender(): void {
-    const players = this.getPlayersWithWindowOpen(true)
-    for (const player of players) {
-      this.displayToPlayer(player.login)
+    const logins = this.getPlayersWithWindowOpen()
+    for (const login of logins) {
+      this.displayToPlayer(login)
     }
   }
 
