@@ -12,10 +12,11 @@ declare global {
       readonly fileName: string
       /** Map author login */
       readonly author: string
+      // TODO DOCUMENT ENUMS
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise', 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Bronze medal time */
       readonly bronzeTime: number
       /** Silver medal time */
@@ -153,8 +154,8 @@ declare global {
       readonly params?: {
         /** Parameter name */
         readonly name: string,
-        /** Parameter type */
-        readonly type?: 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword',
+        /** Parameter data type */
+        readonly type?: CommandParameterType,
         /** If set only the given values will be considered valid */
         readonly validValues?: (string | number)[]
         /** Whether the parameter is optional or not */
@@ -296,9 +297,9 @@ declare global {
       /** TMX map type ('Race', 'Stunts', etc.) */
       readonly type: string
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise, 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Map TMX style (eg. Full Speed, LOL) */
       readonly style: string
       /** Map TMX routes (Single, Multi, Symmetrical) */
@@ -306,7 +307,7 @@ declare global {
       /** Map TMX length, determined by the map author time eg. 1m30s etc. */
       readonly length: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
-      readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+      readonly difficulty: TMXDifficulty
       /** Map TMX leaderboard rating */
       readonly leaderboardRating: number
       /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
@@ -378,15 +379,15 @@ declare global {
       /** TMX map type ('Race', 'Stunts', etc.) */
       readonly type: string
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise, 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Map TMX style (eg. Full Speed, LOL) */
       readonly style: string
       /** Map TMX routes (Single, Multi, Symmetrical) */
       readonly routes: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
-      readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+      readonly difficulty: TMXDifficulty
       /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
       readonly game: string
       /** Map TMX comment */
@@ -844,9 +845,17 @@ declare global {
     }, 'currentCheckpoints' | 'isSpectator'>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
-    /** TMX site ('TMNF', 'TMU', etc.) */
-    export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
     /** Dedicated server state ('result', 'race', 'transition') */
     export type ServerState = 'result' | 'race' | 'transition'
+    /** Map environment ('Stadium', 'Island', etc.) */
+    export type Environment = 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+    /** Map mood ('Sunrise', 'Night', etc.) */
+    export type Mood = 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+    /** Server command data type */
+    export type CommandParameterType = 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword'
+    /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
+    export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+    /** TMX site ('TMNF', 'TMU', etc.) */
+    export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
   }
 }
