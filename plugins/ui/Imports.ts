@@ -103,6 +103,7 @@ tm.addListener(`Startup`, (): void => {
   new Mutelist()
   new Changelog()
   new ChatLog()
-  new TMXSearchWindow(),
-    new ServerInfoWindow()
+  new TMXSearchWindow()
+  new ServerInfoWindow()
 }, true)
+

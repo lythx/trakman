@@ -1,15 +1,14 @@
-import { UiNode } from "./UiNode";
+import { UiNode } from "./UiNode.js";
 
-export type LabelProps = {
-  size: number[]
-  pos: number[]
-  text: string
-}
+export type LabelProps = Partial<{
+  width: number
+  height: number
+  x: number
+  y: number
+  z: number
+  text: number
+  align: 'center' | 'left' | 'right'
+}>
 
-export class LabelNode extends UiNode {
-
-  constructor(props: LabelProps, childNodes: UiNode[]) {
-    super('label', props, childNodes)
-  }
-
-}
+export const LabelNode = (props: LabelProps = {}) =>
+  new UiNode('label', false, props)

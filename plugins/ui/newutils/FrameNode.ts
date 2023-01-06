@@ -1,13 +1,11 @@
-import { UiNode } from "./UiNode";
+import { UiNode } from "./UiNode.js";
 
-export type FrameProps = {
-  pos: number[]
-}
+export type FrameProps = Partial<{
+  x: number
+  y: number
+  z: number
+}>
 
-export class LabelNode extends UiNode {
-
-  constructor(props: FrameProps, childNodes: UiNode[]) {
-    super('frame', props, childNodes)
-  }
-
+export const FrameNode = (props: FrameProps= {}, ...children: UiNode[]) => {
+  return new UiNode('frame',true, props, children)
 }

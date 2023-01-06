@@ -1,13 +1,9 @@
-import { UiNode } from "./UiNode";
+import { UiNode } from "./UiNode.js";
 
-export type FormatProps = {
-  pos: number[]
-}
+export type FormatProps = Partial<{
+  textSize: number
+  textColor: number
+}>
 
-export class FormatNode extends UiNode {
-
-  constructor(props: FormatProps) {
-    super('format', props, [])
-  }
-
-}
+export const FormatNode = (props: FormatProps = {}): UiNode =>
+  new UiNode('format', false, props)
