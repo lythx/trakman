@@ -9,18 +9,11 @@ import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private xml: string = ''
 
   constructor() {
     super(componentIds.liveCheckpoint, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
@@ -43,6 +36,11 @@ export default class DonationPanel extends StaticComponent {
     if (tm.players.get(login)?.isUnited === true) {
       tm.sendManialink(this.xml, login)
     }
+  }
+
+  protected onPositionChange(): void {
+    this.constructXML()
+    this.display()
   }
 
   private constructXML(): void {

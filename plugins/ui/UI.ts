@@ -70,7 +70,7 @@ const dynamicComponents: DynamicComponent[] = []
 // TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
-
+let staticUpdateNeeded = false // todo make more optimal
 const events: tm.Listener[] = [
   {
     event: 'Startup',
@@ -82,7 +82,11 @@ const events: tm.Listener[] = [
       customUi = new CustomUi()
       customUi.display()
       for (const c of Object.values(staticComponents)) {
-        if (c.displayMode === status || c.displayMode === 'always') { c.display() }
+        console.log(c.gameModes.includes(tm.getGameMode()) &&
+        (c.displayMode === status || c.displayMode === 'always'), c.constructor.name,
+        c.gameModes, tm.getGameMode())
+        if (c.gameModes.includes(tm.getGameMode()) &&
+          (c.displayMode === status || c.displayMode === 'always')) { c.display() }
       }
       new TestWindow()
       for (const e of loadListeners) { e() }
@@ -92,7 +96,17 @@ const events: tm.Listener[] = [
     event: 'BeginMap',
     callback: async () => {
       loadMod()
+      if (staticUpdateNeeded) {
+        staticUpdateNeeded = false
+        for (const e of staticComponents) { e.updatePosition() }
+      }
     }
+  },
+  {
+    event: 'ServerStateChanged',
+    callback() {
+      staticUpdateNeeded = true
+    },
   },
   {
     event: 'PlayerJoin',

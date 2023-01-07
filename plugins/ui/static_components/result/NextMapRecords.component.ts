@@ -8,19 +8,12 @@ import config from './NextMapRecords.config.js'
 
 export default class NextMapRecords extends StaticComponent {
 
-  private readonly posX: number
-  private readonly posY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private records: tm.Record[] = []
   private readonly list: RecordList
 
   constructor() {
     super(componentIds.nextMapRecords, 'result')
-    const pos = this.getRelativePosition()
-    this.posX = pos.x
-    this.posY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('result')
     this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
@@ -61,7 +54,7 @@ export default class NextMapRecords extends StaticComponent {
     if (this.isDisplayed === false) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <format textsize="1"/>
-      <frame posn="${this.posX} ${this.posY} 2">
+      <frame posn="${this.positionX} ${this.positionY} 2">
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 ${-this.header.options.height - config.margin} 2">
         ${this.list.constructXml(login, this.records.map(a => ({

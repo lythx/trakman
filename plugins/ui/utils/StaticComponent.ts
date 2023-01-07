@@ -20,23 +20,30 @@ export default abstract class StaticComponent {
     result: ['result']
   }
   private static readonly componentCreateListeners: ((component: StaticComponent) => void)[] = []
+  protected positionY: number
+  protected positionX: number
+  protected side: boolean
+  gameModes: tm.GameMode[] // todo make getter
 
   /**
    * Abstract class for static manialink components
    * @param id Component manialink ID
    * @param displayMode Events preset on which manialink will get displayed and hidden
    */
-  constructor(id: number, displayMode: DisplayMode) {
+  constructor(id: number, displayMode: DisplayMode, gameModes: tm.GameMode[] = ['Cup', 'Rounds', 'Stunts', 'Teams', 'TimeAttack']) {
     this.id = id
     this.displayMode = displayMode
+    this.gameModes = gameModes
     tm.addListener('EndMap', (info): void => {
-
-      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
+      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1 ||
+        !gameModes.includes(tm.getGameMode())) { return } // ignore the short restart
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
       this._isDisplayed ? this.display() : this.hide()
     }, true)
     tm.addListener('BeginMap', (): void => {
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
+      console.log(gameModes.includes(tm.getGameMode()), gameModes, tm.getGameMode())
+      if (!gameModes.includes(tm.getGameMode())) { this._isDisplayed = false }
       this._isDisplayed ? this.display() : this.hide()
     }, true)
     tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
@@ -45,26 +52,47 @@ export default abstract class StaticComponent {
     if (!this.dislayStates[displayMode].includes(tm.getState())) {
       this._isDisplayed = false
     }
+    const pos = this.getRelativePosition()
+    this.positionX = pos.x
+    this.positionY = pos.y
+    this.side = pos.side
     for (const e of StaticComponent.componentCreateListeners) {
       e(this)
     }
+  }
+
+  updatePosition() {
+    const pos = this.getRelativePosition()
+    this.positionX = pos.x
+    this.positionY = pos.y
+    this.side = pos.side
+    this.onPositionChange()
+  }
+
+  protected onPositionChange() {
+    this.display()
   }
 
   /**
    * Gets position relative to other static manialinks based on config.
    * @returns Object containing coordinates and side of the component
    */
-  protected getRelativePosition(): { x: number, y: number, side: boolean } {
+  private getRelativePosition(): { x: number, y: number, side: boolean } {
     const widgetName: string = this.constructor.name
-    let cfg: typeof RaceUi | typeof ResultUi
+    let cfg
+    let left, right
     if (this.displayMode === 'result') {
       cfg = ResultUi
+      left = cfg.leftSideOrder
+      right = cfg.rightSideOrder
     } else {
       cfg = RaceUi
+      left = tm.config.game.gameMode === 2 ? cfg.teamsLeftSideOrder : cfg.leftSideOrder
+      right = tm.config.game.gameMode === 2 ? cfg.teamsRightSideOrder : cfg.rightSideOrder
     }
     let side: boolean = false
-    if (cfg.rightSideOrder.some(a => a.name === widgetName)) { side = true }
-    const order: { name: string; height: number; }[] = side ? cfg.rightSideOrder : cfg.leftSideOrder
+    if (right.some(a => a.name === widgetName)) { side = true }
+    const order: { name: string; height: number; }[] = side ? right : left
     let positionSum: number = 0
     for (const e of order) {
       if (e.name === widgetName) { break }

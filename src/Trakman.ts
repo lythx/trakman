@@ -536,6 +536,13 @@ namespace trakman {
   export const getState = (): tm.ServerState => {
     return GameService.state
   }
+  
+  /**
+   * Gets current server gamemode. ('Rounds', 'TimeAttack', 'Teams', 'Laps', 'Stunts', 'Cup')
+   */
+  export const getGameMode = (): tm.GameMode => {
+    return GameService.gameMode
+  }
 
   /**
    * Adds a listener to an event to execute callbacks.

@@ -4,33 +4,33 @@
  */
 
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
-import config from './LiveRanking.config.js'
 
-export default class LiveRanking extends StaticComponent {
+import config from './TeamsRanking.config.js'
+
+export default class TeamsRanking extends StaticComponent {
 
   private readonly header: StaticHeader
   private readonly recordList: RecordList
 
   constructor() {
-    super(componentIds.live, 'race', ['TimeAttack'])
+    super(componentIds.teamsRanking, 'race', ['Teams'])
     this.header = new StaticHeader('race')
     this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, config.maxRecordsAmount, config.displayNoRecordEntry)
+      config.entries, this.side, config.topCount, 250, config.displayNoRecordEntry) // TODO
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('LiveRecord', (): void => {
-      this.display()
-    })
+    tm.addListener('LocalRecord', (): void => this.display())
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
+      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
+      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.live.some(a => info.some(b => b.login === a.login))) { this.display() }
+      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
+    tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }
 
   display(): void {
@@ -43,15 +43,18 @@ export default class LiveRanking extends StaticComponent {
   displayToPlayer(login: string): void {
     if (this.isDisplayed === false) { return }
     tm.sendManialink(`<manialink id="${this.id}">
-    <frame posn="${this.positionX} ${this.positionY} 1">
-      <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.liveCps })}
+      <frame posn="${this.positionX} ${this.positionY} 1">
+        <format textsize="1" textcolor="FFFF"/> 
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, tm.records.live.map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))}
+          ${this.recordList.constructXml(login, tm.records.local
+      .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
+      .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,
       login
     )
   }
+
 }

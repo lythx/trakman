@@ -8,9 +8,6 @@ import config from './AdminPanel.config.js'
 
 export default class AdminPanel extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private xml: string = ''
   private readonly actions = {
@@ -26,10 +23,6 @@ export default class AdminPanel extends StaticComponent {
 
   constructor() {
     super(componentIds.admin, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info): void => {

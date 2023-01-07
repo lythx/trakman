@@ -39,6 +39,14 @@ export class GameService {
   private static lastDynamicTimerUpdate = 0
   private static dynamicTimerPaused = false
   private static _mapStartTimestamp: number
+  private static readonly gameModeMap: { [value: number]: tm.GameMode } = {
+    0: 'Rounds',
+    1: 'TimeAttack',
+    2: 'Teams',
+    3: 'Laps',
+    4: 'Stunts',
+    5: 'Cup'
+  }
 
   static async initialize(): Promise<void> {
     Client.callNoRes(`SetCallVoteRatios`,
@@ -59,6 +67,7 @@ export class GameService {
     if (this._game.timeAttackLimit === 0) {
       this._enableDynamicTimer()
     }
+    await this.loadGamemodeConfig()
     this.startTimer()
     this._mapStartTimestamp = Date.now()
   }
@@ -291,6 +300,11 @@ export class GameService {
     return this._mapStartTimestamp
   }
 
+  // TODO DOCUMENT
+  static get gameMode(): tm.GameMode {
+    return this.gameModeMap[this._game.gameMode]
+  }
+
   private static _enableDynamicTimer(): void {
     this._dynamicTimerEnabled = true
     this._dynamicTimerOnNextRound = true
@@ -310,6 +324,10 @@ export class GameService {
     this._dynamicTimerEnabled = false
     this._dynamicTimerOnNextRound = false
     clearInterval(this.dynamicTimerInterval)
+  }
+
+  private static async loadGamemodeConfig(): Promise<void> {
+    await Client.call('SetUseNewRulesTeam', [{ boolean: true }]) // TODO CONFIG
   }
 
 }

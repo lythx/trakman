@@ -8,9 +8,6 @@ import config from './TimerWidget.config.js'
 
 export default class TimerWidget extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private flexiTimeInterval: NodeJS.Timer | undefined
   private noButtonXml: string = ''
@@ -21,11 +18,7 @@ export default class TimerWidget extends StaticComponent {
   private isOnRestart = false
 
   constructor() {
-    super(componentIds.timer, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
+    super(componentIds.timer, 'race', ['TimeAttack'])
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
@@ -124,6 +117,12 @@ export default class TimerWidget extends StaticComponent {
     } else {
       tm.sendManialink(this.xmlWithButtons, login)
     }
+  }
+
+  protected onPositionChange(): void {
+    this.noButtonXml = this.constructXml(false)
+    this.xmlWithButtons = this.constructXml(true)
+    this.display()
   }
 
   private constructXml(isDynamic: boolean): string {

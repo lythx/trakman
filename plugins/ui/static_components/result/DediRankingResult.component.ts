@@ -9,19 +9,12 @@ import config from './DediRankingResult.config.js'
 
 export default class DediRankingResult extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private readonly recordList: RecordList
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
     super(componentIds.dedisResult, 'result')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('result')
     this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)

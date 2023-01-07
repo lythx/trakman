@@ -8,15 +8,10 @@ import config from './PreviousAndBest.config.js'
 
 export default class PreviousAndBest extends StaticComponent {
 
-  private readonly positionY: number
-  private readonly positionX: number
   private xml: string = ''
 
   constructor() {
     super(componentIds.previousAndBest, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
     this.constructXml()
   }
 

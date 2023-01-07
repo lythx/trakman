@@ -857,5 +857,7 @@ declare global {
     export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
+    // TODO DOCUMENT
+    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
   }
 }

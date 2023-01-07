@@ -9,8 +9,6 @@ import config from './KarmaWidget.config.js'
 
 export default class KarmaWidget extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
   private readonly header: StaticHeader
   private readonly headerH: number
   private readonly options = [3, 2, 1, -1, -2, -3] as const
@@ -19,9 +17,6 @@ export default class KarmaWidget extends StaticComponent {
 
   constructor() {
     super(componentIds.karma, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
     this.header = new StaticHeader('race')
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,

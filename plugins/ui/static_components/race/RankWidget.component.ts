@@ -9,15 +9,10 @@ import config from './RankWidget.config.js'
 
 export default class RankWidget extends StaticComponent {
 
-  private readonly positionY: number
-  private readonly positionX: number
   private xml: string = ''
 
   constructor() {
     super(componentIds.rank, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
     this.constructXml()
   }
 
