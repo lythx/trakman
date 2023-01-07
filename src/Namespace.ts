@@ -91,6 +91,10 @@ declare global {
       privilege: number
       /** Whether the player is in the spectator mode */
       isSpectator: boolean
+      // TODO DOCUMENT
+      isPureSpectator: boolean
+      // TODO DOCUMENT
+      isTemporarySpectator: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
       /** Player average server map rank */
@@ -804,7 +808,8 @@ declare global {
       readonly player: Player
     }
     /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
-    export type FinishInfo = Omit<Player & LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'>
+    export type FinishInfo = Omit<Player & LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'
+      | 'isTemporarySpectator' | 'isPureSpectator'>
     /** Object containing player information. Created and emitted on the PlayerLeave event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LeaveInfo = Omit<Player, 'lastOnline'> & {
       /** Amount of time the player spent on the server in the current session */
@@ -842,7 +847,7 @@ declare global {
         /** Previous player local record time */
         readonly time: number
       }
-    }, 'currentCheckpoints' | 'isSpectator'>
+    }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
     /** Dedicated server state ('result', 'race', 'transition') */

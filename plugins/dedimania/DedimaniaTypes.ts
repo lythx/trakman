@@ -11,4 +11,4 @@ export type NewDediRecord = Omit<tm.Player & DediRecord & {
     readonly time: number,
     readonly position: number
   }
-}, 'currentCheckpoints' | 'isSpectator'>
+}, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>

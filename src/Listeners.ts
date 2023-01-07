@@ -300,11 +300,10 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        if (info.isSpectator || info.isPureSpectator) {
-          PlayerService.setPlayerSpectatorStatus(info.login, true)
-        } else {
-          PlayerService.setPlayerSpectatorStatus(info.login, false)
-        }
+        // If pure spectator is true then player doesn't have a player slot (so hes not counted in round scores for example) 
+        console.log(info.isSpectator, info.isPureSpectator, info.isTemporarySpectator, info.login)
+        PlayerService.setPlayerSpectatorStatus(info.login, info.isSpectator,
+          info.isPureSpectator, info.isTemporarySpectator)
         Events.emit('PlayerInfoChanged', info)
       }
     },

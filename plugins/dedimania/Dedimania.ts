@@ -162,7 +162,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
   if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
 }
 
-const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
+const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   time: number, checkpoints: number[]): void => {
   if (client.connected === false) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
@@ -288,7 +288,7 @@ const getPlayersArray = (): any[] => {
   return arr
 }
 
-const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
+const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   checkpoints: number[], time: number, previousTime: number | undefined, position: number, previousPosition: number | undefined): NewDediRecord => {
   return {
     ...player,

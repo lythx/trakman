@@ -118,6 +118,8 @@ export class PlayerService {
         wins: 0,
         privilege,
         isSpectator,
+        isTemporarySpectator: isSpectator,
+        isPureSpectator: isSpectator,
         ip,
         region,
         isUnited,
@@ -142,6 +144,8 @@ export class PlayerService {
         wins: playerData.wins,
         privilege,
         isSpectator,
+        isTemporarySpectator: isSpectator,
+        isPureSpectator: isSpectator,
         id,
         ip,
         region,
@@ -247,11 +251,14 @@ export class PlayerService {
    * @param login Player login
    * @param status Spectator status
    * @returns True if successfull
-   */
-  static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
+   */ // TODO CHANGE DOCS
+  static setPlayerSpectatorStatus(login: string, isSpectator: boolean, isPureSpectator: boolean,
+    isTemporarySpectator: boolean): boolean {
     const player: tm.Player | undefined = this._players.find(a => a.login === login)
     if (player === undefined) { return false }
-    player.isSpectator = status
+    player.isSpectator = isSpectator
+    player.isPureSpectator = isPureSpectator
+    player.isTemporarySpectator = isTemporarySpectator
     return true
   }
 
