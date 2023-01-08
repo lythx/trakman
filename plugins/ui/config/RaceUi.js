@@ -31,8 +31,9 @@ export default {
     { name: "PreviousAndBest", height: 4.95 },
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
-    { name: "TeamsRanking", height: 34.12 },
+    { name: "RoundScore", height: 23.48 },
     { name: "LocalRanking", height: 15.07 },
+    { name: "TeamScore", height: 5.5 },
     { name: "DonationPanel", height: 4.49 }
   ],
   teamsLeftSideOrder: [

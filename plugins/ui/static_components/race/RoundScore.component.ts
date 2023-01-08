@@ -1,36 +1,37 @@
 /**
  * @author lythx
- * @since 0.1
+ * @since 1.2
  */
 
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 
-import config from './TeamsRanking.config.js'
+import config from './RoundScore.config.js'
 
-export default class TeamsRanking extends StaticComponent {
+export default class RoundScore extends StaticComponent {
 
   private readonly header: StaticHeader
   private readonly recordList: RecordList
+  private roundRecords: tm.FinishInfo[] = []
 
   constructor() {
-    super(componentIds.teamsRanking, 'race', ['Teams'])
+    super(componentIds.roundScore, 'race', ['Teams'])
     this.header = new StaticHeader('race')
     this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, 250, config.displayNoRecordEntry) // TODO
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('LocalRecord', (): void => this.display())
-    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('PlayerFinish', (info): void => {
+      this.roundRecords.push(info)
+      this.display()
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+    tm.addListener('TrackMania.BeginRound', () => {
+      this.roundRecords.length = 0
+      this.display()
     })
     tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
-    tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }
 
   display(): void {
@@ -47,8 +48,9 @@ export default class TeamsRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, tm.records.local
-      .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
+          ${this.recordList.constructXml(login, this.roundRecords
+      .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints,
+         login: a.login, points: a.roundPoints, color: a.team }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>

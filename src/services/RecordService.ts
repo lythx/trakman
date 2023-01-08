@@ -19,6 +19,7 @@ export class RecordService {
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
   private static _queueRecords: { mapId: string, records: tm.Record[] }[] = []
   private static _historyRecords: { mapId: string, records: tm.Record[] }[] = []
+  private static nextRoundPoints?: number
 
   /**
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
@@ -141,15 +142,28 @@ export class RecordService {
       checkpoints.length = 0
       return false
     }
-    const finishInfo = {
+    const finishInfo: tm.FinishInfo = {
       ...player,
       checkpoints: [...checkpoints],
       map,
-      time
+      time,
+      roundPoints: this.getRoundPoints()
     }
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
+  }
+
+  static resetRoundPoints(): void {
+    this.nextRoundPoints = undefined
+  }
+
+  private static getRoundPoints(): number | undefined {
+    if (GameService.gameMode !== 'Teams') { return }
+    if (this.nextRoundPoints === undefined) {
+      this.nextRoundPoints = PlayerService.players.filter(a => !a.isPureSpectator).length
+    }
+    return this.nextRoundPoints--
   }
 
   /**
@@ -360,7 +374,8 @@ export class RecordService {
       average: player.average,
       ladderPoints: player.ladderPoints,
       ladderRank: player.ladderRank,
-      title: player.title
+      title: player.title,
+      hasPlayerSlot: player.hasPlayerSlot
     }
   }
 

@@ -18,7 +18,7 @@ export default class TimerWidget extends StaticComponent {
   private isOnRestart = false
 
   constructor() {
-    super(componentIds.timer, 'race', ['TimeAttack'])
+    super(componentIds.timer, 'race')
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)

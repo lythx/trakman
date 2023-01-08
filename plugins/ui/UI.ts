@@ -82,9 +82,6 @@ const events: tm.Listener[] = [
       customUi = new CustomUi()
       customUi.display()
       for (const c of Object.values(staticComponents)) {
-        console.log(c.gameModes.includes(tm.getGameMode()) &&
-        (c.displayMode === status || c.displayMode === 'always'), c.constructor.name,
-        c.gameModes, tm.getGameMode())
         if (c.gameModes.includes(tm.getGameMode()) &&
           (c.displayMode === status || c.displayMode === 'always')) { c.display() }
       }

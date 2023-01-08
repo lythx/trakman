@@ -97,7 +97,6 @@ export class UiNode {
   }
 
   private getNodePosition(node: UiNode, x: number, y: number): [number, number] {
-    console.log(node.props.align)
     let posX = x
     let posY = y
     if (node.props.align === 'center') {

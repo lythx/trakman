@@ -93,7 +93,7 @@ export class PlayerService {
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> {
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> { // TODO ADD NEW PROPERTIES
     const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
@@ -120,6 +120,7 @@ export class PlayerService {
         isSpectator,
         isTemporarySpectator: isSpectator,
         isPureSpectator: isSpectator,
+        hasPlayerSlot: isSpectator,
         ip,
         region,
         isUnited,
@@ -146,6 +147,7 @@ export class PlayerService {
         isSpectator,
         isTemporarySpectator: isSpectator,
         isPureSpectator: isSpectator,
+        hasPlayerSlot: isSpectator,
         id,
         ip,
         region,
@@ -249,16 +251,19 @@ export class PlayerService {
   /**
    * Sets spectator status in player object
    * @param login Player login
-   * @param status Spectator status
    * @returns True if successfull
    */ // TODO CHANGE DOCS
-  static setPlayerSpectatorStatus(login: string, isSpectator: boolean, isPureSpectator: boolean,
-    isTemporarySpectator: boolean): boolean {
-    const player: tm.Player | undefined = this._players.find(a => a.login === login)
+  static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
+    const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
     if (player === undefined) { return false }
-    player.isSpectator = isSpectator
-    player.isPureSpectator = isPureSpectator
-    player.isTemporarySpectator = isTemporarySpectator
+    player.isSpectator = info.isSpectator
+    player.isPureSpectator = info.isPureSpectator
+    player.isTemporarySpectator = info.isTemporarySpectator
+    player.hasPlayerSlot = info.hasPlayerSlot
+    if(info.teamId === -1) { player.team = undefined} // TODO CHECK
+    else {
+      player.team = info.teamId === 0 ? 'blue' : 'red'
+    }
     return true
   }
 

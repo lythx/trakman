@@ -9,9 +9,11 @@ interface UiRecord {
   readonly date?: Date
   readonly checkpoints?: number[]
   readonly url?: string
+  readonly points?: number
+  readonly color?: 'red' | 'blue'
 }
 
-type Marker = 'faster' | 'slower' | 'you' | null
+type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue' } | null
 
 type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
@@ -76,6 +78,10 @@ export default class RecordList {
     you: string,
     top: string
   }>
+  readonly markerBackground = {
+    red: tm.utils.palette.red + '6',
+    blue: tm.utils.palette.purple + '6'
+  } // todo config
 
   /**
    * Util to display record data in manialinks. 
@@ -93,7 +99,7 @@ export default class RecordList {
    * @param options Optional parameters
    */
   constructor(preset: 'result' | 'race', parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
-    options?: { getColoursFromPb?: true}) {
+    options?: { getColoursFromPb?: true }) {
     this.config = preset === 'result' ? resultConfig : raceConfig
     const INFO = this.config.info
     this.columnGap = this.config.columnGap
@@ -295,6 +301,11 @@ export default class RecordList {
   private getMarkers(playerIndex: number, infoPositions: boolean[][], records: UiRecord[]): Marker[] {
     const ret: Marker[] = []
     for (let i: number = 0; i < records.length; i++) {
+      const points = records[i].points
+      if (points !== undefined) {
+        ret.push({ points: points, color: records[i].color })
+        continue
+      }
       if (infoPositions?.[i]?.[0] === true) {
         ret.push(null)
         continue
@@ -446,11 +457,16 @@ export default class RecordList {
     if (marker === undefined || marker === null) { return '' }
     const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
-    if (marker === 'faster') {
+    if (typeof marker === 'object') {
+      const color = (marker.color && this.markerBackground[marker.color]) ?
+        `bgcolor="${this.markerBackground[marker.color]}"` : ''
+      icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" ${color}/>
+      ${this.centeredText(marker.points.toString(), this.markerWidth, this.rowHeight - this.rowGap, posX)}` // tood configer
+    } else if (marker === 'faster') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.faster}"/>`
-    } if (marker === 'slower') {
+    } else if (marker === 'slower') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.slower}"/>`
-    } if (marker === 'you') {
+    } else if (marker === 'you') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.you}"/>`
     }
     return `<quad posn="${posX} 0 1" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" bgcolor="${this.background}"/>

@@ -95,10 +95,13 @@ declare global {
       isPureSpectator: boolean
       // TODO DOCUMENT
       isTemporarySpectator: boolean
+      hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
       /** Player average server map rank */
       average: number
+      /** Player team (teams mode only) */ // TODO DOCUMENT and maybe remove from other objects
+      team?: 'red' | 'blue'
     }
     /** Controller offline player object */
     export interface OfflinePlayer {
@@ -518,7 +521,7 @@ declare global {
       readonly isSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** Seems to be always the same as isSpectator */ // TODO ROUNDS
+      /** Seems to be always the same as isSpectator */ // TODO UPDATE
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
@@ -800,8 +803,8 @@ declare global {
       /** Amount of checkpoints */
       readonly checkpointsAmount: number
     }
-    /** Controller local record object */
-    export type LocalRecord = Record & OfflinePlayer
+    /** Controller local record object */ // TODO UPDATE DOC
+    export type LocalRecord = Record & OfflinePlayer & { roundPoints?: number }
     /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
       /** Player object */

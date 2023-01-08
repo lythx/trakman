@@ -42,7 +42,6 @@ export default abstract class StaticComponent {
     }, true)
     tm.addListener('BeginMap', (): void => {
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
-      console.log(gameModes.includes(tm.getGameMode()), gameModes, tm.getGameMode())
       if (!gameModes.includes(tm.getGameMode())) { this._isDisplayed = false }
       this._isDisplayed ? this.display() : this.hide()
     }, true)

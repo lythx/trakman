@@ -169,6 +169,7 @@ export class Listeners {
       event: 'TrackMania.EndRound',
       callback: (): void => {
         // No params, rounds mode only
+        RecordService.resetRoundPoints()
       }
     },
     {
@@ -301,9 +302,7 @@ export class Listeners {
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
         // If pure spectator is true then player doesn't have a player slot (so hes not counted in round scores for example) 
-        console.log(info.isSpectator, info.isPureSpectator, info.isTemporarySpectator, info.login)
-        PlayerService.setPlayerSpectatorStatus(info.login, info.isSpectator,
-          info.isPureSpectator, info.isTemporarySpectator)
+        PlayerService.setPlayerInfo(info)
         Events.emit('PlayerInfoChanged', info)
       }
     },
