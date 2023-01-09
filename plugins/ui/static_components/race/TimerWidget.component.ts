@@ -16,6 +16,7 @@ export default class TimerWidget extends StaticComponent {
   private readonly addButtonid = this.id + 2
   private readonly subtractButtonId = this.id + 3
   private isOnRestart = false
+  private roundCountdownDisplayed = false
 
   constructor() {
     super(componentIds.timer, 'race')
@@ -43,7 +44,17 @@ export default class TimerWidget extends StaticComponent {
     })
     tm.addListener('BeginMap', () => {
       this.isOnRestart = false
+      this.roundCountdownDisplayed = false
       this.display()
+    })
+    tm.addListener('TrackMania.BeginRound', (info) => {
+      this.roundCountdownDisplayed = false
+      this.display()
+    })
+    tm.addListener('PlayerFinish', () => {
+      if (tm.getGameMode() === 'Teams') {
+        this.roundCountdownDisplayed = true
+      }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -112,7 +123,13 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (this.isDisplayed === false) { return }
-    if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
+    if (tm.getGameMode() === 'Rounds') {
+      if (this.roundCountdownDisplayed) {
+        tm.sendManialink(this.noButtonXml, login)
+      } else {
+        this.hide()
+      }
+    } else if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)

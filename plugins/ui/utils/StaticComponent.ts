@@ -35,8 +35,12 @@ export default abstract class StaticComponent {
     this.displayMode = displayMode
     this.gameModes = gameModes
     tm.addListener('EndMap', (info): void => {
-      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1 ||
-        !gameModes.includes(tm.getGameMode())) { return } // ignore the short restart
+      if (!gameModes.includes(tm.getGameMode())) {
+        this.hide()
+        this._isDisplayed = false
+        return
+      }
+      if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
       this._isDisplayed = this.dislayStates[displayMode].includes(tm.getState())
       this._isDisplayed ? this.display() : this.hide()
     }, true)
