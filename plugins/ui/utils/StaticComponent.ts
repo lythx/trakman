@@ -52,7 +52,8 @@ export default abstract class StaticComponent {
     tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
       if (this._isDisplayed === true) { this.displayToPlayer(info.login) }
     })
-    if (!this.dislayStates[displayMode].includes(tm.getState())) {
+    if (!this.dislayStates[displayMode].includes(tm.getState())
+      || !gameModes.includes(tm.getGameMode())) {
       this._isDisplayed = false
     }
     const pos = this.getRelativePosition()

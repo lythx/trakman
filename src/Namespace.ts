@@ -582,7 +582,7 @@ declare global {
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end the map in teams mode */
+      /** Teams mode related */ // TODO TEAMS TODO UPDATE DOCS
       teamPointsLimit: number
       /** Teams mode related */ // TODO TEAMS
       teamMaxPoints: number

@@ -49,8 +49,10 @@ export default class RoundScore extends StaticComponent {
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, this.roundRecords
-      .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints,
-         login: a.login, points: a.roundPoints, color: a.team }))
+      .map(a => ({
+        name: a.nickname, time: a.time, checkpoints: a.checkpoints,
+        login: a.login, points: a.roundPoints, color: a.team
+      }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
