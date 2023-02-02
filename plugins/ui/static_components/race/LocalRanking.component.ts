@@ -16,9 +16,6 @@ export default class LocalRanking extends StaticComponent {
     super(componentIds.locals, 'race')
     this.header = new StaticHeader('race')
     this.getRecordList()
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
     tm.addListener('LocalRecord', (): void => this.display())
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
@@ -46,9 +43,12 @@ export default class LocalRanking extends StaticComponent {
       height = config.teamsHeight
       entries = config.teamsEntries
     }
-    // TODO FIX MEMORY LEAK
+    this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
   }
 
   protected onPositionChange(): void {

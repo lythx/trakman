@@ -47,13 +47,14 @@ export default class TimerWidget extends StaticComponent {
       this.roundCountdownDisplayed = false
       this.display()
     })
-    tm.addListener('TrackMania.BeginRound', (info) => {
+    tm.addListener('TrackMania.BeginRound', () => {
       this.roundCountdownDisplayed = false
       this.display()
     })
     tm.addListener('PlayerFinish', () => {
       if (tm.getGameMode() === 'Teams') {
         this.roundCountdownDisplayed = true
+        this.display()
       }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
@@ -123,7 +124,7 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (this.isDisplayed === false) { return }
-    if (tm.getGameMode() === 'Rounds') {
+    if (tm.getGameMode() === 'Teams') {
       if (this.roundCountdownDisplayed) {
         tm.sendManialink(this.noButtonXml, login)
       } else {

@@ -63,6 +63,7 @@ export default class RecordList {
   /** Number of records which are always displayed regardless of player personal record */
   readonly topCount: number
   private readonly maxCount: number
+  private clickListener: (info: tm.ManialinkClickInfo) => void = () => undefined
   private readonly infos: { login: string, indexes: number[] }[] = []
   /** Marker icons */
   readonly markers: { readonly you: string; readonly faster: string; readonly slower: string; }
@@ -177,8 +178,15 @@ export default class RecordList {
     return ret
   }
 
+  /**
+   * Unloads the click listener from memory
+   */
+  destroy(): void {
+    tm.removeListener(this.clickListener)
+  }
+
   private setupListeners(): void {
-    tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
+    this.clickListener = (info: tm.ManialinkClickInfo) => {
       if (info.actionId === IDS.ClearAlerts) {
         const index: number = this.infos.findIndex(a => a.login === info.login)
         if (index !== -1) {
@@ -205,7 +213,8 @@ export default class RecordList {
           e(info)
         }
       }
-    })
+    }
+    tm.addListener('ManialinkClick', this.clickListener)
   }
 
   private getDisplayedRecords(login: string, records: UiRecord[]): { index: number, record: UiRecord }[] {
