@@ -285,10 +285,15 @@ export class MapService {
         await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
       }
       Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
-      res = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
       i++
+      const list = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+      if (list instanceof Error) { continue }
+      const fileName = list.find((a: any) => a.UId === map.id)?.FileName
+      if (fileName === undefined) { continue }
+      this.repo.setFileName(map.id, fileName)
+      res = await Client.call('ChooseNextChallenge', [{ string: fileName }])
     }
-    Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author}`)
+    Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author} `)
   }
 
   /**
