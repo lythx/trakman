@@ -94,11 +94,13 @@ export class PlayerService {
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
     ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> { // TODO ADD NEW PROPERTIES
-    const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
+    let { region, country, countryCode } = Utils.getRegionInfo(fullRegion) // TODO fix this somehow IDK
     if (countryCode === undefined) {
       // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
-      await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
-      return {} as any // Shut up IDE
+      // await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
+      Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
+      Logger.debug(`Login: "${login}", Region: "${fullRegion}".`)
+      countryCode = 'OTH'
     }
     const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
@@ -260,7 +262,7 @@ export class PlayerService {
     player.isPureSpectator = info.isPureSpectator
     player.isTemporarySpectator = info.isTemporarySpectator
     player.hasPlayerSlot = info.hasPlayerSlot
-    if(info.teamId === -1) { player.team = undefined} // TODO CHECK
+    if (info.teamId === -1) { player.team = undefined } // TODO CHECK
     else {
       player.team = info.teamId === 0 ? 'blue' : 'red'
     }
