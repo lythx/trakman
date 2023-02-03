@@ -20,6 +20,7 @@ export class RecordService {
   private static _queueRecords: { mapId: string, records: tm.Record[] }[] = []
   private static _historyRecords: { mapId: string, records: tm.Record[] }[] = []
   private static nextRoundPoints?: number
+  private static readonly _roundRecords: tm.FinishInfo[] = []
 
   /**
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
@@ -149,9 +150,17 @@ export class RecordService {
       time,
       roundPoints: this.getRoundPoints()
     }
+    if (GameService.gameMode === 'Cup' || GameService.gameMode === 'Laps'
+      || GameService.gameMode === 'Rounds' || GameService.gameMode === 'Teams') {
+      this._roundRecords.push(finishInfo)
+    }
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
+  }
+
+  static resetRoundRecords(): void {
+    this._roundRecords.length = 0
   }
 
   static resetRoundPoints(): void {
@@ -587,8 +596,22 @@ export class RecordService {
   /**
    * Number of live records
    */
-  static get liveRecordsCount(): number {
+  static get liveRecordsCount(): number { // TODO FIX PLURAL
     return this._liveRecords.length
+  }
+  // TODO DOCUMENTATA
+  /**
+   * Current round records
+   */
+  static get roundRecords(): Readonly<tm.FinishInfo>[] {
+    return [...this._roundRecords]
+  }
+
+  /**
+   * Number of current round records
+   */
+  static get roundRecordCount(): number {
+    return this._roundRecords.length
   }
 
 }

@@ -163,6 +163,9 @@ export class Listeners {
       event: 'TrackMania.BeginRound',
       callback: (): void => {
         // No params, rounds mode only
+        const roundRecords = RecordService.roundRecords
+        RecordService.resetRoundRecords()
+        Events.emit('BeginRound', roundRecords)
       }
     },
     {

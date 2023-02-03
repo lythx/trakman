@@ -154,7 +154,12 @@ namespace trakman {
      * Maximum amount of local records. 
      * All local records get fetched, but only ones below max amount count towards server rank.
      */
-    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount }
+    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
+
+    // TODO DOCUMENT
+    get roundRecords(): Readonly<tm.FinishInfo>[] { return RecordService.roundRecords },
+
+    get roundRecordCount(): number { return RecordService.roundRecordCount }
 
   }
 
@@ -536,7 +541,7 @@ namespace trakman {
   export const getState = (): tm.ServerState => {
     return GameService.state
   }
-  
+
   /**
    * Gets current server gamemode. ('Rounds', 'TimeAttack', 'Teams', 'Laps', 'Stunts', 'Cup')
    */

@@ -11,7 +11,6 @@ export default class RoundScore extends StaticComponent {
 
   private readonly header: StaticHeader
   private readonly recordList: RecordList
-  private roundRecords: tm.FinishInfo[] = []
 
   constructor() {
     super(componentIds.roundScore, 'race', ['Teams'])
@@ -21,16 +20,10 @@ export default class RoundScore extends StaticComponent {
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.addListener('PlayerFinish', (info): void => {
-      this.roundRecords.push(info)
-      this.display()
-    })
-    tm.addListener('TrackMania.BeginRound', () => {
-      this.roundRecords.length = 0
-      this.display()
-    })
+    tm.addListener('PlayerFinish', (): void => this.display())
+    tm.addListener('BeginRound', () => this.display())
     tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
+      if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
   }
 
@@ -48,7 +41,7 @@ export default class RoundScore extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, this.roundRecords
+          ${this.recordList.constructXml(login, tm.records.roundRecords
       .map(a => ({
         name: a.nickname, time: a.time, checkpoints: a.checkpoints,
         login: a.login, points: a.roundPoints, color: a.team
