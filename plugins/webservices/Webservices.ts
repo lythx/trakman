@@ -22,6 +22,14 @@ let nextAuthor: WebservicesInfo | undefined
 let isMapRestart: boolean = false
 const cachedAuthors: WebservicesInfo[] = []
 
+const emitCurrentAuthorFetch = () => {
+  for (const e of currentAuthorListeners) { e(curAuthor) }
+}
+
+const emitNextAuthorFetch = () => {
+  for (const e of nextAuthorListeners) { e(nextAuthor) }
+}
+
 const fetchWebservices = async (login: string): Promise<{
   id: number
   login: string
@@ -96,10 +104,10 @@ tm.addListener('Startup', async (): Promise<void> => {
   }
   const curRes: WebservicesInfo | Error = await fetchPlayer(tm.maps.current.author)
   if (!(curRes instanceof Error)) { curAuthor = curRes }
-  for (const e of currentAuthorListeners) { e(curAuthor) }
+  emitCurrentAuthorFetch()
   const nextRes: WebservicesInfo | Error = await fetchPlayer(tm.jukebox.queue[0].id)
   if (!(nextRes instanceof Error)) { nextAuthor = nextRes }
-  for (const e of nextAuthorListeners) { e(nextAuthor) }
+  emitNextAuthorFetch()
 })
 
 tm.addListener('EndMap', (info): void => { isMapRestart = info.isRestart })
@@ -108,18 +116,20 @@ tm.addListener('BeginMap', (): void => { isMapRestart = false })
 tm.addListener('JukeboxChanged', async (): Promise<void> => {
   const curLogin: string = tm.maps.current.author
   if (curAuthor?.login !== curLogin) {
+    curAuthor = undefined
+    emitCurrentAuthorFetch()
     const res: WebservicesInfo | Error = await fetchPlayer(curLogin)
-    if (res instanceof Error) { curAuthor = undefined }
-    else { curAuthor = res }
+    if (!(res instanceof Error)) { curAuthor = res }
   }
-  for (const e of currentAuthorListeners) { e(curAuthor) }
+  emitCurrentAuthorFetch()
   const nextLogin: string = tm.jukebox.queue[0].author
   if (nextAuthor?.login !== nextLogin) {
+    nextAuthor = undefined
+    emitNextAuthorFetch()
     const res: WebservicesInfo | Error = await fetchPlayer(nextLogin)
-    if (res instanceof Error) { nextAuthor = undefined }
-    else { nextAuthor = res }
+    if (!(res instanceof Error)) { nextAuthor = res }
   }
-  for (const e of nextAuthorListeners) { e(nextAuthor) }
+  emitNextAuthorFetch()
 })
 
 /**
