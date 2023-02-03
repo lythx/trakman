@@ -159,7 +159,11 @@ namespace trakman {
     // TODO DOCUMENT
     get roundRecords(): Readonly<tm.FinishInfo>[] { return RecordService.roundRecords },
 
-    get roundRecordCount(): number { return RecordService.roundRecordCount }
+    get roundRecordCount(): number { return RecordService.roundRecordCount },
+
+    get teamScores() {
+      return RecordService.teamScores
+    }
 
   }
 

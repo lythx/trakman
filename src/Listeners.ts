@@ -164,15 +164,16 @@ export class Listeners {
       callback: (): void => {
         // No params, rounds mode only
         const roundRecords = RecordService.roundRecords
-        RecordService.resetRoundRecords()
+        RecordService.handleBeginRound()
         Events.emit('BeginRound', roundRecords)
       }
     },
     {
       event: 'TrackMania.EndRound',
-      callback: (): void => {
+      callback: async (): Promise<void> => {
         // No params, rounds mode only
-        RecordService.resetRoundPoints()
+        await RecordService.handleEndRound()
+        Events.emit('EndRound', RecordService.roundRecords)
       }
     },
     {
@@ -230,6 +231,7 @@ export class Listeners {
           serverSideRankings: rankings,
           isRestart
         }
+        RecordService.handleEndMap()
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
