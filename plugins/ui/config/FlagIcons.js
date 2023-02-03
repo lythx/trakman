@@ -85,7 +85,7 @@ export default {
     "TUN": "https://cdn.discordapp.com/attachments/502122268936110100/994282591454769182/TUN.png",
     "TUR": "https://cdn.discordapp.com/attachments/502122268936110100/994282591693848595/TUR.png",
     "UAE": "https://cdn.discordapp.com/attachments/502122268936110100/994282591962288258/UAE.png",
-    "UKR": "https://cdn.discordapp.com/attachments/502122268936110100/994282241901469696/UKR.png",
+    "UKR": "https://cdn.discordapp.com/attachments/502122268936110100/1071116389265440909/UKR.png",
     "URU": "https://cdn.discordapp.com/attachments/502122268936110100/994278734343438336/URU.png",
     "USA": "https://cdn.discordapp.com/attachments/502122268936110100/994278734557356132/USA.png",
     "UZB": "https://cdn.discordapp.com/attachments/502122268936110100/994278734796443718/UZB.png",
