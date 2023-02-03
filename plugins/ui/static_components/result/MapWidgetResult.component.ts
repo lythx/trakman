@@ -22,7 +22,7 @@ export default class MapWidgetResult extends StaticComponent {
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled === true) {
-      webservices.onCurrentAuthorChange((): void => {
+      webservices.onNextAuthorChange((): void => {
         void this.display()
       })
     }
