@@ -7,6 +7,7 @@ import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Client } from '../client/Client.js'
 import config from '../../config/Config.js'
+import { RoundsService } from './RoundsService.js'
 
 export class RecordService {
 
@@ -19,9 +20,6 @@ export class RecordService {
   private static _playerRanks: { login: string, mapId: string, rank: number }[] = []
   private static _queueRecords: { mapId: string, records: tm.Record[] }[] = []
   private static _historyRecords: { mapId: string, records: tm.Record[] }[] = []
-  private static nextRoundPoints?: number
-  private static readonly _roundRecords: tm.FinishInfo[] = []
-  private static _teamScores: { blue: number; red: number } = { blue: 0, red: 0 }
 
   /**
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
@@ -31,7 +29,6 @@ export class RecordService {
     this._initialLocals.push(...this._localRecords)
     await this.updateQueue()
     await this.fetchAndStoreRanks()
-    await this.handleEndRound() // Update team score
     // Recreate list when Match Settings get changed
     Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
       this._playerRanks.length = 0
@@ -150,46 +147,11 @@ export class RecordService {
       checkpoints: [...checkpoints],
       map,
       time,
-      roundPoints: this.getRoundPoints()
-    }
-    if (GameService.gameMode === 'Cup' || GameService.gameMode === 'Laps'
-      || GameService.gameMode === 'Rounds' || GameService.gameMode === 'Teams') {
-      this._roundRecords.push(finishInfo)
+      roundPoints: RoundsService.getRoundPoints()
     }
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
-  }
-
-  private static getRoundPoints(): number | undefined {
-    if (GameService.gameMode !== 'Teams') { return }
-    if (this.nextRoundPoints === undefined) {
-      this.nextRoundPoints = PlayerService.players.filter(a => !a.isPureSpectator).length
-    }
-    return this.nextRoundPoints--
-  }
-
-  static handleEndMap(): void {
-    this.nextRoundPoints = undefined
-    this._teamScores = { blue: 0, red: 0 }
-  }
-
-  static handleBeginRound(): void {
-    this._roundRecords.length = 0
-  }
-
-  static async handleEndRound(): Promise<void> {
-    this.nextRoundPoints = undefined
-    if (GameService.gameMode === 'Teams') {
-      const res: tm.TrackmaniaRankingInfo[] | Error =
-        await tm.client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
-      if (res instanceof Error) {
-        tm.log.error(`Call to get team score failed`, res.message)
-        return
-      }
-      this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
-      this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
-    }
   }
 
   /**
@@ -615,27 +577,6 @@ export class RecordService {
    */
   static get liveRecordsCount(): number { // TODO FIX PLURAL
     return this._liveRecords.length
-  }
-  // TODO DOCUMENTATA
-  /**
-   * Current round records
-   */
-  static get roundRecords(): Readonly<tm.FinishInfo>[] {
-    return [...this._roundRecords]
-  }
-
-  /**
-   * Number of current round records
-   */
-  static get roundRecordCount(): number {
-    return this._roundRecords.length
-  }
-
-  /**
-   * Get current team scores (teams mode only)
-   */
-  static get teamScores(): typeof this._teamScores {
-    return { ...this._teamScores }
   }
 
 }

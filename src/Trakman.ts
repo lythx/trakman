@@ -16,6 +16,7 @@ import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
+import { RoundsService } from './services/RoundsService.js'
 
 const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
@@ -157,12 +158,12 @@ namespace trakman {
     get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
 
     // TODO DOCUMENT
-    get roundRecords(): Readonly<tm.FinishInfo>[] { return RecordService.roundRecords },
+    get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
 
-    get roundRecordCount(): number { return RecordService.roundRecordCount },
+    get roundRecordCount(): number { return RoundsService.roundRecordCount },
 
     get teamScores() {
-      return RecordService.teamScores
+      return RoundsService.teamScores
     }
 
   }

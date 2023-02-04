@@ -6,7 +6,7 @@ import config from '../../config/Config.js'
 export class GameService {
 
   private static _game: tm.Game
-  private static readonly proxyMethods: string[] = [
+  private static readonly proxyMethods = [
     'SetGameMode',
     'SetChatTime',
     'SetFinishTimeout',
@@ -28,7 +28,7 @@ export class GameService {
     'SetCupRoundsPerChallenge',
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
-  ]
+  ] as const
   private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
   private static _dynamicTimerEnabled = false
@@ -100,6 +100,7 @@ export class GameService {
       Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
       return
     }
+    if (!this.isGameInfoChanged(res)) { return }
     this._game = {
       gameMode: res.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       resultTime: res.ChatTime,
@@ -125,9 +126,19 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
-    if (this._game.timeAttackLimit !== 0) {
+    if (this._game.timeAttackLimit !== 0) { // TODO CHECK IF CAUSES BUGS DUE TO RETURN 
       this.timeAttackLimit = this._game.timeAttackLimit
     }
+    Events.emit('GameConfigChanged', this._game)
+  }
+
+  private static isGameInfoChanged(obj: any): boolean {
+    for (const key in this._game) {
+      if (obj[key] !== this._game[key as keyof typeof this._game]) {
+        return false
+      }
+    }
+    return true
   }
 
   static set state(state: tm.ServerState) {

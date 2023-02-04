@@ -6,7 +6,7 @@ export abstract class Client {
 
   private static readonly socket: ClientSocket = new ClientSocket()
   private static requestId: number = 0x80000000
-  private static readonly proxies: { methods: string[], callback: ((method: string, params: tm.CallParams[], response: any) => void) }[] = []
+  private static readonly proxies: { methods: readonly string[], callback: ((method: string, params: tm.CallParams[], response: any) => void) }[] = []
 
   static async connect(host = 'localhost', port = 5000): Promise<void> {
     if (port < 0 || port >= 65536 || isNaN(port)) {
@@ -98,7 +98,7 @@ export abstract class Client {
  * @param methods Array of dedicated server methods
  * @param callback Callback to execute
  */
-  static addProxy(methods: string[], callback: ((method: string, params: tm.CallParams[], response: any) => void)): void {
+  static addProxy(methods: readonly string[], callback: ((method: string, params: tm.CallParams[], response: any) => void)): void {
     this.proxies.push({ methods, callback })
   }
 

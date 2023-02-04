@@ -751,6 +751,7 @@ declare global {
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "BeginRound": Readonly<tm.FinishInfo>[]
       "EndRound": Readonly<tm.FinishInfo>[]
+      "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]

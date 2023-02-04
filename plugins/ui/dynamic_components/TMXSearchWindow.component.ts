@@ -122,7 +122,7 @@ export default class TMXSearchWindow extends PopupWindow<{
       const gridIndex = (i * config.columns) + j
       const index = startIndex + gridIndex
       let name = tm.utils.safeString(tm.utils.strip(maps[index].name, false))
-      let author = tm.utils.safeString(maps[index].author)
+      let author = tm.utils.safeString(tm.utils.strip(maps[index].author))
       if (this.isMultiByte(name)) {
         name = ''
       }

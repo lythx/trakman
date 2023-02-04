@@ -11,6 +11,7 @@ import { Events } from './Events.js'
 import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
+import { RoundsService } from './services/RoundsService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
 import './Trakman.js'
@@ -61,6 +62,9 @@ Logger.trace('Chat service instantiated')
 Logger.trace('Loading server config...')
 await ServerConfig.initialize()
 Logger.trace('Server config loaded')
+Logger.trace('Fetching rounds mode settings...')
+await RoundsService.initialize()
+Logger.trace('Round settings fetched')
 Logger.trace('Enabling callbacks...')
 const cb: true | Error = await Listeners.initialize()
 if (cb instanceof Error) {

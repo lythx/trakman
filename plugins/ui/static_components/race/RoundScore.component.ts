@@ -13,7 +13,7 @@ export default class RoundScore extends StaticComponent {
   private readonly recordList: RecordList
 
   constructor() {
-    super(componentIds.roundScore, 'race', ['Teams'])
+    super(componentIds.roundScore, 'race', ['Teams', 'Rounds'])
     this.header = new StaticHeader('race')
     this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, 250, config.displayNoRecordEntry) // TODO

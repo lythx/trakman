@@ -11,6 +11,7 @@ import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import config from '../config/Config.js'
 import { Utils } from './Utils.js'
+import { RoundsService } from './services/RoundsService.js'
 
 let isRestart: boolean = false
 
@@ -107,6 +108,7 @@ export class Listeners {
               // Register player live record
               Events.emit('LiveRecord', obj.liveRecord)
             }
+            RoundsService.registerRoundRecord(obj.finishInfo)
             // Register player finish
             Events.emit('PlayerFinish', obj.finishInfo)
           }
@@ -163,8 +165,8 @@ export class Listeners {
       event: 'TrackMania.BeginRound',
       callback: (): void => {
         // No params, rounds mode only
-        const roundRecords = RecordService.roundRecords
-        RecordService.handleBeginRound()
+        const roundRecords = RoundsService.roundRecords
+        RoundsService.handleBeginRound()
         Events.emit('BeginRound', roundRecords)
       }
     },
@@ -172,8 +174,8 @@ export class Listeners {
       event: 'TrackMania.EndRound',
       callback: async (): Promise<void> => {
         // No params, rounds mode only
-        await RecordService.handleEndRound()
-        Events.emit('EndRound', RecordService.roundRecords)
+        await RoundsService.handleEndRound()
+        Events.emit('EndRound', RoundsService.roundRecords)
       }
     },
     {
@@ -231,7 +233,7 @@ export class Listeners {
           serverSideRankings: rankings,
           isRestart
         }
-        RecordService.handleEndMap()
+        RoundsService.handleEndMap()
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
