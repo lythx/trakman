@@ -239,6 +239,7 @@ export class MapService {
    */
   static async remove(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
+    await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }]) // I HAVE NO CLUE HOW IT WORKS WITH THIS
     if (map === undefined) { return false }
     const remove: any | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
     if (remove instanceof Error) { return remove }
