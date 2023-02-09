@@ -9,7 +9,7 @@ import config from './TimerWidget.config.js'
 export default class TimerWidget extends StaticComponent {
 
   private readonly header: StaticHeader
-  private flexiTimeInterval: NodeJS.Timer | undefined
+  private dynamicTimerInterval: NodeJS.Timer | undefined
   private noButtonXml: string = ''
   private xmlWithButtons: string = ''
   private readonly pauseButtonId = this.id + 1
@@ -30,7 +30,7 @@ export default class TimerWidget extends StaticComponent {
       if (state === 'enabled') {
         this.startDynamicTimerInterval()
       } else {
-        clearInterval(this.flexiTimeInterval)
+        clearInterval(this.dynamicTimerInterval)
       }
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
@@ -107,8 +107,8 @@ export default class TimerWidget extends StaticComponent {
   }
 
   private startDynamicTimerInterval() {
-    clearInterval(this.flexiTimeInterval)
-    this.flexiTimeInterval = setInterval(() => {
+    clearInterval(this.dynamicTimerInterval)
+    this.dynamicTimerInterval = setInterval(() => {
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
       this.display()

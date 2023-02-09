@@ -2,7 +2,7 @@ import config from '../config/ServerCommands.config.js'
 
 const pauseTimer = (info: tm.Player) => {
   if (tm.getState() !== 'race') {
-    tm.sendMessage(config.timelimit.notRaceMode)
+    tm.sendMessage(config.timelimit.notRaceMode, info.login)
     return
   }
   if (!tm.timer.isDynamic) {
@@ -18,7 +18,7 @@ const pauseTimer = (info: tm.Player) => {
 
 const resumeTimer = (info: tm.Player) => {
   if (tm.getState() !== 'race') {
-    tm.sendMessage(config.timelimit.notRaceMode)
+    tm.sendMessage(config.timelimit.notRaceMode, info.login)
     return
   }
   if (!tm.timer.isDynamic) {
@@ -39,7 +39,7 @@ const commands: tm.Command[] = [
     params: [{ name: 'action' }],
     callback(info, actionStr: string) {
       if (tm.getState() !== 'race') {
-        tm.sendMessage(config.timelimit.notRaceMode)
+        tm.sendMessage(config.timelimit.notRaceMode, info.login)
         return
       }
       if (!tm.timer.isDynamic) {
@@ -67,7 +67,7 @@ const commands: tm.Command[] = [
         time = tm.utils.parseTimeString(actionStr)
       }
       if (time instanceof Error) {
-        tm.sendMessage(config.timelimit.invalidParam)
+        tm.sendMessage(config.timelimit.invalidParam, info.login)
         return
       }
       let wasSet = true
@@ -85,7 +85,7 @@ const commands: tm.Command[] = [
           time: tm.utils.msToTime(tm.timer.remainingRaceTime)
         }))
       } else {
-        tm.sendMessage(config.timelimit.tooLow)
+        tm.sendMessage(config.timelimit.tooLow, info.login)
       }
     },
     privilege: config.timelimit.privilege
