@@ -1,12 +1,12 @@
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 
-let mapToErase: string | undefined
+let eraseObject: { id: string, admin: tm.Player } | undefined
 tm.addListener('BeginMap', (info): void => {
   if (info.isRestart === true) { return }
-  if (mapToErase !== undefined) {
-    void tm.maps.remove(mapToErase)
-    mapToErase = undefined
+  if (eraseObject !== undefined) {
+    void tm.maps.remove(eraseObject.id, eraseObject.admin)
+    eraseObject = undefined
   }
 })
 
@@ -105,11 +105,11 @@ const commands: tm.Command[] = [
     aliases: config.remove.aliases,
     help: config.remove.help,
     callback: (info): void => {
-      if (mapToErase !== undefined) {
+      if (eraseObject !== undefined) {
         tm.sendMessage(config.remove.error, info.login)
         return
       }
-      mapToErase = tm.maps.current.id
+      eraseObject = { id: tm.maps.current.id, admin: info }
       tm.sendMessage(tm.utils.strVar(config.remove.text, {
         title: info.title,
         nickname: tm.utils.strip(info.nickname, true)
