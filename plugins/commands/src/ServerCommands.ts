@@ -37,7 +37,7 @@ const commands: tm.Command[] = [
     aliases: config.timelimit.aliases,
     help: config.timelimit.help,
     params: [{ name: 'action' }],
-    callback(info, actionStr: string) {
+    callback: (info, actionStr: string): void => {
       if (tm.getState() !== 'race') {
         tm.sendMessage(config.timelimit.notRaceMode, info.login)
         return
@@ -93,19 +93,19 @@ const commands: tm.Command[] = [
   {
     aliases: config.pauseTimer.aliases,
     help: config.pauseTimer.help,
-    callback: (info) => pauseTimer(info),
+    callback: (info): void => pauseTimer(info),
     privilege: config.pauseTimer.privilege
   },
   {
     aliases: config.resumeTimer.aliases,
     help: config.resumeTimer.help,
-    callback: (info) => resumeTimer(info),
+    callback: (info): void => resumeTimer(info),
     privilege: config.resumeTimer.privilege
   },
   {
     aliases: config.enabledynamictimer.aliases,
     help: config.enabledynamictimer.help,
-    callback(info) {
+    callback: (info): void => {
       if (tm.timer.isDynamicOnNextRound) {
         tm.sendMessage(config.enabledynamictimer.alreadyEnabled, info.login)
         return
@@ -121,7 +121,7 @@ const commands: tm.Command[] = [
   {
     aliases: config.disabledynamictimer.aliases,
     help: config.disabledynamictimer.help,
-    callback(info) {
+    callback: (info): void => {
       if (!tm.timer.isDynamicOnNextRound) {
         tm.sendMessage(config.disabledynamictimer.alreadyDisabled, info.login)
         return
