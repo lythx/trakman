@@ -180,7 +180,8 @@ export class PlayerService {
       if (obj === undefined) { continue }
       // if (p.title !== undefined) { obj.title = p.title } // I don't think this needs to be here?
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
-      if (p.nickname !== undefined) {
+      if (p.nickname !== undefined && p.nickname !== obj.nickname) {
+        Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)
         await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
       }
       if (countryCode !== undefined) {
