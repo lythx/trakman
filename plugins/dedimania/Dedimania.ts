@@ -97,7 +97,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
         struct: {
           SrvName: { string: cfg.name },
           Comment: { string: cfg.comment },
-          Private: { boolean: cfg.password === '' },
+          Private: { boolean: cfg.password !== '' },
           SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
           SrvPort: { string: '5000' },
           XmlRpcPort: { string: '5000' },
@@ -210,7 +210,7 @@ const updateServerPlayers = (): void => {
           struct: {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
-            Private: { boolean: cfg.password === '' },
+            Private: { boolean: cfg.password !== '' },
             SrvIP: { string: '127.0.0.1' },
             SrvPort: { string: '5000' },
             XmlRpcPort: { string: '5000' },
@@ -226,7 +226,7 @@ const updateServerPlayers = (): void => {
       ]
     )
     if (status instanceof Error) { tm.log.error('Failed to update dedimania status', status.message) }
-  }, 240000)
+  }, config.updateInterval * 1000)
 }
 
 /**

@@ -174,9 +174,8 @@ export class PlayerService {
    * @param players Objects containing player login and infos to change
    */
   static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
-    console.log(players)
     for (const p of players) {
-      const obj = this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
+      const obj: tm.OfflinePlayer | undefined = this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
       if (obj === undefined) { continue }
       // if (p.title !== undefined) { obj.title = p.title } // I don't think this needs to be here?
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
@@ -185,7 +184,7 @@ export class PlayerService {
         await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
       }
       if (countryCode !== undefined) {
-        const r = countryCode === undefined ? obj.region : region // Set only if region is valid
+        const r: string = countryCode === undefined ? obj.region : region // Set only if region is valid
         await this.repo.updateRegion(p.login, r)
       }
     }
