@@ -91,7 +91,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { string: name },
       { string: environment },
       { string: author },
-      { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
+      { string: 'TMF' },
       { int: tm.config.game.gameMode },
       {
         struct: {
