@@ -100,8 +100,7 @@ export class GameService {
       Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
       return
     }
-    if (!this.isGameInfoChanged(res)) { return }
-    this._game = {
+    const obj = {
       gameMode: res.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       resultTime: res.ChatTime,
       mapIndex: res.NbChallenge,
@@ -126,6 +125,8 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
+    if (!this.isGameInfoChanged(obj)) { return }
+    this._game = obj
     if (this._game.timeAttackLimit !== 0) { // TODO CHECK IF CAUSES BUGS DUE TO RETURN 
       this.timeAttackLimit = this._game.timeAttackLimit
     }

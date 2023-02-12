@@ -48,16 +48,16 @@ export default {
     { name: "PreviousAndBest", height: 4.95 },
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
-    { name: "RoundScore", height: 23.48 },
-    { name: "LocalRanking", height: 15.07 },
-    { name: "TeamScore", height: 5.5 },
+    { name: "RoundScore", height: 17.22 }, // row height 2.15
+    { name: "", height: 17.22 },
     { name: "DonationPanel", height: 4.49 }
   ],
   roundsLeftSideOrder: [
     { name: "ButtonsWidget", height: 14.5 },
     { name: "RankWidget", height: 3.8 },
     { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 34.12 },
+    { name: "DediRanking", height: 17.22 },
+    { name: "LocalRanking", height: 17.22 },
     { name: "AdminPanel", height: 5 }
   ]
 }

@@ -7,13 +7,13 @@ import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../U
 
 import config from './LocalRanking.config.js'
 
-export default class LocalRanking extends StaticComponent {
+export default class RoundPointsRanking extends StaticComponent {
 
   private readonly header: StaticHeader
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.locals, 'race')
+    super(componentIds.roundPointsRanking, 'race', ['Rounds'])
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LocalRecord', (): void => this.display())

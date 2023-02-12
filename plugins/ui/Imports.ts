@@ -37,6 +37,7 @@ import WinnersRanking from './static_components/result/WinnersRanking.component.
 import MostRecordsRanking from './static_components/result/MostRecordsRanking.component.js'
 import RoundScore from './static_components/race/RoundScore.component.js'
 import TeamScore from './static_components/race/TeamScore.component.js'
+import RoundPointsRanking from './static_components/race/RoundPointsRanking.component.js'
 
 /*
 ------------------
@@ -109,5 +110,6 @@ tm.addListener(`Startup`, (): void => {
   new ServerInfoWindow()
   new RoundScore()
   new TeamScore()
+  new RoundPointsRanking()
 }, true)
 

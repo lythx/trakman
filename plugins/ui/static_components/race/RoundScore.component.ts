@@ -10,16 +10,12 @@ import config from './RoundScore.config.js'
 export default class RoundScore extends StaticComponent {
 
   private readonly header: StaticHeader
-  private readonly recordList: RecordList
+  private recordList!: RecordList
 
   constructor() {
     super(componentIds.roundScore, 'race', ['Teams', 'Rounds'])
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, 250, config.displayNoRecordEntry) // TODO
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
+    this.getRecordList()
     tm.addListener('PlayerFinish', (): void => this.display())
     tm.addListener('BeginRound', () => this.display())
     tm.addListener('PlayerDataUpdated', (info): void => {
@@ -52,6 +48,29 @@ export default class RoundScore extends StaticComponent {
     </manialink>`,
       login
     )
+  }
+
+  protected onPositionChange(): void {
+    this.getRecordList()
+    this.display()
+  }
+
+  private getRecordList(): void {
+    let height = config.teamsHeight
+    let entries = config.teamsEntries
+    if (tm.getGameMode() === 'Teams') {
+      height = config.teamsHeight
+      entries = config.teamsEntries
+    } else if (tm.getGameMode() === 'Rounds') {
+      height = config.roundsHeight
+      entries = config.roundsEntries
+    }
+    this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
+      entries, this.side, config.topCount, 250, config.displayNoRecordEntry)
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
   }
 
 }

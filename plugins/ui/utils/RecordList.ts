@@ -72,6 +72,7 @@ export default class RecordList {
   /** Download icon url */
   readonly downloadIcon: string
   private readonly clickListeners: ((info: tm.ManialinkClickInfo) => void)[] = []
+  private readonly parseTime: boolean = true
   /** Time string colours */
   readonly timeColours: Readonly<{
     slower: string,
@@ -99,8 +100,9 @@ export default class RecordList {
    * @param noRecordEntry If true, a placeholder entry gets displayed at the end of the list if the player has no personal record
    * @param options Optional parameters
    */
-  constructor(preset: 'result' | 'race', parentId: number, width: number, height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
-    options?: { getColoursFromPb?: true }) {
+  constructor(preset: 'result' | 'race', parentId: number, width: number,
+    height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
+    options?: { getColoursFromPb?: true, dontParseTime?: boolean }) {
     this.config = preset === 'result' ? resultConfig : raceConfig
     const INFO = this.config.info
     this.columnGap = this.config.columnGap
@@ -131,6 +133,9 @@ export default class RecordList {
     this.infoBackground = INFO.bgColor
     this.background = this.config.background
     this.headerBackground = this.config.headerBackground
+    if (options?.dontParseTime === true) {
+      this.parseTime = false
+    }
   }
 
   /**
@@ -496,7 +501,7 @@ export default class RecordList {
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.columnGap
     const colour: string = timeColour === undefined ? 'FFFF' : (this.timeColours)[timeColour]
-    const t: string = (`${time === undefined ? '' : tm.utils.getTimeString(time)}`).toString()
+    const t: string = (`${time === undefined ? '' : (this.parseTime ? tm.utils.getTimeString(time) : time)}`).toString()
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>
     ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}

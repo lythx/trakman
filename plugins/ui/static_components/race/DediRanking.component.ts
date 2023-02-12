@@ -11,17 +11,13 @@ import config from './DediRanking.config.js'
 export default class DediRanking extends StaticComponent {
 
   private readonly header: StaticHeader
-  private readonly recordList: RecordList
+  private recordList!: RecordList
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
     super(componentIds.dedis, 'race')
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
+    this.getRecordList()
     dedimania.onFetch((): void => this.display())
     dedimania.onRecord((): void => this.display())
     dedimania.onNicknameUpdate((): void => this.display())
@@ -53,6 +49,31 @@ export default class DediRanking extends StaticComponent {
     </manialink>`,
       login
     )
+  }
+
+  protected onPositionChange(): void {
+    console.log('pch')
+    this.getRecordList()
+    this.display()
+  }
+
+  private getRecordList(): void {
+    let height = config.height
+    let entries = config.entries
+    if (tm.getGameMode() === 'Teams') {
+      height = config.teamsHeight
+      entries = config.teamsEntries
+    } else if (tm.getGameMode() === 'Rounds') {
+      height = config.roundsHeight
+      entries = config.roundsEntries
+    }
+    console.log(tm.getGameMode(), 'gm')
+    this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
+      entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
   }
 
 }

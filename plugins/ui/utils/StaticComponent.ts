@@ -91,8 +91,19 @@ export default abstract class StaticComponent {
       right = cfg.rightSideOrder
     } else {
       cfg = RaceUi
-      left = tm.config.game.gameMode === 2 ? cfg.teamsLeftSideOrder : cfg.leftSideOrder
-      right = tm.config.game.gameMode === 2 ? cfg.teamsRightSideOrder : cfg.rightSideOrder
+      switch (tm.getGameMode()) {
+        case "Rounds":
+          left = cfg.roundsLeftSideOrder
+          right = cfg.roundsRightSideOrder
+          break
+        case "Teams":
+          left = cfg.teamsLeftSideOrder
+          right = cfg.teamsRightSideOrder
+          break
+        default:
+          left = cfg.leftSideOrder
+          right = cfg.rightSideOrder
+      }
     }
     let side: boolean = false
     if (right.some(a => a.name === widgetName)) { side = true }
