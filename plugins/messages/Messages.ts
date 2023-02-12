@@ -78,13 +78,20 @@ const events: tm.Listener[] = [
   },
   {
     event: 'EndMap',
-    callback: (info: tm.EndMapInfo): void => {
-      if (info.winnerLogin === undefined || info.winnerWins === undefined) {
-        return
+    callback: async (info: tm.EndMapInfo): Promise<void> => {
+      if (info.winnerLogin !== undefined && info.winnerWins !== undefined) {
+        tm.sendMessage(tm.utils.strVar(c.win, {
+          wins: tm.utils.getPositionString(info.winnerWins)
+        }), info.winnerLogin)
       }
-      tm.sendMessage(tm.utils.strVar(c.win, {
-        wins: tm.utils.getPositionString(info.winnerWins)
-      }), info.winnerLogin)
+      if (tm.jukebox.juked.length !== 0 && tm.jukebox.juked[0].callerLogin !== undefined) {
+        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin) ?? undefined
+        if (player === undefined) { return } // Not even possible
+        tm.sendMessage(tm.utils.strVar(c.nextJuke, {
+          map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
+          nickname: tm.utils.strip(player?.nickname, true)
+        }))
+      }
     }
   },
   {

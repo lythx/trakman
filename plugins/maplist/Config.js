@@ -2,7 +2,7 @@ const p = tm.utils.palette
 
 export default {
   cacheSize: 10, // Max number of map arrays stored in cache
-  added: `${p.highlight}#{nickname} ${p.vote}added ${p.highlight}#{map}${p.vote} to the queue.`,
+  added: `${p.highlight}#{nickname} ${p.vote}has added ${p.highlight}#{map}${p.vote} to the queue.`,
   noPermission: `${p.error}You can't add more than one map to the queue.`,
   noFinishError: `${p.error}No unfinished maps available.`,
   noAuthorError: `${p.error}No maps with no author time available.`,

@@ -7,9 +7,11 @@ const karmaSort: tm.Map[] = []
 const worstKarmaSort: tm.Map[] = []
 const atSort: tm.Map[] = []
 const worstAtSort: tm.Map[] = []
+const newestSort: tm.Map[] = []
+const oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
 const cache: {
-  type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor',
+  type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
   query: string, list: tm.Map[]
 }[] = []
 const updateListeners: ((action: 'add' | 'remove', addedOrRemovedMap: Readonly<tm.Map>) => void)[] = []
@@ -28,6 +30,8 @@ tm.addListener('Startup', (): void => {
   worstKarmaSort.push(...[...karmaSort].reverse())
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
   worstAtSort.push(...[...atSort].reverse())
+  oldestSort.push(...[...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime()))
+  newestSort.push(...[...oldestSort].reverse())
 })
 
 tm.addListener('JukeboxChanged', (list): void => {
@@ -37,8 +41,10 @@ tm.addListener('JukeboxChanged', (list): void => {
 })
 
 tm.addListener('MapAdded', (map): void => {
-  authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
-  nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name)), 0, map)
+  authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author)
+    && map.name.localeCompare(a.name)), 0, map)
+  nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author)
+    && map.name.localeCompare(a.name)), 0, map)
   const ratio: number = map.voteRatio
   karmaSort.splice(karmaSort.findIndex(a => map.author.localeCompare(a.author)
     && map.name.localeCompare(a.name)
@@ -46,8 +52,18 @@ tm.addListener('MapAdded', (map): void => {
   worstKarmaSort.splice(worstKarmaSort.findIndex(a => !map.author.localeCompare(a.author)
     && !map.name.localeCompare(a.name)
     && ratio <= map.voteRatio), 0, map)
-  atSort.splice(atSort.findIndex(a => map.author.localeCompare(a.author) && map.name.localeCompare(a.name) && map.authorTime < a.authorTime), 0, map)
-  worstAtSort.splice(worstAtSort.findIndex(a => !map.author.localeCompare(a.author) && !map.name.localeCompare(a.name) && map.authorTime >= a.authorTime), 0, map)
+  atSort.splice(atSort.findIndex(a => map.author.localeCompare(a.author)
+    && map.name.localeCompare(a.name)
+    && map.authorTime < a.authorTime), 0, map)
+  worstAtSort.splice(worstAtSort.findIndex(a => !map.author.localeCompare(a.author)
+    && !map.name.localeCompare(a.name)
+    && map.authorTime >= a.authorTime), 0, map)
+  newestSort.splice(newestSort.findIndex(a => !map.author.localeCompare(a.author)
+    && map.name.localeCompare(a.name)
+    && map.addDate.getTime() < a.addDate.getTime()), 0, map)
+  oldestSort.splice(oldestSort.findIndex(a => !map.author.localeCompare(a.author)
+    && !map.name.localeCompare(a.name)
+    && map.addDate.getTime() >= a.addDate.getTime()), 0, map)
   cache.length = 0
   for (const e of updateListeners) { e('add', map) }
 })
@@ -59,6 +75,8 @@ tm.addListener('MapRemoved', (map): void => {
   worstKarmaSort.splice(worstKarmaSort.findIndex(a => a.id === map.id), 1)
   atSort.splice(atSort.findIndex(a => a.id === map.id), 1)
   worstAtSort.splice(worstAtSort.findIndex(a => a.id === map.id), 1)
+  newestSort.splice(newestSort.findIndex(a => a.id === map.id), 1)
+  oldestSort.splice(oldestSort.findIndex(a => a.id === map.id), 1)
   cache.length = 0
   for (const e of updateListeners) { e('remove', map) }
 })
@@ -91,7 +109,7 @@ export const maplist = {
    * @param sort Sorting criteria, author by default
    * @returns Array of map objects
    */
-  get: (sort?: 'jukebox' | 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'author'): readonly Readonly<tm.Map>[] => {
+  get: (sort?: 'jukebox' | 'name' | 'karma' | 'long' | 'short' | 'worstkarma' | 'author' | 'oldest' | 'newest'): readonly Readonly<tm.Map>[] => {
     switch (sort) {
       case 'jukebox':
         return jukebox
@@ -105,6 +123,10 @@ export const maplist = {
         return atSort
       case 'long':
         return worstAtSort
+      case 'oldest':
+        return oldestSort
+      case 'newest':
+        return newestSort
       case 'author': default:
         return authorSort
     }

@@ -199,14 +199,14 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to set in miliseconds
+   * @param milliseconds Amount of time to set in milliseconds
    * @returns Boolean indicating whether the time got set
    */
-  static setTime(miliseconds: number): boolean {
+  static setTime(milliseconds: number): boolean {
     if (!this.dynamicTimerEnabled ||
-      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
+      milliseconds < config.dynamicTimerSubtractionLimit
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime = miliseconds
+    this.remainingDynamicTime = milliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
@@ -215,13 +215,13 @@ export class GameService {
   /**
    * Adds remaining race time. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to add in miliseconds
+   * @param milliseconds Amount of time to add in milliseconds
    * @returns Boolean indicating whether the time got added
    */
-  static addTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0
+  static addTime(milliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || milliseconds <= 0
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime += miliseconds
+    this.remainingDynamicTime += milliseconds
     return true
   }
 
@@ -230,21 +230,21 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to subtract in miliseconds
+   * @param milliseconds Amount of time to subtract in milliseconds
    * @returns Boolean indicating whether the time got subtracted
    */
-  static subtractTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0 ||
+  static subtractTime(milliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || milliseconds <= 0 ||
       this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime -= miliseconds
+    this.remainingDynamicTime -= milliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
   }
 
   /** 
-   * Remaining race time in miliseconds.
+   * Remaining race time in milliseconds.
    */
   static get remainingRaceTime(): number {
     if (this.dynamicTimerEnabled) {
@@ -256,7 +256,7 @@ export class GameService {
   }
 
   /**
-   * Remaining result screen time in miliseconds.
+   * Remaining result screen time in milliseconds.
    */
   static get remainingResultTime(): number {
     if (this._state === 'race' || this.state === 'transition') { return 0 }
@@ -279,14 +279,14 @@ export class GameService {
   }
 
   /**
-   * Result time limit in the current round in miliseconds.
+   * Result time limit in the current round in milliseconds.
    */
   static get resultTimeLimit(): number {
     return this._game.resultTime
   }
 
   /**
-   * Race time limit in the current round in miliseconds.
+   * Race time limit in the current round in milliseconds.
    */
   static get raceTimeLimit(): number {
     return this.timeAttackLimit

@@ -30,7 +30,7 @@ export class RecordService {
     await this.updateQueue()
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
-    Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
+    Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'], async (): Promise<void> => {
       this._playerRanks.length = 0
       await this.fetchAndStoreRanks()
     })
