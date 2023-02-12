@@ -175,9 +175,10 @@ export class PlayerService {
    */
   static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
     for (const p of players) {
-      const obj: tm.OfflinePlayer | undefined = this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
+      const obj: tm.Player | tm.OfflinePlayer | undefined = 
+      this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
       if (obj === undefined) { continue }
-      // if (p.title !== undefined) { obj.title = p.title } // I don't think this needs to be here?
+      if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title } 
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
       if (p.nickname !== undefined && p.nickname !== obj.nickname) {
         Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)
