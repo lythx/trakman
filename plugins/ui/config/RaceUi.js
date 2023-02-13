@@ -15,7 +15,7 @@ export default {
     { name: "PreviousAndBest", height: 4.95 },
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
-    { name: "LocalRanking", height: 34.12 },
+    { name: "LocalRanking", height: 34.12 }, // default recordlist row height is 2.15 (remember to include header height)
     { name: "LiveRanking", height: 15.07 },
     { name: "DonationPanel", height: 4.49 }
   ],
@@ -48,8 +48,8 @@ export default {
     { name: "PreviousAndBest", height: 4.95 },
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
-    { name: "RoundScore", height: 17.22 }, // row height 2.15
-    { name: "", height: 17.22 },
+    { name: "RoundScore", height: 17.22 },
+    { name: "RoundPointsRanking", height: 17.22 },
     { name: "DonationPanel", height: 4.49 }
   ],
   roundsLeftSideOrder: [

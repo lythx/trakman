@@ -8,7 +8,6 @@ import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
 import { titles } from '../../config/Titles.js'
-import { RoundsService } from './RoundsService.js'
 
 /**
  * This service manages online players on the server and players table in the database
@@ -173,10 +172,6 @@ export class PlayerService {
         `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
-  }
-
-  static resetRoundsPoints() {
-    RoundsService.resetRankingAndTimes(this._players)
   }
 
   /**

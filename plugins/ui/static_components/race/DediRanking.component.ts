@@ -52,7 +52,6 @@ export default class DediRanking extends StaticComponent {
   }
 
   protected onPositionChange(): void {
-    console.log('pch')
     this.getRecordList()
     this.display()
   }
@@ -67,7 +66,6 @@ export default class DediRanking extends StaticComponent {
       height = config.roundsHeight
       entries = config.roundsEntries
     }
-    console.log(tm.getGameMode(), 'gm')
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)

@@ -9,5 +9,6 @@ export default {
   margin: cfg.margin,
   entries: 7,
   topCount: 5,
+  columnProportions: [1, 2, 5],
   displayNoRecordEntry: true
 }

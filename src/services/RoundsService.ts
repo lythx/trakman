@@ -15,6 +15,8 @@ export class RoundsService {
   private static teamMaxPoints: number // TODO FIND OUT WHAT IS THIS
   private static _ranking: tm.Player[]
   private static readonly _roundRecords: tm.FinishInfo[] = []
+  private static noRoundFinishes = true
+  private static finishedRounds = 0
   private static roundFinishCount = 0
 
   /**
@@ -25,7 +27,21 @@ export class RoundsService {
     if (status instanceof Error) {
       Logger.fatal(status.message)
     }
-    this._ranking = PlayerService.players
+    const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+    const playerList = PlayerService.players as tm.Player[]
+    this._ranking = []
+    for (const e of ranking) {
+      const player = playerList.find(a => e.Login === a.login)
+      if (player !== undefined) {
+        player.roundsPoints = e.Score
+        this._ranking.push(player)
+      }
+    }
+    for (const e of playerList) {
+      if (!this._ranking.some(a => a.login === e.login)) {
+        this._ranking.push(e)
+      }
+    }
     Events.addListener('GameConfigChanged', () => {
       const status = this.updateRoundsSettings()
       if (status instanceof Error) {
@@ -64,8 +80,12 @@ export class RoundsService {
 
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
     if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') { return }
+    if (this.noRoundFinishes === true) {
+      this.noRoundFinishes = false
+      this.finishedRounds++
+    }
     this._roundRecords.push(record)
-    player.roundTimes.push(record.time)
+    player.roundTimes[this.finishedRounds - 1] = record.time
   }
 
   static registerRoundPoints(player: tm.Player): number {
@@ -92,10 +112,22 @@ export class RoundsService {
   }
 
   static registerPlayer(player: tm.Player) {
-    this._ranking.push(player)
+    const index = this._ranking.findIndex(a => a.login === player.login)
+    if (index === -1) {
+      this._ranking.push(player)
+      return
+    }
+    player.roundTimes = this._ranking[index].roundTimes
+    for (let i = 0; i < this.finishedRounds; i++) {
+      if (player.roundTimes[i] === undefined) { player.roundTimes[i] = -1 }
+    }
+    player.roundsPoints = this._ranking[index].roundsPoints
+    this._ranking[index] = player
   }
 
-  static resetRankingAndTimes(playerList: tm.Player[]) {
+  static resetRankingAndTimes() {
+    // This method modifies the player objects so it needs to ignore the readonly constraint
+    const playerList = PlayerService.players as tm.Player[]
     for (const e of playerList) {
       e.roundsPoints = 0
       e.roundTimes = []
@@ -107,11 +139,13 @@ export class RoundsService {
     this.teamsRoundPoints = undefined
     this._teamScores = { blue: 0, red: 0 }
     this._ranking.length = 0
+    this.finishedRounds = 0
   }
 
   static handleBeginRound(): void {
     this._roundRecords.length = 0
     this.roundFinishCount = 0
+    this.noRoundFinishes = true
   }
 
   static async handleEndRound(): Promise<void> {
@@ -125,6 +159,28 @@ export class RoundsService {
       }
       this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
       this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
+    }
+    if (GameService.gameMode === 'Rounds') {
+      // This method modifies the player objects so it needs to ignore the readonly constraint
+      const playerList = PlayerService.players as tm.Player[]
+      for (let i = 0; i < playerList.length; i++) {
+        const roundTimes = playerList[i].roundTimes
+        if (roundTimes.length !== this.finishedRounds) {
+          roundTimes[this.finishedRounds - 1] = -1
+        }
+      }
+      // TODO REMOVE THIS IF NEVER HAPPENS  
+      const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+      for (const e of ranking) {
+        const obj = this._ranking.find(a => a.login === e.Login)
+        if (obj === undefined) { continue }
+        if (obj.roundsPoints !== e.Score) {
+          Logger.debug(`Rounds points mismatch in RoundsService`, obj, e)
+          const player = PlayerService.get(obj.login) as tm.Player
+          obj.roundsPoints = e.Score
+          if (player !== undefined) { player.roundsPoints = e.Score }
+        }
+      }
     }
   }
 

@@ -102,7 +102,7 @@ export default class RecordList {
    */
   constructor(preset: 'result' | 'race', parentId: number, width: number,
     height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
-    options?: { getColoursFromPb?: true, dontParseTime?: boolean }) {
+    options?: { getColoursFromPb?: true, dontParseTime?: boolean, columnProportions?: number[] }) {
     this.config = preset === 'result' ? resultConfig : raceConfig
     const INFO = this.config.info
     this.columnGap = this.config.columnGap
@@ -124,7 +124,11 @@ export default class RecordList {
     this.topCount = topCount
     this.maxCount = maxCount
     this.markers = side ? this.config.markersRight : this.config.markersLeft
-    const columnProportions: number[] = this.config.columnProportions
+    if (options?.columnProportions !== undefined &&
+      (options.columnProportions.length < 3 || options.columnProportions.some(a => isNaN(a)))) {
+      tm.log.fatal(`Expected 3 numbers in column proportions array in recordlist, received ${options.columnProportions}`)
+    }
+    const columnProportions: number[] = options?.columnProportions ?? this.config.columnProportions
     const proportionsSum: number = columnProportions.reduce((acc, cur): number => acc += cur, 0)
     this.columnWidths = columnProportions.map(a => (a / proportionsSum) * (width + this.columnGap))
     this.noRecordEntry = noRecordEntry

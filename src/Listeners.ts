@@ -43,6 +43,7 @@ export class Listeners {
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
         AdministrationService.updateNickname({ login, nickname: player.nickname })
         RecordService.updateInfo({ login, nickname: player.nickname, region: player.region, title: player.title })
+        RoundsService.registerPlayer(player)
         Events.emit('PlayerDataUpdated', [{
           login, nickname: player.nickname, country: {
             name: player.country,
@@ -50,7 +51,6 @@ export class Listeners {
             region: player.region
           }, title: player.title
         }])
-        RoundsService.registerPlayer(player)
         Events.emit('PlayerJoin', player)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo.Login)
@@ -174,6 +174,7 @@ export class Listeners {
       event: 'TrackMania.EndRound',
       callback: async (): Promise<void> => {
         // No params, rounds mode only
+
         await RoundsService.handleEndRound()
         Events.emit('EndRound', RoundsService.roundRecords)
       }
@@ -234,7 +235,6 @@ export class Listeners {
           isRestart
         }
         RoundsService.handleEndMap()
-        PlayerService.resetRoundsPoints()
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
@@ -264,6 +264,10 @@ export class Listeners {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
+        if (temp === undefined) {
+          Logger.error(`Player ${login} not online in TrackMania.PlayerManialinkPageAnswer event`)
+          return
+        }
         temp.actionId = answer
         const info: tm.ManialinkClickInfo = temp
         Events.emit('ManialinkClick', info)

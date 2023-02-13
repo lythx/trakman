@@ -15,14 +15,3 @@ const styles = StyleSheet({
     height: 5
   }
 })
-
-
-
-// tm.addListener('Startup', () => {
-//   const ml = `<manialink id="342234987">
-// ${View(styles.view, Text('lolololololool', styles.text)).render()}
-// </manialink>`
-//   console.log(ml)
-//   setTimeout(() => tm.sendManialink(ml), 2000)
-
-// })

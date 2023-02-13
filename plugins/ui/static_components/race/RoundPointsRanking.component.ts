@@ -51,11 +51,11 @@ export default class RoundPointsRanking extends StaticComponent {
     // } // TODO CUP
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+       { dontParseTime: true, columnProportions: config.columnProportions })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
-    tm.rounds.pointsRanking
   }
 
   protected onPositionChange(): void {

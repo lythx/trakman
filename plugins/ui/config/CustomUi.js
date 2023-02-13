@@ -4,7 +4,7 @@ export default {
   netInfo: true,
   chat: true,
   checkpointList: false,
-  roundScores: true,
+  roundScores: false,
   scoreTable: true,
   global: true
 }
