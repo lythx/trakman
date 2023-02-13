@@ -9,10 +9,10 @@ export class RoundsService {
 
   private static teamsRoundPoints?: number
   private static _teamScores: { blue: number; red: number } = { blue: 0, red: 0 }
-  private static roundsPointSystem: number[] = []
-  private static roundPointsLimit: number
-  private static teamPointsLimit: number
-  private static teamMaxPoints: number
+  private static _roundsPointSystem: number[] = []
+  private static _roundsPointsLimit: number
+  private static _teamsPointsLimit: number
+  private static teamMaxPoints: number // TODO FIND OUT WHAT IS THIS
   private static _ranking: tm.Player[]
   private static readonly _roundRecords: tm.FinishInfo[] = []
   private static roundFinishCount = 0
@@ -25,6 +25,7 @@ export class RoundsService {
     if (status instanceof Error) {
       Logger.fatal(status.message)
     }
+    this._ranking = PlayerService.players
     Events.addListener('GameConfigChanged', () => {
       const status = this.updateRoundsSettings()
       if (status instanceof Error) {
@@ -48,27 +49,27 @@ export class RoundsService {
     }
     const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints] =
       (settings as { method: string; params: any; }[]).map(a => a.params)
-    this.roundsPointSystem = roundPointSystem
-    this.roundsPointSystem = roundPointSystem
-    this.roundPointsLimit = roundPointsLimit.currentValue
-    this.teamPointsLimit = teamPointsLimit.currentValue
+    this._roundsPointSystem = roundPointSystem
+    this._roundsPointSystem = roundPointSystem
+    this._roundsPointsLimit = roundPointsLimit.currentValue
+    this._teamsPointsLimit = teamPointsLimit.currentValue
     this.teamMaxPoints = teamMaxPoints.currentValue
-    if (this.roundsPointSystem.length === 0) {
-      this.roundsPointSystem = config.roundsModePointSystem
+    if (this._roundsPointSystem.length === 0) {
+      this._roundsPointSystem = config.roundsModePointSystem
       Client.callNoRes(`SetRoundCustomPoints`,
-        [{ array: this.roundsPointSystem.map(a => ({ int: a })) }, { boolean: true }])
+        [{ array: this._roundsPointSystem.map(a => ({ int: a })) }, { boolean: true }])
     }
     return true
   }
 
-  static registerRoundRecord(record: tm.FinishInfo) {
-    if (GameService.gameMode === 'Cup' || GameService.gameMode === 'Laps'
-      || GameService.gameMode === 'Rounds' || GameService.gameMode === 'Teams') {
-      this._roundRecords.push(record)
-    }
+  static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') { return }
+    this._roundRecords.push(record)
+    player.roundTimes.push(record.time)
   }
 
   static registerRoundPoints(player: tm.Player): number {
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') { return 0 }
     const index = this._ranking.findIndex(a => a.login === player.login)
     if (index === -1) {
       Logger.error(`Player object not present in RoundsService ranking when adding points`)
@@ -81,7 +82,7 @@ export class RoundsService {
       }
       points = this.teamsRoundPoints - this.roundFinishCount
     } else if (GameService.gameMode === 'Rounds') {
-      points = this.roundsPointSystem[this.roundFinishCount]
+      points = this._roundsPointSystem[this.roundFinishCount]
     }
     player.roundsPoints += points
     this._ranking[index] = player
@@ -94,9 +95,10 @@ export class RoundsService {
     this._ranking.push(player)
   }
 
-  static resetRanking(playerList: tm.Player[]) {
+  static resetRankingAndTimes(playerList: tm.Player[]) {
     for (const e of playerList) {
       e.roundsPoints = 0
+      e.roundTimes = []
     }
     this._ranking = playerList
   }
@@ -154,6 +156,22 @@ export class RoundsService {
    */
   static get teamScores(): typeof this._teamScores {
     return { ...this._teamScores }
+  }
+
+  static get roundsPointSystem(): number[] {
+    return [...this._roundsPointSystem]
+  }
+
+  static get roundsPointsLimit(): number {
+    return this._roundsPointsLimit
+  }
+
+  static get teamsPointsLimit(): number {
+    return this._teamsPointsLimit
+  }
+
+  static get pointsRanking(): Readonly<tm.Player>[] {
+    return [...this._ranking]
   }
 
 }

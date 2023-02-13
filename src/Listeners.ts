@@ -109,7 +109,6 @@ export class Listeners {
               // Register player live record
               Events.emit('LiveRecord', obj.liveRecord)
             }
-            RoundsService.registerRoundRecord(obj.finishInfo)
             // Register player finish
             Events.emit('PlayerFinish', obj.finishInfo)
           }

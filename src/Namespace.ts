@@ -104,6 +104,8 @@ declare global {
       team?: 'red' | 'blue'
       // TODO DOCUMENT
       roundsPoints: number
+
+      roundTimes: number[]
     }
     /** Controller offline player object */
     export interface OfflinePlayer {

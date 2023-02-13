@@ -150,6 +150,7 @@ export class RecordService {
       time,
       roundPoints: points
     }
+    RoundsService.registerRoundRecord(finishInfo, player)
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
     return { localRecord, finishInfo, liveRecord }
@@ -365,7 +366,8 @@ export class RecordService {
       ladderRank: player.ladderRank,
       title: player.title,
       hasPlayerSlot: player.hasPlayerSlot,
-      roundsPoints: player.roundsPoints
+      roundsPoints: player.roundsPoints,
+      roundTimes: player.roundTimes
     }
   }
 

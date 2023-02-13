@@ -168,6 +168,20 @@ namespace trakman {
 
   }
 
+  export const rounds = {
+
+    get currentRecords() { return RoundsService.roundRecords },
+
+    get currentRecordCount(): number { return RoundsService.roundRecordCount },
+
+    get teamScores() { return RoundsService.teamScores },
+
+    get pointsRanking() { return RoundsService.pointsRanking },
+
+
+
+  }
+
   export const messages = {
 
     fetch: ChatService.fetch.bind(ChatService),

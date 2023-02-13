@@ -3,6 +3,8 @@
  * @since 0.1
  */
 
+// TODO MAYBE RENAME TO RoundsPointsRanking to be the same as in core
+
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './RoundPointsRanking.config.js'
 
@@ -16,17 +18,18 @@ export default class RoundPointsRanking extends StaticComponent {
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+      if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
+        .some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+      if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
+        .some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
+      if (info.some(a => tm.rounds.pointsRanking // TODO CHECK IF WORK
+        .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { this.display() }
     })
-    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
-      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
-    })
+    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => this.display())
   }
 
   display(): void {
@@ -52,6 +55,7 @@ export default class RoundPointsRanking extends StaticComponent {
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
+    tm.rounds.pointsRanking
   }
 
   protected onPositionChange(): void {
@@ -66,8 +70,9 @@ export default class RoundPointsRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, tm.records.local
-      .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
+          ${this.recordList.constructXml(login, tm.rounds.pointsRanking
+      .filter(a => a.roundsPoints !== 0)
+      .map(a => ({ name: a.nickname, time: a.roundsPoints, checkpoints: a.roundTimes, login: a.login }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
