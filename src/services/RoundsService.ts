@@ -13,6 +13,7 @@ export class RoundsService {
   private static roundPointsLimit: number
   private static teamPointsLimit: number
   private static teamMaxPoints: number
+  private static _ranking: tm.Player[]
   private static readonly _roundRecords: tm.FinishInfo[] = []
   private static roundFinishCount = 0
 
@@ -67,7 +68,12 @@ export class RoundsService {
     }
   }
 
-  static getRoundPoints(): number | undefined {
+  static registerRoundPoints(player: tm.Player): number {
+    const index = this._ranking.findIndex(a => a.login === player.login)
+    if (index === -1) {
+      Logger.error(`Player object not present in RoundsService ranking when adding points`)
+      return 0
+    }
     let points = 0
     if (GameService.gameMode === 'Teams') {
       if (this.teamsRoundPoints === undefined) {
@@ -77,13 +83,28 @@ export class RoundsService {
     } else if (GameService.gameMode === 'Rounds') {
       points = this.roundsPointSystem[this.roundFinishCount]
     }
+    player.roundsPoints += points
+    this._ranking[index] = player
+    this.fixRankingPosition(index)
     this.roundFinishCount++
     return points
+  }
+
+  static registerPlayer(player: tm.Player) {
+    this._ranking.push(player)
+  }
+
+  static resetRanking(playerList: tm.Player[]) {
+    for (const e of playerList) {
+      e.roundsPoints = 0
+    }
+    this._ranking = playerList
   }
 
   static handleEndMap(): void {
     this.teamsRoundPoints = undefined
     this._teamScores = { blue: 0, red: 0 }
+    this._ranking.length = 0
   }
 
   static handleBeginRound(): void {
@@ -105,6 +126,14 @@ export class RoundsService {
     }
   }
 
+  private static fixRankingPosition(index: number) {
+    const obj = this._ranking[index]
+    for (let i = 0; i < index; i++) {
+      if (obj.roundsPoints > this._ranking[i].roundsPoints) {
+        this._ranking.splice(i, 0, obj)
+      }
+    }
+  }
   // TODO DOCUMENTATA
   /**
    * Current round records

@@ -8,6 +8,7 @@ import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
 import { RecordService } from './RecordService.js'
 import { titles } from '../../config/Titles.js'
+import { RoundsService } from './RoundsService.js'
 
 /**
  * This service manages online players on the server and players table in the database
@@ -90,10 +91,11 @@ export class PlayerService {
    * @param ip Player ip address
    * @param isUnited True if player has united version of game
    * @param serverStart True if executed on server start
+   * @returns Player object
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> { // TODO ADD NEW PROPERTIES
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> { // TODO ADD NEW PROPERTIES
     let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
       Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
@@ -128,7 +130,8 @@ export class PlayerService {
         ladderPoints,
         ladderRank,
         rank: index === -1 ? undefined : (index + 1),
-        title: this.getTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode),
+        roundsPoints: 0
       }
       this._totalPlayerCount++
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
@@ -157,7 +160,8 @@ export class PlayerService {
         average: playerData.average,
         ladderPoints,
         ladderRank,
-        title: this.getTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode),
+        roundsPoints: 0
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
@@ -169,16 +173,20 @@ export class PlayerService {
     return player
   }
 
+  static resetRoundsPoints() {
+    RoundsService.resetRanking(this._players)
+  }
+
   /**
    * Updates the player information in runtime memory and the database
    * @param players Objects containing player login and infos to change
    */
   static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
     for (const p of players) {
-      const obj: tm.Player | tm.OfflinePlayer | undefined = 
-      this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
+      const obj: tm.Player | tm.OfflinePlayer | undefined =
+        this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
       if (obj === undefined) { continue }
-      if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title } 
+      if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title }
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
       if (p.nickname !== undefined && p.nickname !== obj.nickname) {
         Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)

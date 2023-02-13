@@ -102,6 +102,8 @@ declare global {
       average: number
       /** Player team (teams mode only) */ // TODO DOCUMENT and maybe remove from other objects
       team?: 'red' | 'blue'
+      // TODO DOCUMENT
+      roundsPoints: number
     }
     /** Controller offline player object */
     export interface OfflinePlayer {
@@ -273,6 +275,8 @@ declare global {
       readonly checkpoints: number[]
       /** Player nickname */
       nickname: string
+      // TODO DOC
+      roundPoints?: number
     }
     /** Controller karma map vote object */
     export interface Vote {
@@ -807,7 +811,7 @@ declare global {
       readonly checkpointsAmount: number
     }
     /** Controller local record object */ // TODO UPDATE DOC
-    export type LocalRecord = Record & OfflinePlayer & { roundPoints?: number }
+    export type LocalRecord = Record & OfflinePlayer
     /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
       /** Player object */

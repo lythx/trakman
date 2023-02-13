@@ -4,8 +4,7 @@
  */
 
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
-
-import config from './LocalRanking.config.js'
+import config from './RoundPointsRanking.config.js'
 
 export default class RoundPointsRanking extends StaticComponent {
 
@@ -16,7 +15,6 @@ export default class RoundPointsRanking extends StaticComponent {
     super(componentIds.roundPointsRanking, 'race', ['Rounds'])
     this.header = new StaticHeader('race')
     this.getRecordList()
-    tm.addListener('LocalRecord', (): void => this.display())
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
     })
@@ -26,7 +24,9 @@ export default class RoundPointsRanking extends StaticComponent {
     tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
-    tm.addListener('LocalRecordsRemoved', (): void => this.display())
+    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
+      if (tm.records.local.some(a => a.login === info.login)) { this.display() }
+    })
   }
 
   display(): void {
@@ -39,13 +39,13 @@ export default class RoundPointsRanking extends StaticComponent {
   private getRecordList(): void {
     let height = config.height
     let entries = config.entries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Rounds') {
-      height = config.roundsHeight
-      entries = config.roundsEntries
-    }
+    // if (tm.getGameMode() === 'Teams') {
+    //   height = config.teamsHeight
+    //   entries = config.teamsEntries
+    // } else if (tm.getGameMode() === 'Rounds') {
+    //   height = config.roundsHeight
+    //   entries = config.roundsEntries
+    // } // TODO CUP
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)

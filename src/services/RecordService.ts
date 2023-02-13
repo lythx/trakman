@@ -142,12 +142,13 @@ export class RecordService {
       checkpoints.length = 0
       return false
     }
+    const points = RoundsService.registerRoundPoints(player)
     const finishInfo: tm.FinishInfo = {
       ...player,
       checkpoints: [...checkpoints],
       map,
       time,
-      roundPoints: RoundsService.getRoundPoints()
+      roundPoints: points
     }
     const localRecord: tm.RecordInfo | undefined = await this.handleLocalRecord(map, time, date, [...checkpoints], player)
     const liveRecord: tm.RecordInfo | undefined = this.handleLiveRecord(map, time, date, [...checkpoints], player)
@@ -363,7 +364,8 @@ export class RecordService {
       ladderPoints: player.ladderPoints,
       ladderRank: player.ladderRank,
       title: player.title,
-      hasPlayerSlot: player.hasPlayerSlot
+      hasPlayerSlot: player.hasPlayerSlot,
+      roundsPoints: player.roundsPoints
     }
   }
 

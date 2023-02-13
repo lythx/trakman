@@ -38,19 +38,20 @@ export class Listeners {
           Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
-        const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
+        const player: tm.Player = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
           playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
-        AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
-        RecordService.updateInfo({ login, nickname: joinInfo.nickname, region: joinInfo.region, title: joinInfo.title })
+        AdministrationService.updateNickname({ login, nickname: player.nickname })
+        RecordService.updateInfo({ login, nickname: player.nickname, region: player.region, title: player.title })
         Events.emit('PlayerDataUpdated', [{
-          login, nickname: joinInfo.nickname, country: {
-            name: joinInfo.country,
-            code: joinInfo.countryCode,
-            region: joinInfo.region
-          }, title: joinInfo.title
+          login, nickname: player.nickname, country: {
+            name: player.country,
+            code: player.countryCode,
+            region: player.region
+          }, title: player.title
         }])
-        Events.emit('PlayerJoin', joinInfo)
+        RoundsService.registerPlayer(player)
+        Events.emit('PlayerJoin', player)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo.Login)
       }
@@ -234,6 +235,7 @@ export class Listeners {
           isRestart
         }
         RoundsService.handleEndMap()
+        PlayerService.resetRoundsPoints()
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
