@@ -125,7 +125,11 @@ export class RoundsService {
     this._ranking[index] = player
   }
 
-  static resetRankingAndTimes() {
+  static handleBeginMap(): void {
+    this._ranking = PlayerService.players
+    this.teamsRoundPoints = undefined
+    this._teamScores = { blue: 0, red: 0 }
+    this.finishedRounds = 0
     // This method modifies the player objects so it needs to ignore the readonly constraint
     const playerList = PlayerService.players as tm.Player[]
     for (const e of playerList) {
@@ -133,13 +137,6 @@ export class RoundsService {
       e.roundTimes = []
     }
     this._ranking = playerList
-  }
-
-  static handleEndMap(): void {
-    this.teamsRoundPoints = undefined
-    this._teamScores = { blue: 0, red: 0 }
-    this._ranking.length = 0
-    this.finishedRounds = 0
   }
 
   static handleBeginRound(): void {
@@ -152,9 +149,9 @@ export class RoundsService {
     this.teamsRoundPoints = undefined
     if (GameService.gameMode === 'Teams') {
       const res: tm.TrackmaniaRankingInfo[] | Error =
-        await tm.client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
+        await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
       if (res instanceof Error) {
-        tm.log.error(`Call to get team score failed`, res.message)
+        Logger.error(`Call to get team score failed`, res.message)
         return
       }
       this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
@@ -175,7 +172,7 @@ export class RoundsService {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }
         if (obj.roundsPoints !== e.Score) {
-          Logger.debug(`Rounds points mismatch in RoundsService`, obj, e)
+          Logger.debug(`Rounds points mismatch in RoundsService`, JSON.stringify(obj), JSON.stringify(e))
           const player = PlayerService.get(obj.login) as tm.Player
           obj.roundsPoints = e.Score
           if (player !== undefined) { player.roundsPoints = e.Score }

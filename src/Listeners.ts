@@ -183,8 +183,7 @@ export class Listeners {
       event: 'TrackMania.BeginChallenge',
       callback: async ([map]: tm.Events['TrackMania.BeginChallenge']): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
-        // Set game state to 'race'
-
+        // Set game state to 'transition'
         GameService.state = 'transition'
         // Update server parameters
         await GameService.update()
@@ -201,6 +200,7 @@ export class Listeners {
         }
         // Update server config
         await ServerConfig.update()
+        RoundsService.handleBeginMap()
         // Register map update
         Events.emit('BeginMap', { ...MapService.current, isRestart })
       }
@@ -234,7 +234,6 @@ export class Listeners {
           serverSideRankings: rankings,
           isRestart
         }
-        RoundsService.handleEndMap()
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
         // Register map ending
