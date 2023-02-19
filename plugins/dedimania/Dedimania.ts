@@ -12,6 +12,15 @@ const client: DedimaniaClient = new DedimaniaClient()
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
+const environment: { [environment in tm.Environment]: string } = {
+  Stadium: 'Stadium',
+  Island: 'Island',
+  Desert: 'Speed',
+  Rally: 'Rally',
+  Bay: 'Bay',
+  Coast: 'Coast',
+  Snow: 'Alpine'
+}
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -39,7 +48,7 @@ const initialize = async (): Promise<void> => {
   }
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
-  await getRecords(current.id, current.name, current.environment, current.author)
+  await getRecords(current.id, current.name, environment[current.environment], current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
