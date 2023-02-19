@@ -39,10 +39,11 @@ declare global {
       voteCount: number
       /** Map karma vote ratio (0 to 100) */
       voteRatio: number
-      /** Amount of laps (undefined if the map was never played) */
-      lapsAmount?: number
-      /** Amount of checkpoints (undefined if the map was never played) */
-      checkpointsAmount?: number
+      // TODO DOCUMENT
+      /** Default amount of laps (different amounts can be set using server call) (undefined if the map was never played) */
+      defaultLapsAmount?: number
+      /** Amount of checkpoints per lap (undefined if the map was never played) */
+      checkpointsPerLap?: number
       /** Map TMX leaderboard rating (undefined if the map was never fetched from TMX) */
       leaderboardRating?: number
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
@@ -807,9 +808,14 @@ declare global {
     }
     /** Controller current map object */
     export type CurrentMap = Map & {
-      /** Amount of laps */
+      // TODO DOCUMENT
+      /** Default amount of laps (may be incoherent with actual laps amount if it's modified using dedicated server call) */
+      readonly defaultLapsAmount: number
+      /** Current amount of laps depending on dedicated server config and map default laps */
       readonly lapsAmount: number
-      /** Amount of checkpoints */
+      /** Amount of checkpoints per lap */
+      readonly checkpointsPerLap: number
+      /** Total amount of checkpoints depending on map checkpoints per lap and laps amount */
       readonly checkpointsAmount: number
     }
     /** Controller local record object */ // TODO UPDATE DOC

@@ -149,7 +149,7 @@ const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
     author: lastMap.author,
     atime: lastMap.authorTime.toString(),
     ascore: '0', // STUNTS MODE IDC
-    nblaps: lastMap.lapsAmount.toString(),
+    nblaps: lastMap.defaultLapsAmount.toString(),
     nbchecks: lastMap.checkpointsAmount.toString(),
     mood: lastMap.mood,
     env: lastMap.environment,

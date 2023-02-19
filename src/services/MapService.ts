@@ -4,6 +4,7 @@ import { MapRepository } from '../database/MapRepository.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import config from "../../config/Config.js"
+import { GameService } from './GameService.js'
 
 interface JukeboxMap {
   readonly map: tm.Map
@@ -102,25 +103,29 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const mapInfo: tm.Map | undefined = this._maps.find(a => a.id === res.UId)
+    const mapInfo: Partial<{ -readonly [K in keyof tm.CurrentMap]: tm.CurrentMap[K] }> | undefined =
+      this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
     // (this information can be acquired only if the map is currently played on the server so it is undefined if map was never played)
-    if (mapInfo.checkpointsAmount === undefined || mapInfo.lapsAmount === undefined) {
-      mapInfo.checkpointsAmount = res.NbCheckpoints
-      mapInfo.lapsAmount = res.NbLaps
+    if (mapInfo.checkpointsPerLap === undefined || mapInfo.defaultLapsAmount === undefined) {
+      mapInfo.checkpointsPerLap = res.NbCheckpoints
+      mapInfo.defaultLapsAmount = res.NbLaps
     }
-    this._current = mapInfo as any
+    const obj = this.getLapsAndCheckpointsAmount(res.NbCheckpoints, res.NbLaps)
+    mapInfo.checkpointsAmount = obj.checkpoints
+    mapInfo.lapsAmount = obj.laps
+    this._current = mapInfo as tm.CurrentMap
     if (this._history[0] === undefined) {
-      Logger.info(`Current map set to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}`)
+      Logger.info(`Current map set to ${Utils.strip(this._current.name)} by ${this._current.author}`)
     } else {
-      Logger.info(`Current map changed to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}` +
+      Logger.info(`Current map changed to ${Utils.strip(this._current.name)} by ${this._current.author}` +
         ` from ${Utils.strip(this._history[0].name)} by ${this._history[0].author}.`)
     }
-    void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
+    void this.repo.setCpsAndLapsAmount(this._current.id, this._current.defaultLapsAmount, this._current.checkpointsPerLap)
   }
 
   /**
@@ -271,6 +276,12 @@ export class MapService {
     await this.updateNextMap()
   }
 
+  static restartMap() {
+    const obj = this.getLapsAndCheckpointsAmount(this._current.checkpointsPerLap, this._current.defaultLapsAmount)
+    // Avoid reference errors
+    this._current = { ...this._current, checkpointsAmount: obj.checkpoints, lapsAmount: obj.laps }
+  }
+
   /**
    * Sends a dedicated server call to set next map to first map in queue
    * @returns True if map gets set, Error if it fails
@@ -399,6 +410,23 @@ export class MapService {
     }
   }
 
+  private static getLapsAndCheckpointsAmount
+    (checkpointsPerLap: number, defaultLapAmount: number): { laps: number, checkpoints: number } {
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') {
+      return { checkpoints: checkpointsPerLap, laps: 1 }
+    }
+    let laps: number
+    if (GameService.gameMode === 'Rounds' && GameService.config.roundsModeLapsAmount !== 0) {
+      laps = GameService.config.roundsModeLapsAmount
+    } else {
+      laps = defaultLapAmount
+    }
+    // if(GameService.gameMode === 'Laps' && GameService.config.lapsModeLapsAmount !== 0) {
+    //   return GameService.config.roundsModeLapsAmount * checkpointsPerLap
+    // } TODO 
+    return { checkpoints: laps * checkpointsPerLap, laps }// + defaultLapAmount // Treat finish as checkpoint between laps
+  }
+
   /**
    * Contstructs tm.Map object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
@@ -428,8 +456,8 @@ export class MapService {
       authorTime: info.AuthorTime,
       copperPrice: info.CopperPrice,
       isLapRace: info.LapRace,
-      lapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
+      defaultLapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
+      checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date(),
       isNadeo: false,
       isClassic: false

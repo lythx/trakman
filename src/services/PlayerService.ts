@@ -232,12 +232,13 @@ export class PlayerService {
     if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
       laps = 1
     } else if ([0, 3, 5].includes(GameService.config.gameMode)) {
-      laps = GameService.config.roundsModeLapsAmount
+      laps = MapService.current.defaultLapsAmount
+      // laps = GameService.config.roundsModeLapsAmount
     } else { // TEST ROUNDS MODE
       laps = GameService.config.lapsModeLapsAmount
     }
     if (cp.index === 0) {
-      if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
+      if (laps === 1 && MapService.current.checkpointsPerLap === 1) {  // finish if 0 cp map
         player.currentCheckpoints.length = 0
         return true
       }
@@ -245,7 +246,9 @@ export class PlayerService {
       player.currentCheckpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.currentCheckpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
+    if (player.currentCheckpoints.length === 0) {
+      return new Error('Index not coherent with checkpoints length')
+    } // handle people passing some cps before controller start
     const endLap: number = player.currentCheckpoints[0].lap + laps
     if (cp.lap < endLap) {
       player.currentCheckpoints.push(cp)

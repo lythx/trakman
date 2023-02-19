@@ -60,7 +60,7 @@ export class MapRepository extends Repository {
     for (const [i, map] of arr.entries()) {
       values.push(ids[i].id, map.name,
         map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
-        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.lapsAmount, map.checkpointsAmount, map.addDate,
+        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate,
         map.leaderboardRating, map.awards)
     }
     await this.query(query, ...values)
@@ -202,8 +202,8 @@ export class MapRepository extends Repository {
       copperPrice: entry.copper_price,
       isLapRace: entry.is_lap_race,
       addDate: entry.add_date,
-      lapsAmount: entry.laps_amount ?? undefined,
-      checkpointsAmount: entry.checkpoints_amount ?? undefined,
+      defaultLapsAmount: entry.laps_amount ?? undefined,
+      checkpointsPerLap: entry.checkpoints_amount ?? undefined,
       awards: entry.awards ?? undefined,
       leaderboardRating: entry.leaderboard_rating ?? undefined,
       voteCount: entry.vote_count,

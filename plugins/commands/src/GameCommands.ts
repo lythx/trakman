@@ -109,7 +109,7 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.setroundslapsamount.error, info.login)
         return
       }
-      if (amount <= 0) {
+      if (amount < 0) { // TODO FIX MESSAGE FOR 0
         tm.sendMessage(config.setroundslapsamount.insufficientLaps, info.login)
         return
       }

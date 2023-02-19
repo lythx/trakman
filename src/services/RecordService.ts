@@ -124,7 +124,7 @@ export class RecordService {
     finishInfo: tm.FinishInfo, localRecord?: tm.RecordInfo, liveRecord?: tm.RecordInfo
   }> {
     const date: Date = new Date()
-    const cpsPerLap: number = MapService.current.checkpointsAmount
+    const cpsPerLap: number = MapService.current.checkpointsPerLap
     let laps: number
     if (GameService.config.gameMode === 1 || !MapService.current.isLapRace) { // TA mode or not a lap map
       laps = 1
@@ -133,7 +133,7 @@ export class RecordService {
     } else if (GameService.config.gameMode === 4) { // Stunts mode
       return false// STUNTS MODE
     } else { // Rounds / Teams / Cup mode
-      laps = MapService.current.lapsAmount
+      laps = MapService.current.defaultLapsAmount
     }
     const cpAmount: number = cpsPerLap * laps
     const checkpoints: number[] = [...player.currentCheckpoints.map(a => a.time)]

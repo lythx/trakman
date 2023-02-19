@@ -68,7 +68,6 @@ export default class BestCps extends StaticComponent {
   displayToPlayer(login: string, params?: { page?: number }): void {
     if (this.isDisplayed === false) { return }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
-
     const pageCount: number = this.paginator.pageCount
     tm.sendManialink(`
     <manialink id="${this.id}">
