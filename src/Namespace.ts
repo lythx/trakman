@@ -802,7 +802,7 @@ declare global {
       readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
-    export type BeginMapInfo = Map & {
+    export type BeginMapInfo = Readonly<CurrentMap> & {
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
     }
@@ -819,6 +819,8 @@ declare global {
       readonly checkpointsAmount: number
       /** Whether the map is in laps mode (always false in TimeAttack and Stunts, true in other gamemodes if map has multilap start) */
       readonly isInLapsMode: boolean
+      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack and Stunts) */
+      readonly isLapsAmountModified: boolean
     }
     /** Controller local record object */ // TODO UPDATE DOC
     export type LocalRecord = Record & OfflinePlayer

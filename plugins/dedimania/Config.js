@@ -8,4 +8,5 @@ export default {
   host: 'dedimania.net',
   reconnectTimeout: 120, // Timeout for Dedimania reconnection attempts, in seconds
   updateInterval: 240, // Interval for Dedimania server update, in seconds (recommended to be kept between 2-5 minutes)
+  modifiedLapsMessage: `${tm.utils.palette.error}Dedimania records won't be sent for this map due to modified lap amount.`
 }

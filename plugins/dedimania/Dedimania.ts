@@ -141,8 +141,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
 }
 
 const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
-  if (client.connected === false) { return }
-  if (newDedis.length === 0) { return }
+  if (client.connected === false || newDedis.length === 0 || tm.maps.current.isLapsAmountModified) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -173,7 +172,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
 
 const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   time: number, checkpoints: number[]): void => {
-  if (client.connected === false) { return }
+  if (client.connected === false || tm.maps.current.isLapsAmountModified) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
@@ -319,14 +318,23 @@ if (config.isEnabled === true) {
 
   tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Dedimania...')
+    if (tm.maps.current.isLapsAmountModified) {
+      tm.sendMessage(config.modifiedLapsMessage)
+    }
     void initialize()
   }, true)
 
   tm.addListener('BeginMap', (info): void => {
+    if (info.isLapsAmountModified) {
+      tm.sendMessage(config.modifiedLapsMessage)
+    }
     void getRecords(info.id, info.name, environmentMap[info.environment], info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
+    if (info.isLapsAmountModified) {
+      tm.log.warn(`Dedimania records for map ${tm.utils.strip(info.name)} (${info.id}) not sent due to modified lap amount`)
+    }
     void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, info.checkpointsAmount)
   })
 

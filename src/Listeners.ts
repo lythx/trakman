@@ -187,8 +187,6 @@ export class Listeners {
         GameService.state = 'transition'
         // Update server parameters
         await GameService.update()
-        // Get records for current map
-
         // Check whether the map was restarted
         if (isRestart === false) {
           // In case it wasn't, update the votes and records
@@ -197,8 +195,7 @@ export class Listeners {
           await VoteService.nextMap()
         } else {
           MapService.restartMap()
-          RecordService.restartMap()
-          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.`)
+          await RecordService.restartMap()
         }
         // Update server config
         await ServerConfig.update()

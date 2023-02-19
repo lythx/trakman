@@ -119,6 +119,7 @@ export class MapService {
     mapInfo.checkpointsAmount = obj.checkpoints
     mapInfo.lapsAmount = obj.laps
     mapInfo.isInLapsMode = obj.isInLapsMode
+    mapInfo.isLapsAmountModified = obj.isLapsAmountModified
     this._current = mapInfo as tm.CurrentMap
     if (this._history[0] === undefined) {
       Logger.info(`Current map set to ${Utils.strip(this._current.name)} by ${this._current.author}`)
@@ -285,8 +286,10 @@ export class MapService {
       ...this._current,
       checkpointsAmount: obj.checkpoints,
       lapsAmount: obj.laps,
-      isInLapsMode: obj.isInLapsMode
+      isInLapsMode: obj.isInLapsMode,
+      isLapsAmountModified: obj.isLapsAmountModified
     }
+    Logger.info(`Map ${Utils.strip(this._current.name)} by ${this._current.author} restarted.`)
   }
 
   /**
@@ -418,20 +421,24 @@ export class MapService {
   }
 
   private static getLapsAndCheckpointsAmount(checkpointsPerLap: number, defaultLapAmount: number,
-    isLapRace: boolean): { laps: number, checkpoints: number, isInLapsMode: boolean } {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') {
-      return { checkpoints: checkpointsPerLap, laps: 1, isInLapsMode: false }
+    isLapRace: boolean): { laps: number, checkpoints: number, isInLapsMode: boolean, isLapsAmountModified: boolean } {
+    let isLapsAmountModified = false
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || !isLapRace) {
+      return { checkpoints: checkpointsPerLap, laps: 1, isInLapsMode: false, isLapsAmountModified }
     }
     let laps: number
-  if (GameService.gameMode === 'Rounds' && GameService.config.roundsModeLapsAmount !== 0) {
+    if (GameService.gameMode === 'Rounds' && GameService.config.roundsModeLapsAmount !== 0) {
       laps = GameService.config.roundsModeLapsAmount
+      if (defaultLapAmount !== laps) { // Check if modified value is different from default one
+        isLapsAmountModified = true
+      }
     } else {
       laps = defaultLapAmount
     }
     // if(GameService.gameMode === 'Laps' && GameService.config.lapsModeLapsAmount !== 0) {
     //   return GameService.config.roundsModeLapsAmount * checkpointsPerLap
     // } TODO 
-    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: isLapRace }// + defaultLapAmount // Treat finish as checkpoint between laps
+    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }// + defaultLapAmount // Treat finish as checkpoint between laps
   }
 
   /**

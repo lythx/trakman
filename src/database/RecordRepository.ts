@@ -82,8 +82,8 @@ export class RecordRepository extends Repository {
     }
     if (mapIds.length === 0) { return [] }
     const query = `SELECT uid, login, time, checkpoints, date, nickname FROM ${table}
-    JOIN map_ids ON map_ids.id=records.map_id
-    JOIN players ON players.id=records.player_id
+    JOIN map_ids ON map_ids.id=${table}.map_id
+    JOIN players ON players.id=${table}.player_id
     WHERE (${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}) ${lapCondition} 
     ORDER BY time ASC,
     date ASC;`
@@ -107,8 +107,8 @@ export class RecordRepository extends Repository {
     if (mapIds.length === 0) { return [] }
     const query = `SELECT uid, players.login, time, checkpoints, date, nickname, region, wins, time_played, 
     visits, is_united, last_online, average, privilege FROM ${table}
-    JOIN map_ids ON map_ids.id=records.map_id
-    JOIN players ON players.id=records.player_id
+    JOIN map_ids ON map_ids.id=${table}.map_id
+    JOIN players ON players.id=${table}.player_id
     LEFT JOIN privileges ON privileges.login=players.login
     WHERE (${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}) ${lapCondition}
     ORDER BY time ASC,

@@ -58,10 +58,15 @@ export class RecordService {
   /**
    * Resets the live and initial local records for the restarted map
    */
-  static restartMap(): void {
+  static async restartMap(): Promise<void> {
     this._liveRecords.length = 0
     this._initialLocals.length = 0
     this._initialLocals.push(...this._localRecords)
+    if (MapService.current.isInLapsMode) {
+      this._localRecords = await this.repo.getLocalRecords(MapService.current.lapsAmount, MapService.current.id)
+    } else {
+      this._localRecords = await this.repo.getLocalRecords(null, MapService.current.id)
+    }
   }
 
   /**
