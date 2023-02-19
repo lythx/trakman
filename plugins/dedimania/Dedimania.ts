@@ -12,7 +12,7 @@ const client: DedimaniaClient = new DedimaniaClient()
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
-const environment: { [environment in tm.Environment]: string } = {
+const environmentMap: { [environment in tm.Environment]: string } = { // For Dedimania Snow is Alpine and Desert is Speed
   Stadium: 'Stadium',
   Island: 'Island',
   Desert: 'Speed',
@@ -48,7 +48,7 @@ const initialize = async (): Promise<void> => {
   }
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
-  await getRecords(current.id, current.name, environment[current.environment], current.author)
+  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
@@ -68,7 +68,7 @@ const reinitialize = async (): Promise<void> => {
   tm.log.info('Initialized dedimania after an error')
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
-  await getRecords(current.id, current.name, current.environment, current.author)
+  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
@@ -323,11 +323,11 @@ if (config.isEnabled === true) {
   }, true)
 
   tm.addListener('BeginMap', (info): void => {
-    void getRecords(info.id, info.name, info.environment, info.author)
+    void getRecords(info.id, info.name, environmentMap[info.environment], info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
-    void sendRecords(info.id, info.name, info.environment, info.author, info.checkpointsAmount)
+    void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, info.checkpointsAmount)
   })
 
   tm.addListener('PlayerJoin', (info): void => {
