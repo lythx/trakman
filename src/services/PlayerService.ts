@@ -228,15 +228,7 @@ export class PlayerService {
    * @param cp Checkpoint object
    */
   static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean {
-    let laps
-    if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
-      laps = 1
-    } else if ([0, 3, 5].includes(GameService.config.gameMode)) {
-      laps = MapService.current.defaultLapsAmount
-      // laps = GameService.config.roundsModeLapsAmount
-    } else { // TEST ROUNDS MODE
-      laps = GameService.config.lapsModeLapsAmount
-    }
+    const laps = tm.maps.current.lapsAmount
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsPerLap === 1) {  // finish if 0 cp map
         player.currentCheckpoints.length = 0

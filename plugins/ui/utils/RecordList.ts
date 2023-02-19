@@ -7,7 +7,7 @@ interface UiRecord {
   readonly login?: string
   readonly name?: string
   readonly date?: Date
-  readonly checkpoints?: number[]
+  readonly checkpoints?: (number | undefined)[]
   readonly url?: string
   readonly points?: number
   readonly color?: 'red' | 'blue'
@@ -157,7 +157,8 @@ export default class RecordList {
    * @returns Record list XML string
    */
   constructXml(login: string, allRecords: UiRecord[]): string {
-    const cpAmount: number = allRecords?.[0]?.checkpoints?.length ?? 0
+    const cpAmount: number = Math.max(...(allRecords.map(a =>
+      a?.checkpoints?.length).filter(a => a !== undefined) as number[])) ?? 0
     this.infoRows = Math.ceil(cpAmount / this.infoColumns) + 1
     const parsedRecs = this.getDisplayedRecords(login, allRecords)
     const info = this.infos.find(a => a.login === login)
@@ -175,7 +176,7 @@ export default class RecordList {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.parentId + 2 + i}"/>`
       }
       if (info !== undefined && parsedRecs?.[i] !== undefined && parsedRecs?.[i]?.record?.time !== -1) {
-        ret += this.constructInfo(info.offset, parsedRecs?.[i]?.record, cpTypes?.[i])
+        ret += this.constructInfo(info.offset, parsedRecs?.[i]?.record, cpTypes?.[i], cpAmount)
       } else {
         ret += this.constructMarker(markers?.[i])
       }
@@ -249,7 +250,7 @@ export default class RecordList {
   }
 
   private getInfos(login: string, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: UiRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
-    const cps: number[][] = Array.from(Array(cpAmount), (): never[] => [])
+    const cps: (number | undefined)[][] = Array.from(Array(cpAmount), (): never[] => [])
     const infos: { index: number, offset: number }[] = []
     const infoPositions: boolean[][] = Array.from(Array(records.length), (): any[] => new Array(Math.ceil(cpAmount / this.infoColumns) + 1).fill(false))
     for (const [i, e] of records.entries()) {
@@ -269,17 +270,18 @@ export default class RecordList {
     return this.isFullRow === false ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
   }
 
-  private getCpTypes = (login: string, cps: number[][], records: UiRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  private getCpTypes = (login: string, cps: (number | undefined)[][], records: UiRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
     if (cps.length === 0 || cps?.[0]?.length === 0) {
       return []
     }
     const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), (): any[] => new Array(cps.length).fill(null))
     if (cps?.[0]?.filter(a => a !== undefined)?.length === 1) {
-      const c: number[] | undefined = records.find(a => a.login === login)?.checkpoints
+      const c: (number | undefined)[] | undefined = records.find(a => a.login === login)?.checkpoints
       const index: number = cps[0].length - 1
       if (c !== undefined) {
         for (const [i, e] of cps.map(a => a[index]).entries()) {
-          if (e > c[i]) {
+          if (e === undefined || c[i] !== undefined) { continue }
+          if (e > (c[i] as number)) {
             cpTypes[index][i] = 'worst'
           } else if (e === c[i]) {
             cpTypes[index][i] = 'equal'
@@ -294,10 +296,10 @@ export default class RecordList {
       if (cps?.[0]?.length < 2) {
         break
       }
-      const max: number = Math.max(...e.filter(a => !isNaN(a)))
-      const worst: number[] = e.filter(a => a === max)
-      const min: number = Math.min(...e.filter(a => !isNaN(a)))
-      const best: number[] = e.filter(a => a === min)
+      const max: number = Math.max(...e.filter(a => !isNaN(a as any)) as number[])
+      const worst: number[] = e.filter(a => a === max) as number[]
+      const min: number = Math.min(...e.filter(a => !isNaN(a as any)) as number[])
+      const best: number[] = e.filter(a => a === min) as number[]
       if (max === min) {
         continue
       }
@@ -381,7 +383,7 @@ export default class RecordList {
     return ret
   }
 
-  private constructInfo(offset: number, record: UiRecord, cpTypes: ("best" | "worst" | "equal" | undefined)[]): string {
+  private constructInfo(offset: number, record: UiRecord, cpTypes: ("best" | "worst" | "equal" | undefined)[], cpAmount: number): string {
     let ret: string = ''
     const width: number = this.infoColumnWidth * this.infoColumns
     const h: number = this.rowHeight - this.rowGap
@@ -445,7 +447,7 @@ export default class RecordList {
       ret += `<quad posn="${posX + w} 0 1" sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}"/>
       <quad posn="${posX + w + this.iconHorizontalPadding} ${-this.iconVerticalPadding} 6" sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.infoIcon}"/>`
     }
-    const cps: number[] | undefined = record.checkpoints
+    const cps: (number | undefined)[] | undefined = record.checkpoints
     const colours = {
       best: `${tm.utils.palette.green}F`,
       worst: `${tm.utils.palette.red}F`,
@@ -454,16 +456,17 @@ export default class RecordList {
     if (cps !== undefined) {
       for (let i: number = 0; i < cps.length / this.infoColumns; i++) {
         for (let j: number = 0; j < this.infoColumns; j++) {
-          const cp: number = cps[(i * this.infoColumns) + j]
-          if (cp === undefined) { break }
+          const cp: number | undefined = cps[(i * this.infoColumns) + j]
           let colour: string = 'FFFF'
+          if ((i * this.infoColumns) + j >= cpAmount) { break }
           const type = cpTypes?.[(i * this.infoColumns) + j]
           if (type !== undefined) {
             colour = (colours as any)[type]
           }
           ret += `<quad posn="${posX + (this.infoColumnWidth * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.infoColumnWidth - this.columnGap} ${h}" bgcolor="${this.background}"/>
           <format textcolor="${colour}"/>
-          ${this.centeredText(tm.utils.getTimeString(cp), this.infoColumnWidth - this.columnGap, h, posX + (this.infoColumnWidth * j), this.rowHeight * (i + 1))}
+          ${this.centeredText(cp === undefined ? '-:--.--' : tm.utils.getTimeString(cp),
+            this.infoColumnWidth - this.columnGap, h, posX + (this.infoColumnWidth * j), this.rowHeight * (i + 1))}
           <format textcolor="FFFF"/>`
         }
       }

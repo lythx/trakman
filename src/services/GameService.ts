@@ -125,7 +125,7 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
-    if (!this.isGameInfoChanged(obj)) { return }
+    if (this._game !== undefined && !this.isGameInfoChanged(obj)) { return }
     this._game = obj
     if (this._game.timeAttackLimit !== 0) { // TODO CHECK IF CAUSES BUGS DUE TO RETURN 
       this.timeAttackLimit = this._game.timeAttackLimit
@@ -136,10 +136,10 @@ export class GameService {
   private static isGameInfoChanged(obj: any): boolean {
     for (const key in this._game) {
       if (obj[key] !== this._game[key as keyof typeof this._game]) {
-        return false
+        return true
       }
     }
-    return true
+    return false
   }
 
   static set state(state: tm.ServerState) {

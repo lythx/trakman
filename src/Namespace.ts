@@ -105,7 +105,7 @@ declare global {
       team?: 'red' | 'blue'
       // TODO DOCUMENT
       roundsPoints: number
-
+      // -1 if nofin
       roundTimes: number[]
     }
     /** Controller offline player object */
@@ -813,10 +813,12 @@ declare global {
       readonly defaultLapsAmount: number
       /** Current amount of laps depending on dedicated server config and map default laps */
       readonly lapsAmount: number
-      /** Amount of checkpoints per lap */
+      /** Amount of checkpoints per lap (includes finish) */
       readonly checkpointsPerLap: number
-      /** Total amount of checkpoints depending on map checkpoints per lap and laps amount */
+      /** Total amount of checkpoints depending on map checkpoints per lap and laps amount (includes finish) */
       readonly checkpointsAmount: number
+      /** Whether the map is in laps mode (always false in TimeAttack and Stunts, true in other gamemodes if map has multilap start) */
+      readonly isInLapsMode: boolean
     }
     /** Controller local record object */ // TODO UPDATE DOC
     export type LocalRecord = Record & OfflinePlayer

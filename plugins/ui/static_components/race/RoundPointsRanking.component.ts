@@ -52,7 +52,7 @@ export default class RoundPointsRanking extends StaticComponent {
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
-       { dontParseTime: true, columnProportions: config.columnProportions })
+      { dontParseTime: true, columnProportions: config.columnProportions })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -72,7 +72,10 @@ export default class RoundPointsRanking extends StaticComponent {
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(login, tm.rounds.pointsRanking
       .filter(a => a.roundsPoints !== 0)
-      .map(a => ({ name: a.nickname, time: a.roundsPoints, checkpoints: a.roundTimes, login: a.login }))
+      .map(a => ({
+        name: a.nickname, time: a.roundsPoints, login: a.login,
+        checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a),
+      }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
