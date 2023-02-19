@@ -12,6 +12,15 @@ const client: DedimaniaClient = new DedimaniaClient()
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
+const environment: { [environment in tm.Environment]: string } = {
+  Stadium: 'Stadium',
+  Island: 'Island',
+  Desert: 'Speed',
+  Rally: 'Rally',
+  Bay: 'Bay',
+  Coast: 'Coast',
+  Snow: 'Alpine'
+}
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -39,7 +48,7 @@ const initialize = async (): Promise<void> => {
   }
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
-  await getRecords(current.id, current.name, current.environment, current.author)
+  await getRecords(current.id, current.name, environment[current.environment], current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
@@ -91,13 +100,13 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { string: name },
       { string: environment },
       { string: author },
-      { string: 'TMF' }, // Maybe do cfg.game.toUpperCase().substring(3) :fun:
+      { string: 'TMF' },
       { int: tm.config.game.gameMode },
       {
         struct: {
           SrvName: { string: cfg.name },
           Comment: { string: cfg.comment },
-          Private: { boolean: cfg.password === '' },
+          Private: { boolean: cfg.password !== '' },
           SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
           SrvPort: { string: '5000' },
           XmlRpcPort: { string: '5000' },
@@ -162,7 +171,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
   if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
 }
 
-const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
+const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   time: number, checkpoints: number[]): void => {
   if (client.connected === false) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
@@ -210,7 +219,7 @@ const updateServerPlayers = (): void => {
           struct: {
             SrvName: { string: cfg.name },
             Comment: { string: cfg.comment },
-            Private: { boolean: cfg.password === '' },
+            Private: { boolean: cfg.password !== '' },
             SrvIP: { string: '127.0.0.1' },
             SrvPort: { string: '5000' },
             XmlRpcPort: { string: '5000' },
@@ -226,7 +235,7 @@ const updateServerPlayers = (): void => {
       ]
     )
     if (status instanceof Error) { tm.log.error('Failed to update dedimania status', status.message) }
-  }, 240000)
+  }, config.updateInterval * 1000)
 }
 
 /**
@@ -288,7 +297,7 @@ const getPlayersArray = (): any[] => {
   return arr
 }
 
-const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator'>,
+const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   checkpoints: number[], time: number, previousTime: number | undefined, position: number, previousPosition: number | undefined): NewDediRecord => {
   return {
     ...player,
