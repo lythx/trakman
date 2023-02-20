@@ -42,13 +42,10 @@ export default class RoundPointsRanking extends StaticComponent {
   private getRecordList(): void {
     let height = config.height
     let entries = config.entries
-    // if (tm.getGameMode() === 'Teams') {
-    //   height = config.teamsHeight
-    //   entries = config.teamsEntries
-    // } else if (tm.getGameMode() === 'Rounds') {
-    //   height = config.roundsHeight
-    //   entries = config.roundsEntries
-    // } // TODO CUP
+    if (tm.getGameMode() === 'Cup') {
+      height = config.cupHeight
+      entries = config.cupEntries
+    }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
@@ -73,7 +70,7 @@ export default class RoundPointsRanking extends StaticComponent {
           ${this.recordList.constructXml(login, tm.rounds.pointsRanking
       .filter(a => a.roundsPoints !== 0)
       .map(a => ({
-        name: a.nickname, time: a.roundsPoints, login: a.login,
+        name: a.nickname, time: a.cupPosition ?? a.roundsPoints, login: a.login,
         checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a),
       }))
       .slice(0, tm.records.maxLocalsAmount))}

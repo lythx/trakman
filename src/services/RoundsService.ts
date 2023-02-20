@@ -11,6 +11,10 @@ export class RoundsService {
   private static _teamScores: { blue: number; red: number } = { blue: 0, red: 0 }
   private static _roundsPointSystem: number[] = []
   private static _roundsPointsLimit: number
+  private static _cupPointsLimit: number
+  private static _cupWarmUpRounds: number
+  private static _cupMaxWinnersCount: number
+  private static readonly _cupWinners: tm.Player[] = []
   private static _teamsPointsLimit: number
   private static teamMaxPoints: number // TODO FIND OUT WHAT IS THIS
   private static _ranking: tm.Player[]
@@ -25,7 +29,7 @@ export class RoundsService {
   static async initialize(): Promise<void> {
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
-      Logger.fatal(status.message)
+      await Logger.fatal(status.message)
     }
     const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
     const playerList = PlayerService.players as tm.Player[]
@@ -55,7 +59,10 @@ export class RoundsService {
       { method: 'GetRoundCustomPoints' },
       { method: 'GetRoundPointsLimit' },
       { method: 'GetTeamPointsLimit' },
-      { method: 'GetMaxPointsTeam' }])
+      { method: 'GetMaxPointsTeam' },
+      { method: 'GetCupPointsLimit' },
+      { method: 'GetCupWarmUpDuration' },
+      { method: 'GetCupNbWinners' }])
     if (settings instanceof Error) {
       return new Error(`Failed to fetch round settings, server responded with error: ${settings.message}`)
     }
@@ -63,13 +70,17 @@ export class RoundsService {
     if (err !== undefined) {
       return new Error(`Failed to fetch round settings, server responded with error: ${err.message}`)
     }
-    const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints] =
+    const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints,
+      cupPointsLimit, cupWarmUpRounds, cupMaxWinnersCount] =
       (settings as { method: string; params: any; }[]).map(a => a.params)
     this._roundsPointSystem = roundPointSystem
     this._roundsPointSystem = roundPointSystem
     this._roundsPointsLimit = roundPointsLimit.currentValue
     this._teamsPointsLimit = teamPointsLimit.currentValue
     this.teamMaxPoints = teamMaxPoints.currentValue
+    this._cupPointsLimit = cupPointsLimit.currentValue
+    this._cupWarmUpRounds = cupWarmUpRounds.currentValue
+    this._cupMaxWinnersCount = cupMaxWinnersCount.currentValue
     if (this._roundsPointSystem.length === 0) {
       this._roundsPointSystem = config.roundsModePointSystem
       Client.callNoRes(`SetRoundCustomPoints`,
@@ -101,12 +112,16 @@ export class RoundsService {
         this.teamsRoundPoints = PlayerService.players.filter(a => !a.isPureSpectator).length
       }
       points = this.teamsRoundPoints - this.roundFinishCount
-    } else if (GameService.gameMode === 'Rounds') {
+    } else if (GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup') {
       points = this._roundsPointSystem[this.roundFinishCount]
     }
     player.roundsPoints += points
     this._ranking[index] = player
     this.fixRankingPosition(index)
+    if (GameService.gameMode === 'Cup' && player.roundsPoints > this._cupPointsLimit) {
+      this._cupWinners.push(player)
+      player.cupPosition = this._cupWinners.length
+    }
     this.roundFinishCount++
     return points
   }
@@ -122,6 +137,10 @@ export class RoundsService {
       if (player.roundTimes[i] === undefined) { player.roundTimes[i] = -1 }
     }
     player.roundsPoints = this._ranking[index].roundsPoints
+    const winIndex = this._cupWinners.findIndex(a => a.login === player.login)
+    if (winIndex !== -1) {
+      player.cupPosition = winIndex + 1
+    }
     this._ranking[index] = player
   }
 
@@ -143,6 +162,7 @@ export class RoundsService {
     this._roundRecords.length = 0
     this.roundFinishCount = 0
     this.noRoundFinishes = true
+    this._cupWinners.length = 0
   }
 
   static async handleEndRound(): Promise<void> {
@@ -157,7 +177,7 @@ export class RoundsService {
       this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
       this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
     }
-    if (GameService.gameMode === 'Rounds') {
+    if (GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup') {
       // This method modifies the player objects so it needs to ignore the readonly constraint
       const playerList = PlayerService.players as tm.Player[]
       for (let i = 0; i < playerList.length; i++) {
@@ -172,7 +192,7 @@ export class RoundsService {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }
         if (obj.roundsPoints !== e.Score) {
-          Logger.debug(`Rounds points mismatch in RoundsService`, JSON.stringify(obj), JSON.stringify(e))
+          Logger.debug(`${GameService.gameMode} points mismatch in RoundsService`, JSON.stringify(obj), JSON.stringify(e))
           const player = PlayerService.get(obj.login) as tm.Player
           obj.roundsPoints = e.Score
           if (player !== undefined) { player.roundsPoints = e.Score }
@@ -183,7 +203,7 @@ export class RoundsService {
 
   private static fixRankingPosition(index: number) {
     const obj = this._ranking[index]
-    for (let i = 0; i < index; i++) {
+    for (let i = this._cupWinners.length; i < index; i++) { // Preserve cup winner order
       if (obj.roundsPoints > this._ranking[i].roundsPoints) {
         this._ranking.splice(i, 0, obj)
       }

@@ -16,7 +16,7 @@ export default {
     mute: 1,
     addGuest: 1
   },
-  //TODO DOCUMENT
+  //TODO DOCUMENT also for cup
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
   /** TODO DOCUMENT */
   defaultTimeAttackTimeLimit: 300000,

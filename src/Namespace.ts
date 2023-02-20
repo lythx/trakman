@@ -107,6 +107,8 @@ declare global {
       roundsPoints: number
       // -1 if nofin
       roundTimes: number[]
+      
+      cupPosition?: number
     }
     /** Controller offline player object */
     export interface OfflinePlayer {
@@ -278,8 +280,6 @@ declare global {
       readonly checkpoints: number[]
       /** Player nickname */
       nickname: string
-      // TODO DOC
-      roundPoints?: number
     }
     /** Controller karma map vote object */
     export interface Vote {
@@ -830,8 +830,11 @@ declare global {
       readonly player: Player
     }
     /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
-    export type FinishInfo = Omit<Player & LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'
-      | 'isTemporarySpectator' | 'isPureSpectator'>
+    export type FinishInfo = Omit<Player & LocalRecord & {
+      // TODO DOC
+      readonly roundPoints?: number
+    },
+      'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
     /** Object containing player information. Created and emitted on the PlayerLeave event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LeaveInfo = Omit<Player, 'lastOnline'> & {
       /** Amount of time the player spent on the server in the current session */
