@@ -46,11 +46,11 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.timelimit.notDynamic, info.login)
         return
       }
-      if (actionStr.startsWith('pause')) {
+      if (actionStr === 'pause' || actionStr === 'stop') {
         pauseTimer(info)
         return
       }
-      if (actionStr.startsWith('resume')) {
+      if (actionStr === 'resume' || actionStr === 'unpause' || actionStr === 'start') {
         resumeTimer(info)
         return
       }

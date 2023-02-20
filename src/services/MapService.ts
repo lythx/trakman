@@ -435,9 +435,11 @@ export class MapService {
     } else {
       laps = defaultLapAmount
     }
-    // if(GameService.gameMode === 'Laps' && GameService.config.lapsModeLapsAmount !== 0) {
-    //   return GameService.config.roundsModeLapsAmount * checkpointsPerLap
-    // } TODO 
+    if (GameService.gameMode === 'Laps') { // TODO TEST
+      laps = GameService.config.lapsModeLapsAmount
+      isLapsAmountModified = true
+    }
+    // Cup and Teams laps amount can't be modified
     return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }// + defaultLapAmount // Treat finish as checkpoint between laps
   }
 

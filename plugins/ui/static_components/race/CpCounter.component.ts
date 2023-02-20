@@ -121,4 +121,14 @@ export default class CpCounter extends StaticComponent {
             </frame>
         </manialink>`, login)
   }
+
+  // private getLapsXml(w: number) {
+  //   const h = this.header.options
+  //   let counterXml: string = `
+  //   <frame posn="${h.squareWidth + h.margin * 2 + h.rectangleWidth} ${h.height + config.margin} 3">
+  //     <quad posn="0 0 3" sizen="${counterW} ${h.height}" bgcolor="${h.textBackground}"/>
+  //     ${centeredText(counter, counterW, h.height, h)}
+  //   </frame>`
+  // }
+
 }

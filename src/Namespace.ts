@@ -589,13 +589,13 @@ declare global {
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Teams mode related */ // TODO TEAMS TODO UPDATE DOCS
+      /** Amount of points to end map in Teams Mode */ // TODO Document
       teamPointsLimit: number
       /** Teams mode related */ // TODO TEAMS
       teamMaxPoints: number
       /** Points system type used in teams mode */ // TODO TEAMS
       teamPointSystemType: boolean
-      /** Amount of laps in laps mode */ // TODO LAPS
+      /** Amount of laps in laps mode */ // TODO Document
       lapsModeLapsAmount: number
       /** Amount of time left for players to finish the track after the leader in laps mode */
       lapsModeFinishTimeout: number
@@ -819,7 +819,7 @@ declare global {
       readonly checkpointsAmount: number
       /** Whether the map is in laps mode (always false in TimeAttack and Stunts, true in other gamemodes if map has multilap start) */
       readonly isInLapsMode: boolean
-      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack and Stunts) */
+      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts, Cup, Teams, always true in Laps) */
       readonly isLapsAmountModified: boolean
     }
     /** Controller local record object */ // TODO UPDATE DOC

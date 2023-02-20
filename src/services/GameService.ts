@@ -127,7 +127,7 @@ export class GameService {
     }
     if (this._game !== undefined && !this.isGameInfoChanged(obj)) { return }
     this._game = obj
-    if (this._game.timeAttackLimit !== 0) { // TODO CHECK IF CAUSES BUGS DUE TO RETURN 
+    if (this._game.timeAttackLimit !== 0) {
       this.timeAttackLimit = this._game.timeAttackLimit
     }
     Events.emit('GameConfigChanged', this._game)
