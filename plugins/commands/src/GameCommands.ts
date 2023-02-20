@@ -101,23 +101,25 @@ const commands: tm.Command[] = [
     privilege: config.setlapsamount.privilege
   },
   {
-    aliases: config.setroundslapsamount.aliases,
+    aliases: config.setroundslapsamount.aliases, // TODO TEST
     help: config.setroundslapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 0) {
-        tm.sendMessage(config.setroundslapsamount.error, info.login)
-        return
-      }
-      if (amount < 0) { // TODO FIX MESSAGE FOR 0
+      if (amount < 0) {
         tm.sendMessage(config.setroundslapsamount.insufficientLaps, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.text, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setroundslapsamount.public ? undefined : info.login)
+      if (amount === 0) {
+        tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.resetText, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname), amount: amount
+        }), config.setroundslapsamount.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.text, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname), amount: amount
+        }), config.setroundslapsamount.public ? undefined : info.login)
+      }
       tm.client.callNoRes(`SetRoundForcedLaps`, [{ int: amount }])
     },
     privilege: config.setroundslapsamount.privilege

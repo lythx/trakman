@@ -40,13 +40,13 @@ export default {
     help: `Set the laps amount in laps mode.`
   },
   setroundslapsamount: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the laps amount to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in rounds mode.`,
-    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to ${p.highlight}#{amount}${p.admin}.`,
+    resetText: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to default map value.`,
+    insufficientLaps: `${p.error}Laps amount cannot be less than zero`,
     public: true,
     privilege: 2,
     aliases: ['srla', 'setroundslapsamount'],
-    help: `Set the laps amount in rounds mode.`
+    help: `Set the laps amount in rounds mode. Set 0 to use default map laps.`
   },
   setroundspointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
