@@ -13,6 +13,7 @@ export class RecordService {
 
   private static repo: RecordRepository = new RecordRepository()
   private static _localRecords: tm.LocalRecord[] = []
+  private static _lapRecords: tm.LocalRecord[] = []
   private static _liveRecords: tm.FinishInfo[] = []
   /** Maximum amount of local records */
   static readonly maxLocalsAmount: number = config.localRecordsLimit
@@ -27,8 +28,10 @@ export class RecordService {
   static async initialize(): Promise<void> {
     if (MapService.current.isInLapsMode) {
       this._localRecords = await this.repo.getLocalRecords(MapService.current.lapsAmount, MapService.current.id)
+      this._lapRecords = await this.repo.getLocalRecords(null, MapService.current.id)
     } else {
       this._localRecords = await this.repo.getLocalRecords(null, MapService.current.id)
+      this._lapRecords = []
     }
     this._initialLocals.push(...this._localRecords)
     await this.updateQueue()
@@ -64,8 +67,10 @@ export class RecordService {
     this._initialLocals.push(...this._localRecords)
     if (MapService.current.isInLapsMode) {
       this._localRecords = await this.repo.getLocalRecords(MapService.current.lapsAmount, MapService.current.id)
+      this._lapRecords = await this.repo.getLocalRecords(null, MapService.current.id)
     } else {
       this._localRecords = await this.repo.getLocalRecords(null, MapService.current.id)
+      this._lapRecords = []
     }
   }
 
@@ -77,8 +82,10 @@ export class RecordService {
     this._liveRecords.length = 0
     if (MapService.current.isInLapsMode) {
       this._localRecords = await this.repo.getLocalRecords(MapService.current.lapsAmount, MapService.current.id)
+      this._lapRecords = await this.repo.getLocalRecords(null, MapService.current.id)
     } else {
       this._localRecords = await this.repo.getLocalRecords(null, MapService.current.id)
+      this._lapRecords = []
     }
     this._initialLocals.length = 0
     this._initialLocals.push(...this._localRecords)
@@ -157,6 +164,30 @@ export class RecordService {
     return { localRecord, finishInfo, liveRecord }
   }
 
+  static async addLap(map: string, player: tm.Player, time: number, checkpoints: number[], isFinish: boolean): Promise<false | {
+    lapInfo: tm.LapFinishInfo, lapRecord?: tm.LapRecordInfo
+  }> {
+    const date: Date = new Date()
+    // If number of checkpoints doesn't match the map checkpoints amount reset checkpoints array and return
+    if (checkpoints.length !== MapService.current.checkpointsPerLap - 1) {
+      checkpoints.length = 0
+      return false
+    }
+    const finishInfo: tm.LapFinishInfo = {
+      ...player,
+      checkpoints: [...checkpoints],
+      map,
+      time,
+      isFinish
+    }
+    const localRecord: Partial<tm.LapRecordInfo> | undefined =
+      await this.handleLocalRecord(map, time, date, [...checkpoints], player, true)
+    if (localRecord !== undefined) {
+      (localRecord as any).isFinish = isFinish
+    }
+    return { lapRecord: localRecord as tm.LapRecordInfo, lapInfo: finishInfo }
+  }
+
   /**
    * Updates the player nickname in runtime memory
    * @param players Objects containing player logins and nicknames
@@ -196,35 +227,37 @@ export class RecordService {
    * @returns Record object if local record gets added, undefined otherwise
    */
   private static async handleLocalRecord(mapId: string, time: number, date: Date,
-    checkpoints: number[], player: tm.Player): Promise<tm.RecordInfo | undefined> {
-    const previousIndex = this._localRecords.findIndex(a => a.login === player.login)
-    let position: number = this._localRecords.findIndex(a => a.time > time) + 1
+    checkpoints: number[], player: tm.Player, isLap?: true): Promise<tm.RecordInfo | undefined> {
+    const records = isLap ? this._lapRecords : this._localRecords
+    const recType = isLap ? 'lap' : 'local'
+    const previousIndex = records.findIndex(a => a.login === player.login)
+    let position: number = records.findIndex(a => a.time > time) + 1
     // If player gets the worst record on the server set position to array length + 1
-    if (position === 0) { position = this._localRecords.length + 1 }
+    if (position === 0) { position = records.length + 1 }
     if (previousIndex === -1) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
-      this._localRecords.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(undefined, position, undefined, time, player, 'local'))
-      if (MapService.current.isInLapsMode) {
+      records.splice(position - 1, 0, recordInfo)
+      Logger.info(...this.getLogString(undefined, position, undefined, time, player, recType))
+      if (MapService.current.isInLapsMode && !isLap) {
         void this.repo.add(MapService.current.lapsAmount, recordInfo)
       } else {
         void this.repo.add(null, recordInfo)
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
-    const pb: number | undefined = this._localRecords[previousIndex].time
+    const pb: number | undefined = records[previousIndex].time
     if (time === pb) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
-      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, 'local'))
+      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, recType))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     if (time < pb) {
-      const previousTime: number | undefined = this._localRecords[previousIndex].time
+      const previousTime: number | undefined = records[previousIndex].time
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
-      this._localRecords.splice(previousIndex, 1)
-      this._localRecords.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'local'))
-      if (MapService.current.isInLapsMode) {
+      records.splice(previousIndex, 1)
+      records.splice(position - 1, 0, recordInfo)
+      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, recType))
+      if (MapService.current.isInLapsMode && !isLap) {
         void this.repo.update(recordInfo.map, recordInfo.login,
           recordInfo.time, recordInfo.checkpoints, recordInfo.date, MapService.current.lapsAmount)
       } else {
@@ -395,7 +428,8 @@ export class RecordService {
    * @returns Array of strings formatted for Logger output
    */
   private static getLogString(previousPosition: number | undefined, position: number,
-    previousTime: number | undefined, time: number, player: { login: string, nickname: string }, recordType: 'live' | 'local'): string[] {
+    previousTime: number | undefined, time: number, player: { login: string, nickname: string },
+    recordType: 'live' | 'local' | 'lap'): string[] {
     const rs = Utils.getRankingString({ time, position }, (previousPosition && previousTime) ? { position: previousPosition, time: previousTime } : undefined)
     return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
       ` ${Utils.getPositionString(position)} ${recordType} record. Time: ` + `

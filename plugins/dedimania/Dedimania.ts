@@ -397,7 +397,7 @@ if (config.isEnabled === true) {
 
   tm.addListener('PlayerLap', (info) => {
     if (uploadLaps) {
-      void addRecord(info.player, info.lapTime, info.lapCheckpoints)
+      void addRecord(info, info.time, info.checkpoints)
     }
   })
 

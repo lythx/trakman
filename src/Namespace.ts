@@ -759,7 +759,9 @@ declare global {
       "BeginRound": Readonly<tm.FinishInfo>[]
       "EndRound": Readonly<tm.FinishInfo>[]
       "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
-      "PlayerLap": Readonly<LapInfo>
+      // TODO DOC
+      "PlayerLap": Readonly<LapFinishInfo>
+      "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]
@@ -874,11 +876,13 @@ declare global {
         readonly time: number
       }
     }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
-    export type LapInfo = Readonly<CheckpointInfo & {
-      //TODO DOCUMENT
+    export type LapFinishInfo = Readonly<FinishInfo & {
+      //TODO DOC
       readonly isFinish: boolean
-      readonly lapTime: number
-      readonly lapCheckpoints: number[]
+    }>
+    export type LapRecordInfo = Readonly<RecordInfo & {
+      //TODO DOC
+      readonly isFinish: boolean
     }>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player

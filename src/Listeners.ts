@@ -103,16 +103,21 @@ export class Listeners {
           index: checkpointIndex,
           player
         }
+        if ((cpStatus as any).isFinish !== undefined) {
+          const lapObj = await RecordService.addLap(MapService.current.id, player, (cpStatus as any).lapTime,
+            (cpStatus as any).lapCheckpoints, (cpStatus as any).isFinish)
+          if (lapObj !== false) {
+            Events.emit(`PlayerLap`, lapObj.lapInfo)
+            if (lapObj.lapRecord !== undefined) {
+              // TODO MAKE MESSAGES FOR LAP RECORDS (and widgets later too)
+              Events.emit(`LapRecord`, lapObj.lapRecord)
+            }
+          }
+        }
         // Last CP = Finish
         if (cpStatus === true || (cpStatus as any).isFinish === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
-            if ((cpStatus as any).isFinish !== undefined) {
-              Events.emit(`PlayerLap`, {
-                ...info, lapTime: (cpStatus as any).lapTime,
-                isFinish: true, lapCheckpoints: (cpStatus as any).lapCheckpoints
-              })
-            }
             if (obj.localRecord !== undefined) {
               // Register player local record
               Events.emit('LocalRecord', obj.localRecord)
@@ -129,12 +134,6 @@ export class Listeners {
         } else if (cpStatus === false || (cpStatus as any).isFinish === false) {
           // Register player checkpoint
           Events.emit('PlayerCheckpoint', info)
-          if ((cpStatus as any).isFinish !== undefined) {
-            Events.emit(`PlayerLap`, {
-              ...info, lapTime: (cpStatus as any).lapTime,
-              isFinish: false, lapCheckpoints: (cpStatus as any).lapCheckpoints
-            })
-          }
         }
       }
     },
