@@ -109,6 +109,8 @@ declare global {
       roundTimes: number[]
 
       cupPosition?: number
+
+      isCupFinalist: boolean  
     }
     /** Controller offline player object */
     export interface OfflinePlayer {

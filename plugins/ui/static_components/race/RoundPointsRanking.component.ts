@@ -14,7 +14,7 @@ export default class RoundPointsRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundPointsRanking, 'race', ['Rounds'])
+    super(componentIds.roundPointsRanking, 'race', ['Rounds', 'Cup'])
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
@@ -70,8 +70,8 @@ export default class RoundPointsRanking extends StaticComponent {
           ${this.recordList.constructXml(login, tm.rounds.pointsRanking
       .filter(a => a.roundsPoints !== 0)
       .map(a => ({
-        name: a.nickname, time: a.cupPosition ?? a.roundsPoints, login: a.login,
-        checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a),
+        name: a.nickname, time: a.roundsPoints, login: a.login,
+        checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a), image: this.getCupImage(a)
       }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
@@ -79,6 +79,11 @@ export default class RoundPointsRanking extends StaticComponent {
     </manialink>`,
       login
     )
+  }
+
+  private getCupImage(player: tm.Player): string | undefined {
+    if(player.cupPosition === undefined) { return undefined}
+    return config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage
   }
 
 }

@@ -93,6 +93,7 @@ export default {
     aliases: ['scrpm', 'setcuproundspermap'],
     help: `Set the amount of rounds per map for cup mode.`
   },
+  // TODO CHANGE NAME ITS NOT REALLY TIME IS IT
   setcupwarmuptime: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of rounds in warm-up to ${p.highlight}#{amount}${p.admin}.`,
     error: `${p.error}Server is not in cup mode.`,

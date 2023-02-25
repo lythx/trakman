@@ -9,8 +9,10 @@ export default {
   icon: icons.chartLocal,
   margin: cfg.margin,
   entries: 7,
-  cupEntries: 17.22,
+  cupEntries: 7,
   topCount: 5,
   columnProportions: [1, 2, 5],
-  displayNoRecordEntry: true
+  displayNoRecordEntry: true,
+  cupPositionImages: [icons.trophyClassic, icons.trophy, icons.trophyNadeo],
+  otherCupPositionsImage: icons.placeholder
 }

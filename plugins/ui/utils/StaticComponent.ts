@@ -100,6 +100,10 @@ export default abstract class StaticComponent {
           left = cfg.teamsLeftSideOrder
           right = cfg.teamsRightSideOrder
           break
+        case "Cup":
+          left = cfg.cupLeftSideOrder
+          right = cfg.cupRightSideOrder
+          break
         default:
           left = cfg.leftSideOrder
           right = cfg.rightSideOrder

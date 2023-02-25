@@ -13,7 +13,7 @@ export default class RoundScore extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundScore, 'race', ['Teams', 'Rounds'])
+    super(componentIds.roundScore, 'race', ['Teams', 'Rounds', 'Cup'])
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerFinish', (): void => this.display())
@@ -40,7 +40,8 @@ export default class RoundScore extends StaticComponent {
           ${this.recordList.constructXml(login, tm.records.roundRecords
       .map(a => ({
         name: a.nickname, time: a.time, checkpoints: a.checkpoints,
-        login: a.login, points: a.roundPoints, color: a.team
+        login: a.login, points: a.roundPoints, color: a.team,
+        markerImage: a.isCupFinalist ? config.cupFinalistIcon : this.getCupImage(a)
       }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
@@ -56,14 +57,14 @@ export default class RoundScore extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.teamsHeight
-    let entries = config.teamsEntries
+    let height = config.roundsHeight
+    let entries = config.roundsEntries
     if (tm.getGameMode() === 'Teams') {
       height = config.teamsHeight
       entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Rounds') {
-      height = config.roundsHeight
-      entries = config.roundsEntries
+    } else if (tm.getGameMode() === 'Cup') {
+      height = config.cupHeight
+      entries = config.cupEntries
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
@@ -71,6 +72,11 @@ export default class RoundScore extends StaticComponent {
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
+  }
+
+  private getCupImage(player: tm.FinishInfo): string | undefined {
+    if (player.cupPosition === undefined) { return undefined }
+    return config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage
   }
 
 }

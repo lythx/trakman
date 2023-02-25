@@ -27,6 +27,7 @@ export class RoundsService {
    * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
    */
   static async initialize(): Promise<void> {
+    await Client.call('SetCupRoundsPerChallenge', [{ int: 0 }])
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
       await Logger.fatal(status.message)
@@ -44,6 +45,17 @@ export class RoundsService {
     for (const e of playerList) {
       if (!this._ranking.some(a => a.login === e.login)) {
         this._ranking.push(e)
+      }
+    }
+    if (GameService.gameMode === 'Cup') {
+      for (const e of this._ranking) {
+        if (e.roundsPoints > this._cupPointsLimit) {
+          e.roundsPoints = this._cupPointsLimit
+          this._cupWinners.push(e)
+          e.cupPosition = this._cupWinners.length
+        } else if (e.roundsPoints === this._cupPointsLimit) {
+          e.isCupFinalist = true
+        }
       }
     }
     Events.addListener('GameConfigChanged', () => {
@@ -75,12 +87,12 @@ export class RoundsService {
       (settings as { method: string; params: any; }[]).map(a => a.params)
     this._roundsPointSystem = roundPointSystem
     this._roundsPointSystem = roundPointSystem
-    this._roundsPointsLimit = roundPointsLimit.currentValue
-    this._teamsPointsLimit = teamPointsLimit.currentValue
-    this.teamMaxPoints = teamMaxPoints.currentValue
-    this._cupPointsLimit = cupPointsLimit.currentValue
-    this._cupWarmUpRounds = cupWarmUpRounds.currentValue
-    this._cupMaxWinnersCount = cupMaxWinnersCount.currentValue
+    this._roundsPointsLimit = roundPointsLimit.CurrentValue
+    this._teamsPointsLimit = teamPointsLimit.CurrentValue
+    this.teamMaxPoints = teamMaxPoints.CurrentValue
+    this._cupPointsLimit = cupPointsLimit.CurrentValue
+    this._cupWarmUpRounds = cupWarmUpRounds.CurrentValue
+    this._cupMaxWinnersCount = cupMaxWinnersCount.CurrentValue
     if (this._roundsPointSystem.length === 0) {
       this._roundsPointSystem = config.roundsModePointSystem
       Client.callNoRes(`SetRoundCustomPoints`,
@@ -115,14 +127,25 @@ export class RoundsService {
     } else if (GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup') {
       points = this._roundsPointSystem[this.roundFinishCount]
     }
-    player.roundsPoints += points
     this._ranking[index] = player
-    this.fixRankingPosition(index)
-    if (GameService.gameMode === 'Cup' && player.roundsPoints > this._cupPointsLimit) {
-      this._cupWinners.push(player)
-      player.cupPosition = this._cupWinners.length
-    }
     this.roundFinishCount++
+    if (GameService.gameMode === 'Cup' && player.roundsPoints === this._cupPointsLimit) {
+      // Cupmode winner
+      if (this.roundFinishCount === 1) {
+        player.isCupFinalist = false
+        player.cupPosition = this._cupWinners.length + 1
+        this._ranking.splice(index, 1)
+        this._ranking.splice(player.cupPosition - 1, 0, player)
+        this._cupWinners.push(player)
+      } 
+      return points
+    }
+    player.roundsPoints += points
+    if (GameService.gameMode === 'Cup' && player.roundsPoints > this._cupPointsLimit) {
+      player.roundsPoints = this._cupPointsLimit
+      player.isCupFinalist = true
+    }
+    this.fixRankingPosition(index)
     return points
   }
 
@@ -137,6 +160,7 @@ export class RoundsService {
       if (player.roundTimes[i] === undefined) { player.roundTimes[i] = -1 }
     }
     player.roundsPoints = this._ranking[index].roundsPoints
+    player.isCupFinalist = this._ranking[index].isCupFinalist
     const winIndex = this._cupWinners.findIndex(a => a.login === player.login)
     if (winIndex !== -1) {
       player.cupPosition = winIndex + 1
@@ -154,6 +178,8 @@ export class RoundsService {
     for (const e of playerList) {
       e.roundsPoints = 0
       e.roundTimes = []
+      e.isCupFinalist = false
+      e.cupPosition = undefined
     }
     this._ranking = playerList
   }
@@ -192,6 +218,8 @@ export class RoundsService {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }
         if (obj.roundsPoints !== e.Score) {
+          if (GameService.gameMode === 'Cup' && (obj.roundsPoints === this._cupPointsLimit
+            || this._cupWinners.some(a => a.login === e.Login))) { continue }
           Logger.debug(`${GameService.gameMode} points mismatch in RoundsService`, JSON.stringify(obj), JSON.stringify(e))
           const player = PlayerService.get(obj.login) as tm.Player
           obj.roundsPoints = e.Score
@@ -202,12 +230,15 @@ export class RoundsService {
   }
 
   private static fixRankingPosition(index: number) {
-    const obj = this._ranking[index]
+    if (this._ranking[index] === undefined) { return }
+    const obj = this._ranking.splice(index, 1)[0]
     for (let i = this._cupWinners.length; i < index; i++) { // Preserve cup winner order
       if (obj.roundsPoints > this._ranking[i].roundsPoints) {
         this._ranking.splice(i, 0, obj)
+        return
       }
     }
+    this._ranking.splice(index, 0, obj)
   }
   // TODO DOCUMENTATA
   /**

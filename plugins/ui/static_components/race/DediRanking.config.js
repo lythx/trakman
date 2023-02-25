@@ -5,6 +5,7 @@ export default {
   height: 34.12,
   teamsHeight: 34.12,
   roundsHeight: 17.22,
+  cupHeight: 17.22,
   width: cfg.width,
   title: "Dedi Records",
   icon: icons.chartDedi,
@@ -12,6 +13,7 @@ export default {
   entries: 15,
   teamsEntries: 15,
   roundsEntries: 7,
+  cupEntries: 7,
   topCount: 5,
   displayNoRecordEntry: true
 }

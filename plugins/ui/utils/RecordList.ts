@@ -2,6 +2,7 @@ import IDS from '../config/UtilIds.js'
 import raceConfig from './RecordListRace.config.js'
 import resultConfig from './RecordListResult.config.js'
 
+// TODO DOC
 interface UiRecord {
   readonly time: number
   readonly login?: string
@@ -11,9 +12,11 @@ interface UiRecord {
   readonly url?: string
   readonly points?: number
   readonly color?: 'red' | 'blue'
+  readonly image?: string
+  readonly markerImage?: string
 }
 
-type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue' } | null
+type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue', image?: string } | null
 
 type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
@@ -181,7 +184,7 @@ export default class RecordList {
         ret += this.constructMarker(markers?.[i])
       }
       ret += this.constructIndex(parsedRecs?.[i]?.index) +
-        this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i]) +
+        this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i], parsedRecs?.[i]?.record?.image) +
         this.constructName(parsedRecs?.[i]?.record?.name) +
         '</frame>'
     }
@@ -323,7 +326,7 @@ export default class RecordList {
     for (let i: number = 0; i < records.length; i++) {
       const points = records[i].points
       if (points !== undefined) {
-        ret.push({ points: points, color: records[i].color })
+        ret.push({ points: points, color: records[i].color, image: records[i].markerImage })
         continue
       }
       if (infoPositions?.[i]?.[0] === true) {
@@ -481,8 +484,14 @@ export default class RecordList {
     if (typeof marker === 'object') {
       const color = (marker.color && this.markerBackground[marker.color]) ?
         `bgcolor="${this.markerBackground[marker.color]}"` : ''
+      let content: string
+      if (marker.image !== undefined) {
+        content = `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${marker.image}"/>`
+      } else {
+        content = this.centeredText(marker.points.toString(), this.markerWidth, this.rowHeight - this.rowGap, posX)
+      }
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" ${color}/>
-      ${this.centeredText(marker.points.toString(), this.markerWidth, this.rowHeight - this.rowGap, posX)}` // tood configer
+      ${content}`
     } else if (marker === 'faster') {
       icon += `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${this.markers.faster}"/>`
     } else if (marker === 'slower') {
@@ -503,15 +512,22 @@ export default class RecordList {
       ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
   }
 
-  private constructTime(time: number | undefined, timeColour: TimeColour | undefined): string {
+  private constructTime(time: number | undefined, timeColour: TimeColour | undefined, image: string | undefined): string {
     const posX: number = this.columnWidths[0]
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.columnGap
     const colour: string = timeColour === undefined ? 'FFFF' : (this.timeColours)[timeColour]
     const t: string = (`${time === undefined ? '' : (this.parseTime ? tm.utils.getTimeString(time) : time)}`).toString()
+    let content: string
+    if (image !== undefined) {
+      content = `<quad posn="${posX} 0 2"
+       sizen="${width} ${height}" image="${image}"/>`
+    } else {
+      content = this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)
+    }
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>
-    ${this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)}
+    ${content}
     <format textsize="1" textcolor="FFFF"/>`
   }
 

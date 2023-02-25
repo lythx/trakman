@@ -413,7 +413,8 @@ export class RecordService {
       title: player.title,
       hasPlayerSlot: player.hasPlayerSlot,
       roundsPoints: player.roundsPoints,
-      roundTimes: player.roundTimes
+      roundTimes: player.roundTimes,
+      isCupFinalist: player.isCupFinalist
     }
   }
 

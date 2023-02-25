@@ -131,7 +131,8 @@ export class PlayerService {
         rank: index === -1 ? undefined : (index + 1),
         title: this.getTitle(login, privilege, country, countryCode),
         roundsPoints: 0,
-        roundTimes: []
+        roundTimes: [],
+        isCupFinalist: false
       }
       this._totalPlayerCount++
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
@@ -162,7 +163,8 @@ export class PlayerService {
         ladderRank,
         title: this.getTitle(login, privilege, country, countryCode),
         roundsPoints: 0,
-        roundTimes: []
+        roundTimes: [],
+        isCupFinalist: false
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
