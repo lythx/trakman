@@ -96,11 +96,23 @@ export class Listeners {
           return
         }
         const checkpoint: tm.Checkpoint = { index: checkpointIndex, time: timeOrScore, lap: currentLap }
-        const cpStatus: boolean | Error = PlayerService.addCP(player, checkpoint)
+        const cpStatus = PlayerService.addCP(player, checkpoint)
+        const info: tm.CheckpointInfo = {
+          time: timeOrScore,
+          lap: currentLap,
+          index: checkpointIndex,
+          player
+        }
         // Last CP = Finish
-        if (cpStatus === true) {
+        if (cpStatus === true || (cpStatus as any).isFinish === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
+            if ((cpStatus as any).isFinish !== undefined) {
+              Events.emit(`PlayerLap`, {
+                ...info, lapTime: (cpStatus as any).lapTime,
+                isFinish: true, lapCheckpoints: (cpStatus as any).lapCheckpoints
+              })
+            }
             if (obj.localRecord !== undefined) {
               // Register player local record
               Events.emit('LocalRecord', obj.localRecord)
@@ -114,15 +126,15 @@ export class Listeners {
           }
           return
           // Real CP
-        } else if (cpStatus === false) {
-          const info: tm.CheckpointInfo = {
-            time: timeOrScore,
-            lap: currentLap,
-            index: checkpointIndex,
-            player
-          }
+        } else if (cpStatus === false || (cpStatus as any).isFinish === false) {
           // Register player checkpoint
           Events.emit('PlayerCheckpoint', info)
+          if ((cpStatus as any).isFinish !== undefined) {
+            Events.emit(`PlayerLap`, {
+              ...info, lapTime: (cpStatus as any).lapTime,
+              isFinish: false, lapCheckpoints: (cpStatus as any).lapCheckpoints
+            })
+          }
         }
       }
     },

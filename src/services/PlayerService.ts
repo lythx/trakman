@@ -227,7 +227,10 @@ export class PlayerService {
    * @param player Player object
    * @param cp Checkpoint object
    */
-  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean {
+  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean | {
+    lapTime: number,
+    isFinish: boolean, lapCheckpoints: number[]
+  } {
     const laps = tm.maps.current.lapsAmount
     if (cp.index === 0) {
       if (laps === 1 && MapService.current.checkpointsPerLap === 1) {  // finish if 0 cp map
@@ -244,8 +247,24 @@ export class PlayerService {
     const endLap: number = player.currentCheckpoints[0].lap + laps
     if (cp.lap < endLap) {
       player.currentCheckpoints.push(cp)
+      if (MapService.current.isInLapsMode && (cp.index + 1) % MapService.current.checkpointsPerLap === 0) {
+        const startIndex = cp.index - MapService.current.checkpointsPerLap
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        return {
+          lapTime: cp.time - startTime, isFinish: false,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1, -1).map(a => a.time - startTime)
+        }
+      }
       return false
     } else {
+      if (MapService.current.isInLapsMode) {
+        const startIndex = cp.index - MapService.current.checkpointsPerLap
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        return {
+          lapTime: cp.time - startTime, isFinish: true,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1).map(a => a.time - startTime)
+        }
+      }
       return true
     }
   }

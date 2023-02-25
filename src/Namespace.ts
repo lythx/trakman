@@ -107,7 +107,7 @@ declare global {
       roundsPoints: number
       // -1 if nofin
       roundTimes: number[]
-      
+
       cupPosition?: number
     }
     /** Controller offline player object */
@@ -759,6 +759,7 @@ declare global {
       "BeginRound": Readonly<tm.FinishInfo>[]
       "EndRound": Readonly<tm.FinishInfo>[]
       "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
+      "PlayerLap": Readonly<LapInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]
@@ -819,7 +820,7 @@ declare global {
       readonly checkpointsAmount: number
       /** Whether the map is in laps mode (always false in TimeAttack and Stunts, true in other gamemodes if map has multilap start) */
       readonly isInLapsMode: boolean
-      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts, Cup, Teams, always true in Laps) */
+      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts always true in Laps) */
       readonly isLapsAmountModified: boolean
     }
     /** Controller local record object */ // TODO UPDATE DOC
@@ -873,6 +874,12 @@ declare global {
         readonly time: number
       }
     }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+    export type LapInfo = Readonly<CheckpointInfo & {
+      //TODO DOCUMENT
+      readonly isFinish: boolean
+      readonly lapTime: number
+      readonly lapCheckpoints: number[]
+    }>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
     /** Dedicated server state ('result', 'race', 'transition') */

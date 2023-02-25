@@ -426,21 +426,19 @@ export class MapService {
     if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || !isLapRace) {
       return { checkpoints: checkpointsPerLap, laps: 1, isInLapsMode: false, isLapsAmountModified }
     }
-    let laps: number
-    if (GameService.gameMode === 'Rounds' && GameService.config.roundsModeLapsAmount !== 0) {
+    let laps = defaultLapAmount
+    if ((GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup' || GameService.gameMode === 'Teams')
+      && GameService.config.roundsModeLapsAmount !== 0) {
       laps = GameService.config.roundsModeLapsAmount
       if (defaultLapAmount !== laps) { // Check if modified value is different from default one
         isLapsAmountModified = true
       }
-    } else {
-      laps = defaultLapAmount
     }
-    if (GameService.gameMode === 'Laps') { // TODO TEST
+    if (GameService.gameMode === 'Laps') {
       laps = GameService.config.lapsModeLapsAmount
       isLapsAmountModified = true
     }
-    // Cup and Teams laps amount can't be modified
-    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }// + defaultLapAmount // Treat finish as checkpoint between laps
+    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }
   }
 
   /**

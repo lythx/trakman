@@ -17,7 +17,7 @@ export default class CpCounter extends StaticComponent {
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
     tm.addListener('PlayerCheckpoint', (info): void => {
       const local: tm.LocalRecord | undefined = tm.records.getLocal(info.player.login)
-      const dedi: DediRecord | undefined = dedimania.getRecord(info.player.login)
+      const dedi: DediRecord | undefined = dedimania.isUploadingLaps ? undefined : dedimania.getRecord(info.player.login)
       let pb: number | undefined = dedi?.checkpoints?.[info.index] ?? local?.checkpoints?.[info.index]
       if (dedi !== undefined && local !== undefined) {
         pb = Math.min(local?.checkpoints?.[info.index], dedi?.checkpoints?.[info.index])
@@ -29,7 +29,7 @@ export default class CpCounter extends StaticComponent {
       let best: number | undefined
       if (time !== 0) {
         const local: tm.LocalRecord | undefined = tm.records.getLocal(login)
-        const dedi: DediRecord | undefined = dedimania.getRecord(login)
+        const dedi: DediRecord | undefined = dedimania.isUploadingLaps ? undefined : dedimania.getRecord(login)
         best = dedi?.time ?? local?.time
         if (dedi !== undefined && local !== undefined) {
           best = Math.min(local?.time, dedi?.time)

@@ -1,3 +1,5 @@
+const p = tm.utils.palette
+
 export default {
   isEnabled: true,
   // Maximum amount of fetched records 
@@ -8,5 +10,6 @@ export default {
   host: 'dedimania.net',
   reconnectTimeout: 120, // Timeout for Dedimania reconnection attempts, in seconds
   updateInterval: 240, // Interval for Dedimania server update, in seconds (recommended to be kept between 2-5 minutes)
-  modifiedLapsMessage: `${tm.utils.palette.error}Dedimania records won't be sent for this map due to modified lap amount.`
+  modifiedLapsMessage: `${p.dedimessage}Dedimania records will be sent in ${p.highlight}Time Attack` +
+    ` ${p.dedimessage}instead of ${p.highlight}Rounds ${p.dedimessage}mode due to modified lap amount.`
 }
