@@ -76,5 +76,22 @@ export default {
     { name: "DediRanking", height: 17.22 },
     { name: "LocalRanking", height: 17.22 },
     { name: "AdminPanel", height: 5 }
+  ],
+  lapsRightSideOrder: [
+    { name: "MapWidget", height: 9.13 },
+    { name: "PreviousAndBest", height: 4.95 },
+    { name: "TMXRanking", height: 8.68 },
+    { name: "TimerWidget", height: 6.45 },
+    { name: "LiveRanking", height: 17.22 },
+    { name: "LocalRanking", height: 17.22 },
+    { name: "DonationPanel", height: 4.49 }
+  ],
+  lapsLeftSideOrder: [
+    { name: "ButtonsWidget", height: 14.5 },
+    { name: "RankWidget", height: 3.8 },
+    { name: "KarmaWidget", height: 8.8 },
+    { name: "DediRanking", height: 17.22 },
+    { name: "LapRanking", height: 17.22 },
+    { name: "AdminPanel", height: 5 }
   ]
 }

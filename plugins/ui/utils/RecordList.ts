@@ -11,6 +11,7 @@ export interface RLImage {
 // TODO DOC
 export interface RLRecord {
   time: number
+  text?: string
   login?: string
   name?: string
   date?: Date
@@ -196,7 +197,8 @@ export default class RecordList {
         ret += this.constructMarker(markers?.[i])
       }
       ret += this.constructIndex(parsedRecs?.[i]?.index) +
-        this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i], parsedRecs?.[i]?.record?.image) +
+        this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i],
+          parsedRecs?.[i]?.record?.text, parsedRecs?.[i]?.record?.image) +
         this.constructName(parsedRecs?.[i]?.record?.name) +
         '</frame>'
     }
@@ -527,7 +529,8 @@ export default class RecordList {
       ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
   }
 
-  private constructTime(time: number | undefined, timeColour: TimeColour | undefined, image: RLImage | undefined): string {
+  private constructTime(time: number | undefined, timeColour: TimeColour | undefined,
+    text: string | undefined, image: RLImage | undefined): string {
     const posX: number = this.columnWidths[0]
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.columnGap
@@ -540,7 +543,7 @@ export default class RecordList {
       content = `<quad posn="${posX + hpadding} ${-vpadding} 2"
        sizen="${width - hpadding * 2} ${height - vpadding * 2}" image="${image.url}"/>`
     } else {
-      content = this.centeredText(time === -1 ? this.noRecordEntryText : t, width, height, posX)
+      content = this.centeredText(text ?? (time === -1 ? this.noRecordEntryText : t), width, height, posX)
     }
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>

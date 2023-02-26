@@ -30,7 +30,7 @@ export default abstract class StaticComponent {
    * @param id Component manialink ID
    * @param displayMode Events preset on which manialink will get displayed and hidden
    */
-  constructor(id: number, displayMode: DisplayMode, gameModes: tm.GameMode[] = ['Cup', 'Rounds', 'Stunts', 'Teams', 'TimeAttack']) {
+  constructor(id: number, displayMode: DisplayMode, gameModes: tm.GameMode[] = ['Cup', 'Rounds', 'Stunts', 'Teams', 'Laps', 'TimeAttack']) {
     this.id = id
     this.displayMode = displayMode
     this.gameModes = gameModes
@@ -103,6 +103,10 @@ export default abstract class StaticComponent {
         case "Cup":
           left = cfg.cupLeftSideOrder
           right = cfg.cupRightSideOrder
+          break
+        case "Laps":
+          left = cfg.lapsLeftSideOrder
+          right = cfg.lapsRightSideOrder
           break
         default:
           left = cfg.leftSideOrder

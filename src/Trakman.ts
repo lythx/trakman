@@ -131,6 +131,8 @@ namespace trakman {
 
     getRank: RecordService.getRank.bind(RecordService),
 
+    getLap: RecordService.getLap.bind(RecordService),
+
     /**
      * Current map local records.
      */
@@ -157,10 +159,14 @@ namespace trakman {
      */
     get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
 
-    // TODO DOCUMENT
+    // TODO DOCUMENT eee maybe move
     get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
 
     get roundRecordCount(): number { return RoundsService.roundRecordCount },
+
+    get lap(): Readonly<tm.LocalRecord>[] { return RecordService.lapRecords },
+
+    get lapCount(): number { return RecordService.lapRecordCount },
 
     get teamScores() {
       return RoundsService.teamScores
@@ -177,8 +183,6 @@ namespace trakman {
     get teamScores() { return RoundsService.teamScores },
 
     get pointsRanking() { return RoundsService.pointsRanking },
-
-
 
   }
 

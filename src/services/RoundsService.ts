@@ -102,7 +102,8 @@ export class RoundsService {
   }
 
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') { return }
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
+      GameService.gameMode === 'Laps') { return }
     if (this.noRoundFinishes === true) {
       this.noRoundFinishes = false
       this.finishedRounds++
@@ -112,7 +113,8 @@ export class RoundsService {
   }
 
   static registerRoundPoints(player: tm.Player): number {
-    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts') { return 0 }
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
+      GameService.gameMode === 'Laps') { return 0 }
     const index = this._ranking.findIndex(a => a.login === player.login)
     if (index === -1) {
       Logger.error(`Player object not present in RoundsService ranking when adding points`)
@@ -137,7 +139,7 @@ export class RoundsService {
         this._ranking.splice(index, 1)
         this._ranking.splice(player.cupPosition - 1, 0, player)
         this._cupWinners.push(player)
-      } 
+      }
       return points
     }
     player.roundsPoints += points

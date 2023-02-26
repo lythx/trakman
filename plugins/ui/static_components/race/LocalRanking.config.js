@@ -6,6 +6,7 @@ export default {
   teamsHeight: 15.07,
   roundsHeight: 17.22,
   cupHeight: 17.22,
+  lapsHeight: 17.22,
   width: cfg.width,
   title: "Local Records",
   icon: icons.chartLocal,
@@ -14,6 +15,7 @@ export default {
   teamsEntries: 6,
   roundsEntries: 7,
   cupEntries: 7,
+  lapsEntries: 7,
   topCount: 5,
   displayNoRecordEntry: true
 }

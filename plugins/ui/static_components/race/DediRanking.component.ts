@@ -68,6 +68,9 @@ export default class DediRanking extends StaticComponent {
     } else if (tm.getGameMode() === 'Cup') {
       height = config.cupHeight
       entries = config.cupEntries
+    } else if (tm.getGameMode() === 'Laps') {
+      height = config.lapsHeight
+      entries = config.lapsEntries
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),

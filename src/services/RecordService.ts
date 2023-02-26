@@ -487,6 +487,31 @@ export class RecordService {
     }
     return this._localRecords.filter(a => logins.includes(a.login))
   }
+  // TODO DOC
+  /**
+   * Gets the players lap record on the current map. If the map is not in laps mode returns a local record omstead.
+   * @param login Player login
+   * @returns Lap record object or undefined if the player doesn't have a lap record
+   */
+  static getLap(login: string): tm.LocalRecord | undefined
+  /**
+   * Gets multiple lap records on the current map from runtime memory. 
+   * If the map is not in laps mode returns local records instead. 
+   * If some player has no lap record his record object wont be returned. 
+   * Returned array is sorted primary by time ascending, secondary by date ascending
+   * @param logins Array of player logins
+   * @returns Array of lap record objects
+   */
+  static getLap(logins: string[]): tm.LocalRecord[]
+  static getLap(logins: string | string[]): tm.LocalRecord | undefined | tm.LocalRecord[] {
+    if (!MapService.current.isInLapsMode) {
+      return this.getLocal(logins as any)
+    }
+    if (typeof logins === 'string') {
+      return this._lapRecords.find(a => a.login === logins)
+    }
+    return this._lapRecords.filter(a => logins.includes(a.login))
+  }
 
   /**
    * Gets local records on the given map if it's in map queue. 
@@ -636,12 +661,26 @@ export class RecordService {
   static get liveRecords(): Readonly<tm.FinishInfo>[] {
     return [...this._liveRecords]
   }
-
+  // TODO SINGULAR
   /**
    * Number of live records
    */
   static get liveRecordsCount(): number { // TODO FIX PLURAL
     return this._liveRecords.length
+  }
+  // TODO DOC
+  /**
+   * Current map lap records. Same as local records if the map is not in laps mode.
+   */
+  static get lapRecords(): Readonly<tm.LocalRecord>[] {
+    return [...this._lapRecords]
+  }
+
+  /**
+   * Number of lap records on the current map. Same as local records if the map is not in laps mode.
+   */
+  static get lapRecordCount(): number { // TODO FIX PLURAL
+    return this._lapRecords.length
   }
 
 }

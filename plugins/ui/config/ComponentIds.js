@@ -69,5 +69,6 @@ export default {
   betInfoWidget: 375000,
   roundScore: 380000,
   teamScore: 390000,
-  roundPointsRanking: 400000
+  roundPointsRanking: 400000,
+  lapRanking: 410000
 }
