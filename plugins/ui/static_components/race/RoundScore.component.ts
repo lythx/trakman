@@ -3,7 +3,7 @@
  * @since 1.2
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
 
 import config from './RoundScore.config.js'
 
@@ -41,7 +41,7 @@ export default class RoundScore extends StaticComponent {
       .map(a => ({
         name: a.nickname, time: a.time, checkpoints: a.checkpoints,
         login: a.login, points: a.roundPoints, color: a.team,
-        markerImage: a.isCupFinalist ? config.cupFinalistIcon : this.getCupImage(a)
+        markerImage: this.getCupImage(a)
       }))
       .slice(0, tm.records.maxLocalsAmount))}
         </frame>
@@ -74,9 +74,12 @@ export default class RoundScore extends StaticComponent {
     })
   }
 
-  private getCupImage(player: tm.FinishInfo): string | undefined {
+  private getCupImage(player: tm.FinishInfo): RLImage | undefined {
+    if (player.isCupFinalist) {
+      return { url: config.cupFinalistIcon }
+    }
     if (player.cupPosition === undefined) { return undefined }
-    return config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage
+    return { url: config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage }
   }
 
 }

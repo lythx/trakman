@@ -11,8 +11,13 @@ export default {
   entries: 7,
   cupEntries: 7,
   topCount: 5,
-  columnProportions: [1, 2, 5],
+  columnProportions: [1, 1.5, 5.5],
   displayNoRecordEntry: true,
+  noRecordEntryText: '--',
+  // TODO actual trophies
   cupPositionImages: [icons.trophyClassic, icons.trophy, icons.trophyNadeo],
-  otherCupPositionsImage: icons.placeholder
+  otherCupPositionsImage: icons.placeholder,
+  cupFinalistImage: icons.placeholder,
+  cupImageVerticalPadding: 0.1,
+  cupImageHorizontalPadding: 0.3
 }

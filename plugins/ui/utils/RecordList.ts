@@ -3,20 +3,26 @@ import raceConfig from './RecordListRace.config.js'
 import resultConfig from './RecordListResult.config.js'
 
 // TODO DOC
-interface UiRecord {
-  readonly time: number
-  readonly login?: string
-  readonly name?: string
-  readonly date?: Date
-  readonly checkpoints?: (number | undefined)[]
-  readonly url?: string
-  readonly points?: number
-  readonly color?: 'red' | 'blue'
-  readonly image?: string
-  readonly markerImage?: string
+export interface RLImage {
+  url: string,
+  horizontalPadding?: number
+  verticalPadding?: number
+}
+// TODO DOC
+export interface RLRecord {
+  time: number
+  login?: string
+  name?: string
+  date?: Date
+  checkpoints?: (number | undefined)[]
+  url?: string
+  points?: number
+  color?: 'red' | 'blue'
+  image?: RLImage
+  markerImage?: RLImage
 }
 
-type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue', image?: string } | null
+type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue', image?: RLImage } | null
 
 type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
@@ -87,6 +93,7 @@ export default class RecordList {
     red: tm.utils.palette.red + '6',
     blue: tm.utils.palette.purple + '6'
   } // todo config
+  readonly noRecordEntryText: string
 
   /**
    * Util to display record data in manialinks. 
@@ -105,7 +112,10 @@ export default class RecordList {
    */
   constructor(preset: 'result' | 'race', parentId: number, width: number,
     height: number, rows: number, side: boolean, topCount: number, maxCount: number, noRecordEntry: boolean,
-    options?: { getColoursFromPb?: true, dontParseTime?: boolean, columnProportions?: number[] }) {
+    options?: {
+      getColoursFromPb?: true, dontParseTime?: boolean, columnProportions?: number[],
+      noRecordEntryText?: string
+    }) {
     this.config = preset === 'result' ? resultConfig : raceConfig
     const INFO = this.config.info
     this.columnGap = this.config.columnGap
@@ -140,6 +150,7 @@ export default class RecordList {
     this.infoBackground = INFO.bgColor
     this.background = this.config.background
     this.headerBackground = this.config.headerBackground
+    this.noRecordEntryText = options?.noRecordEntryText ?? this.config.noRecordEntryText
     if (options?.dontParseTime === true) {
       this.parseTime = false
     }
@@ -159,9 +170,10 @@ export default class RecordList {
    * @param allRecords Array of record objects
    * @returns Record list XML string
    */
-  constructXml(login: string, allRecords: UiRecord[]): string {
-    const cpAmount: number = Math.max(...(allRecords.map(a =>
-      a?.checkpoints?.length).filter(a => a !== undefined) as number[])) ?? 0
+  constructXml(login: string, allRecords: RLRecord[]): string {
+    const checkpointAmounts = allRecords.map(a =>
+      a?.checkpoints?.length).filter(a => a !== undefined) as number[]
+    const cpAmount: number = checkpointAmounts.length === 0 ? 0 : Math.max(...checkpointAmounts)
     this.infoRows = Math.ceil(cpAmount / this.infoColumns) + 1
     const parsedRecs = this.getDisplayedRecords(login, allRecords)
     const info = this.infos.find(a => a.login === login)
@@ -230,11 +242,11 @@ export default class RecordList {
     tm.addListener('ManialinkClick', this.clickListener)
   }
 
-  private getDisplayedRecords(login: string, records: UiRecord[]): { index: number, record: UiRecord }[] {
-    const playerRecord: UiRecord | undefined = records.find(a => a.login === login)
+  private getDisplayedRecords(login: string, records: RLRecord[]): { index: number, record: RLRecord }[] {
+    const playerRecord: RLRecord | undefined = records.find(a => a.login === login)
     const playerRecordIndex: number = playerRecord !== undefined ? records.indexOf(playerRecord) : -1
     const diff: number = this.rows - this.topCount
-    const ret: { index: number, record: UiRecord }[] = []
+    const ret: { index: number, record: RLRecord }[] = []
     for (const [i, e] of records.entries()) {
       if (ret.length === this.rows || (this.noRecordEntry === true && playerRecord === undefined && ret.length === this.rows - 1)) { break }
       else if (i < this.topCount ||
@@ -252,7 +264,7 @@ export default class RecordList {
     return ret
   }
 
-  private getInfos(login: string, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: UiRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
+  private getInfos(login: string, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: RLRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
     const cps: (number | undefined)[][] = Array.from(Array(cpAmount), (): never[] => [])
     const infos: { index: number, offset: number }[] = []
     const infoPositions: boolean[][] = Array.from(Array(records.length), (): any[] => new Array(Math.ceil(cpAmount / this.infoColumns) + 1).fill(false))
@@ -273,7 +285,7 @@ export default class RecordList {
     return this.isFullRow === false ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
   }
 
-  private getCpTypes = (login: string, cps: (number | undefined)[][], records: UiRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  private getCpTypes = (login: string, cps: (number | undefined)[][], records: RLRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
     if (cps.length === 0 || cps?.[0]?.length === 0) {
       return []
     }
@@ -321,7 +333,7 @@ export default class RecordList {
     return cpTypes
   }
 
-  private getMarkers(playerIndex: number, infoPositions: boolean[][], records: UiRecord[]): Marker[] {
+  private getMarkers(playerIndex: number, infoPositions: boolean[][], records: RLRecord[]): Marker[] {
     const ret: Marker[] = []
     for (let i: number = 0; i < records.length; i++) {
       const points = records[i].points
@@ -354,7 +366,7 @@ export default class RecordList {
     return ret
   }
 
-  private getTimeColours(login: string, playerIndex: number, records: UiRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
+  private getTimeColours(login: string, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
     if (this.getColoursFromPb === true && playerIndex === -1) {
       const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
@@ -386,7 +398,7 @@ export default class RecordList {
     return ret
   }
 
-  private constructInfo(offset: number, record: UiRecord, cpTypes: ("best" | "worst" | "equal" | undefined)[], cpAmount: number): string {
+  private constructInfo(offset: number, record: RLRecord, cpTypes: ("best" | "worst" | "equal" | undefined)[], cpAmount: number): string {
     let ret: string = ''
     const width: number = this.infoColumnWidth * this.infoColumns
     const h: number = this.rowHeight - this.rowGap
@@ -468,7 +480,7 @@ export default class RecordList {
           }
           ret += `<quad posn="${posX + (this.infoColumnWidth * j)} ${-this.rowHeight * (i + 1)} 1" sizen="${this.infoColumnWidth - this.columnGap} ${h}" bgcolor="${this.background}"/>
           <format textcolor="${colour}"/>
-          ${this.centeredText(cp === undefined ? '-:--.--' : tm.utils.getTimeString(cp),
+          ${this.centeredText(cp === undefined ? this.noRecordEntryText : tm.utils.getTimeString(cp),
             this.infoColumnWidth - this.columnGap, h, posX + (this.infoColumnWidth * j), this.rowHeight * (i + 1))}
           <format textcolor="FFFF"/>`
         }
@@ -486,7 +498,10 @@ export default class RecordList {
         `bgcolor="${this.markerBackground[marker.color]}"` : ''
       let content: string
       if (marker.image !== undefined) {
-        content = `<quad posn="${posX} 0 2" sizen="${this.markerWidth} ${this.rowHeight - this.rowGap}" image="${marker.image}"/>`
+        const vpadding = marker.image.verticalPadding ?? 0
+        const hpadding = marker.image.horizontalPadding ?? 0
+        content = `<quad posn="${posX + hpadding} ${-vpadding} 2"
+         sizen="${this.markerWidth - hpadding * 2} ${this.rowHeight - (this.rowGap + vpadding * 2)}" image="${marker.image.url}"/>`
       } else {
         content = this.centeredText(marker.points.toString(), this.markerWidth, this.rowHeight - this.rowGap, posX)
       }
@@ -512,7 +527,7 @@ export default class RecordList {
       ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
   }
 
-  private constructTime(time: number | undefined, timeColour: TimeColour | undefined, image: string | undefined): string {
+  private constructTime(time: number | undefined, timeColour: TimeColour | undefined, image: RLImage | undefined): string {
     const posX: number = this.columnWidths[0]
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[1] - this.columnGap
@@ -520,10 +535,12 @@ export default class RecordList {
     const t: string = (`${time === undefined ? '' : (this.parseTime ? tm.utils.getTimeString(time) : time)}`).toString()
     let content: string
     if (image !== undefined) {
-      content = `<quad posn="${posX} 0 2"
-       sizen="${width} ${height}" image="${image}"/>`
+      const vpadding = image.verticalPadding ?? 0
+      const hpadding = image.horizontalPadding ?? 0
+      content = `<quad posn="${posX + hpadding} ${-vpadding} 2"
+       sizen="${width - hpadding * 2} ${height - vpadding * 2}" image="${image.url}"/>`
     } else {
-      content = this.centeredText(time === -1 ? '-:--.--' : t, width, height, posX)
+      content = this.centeredText(time === -1 ? this.noRecordEntryText : t, width, height, posX)
     }
     return `<quad posn="${posX} 0 1" sizen="${width} ${height}" bgcolor="${this.background}"/>
     <format textsize="1" textcolor="${time === -1 ? this.timeColours.you : colour}"/>

@@ -8,7 +8,7 @@ export default {
     4.1
   ],
   background: cfg.background,
-  headerBackground:"8886",   
+  headerBackground: "8886",
   format: cfg.format,
   textScale: 0.85,
   padding: 0.2,
@@ -40,5 +40,6 @@ export default {
     columnWidth: 3,
     bgColor: "0009",
     icon: icons.infoCircle
-  }
+  },
+  noRecordEntryText: '-:--.--'
 }

@@ -40,5 +40,6 @@ export default {
     columnWidth: 3,
     bgColor: "0009",
     icon: icons.infoCircle
-  }
+  },
+  noRecordEntryText: '-:--.--'
 }

@@ -5,7 +5,7 @@
 
 // TODO MAYBE RENAME TO RoundsPointsRanking to be the same as in core
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
 import config from './RoundPointsRanking.config.js'
 
 export default class RoundPointsRanking extends StaticComponent {
@@ -49,7 +49,7 @@ export default class RoundPointsRanking extends StaticComponent {
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
-      { dontParseTime: true, columnProportions: config.columnProportions })
+      { dontParseTime: true, columnProportions: config.columnProportions, noRecordEntryText: config.noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -81,9 +81,19 @@ export default class RoundPointsRanking extends StaticComponent {
     )
   }
 
-  private getCupImage(player: tm.Player): string | undefined {
-    if(player.cupPosition === undefined) { return undefined}
-    return config.cupPositionImages[player.cupPosition - 1] ?? config.otherCupPositionsImage
+  private getCupImage(player: tm.Player): RLImage | undefined {
+    if (player.cupPosition === undefined && !player.isCupFinalist) { return undefined }
+    let url: string
+    if (player.isCupFinalist) {
+      url = config.cupFinalistImage
+    } else {
+      url = config.cupPositionImages[player.cupPosition as number - 1] ?? config.otherCupPositionsImage
+    }
+    return {
+      url,
+      verticalPadding: config.cupImageVerticalPadding,
+      horizontalPadding: config.cupImageHorizontalPadding
+    }
   }
 
 }
