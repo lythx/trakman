@@ -139,8 +139,9 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params: tm.Events['TrackMania.PlayerFinish']): Promise<void> => {
+      callback: async ([id, login, time]: tm.Events['TrackMania.PlayerFinish']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
+        PlayerService.resetCheckpoints(login)
         // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
         //   return
         // }
@@ -221,6 +222,7 @@ export class Listeners {
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
+        PlayerService.resetCheckpoints()
         const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart

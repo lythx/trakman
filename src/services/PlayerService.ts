@@ -224,6 +224,19 @@ export class PlayerService {
     return leaveInfo
   }
 
+  static resetCheckpoints(login?: string) {
+    if(login === undefined) {
+      for(const e of this._players) {
+        e.currentCheckpoints.length = 0
+      }
+      return
+    }
+    const player = this.get(login)
+    if (player !== undefined) {
+      player.currentCheckpoints.length = 0
+    }
+  }
+
   /**
    * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    * @param player Player object
