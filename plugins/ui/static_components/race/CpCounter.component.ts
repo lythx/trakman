@@ -13,11 +13,12 @@ interface CheckpointData {
   current?: number,
   isFinish: boolean,
 }
-
+// TODO TEST
 export default class CpCounter extends StaticComponent {
 
   private readonly header: StaticHeader
   private prevTimes: { login: string, best?: number, current: number, isFinish: boolean }[] = []
+  private prevLapTimes: { login: string, best?: number, current: number, isFinish: boolean }[] = []
 
   constructor() {
     super(componentIds.cpCounter, 'race')
@@ -94,7 +95,8 @@ export default class CpCounter extends StaticComponent {
     }
   }
 
-  private constructTimeXml(login: string, isFinish?: boolean, currentTime?: number, bestTime?: number): string {
+  private constructTimeXml(login: string, isLap: boolean, isFinish?: boolean, currentTime?: number, bestTime?: number): string {
+    const arr = isLap ? this.prevLapTimes : this.prevTimes
     const prev = this.prevTimes.find(a => a.login === login)
     if (currentTime === undefined) {
       if (prev === undefined) { return '' }
@@ -102,7 +104,7 @@ export default class CpCounter extends StaticComponent {
       bestTime = prev?.best
       isFinish = prev?.isFinish
     } else if (prev === undefined) {
-      this.prevTimes.push({ login, best: bestTime, current: currentTime, isFinish: isFinish === true })
+      arr.push({ login, best: bestTime, current: currentTime, isFinish: isFinish === true })
     } else {
       prev.best = bestTime
       prev.current = currentTime
@@ -158,26 +160,48 @@ export default class CpCounter extends StaticComponent {
     }
     tm.sendManialink(`
         <manialink id="${this.id}">
-            ${this.getLapsXml(params?.lap)}
+            ${this.getLapsXml(login, params?.lap)}
             <frame posn="${config.posX} ${config.posY} 4">
               <format textsize="1"/>
               ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
-                ${cpAmount === 0 ? '' : this.constructTimeXml(login, params?.isFinish, params?.current, params?.best)}
+                ${cpAmount === 0 ? '' : this.constructTimeXml(login, false,
+      params?.isFinish, params?.current, params?.best)}
               </frame>
             </frame>
         </manialink>`, login)
   }
 
-  private getLapsXml(data: CheckpointData | undefined) { // TODO
-    // if (data === undefined) { return '' }
-    // const h = this.header.options
-    // let counterXml: string = `
-    // <frame posn="${h.squareWidth + h.margin * 2 + h.rectangleWidth} ${h.height + config.margin} 3">
-    //   <quad posn="0 0 3" sizen="${counterW} ${h.height}" bgcolor="${h.textBackground}"/>
-    //   ${centeredText(counter, counterW, h.height, h)}
-    // </frame>`
+  private getLapsXml(login: string, data: CheckpointData | undefined) { // TODO
+    const cpAmount: number = tm.maps.current.checkpointsPerLap - 1
+    let colour: string = config.colours.default
+    if (cpAmount === data?.index) {
+      colour = config.colours.cpsCollected
+    }
+    const h: StaticHeaderOptions = this.header.options
+    const counterW: number = config.width - (config.rectangleWidth + config.margin)
+    let text: string = config.text
+    let rectangleWidth: number = config.rectangleWidth
+    let counter: string = `$${colour}${data?.index ?? 0}/${cpAmount}`
+    if (data?.isFinish === true) {
+      counter = config.finishText
+      setTimeout((): void => this.displayToPlayer(login), config.finishTextDuration)
+    }
+    let counterXml: string = `
+    <frame posn="${h.squareWidth + h.margin * 2 + h.rectangleWidth} 0 3">
+      <quad posn="0 0 3" sizen="${counterW} ${h.height}" bgcolor="${h.textBackground}"/>
+      ${centeredText(counter, counterW, h.height, h)}
+    </frame>`
+    return `<frame posn="${config.posX} ${config.posY} 4">
+    <format textsize="1"/>
+    ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}
+    ${counterXml}
+    <frame posn="0 ${-(config.height + config.margin)} 2">
+      ${cpAmount === 0 ? '' : this.constructTimeXml(login, true,
+      data?.isFinish, data?.current, data?.best)}
+    </frame>
+  </frame>`
   }
 
 }
