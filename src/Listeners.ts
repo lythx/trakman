@@ -89,27 +89,29 @@ export class Listeners {
         tm.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
-        if (playerId === 0) { return }
+        if (playerId === 0) { return } // TODO DONATIONS TEXT IS NOT CENTERED
         const player: tm.Player | undefined = PlayerService.get(login)
         if (player === undefined) {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
           return
         }
-        // TODO CHECK IF WORKS
-        const cpAmount = MapService.current.checkpointsAmount
-        const startIndex = Math.floor(checkpointIndex - player.currentCheckpoints.length / cpAmount)
+        const cpsPerLap = MapService.current.checkpointsPerLap
+        let div = player.currentCheckpoints.length / cpsPerLap
+        const startIndex = cpsPerLap * Math.floor(div)
         const lapCheckpointIndex = checkpointIndex - startIndex
-        const lapCheckpointTime = timeOrScore - player.currentCheckpoints[startIndex].time
+        const lapCheckpointTime = timeOrScore - (player.currentCheckpoints[startIndex - 1]?.time ?? 0)
+        const isLapFinish = (lapCheckpointIndex + 1) % MapService.current.checkpointsPerLap === 0
         const checkpoint: tm.Checkpoint = {
           index: checkpointIndex, time: timeOrScore, lap: currentLap,
-          lapCheckpointIndex, lapCheckpointTime
+          lapCheckpointIndex, lapCheckpointTime,
+          isLapFinish
         }
         const cpStatus = PlayerService.addCP(player, checkpoint)
         const info: tm.CheckpointInfo = {
           time: timeOrScore,
           lap: currentLap,
           index: checkpointIndex,
-          player, lapCheckpointIndex, lapCheckpointTime
+          player, lapCheckpointIndex, lapCheckpointTime, isLapFinish
         }
         if ((cpStatus as any).isFinish !== undefined) {
           const lapObj = await RecordService.addLap(MapService.current.id, player, (cpStatus as any).lapTime,
@@ -136,6 +138,7 @@ export class Listeners {
             }
             // Register player finish
             Events.emit('PlayerFinish', obj.finishInfo)
+            PlayerService.resetCheckpoints(player.login)
           }
           return
           // Real CP
@@ -149,7 +152,6 @@ export class Listeners {
       event: 'TrackMania.PlayerFinish',
       callback: async ([id, login, time]: tm.Events['TrackMania.PlayerFinish']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
-        PlayerService.resetCheckpoints(login)
         // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
         //   return
         // }

@@ -259,6 +259,7 @@ declare global {
       // TODO DOC
       readonly lapCheckpointTime: number
       readonly lapCheckpointIndex: number
+      readonly isLapFinish: boolean
     }
     /** Controller chat message object */
     export interface Message {
