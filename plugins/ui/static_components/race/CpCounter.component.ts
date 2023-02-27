@@ -22,7 +22,25 @@ export default class CpCounter extends StaticComponent {
       if (dedi !== undefined && local !== undefined) {
         pb = Math.min(local?.checkpoints?.[info.index], dedi?.checkpoints?.[info.index])
       }
-      this.displayToPlayer(info.player.login, { index: info.index + 1, best: pb, current: info.time, isFinish: false })
+      let lap: any
+      if (tm.maps.current.isInLapsMode) {
+        const local: tm.LocalRecord | undefined = tm.records.getLap(info.player.login)
+        const dedi: DediRecord | undefined = !dedimania.isUploadingLaps ? undefined : dedimania.getRecord(info.player.login)
+        let pb: number | undefined = dedi?.checkpoints?.[info.lapCheckpointIndex] ??
+          local?.checkpoints?.[info.lapCheckpointIndex]
+        if (dedi !== undefined && local !== undefined) {
+          pb = Math.min(local?.checkpoints?.[info.lapCheckpointIndex],
+            dedi?.checkpoints?.[info.lapCheckpointIndex])
+        }
+        lap = {
+          index: info.lapCheckpointIndex + 1, best: pb,
+          current: info.lapCheckpointTime, isFinish: false
+        } // TODO
+      }
+      this.displayToPlayer(info.player.login, {
+        index: info.index + 1,
+        best: pb, current: info.time, isFinish: false, lap
+      })
     })
     // Using TM event to reset the counter on backspace press
     tm.addListener('TrackMania.PlayerFinish', ([_, login, time]): void => {
@@ -83,7 +101,10 @@ export default class CpCounter extends StaticComponent {
     </frame>`
   }
 
-  displayToPlayer(login: string, params?: { index: number, best?: number, current?: number, isFinish: boolean }): void {
+  displayToPlayer(login: string, params?: {
+    index: number, best?: number, current?: number, isFinish: boolean,
+    lap?: { index: number, best?: number, current?: number, isFinish: boolean }
+  }): void {
     if (this.isDisplayed === false) { return }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
