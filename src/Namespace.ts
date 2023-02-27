@@ -110,7 +110,7 @@ declare global {
 
       cupPosition?: number
 
-      isCupFinalist: boolean  
+      isCupFinalist: boolean
     }
     /** Controller offline player object */
     export interface OfflinePlayer {
@@ -256,6 +256,9 @@ declare global {
       readonly time: number
       /** Checkpoint lap */
       readonly lap: number
+      // TODO DOC
+      readonly lapCheckpointTime: number
+      readonly lapCheckpointIndex: number
     }
     /** Controller chat message object */
     export interface Message {

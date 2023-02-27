@@ -95,13 +95,21 @@ export class Listeners {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
           return
         }
-        const checkpoint: tm.Checkpoint = { index: checkpointIndex, time: timeOrScore, lap: currentLap }
+        // TODO CHECK IF WORKS
+        const cpAmount = MapService.current.checkpointsAmount
+        const startIndex = Math.floor(checkpointIndex - player.currentCheckpoints.length / cpAmount)
+        const lapCheckpointIndex = checkpointIndex - startIndex
+        const lapCheckpointTime = timeOrScore - player.currentCheckpoints[startIndex].time
+        const checkpoint: tm.Checkpoint = {
+          index: checkpointIndex, time: timeOrScore, lap: currentLap,
+          lapCheckpointIndex, lapCheckpointTime
+        }
         const cpStatus = PlayerService.addCP(player, checkpoint)
         const info: tm.CheckpointInfo = {
           time: timeOrScore,
           lap: currentLap,
           index: checkpointIndex,
-          player
+          player, lapCheckpointIndex, lapCheckpointTime
         }
         if ((cpStatus as any).isFinish !== undefined) {
           const lapObj = await RecordService.addLap(MapService.current.id, player, (cpStatus as any).lapTime,
