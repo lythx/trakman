@@ -1,7 +1,6 @@
 import net from 'node:net'
 import { ClientResponse } from './ClientResponse.js'
 import { Events } from '../Events.js'
-import { Logger } from '../Logger.js'
 
 export class ClientSocket extends net.Socket {
 
@@ -26,7 +25,6 @@ export class ClientSocket extends net.Socket {
         this.handleResponseChunk(buffer)
       }
     })
-    this.on('error', (err: Error): void => void Logger.fatal('Client socket error:', err.message))
   }
 
   /**
@@ -48,6 +46,11 @@ export class ClientSocket extends net.Socket {
       }
       setImmediate(poll)
     })
+  }
+
+  destroy(): this {
+    this.responses.length = 0
+    return super.destroy()
   }
 
   /**
