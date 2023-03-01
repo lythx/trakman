@@ -88,7 +88,7 @@ export default class CpCounter extends StaticComponent {
             index: 0, best: pb,
             current: time - player.currentCheckpoints[startIndex].time,
             isFinish: true
-          } // TODO CHECK WORK
+          } 
         }
       }
       this.displayToPlayer(login, {
@@ -189,7 +189,7 @@ export default class CpCounter extends StaticComponent {
         </manialink>`, login)
   }
 
-  private getLapsXml(login: string, data?: CheckpointData & { cpIndex: number }) { // TODO
+  private getLapsXml(login: string, data?: CheckpointData & { cpIndex: number }) {
     if (!tm.maps.current.isInLapsMode || tm.maps.current.lapsAmount === 1) { return '' }
     const h: StaticHeaderOptions = this.header.options
     const lapCounterW: number = config.lap.lapCounterWidth

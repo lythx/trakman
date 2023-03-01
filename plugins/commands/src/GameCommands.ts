@@ -101,7 +101,7 @@ const commands: tm.Command[] = [
     privilege: config.setlapsamount.privilege
   },
   {
-    aliases: config.setroundslapsamount.aliases, // TODO TEST
+    aliases: config.setroundslapsamount.aliases,
     help: config.setroundslapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {

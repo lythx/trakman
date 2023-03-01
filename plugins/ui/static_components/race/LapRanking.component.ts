@@ -26,7 +26,6 @@ export default class LapRanking extends StaticComponent {
     tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.lap.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
-    // TODO REC REMOVAL LAP
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }
 
