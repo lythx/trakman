@@ -1,32 +1,39 @@
-# TRAKMAN
-Trackmania Forever server controller written in TypeScript
+<div align="center">
+<h1>TRAKMAN</h1>
 
-Info about included plugins and general plugin development can be found on the [project wiki](https://github.com/lythx/trakman/wiki)
+[![License](https://img.shields.io/github/license/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/blob/main/LICENSE/)
+[![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/commits/main/)
+[![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues/)
+[![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers/)
+
+<h3>Trackmania Forever server controller written in TypeScript</h3>
+
+![Trakman UI](https://cdn.discordapp.com/attachments/599381118633902080/1080276712417415208/TrakmanUI-Logo.png)
+
+</div>
 
 ## Prerequisites
-- [Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip) Trackmania Forever dedicated server
-- [Latest](https://nodejs.org/en/download/current/) Node.js
-- [Latest](https://www.postgresql.org/download/) PostgreSQL
+- Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
+- Node.js [v12+](https://nodejs.org/en/download/)
+- PostgreSQL [v10+](https://www.postgresql.org/download/)
 
-On Linux, relevant versions of Node & Postgres should be available in your distro's repositories by default (see [[1]](https://repology.org/project/nodejs/versions),  [[2]](https://repology.org/project/postgresql/versions)), that might not be the case if you are a [Debian](https://packages.debian.org/bookworm/nodejs) user.
+On Linux, relevant versions of Node & Postgres should be available in your distro's repositories by default (see [[1]](https://repology.org/project/nodejs/versions),  [[2]](https://repology.org/project/postgresql/versions))
 
-On Windows, the installation instructions might be a little goofy, thus you are adviced to look into it by yourself (it is never a good idea though).
+On Windows, the installation instructions should be covered by the projects' websites (see above)
 
-## Install & Run
-See the [relevant wiki page](https://github.com/lythx/trakman/wiki/Installation-Instructions) on the matter.
+## Installation
+See the [relevant wiki page](https://github.com/lythx/trakman/wiki/Installation-Instructions) on the matter
 
-## Contributions
-See the [CONTRIBUTING](https://github.com/lythx/trakman/blob/main/CONTRIBUTING.md) file.
+## XASECO Migration
+Information about database migration is available on [this page](https://github.com/lythx/trakman/wiki/Migration-from-other-controllers)
 
-## Recent Changes
-See the [CHANGELOG](https://github.com/lythx/trakman/blob/main/CHANGELOG.md) file.
-
-Shortened version of the changelog is normally available in-game via the `/changes` command.
+## Default Plugins
+The default shipment of the controller is (somewhat) outlined on [the wiki](https://github.com/lythx/trakman/wiki/Included-Plugins)
 
 ## Settings
-Most controller configs descriptions are available on [this wiki page](https://github.com/lythx/trakman/wiki/Controller-Configs).
+Most controller configs descriptions are available on [this wiki page](https://github.com/lythx/trakman/wiki/Controller-Configs)
 
 ## Limitations
-1. Only the TimeAttack gamemode is fully supported as of now, with Stunts being very low on the priority list.
-2. Some of the [methods](https://methods.xaseco.org/methodstmf.php) were never tested, and might be broken.
-3. Bugs can still happen rather often.
+1. Only the TimeAttack gamemode was fully tested
+2. Stunts mode is NOT supported
+3. Bugs, while rare, can still happen
