@@ -15,9 +15,9 @@ export default {
   displayNoRecordEntry: true,
   noRecordEntryText: '--',
   // TODO actual trophies
-  cupPositionImages: [icons.trophyClassic, icons.trophy, icons.trophyNadeo],
-  otherCupPositionsImage: icons.placeholder,
-  cupFinalistImage: icons.placeholder,
+  cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
+  otherCupPositionsImage: icons.trophy,
+  cupFinalistImage: icons.flagFinish,
   cupImageVerticalPadding: 0.1,
   cupImageHorizontalPadding: 0.3
 }

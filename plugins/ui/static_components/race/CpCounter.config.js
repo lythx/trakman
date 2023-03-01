@@ -26,8 +26,8 @@ export default {
     finish: p.green
   },
   lap: {
-    iconBottom: icons.placeholder,
-    iconTop: icons.placeholder,
+    iconBottom: icons.lap,
+    iconTop: icons.clockLap,
     lapText: 'Lap',
     lapTextWidth: 2.8,
     lapCounterWidth: 3.1,

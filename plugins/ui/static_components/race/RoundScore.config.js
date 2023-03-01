@@ -13,8 +13,8 @@ export default {
   teamsEntries: 10,
   cupEntries: 7,
   topCount: 5,
-  cupFinalistIcon: icons.placeholder,
-  cupPositionImages: [icons.trophyClassic, icons.trophy, icons.trophyNadeo],
-  otherCupPositionsImage: icons.placeholder,
+  cupFinalistIcon: icons.flagFinish,
+  cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
+  otherCupPositionsImage: icons.flagFinish,
   displayNoRecordEntry: true
 }
