@@ -164,7 +164,7 @@ export class RecordRepository extends Repository {
       const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`
       await this.query(query, mapId, playerId)
     } else {
-      const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2 AND laps=$3;`
+      const query: string = `DELETE FROM records_multilap WHERE map_id=$1 AND player_id=$2 AND laps=$3;`
       await this.query(query, mapId, playerId, laps)
     }
   }
