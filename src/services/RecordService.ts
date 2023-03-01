@@ -530,7 +530,7 @@ export class RecordService {
    * @returns Record object or undefined if record doesn't exist
    */
   static getOneFromQueue(login: string, mapId: string): tm.Record | undefined {
-    const arr = this._queueRecords.find(a => mapId = a.mapId)
+    const arr = this._queueRecords.find(a => mapId === a.mapId)
     return arr?.records?.find?.(a => a.login === login)
   }
 
@@ -551,7 +551,7 @@ export class RecordService {
    * @returns Record object or undefined if record doesn't exist
    */
   static getOneFromHistory(login: string, mapId: string): tm.Record | undefined {
-    const arr = this._historyRecords.find(a => mapId = a.mapId)
+    const arr = this._historyRecords.find(a => mapId === a.mapId)
     return arr?.records?.find?.(a => a.login === login)
   }
 

@@ -22,7 +22,7 @@ const commands: tm.Command[] = [{
       }
     }
     tm.sendMessage(tm.utils.strVar(config.delrec.text, { title: info.title, adminName: tm.utils.strip(info.nickname), nickname: tm.utils.strip(playerRecord.nickname) }), config.delrec.public ? undefined : info.login)
-    tm.records.remove(playerRecord, tm.maps.current.id, info)
+    tm.records.remove(playerRecord, tm.maps.current.id, info, tm.maps.current.isInLapsMode ? tm.maps.current.lapsAmount : undefined)
   },
   privilege: config.delrec.privilege
 },
@@ -31,7 +31,7 @@ const commands: tm.Command[] = [{
   help: config.prunerecs.help,
   callback: (info: tm.MessageInfo): void => {
     tm.sendMessage(tm.utils.strVar(config.prunerecs.text, { title: info.title, adminName: tm.utils.strip(info.nickname) }), config.prunerecs.public ? undefined : info.login)
-    tm.records.removeAll(tm.maps.current.id, info)
+    tm.records.removeAll(tm.maps.current.id, info, tm.maps.current.isInLapsMode ? tm.maps.current.lapsAmount : undefined)
   },
   privilege: config.prunerecs.privilege
 }]
