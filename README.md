@@ -6,7 +6,7 @@
 [![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues/)
 [![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers/)
 
-Trackmania Forever server controller written in TypeScript
+<h3>Trackmania Forever server controller written in TypeScript</h3>
 
 ![Trakman UI](https://cdn.discordapp.com/attachments/599381118633902080/1080276712417415208/TrakmanUI-Logo.png)
 
