@@ -100,6 +100,8 @@ export class PlayerService {
       Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
       Logger.debug(`Login: "${login}", Region: "${fullRegion}".`)
       countryCode = 'OTH'
+      region = 'Other Countries'
+      country = 'Other Countries'
     }
     const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
@@ -110,8 +112,8 @@ export class PlayerService {
         id,
         login,
         nickname,
-        country: country,
-        countryCode: countryCode,
+        country,
+        countryCode,
         timePlayed: 0,
         joinTimestamp: Date.now(),
         visits: 1,
@@ -140,8 +142,8 @@ export class PlayerService {
       player = {
         login,
         nickname,
-        country: country,
-        countryCode: countryCode,
+        country,
+        countryCode,
         timePlayed: playerData.timePlayed,
         joinTimestamp: Date.now(),
         visits: serverStart === true ? playerData.visits : playerData.visits + 1, // Prevent adding visits on server start
@@ -225,8 +227,8 @@ export class PlayerService {
   }
 
   static resetCheckpoints(login?: string) {
-    if(login === undefined) {
-      for(const e of this._players) {
+    if (login === undefined) {
+      for (const e of this._players) {
         e.currentCheckpoints.length = 0
       }
       return
