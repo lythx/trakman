@@ -3,7 +3,8 @@ export interface DediRecord {
   nickname: string
   time: number
   checkpoints: number[]
-  readonly isLap: boolean
+  readonly leaderboard: DediLeaderboard
+  readonly isLapRecord: boolean
 }
 
 export type NewDediRecord = Omit<tm.Player & DediRecord & {
@@ -11,6 +12,7 @@ export type NewDediRecord = Omit<tm.Player & DediRecord & {
   readonly previous?: {
     readonly time: number,
     readonly position: number
-  },
-  readonly isLap: boolean
+  }
 }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+
+export type DediLeaderboard = 'TimeAttack' | 'Rounds'
