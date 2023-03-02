@@ -16,5 +16,9 @@ export default {
   cupFinalistIcon: icons.flagFinish,
   cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
   otherCupPositionsImage: icons.flagFinish,
-  displayNoRecordEntry: true
+  displayNoRecordEntry: true,
+  markerBackgrounds: {
+    red: tm.utils.palette.red + '6',
+    blue: tm.utils.palette.purple + '6'
+  }
 }

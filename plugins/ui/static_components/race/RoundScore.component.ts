@@ -40,7 +40,8 @@ export default class RoundScore extends StaticComponent {
           ${this.recordList.constructXml(login, tm.records.roundRecords
       .map(a => ({
         name: a.nickname, time: a.time, checkpoints: a.checkpoints,
-        login: a.login, points: a.roundPoints, color: a.team,
+        login: a.login, points: a.roundPoints,
+        colour: a.team !== undefined ? config.markerBackgrounds[a.team] : undefined,
         markerImage: this.getCupImage(a)
       }))
       .slice(0, tm.records.maxLocalsAmount))}

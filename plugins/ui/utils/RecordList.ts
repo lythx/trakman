@@ -18,12 +18,12 @@ export interface RLRecord {
   checkpoints?: (number | undefined)[]
   url?: string
   points?: number
-  color?: 'red' | 'blue'
+  colour?: string
   image?: RLImage
   markerImage?: RLImage
 }
 
-type Marker = 'faster' | 'slower' | 'you' | { points: number, color?: 'red' | 'blue', image?: RLImage } | null
+type Marker = 'faster' | 'slower' | 'you' | { points: number, colour?: string, image?: RLImage } | null
 
 type TimeColour = 'slower' | 'faster' | 'top' | 'you'
 
@@ -90,10 +90,6 @@ export default class RecordList {
     you: string,
     top: string
   }>
-  readonly markerBackground = {
-    red: tm.utils.palette.red + '6',
-    blue: tm.utils.palette.purple + '6'
-  } // todo config
   readonly noRecordEntryText: string
 
   /**
@@ -340,7 +336,7 @@ export default class RecordList {
     for (let i: number = 0; i < records.length; i++) {
       const points = records[i].points
       if (points !== undefined) {
-        ret.push({ points: points, color: records[i].color, image: records[i].markerImage })
+        ret.push({ points: points, colour: records[i].colour, image: records[i].markerImage })
         continue
       }
       if (infoPositions?.[i]?.[0] === true) {
@@ -496,8 +492,7 @@ export default class RecordList {
     const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
     if (typeof marker === 'object') {
-      const color = (marker.color && this.markerBackground[marker.color]) ?
-        `bgcolor="${this.markerBackground[marker.color]}"` : ''
+      const color = marker.colour && `bgcolor="${marker.colour}"`
       let content: string
       if (marker.image !== undefined) {
         const vpadding = marker.image.verticalPadding ?? 0
