@@ -122,6 +122,26 @@ const events: tm.Listener[] = [
         }) : ''
       }))
     }
+  },
+  {
+    event: 'LapRecord',
+    callback: (info: tm.LapRecordInfo): void => {
+      let prevObj: undefined | { time: number, position: number } = info.previous
+      if (info.previous !== undefined && info.previous.position > tm.records.maxLocalsAmount) {
+        prevObj = undefined
+      }
+      const rs = tm.utils.getRankingString({ time: info.time, position: info.position }, prevObj)
+      tm.sendMessage(tm.utils.strVar(c.lapRecord, {
+        nickname: tm.utils.strip(info.nickname, true),
+        status: rs.status,
+        position: tm.utils.getPositionString(info.position),
+        time: tm.utils.getTimeString(info.time),
+        difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
+          position: info.previous?.position,
+          time: rs.difference
+        }) : ''
+      }))
+    }
   }
 ]
 
