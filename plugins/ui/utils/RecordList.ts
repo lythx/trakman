@@ -492,7 +492,7 @@ export default class RecordList {
     const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
     if (typeof marker === 'object') {
-      const color = marker.colour && `bgcolor="${marker.colour}"`
+      const color = marker.colour === undefined ? '' : `bgcolor="${marker.colour}"`
       let content: string
       if (marker.image !== undefined) {
         const vpadding = marker.image.verticalPadding ?? 0
