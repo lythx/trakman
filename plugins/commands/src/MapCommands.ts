@@ -1,12 +1,12 @@
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 
-let mapToErase: string | undefined
+let eraseObject: { id: string, admin: tm.Player } | undefined
 tm.addListener('BeginMap', (info): void => {
   if (info.isRestart === true) { return }
-  if (mapToErase !== undefined) {
-    void tm.maps.remove(mapToErase)
-    mapToErase = undefined
+  if (eraseObject !== undefined) {
+    void tm.maps.remove(eraseObject.id, eraseObject.admin)
+    eraseObject = undefined
   }
 })
 
@@ -73,7 +73,7 @@ const commands: tm.Command[] = [
     help: config.addrandom.help,
     params: [{ name: 'tmxSite', optional: true }],
     callback: async (info: tm.MessageInfo, tmxSite?: string): Promise<void> => {
-      let obj: { map: tm.Map; wasAlreadyAdded: boolean; } | Error
+      let obj: { map?: tm.Map; wasAlreadyAdded: boolean; } | Error
       let iteration = 0
       do {
         const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
@@ -84,11 +84,14 @@ const commands: tm.Command[] = [
           tm.sendMessage(config.addrandom.fetchError, info.login)
           return
         }
-        obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
+        obj = await tm.maps.writeFileAndAdd(file.name, file.content, info, { cancelIfAlreadyAdded: true })
         iteration++
       } while (!(obj instanceof Error) && obj.wasAlreadyAdded === true && iteration < 10)
       if (obj instanceof Error) {
         tm.log.warn(obj.message)
+        tm.sendMessage(config.addrandom.addError, info.login)
+        return
+      } else if (obj.map === undefined) {
         tm.sendMessage(config.addrandom.addError, info.login)
         return
       } else {
@@ -105,11 +108,11 @@ const commands: tm.Command[] = [
     aliases: config.remove.aliases,
     help: config.remove.help,
     callback: (info): void => {
-      if (mapToErase !== undefined) {
+      if (eraseObject !== undefined) {
         tm.sendMessage(config.remove.error, info.login)
         return
       }
-      mapToErase = tm.maps.current.id
+      eraseObject = { id: tm.maps.current.id, admin: info }
       tm.sendMessage(tm.utils.strVar(config.remove.text, {
         title: info.title,
         nickname: tm.utils.strip(info.nickname, true)

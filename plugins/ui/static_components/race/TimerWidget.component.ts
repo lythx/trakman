@@ -8,24 +8,18 @@ import config from './TimerWidget.config.js'
 
 export default class TimerWidget extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
-  private flexiTimeInterval: NodeJS.Timer | undefined
+  private dynamicTimerInterval: NodeJS.Timer | undefined
   private noButtonXml: string = ''
   private xmlWithButtons: string = ''
   private readonly pauseButtonId = this.id + 1
   private readonly addButtonid = this.id + 2
   private readonly subtractButtonId = this.id + 3
   private isOnRestart = false
+  private roundCountdownDisplayed = false
 
   constructor() {
     super(componentIds.timer, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
@@ -36,7 +30,7 @@ export default class TimerWidget extends StaticComponent {
       if (state === 'enabled') {
         this.startDynamicTimerInterval()
       } else {
-        clearInterval(this.flexiTimeInterval)
+        clearInterval(this.dynamicTimerInterval)
       }
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
@@ -48,9 +42,21 @@ export default class TimerWidget extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('BeginMap', () => {
-      this.isOnRestart = false
+    tm.addListener('EndRound', () => {
+      this.roundCountdownDisplayed = false
       this.display()
+    })
+    tm.addListener('BeginMap', () => {
+      this.roundCountdownDisplayed = false
+      this.display()
+    })
+    tm.addListener('PlayerFinish', () => {
+      if (this.isRoundsOrientedGamemode()) {
+        if (this.roundCountdownDisplayed === false) {
+          this.roundCountdownDisplayed = true
+          this.display()
+        }
+      }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -102,8 +108,8 @@ export default class TimerWidget extends StaticComponent {
   }
 
   private startDynamicTimerInterval() {
-    clearInterval(this.flexiTimeInterval)
-    this.flexiTimeInterval = setInterval(() => {
+    clearInterval(this.dynamicTimerInterval)
+    this.dynamicTimerInterval = setInterval(() => {
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
       this.display()
@@ -119,11 +125,23 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (this.isDisplayed === false) { return }
-    if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
+    if (this.isRoundsOrientedGamemode()) {
+      if (this.roundCountdownDisplayed) {
+        tm.sendManialink(this.noButtonXml, login)
+      } else {
+        this.hide()
+      }
+    } else if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)
     }
+  }
+
+  protected onPositionChange(): void {
+    this.noButtonXml = this.constructXml(false)
+    this.xmlWithButtons = this.constructXml(true)
+    this.display()
   }
 
   private constructXml(isDynamic: boolean): string {
@@ -197,6 +215,10 @@ export default class TimerWidget extends StaticComponent {
     }
     return this.header.constructXml(config.title, config.icon,
       this.side, { rectangleWidth: headerRectWidth }) + buttonXml
+  }
+
+  private isRoundsOrientedGamemode(): boolean {
+    return tm.getGameMode() !== 'Stunts' && tm.getGameMode() !== 'TimeAttack'
   }
 
 }

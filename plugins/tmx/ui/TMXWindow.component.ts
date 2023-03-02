@@ -47,6 +47,9 @@ class TMXWindow extends PopupWindow<number> {
     }
   }
 
+  private isMultiByte = (str: string) =>
+    [...str].some(c => (c.codePointAt(0) ?? 0) > 255)
+
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.historyCount + 1
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
@@ -80,12 +83,16 @@ class TMXWindow extends PopupWindow<number> {
       if (map === undefined) { return '' }
       const grid = new Grid(w, h, [1], config.gridRows,
         { background: config.info.background, margin: config.margin })
+      let mapName = map.name
+      if (this.isMultiByte(mapName)) {
+        mapName = ''
+      }
       const TMXMap = TMXMaps[j] ?? undefined
       const mapRecords = allRecords.filter(a => a.map === map.id)
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, TMXMap)
       const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, TMXMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
-        this.constructEntry(tm.utils.safeString(tm.utils.strip(map.name, false)), config.icons.name, ww, hh, config.iconWidth)
+        this.constructEntry(tm.utils.safeString(tm.utils.strip(mapName, false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructInfoXml(ww, hh, map, TMXMap)
@@ -180,7 +187,11 @@ image="${image}" url="${url}" /> `
   }
 
   protected constructAuthor(width: number, height: number, map: tm.Map): string {
-    return `${this.constructEntry(tm.utils.safeString(map.author), config.icons.author, width - config.authorTimeWidth, height, config.iconWidth)}
+    let author = map.author
+    if (this.isMultiByte(author)) {
+      author = ''
+    }
+    return `${this.constructEntry(tm.utils.safeString(author), config.icons.author, width - config.authorTimeWidth, height, config.iconWidth)}
     <frame posn="${width - (config.authorTimeWidth + config.margin)} 0 4">
       ${this.constructEntry(tm.utils.getTimeString(map.authorTime), config.icons.authorTime, config.authorTimeWidth + config.margin, height, config.iconWidth, true)}
     </frame>`
@@ -209,10 +220,11 @@ image="${image}" url="${url}" /> `
       [map.voteRatio === -1 ? config.defaultText : map.voteRatio.toFixed(0), ic.voteRatio],
       [map.copperPrice.toString(), ic.copperPrice],
       [map.environment, ic.environment],
-      [map?.checkpointsAmount !== undefined ? `${map.checkpointsAmount - 1} CPs` : config.defaultText, ic.checkpointsAmount],
+      [map?.checkpointsPerLap !== undefined ? `${map.checkpointsPerLap - 1} CPs` : config.defaultText, ic.checkpointsAmount],
       [map.voteCount.toString(), ic.voteCount],
       [(TMXMap?.awards?.toString() ?? map?.awards?.toString()) ?? config.defaultText, awardsIcon],
-      [TMXMap?.author ?? config.defaultText, ic.tmxAuthor],
+      [TMXMap?.author === undefined ? config.defaultText :
+        (this.isMultiByte(TMXMap.author) ? '' : tm.utils.safeString(TMXMap.author)), ic.tmxAuthor],
       [TMXMap !== undefined ? tm.utils.formatDate(TMXMap.lastUpdateDate, true) : config.defaultText, ic.buildDate],
       [TMXMap?.style ?? config.defaultText, ic.style],
       [lbRating, lbIcon],

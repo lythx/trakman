@@ -64,6 +64,22 @@ export const createQueries = [
         REFERENCES map_ids(id)
   );`,
 
+  `CREATE TABLE IF NOT EXISTS records_multilap(
+    map_id INT4 NOT NULL,
+    player_id INT4 NOT NULL,
+    time INT4 NOT NULL,
+    checkpoints INT4[] NOT NULL,
+    date TIMESTAMP NOT NULL,
+    laps INT2 NOT NULL,
+    PRIMARY KEY(map_id, player_id, laps),
+    CONSTRAINT fk_player_id
+      FOREIGN KEY(player_id) 
+        REFERENCES players(id),
+    CONSTRAINT fk_map_id
+      FOREIGN KEY(map_id)
+        REFERENCES map_ids(id)
+  );`,
+
   `CREATE TABLE IF NOT EXISTS votes(
     map_id INT4 NOT NULL,
     player_id INT4 NOT NULL,

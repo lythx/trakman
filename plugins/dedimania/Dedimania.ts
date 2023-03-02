@@ -1,20 +1,25 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import config from './Config.js'
-import { DediRecord, NewDediRecord } from './DedimaniaTypes.js'
+import { DediLeaderboard, DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 import './ui/DediCps.component.js'
 import './ui/DediSectors.component.js'
-
-type Environment = 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow' // TODO USE NAMESPACE TYPE IN 1.2
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
 let isFailedAuthentication: boolean = false
+let uploadLaps = false
+let leaderboard: DediLeaderboard
 const client: DedimaniaClient = new DedimaniaClient()
+// 0 is Rounds, 1 is TimeAttack, Stunts mode records do not get sent
+const recordModeEnum: { [mode in DediLeaderboard]: number } = {
+  Rounds: 0,
+  TimeAttack: 1
+}
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
-const environmentMap: { [environment in Environment]: string } = {
+const environmentMap: { [environment in tm.Environment]: string } = { // For Dedimania Snow is Alpine and Desert is Speed
   Stadium: 'Stadium',
   Island: 'Island',
   Desert: 'Speed',
@@ -36,6 +41,17 @@ const emitNicknameUpdateEvent = (updatedRecords: DediRecord[]): void => {
   for (const e of nicknameUpdateListeners) { e(updatedRecords) }
 }
 
+const updateRecordMode = () => {
+  uploadLaps = tm.maps.current.isLapsAmountModified
+  const gameMode = tm.getGameMode()
+  if (gameMode === 'TimeAttack' || gameMode === 'Laps') {
+    leaderboard = 'TimeAttack'
+  } else {
+    leaderboard = uploadLaps ? 'TimeAttack' : 'Rounds'
+  }
+  // TODO HANDLE STUNT
+}
+
 const initialize = async (): Promise<void> => {
   const status = await client.connect(config.host, config.port)
   if (status !== true) {
@@ -48,8 +64,12 @@ const initialize = async (): Promise<void> => {
     }
     return
   }
+  updateRecordMode()
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
+  if (uploadLaps && tm.getGameMode() !== 'Laps') {
+    tm.sendMessage(config.modifiedLapsMessage)
+  }
   await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
   tm.log.trace('Connected to Dedimania')
 }
@@ -68,8 +88,12 @@ const reinitialize = async (): Promise<void> => {
     }
   } while (status !== true)
   tm.log.info('Initialized dedimania after an error')
+  updateRecordMode()
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
+  if (uploadLaps && tm.getGameMode() !== 'Laps') {
+    tm.sendMessage(config.modifiedLapsMessage)
+  }
   await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
 }
 
@@ -103,7 +127,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
       { string: environment },
       { string: author },
       { string: 'TMF' },
-      { int: tm.config.game.gameMode },
+      { int: recordModeEnum[leaderboard] },
       {
         struct: {
           SrvName: { string: cfg.name },
@@ -134,7 +158,8 @@ const getRecords = async (id: string, name: string, environment: string, author:
   currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>
   ({
     login: a.Login, nickname: a.NickName, time: a.Best,
-    checkpoints: a.Checks.slice(0, a.Checks.length - 1)
+    checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
+    isLapRecord: uploadLaps
   }))
   if (config.syncName === true) {
     void tm.updatePlayerInfo(...currentDedis)
@@ -143,8 +168,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
 }
 
 const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
-  if (client.connected === false) { return }
-  if (newDedis.length === 0) { return }
+  if (client.connected === false || newDedis.length === 0) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -164,7 +188,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
       { string: environment },
       { string: author },
       { string: 'TMF' },
-      { int: tm.config.game.gameMode },
+      { int: recordModeEnum[leaderboard] },
       { int: checkpointsAmount },
       { int: config.dediCount },
       { array: recordsArray }
@@ -181,8 +205,15 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
   if (pb === undefined) {
     const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, undefined, position, undefined)
-    currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
-    newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+    currentDedis.splice(position - 1, 0,
+      {
+        login: player.login, time: time, nickname: player.nickname,
+        checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+      })
+    newDedis.push({
+      login: player.login, time: time, nickname: player.nickname,
+      checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+    })
     tm.log.info(getLogString(undefined, position, undefined, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time === pb) {
@@ -199,9 +230,16 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
     }
     const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, previousTime, position, currentDedis.findIndex(a => a.login === player.login) + 1)
     currentDedis = currentDedis.filter(a => a.login !== player.login)
-    currentDedis.splice(position - 1, 0, { login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+    currentDedis.splice(position - 1, 0,
+      {
+        login: player.login, time: time, nickname: player.nickname,
+        checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+      })
     newDedis = newDedis.filter(a => a.login !== player.login)
-    newDedis.push({ login: player.login, time: time, nickname: player.nickname, checkpoints: [...checkpoints] })
+    newDedis.push({
+      login: player.login, time: time, nickname: player.nickname,
+      checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+    })
     tm.log.info(getLogString(previousIndex + 1, position, previousTime, time, player))
     emitRecordEvent(dediRecordInfo)
   }
@@ -306,7 +344,9 @@ const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'i
     time,
     checkpoints,
     position,
-    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined
+    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined,
+    leaderboard,
+    isLapRecord: uploadLaps
   }
 }
 
@@ -325,11 +365,16 @@ if (config.isEnabled === true) {
   }, true)
 
   tm.addListener('BeginMap', (info): void => {
+    updateRecordMode()
+    if (uploadLaps && tm.getGameMode() !== 'Laps') {
+      tm.sendMessage(config.modifiedLapsMessage)
+    }
     void getRecords(info.id, info.name, environmentMap[info.environment], info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
-    void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, info.checkpointsAmount)
+    let cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
+    void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, cpAmount)
   })
 
   tm.addListener('PlayerJoin', (info): void => {
@@ -358,6 +403,12 @@ if (config.isEnabled === true) {
     }
     if (changedObjects.length !== 0) {
       emitNicknameUpdateEvent(changedObjects)
+    }
+  })
+
+  tm.addListener('PlayerLap', (info) => {
+    if (uploadLaps) {
+      void addRecord(info, info.time, info.checkpoints)
     }
   })
 
@@ -477,6 +528,24 @@ export const dedimania = {
    */
   get isConnected(): boolean {
     return client.connected
+  },
+
+  /** 
+   * Whether the plugin is uploading lap times instead of total race time on the current map.
+   * True if the server is in Laps mode or if it's in Cup/Rounds/Teams mode with modified laps amount.
+   */
+  get isUploadingLaps(): boolean {
+    return uploadLaps
+  },
+
+  /**
+   * Dedimania leaderboard ('Rounds' or 'TimeAttack') from which the current records were 
+   * fetched and to which the new records will be uploaded.
+   * The plugin fetches and uploads records to the Rounds Mode leaderboard in Cup/Rounds/Teams mode
+   * if the laps amount is not modified, otherwise to the TimeAttack leaderboard.
+   */
+  get currentLeaderboard(): DediLeaderboard {
+    return leaderboard
   },
 
   /**

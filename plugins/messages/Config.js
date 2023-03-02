@@ -23,8 +23,13 @@ export default {
   record: `${p.highlight}#{nickname}${p.record} has `
     + `#{status} the ${p.rank}#{position}${p.record} `
     + `local record. Time${p.highlight}: #{time}#{difference}`,
+  lapRecord: `${p.highlight}#{nickname}${p.message} has `
+    + `#{status} the ${p.rank}#{position}${p.message} `
+    + `lap record. Time${p.highlight}: #{time}#{difference}`,
   recordDifference: ` ${p.record}$n(${p.rank}#{position} ${p.highlight}-#{time}${p.record})`,
   dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
     + `#{status} the ${p.rank}#{position}${p.dedirecord} `
-    + `dedimania record. Time${p.highlight}: #{time}#{difference}`
+    + `dedimania record. Time${p.highlight}: #{time}#{difference}`,
+  nextJuke: `${p.vote}The next map will be ${p.highlight}#{map}${p.vote}, as requested `
+    + `by ${p.highlight}#{nickname}${p.vote}.`,
 }

@@ -6,7 +6,7 @@ import config from '../../config/Config.js'
 export class GameService {
 
   private static _game: tm.Game
-  private static readonly proxyMethods: string[] = [
+  private static readonly proxyMethods = [
     'SetGameMode',
     'SetChatTime',
     'SetFinishTimeout',
@@ -28,7 +28,7 @@ export class GameService {
     'SetCupRoundsPerChallenge',
     'SetCupWarmUpDuration',
     'SetCupNbWinners'
-  ]
+  ] as const
   private static _state: tm.ServerState
   private static _timerStartTimestamp: number = Date.now()
   private static _dynamicTimerEnabled = false
@@ -39,6 +39,14 @@ export class GameService {
   private static lastDynamicTimerUpdate = 0
   private static dynamicTimerPaused = false
   private static _mapStartTimestamp: number
+  private static readonly gameModeMap: { [value: number]: tm.GameMode } = {
+    0: 'Rounds',
+    1: 'TimeAttack',
+    2: 'Teams',
+    3: 'Laps',
+    4: 'Stunts',
+    5: 'Cup'
+  }
 
   static async initialize(): Promise<void> {
     Client.callNoRes(`SetCallVoteRatios`,
@@ -59,6 +67,7 @@ export class GameService {
     if (this._game.timeAttackLimit === 0) {
       this._enableDynamicTimer()
     }
+    await this.loadGamemodeConfig()
     this.startTimer()
     this._mapStartTimestamp = Date.now()
   }
@@ -66,12 +75,13 @@ export class GameService {
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
     this._mapStartTimestamp = Date.now()
-    if (this._game.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
-      this._enableDynamicTimer()
-      stateChange = 'enabled'
-    } else if (this._game.timeAttackLimit !== 0 && this.dynamicTimerEnabled) {
+    if ((this._game.timeAttackLimit !== 0 || this.gameMode === 'Teams')
+      && this.dynamicTimerEnabled) {
       this._disableDynamicTimer()
       stateChange = 'disabled'
+    } else if (this._game.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
+      this._enableDynamicTimer()
+      stateChange = 'enabled'
     }
     if (this.dynamicTimerEnabled) {
       this.remainingDynamicTime = this.timeAttackLimit
@@ -90,7 +100,7 @@ export class GameService {
       Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
       return
     }
-    this._game = {
+    const obj = {
       gameMode: res.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       resultTime: res.ChatTime,
       mapIndex: res.NbChallenge,
@@ -115,9 +125,21 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
+    if (this._game !== undefined && !this.isGameInfoChanged(obj)) { return }
+    this._game = obj
     if (this._game.timeAttackLimit !== 0) {
       this.timeAttackLimit = this._game.timeAttackLimit
     }
+    Events.emit('GameConfigChanged', this._game)
+  }
+
+  private static isGameInfoChanged(obj: any): boolean {
+    for (const key in this._game) {
+      if (obj[key] !== this._game[key as keyof typeof this._game]) {
+        return true
+      }
+    }
+    return false
   }
 
   static set state(state: tm.ServerState) {
@@ -177,14 +199,14 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to set in miliseconds
+   * @param milliseconds Amount of time to set in milliseconds
    * @returns Boolean indicating whether the time got set
    */
-  static setTime(miliseconds: number): boolean {
+  static setTime(milliseconds: number): boolean {
     if (!this.dynamicTimerEnabled ||
-      this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
+      milliseconds < config.dynamicTimerSubtractionLimit
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime = miliseconds
+    this.remainingDynamicTime = milliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
@@ -193,13 +215,13 @@ export class GameService {
   /**
    * Adds remaining race time. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to add in miliseconds
+   * @param milliseconds Amount of time to add in milliseconds
    * @returns Boolean indicating whether the time got added
    */
-  static addTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0
+  static addTime(milliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || milliseconds <= 0
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime += miliseconds
+    this.remainingDynamicTime += milliseconds
     return true
   }
 
@@ -208,21 +230,21 @@ export class GameService {
    * "dynamicTimerSubtractionLimit" from config
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
-   * @param miliseconds Amount of time to subtract in miliseconds
+   * @param milliseconds Amount of time to subtract in milliseconds
    * @returns Boolean indicating whether the time got subtracted
    */
-  static subtractTime(miliseconds: number): boolean {
-    if (!this.dynamicTimerEnabled || miliseconds <= 0 ||
+  static subtractTime(milliseconds: number): boolean {
+    if (!this.dynamicTimerEnabled || milliseconds <= 0 ||
       this.remainingDynamicTime < config.dynamicTimerSubtractionLimit
       || tm.getState() !== 'race') { return false }
-    this.remainingDynamicTime -= miliseconds
+    this.remainingDynamicTime -= milliseconds
     this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit,
       this.remainingDynamicTime)
     return true
   }
 
   /** 
-   * Remaining race time in miliseconds.
+   * Remaining race time in milliseconds.
    */
   static get remainingRaceTime(): number {
     if (this.dynamicTimerEnabled) {
@@ -234,7 +256,7 @@ export class GameService {
   }
 
   /**
-   * Remaining result screen time in miliseconds.
+   * Remaining result screen time in milliseconds.
    */
   static get remainingResultTime(): number {
     if (this._state === 'race' || this.state === 'transition') { return 0 }
@@ -257,14 +279,14 @@ export class GameService {
   }
 
   /**
-   * Result time limit in the current round in miliseconds.
+   * Result time limit in the current round in milliseconds.
    */
   static get resultTimeLimit(): number {
     return this._game.resultTime
   }
 
   /**
-   * Race time limit in the current round in miliseconds.
+   * Race time limit in the current round in milliseconds.
    */
   static get raceTimeLimit(): number {
     return this.timeAttackLimit
@@ -291,6 +313,11 @@ export class GameService {
     return this._mapStartTimestamp
   }
 
+  // TODO DOCUMENT
+  static get gameMode(): tm.GameMode {
+    return this.gameModeMap[this._game.gameMode]
+  }
+
   private static _enableDynamicTimer(): void {
     this._dynamicTimerEnabled = true
     this._dynamicTimerOnNextRound = true
@@ -310,6 +337,10 @@ export class GameService {
     this._dynamicTimerEnabled = false
     this._dynamicTimerOnNextRound = false
     clearInterval(this.dynamicTimerInterval)
+  }
+
+  private static async loadGamemodeConfig(): Promise<void> {
+    await Client.call('SetUseNewRulesTeam', [{ boolean: true }]) // TODO CONFIG
   }
 
 }

@@ -12,6 +12,7 @@ import 'dotenv/config'
 export default class ServerInfoWindow extends PopupWindow {
 
   private readonly grid: Grid
+  private reRenderInterval?: NodeJS.Timeout
 
   constructor() {
     super(componentIds.serverInfoWindow, config.icon, config.title, config.navbar)
@@ -67,6 +68,26 @@ export default class ServerInfoWindow extends PopupWindow {
     return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
       trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
       postgresVersion, postgresDBSize]
+  }
+
+  protected onOpen(info: tm.ManialinkClickInfo): void {
+    this.displayToPlayer(info.login)
+    // If loop was already running no need to start it again
+    if (this.reRenderInterval !== undefined) { return }
+    this.reRenderInterval = setInterval((): void => { // Start the loop on window open
+      this.reRender()
+      if (this.getPlayersWithWindowOpen().length === 0) {
+        clearInterval(this.reRenderInterval)
+        this.reRenderInterval = undefined
+      }
+    }, 1000)
+  }
+
+  private reRender(): void {
+    const logins = this.getPlayersWithWindowOpen()
+    for (const login of logins) {
+      this.displayToPlayer(login)
+    }
   }
 
   protected async constructContent(): Promise<string> {

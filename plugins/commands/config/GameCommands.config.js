@@ -24,7 +24,6 @@ export default {
   },
   setwarmup: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}#{state} ${p.admin}warmup mode.`,
-    error: `${p.error}Server is not in rounds/teams/laps/cup mode.`,
     public: true,
     privilege: 2,
     aliases: ['swu', 'setwarmup'],
@@ -32,26 +31,24 @@ export default {
   },
   setlapsamount: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the laps amount to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in laps mode.`,
-    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero`,
+    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['sla', 'setlapsamount'],
     help: `Set the laps amount in laps mode.`
   },
   setroundslapsamount: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the laps amount to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in rounds mode.`,
-    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to ${p.highlight}#{amount}${p.admin}.`,
+    resetText: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to default map value.`,
+    insufficientLaps: `${p.error}Laps amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['srla', 'setroundslapsamount'],
-    help: `Set the laps amount in rounds mode.`
+    help: `Set the laps amount in rounds mode. Set 0 to use default map laps.`
   },
   setroundspointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in rounds mode.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['srpl', 'setroundspointlimit'],
@@ -59,8 +56,7 @@ export default {
   },
   setteamspointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in teams mode.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['stpl', 'setteamspointlimit'],
@@ -68,8 +64,7 @@ export default {
   },
   setteamsmaxpoints: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the max points per team to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in teams mode.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['stmp', 'setteamsmaxpoints'],
@@ -77,8 +72,7 @@ export default {
   },
   setcuppointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in cup mode.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['scpl', 'setcuppointlimit'],
@@ -86,26 +80,23 @@ export default {
   },
   setcuproundspermap: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of rounds per map to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in cup mode.`,
-    insufficientRounds: `${p.error}Rounds amount cannot be less or equal to zero`,
+    insufficientRounds: `${p.error}Rounds amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['scrpm', 'setcuproundspermap'],
     help: `Set the amount of rounds per map for cup mode.`
   },
-  setcupwarmuptime: {
+  setcupwarmuprounds: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of rounds in warm-up to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in cup mode.`,
-    insufficientRounds: `${p.error}Rounds amount cannot be less than zero`,
+    insufficientRounds: `${p.error}Rounds amount cannot be less than zero.`,
     public: true,
     privilege: 2,
-    aliases: ['scwt', 'setcupwarmuptime'],
+    aliases: ['scwr', 'setcupwarmuprounds'],
     help: `Set the amount of rounds in warmup for cup mode.`
   },
   setcupwinnersamount: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of cup winners to ${p.highlight}#{amount}${p.admin}.`,
-    error: `${p.error}Server is not in cup mode.`,
-    insufficientWinners: `${p.error}Winners amount cannot be less or equal to zero`,
+    insufficientWinners: `${p.error}Winners amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['scwa', 'setcupwinnersamount'],

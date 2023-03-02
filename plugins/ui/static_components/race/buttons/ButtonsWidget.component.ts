@@ -19,16 +19,11 @@ export default class ButtonsWidget extends StaticComponent {
   private readonly width: number = config.width
   private readonly height: number = config.height
   private readonly grid: Grid
-  private readonly positionX: number
-  private readonly positionY: number
   private readonly buttons: UiButton[] = []
   private xml: string = ''
 
   constructor() {
     super(componentIds.buttons, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
     this.grid = new Grid(this.width + config.margin, this.height + config.margin,
       new Array(config.columns).fill(1), new Array(config.rows).fill(1))
     const allButtons = [

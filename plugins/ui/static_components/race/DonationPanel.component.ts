@@ -9,18 +9,11 @@ import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private xml: string = ''
 
   constructor() {
     super(componentIds.liveCheckpoint, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
@@ -45,6 +38,11 @@ export default class DonationPanel extends StaticComponent {
     }
   }
 
+  protected onPositionChange(): void {
+    this.constructXML()
+    this.display()
+  }
+
   private constructXML(): void {
     const headerHeight: number = this.header.options.height
     const marginSmall: number = config.margin
@@ -55,8 +53,8 @@ export default class DonationPanel extends StaticComponent {
       boxXML += `
             <quad posn="${iconWidth * i} -${headerHeight + marginSmall} 1" sizen="${iconWidth - marginSmall} ${headerHeight}"
              bgcolor="${config.background}" action="${this.id + i + 1}"/>`
-      xmltext += centeredText(e.toString(), iconWidth, headerHeight, {
-        xOffset: iconWidth * i - marginSmall,
+      xmltext += centeredText(e.toString(), iconWidth - marginSmall, headerHeight, {
+        xOffset: iconWidth * i,
         yOffset: headerHeight + marginSmall
       })
     }

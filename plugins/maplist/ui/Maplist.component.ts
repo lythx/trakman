@@ -10,37 +10,37 @@ import config from './Maplist.config.js'
 export default class MapList extends PopupWindow<{ page: number, paginator: Paginator, list?: readonly tm.Map[] }> {
 
   private readonly paginator: Paginator
-  private readonly mapAddId = 1000
+  private readonly mapAddId: number = 1000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
-  private readonly paginatorIdOffset = 7000
-  private nextPaginatorId = 0
+  private readonly paginatorIdOffset: number = 7000
+  private nextPaginatorId: number = 0
 
   constructor() {
     super(componentIds.mapList, config.icon, config.title, config.navbar)
-    const pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
+    const pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, pageCount)
-    this.paginator.onPageChange = (login: string, page: number) => {
-      let pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
+    this.paginator.onPageChange = (login: string, page: number): void => {
+      let pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
       if (pageCount === 0) { pageCount++ }
       this.paginator.setPageCount(pageCount)
       this.displayToPlayer(login, { page, paginator: this.paginator }, `${page}/${pageCount}`)
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
-    addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex) => {
-      const mapId = this.mapActionIds[mapIndex]
+    addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex): void => {
+      const mapId: string = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
         tm.log.error('Error while adding map to queue from jukebox', `Map index out of range`)
         return
       }
-      const gotQueued = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
+      const gotQueued: boolean = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
       if (gotQueued === false) { return }
       this.reRender()
     })
-    addManialinkListener(componentIds.jukebox, (info) => this.openWithOption(info.login, 'jukebox'))
+    addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
     tm.commands.add({
       aliases: config.commands.list.aliases,
       help: config.commands.list.help,
@@ -51,8 +51,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           return
         }
         if (query === 'jb') { query = 'jukebox' }
-        const option = query.split(' ').filter(a => a !== '')[0]
-        const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma'] as const
+        const option: string = query.split(' ').filter(a => a !== '')[0]
+        const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'oldest', 'newest'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
           void this.openWithOption(info.login, o)
@@ -97,12 +97,13 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         privilege: config.commands.jukebox.privilege
       }
     )
-    maplist.onListUpdate(() => this.reRender())
-    maplist.onJukeboxUpdate(() => this.reRender())
+    maplist.onListUpdate((): void => this.reRender())
+    maplist.onJukeboxUpdate((): void => this.reRender())
   }
 
   async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
-    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish' | 'norank' | 'noauthor'): Promise<void> {
+    | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish'
+    | 'norank' | 'noauthor' | 'oldest' | 'newest'): Promise<void> {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = maplist.getByPosition(login, option)
@@ -116,21 +117,21 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       undefined, config.optionTitles[option as keyof typeof config.optionTitles])
   }
 
-  openWithQuery(login: string, query: string, searchByAuthor?: true) {
-    const list = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
+  openWithQuery(login: string, query: string, searchByAuthor?: true): void {
+    const list: Readonly<tm.Map>[] = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list, query)
     this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
   }
 
-  private getPaginator(login: string, list: readonly tm.Map[], option: string) {
-    const pageCount = Math.ceil(list.length / (config.rows * config.columns))
+  private getPaginator(login: string, list: readonly tm.Map[], option: string): Paginator {
+    const pageCount: number = Math.ceil(list.length / (config.rows * config.columns))
     const playerQuery = this.playerQueries.find(a => a.login === login)
     let paginator: Paginator
     if (playerQuery !== undefined) {
       playerQuery.list = list
       paginator = playerQuery.paginator
       paginator.setPageForLogin(login, 1)
-      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
+      paginator.onPageChange = (login: string, page: number): Promise<void> => this.displayToPlayer(login,
         { page, paginator, list }, `${page}/${pageCount}`, undefined,
         config.optionTitles[option as keyof typeof config.optionTitles])
       paginator.setPageCount(pageCount)
@@ -140,7 +141,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       this.nextPaginatorId += 10
       this.nextPaginatorId = this.nextPaginatorId % 3000
       this.playerQueries.push({ paginator, login, list, query: option })
-      paginator.onPageChange = (login: string, page: number) => this.displayToPlayer(login,
+      paginator.onPageChange = (login: string, page: number): Promise<void> => this.displayToPlayer(login,
         { page, paginator, list }, `${page}/${pageCount}`, undefined,
         config.optionTitles[option as keyof typeof config.optionTitles])
     }
@@ -148,19 +149,19 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private reRender(): void {
-    const players = this.getPlayersWithWindowOpen()
+    const players: string[] = this.getPlayersWithWindowOpen()
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       let paginator = this.paginator
-      let list = maplist.get()
+      let list: readonly Readonly<tm.Map>[] = maplist.get()
       let query: string | undefined
       if (obj !== undefined) {
         paginator = obj.paginator
         list = obj.list
         query = obj.query
       }
-      const page = paginator.getPageByLogin(login)
-      let pageCount = Math.ceil(list.length / (config.rows * config.columns))
+      const page: number = paginator.getPageByLogin(login)
+      let pageCount: number = Math.ceil(list.length / (config.rows * config.columns))
       if (pageCount === 0) { pageCount++ }
       if (page === undefined) {
         this.displayToPlayer(login, { page: 1, paginator, list }, `1/${pageCount}`, undefined, query)
@@ -171,15 +172,15 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
-    const page = this.paginator.getPageByLogin(info.login)
-    let pageCount = Math.ceil(tm.maps.count / (config.rows * config.columns))
+    const page: number = this.paginator.getPageByLogin(info.login)
+    let pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
     if (page === undefined) {
       this.displayToPlayer(info.login, { page: 1, paginator: this.paginator }, `1/${pageCount}`)
       return
     }
     this.paginator.setPageCount(pageCount)
-    const index = this.playerQueries.findIndex(a => a.login === info.login)
+    const index: number = this.playerQueries.findIndex(a => a.login === info.login)
     if (index !== -1) {
       this.playerQueries[index].paginator.destroy()
       this.playerQueries.splice(index, 1)
@@ -188,7 +189,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   protected onClose(info: tm.ManialinkClickInfo): void {
-    const index = this.playerQueries.findIndex(a => a.login === info.login)
+    const index: number = this.playerQueries.findIndex(a => a.login === info.login)
     if (index !== -1) {
       this.playerQueries[index].paginator.destroy()
       this.playerQueries.splice(index, 1)
@@ -197,20 +198,20 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   protected async constructContent(login: string, params?: { page: number, list?: readonly tm.Map[] }): Promise<string> {
-    const maps = params?.list ?? maplist.get()
-    const startIndex = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
-    const mapsToDisplay = Math.min(maps.length - startIndex, config.rows * config.columns)
-    const recordIndexStrings = await this.getRecordIndexStrings(login, ...maps.slice(startIndex,
+    const maps: readonly Readonly<tm.Map>[] = params?.list ?? maplist.get()
+    const startIndex: number = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
+    const mapsToDisplay: number = Math.min(maps.length - startIndex, config.rows * config.columns)
+    const recordIndexStrings: string[] = await this.getRecordIndexStrings(login, ...maps.slice(startIndex,
       (config.rows * config.columns) + startIndex).map(a => a.id))
-    const cell = (i: number, j: number, w: number, h: number) => {
-      const gridIndex = (i * config.columns) + j
-      const recordIndexString = recordIndexStrings[gridIndex]
-      const index = startIndex + gridIndex
-      const actionId = this.getActionId(maps[index].id)
-      const header = this.getHeader(login, index, maps[index].id, actionId, w, h)
-      const rowH = (h - this.margin) / 4
-      const width = (w - this.margin * 3) - config.iconWidth
-      const karmaW = width - (config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2)
+    const cell = (i: number, j: number, w: number, h: number): string => {
+      const gridIndex: number = (i * config.columns) + j
+      const recordIndexString: string = recordIndexStrings[gridIndex]
+      const index: number = startIndex + gridIndex
+      const actionId: number = this.getActionId(maps[index].id)
+      const header: string = this.getHeader(login, index, maps[index].id, actionId, w, h)
+      const rowH: number = (h - this.margin) / 4
+      const width: number = (w - this.margin * 3) - config.iconWidth
+      const karmaW: number = width - (config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2)
       return `
         <frame posn="${this.margin} ${-this.margin} 3">
           <format textsize="1"/>
@@ -273,7 +274,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private handleMapClick(mapId: string, login: string, nickname: string, privilege: number): boolean {
-    const map = maplist.get().find(a => a.id === mapId)
+    const map: Readonly<tm.Map> | undefined = maplist.get().find(a => a.id === mapId)
     if (map === undefined) {
       tm.sendMessage(config.messages.error, login)
       tm.log.error('Error while adding map to queue from jukebox', `Can't find map with id ${mapId} in memory`)
@@ -299,7 +300,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
     const ranks = tm.records.getRank(login, mapIds)
     const ret: string[] = []
-    for (let i = 0; i < mapIds.length; i++) {
+    for (let i: number = 0; i < mapIds.length; i++) {
       const r = ranks.find(a => a.mapId === mapIds[i])
       if (r === undefined) { ret.push(config.texts.noRank) }
       else { ret.push(tm.utils.getPositionString(r.rank)) }
@@ -308,7 +309,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private getActionId(mapId: string): number {
-    const mapActionId = this.mapActionIds.indexOf(mapId)
+    const mapActionId: number = this.mapActionIds.indexOf(mapId)
     if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId }
     else {
       this.mapActionIds.push(mapId)
@@ -317,10 +318,10 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
-    const width = (w - this.margin * 3) - config.iconWidth
-    const height = h - this.margin
-    const index = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
-    const prevIndex = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
+    const width: number = (w - this.margin * 3) - config.iconWidth
+    const height: number = h - this.margin
+    const index: number = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
+    const prevIndex: number = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
     const player = tm.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
@@ -362,6 +363,6 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
 }
 
-tm.addListener('Startup', () => {
+tm.addListener('Startup', (): void => {
   new MapList()
 })

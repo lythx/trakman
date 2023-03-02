@@ -65,10 +65,6 @@ const commands: tm.Command[] = [
     help: config.setwarmup.help,
     params: [{ name: 'enabled', type: 'boolean' }],
     callback: (info: tm.MessageInfo, enabled: boolean): void => {
-      if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
-        tm.sendMessage(config.setwarmup.error, info.login)
-        return
-      }
       tm.sendMessage(tm.utils.strVar(config.setwarmup.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), state: enabled ? 'enabled' : 'disabled'
@@ -83,10 +79,6 @@ const commands: tm.Command[] = [
     help: config.setlapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 3) {
-        tm.sendMessage(config.setlapsamount.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setlapsamount.insufficientLaps, info.login)
         return
@@ -105,19 +97,21 @@ const commands: tm.Command[] = [
     help: config.setroundslapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 0) {
-        tm.sendMessage(config.setroundslapsamount.error, info.login)
-        return
-      }
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setroundslapsamount.insufficientLaps, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.text, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setroundslapsamount.public ? undefined : info.login)
+      if (amount === 0) {
+        tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.resetText, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname), amount: amount
+        }), config.setroundslapsamount.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.setroundslapsamount.text, {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname), amount: amount
+        }), config.setroundslapsamount.public ? undefined : info.login)
+      }
       tm.client.callNoRes(`SetRoundForcedLaps`, [{ int: amount }])
     },
     privilege: config.setroundslapsamount.privilege
@@ -127,10 +121,6 @@ const commands: tm.Command[] = [
     help: config.setroundspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 0) {
-        tm.sendMessage(config.setroundspointlimit.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setroundspointlimit.insufficientPoints, info.login)
         return
@@ -149,11 +139,7 @@ const commands: tm.Command[] = [
     help: config.setteamspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 2) {
-        tm.sendMessage(config.setteamspointlimit.error, info.login)
-        return
-      }
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setteamspointlimit.insufficientPoints, info.login)
         return
       }
@@ -171,11 +157,7 @@ const commands: tm.Command[] = [
     help: config.setteamsmaxpoints.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 2) {
-        tm.sendMessage(config.setteamsmaxpoints.error, info.login)
-        return
-      }
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setteamsmaxpoints.insufficientPoints, info.login)
         return
       }
@@ -191,10 +173,6 @@ const commands: tm.Command[] = [
     help: config.setcuppointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcuppointlimit.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setcuppointlimit.insufficientPoints, info.login)
         return
@@ -213,54 +191,40 @@ const commands: tm.Command[] = [
     help: config.setcuproundspermap.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcuproundspermap.error, info.login)
-        return
-      }
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setcuproundspermap.insufficientRounds, info.login)
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcuproundspermap.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setcuproundspermap.public ? undefined : info.login)
+      }), config.setcuproundspermap.public ? undefined : info.login)
       tm.client.callNoRes(`SetCupRoundsPerChallenge`, [{ int: amount }])
     },
     privilege: config.setcuproundspermap.privilege
   },
   {
-    aliases: config.setcupwarmuptime.aliases, // todo it says time but then it says rounds????
-    help: config.setcupwarmuptime.help,
+    aliases: config.setcupwarmuprounds.aliases,
+    help: config.setcupwarmuprounds.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcupwarmuptime.error, info.login)
-        return
-      }
       if (amount < 0) {
-        tm.sendMessage(config.setcupwarmuptime.insufficientRounds, info.login)
+        tm.sendMessage(config.setcupwarmuprounds.insufficientRounds, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.setcupwarmuptime.text, {
+      tm.sendMessage(tm.utils.strVar(config.setcupwarmuprounds.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setcupwarmuptime.public ? undefined : info.login)
+      }), config.setcupwarmuprounds.public ? undefined : info.login)
       tm.client.callNoRes(`SetCupWarmUpDuration`, [{ int: amount }])
     },
-    privilege: config.setcupwarmuptime.privilege
+    privilege: config.setcupwarmuprounds.privilege
   },
   {
     aliases: config.setcupwinnersamount.aliases,
     help: config.setcupwinnersamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcupwinnersamount.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setcupwinnersamount.insufficientWinners, info.login)
         return

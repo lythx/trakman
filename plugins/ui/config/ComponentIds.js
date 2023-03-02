@@ -67,4 +67,8 @@ export default {
   serverInfoWindow: 360000,
   betPlaceWindow: 370000,
   betInfoWidget: 375000,
+  roundScore: 380000,
+  teamScore: 390000,
+  roundsPointsRanking: 400000,
+  lapRanking: 410000
 }

@@ -1,4 +1,4 @@
-import { raceConfig, StaticHeader } from "../ui/UI.js"
+import { raceConfig, StaticHeader } from "../../ui/UI.js"
 
 const p = tm.utils.palette
 

@@ -8,15 +8,10 @@ import config from './TimerWidgetResult.config.js'
 
 export default class TimerWidgetResult extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
   private xml: string = ''
 
   constructor() {
     super(componentIds.timerResult, 'result')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
     this.constructXml()
   }
 

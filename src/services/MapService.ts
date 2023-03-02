@@ -4,6 +4,7 @@ import { MapRepository } from '../database/MapRepository.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import config from "../../config/Config.js"
+import { GameService } from './GameService.js'
 
 interface JukeboxMap {
   readonly map: tm.Map
@@ -102,25 +103,31 @@ export class MapService {
       Logger.error('Unable to retrieve current map info.', res.message)
       return
     }
-    const mapInfo: tm.Map | undefined = this._maps.find(a => a.id === res.UId)
+    const mapInfo: Partial<{ -readonly [K in keyof tm.CurrentMap]: tm.CurrentMap[K] }> | undefined =
+      this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
     // (this information can be acquired only if the map is currently played on the server so it is undefined if map was never played)
-    if (mapInfo.checkpointsAmount === undefined || mapInfo.lapsAmount === undefined) {
-      mapInfo.checkpointsAmount = res.NbCheckpoints
-      mapInfo.lapsAmount = res.NbLaps
+    if (mapInfo.checkpointsPerLap === undefined || mapInfo.defaultLapsAmount === undefined) {
+      mapInfo.checkpointsPerLap = res.NbCheckpoints
+      mapInfo.defaultLapsAmount = res.NbLaps
     }
-    this._current = mapInfo as any
+    const obj = this.getLapsAndCheckpointsAmount(res.NbCheckpoints, res.NbLaps, res.LapRace)
+    mapInfo.checkpointsAmount = obj.checkpoints
+    mapInfo.lapsAmount = obj.laps
+    mapInfo.isInLapsMode = obj.isInLapsMode
+    mapInfo.isLapsAmountModified = obj.isLapsAmountModified
+    this._current = mapInfo as tm.CurrentMap
     if (this._history[0] === undefined) {
-      Logger.info(`Current map set to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}`)
+      Logger.info(`Current map set to ${Utils.strip(this._current.name)} by ${this._current.author}`)
     } else {
-      Logger.info(`Current map changed to ${Utils.strip(mapInfo.name)} by ${mapInfo.author}` +
+      Logger.info(`Current map changed to ${Utils.strip(this._current.name)} by ${this._current.author}` +
         ` from ${Utils.strip(this._history[0].name)} by ${this._history[0].author}.`)
     }
-    void this.repo.setCpsAndLapsAmount(this._current.id, this._current.lapsAmount, this._current.checkpointsAmount)
+    void this.repo.setCpsAndLapsAmount(this._current.id, this._current.defaultLapsAmount, this._current.checkpointsPerLap)
   }
 
   /**
@@ -189,23 +196,32 @@ export class MapService {
     Events.emit('MapAdded', { ...obj, callerLogin: caller?.login })
     return obj
   }
-
+  // TODO UPDATE DOC
   /**
    * Writes a map file to the server, adds it to the current Match Settings and to the jukebox.
    * @param fileName Map file name (file will be saved with this name on the server)
    * @param file Map file buffer
    * @param caller Object containing login and nickname of the player who is adding the map
-   * @param dontJuke If true the map doesn't get enqueued, false by default
+   * @param options Optional parameters: 
+   * @option `dontJuke` - If true the map doesn't get enqueued, false by default
+   * @option `cancelIfAlreadyAdded` - If the map was already on the server returns from the function without searching for the map object.
+   * If that happens the map in returned object will be undefined.
    * @returns Error if unsuccessfull, object containing map object and boolean indicating whether the map was already on the server
    */
-  static async writeFileAndAdd(fileName: string, file: Buffer, caller?: { nickname: string, login: string }, dontJuke: boolean = false):
-    Promise<{ map: tm.Map, wasAlreadyAdded: boolean } | Error> {
+  static async writeFileAndAdd<T>(fileName: string, file: Buffer,
+    caller?: { nickname: string, login: string },
+    options?: { dontJuke?: boolean, cancelIfAlreadyAdded?: T }):
+    Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) :
+      ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
     const write: any | Error = await Client.call('WriteFile', [{ string: fileName }, { base64: base64String }])
     if (write instanceof Error) {
       return new Error(`Failed to write map file ${fileName}.`)
     }
-    const map: tm.Map | Error = await this.add(fileName, caller, dontJuke)
+    const map: tm.Map | Error = await this.add(fileName, caller, options?.dontJuke)
+    if ((options as any)?.cancelIfAlreadyAdded === true) {
+      return { wasAlreadyAdded: true } as any
+    }
     if (map instanceof Error) {
       // Yes we actually need to do this in order to juke a map if it was on the server already
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
@@ -218,7 +234,7 @@ export class MapService {
             if (map === undefined) {
               return new Error(`Failed to queue map ${fileName}`)
             }
-            if (!dontJuke) {
+            if (options?.dontJuke !== true) {
               this.addToJukebox(id, caller)
             }
             return { wasAlreadyAdded: true, map }
@@ -239,6 +255,7 @@ export class MapService {
    */
   static async remove(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
+    await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }]) // I HAVE NO CLUE HOW IT WORKS WITH THIS
     if (map === undefined) { return false }
     const remove: any | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
     if (remove instanceof Error) { return remove }
@@ -270,6 +287,20 @@ export class MapService {
     await this.updateNextMap()
   }
 
+  static restartMap() {
+    const obj = this.getLapsAndCheckpointsAmount(this._current.checkpointsPerLap,
+      this._current.defaultLapsAmount, this._current.isLapRace)
+    // Avoid reference errors
+    this._current = {
+      ...this._current,
+      checkpointsAmount: obj.checkpoints,
+      lapsAmount: obj.laps,
+      isInLapsMode: obj.isInLapsMode,
+      isLapsAmountModified: obj.isLapsAmountModified
+    }
+    Logger.info(`Map ${Utils.strip(this._current.name)} by ${this._current.author} restarted.`)
+  }
+
   /**
    * Sends a dedicated server call to set next map to first map in queue
    * @returns True if map gets set, Error if it fails
@@ -285,10 +316,15 @@ export class MapService {
         await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
       }
       Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
-      res = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
       i++
+      const list = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+      if (list instanceof Error) { continue }
+      const fileName = list.find((a: any) => a.UId === map.id)?.FileName
+      if (fileName === undefined) { continue }
+      this.repo.setFileName(map.id, fileName)
+      res = await Client.call('ChooseNextChallenge', [{ string: fileName }])
     }
-    Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author}`)
+    Logger.trace(`Next map set to ${Utils.strip(map.name)} by ${map.author} `)
   }
 
   /**
@@ -393,6 +429,27 @@ export class MapService {
     }
   }
 
+  private static getLapsAndCheckpointsAmount(checkpointsPerLap: number, defaultLapAmount: number,
+    isLapRace: boolean): { laps: number, checkpoints: number, isInLapsMode: boolean, isLapsAmountModified: boolean } {
+    let isLapsAmountModified = false
+    if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || !isLapRace) {
+      return { checkpoints: checkpointsPerLap, laps: 1, isInLapsMode: false, isLapsAmountModified }
+    }
+    let laps = defaultLapAmount
+    if ((GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup' || GameService.gameMode === 'Teams')
+      && GameService.config.roundsModeLapsAmount !== 0) {
+      laps = GameService.config.roundsModeLapsAmount
+      if (defaultLapAmount !== laps) { // Check if modified value is different from default one
+        isLapsAmountModified = true
+      }
+    }
+    if (GameService.gameMode === 'Laps') {
+      laps = GameService.config.lapsModeLapsAmount
+      isLapsAmountModified = true
+    }
+    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }
+  }
+
   /**
    * Contstructs tm.Map object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
@@ -422,8 +479,8 @@ export class MapService {
       authorTime: info.AuthorTime,
       copperPrice: info.CopperPrice,
       isLapRace: info.LapRace,
-      lapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
-      checkpointsAmount: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
+      defaultLapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
+      checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date(),
       isNadeo: false,
       isClassic: false

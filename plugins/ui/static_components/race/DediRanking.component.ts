@@ -10,25 +10,14 @@ import config from './DediRanking.config.js'
 
 export default class DediRanking extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
-  private readonly recordList: RecordList
+  private recordList!: RecordList
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
     super(componentIds.dedis, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
+    this.getRecordList()
     dedimania.onFetch((): void => this.display())
     dedimania.onRecord((): void => this.display())
     dedimania.onNicknameUpdate((): void => this.display())
@@ -60,6 +49,35 @@ export default class DediRanking extends StaticComponent {
     </manialink>`,
       login
     )
+  }
+
+  protected onPositionChange(): void {
+    this.getRecordList()
+    this.display()
+  }
+
+  private getRecordList(): void {
+    let height = config.height
+    let entries = config.entries
+    if (tm.getGameMode() === 'Teams') {
+      height = config.teamsHeight
+      entries = config.teamsEntries
+    } else if (tm.getGameMode() === 'Rounds') {
+      height = config.roundsHeight
+      entries = config.roundsEntries
+    } else if (tm.getGameMode() === 'Cup') {
+      height = config.cupHeight
+      entries = config.cupEntries
+    } else if (tm.getGameMode() === 'Laps') {
+      height = config.lapsHeight
+      entries = config.lapsEntries
+    }
+    this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
+      entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
   }
 
 }

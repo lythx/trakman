@@ -9,24 +9,13 @@ import config from './LocalRanking.config.js'
 
 export default class LocalRanking extends StaticComponent {
 
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
-  private readonly recordList: RecordList
+  private recordList!: RecordList
 
   constructor() {
     super(componentIds.locals, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin),
-      config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
+    this.getRecordList()
     tm.addListener('LocalRecord', (): void => this.display())
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
       if (tm.records.local.some(a => a.login === info.login)) { this.display() }
@@ -45,6 +34,35 @@ export default class LocalRanking extends StaticComponent {
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
+  }
+
+  private getRecordList(): void {
+    let height = config.height
+    let entries = config.entries
+    if (tm.getGameMode() === 'Teams') {
+      height = config.teamsHeight
+      entries = config.teamsEntries
+    } else if (tm.getGameMode() === 'Rounds') {
+      height = config.roundsHeight
+      entries = config.roundsEntries
+    } else if (tm.getGameMode() === 'Cup') {
+      height = config.cupHeight
+      entries = config.cupEntries
+    } else if (tm.getGameMode() === 'Laps') {
+      height = config.lapsHeight
+      entries = config.lapsEntries
+    }
+    this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
+      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
+  }
+
+  protected onPositionChange(): void {
+    this.getRecordList()
+    this.display()
   }
 
   displayToPlayer(login: string): void {

@@ -35,6 +35,10 @@ import RoundAveragesRanking from './static_components/result/RoundAveragesRankin
 import AdminPanelResult from './static_components/result/AdminPanelResult.component.js'
 import WinnersRanking from './static_components/result/WinnersRanking.component.js'
 import MostRecordsRanking from './static_components/result/MostRecordsRanking.component.js'
+import RoundScore from './static_components/race/RoundScore.component.js'
+import TeamScore from './static_components/race/TeamScore.component.js'
+import RoundsPointsRanking from './static_components/race/RoundsPointsRanking.component.js'
+import LapRanking from './static_components/race/LapRanking.component.js'
 
 /*
 ------------------
@@ -103,6 +107,11 @@ tm.addListener(`Startup`, (): void => {
   new Mutelist()
   new Changelog()
   new ChatLog()
-  new TMXSearchWindow(),
-    new ServerInfoWindow()
+  new TMXSearchWindow()
+  new ServerInfoWindow()
+  new RoundScore()
+  new TeamScore()
+  new RoundsPointsRanking()
+  new LapRanking()
 }, true)
+

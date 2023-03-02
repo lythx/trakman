@@ -14,7 +14,7 @@ import CustomUi from './CustomUi.js'
 import Paginator from './utils/Paginator.js'
 import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
 import Navbar from './utils/Navbar.js'
-import RecordList from './utils/RecordList.js'
+import RecordList, { RLImage, RLRecord } from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
 import componentIds from './config/ComponentIds.js'
 import { centeredText, horizontallyCenteredText, leftAlignedText, rightAlignedText } from './utils/TextUtils.js'
@@ -67,10 +67,13 @@ const preloadIcons = (login?: string): void => {
 const loadListeners: Function[] = []
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
-// TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
-
+// Static UI needs to update on the next map if the gamemode changes
+let staticUpdateNeeded = false
+tm.client.addProxy(['SetGameMode'], () => { 
+  staticUpdateNeeded = true
+})
 const events: tm.Listener[] = [
   {
     event: 'Startup',
@@ -82,7 +85,8 @@ const events: tm.Listener[] = [
       customUi = new CustomUi()
       customUi.display()
       for (const c of Object.values(staticComponents)) {
-        if (c.displayMode === status || c.displayMode === 'always') { c.display() }
+        if (c.gameModes.includes(tm.getGameMode()) &&
+          (c.displayMode === status || c.displayMode === 'always')) { c.display() }
       }
       new TestWindow()
       for (const e of loadListeners) { e() }
@@ -92,6 +96,10 @@ const events: tm.Listener[] = [
     event: 'BeginMap',
     callback: async () => {
       loadMod()
+      if (staticUpdateNeeded) {
+        staticUpdateNeeded = false
+        for (const e of staticComponents) { e.updatePosition() }
+      }
     }
   },
   {
@@ -153,11 +161,11 @@ const addLoadListener = (callback: Function): void => {
 
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  PopupWindow, StaticComponent, DynamicComponent, StaticHeaderOptions,
+  PopupWindow, StaticComponent, DynamicComponent, StaticHeaderOptions, RLImage, RLRecord,
   components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText, addLoadListener,
-  leftAlignedText, addManialinkListener, removeManialinkListener
+  leftAlignedText, addManialinkListener, removeManialinkListener,
 }
 
 // Has to be like that due to circular dependencies

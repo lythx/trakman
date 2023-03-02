@@ -133,5 +133,11 @@ export default {
     plus: "https://cdn.discordapp.com/attachments/793464821030322196/1052977017223647323/Plus.png",
     plusGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1052977017542426665/PlusHover.png",
     play: "https://cdn.discordapp.com/attachments/793464821030322196/1053005812253069372/Play.png",
-    playGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1053005812651544657/PlayHover.png"
+    playGreen: "https://cdn.discordapp.com/attachments/793464821030322196/1053005812651544657/PlayHover.png",
+    clockLap: "https://media.discordapp.net/attachments/793464821030322196/1080542522893414460/ClockLap.png",
+    lap: "https://cdn.discordapp.com/attachments/793464821030322196/1080542523107311677/Laps.png",
+    trakman: "https://media.discordapp.net/attachments/793464821030322196/1080542523325423737/Trakman.png",
+    flagFinish:"https://cdn.discordapp.com/attachments/793464821030322196/1080545346519838820/FlagFinish.png",
+    trophySilver: "https://cdn.discordapp.com/attachments/793464821030322196/1080545347014762537/TrophySilver.png",
+    trophyBronze: "https://cdn.discordapp.com/attachments/793464821030322196/1080545346788261928/TrophyBronze.png",
 }

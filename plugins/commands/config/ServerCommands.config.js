@@ -5,12 +5,12 @@ export default {
     set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`,
     notDynamic: `${p.error}Dynamic timer is disabled.`,
     notRaceMode: `${p.error}Time can be modified only during race.`,
-    invalidParam: `${p.error}Invalid action. Actions: [time] (set), +[time] (add), -[time] (subtract), pause|stop (pause), resume|start (resume).`,
+    invalidParam: `${p.error}Invalid action. Actions: [time] (set), +[time] (add), -[time] (subtract), pause|stop (pause), resume|start|unpause (resume).`,
     tooLow: `${p.error}Timelimit too low to subtract time.`,
     public: true,
     privilege: 1,
     aliases: ['tl', 'timelimit'],
-    help: 'Set, add, subtract, pause, or resume the remaining time of the current round.' 
+    help: 'Set, add, subtract, pause, or resume the remaining time of the current round.'
   },
   pauseTimer: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}paused ${p.admin}the timer.`,

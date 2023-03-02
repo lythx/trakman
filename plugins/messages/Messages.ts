@@ -78,13 +78,20 @@ const events: tm.Listener[] = [
   },
   {
     event: 'EndMap',
-    callback: (info: tm.EndMapInfo): void => {
-      if (info.winnerLogin === undefined || info.winnerWins === undefined) {
-        return
+    callback: async (info: tm.EndMapInfo): Promise<void> => {
+      if (info.winnerLogin !== undefined && info.winnerWins !== undefined) {
+        tm.sendMessage(tm.utils.strVar(c.win, {
+          wins: tm.utils.getPositionString(info.winnerWins)
+        }), info.winnerLogin)
       }
-      tm.sendMessage(tm.utils.strVar(c.win, {
-        wins: tm.utils.getPositionString(info.winnerWins)
-      }), info.winnerLogin)
+      if (tm.jukebox.juked.length !== 0 && tm.jukebox.juked[0].callerLogin !== undefined) {
+        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin) ?? undefined
+        if (player === undefined) { return } // Not even possible
+        tm.sendMessage(tm.utils.strVar(c.nextJuke, {
+          map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
+          nickname: tm.utils.strip(player?.nickname, true)
+        }))
+      }
     }
   },
   {
@@ -105,6 +112,26 @@ const events: tm.Listener[] = [
       }
       const rs = tm.utils.getRankingString({ time: info.time, position: info.position }, prevObj)
       tm.sendMessage(tm.utils.strVar(c.record, {
+        nickname: tm.utils.strip(info.nickname, true),
+        status: rs.status,
+        position: tm.utils.getPositionString(info.position),
+        time: tm.utils.getTimeString(info.time),
+        difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
+          position: info.previous?.position,
+          time: rs.difference
+        }) : ''
+      }))
+    }
+  },
+  {
+    event: 'LapRecord',
+    callback: (info: tm.LapRecordInfo): void => {
+      let prevObj: undefined | { time: number, position: number } = info.previous
+      if (info.previous !== undefined && info.previous.position > tm.records.maxLocalsAmount) {
+        prevObj = undefined
+      }
+      const rs = tm.utils.getRankingString({ time: info.time, position: info.position }, prevObj)
+      tm.sendMessage(tm.utils.strVar(c.lapRecord, {
         nickname: tm.utils.strip(info.nickname, true),
         status: rs.status,
         position: tm.utils.getPositionString(info.position),

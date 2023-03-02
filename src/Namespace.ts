@@ -12,10 +12,11 @@ declare global {
       readonly fileName: string
       /** Map author login */
       readonly author: string
+      // TODO DOCUMENT ENUMS
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise', 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Bronze medal time */
       readonly bronzeTime: number
       /** Silver medal time */
@@ -38,10 +39,11 @@ declare global {
       voteCount: number
       /** Map karma vote ratio (0 to 100) */
       voteRatio: number
-      /** Amount of laps (undefined if the map was never played) */
-      lapsAmount?: number
-      /** Amount of checkpoints (undefined if the map was never played) */
-      checkpointsAmount?: number
+      // TODO DOCUMENT
+      /** Default amount of laps (different amounts can be set using server call) (undefined if the map was never played) */
+      defaultLapsAmount?: number
+      /** Amount of checkpoints per lap (undefined if the map was never played) */
+      checkpointsPerLap?: number
       /** Map TMX leaderboard rating (undefined if the map was never fetched from TMX) */
       leaderboardRating?: number
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
@@ -90,10 +92,25 @@ declare global {
       privilege: number
       /** Whether the player is in the spectator mode */
       isSpectator: boolean
+      // TODO DOCUMENT
+      isPureSpectator: boolean
+      // TODO DOCUMENT
+      isTemporarySpectator: boolean
+      hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
       /** Player average server map rank */
       average: number
+      /** Player team (teams mode only) */ // TODO DOCUMENT and maybe remove from other objects
+      team?: 'red' | 'blue'
+      // TODO DOCUMENT
+      roundsPoints: number
+      // -1 if nofin
+      roundTimes: number[]
+
+      cupPosition?: number
+
+      isCupFinalist: boolean
     }
     /** Controller offline player object */
     export interface OfflinePlayer {
@@ -153,8 +170,8 @@ declare global {
       readonly params?: {
         /** Parameter name */
         readonly name: string,
-        /** Parameter type */
-        readonly type?: 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword',
+        /** Parameter data type */
+        readonly type?: CommandParameterType,
         /** If set only the given values will be considered valid */
         readonly validValues?: (string | number)[]
         /** Whether the parameter is optional or not */
@@ -239,6 +256,10 @@ declare global {
       readonly time: number
       /** Checkpoint lap */
       readonly lap: number
+      // TODO DOC
+      readonly lapCheckpointTime: number
+      readonly lapCheckpointIndex: number
+      readonly isLapFinish: boolean
     }
     /** Controller chat message object */
     export interface Message {
@@ -296,9 +317,9 @@ declare global {
       /** TMX map type ('Race', 'Stunts', etc.) */
       readonly type: string
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise, 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Map TMX style (eg. Full Speed, LOL) */
       readonly style: string
       /** Map TMX routes (Single, Multi, Symmetrical) */
@@ -306,7 +327,7 @@ declare global {
       /** Map TMX length, determined by the map author time eg. 1m30s etc. */
       readonly length: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
-      readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+      readonly difficulty: TMXDifficulty
       /** Map TMX leaderboard rating */
       readonly leaderboardRating: number
       /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
@@ -378,15 +399,15 @@ declare global {
       /** TMX map type ('Race', 'Stunts', etc.) */
       readonly type: string
       /** Map environment ('Stadium', 'Island', etc.) */
-      readonly environment: 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+      readonly environment: Environment
       /** Map mood ('Sunrise, 'Night', etc.) */
-      readonly mood: 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+      readonly mood: Mood
       /** Map TMX style (eg. Full Speed, LOL) */
       readonly style: string
       /** Map TMX routes (Single, Multi, Symmetrical) */
       readonly routes: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
-      readonly difficulty: 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+      readonly difficulty: TMXDifficulty
       /** Map TMX game, the version of the game the map was built in, eg. TMUF, TMNF etc. */
       readonly game: string
       /** Map TMX comment */
@@ -513,7 +534,7 @@ declare global {
       readonly isSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** Seems to be always the same as isSpectator */ // TODO ROUNDS
+      /** Seems to be always the same as isSpectator */ // TODO UPDATE
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
@@ -574,13 +595,13 @@ declare global {
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end the map in teams mode */
+      /** Amount of points to end map in Teams Mode */ // TODO Document
       teamPointsLimit: number
       /** Teams mode related */ // TODO TEAMS
       teamMaxPoints: number
       /** Points system type used in teams mode */ // TODO TEAMS
       teamPointSystemType: boolean
-      /** Amount of laps in laps mode */ // TODO LAPS
+      /** Amount of laps in laps mode */ // TODO Document
       lapsModeLapsAmount: number
       /** Amount of time left for players to finish the track after the leader in laps mode */
       lapsModeFinishTimeout: number
@@ -741,6 +762,12 @@ declare global {
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
+      "BeginRound": Readonly<tm.FinishInfo>[]
+      "EndRound": Readonly<tm.FinishInfo>[]
+      "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
+      // TODO DOC
+      "PlayerLap": Readonly<LapFinishInfo>
+      "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
       "TrackMania.PlayerDisconnect": string
       "TrackMania.PlayerChat": readonly [number, string, string, boolean]
@@ -784,18 +811,27 @@ declare global {
       readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
-    export type BeginMapInfo = Map & {
+    export type BeginMapInfo = Readonly<CurrentMap> & {
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
     }
     /** Controller current map object */
     export type CurrentMap = Map & {
-      /** Amount of laps */
+      // TODO DOCUMENT
+      /** Default amount of laps (may be incoherent with actual laps amount if it's modified using dedicated server call) */
+      readonly defaultLapsAmount: number
+      /** Current amount of laps depending on dedicated server config and map default laps */
       readonly lapsAmount: number
-      /** Amount of checkpoints */
+      /** Amount of checkpoints per lap (includes finish) */
+      readonly checkpointsPerLap: number
+      /** Total amount of checkpoints depending on map checkpoints per lap and laps amount (includes finish) */
       readonly checkpointsAmount: number
+      /** Whether the map is in laps mode (always false in TimeAttack and Stunts, true in other gamemodes if map has multilap start) */
+      readonly isInLapsMode: boolean
+      /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts always true in Laps) */
+      readonly isLapsAmountModified: boolean
     }
-    /** Controller local record object */
+    /** Controller local record object */ // TODO UPDATE DOC
     export type LocalRecord = Record & OfflinePlayer
     /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
@@ -803,7 +839,11 @@ declare global {
       readonly player: Player
     }
     /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
-    export type FinishInfo = Omit<Player & LocalRecord, 'currentCheckpoints' | 'isSpectator' | 'date'>
+    export type FinishInfo = Omit<Player & LocalRecord & {
+      // TODO DOC
+      readonly roundPoints?: number
+    },
+      'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
     /** Object containing player information. Created and emitted on the PlayerLeave event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LeaveInfo = Omit<Player, 'lastOnline'> & {
       /** Amount of time the player spent on the server in the current session */
@@ -841,12 +881,30 @@ declare global {
         /** Previous player local record time */
         readonly time: number
       }
-    }, 'currentCheckpoints' | 'isSpectator'>
+    }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+    export type LapFinishInfo = Readonly<FinishInfo & {
+      //TODO DOC
+      readonly isFinish: boolean
+    }>
+    export type LapRecordInfo = Readonly<RecordInfo & {
+      //TODO DOC
+      readonly isFinish: boolean
+    }>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
-    /** TMX site ('TMNF', 'TMU', etc.) */
-    export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
     /** Dedicated server state ('result', 'race', 'transition') */
     export type ServerState = 'result' | 'race' | 'transition'
+    /** Map environment ('Stadium', 'Island', etc.) */
+    export type Environment = 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
+    /** Map mood ('Sunrise', 'Night', etc.) */
+    export type Mood = 'Sunrise' | 'Day' | 'Sunset' | 'Night'
+    /** Server command data type */
+    export type CommandParameterType = 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword'
+    /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
+    export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
+    /** TMX site ('TMNF', 'TMU', etc.) */
+    export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
+    // TODO DOCUMENT
+    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
   }
 }

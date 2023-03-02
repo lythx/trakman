@@ -94,6 +94,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
+        this.onClose({ ...info, actionId: this.closeId })
       }
     })
   }

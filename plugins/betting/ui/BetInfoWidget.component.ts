@@ -1,6 +1,6 @@
 import {
   DynamicComponent, StaticHeader, componentIds, centeredText
-} from '../ui/UI.js'
+} from '../../ui/UI.js'
 import config from './BetInfoWidget.config.js'
 
 export default class BetInfoWidget extends DynamicComponent {

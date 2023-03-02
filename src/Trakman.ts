@@ -16,6 +16,7 @@ import { PlayerRepository } from './database/PlayerRepository.js'
 import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
+import { RoundsService } from './services/RoundsService.js'
 
 const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
@@ -130,6 +131,8 @@ namespace trakman {
 
     getRank: RecordService.getRank.bind(RecordService),
 
+    getLap: RecordService.getLap.bind(RecordService),
+
     /**
      * Current map local records.
      */
@@ -154,7 +157,34 @@ namespace trakman {
      * Maximum amount of local records. 
      * All local records get fetched, but only ones below max amount count towards server rank.
      */
-    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount }
+    get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
+
+    // TODO DOCUMENT eee maybe move
+    get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
+
+    get roundRecordCount(): number { return RoundsService.roundRecordCount },
+
+    get lap(): Readonly<tm.LocalRecord>[] { return RecordService.lapRecords },
+
+    get lapCount(): number { return RecordService.lapRecordCount },
+
+    get teamScores() {
+      return RoundsService.teamScores
+    }
+
+  }
+
+  export const rounds = {
+
+    get currentRecords() { return RoundsService.roundRecords },
+
+    get currentRecordCount(): number { return RoundsService.roundRecordCount },
+
+    get teamScores() { return RoundsService.teamScores },
+
+    get pointsRanking() { return RoundsService.pointsRanking },
+
+    get teamsPointsLimit() { return RoundsService.teamsPointsLimit }
 
   }
 
@@ -535,6 +565,13 @@ namespace trakman {
    */
   export const getState = (): tm.ServerState => {
     return GameService.state
+  }
+
+  /**
+   * Gets current server gamemode. ('Rounds', 'TimeAttack', 'Teams', 'Laps', 'Stunts', 'Cup')
+   */
+  export const getGameMode = (): tm.GameMode => {
+    return GameService.gameMode
   }
 
   /**

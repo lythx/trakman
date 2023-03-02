@@ -1,24 +1,54 @@
+import { Events } from '../Events.js'
 import { Logger } from '../Logger.js'
 import { ClientRequest } from './ClientRequest.js'
 import { ClientSocket } from './ClientSocket.js'
 
 export abstract class Client {
 
-  private static readonly socket: ClientSocket = new ClientSocket()
+  private static socket: ClientSocket = new ClientSocket()
   private static requestId: number = 0x80000000
-  private static readonly proxies: { methods: string[], callback: ((method: string, params: tm.CallParams[], response: any) => void) }[] = []
+  private static readonly proxies: { methods: readonly string[], callback: ((method: string, params: tm.CallParams[], response: any) => void) }[] = []
+  private static host: string
+  private static port: number
 
   static async connect(host = 'localhost', port = 5000): Promise<void> {
     if (port < 0 || port >= 65536 || isNaN(port)) {
       await Logger.fatal(`SERVER_PORT needs to be a number >= 0 and < 65536, received ${port}. Check your .env file`)
     }
+    this.port = port
+    this.host = host
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.socket.setupListeners()
+    this.socket.on('error', (error) => setTimeout(() => {
+      Logger.error('Client socket error:', error.message)
+      void this.handleError()
+    }, 5000)) // 5 sec timeout before reconnect try
     const status = await this.socket.awaitHandshake()
     if (status instanceof Error) {
       await Logger.fatal('Connection to the dedicated server failed:', status.message)
     }
+  }
+
+  static async handleError() {
+    this.socket.destroy()
+    this.socket = new ClientSocket()
+    this.socket.connect(this.port, this.host)
+    this.socket.setKeepAlive(true)
+    this.socket.setupListeners()
+    this.socket.on('error', (error) => setTimeout(() => {
+      Logger.error('Client socket error:', error.message)
+      void this.handleError()
+    }, 5000))
+    const status = await this.socket.awaitHandshake()
+    if (status instanceof Error) {
+      await Logger.fatal('Connection to the dedicated server failed:', status.message)
+    }
+    const mapInfo = await this.call('GetCurrentChallengeInfo')
+    if (mapInfo instanceof Error) {
+      await Logger.fatal('Connection to the dedicated server failed:', mapInfo.message)
+    }
+    Events.emit('TrackMania.BeginChallenge', mapInfo)
   }
 
   /**
@@ -98,7 +128,7 @@ export abstract class Client {
  * @param methods Array of dedicated server methods
  * @param callback Callback to execute
  */
-  static addProxy(methods: string[], callback: ((method: string, params: tm.CallParams[], response: any) => void)): void {
+  static addProxy(methods: readonly string[], callback: ((method: string, params: tm.CallParams[], response: any) => void)): void {
     this.proxies.push({ methods, callback })
   }
 

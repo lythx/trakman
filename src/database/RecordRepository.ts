@@ -31,7 +31,7 @@ type TableEntryWithPlayerInfo = TableEntry & {
 
 export class RecordRepository extends Repository {
 
-  async add(...records: tm.RecordInfo[]): Promise<void> {
+  async add(laps: number | null, ...records: tm.RecordInfo[]): Promise<void> {
     const mapIds = await mapIdsRepo.get(records.map(a => a.map))
     const playerIds = await playerRepo.getId(records.map(a => a.login))
     const arr = records.filter(a => mapIds.some(b => b.uid === a.map) && playerIds.some(b => b.login === a.login))
@@ -42,6 +42,16 @@ export class RecordRepository extends Repository {
         .map(a => `(${a.login}, ${a.map})`).join(', ')} while inserting into records table`)
     }
     if (arr.length === 0) { return }
+    if (laps !== null) {
+      const query = `INSERT INTO records_multilap(map_id, player_id, time, checkpoints, date, laps) 
+      ${this.getInsertValuesString(6, arr.length)}`
+      const values: any[] = []
+      for (const [i, record] of arr.entries()) {
+        values.push(mapIds[i].id, playerIds[i].id, record.time, record.checkpoints, record.date, laps)
+      }
+      await this.query(query, ...values)
+      return
+    }
     const query = `INSERT INTO records(map_id, player_id, time, checkpoints, date) 
     ${this.getInsertValuesString(5, arr.length)}`
     const values: any[] = []
@@ -62,31 +72,53 @@ export class RecordRepository extends Repository {
     return res.map(a => this.constructRecordObject(a))
   }
 
-  async get(...mapUids: string[]): Promise<tm.Record[]> {
+  async get(laps: number | null, ...mapUids: string[]): Promise<tm.Record[]> {
+    let table = 'records'
+    let lapCondition = ''
     const mapIds = await mapIdsRepo.get(mapUids)
+    if (laps !== null) {
+      table = 'records_multilap'
+      lapCondition = `AND laps=$${mapIds.length + 1}`
+    }
     if (mapIds.length === 0) { return [] }
-    const query = `SELECT uid, login, time, checkpoints, date, nickname FROM records
-    JOIN map_ids ON map_ids.id=records.map_id
-    JOIN players ON players.id=records.player_id
-    WHERE ${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
+    const query = `SELECT uid, login, time, checkpoints, date, nickname FROM ${table}
+    JOIN map_ids ON map_ids.id=${table}.map_id
+    JOIN players ON players.id=${table}.player_id
+    WHERE (${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}) ${lapCondition} 
     ORDER BY time ASC,
     date ASC;`
-    const res = (await this.query(query, ...mapIds.map(a => a.id)))
+    let res: any[]
+    if (laps === null) {
+      res = (await this.query(query, ...mapIds.map(a => a.id)))
+    } else {
+      res = (await this.query(query, ...mapIds.map(a => a.id), laps))
+    }
     return res.map(a => this.constructRecordObject(a))
   }
 
-  async getLocalRecords(...mapUids: string[]): Promise<tm.LocalRecord[]> {
+  async getLocalRecords(laps: number | null, ...mapUids: string[]): Promise<tm.LocalRecord[]> {
+    let table = 'records'
+    let lapCondition = ''
     const mapIds = await mapIdsRepo.get(mapUids)
+    if (laps !== null) {
+      table = 'records_multilap'
+      lapCondition = `AND laps=$${mapIds.length + 1}`
+    }
     if (mapIds.length === 0) { return [] }
     const query = `SELECT uid, players.login, time, checkpoints, date, nickname, region, wins, time_played, 
-    visits, is_united, last_online, average, privilege FROM records
-    JOIN map_ids ON map_ids.id=records.map_id
-    JOIN players ON players.id=records.player_id
+    visits, is_united, last_online, average, privilege FROM ${table}
+    JOIN map_ids ON map_ids.id=${table}.map_id
+    JOIN players ON players.id=${table}.player_id
     LEFT JOIN privileges ON privileges.login=players.login
-    WHERE ${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}
+    WHERE (${mapIds.map((a, i) => `map_id=$${i + 1} OR `).join(' ').slice(0, -3)}) ${lapCondition}
     ORDER BY time ASC,
     date ASC;`
-    const res = (await this.query(query, ...mapIds.map(a => a.id)))
+    let res: any[]
+    if (laps === null) {
+      res = (await this.query(query, ...mapIds.map(a => a.id)))
+    } else {
+      res = (await this.query(query, ...mapIds.map(a => a.id), laps))
+    }
     return res.map(a => this.constuctLocalRecord(a))
   }
 
@@ -104,46 +136,69 @@ export class RecordRepository extends Repository {
   }
 
 
-  async getOne(mapUid: string, login: string): Promise<tm.Record | undefined> {
+  async getOne(mapUid: string, login: string, laps: number = -1): Promise<tm.Record | undefined> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     if (mapId === undefined || playerId === undefined) { return }
-    const query: string = `SELECT time, checkpoints, date FROM records 
-    WHERE map_id=$1 AND player_id=$2`
-    const res = (await this.query(query, mapId, playerId))
+    let res: any[]
+    if (laps === -1) {
+      const query: string = `SELECT time, checkpoints, date FROM records 
+      WHERE map_id=$1 AND player_id=$2`
+      res = (await this.query(query, mapId, playerId))
+    } else {
+      const query: string = `SELECT time, checkpoints, date FROM records_multilap
+      WHERE map_id=$1 AND player_id=$2 AND laps=$3`
+      res = (await this.query(query, mapId, playerId, laps))
+    }
     return this.constructRecordObject({ uid: mapUid, login, ...res[0] })
   }
 
-  async remove(mapUid: string, login: string): Promise<void> {
+  async remove(mapUid: string, login: string, laps: number = -1): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     if (mapId === undefined || playerId === undefined) {
       Logger.error(`Failed to get mapId or playerId (${mapUid},${login}) while removing from records table`)
       return
     }
-    const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`
-    await this.query(query, mapId, playerId)
+    if (laps === -1) {
+      const query: string = `DELETE FROM records WHERE map_id=$1 AND player_id=$2;`
+      await this.query(query, mapId, playerId)
+    } else {
+      const query: string = `DELETE FROM records_multilap WHERE map_id=$1 AND player_id=$2 AND laps=$3;`
+      await this.query(query, mapId, playerId, laps)
+    }
   }
 
-  async removeAll(mapUid: string): Promise<void> {
+  async removeAll(mapUid: string, laps: number = -1): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     if (mapId === undefined) {
       Logger.error(`Failed to get id for map ${mapUid} while removing from records table`)
       return
     }
-    const query: string = `DELETE FROM records WHERE map_id=$1;`
-    await this.query(query, mapId)
+    if (laps === -1) {
+      const query: string = `DELETE FROM records WHERE map_id=$1;`
+      await this.query(query, mapId)
+    } else {
+      const query: string = `DELETE FROM records_multilap WHERE map_id=$1 AND laps=$2`
+      await this.query(query, mapId, laps)
+    }
   }
 
-  async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date): Promise<void> {
+  async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date, laps: number = -1): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     if (mapId === undefined || playerId === undefined) {
       Logger.error(`Failed to get mapId or playerId (${login},${mapUid}) while updating records table`)
       return
     }
-    const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'
-    await this.query(query, time, checkpoints, date, mapId, playerId)
+    if (laps === -1) {
+      const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'
+      await this.query(query, time, checkpoints, date, mapId, playerId)
+    } else {
+      const query = `UPDATE records_multilap SET time=$1, checkpoints=$2, date=$3 
+        WHERE map_id=$4 AND player_id=$5 AND laps=$6`
+      await this.query(query, time, checkpoints, date, mapId, playerId, laps)
+    }
   }
 
   async countRecords(login: string): Promise<number> {

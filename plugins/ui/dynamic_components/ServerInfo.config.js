@@ -3,7 +3,7 @@ import icons from '../config/Icons.js'
 
 export default {
   title: `Server Overview`,
-  icon: icons.placeholder,
+  icon: icons.trakman,
   navbar: [
     { name: `Changelog`, actionId: ids.changelog }
   ],

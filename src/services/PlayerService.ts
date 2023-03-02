@@ -90,15 +90,18 @@ export class PlayerService {
    * @param ip Player ip address
    * @param isUnited True if player has united version of game
    * @param serverStart True if executed on server start
+   * @returns Player object
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.JoinInfo> {
-    const { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
-    if (countryCode === undefined) {
-      // need to exit the process here because if someone joins and doesn't get stored in memory other services will throw errors if he does anything
-      await Logger.fatal(`Error adding player ${Utils.strip(nickname)} (${login}) to memory, nation ${country} is not in the country list.`)
-      return {} as any // Shut up IDE
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> { // TODO ADD NEW PROPERTIES
+    let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
+    if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
+      Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
+      Logger.debug(`Login: "${login}", Region: "${fullRegion}".`)
+      countryCode = 'OTH'
+      region = 'Other Countries'
+      country = 'Other Countries'
     }
     const playerData: tm.OfflinePlayer | undefined = await this.repo.get(login)
     const privilege: number = await this.privilegeRepo.get(login)
@@ -109,8 +112,8 @@ export class PlayerService {
         id,
         login,
         nickname,
-        country: country,
-        countryCode: countryCode,
+        country,
+        countryCode,
         timePlayed: 0,
         joinTimestamp: Date.now(),
         visits: 1,
@@ -118,6 +121,9 @@ export class PlayerService {
         wins: 0,
         privilege,
         isSpectator,
+        isTemporarySpectator: isSpectator,
+        isPureSpectator: isSpectator,
+        hasPlayerSlot: isSpectator,
         ip,
         region,
         isUnited,
@@ -125,7 +131,10 @@ export class PlayerService {
         ladderPoints,
         ladderRank,
         rank: index === -1 ? undefined : (index + 1),
-        title: this.getTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode),
+        roundsPoints: 0,
+        roundTimes: [],
+        isCupFinalist: false
       }
       this._totalPlayerCount++
       await this.repo.add(player) // need to await so owner privilege gets set after player is added
@@ -133,8 +142,8 @@ export class PlayerService {
       player = {
         login,
         nickname,
-        country: country,
-        countryCode: countryCode,
+        country,
+        countryCode,
         timePlayed: playerData.timePlayed,
         joinTimestamp: Date.now(),
         visits: serverStart === true ? playerData.visits : playerData.visits + 1, // Prevent adding visits on server start
@@ -142,6 +151,9 @@ export class PlayerService {
         wins: playerData.wins,
         privilege,
         isSpectator,
+        isTemporarySpectator: isSpectator,
+        isPureSpectator: isSpectator,
+        hasPlayerSlot: isSpectator,
         id,
         ip,
         region,
@@ -151,7 +163,10 @@ export class PlayerService {
         average: playerData.average,
         ladderPoints,
         ladderRank,
-        title: this.getTitle(login, privilege, country, countryCode)
+        title: this.getTitle(login, privilege, country, countryCode),
+        roundsPoints: 0,
+        roundTimes: [],
+        isCupFinalist: false
       }
       await this.repo.updateOnJoin(player.login, player.nickname, player.region, player.visits, player.isUnited) // need to await so owner privilege gets set after player is added
     }
@@ -169,15 +184,17 @@ export class PlayerService {
    */
   static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
     for (const p of players) {
-      const obj = this._players.find(a => a.login === p.login)
+      const obj: tm.Player | tm.OfflinePlayer | undefined =
+        this._players.find(a => a.login === p.login) ?? await this.repo.get(p.login)
       if (obj === undefined) { continue }
-      if (p.title !== undefined) { obj.title = p.title }
+      if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title }
       const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
-      if (p.nickname !== undefined) {
+      if (p.nickname !== undefined && p.nickname !== obj.nickname) {
+        Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)
         await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
       }
       if (countryCode !== undefined) {
-        const r = countryCode === undefined ? obj.region : region // Set only if region is valid
+        const r: string = countryCode === undefined ? obj.region : region // Set only if region is valid
         await this.repo.updateRegion(p.login, r)
       }
     }
@@ -209,22 +226,31 @@ export class PlayerService {
     return leaveInfo
   }
 
+  static resetCheckpoints(login?: string) {
+    if (login === undefined) {
+      for (const e of this._players) {
+        e.currentCheckpoints.length = 0
+      }
+      return
+    }
+    const player = this.get(login)
+    if (player !== undefined) {
+      player.currentCheckpoints.length = 0
+    }
+  }
+
   /**
    * Add a checkpoint time to the player object, returns true if the checkpoint is finish
    * @param player Player object
    * @param cp Checkpoint object
    */
-  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean {
-    let laps
-    if (GameService.config.gameMode === 1 || MapService.current.isLapRace === false) { // ta gamemode or not a lap map
-      laps = 1
-    } else if ([0, 3, 5].includes(GameService.config.gameMode)) {
-      laps = GameService.config.roundsModeLapsAmount
-    } else { // TEST ROUNDS MODE
-      laps = GameService.config.lapsModeLapsAmount
-    }
+  static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean | {
+    lapTime: number,
+    isFinish: boolean, lapCheckpoints: number[]
+  } {
+    const laps = tm.maps.current.lapsAmount
     if (cp.index === 0) {
-      if (laps === 1 && MapService.current.checkpointsAmount === 1) {  // finish if 0 cp map
+      if (laps === 1 && MapService.current.checkpointsPerLap === 1) {  // finish if 0 cp map
         player.currentCheckpoints.length = 0
         return true
       }
@@ -232,12 +258,30 @@ export class PlayerService {
       player.currentCheckpoints.length = 1 // reset checkpoints array on cp1
       return false
     }
-    if (player.currentCheckpoints.length === 0) { return new Error('Index not coherent with checkpoints length') } // handle people passing some cps before controller start
+    if (player.currentCheckpoints.length === 0) {
+      return new Error('Index not coherent with checkpoints length')
+    } // handle people passing some cps before controller start
     const endLap: number = player.currentCheckpoints[0].lap + laps
     if (cp.lap < endLap) {
       player.currentCheckpoints.push(cp)
+      if (MapService.current.isInLapsMode && (cp.index + 1) % MapService.current.checkpointsPerLap === 0) {
+        const startIndex = cp.index - MapService.current.checkpointsPerLap
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        return {
+          lapTime: cp.time - startTime, isFinish: false,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1, -1).map(a => a.time - startTime)
+        }
+      }
       return false
     } else {
+      if (MapService.current.isInLapsMode) {
+        const startIndex = cp.index - MapService.current.checkpointsPerLap
+        const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
+        return {
+          lapTime: cp.time - startTime, isFinish: true,
+          lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1).map(a => a.time - startTime)
+        }
+      }
       return true
     }
   }
@@ -245,13 +289,19 @@ export class PlayerService {
   /**
    * Sets spectator status in player object
    * @param login Player login
-   * @param status Spectator status
    * @returns True if successfull
-   */
-  static setPlayerSpectatorStatus(login: string, status: boolean): boolean {
-    const player: tm.Player | undefined = this._players.find(a => a.login === login)
+   */ // TODO CHANGE DOCS
+  static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
+    const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
     if (player === undefined) { return false }
-    player.isSpectator = status
+    player.isSpectator = info.isSpectator
+    player.isPureSpectator = info.isPureSpectator
+    player.isTemporarySpectator = info.isTemporarySpectator
+    player.hasPlayerSlot = info.hasPlayerSlot
+    if (info.teamId === -1) { player.team = undefined } // TODO CHECK
+    else {
+      player.team = info.teamId === 0 ? 'blue' : 'red'
+    }
     return true
   }
 

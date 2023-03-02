@@ -732,16 +732,16 @@ export class AdministrationService {
   static get blacklistCount(): number {
     return this._blacklist.length
   }
-
+ // TODO DOC
   /**
-   * \umber of muted players
+   * Number of muted players
    */
   static get muteCount(): number {
     return this.serverMutelist.length + this.muteOnJoin.length
   }
 
   /**
-   * \Number of guests
+   * Number of guests
    */
   static get guestCount(): number {
     return this._guestlist.length

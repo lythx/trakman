@@ -12,9 +12,6 @@ import config from './MapWidgetResult.config.js'
 export default class MapWidgetResult extends StaticComponent {
 
   private readonly rows: number = 5
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private readonly grid: Grid
   private isRestart: boolean = false
@@ -22,14 +19,10 @@ export default class MapWidgetResult extends StaticComponent {
 
   constructor() {
     super(componentIds.mapResult, 'result')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled === true) {
-      webservices.onCurrentAuthorChange((): void => {
+      webservices.onNextAuthorChange((): void => {
         void this.display()
       })
     }

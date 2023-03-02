@@ -1,7 +1,7 @@
 import {
   DynamicComponent, StaticHeader, Grid, GridCellFunction,
   centeredText, icons, addManialinkListener, componentIds
-} from '../ui/UI.js'
+} from '../../ui/UI.js'
 import config from './BetPlaceWindow.config.js'
 
 export default class BetPlaceWindow extends DynamicComponent {

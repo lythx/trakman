@@ -12,19 +12,12 @@ import config from './MapWidget.config.js'
 export default class MapWidget extends StaticComponent {
 
   private readonly rows: number = 4
-  private readonly positionX: number
-  private readonly positionY: number
-  private readonly side: boolean
   private readonly header: StaticHeader
   private readonly grid: Grid
   private xml: string = ''
 
   constructor() {
     super(componentIds.map, 'race')
-    const pos = this.getRelativePosition()
-    this.positionX = pos.x
-    this.positionY = pos.y
-    this.side = pos.side
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     webservices.onCurrentAuthorChange((): void => {

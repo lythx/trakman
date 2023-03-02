@@ -1,5 +1,25 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
+## 1.2
+**02/03/2023**
++ Added UI for Rounds/Teams/Laps/Cup gamemodes
++ Added rerendering capabilitied to Server Info Window
++ Added new UI utils
++ Added new utils and events for Rounds/Teams/Laps/Cup gamemodes
++ Added the multilap records database table
++ Added more sorting functionality to Map List
++ Added client reconnect on dedicated server socket error
+- Fixed controller crash on empty player zone
+- Fixed RecordList not updating on click and leaking memory
+- Fixed the dedicated server not being able to queue a previously added map
+- Fixed the dedicated server not being able to remove a map under specific circumstances
+- Fixed TMX Window not handling special characters in various places
+- Fixed author update on map queue showing previously fetched nickname
+- Fixed the dynamic timer not being set when below the threshold
+- Fixed the Dedimania name update not writing into the database
+- Fixed Dedimania not working on TMUF due to environment mismatch
+- Fixed various commands for Rounds/Teams/Laps/Cup gamemodes
+
 ## 1.1
 **01/01/2023**
 + Added the dynamic timer feature
@@ -18,6 +38,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed formatting in various windows
 - Fixed the window pagination in specific cases
 - Fixed order of the maps added to the queue via //add
+
 ## 1.0
 **07/11/2022**
 × Removed the redundant welcome window

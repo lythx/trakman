@@ -11,6 +11,7 @@ import { Logger } from './Logger.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import config from '../config/Config.js'
 import { Utils } from './Utils.js'
+import { RoundsService } from './services/RoundsService.js'
 
 let isRestart: boolean = false
 
@@ -37,19 +38,20 @@ export class Listeners {
           Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
-        const joinInfo: tm.JoinInfo = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
+        const player: tm.Player = await PlayerService.join(playerInfo.Login, playerInfo.NickName,
           playerInfo.Path, isSpectator, playerInfo.PlayerId, ip, playerInfo.OnlineRights === 3,
           playerInfo?.LadderStats.PlayerRankings[0]?.Score, playerInfo?.LadderStats.PlayerRankings[0]?.Ranking)
-        AdministrationService.updateNickname({ login, nickname: joinInfo.nickname })
-        RecordService.updateInfo({ login, nickname: joinInfo.nickname, region: joinInfo.region, title: joinInfo.title })
+        AdministrationService.updateNickname({ login, nickname: player.nickname })
+        RecordService.updateInfo({ login, nickname: player.nickname, region: player.region, title: player.title })
+        RoundsService.registerPlayer(player)
         Events.emit('PlayerDataUpdated', [{
-          login, nickname: joinInfo.nickname, country: {
-            name: joinInfo.country,
-            code: joinInfo.countryCode,
-            region: joinInfo.region
-          }, title: joinInfo.title
+          login, nickname: player.nickname, country: {
+            name: player.country,
+            code: player.countryCode,
+            region: player.region
+          }, title: player.title
         }])
-        Events.emit('PlayerJoin', joinInfo)
+        Events.emit('PlayerJoin', player)
         // Update rank for the arriving player, this can take time hence no await
         void RecordService.fetchAndStoreRanks(playerInfo.Login)
       }
@@ -93,10 +95,36 @@ export class Listeners {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
           return
         }
-        const checkpoint: tm.Checkpoint = { index: checkpointIndex, time: timeOrScore, lap: currentLap }
-        const cpStatus: boolean | Error = PlayerService.addCP(player, checkpoint)
+        const cpsPerLap = MapService.current.checkpointsPerLap
+        let div = player.currentCheckpoints.length / cpsPerLap
+        const startIndex = cpsPerLap * Math.floor(div)
+        const lapCheckpointIndex = checkpointIndex - startIndex
+        const lapCheckpointTime = timeOrScore - (player.currentCheckpoints[startIndex - 1]?.time ?? 0)
+        const isLapFinish = (lapCheckpointIndex + 1) % MapService.current.checkpointsPerLap === 0
+        const checkpoint: tm.Checkpoint = {
+          index: checkpointIndex, time: timeOrScore, lap: currentLap,
+          lapCheckpointIndex, lapCheckpointTime,
+          isLapFinish
+        }
+        const cpStatus = PlayerService.addCP(player, checkpoint)
+        const info: tm.CheckpointInfo = {
+          time: timeOrScore,
+          lap: currentLap,
+          index: checkpointIndex,
+          player, lapCheckpointIndex, lapCheckpointTime, isLapFinish
+        }
+        if ((cpStatus as any).isFinish !== undefined) {
+          const lapObj = await RecordService.addLap(MapService.current.id, player, (cpStatus as any).lapTime,
+            (cpStatus as any).lapCheckpoints, (cpStatus as any).isFinish)
+          if (lapObj !== false) {
+            Events.emit(`PlayerLap`, lapObj.lapInfo)
+            if (lapObj.lapRecord !== undefined) {
+              Events.emit(`LapRecord`, lapObj.lapRecord)
+            }
+          }
+        }
         // Last CP = Finish
-        if (cpStatus === true) {
+        if (cpStatus === true || (cpStatus as any).isFinish === true) {
           const obj = await RecordService.add(MapService.current.id, player, checkpoint.time)
           if (obj !== false) {
             if (obj.localRecord !== undefined) {
@@ -109,16 +137,11 @@ export class Listeners {
             }
             // Register player finish
             Events.emit('PlayerFinish', obj.finishInfo)
+            PlayerService.resetCheckpoints(player.login)
           }
           return
           // Real CP
-        } else if (cpStatus === false) {
-          const info: tm.CheckpointInfo = {
-            time: timeOrScore,
-            lap: currentLap,
-            index: checkpointIndex,
-            player
-          }
+        } else if (cpStatus === false || (cpStatus as any).isFinish === false) {
           // Register player checkpoint
           Events.emit('PlayerCheckpoint', info)
         }
@@ -126,7 +149,7 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerFinish',
-      callback: async (params: tm.Events['TrackMania.PlayerFinish']): Promise<void> => {
+      callback: async ([id, login, time]: tm.Events['TrackMania.PlayerFinish']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore
         // if (params[0] === 0) { // IGNORE THIS IS A FAKE FINISH
         //   return
@@ -163,36 +186,41 @@ export class Listeners {
       event: 'TrackMania.BeginRound',
       callback: (): void => {
         // No params, rounds mode only
+        const roundRecords = RoundsService.roundRecords
+        RoundsService.handleBeginRound()
+        Events.emit('BeginRound', roundRecords)
       }
     },
     {
       event: 'TrackMania.EndRound',
-      callback: (): void => {
+      callback: async (): Promise<void> => {
         // No params, rounds mode only
+
+        await RoundsService.handleEndRound()
+        Events.emit('EndRound', RoundsService.roundRecords)
       }
     },
     {
       event: 'TrackMania.BeginChallenge',
       callback: async ([map]: tm.Events['TrackMania.BeginChallenge']): Promise<void> => {
         // [0] = Challenge, [1] = WarmUp, [2] = MatchContinuation
-        // Set game state to 'race'
-
+        // Set game state to 'transition'
         GameService.state = 'transition'
         // Update server parameters
         await GameService.update()
-        // Get records for current map
         // Check whether the map was restarted
         if (isRestart === false) {
-          // In case it wasn't, update the ongoing map
+          // In case it wasn't, update the votes and records
           await MapService.update()
-          await VoteService.nextMap()
           await RecordService.nextMap()
+          await VoteService.nextMap()
         } else {
-          RecordService.restartMap()
-          Logger.info(`Map ${Utils.strip(MapService.current.name)} by ${MapService.current.author} restarted.`)
+          MapService.restartMap()
+          await RecordService.restartMap()
         }
         // Update server config
         await ServerConfig.update()
+        RoundsService.handleBeginMap()
         // Register map update
         Events.emit('BeginMap', { ...MapService.current, isRestart })
       }
@@ -203,6 +231,7 @@ export class Listeners {
         tm.Events['TrackMania.EndChallenge']): Promise<void> => {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
+        PlayerService.resetCheckpoints()
         const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart
@@ -255,6 +284,10 @@ export class Listeners {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
+        if (temp === undefined) {
+          Logger.error(`Player ${login} not online in TrackMania.PlayerManialinkPageAnswer event`)
+          return
+        }
         temp.actionId = answer
         const info: tm.ManialinkClickInfo = temp
         Events.emit('ManialinkClick', info)
@@ -300,11 +333,8 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        if (info.isSpectator || info.isPureSpectator) {
-          PlayerService.setPlayerSpectatorStatus(info.login, true)
-        } else {
-          PlayerService.setPlayerSpectatorStatus(info.login, false)
-        }
+        // If pure spectator is true then player doesn't have a player slot (so hes not counted in round scores for example) 
+        PlayerService.setPlayerInfo(info)
         Events.emit('PlayerInfoChanged', info)
       }
     },
