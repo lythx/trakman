@@ -17,12 +17,19 @@ export abstract class ChatService {
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
+  static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
    * Fetches messages from database
    */
   static async initialize(): Promise<void> {
     this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
+    tm.addListener('Startup', () => {
+      Client.callNoRes('ChatEnableManualRouting', [
+        { boolean: this.manualChatRoutingEnabled },
+        { boolean: true }
+      ])
+    })
   }
 
   /**
@@ -214,6 +221,12 @@ export abstract class ChatService {
       this._messages.unshift(message)
       void this.repo.add(login, text, message.date)
       Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
+      if (this.manualChatRoutingEnabled) {
+        Client.callNoRes('ChatSendServerMessage', [{
+          string: Utils.strVar(prefixes.manualChatRoutingMessageFormat,
+            { name: player.nickname }) + text
+        }])
+      }
     }
     this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo

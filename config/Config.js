@@ -1,4 +1,6 @@
 export default {
+  // TODO DOCUMENT
+  manualChatRoutingEnabled: false,
   /** Local records limit for rank calculation and plugins */
   localRecordsLimit: 30,
   /** Amount of chat messages stored in runtime memory */
