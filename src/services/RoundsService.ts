@@ -57,6 +57,15 @@ export class RoundsService {
           e.isCupFinalist = true
         }
       }
+    } else if (GameService.gameMode === 'Teams') {
+      const res: tm.TrackmaniaRankingInfo[] | Error =
+        await Client.call('GetCurrentRanking', [{ int: 2 }, { int: 0 }])
+      if (res instanceof Error) {
+        Logger.error(`Call to get team score failed`, res.message)
+        return
+      }
+      this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
+      this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
     }
     Events.addListener('GameConfigChanged', () => {
       const status = this.updateRoundsSettings()
