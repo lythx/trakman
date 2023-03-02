@@ -1,13 +1,14 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
 ## 1.2
-**01/03/2023**
+**02/03/2023**
 + Added UI for Rounds/Teams/Laps/Cup gamemodes
 + Added rerendering capabilitied to Server Info Window
 + Added new UI utils
 + Added new utils and events for Rounds/Teams/Laps/Cup gamemodes
 + Added the multilap records database table
 + Added more sorting functionality to Map List
++ Added client reconnect on dedicated server socket error
 - Fixed controller crash on empty player zone
 - Fixed RecordList not updating on click and leaking memory
 - Fixed the dedicated server not being able to queue a previously added map

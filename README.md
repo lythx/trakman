@@ -14,8 +14,8 @@
 
 ## Prerequisites
 - Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
-- Node.js [v12+](https://nodejs.org/en/download/)
-- PostgreSQL [v10+](https://www.postgresql.org/download/)
+- Node.js [v16.9.0+](https://nodejs.org/en/download/)
+- PostgreSQL [v11+](https://www.postgresql.org/download/)
 
 On Linux, relevant versions of Node & Postgres should be available in your distro's repositories by default (see [[1]](https://repology.org/project/nodejs/versions),  [[2]](https://repology.org/project/postgresql/versions))
 
