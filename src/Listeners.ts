@@ -71,13 +71,13 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerChat',
-      callback: ([playerId, login, text]: tm.Events['TrackMania.PlayerChat']): void => {
+      callback: async ([playerId, login, text]: tm.Events['TrackMania.PlayerChat']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCommand
         // Ignore server messages (PID 0 = Server)
         if (playerId === 0) {
           return
         }
-        const messageInfo: tm.MessageInfo | Error = ChatService.add(login, text)
+        const messageInfo: tm.MessageInfo | Error = await ChatService.add(login, text)
         if (!(messageInfo instanceof Error)) {
           Events.emit('PlayerChat', messageInfo)
         }

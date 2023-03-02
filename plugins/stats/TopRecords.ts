@@ -148,6 +148,10 @@ export const topRecords = {
   get list(): readonly Readonly<{ login: string, nickname: string, amount: number }>[] {
     return topList
   },
+  // TODO DOC
+  get onlineList(): readonly Readonly<{ login: string, nickname: string, amount: number }>[] {
+    return onlineList
+  },
 
   /**
    * Add a callback function to execute on top records list update

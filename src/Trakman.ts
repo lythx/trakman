@@ -196,6 +196,8 @@ namespace trakman {
 
     get: ChatService.get.bind(ChatService),
 
+    addCustomPrefix: ChatService.addCustomPrefix.bind(ChatService),
+
     /**
      * Recent chat messages. 
      */

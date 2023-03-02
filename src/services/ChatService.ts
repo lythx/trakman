@@ -8,6 +8,8 @@ import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
 
+type PrefixFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
+
 /**
  * This service manages chat table and chat commands
  */
@@ -17,6 +19,7 @@ export abstract class ChatService {
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
+  private static readonly customPrefixes: { callback: PrefixFunction, position: number }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -199,7 +202,7 @@ export abstract class ChatService {
    * @param text Message text
    * @returns Message object or Error if unsuccessfull
    */
-  static add(login: string, text: string): tm.MessageInfo | Error {
+  static async add(login: string, text: string): Promise<tm.MessageInfo | Error> {
     const player: tm.Player | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
@@ -222,14 +225,31 @@ export abstract class ChatService {
       void this.repo.add(login, text, message.date)
       Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
       if (this.manualChatRoutingEnabled) {
+        let str = ''
+        for (const e of this.customPrefixes.filter(a => a.position < 0)) {
+          str += await e.callback(messageInfo)
+        }
+        str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
+        for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
+          str += await e.callback(messageInfo)
+        }
         Client.callNoRes('ChatSendServerMessage', [{
-          string: Utils.strVar(prefixes.manualChatRoutingMessageFormat,
-            { name: player.nickname }) + text
+          string: str + text
         }])
       }
     }
     this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo
+  }
+
+  static addCustomPrefix(callback: PrefixFunction, position: number) {
+    this.customPrefixes.push({ callback, position })
+    this.customPrefixes.sort((a, b) => b.position - a.position)
+  }
+
+  static removeCustomPrefix(callback: PrefixFunction) {
+    const index = this.customPrefixes.findIndex(a => a.callback === callback)
+    this.customPrefixes.splice(index, 1)
   }
 
   /**
