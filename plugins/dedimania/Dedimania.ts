@@ -518,11 +518,21 @@ export const dedimania = {
   get isConnected(): boolean {
     return client.connected
   },
-  // TODO DOCUMENT
+
+  /** 
+   * Whether the plugin is uploading lap times instead of total race time on the current map.
+   * True if the server is in Laps mode or if it's in Cup/Rounds/Teams mode with modified laps amount.
+   */
   get isUploadingLaps(): boolean {
     return uploadLaps
   },
 
+  /**
+   * Dedimania leaderboard ('Rounds' or 'TimeAttack') from which the current records were 
+   * fetched and to which the new records will be uploaded.
+   * The plugin fetches and uploads records to the Rounds Mode leaderboard in Cup/Rounds/Teams mode
+   * if the laps amount is not modified, otherwise to the TimeAttack leaderboard.
+   */
   get recordMode(): typeof recordMode {
     return recordMode
   },
