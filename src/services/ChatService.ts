@@ -20,6 +20,7 @@ export abstract class ChatService {
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
   private static readonly customPrefixes: { callback: PrefixFunction, position: number }[] = []
+  private static messageStyleCallback?: PrefixFunction
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -229,7 +230,11 @@ export abstract class ChatService {
         for (const e of this.customPrefixes.filter(a => a.position < 0)) {
           str += await e.callback(messageInfo)
         }
-        str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
+        if (this.messageStyleCallback !== undefined) {
+          str += this.messageStyleCallback(messageInfo)
+        } else {
+          str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
+        }
         for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
           str += await e.callback(messageInfo)
         }
@@ -306,6 +311,10 @@ export abstract class ChatService {
    */
   static get commandCount(): number {
     return this._commandList.length
+  }
+
+  static setMessageStyle(callback: PrefixFunction) {
+    this.messageStyleCallback = callback
   }
 
 }

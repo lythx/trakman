@@ -206,7 +206,10 @@ namespace trakman {
     /**
      * Number of recent chat messages.
      */
-    get count(): number { return ChatService.messageCount }
+    get count(): number { return ChatService.messageCount },
+
+
+    setMessageStyle: ChatService.setMessageStyle.bind(ChatService)
 
   }
 
