@@ -233,26 +233,21 @@ const commands: tm.Command[] = [
     privilege: config.setcuproundspermap.privilege
   },
   {
-    aliases: config.setcupwarmuptime.aliases, // todo it says time but then it says rounds????
-    help: config.setcupwarmuptime.help,
+    aliases: config.setcupwarmuprounds.aliases,
+    help: config.setcupwarmuprounds.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcupwarmuptime.error, info.login)
-        return
-      }
       if (amount < 0) {
-        tm.sendMessage(config.setcupwarmuptime.insufficientRounds, info.login)
+        tm.sendMessage(config.setcupwarmuprounds.insufficientRounds, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.setcupwarmuptime.text, {
+      tm.sendMessage(tm.utils.strVar(config.setcupwarmuprounds.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setcupwarmuptime.public ? undefined : info.login)
+      }), config.setcupwarmuprounds.public ? undefined : info.login)
       tm.client.callNoRes(`SetCupWarmUpDuration`, [{ int: amount }])
     },
-    privilege: config.setcupwarmuptime.privilege
+    privilege: config.setcupwarmuprounds.privilege
   },
   {
     aliases: config.setcupwinnersamount.aliases,
