@@ -73,7 +73,7 @@ const commands: tm.Command[] = [
     help: config.addrandom.help,
     params: [{ name: 'tmxSite', optional: true }],
     callback: async (info: tm.MessageInfo, tmxSite?: string): Promise<void> => {
-      let obj: { map: tm.Map; wasAlreadyAdded: boolean; } | Error
+      let obj: { map?: tm.Map; wasAlreadyAdded: boolean; } | Error
       let iteration = 0
       do {
         const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
@@ -84,11 +84,14 @@ const commands: tm.Command[] = [
           tm.sendMessage(config.addrandom.fetchError, info.login)
           return
         }
-        obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
+        obj = await tm.maps.writeFileAndAdd(file.name, file.content, info, { cancelIfAlreadyAdded: true })
         iteration++
       } while (!(obj instanceof Error) && obj.wasAlreadyAdded === true && iteration < 10)
       if (obj instanceof Error) {
         tm.log.warn(obj.message)
+        tm.sendMessage(config.addrandom.addError, info.login)
+        return
+      } else if (obj.map === undefined) {
         tm.sendMessage(config.addrandom.addError, info.login)
         return
       } else {
