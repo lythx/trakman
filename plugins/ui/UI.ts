@@ -67,10 +67,13 @@ const preloadIcons = (login?: string): void => {
 const loadListeners: Function[] = []
 const staticComponents: StaticComponent[] = []
 const dynamicComponents: DynamicComponent[] = []
-// TODO LOAD
 StaticComponent.onComponentCreated((component) => staticComponents.push(component))
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
-let staticUpdateNeeded = false // todo make more optimal
+// Static UI needs to update on the next map if the gamemode changes
+let staticUpdateNeeded = false
+tm.client.addProxy(['SetGameMode'], () => { 
+  staticUpdateNeeded = true
+})
 const events: tm.Listener[] = [
   {
     event: 'Startup',
@@ -98,12 +101,6 @@ const events: tm.Listener[] = [
         for (const e of staticComponents) { e.updatePosition() }
       }
     }
-  },
-  {
-    event: 'ServerStateChanged',
-    callback() {
-      staticUpdateNeeded = true
-    },
   },
   {
     event: 'PlayerJoin',
