@@ -23,8 +23,8 @@ export default {
   record: `${p.highlight}#{nickname}${p.record} has `
     + `#{status} the ${p.rank}#{position}${p.record} `
     + `local record. Time${p.highlight}: #{time}#{difference}`,
-  lapRecord: `${p.highlight}#{nickname}${p.record} has `
-    + `#{status} the ${p.rank}#{position}${p.record} `
+  lapRecord: `${p.highlight}#{nickname}${p.message} has `
+    + `#{status} the ${p.rank}#{position}${p.message} `
     + `lap record. Time${p.highlight}: #{time}#{difference}`,
   recordDifference: ` ${p.record}$n(${p.rank}#{position} ${p.highlight}-#{time}${p.record})`,
   dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
