@@ -42,19 +42,20 @@ export default class TimerWidget extends StaticComponent {
         this.display()
       }
     })
-    tm.addListener('BeginMap', () => {
-      this.isOnRestart = false
+    tm.addListener('EndRound', () => {
       this.roundCountdownDisplayed = false
       this.display()
     })
-    tm.addListener('TrackMania.BeginRound', () => {
+    tm.addListener('BeginMap', () => {
       this.roundCountdownDisplayed = false
       this.display()
     })
     tm.addListener('PlayerFinish', () => {
-      if (tm.getGameMode() === 'Teams') {
-        this.roundCountdownDisplayed = true
-        this.display()
+      if (this.isRoundsOrientedGamemode()) {
+        if (this.roundCountdownDisplayed === false) {
+          this.roundCountdownDisplayed = true
+          this.display()
+        }
       }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
@@ -124,7 +125,7 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (this.isDisplayed === false) { return }
-    if (tm.getGameMode() === 'Teams') {
+    if (this.isRoundsOrientedGamemode()) {
       if (this.roundCountdownDisplayed) {
         tm.sendManialink(this.noButtonXml, login)
       } else {
@@ -214,6 +215,10 @@ export default class TimerWidget extends StaticComponent {
     }
     return this.header.constructXml(config.title, config.icon,
       this.side, { rectangleWidth: headerRectWidth }) + buttonXml
+  }
+
+  private isRoundsOrientedGamemode(): boolean {
+    return tm.getGameMode() !== 'Stunts' && tm.getGameMode() !== 'TimeAttack'
   }
 
 }
