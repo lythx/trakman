@@ -22,7 +22,6 @@ export default {
     aliases: ['sct', 'setchattime'],
     help: `Set the time you spend on the podium screen.`
   },
-  //TODO TEST
   setwarmup: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}#{state} ${p.admin}warmup mode.`,
     public: true,
@@ -63,10 +62,9 @@ export default {
     aliases: ['stpl', 'setteamspointlimit'],
     help: `Set the points limit for teams mode.`
   },
-  // TODO WHAT IS THIS
   setteamsmaxpoints: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the max points per team to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
+    insufficientPoints: `${p.error}Points amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['stmp', 'setteamsmaxpoints'],

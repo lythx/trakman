@@ -157,7 +157,7 @@ const commands: tm.Command[] = [
     help: config.setteamsmaxpoints.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setteamsmaxpoints.insufficientPoints, info.login)
         return
       }
