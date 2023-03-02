@@ -6,8 +6,8 @@ export default {
   width: cfg.width,
   margin: cfg.margin,
   title: "Team Score",
-  icon: icons.placeholder,
-  entries: 3,
+  icon: icons.trakman,
+  entries: 3, 
   columnProportions: [
     1,
     1,

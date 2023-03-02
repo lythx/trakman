@@ -23,7 +23,7 @@ export default abstract class StaticComponent {
   protected positionY: number
   protected positionX: number
   protected side: boolean
-  gameModes: tm.GameMode[] // todo make getter
+  private _gameModes: tm.GameMode[]
 
   /**
    * Abstract class for static manialink components
@@ -33,7 +33,7 @@ export default abstract class StaticComponent {
   constructor(id: number, displayMode: DisplayMode, gameModes: tm.GameMode[] = ['Cup', 'Rounds', 'Stunts', 'Teams', 'Laps', 'TimeAttack']) {
     this.id = id
     this.displayMode = displayMode
-    this.gameModes = gameModes
+    this._gameModes = gameModes
     tm.addListener('EndMap', (info): void => {
       if (!gameModes.includes(tm.getGameMode())) {
         this.hide()
@@ -157,6 +157,13 @@ export default abstract class StaticComponent {
    */
   static onComponentCreated(callback: (component: StaticComponent) => void) {
     this.componentCreateListeners.push(callback)
+  }
+ // TODO DOC
+  /**
+   * Game modes in which the widget will be displayed.
+   */
+  get gameModes(): tm.GameMode[] {
+    return [...this._gameModes]
   }
 
 }
