@@ -65,10 +65,6 @@ const commands: tm.Command[] = [
     help: config.setwarmup.help,
     params: [{ name: 'enabled', type: 'boolean' }],
     callback: (info: tm.MessageInfo, enabled: boolean): void => {
-      if (tm.config.game.gameMode === 1 || tm.config.game.gameMode === 4) { // TimeAttack & Stunts
-        tm.sendMessage(config.setwarmup.error, info.login)
-        return
-      }
       tm.sendMessage(tm.utils.strVar(config.setwarmup.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), state: enabled ? 'enabled' : 'disabled'
@@ -83,10 +79,6 @@ const commands: tm.Command[] = [
     help: config.setlapsamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 3) {
-        tm.sendMessage(config.setlapsamount.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setlapsamount.insufficientLaps, info.login)
         return
@@ -129,10 +121,6 @@ const commands: tm.Command[] = [
     help: config.setroundspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 0) {
-        tm.sendMessage(config.setroundspointlimit.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setroundspointlimit.insufficientPoints, info.login)
         return
@@ -151,10 +139,6 @@ const commands: tm.Command[] = [
     help: config.setteamspointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 2) {
-        tm.sendMessage(config.setteamspointlimit.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setteamspointlimit.insufficientPoints, info.login)
         return
@@ -173,10 +157,6 @@ const commands: tm.Command[] = [
     help: config.setteamsmaxpoints.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 2) {
-        tm.sendMessage(config.setteamsmaxpoints.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setteamsmaxpoints.insufficientPoints, info.login)
         return
@@ -193,10 +173,6 @@ const commands: tm.Command[] = [
     help: config.setcuppointlimit.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcuppointlimit.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setcuppointlimit.insufficientPoints, info.login)
         return
@@ -215,10 +191,6 @@ const commands: tm.Command[] = [
     help: config.setcuproundspermap.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcuproundspermap.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setcuproundspermap.insufficientRounds, info.login)
         return
@@ -254,10 +226,6 @@ const commands: tm.Command[] = [
     help: config.setcupwinnersamount.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (tm.config.game.gameMode !== 5) {
-        tm.sendMessage(config.setcupwinnersamount.error, info.login)
-        return
-      }
       if (amount <= 0) {
         tm.sendMessage(config.setcupwinnersamount.insufficientWinners, info.login)
         return
