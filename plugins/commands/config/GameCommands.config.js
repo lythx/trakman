@@ -32,7 +32,7 @@ export default {
   },
   setlapsamount: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the laps amount to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero`,
+    insufficientLaps: `${p.error}Laps amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['sla', 'setlapsamount'],
@@ -41,7 +41,7 @@ export default {
   setroundslapsamount: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to ${p.highlight}#{amount}${p.admin}.`,
     resetText: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode laps amount to default map value.`,
-    insufficientLaps: `${p.error}Laps amount cannot be less than zero`,
+    insufficientLaps: `${p.error}Laps amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['srla', 'setroundslapsamount'],
@@ -49,7 +49,7 @@ export default {
   },
   setroundspointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['srpl', 'setroundspointlimit'],
@@ -57,7 +57,7 @@ export default {
   },
   setteamspointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['stpl', 'setteamspointlimit'],
@@ -66,7 +66,7 @@ export default {
   // TODO WHAT IS THIS
   setteamsmaxpoints: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the max points per team to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['stmp', 'setteamsmaxpoints'],
@@ -74,16 +74,15 @@ export default {
   },
   setcuppointlimit: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero`,
+    insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['scpl', 'setcuppointlimit'],
     help: `Set the points limit for cup mode.`
   },
-  // TODO
   setcuproundspermap: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of rounds per map to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientRounds: `${p.error}Rounds amount cannot be less or equal to zero`,
+    insufficientRounds: `${p.error}Rounds amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['scrpm', 'setcuproundspermap'],
@@ -91,7 +90,7 @@ export default {
   },
   setcupwarmuprounds: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of rounds in warm-up to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientRounds: `${p.error}Rounds amount cannot be less than zero`,
+    insufficientRounds: `${p.error}Rounds amount cannot be less than zero.`,
     public: true,
     privilege: 2,
     aliases: ['scwr', 'setcupwarmuprounds'],
@@ -99,7 +98,7 @@ export default {
   },
   setcupwinnersamount: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the amount of cup winners to ${p.highlight}#{amount}${p.admin}.`,
-    insufficientWinners: `${p.error}Winners amount cannot be less or equal to zero`,
+    insufficientWinners: `${p.error}Winners amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
     aliases: ['scwa', 'setcupwinnersamount'],

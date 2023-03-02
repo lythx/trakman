@@ -191,15 +191,14 @@ const commands: tm.Command[] = [
     help: config.setcuproundspermap.help,
     params: [{ name: 'amount', type: 'int' }],
     callback: (info: tm.MessageInfo, amount: number): void => {
-      if (amount <= 0) {
+      if (amount < 0) {
         tm.sendMessage(config.setcuproundspermap.insufficientRounds, info.login)
         return
       }
       tm.sendMessage(tm.utils.strVar(config.setcuproundspermap.text, {
         title: info.title,
         adminName: tm.utils.strip(info.nickname), amount: amount
-      }),
-        config.setcuproundspermap.public ? undefined : info.login)
+      }), config.setcuproundspermap.public ? undefined : info.login)
       tm.client.callNoRes(`SetCupRoundsPerChallenge`, [{ int: amount }])
     },
     privilege: config.setcuproundspermap.privilege
