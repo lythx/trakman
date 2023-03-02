@@ -11,13 +11,13 @@ export default class TeamScore extends StaticComponent {
   private readonly grid: Grid
   private xml: string = ''
 
-  constructor(private maxScore = tm.config.game.teamMaxPoints - 1) {
+  constructor(private maxScore = tm.rounds.teamsPointsLimit) {
     super(componentIds.teamScore, 'race', ['Teams'])
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height + config.margin - this.header.options.height,
       new Array(3).fill(1), [1], { margin: config.margin })
     tm.addListener('BeginMap', () => {
-      this.maxScore = tm.config.game.teamMaxPoints - 1
+      this.maxScore = tm.rounds.teamsPointsLimit
     })
     tm.addListener('EndRound', () => this.display())
     tm.addListener('BeginRound', () => this.display())
@@ -38,7 +38,7 @@ export default class TeamScore extends StaticComponent {
   private constructXml() {
     const colours = [config.colours.left, config.colours.middle, config.colours.right]
     const teamScores = tm.records.teamScores
-    const data = [teamScores.blue, this.maxScore, teamScores.red]
+    const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : 0, teamScores.red]
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${colours[j]}"/>
       ${centeredText(data[j].toString(), w, h, config.text)}`

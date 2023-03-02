@@ -184,6 +184,8 @@ namespace trakman {
 
     get pointsRanking() { return RoundsService.pointsRanking },
 
+    get teamsPointsLimit() { return RoundsService.teamsPointsLimit }
+
   }
 
   export const messages = {

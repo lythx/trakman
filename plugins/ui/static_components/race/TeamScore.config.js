@@ -21,5 +21,6 @@ export default {
     right: tm.utils.palette.red + '8'
   },
   topCount: 3,
-  displayNoRecordEntry: false
+  displayNoRecordEntry: false,
+  noMaxScore: '-'
 }
