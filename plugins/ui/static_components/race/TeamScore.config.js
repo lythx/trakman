@@ -14,6 +14,7 @@ export default {
     2.8,
     4
   ],
+  text: { specialFont: true, textScale: 0.5 },
   colours: {
     left: tm.utils.palette.purple + '8',
     middle: cfg.background,

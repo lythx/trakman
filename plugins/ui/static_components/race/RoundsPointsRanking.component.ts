@@ -3,8 +3,6 @@
  * @since 0.1
  */
 
-// TODO MAYBE RENAME TO RoundsPointsRanking to be the same as in core
-
 import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
 import config from './RoundsPointsRanking.config.js'
 
@@ -26,10 +24,10 @@ export default class RoundsPointsRanking extends StaticComponent {
         .some(a => a.login === info.login)) { this.display() }
     })
     tm.addListener('PlayerDataUpdated', (info): void => {
-      if (info.some(a => tm.rounds.pointsRanking // TODO CHECK IF WORK
+      if (info.some(a => tm.rounds.pointsRanking
         .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { this.display() }
     })
-    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => this.display())
+    tm.addListener('PlayerFinish', (): void => this.display())
   }
 
   display(): void {

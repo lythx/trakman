@@ -2,7 +2,7 @@
  * @author lythx
  * @since 1.2
  */
-import { componentIds, StaticHeader, centeredText, StaticComponent, GridCellFunction, GridCellObject, Grid } from '../../UI.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent, GridCellFunction, Grid } from '../../UI.js'
 import config from './TeamScore.config.js'
 
 export default class TeamScore extends StaticComponent {
@@ -36,13 +36,12 @@ export default class TeamScore extends StaticComponent {
   }
 
   private constructXml() {
-    const text = { specialFont: true, textScale: 0.5 } // TODO CONFIG
     const colours = [config.colours.left, config.colours.middle, config.colours.right]
     const teamScores = tm.records.teamScores
     const data = [teamScores.blue, this.maxScore, teamScores.red]
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${colours[j]}"/>
-      ${centeredText(data[j].toString(), w, h, text)}`
+      ${centeredText(data[j].toString(), w, h, config.text)}`
     }
     this.xml = `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
