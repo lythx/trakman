@@ -196,23 +196,32 @@ export class MapService {
     Events.emit('MapAdded', { ...obj, callerLogin: caller?.login })
     return obj
   }
-
+  // TODO UPDATE DOC
   /**
    * Writes a map file to the server, adds it to the current Match Settings and to the jukebox.
    * @param fileName Map file name (file will be saved with this name on the server)
    * @param file Map file buffer
    * @param caller Object containing login and nickname of the player who is adding the map
-   * @param dontJuke If true the map doesn't get enqueued, false by default
+   * @param options Optional parameters: 
+   * @option `dontJuke` - If true the map doesn't get enqueued, false by default
+   * @option `cancelIfAlreadyAdded` - If the map was already on the server returns from the function without searching for the map object.
+   * If that happens the map in returned object will be undefined.
    * @returns Error if unsuccessfull, object containing map object and boolean indicating whether the map was already on the server
    */
-  static async writeFileAndAdd(fileName: string, file: Buffer, caller?: { nickname: string, login: string }, dontJuke: boolean = false):
-    Promise<{ map: tm.Map, wasAlreadyAdded: boolean } | Error> {
+  static async writeFileAndAdd<T>(fileName: string, file: Buffer,
+    caller?: { nickname: string, login: string },
+    options?: { dontJuke?: boolean, cancelIfAlreadyAdded?: T }):
+    Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) :
+      ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
     const write: any | Error = await Client.call('WriteFile', [{ string: fileName }, { base64: base64String }])
     if (write instanceof Error) {
       return new Error(`Failed to write map file ${fileName}.`)
     }
-    const map: tm.Map | Error = await this.add(fileName, caller, dontJuke)
+    const map: tm.Map | Error = await this.add(fileName, caller, options?.dontJuke)
+    if (options?.cancelIfAlreadyAdded === true) {
+      return { wasAlreadyAdded: true } as any
+    }
     if (map instanceof Error) {
       // Yes we actually need to do this in order to juke a map if it was on the server already
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
@@ -225,7 +234,7 @@ export class MapService {
             if (map === undefined) {
               return new Error(`Failed to queue map ${fileName}`)
             }
-            if (!dontJuke) {
+            if (options?.dontJuke !== true) {
               this.addToJukebox(id, caller)
             }
             return { wasAlreadyAdded: true, map }
