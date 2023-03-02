@@ -89,7 +89,7 @@ export class Listeners {
         tm.Events['TrackMania.PlayerCheckpoint']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = TimeOrScore, [3] = CurLap, [4] = CheckpointIndex
         // Ignore inexistent people // Please elaborate // PID 0 = Server // HOW CAN SERVER GET A CHECKPOINT
-        if (playerId === 0) { return } // TODO DONATIONS TEXT IS NOT CENTERED
+        if (playerId === 0) { return }
         const player: tm.Player | undefined = PlayerService.get(login)
         if (player === undefined) {
           Logger.error(`Can't find player ${login} in memory on checkpoint event`)
@@ -119,7 +119,6 @@ export class Listeners {
           if (lapObj !== false) {
             Events.emit(`PlayerLap`, lapObj.lapInfo)
             if (lapObj.lapRecord !== undefined) {
-              // TODO MAKE MESSAGES FOR LAP RECORDS (and widgets later too)
               Events.emit(`LapRecord`, lapObj.lapRecord)
             }
           }

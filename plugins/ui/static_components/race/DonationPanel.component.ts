@@ -53,8 +53,8 @@ export default class DonationPanel extends StaticComponent {
       boxXML += `
             <quad posn="${iconWidth * i} -${headerHeight + marginSmall} 1" sizen="${iconWidth - marginSmall} ${headerHeight}"
              bgcolor="${config.background}" action="${this.id + i + 1}"/>`
-      xmltext += centeredText(e.toString(), iconWidth, headerHeight, {
-        xOffset: iconWidth * i - marginSmall,
+      xmltext += centeredText(e.toString(), iconWidth - marginSmall, headerHeight, {
+        xOffset: iconWidth * i,
         yOffset: headerHeight + marginSmall
       })
     }
