@@ -49,7 +49,7 @@ export default {
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
     { name: "RoundScore", height: 17.22 },
-    { name: "RoundPointsRanking", height: 17.22 },
+    { name: "RoundsPointsRanking", height: 17.22 },
     { name: "DonationPanel", height: 4.49 }
   ],
   roundsLeftSideOrder: [
@@ -66,7 +66,7 @@ export default {
     { name: "TMXRanking", height: 8.68 },
     { name: "TimerWidget", height: 6.45 },
     { name: "RoundScore", height: 17.22 },
-    { name: "RoundPointsRanking", height: 17.22 },
+    { name: "RoundsPointsRanking", height: 17.22 },
     { name: "DonationPanel", height: 4.49 }
   ],
   cupLeftSideOrder: [

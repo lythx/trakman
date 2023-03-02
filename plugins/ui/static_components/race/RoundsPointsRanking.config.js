@@ -14,7 +14,6 @@ export default {
   columnProportions: [1, 1.5, 5.5],
   displayNoRecordEntry: true,
   noRecordEntryText: '--',
-  // TODO actual trophies
   cupPositionImages: [icons.trophyClassic, icons.trophySilver, icons.trophyBronze],
   otherCupPositionsImage: icons.trophy,
   cupFinalistImage: icons.flagFinish,

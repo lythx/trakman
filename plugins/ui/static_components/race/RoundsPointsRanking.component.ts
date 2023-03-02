@@ -6,15 +6,15 @@
 // TODO MAYBE RENAME TO RoundsPointsRanking to be the same as in core
 
 import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
-import config from './RoundPointsRanking.config.js'
+import config from './RoundsPointsRanking.config.js'
 
-export default class RoundPointsRanking extends StaticComponent {
+export default class RoundsPointsRanking extends StaticComponent {
 
   private readonly header: StaticHeader
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundPointsRanking, 'race', ['Rounds', 'Cup'])
+    super(componentIds.roundsPointsRanking, 'race', ['Rounds', 'Cup'])
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
