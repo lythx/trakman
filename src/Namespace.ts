@@ -12,7 +12,6 @@ declare global {
       readonly fileName: string
       /** Map author login */
       readonly author: string
-      // TODO DOCUMENT ENUMS
       /** Map environment ('Stadium', 'Island', etc.) */
       readonly environment: Environment
       /** Map mood ('Sunrise', 'Night', etc.) */
@@ -39,7 +38,6 @@ declare global {
       voteCount: number
       /** Map karma vote ratio (0 to 100) */
       voteRatio: number
-      // TODO DOCUMENT
       /** Default amount of laps (different amounts can be set using server call) (undefined if the map was never played) */
       defaultLapsAmount?: number
       /** Amount of checkpoints per lap (undefined if the map was never played) */
@@ -96,20 +94,22 @@ declare global {
       isPureSpectator: boolean
       // TODO DOCUMENT
       isTemporarySpectator: boolean
+      /** Whether the player has a player spot 
+       * (player spot is needed to switch to player mode, it's automatically assigned if the server is not full) */
       hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
       /** Player average server map rank */
       average: number
-      /** Player team (teams mode only) */ // TODO DOCUMENT and maybe remove from other objects
+      /** Player team (Teams mode only) */
       team?: 'red' | 'blue'
-      // TODO DOCUMENT
+      /** Player rounds points sum (Cup and Rounds mode only) */
       roundsPoints: number
-      // -1 if nofin
+      /** Player round finish times (Cup, Rounds and Teams mode only) (-1 if the player didn't finish the round) */
       roundTimes: number[]
-
+      /** Player cup winner position (Cup mode only) */
       cupPosition?: number
-
+      /** Whether the player is a cup finalist (Cup mode only) (Winners are not finalists) */
       isCupFinalist: boolean
     }
     /** Controller offline player object */
@@ -256,9 +256,12 @@ declare global {
       readonly time: number
       /** Checkpoint lap */
       readonly lap: number
-      // TODO DOC
+      /** Checkpoint time in the current lap (Multilap maps only) */
       readonly lapCheckpointTime: number
+      /** Checkpoint index in the current lap (Multilap maps only) */
       readonly lapCheckpointIndex: number
+      /** Whether the checkpoint is a finish (Multilap maps only) 
+       * (Actual race finish is not counted as a checkpoint) */
       readonly isLapFinish: boolean
     }
     /** Controller chat message object */
@@ -595,7 +598,9 @@ declare global {
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end map in Teams Mode */ // TODO Document
+      /** Amount of points to end map in Teams Mode 
+       * (THIS VALUE APPEARS TO BE WRONG, DEDICATED SERVER ALWAYS SENDS 50 FOR SOME REASON,
+       *  USE tm.rounds.teamsPointsLimit INSTEAD) */
       teamPointsLimit: number
       /** Teams mode related */ // TODO TEAMS
       teamMaxPoints: number
@@ -894,6 +899,8 @@ declare global {
     export type MessageInfo = Message & Player
     /** Dedicated server state ('result', 'race', 'transition') */
     export type ServerState = 'result' | 'race' | 'transition'
+    /** Server game mode ('TimeAttack', 'Rounds', 'Cup', 'Laps', 'Teams', 'Stunts') */
+    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
     /** Map environment ('Stadium', 'Island', etc.) */
     export type Environment = 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
     /** Map mood ('Sunrise', 'Night', etc.) */
@@ -904,7 +911,5 @@ declare global {
     export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
-    // TODO DOCUMENT
-    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
   }
 }
