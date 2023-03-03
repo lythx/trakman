@@ -2,24 +2,42 @@ import IDS from '../config/UtilIds.js'
 import raceConfig from './RecordListRace.config.js'
 import resultConfig from './RecordListResult.config.js'
 
-// TODO DOC
+/**
+ * Record list image object
+ */
 export interface RLImage {
+  /** Image url */
   url: string,
+  /** Optional horizontal padding, relative to the parent element */
   horizontalPadding?: number
+  /** Optional vertical padding, relative to the parent element */
   verticalPadding?: number
 }
-// TODO DOC
+/** 
+ * Record list record object
+ */
 export interface RLRecord {
+  /** Record time */
   time: number
+  /** Text to display instead of time */
   text?: string
+  /** Player login (displayed on click) */
   login?: string
+  /** Player name */
   name?: string
+  /** Record date (displayed on click) */
   date?: Date
+  /** Record checkpoints (displayed after click) */
   checkpoints?: (number | undefined)[]
+  /** If set the menu displayed on click will have a button redirecting to given url */
   url?: string
+  /** Points amount displayed next to the record */
   points?: number
+  /** Points amount background colour */
   colour?: string
+  /** Image to display instead of time */
   image?: RLImage
+  /** Custom marker image to display instead of default marker */
   markerImage?: RLImage
 }
 
@@ -90,7 +108,7 @@ export default class RecordList {
     you: string,
     top: string
   }>
-  readonly noRecordEntryText: string
+  private readonly noRecordEntryText: string
 
   /**
    * Util to display record data in manialinks. 
