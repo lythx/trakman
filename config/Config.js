@@ -16,11 +16,11 @@ export default {
     mute: 1,
     addGuest: 1
   },
-  //TODO DOCUMENT also for cup
+  /** Point system for rounds and cup gamemode */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-  /** TODO DOCUMENT */
+  /** Default time limit in TimeAttack mode (in miliseconds) */
   defaultTimeAttackTimeLimit: 300000,
-  /** TODO DOCUMENT */
+  /** Minimal time value to which the dynamic timer can be set (in miliseconds) */
   dynamicTimerSubtractionLimit: 30000,
   /** Relative path (/GameData/Config/) to the blacklist file */
   blacklistFile: "blacklist.txt",
