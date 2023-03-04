@@ -627,7 +627,7 @@ declare global {
       roundsPointLimitSystemType: number
       /** Teams mode related */ // TODO CHECK AND DOC (Amount of points to end the map in teams mode when using "new rules")
       teamPointLimitSystemType: number
-      /** Amount of points to be gained to become a finalist in Cup mode */
+      /** Amount of points to become a finalist in Cup mode */
       cupPointsLimit: number
       /** Amount of times the map will be replayed until skip in Cup mode */
       cupRoundsPerMap: number

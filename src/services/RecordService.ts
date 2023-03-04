@@ -487,9 +487,9 @@ export class RecordService {
     }
     return this._localRecords.filter(a => logins.includes(a.login))
   }
-  // TODO DOC
+
   /**
-   * Gets the players lap record on the current map. If the map is not in laps mode returns a local record omstead.
+   * Gets the players lap record on the current map. If the map is not in laps mode returns a local record instead.
    * @param login Player login
    * @returns Lap record object or undefined if the player doesn't have a lap record
    */
@@ -498,7 +498,7 @@ export class RecordService {
    * Gets multiple lap records on the current map from runtime memory. 
    * If the map is not in laps mode returns local records instead. 
    * If some player has no lap record his record object wont be returned. 
-   * Returned array is sorted primary by time ascending, secondary by date ascending
+   * Returned array is sorted primary by time ascending, secondary by date ascending.
    * @param logins Array of player logins
    * @returns Array of lap record objects
    */
@@ -574,7 +574,7 @@ export class RecordService {
     }
     return this._liveRecords.filter(a => logins.includes(a.login))
   }
-  // TODO DOCUMENT
+
   /**
    * Fetches local records on given maps from the database.
    * Returned array is sorted primary by time ascending, secondary by date ascending
@@ -584,9 +584,9 @@ export class RecordService {
   static async fetch(...mapIds: string[]): Promise<tm.Record[]>
   /**
    * Fetches local records on given maps with specified laps amount from the database.
-   * Returned array is sorted primary by time ascending, secondary by date ascending
+   * Returned array is sorted primary by time ascending, secondary by date ascending.
    * @param mapIds Map uids
-   * @param laps Record laps amount (fetches TimeAttack records if undefined)
+   * @param laps Record laps amount
    * @returns Array of record objects
    */
   static async fetch(laps: number, ...mapIds: string[]): Promise<tm.Record[]>
@@ -615,7 +615,7 @@ export class RecordService {
   static async fetchRecordCount(login: string): Promise<number> {
     return await this.repo.countRecords(login)
   }
-  // TODO DOCUMENT
+
   /**
    * Fetches a given player record on a given map
    * @param mapId Map uid
@@ -668,18 +668,18 @@ export class RecordService {
   static get liveRecordsCount(): number { // TODO FIX PLURAL
     return this._liveRecords.length
   }
-  // TODO DOC
+
   /**
-   * Current map lap records. Same as local records if the map is not in laps mode.
+   * Current map lap records. Same as local records if the map is not in multilap mode.
    */
   static get lapRecords(): Readonly<tm.LocalRecord>[] {
     return [...this._lapRecords]
   }
 
   /**
-   * Number of lap records on the current map. Same as local records if the map is not in laps mode.
+   * Number of lap records on the current map. Same as local records if the map is not in multilap mode.
    */
-  static get lapRecordCount(): number { // TODO FIX PLURAL
+  static get lapRecordCount(): number {
     return this._lapRecords.length
   }
 
