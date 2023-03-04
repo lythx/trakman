@@ -287,10 +287,10 @@ export class PlayerService {
   }
 
   /**
-   * Sets spectator status in player object
-   * @param login Player login
-   * @returns True if successfull
-   */ // TODO CHANGE DOCS
+   * Sets spectator status, player slot and team in the player object.
+   * @param info Player login
+   * @returns True if successfull, false if the player is not in the runtime memory
+   */
   static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
     const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
     if (player === undefined) { return false }

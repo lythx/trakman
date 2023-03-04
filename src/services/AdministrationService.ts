@@ -743,7 +743,7 @@ export class AdministrationService {
   static get blacklistCount(): number {
     return this._blacklist.length
   }
-  // TODO DOC
+
   /**
    * Number of muted players
    */
