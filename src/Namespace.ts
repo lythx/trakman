@@ -590,45 +590,50 @@ declare global {
       mapIndex: number
       /** Amount of points to end the map in rounds mode */
       roundsPointsLimit: number
-      /** Points system type used in rounds mode */ // TODO ROUNDS
+      /** Points system type used in Rounds mode (false is old, true is new).
+       *  The controller always uses custom one */
       roundsPointSystemType: boolean
-      /** Amount of forced laps in rounds mode */
+      /** Amount of forced laps in Rounds mode */
       roundsModeLapsAmount: number
       /** Amount of time (in msec) to be spent in race */
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end map in Teams Mode 
-       * (THIS VALUE APPEARS TO BE WRONG, DEDICATED SERVER ALWAYS SENDS 50 FOR SOME REASON,
-       *  USE tm.rounds.teamsPointsLimit INSTEAD) */
+      /** Amount of points to end map in Teams mode.
+       *  THIS VALUE APPEARS TO BE WRONG, DEDICATED SERVER ALWAYS SENDS 50 FOR SOME REASON,
+       *  USE tm.rounds.teamsPointsLimit INSTEAD */
       teamPointsLimit: number
-      /** Teams mode related */ // TODO TEAMS
+      /** Maximum amount of points that a team can get in one round when using the old point system
+       * (if the old point system is used teamPointSystemType is false).
+       * The controller always uses the new point system */
       teamMaxPoints: number
-      /** Points system type used in teams mode */ // TODO TEAMS
+      /** Points system type used in Teams mode (false is old, true is new).
+       * The controller always uses the new point system */
       teamPointSystemType: boolean
-      /** Amount of laps in laps mode */ // TODO Document
+      /** Amount of laps in Laps mode */
       lapsModeLapsAmount: number
-      /** Amount of time left for players to finish the track after the leader in laps mode */
+      /** Amount of time left for players to finish the track after the leader in Laps mode */
       lapsModeFinishTimeout: number
-      /** Amount of time left for players to finish the track after the leader in rounds mode */
+      /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */ // TODO CHECK IF AFFECTS CUP/TEAMS
       roundsModeFinishTimeout: number
-      /** Duration of the warm-up in rounds mode */
+      /** Duration of the warm-up in Rounds mode */ // TODO CHECK IF AFFECTS TEAMS
       warmUpDuration: number
       /** Whether disabled respawning on checkpoints is active */
       disableRespawn: boolean
       /** Whether force display of all opponents is enabled */
       forceShowOpponents: boolean
-      /** Rounds mode related */ // TODO ROUNDS (Amount of points to end the map in rounds mode when using "new rules")
+      /** Amount of points to end the map in rounds mode when using the new system type.
+       *  The controller always uses a custom point system */ // TODO CHECk
       roundsPointLimitSystemType: number
-      /** Teams mode related */ // TODO TEAMS (Amount of points to end the map in teams mode when using "new rules")
+      /** Teams mode related */ // TODO CHECK AND DOC (Amount of points to end the map in teams mode when using "new rules")
       teamPointLimitSystemType: number
-      /** Amount of points to be gained to win in cup mode */
+      /** Amount of points to be gained to become a finalist in Cup mode */
       cupPointsLimit: number
-      /** Amount of times the map will be replayed until skip in cup mode */ // TODO CUP
+      /** Amount of times the map will be replayed until skip in Cup mode */ // TODO CUP
       cupRoundsPerMap: number
-      /** Amount of winners in cup mode */
+      /** Amount of winners in Cup mode */
       cupWinnersAmount: number
-      /** Duration of the warm-up in cup mode */
+      /** Warm-up rounds count in Cup mode */ // TODO RENAME
       cupWarmUpDuration: number
     }
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
