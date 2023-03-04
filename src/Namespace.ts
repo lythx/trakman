@@ -629,7 +629,7 @@ declare global {
       teamPointLimitSystemType: number
       /** Amount of points to be gained to become a finalist in Cup mode */
       cupPointsLimit: number
-      /** Amount of times the map will be replayed until skip in Cup mode */ // TODO CUP
+      /** Amount of times the map will be replayed until skip in Cup mode */
       cupRoundsPerMap: number
       /** Amount of winners in Cup mode */
       cupWinnersAmount: number
@@ -772,10 +772,9 @@ declare global {
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
-      "BeginRound": Readonly<tm.FinishInfo>[]
-      "EndRound": Readonly<tm.FinishInfo>[]
-      "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
-      // TODO DOC
+      "BeginRound": Readonly<FinishInfo>[]
+      "EndRound": Readonly<FinishInfo>[]
+      "GameConfigChanged": Readonly<Game> // TODO RENAME
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
@@ -808,7 +807,7 @@ declare global {
       readonly liveRecords: Readonly<Readonly<FinishInfo>[]>
       /** Whether the last round played was a warm-up */
       readonly wasWarmUp: boolean
-      /** Whether the race should skip to the next map (cup mode?) */
+      /** Whether the point amounts from the last map will be preserved (Cup mode only) */
       readonly continuesOnNextMap: boolean
       /** Login of the winner */
       readonly winnerLogin?: string
@@ -818,7 +817,7 @@ declare global {
       readonly isRestart: boolean
       /** Server side ranking objects. 
        * (Can differ from controller rankings only if it was restarted during the map) */
-      readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]
+      readonly serverSideRankings: readonly TrackmaniaRankingInfo[]
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Readonly<CurrentMap> & {
@@ -827,7 +826,6 @@ declare global {
     }
     /** Controller current map object */
     export type CurrentMap = Map & {
-      // TODO DOCUMENT
       /** Default amount of laps (may be incoherent with actual laps amount if it's modified using dedicated server call) */
       readonly defaultLapsAmount: number
       /** Current amount of laps depending on dedicated server config and map default laps */
@@ -841,7 +839,7 @@ declare global {
       /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts always true in Laps) */
       readonly isLapsAmountModified: boolean
     }
-    /** Controller local record object */ // TODO UPDATE DOC
+    /** Controller local record object */
     export type LocalRecord = Record & OfflinePlayer
     /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
@@ -850,7 +848,7 @@ declare global {
     }
     /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type FinishInfo = Omit<Player & LocalRecord & {
-      // TODO DOC
+      /** Amount of round points acquired by the player in the current round (Rounds/Cup/Teams mode only) */
       readonly roundPoints?: number
     },
       'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
@@ -892,12 +890,14 @@ declare global {
         readonly time: number
       }
     }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+    /** Object containing player lap finish information. Created and emitted on the PlayerLap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LapFinishInfo = Readonly<FinishInfo & {
-      //TODO DOC
+      /** Whether the lap was the finish lap */
       readonly isFinish: boolean
     }>
+    /** Object containing player lap record information. Created and emitted on the LapRecord event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LapRecordInfo = Readonly<RecordInfo & {
-      //TODO DOC
+      /** Whether the lap was the finish lap */
       readonly isFinish: boolean
     }>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
