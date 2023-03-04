@@ -564,7 +564,22 @@ namespace trakman {
     /**
      * Number of guests.
      */
-    get guestCount(): number { return AdministrationService.guestCount }
+    get guestCount(): number { return AdministrationService.guestCount },
+
+    /**
+     * Privilege levels for each of the administrative actions.
+     */
+    get privileges() { return AdministrationService.privileges },
+
+    /**
+     * Relative path (/GameData/Config/) to the blacklist file.
+     */
+    get blacklistFile() { return AdministrationService.blacklistFile },
+
+    /**
+     * Relative path (/GameData/Config/) to the guestlist file.
+     */
+    get guestlistFile() { return AdministrationService.guestlistFile }
 
   }
 

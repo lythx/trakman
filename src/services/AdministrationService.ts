@@ -23,12 +23,23 @@ export class AdministrationService {
   private static serverMutelist: tm.MutelistEntry[] = []
   private static muteOnJoin: tm.MutelistEntry[] = []
   private static _guestlist: tm.GuestlistEntry[] = []
-  private static readonly blacklistFile: string = config.blacklistFile
-  private static readonly guestlistFile: string = config.guestlistFile
-  static readonly banPrivilege: number = config.privileges.ban
-  static readonly blacklistPrivilege: number = config.privileges.blacklist
-  static readonly mutePrivilege: number = config.privileges.mute
-  static readonly addGuestPrivilege: number = config.privileges.addGuest
+  /** Relative path (/GameData/Config/) to the blacklist file. */
+  static readonly blacklistFile: string = config.blacklistFile
+  /** Relative path (/GameData/Config/) to the guestlist file. */
+  static readonly guestlistFile: string = config.guestlistFile
+  // TODO USE PRIVILEGE OBJECT INSTEAD OF VARS AND ADD KICK
+  /** Privilege levels for each of the administrative actions. */
+  static readonly privileges: {
+    readonly ban: number,
+    readonly blacklist: number,
+    readonly mute: number,
+    readonly addGuest: number
+  } = config.privileges
+  // TODO REMOVE
+  private static readonly banPrivilege: number = config.privileges.ban
+  private static readonly blacklistPrivilege: number = config.privileges.blacklist
+  private static readonly mutePrivilege: number = config.privileges.mute
+  private static readonly addGuestPrivilege: number = config.privileges.addGuest
 
   static async initialize(): Promise<void> {
     void this.setOwner()
@@ -732,7 +743,7 @@ export class AdministrationService {
   static get blacklistCount(): number {
     return this._blacklist.length
   }
- // TODO DOC
+  // TODO DOC
   /**
    * Number of muted players
    */
