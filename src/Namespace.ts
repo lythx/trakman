@@ -90,9 +90,9 @@ declare global {
       privilege: number
       /** Whether the player is in the spectator mode */
       isSpectator: boolean
-      // TODO DOCUMENT
+      // TODO REMOVE
       isPureSpectator: boolean
-      // TODO DOCUMENT
+      // TODO REMOVE
       isTemporarySpectator: boolean
       /** Whether the player has a player spot 
        * (player spot is needed to switch to player mode, it's automatically assigned if the server is not full) */

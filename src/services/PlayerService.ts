@@ -298,10 +298,11 @@ export class PlayerService {
     player.isPureSpectator = info.isPureSpectator
     player.isTemporarySpectator = info.isTemporarySpectator
     player.hasPlayerSlot = info.hasPlayerSlot
-    if (info.teamId === -1) { player.team = undefined } // TODO CHECK
+    if (info.teamId === -1) { player.team = undefined }
     else {
       player.team = info.teamId === 0 ? 'blue' : 'red'
     }
+    console.log(info.login, info.teamId, player.team)
     return true
   }
 
