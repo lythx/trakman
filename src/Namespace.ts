@@ -12,7 +12,6 @@ declare global {
       readonly fileName: string
       /** Map author login */
       readonly author: string
-      // TODO DOCUMENT ENUMS
       /** Map environment ('Stadium', 'Island', etc.) */
       readonly environment: Environment
       /** Map mood ('Sunrise', 'Night', etc.) */
@@ -39,7 +38,6 @@ declare global {
       voteCount: number
       /** Map karma vote ratio (0 to 100) */
       voteRatio: number
-      // TODO DOCUMENT
       /** Default amount of laps (different amounts can be set using server call) (undefined if the map was never played) */
       defaultLapsAmount?: number
       /** Amount of checkpoints per lap (undefined if the map was never played) */
@@ -92,24 +90,26 @@ declare global {
       privilege: number
       /** Whether the player is in the spectator mode */
       isSpectator: boolean
-      // TODO DOCUMENT
+      // TODO REMOVE
       isPureSpectator: boolean
-      // TODO DOCUMENT
+      // TODO REMOVE
       isTemporarySpectator: boolean
+      /** Whether the player has a player spot 
+       * (player spot is needed to switch to player mode, it's automatically assigned if the server is not full) */
       hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
       /** Player average server map rank */
       average: number
-      /** Player team (teams mode only) */ // TODO DOCUMENT and maybe remove from other objects
+      /** Player team (Teams mode only) */
       team?: 'red' | 'blue'
-      // TODO DOCUMENT
+      /** Player rounds points sum (Cup and Rounds mode only) */
       roundsPoints: number
-      // -1 if nofin
+      /** Player round finish times (Cup, Rounds and Teams mode only) (-1 if the player didn't finish the round) */
       roundTimes: number[]
-
+      /** Player cup winner position (Cup mode only) */
       cupPosition?: number
-
+      /** Whether the player is a cup finalist (Cup mode only) (Winners are not finalists) */
       isCupFinalist: boolean
     }
     /** Controller offline player object */
@@ -256,9 +256,12 @@ declare global {
       readonly time: number
       /** Checkpoint lap */
       readonly lap: number
-      // TODO DOC
+      /** Checkpoint time in the current lap (Multilap maps only) */
       readonly lapCheckpointTime: number
+      /** Checkpoint index in the current lap (Multilap maps only) */
       readonly lapCheckpointIndex: number
+      /** Whether the checkpoint is a finish (Multilap maps only) 
+       * (Actual race finish is not counted as a checkpoint) */
       readonly isLapFinish: boolean
     }
     /** Controller chat message object */
@@ -520,7 +523,7 @@ declare global {
       readonly forceSpectator: number
       /** Whether the player */
       readonly isReferee: boolean
-      /** Might be cup mode related */ // TODO CUP
+      /** True if the player pressed delete/backspace in result screen. Pressing it again makes it false */
       readonly isPodiumReady: boolean
       /** Whether the player is using 3D mode */
       readonly isUsingStereoscopy: boolean
@@ -534,7 +537,7 @@ declare global {
       readonly isSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** Seems to be always the same as isSpectator */ // TODO UPDATE
+      /** True if the player is in non-temporary spectator mode and didn't finish the current map */
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
@@ -587,43 +590,52 @@ declare global {
       mapIndex: number
       /** Amount of points to end the map in rounds mode */
       roundsPointsLimit: number
-      /** Points system type used in rounds mode */ // TODO ROUNDS
+      /** Points system type used in Rounds mode (false is old, true is new).
+       *  The controller always uses custom one */
       roundsPointSystemType: boolean
-      /** Amount of forced laps in rounds mode */
+      /** Amount of forced laps in Rounds mode */
       roundsModeLapsAmount: number
       /** Amount of time (in msec) to be spent in race */
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end map in Teams Mode */ // TODO Document
+      /** Amount of points to end map in Teams mode.
+       *  THIS VALUE APPEARS TO BE WRONG, DEDICATED SERVER ALWAYS SENDS 50 FOR SOME REASON,
+       *  USE tm.rounds.teamsPointsLimit INSTEAD */
       teamPointsLimit: number
-      /** Teams mode related */ // TODO TEAMS
+      /** Maximum amount of points that a team can get in one round when using the old point system
+       * (if the old point system is used teamPointSystemType is false).
+       * The controller always uses the new point system */
       teamMaxPoints: number
-      /** Points system type used in teams mode */ // TODO TEAMS
+      /** Points system type used in Teams mode (false is old, true is new).
+       * The controller always uses the new point system */
       teamPointSystemType: boolean
-      /** Amount of laps in laps mode */ // TODO Document
+      /** Amount of laps in Laps mode */
       lapsModeLapsAmount: number
-      /** Amount of time left for players to finish the track after the leader in laps mode */
+      // TODO RENAME AND CHANGE DOC THIS IS LAPS TIME LIMIT
+      /** Amount of time left for players to finish the track after the leader in Laps mode */
       lapsModeFinishTimeout: number
-      /** Amount of time left for players to finish the track after the leader in rounds mode */
+      // TODO RENAME AND CHANGE DOC THIS IS FINISH TIMEOUT FOR LAPS/ROUNDS and proabably other modes
+      /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */
       roundsModeFinishTimeout: number
-      /** Duration of the warm-up in rounds mode */
+      /** Duration of the warm-up in all modes */
       warmUpDuration: number
       /** Whether disabled respawning on checkpoints is active */
       disableRespawn: boolean
       /** Whether force display of all opponents is enabled */
       forceShowOpponents: boolean
-      /** Rounds mode related */ // TODO ROUNDS (Amount of points to end the map in rounds mode when using "new rules")
+      /** Amount of points to end the map in rounds mode when using the new system type.
+       *  The controller always uses a custom point system */ // TODO CHECk
       roundsPointLimitSystemType: number
-      /** Teams mode related */ // TODO TEAMS (Amount of points to end the map in teams mode when using "new rules")
+      /** Teams mode related */ // TODO CHECK AND DOC (Amount of points to end the map in teams mode when using "new rules")
       teamPointLimitSystemType: number
-      /** Amount of points to be gained to win in cup mode */
+      /** Amount of points to become a finalist in Cup mode */
       cupPointsLimit: number
-      /** Amount of times the map will be replayed until skip in cup mode */ // TODO CUP
+      /** Amount of times the map will be replayed until skip in Cup mode */
       cupRoundsPerMap: number
-      /** Amount of winners in cup mode */
+      /** Amount of winners in Cup mode */
       cupWinnersAmount: number
-      /** Duration of the warm-up in cup mode */
+      /** Warm-up rounds count in Cup mode */ // TODO RENAME
       cupWarmUpDuration: number
     }
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
@@ -762,10 +774,9 @@ declare global {
       "RemoveGuest": Readonly<GuestlistEntry>
       "PlayerDataUpdated": readonly PlayerDataUpdatedInfo[]
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
-      "BeginRound": Readonly<tm.FinishInfo>[]
-      "EndRound": Readonly<tm.FinishInfo>[]
-      "GameConfigChanged": Readonly<tm.Game> // TODO RENAME
-      // TODO DOC
+      "BeginRound": Readonly<FinishInfo>[]
+      "EndRound": Readonly<FinishInfo>[]
+      "GameConfigChanged": Readonly<Game> // TODO RENAME
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
@@ -798,7 +809,7 @@ declare global {
       readonly liveRecords: Readonly<Readonly<FinishInfo>[]>
       /** Whether the last round played was a warm-up */
       readonly wasWarmUp: boolean
-      /** Whether the race should skip to the next map (cup mode?) */
+      /** Whether the point amounts from the last map will be preserved (Cup mode only) */
       readonly continuesOnNextMap: boolean
       /** Login of the winner */
       readonly winnerLogin?: string
@@ -808,7 +819,7 @@ declare global {
       readonly isRestart: boolean
       /** Server side ranking objects. 
        * (Can differ from controller rankings only if it was restarted during the map) */
-      readonly serverSideRankings: readonly tm.TrackmaniaRankingInfo[]
+      readonly serverSideRankings: readonly TrackmaniaRankingInfo[]
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Readonly<CurrentMap> & {
@@ -817,7 +828,6 @@ declare global {
     }
     /** Controller current map object */
     export type CurrentMap = Map & {
-      // TODO DOCUMENT
       /** Default amount of laps (may be incoherent with actual laps amount if it's modified using dedicated server call) */
       readonly defaultLapsAmount: number
       /** Current amount of laps depending on dedicated server config and map default laps */
@@ -831,7 +841,7 @@ declare global {
       /** Whether the laps amount was modified by dedicated server calls (always false in TimeAttack, Stunts always true in Laps) */
       readonly isLapsAmountModified: boolean
     }
-    /** Controller local record object */ // TODO UPDATE DOC
+    /** Controller local record object */
     export type LocalRecord = Record & OfflinePlayer
     /** Object containing player checkpoint information. Created and emitted on the PlayerCheckpoint event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type CheckpointInfo = Checkpoint & {
@@ -840,7 +850,7 @@ declare global {
     }
     /** Object containing player finish information. Created and emitted on the PlayerFinish and LiveRecord events https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type FinishInfo = Omit<Player & LocalRecord & {
-      // TODO DOC
+      /** Amount of round points acquired by the player in the current round (Rounds/Cup/Teams mode only) */
       readonly roundPoints?: number
     },
       'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
@@ -882,18 +892,22 @@ declare global {
         readonly time: number
       }
     }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
+    /** Object containing player lap finish information. Created and emitted on the PlayerLap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LapFinishInfo = Readonly<FinishInfo & {
-      //TODO DOC
+      /** Whether the lap was the finish lap */
       readonly isFinish: boolean
     }>
+    /** Object containing player lap record information. Created and emitted on the LapRecord event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LapRecordInfo = Readonly<RecordInfo & {
-      //TODO DOC
+      /** Whether the lap was the finish lap */
       readonly isFinish: boolean
     }>
     /** Object containing chat message information. Created and emitted on the PlayerChat event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type MessageInfo = Message & Player
     /** Dedicated server state ('result', 'race', 'transition') */
     export type ServerState = 'result' | 'race' | 'transition'
+    /** Server game mode ('TimeAttack', 'Rounds', 'Cup', 'Laps', 'Teams', 'Stunts') */
+    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
     /** Map environment ('Stadium', 'Island', etc.) */
     export type Environment = 'Stadium' | 'Island' | 'Desert' | 'Rally' | 'Bay' | 'Coast' | 'Snow'
     /** Map mood ('Sunrise', 'Night', etc.) */
@@ -904,7 +918,5 @@ declare global {
     export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
-    // TODO DOCUMENT
-    export type GameMode = 'TimeAttack' | 'Rounds' | 'Cup' | 'Laps' | 'Teams' | 'Stunts'
   }
 }

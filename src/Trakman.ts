@@ -159,15 +159,29 @@ namespace trakman {
      */
     get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
 
-    // TODO DOCUMENT eee maybe move
-    get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
-
-    get roundRecordCount(): number { return RoundsService.roundRecordCount },
-
+    /**
+     * Current map lap records. Same as local records if the map is not in multilap mode.
+     */
     get lap(): Readonly<tm.LocalRecord>[] { return RecordService.lapRecords },
 
+    /**
+     * Number of lap records on the current map. Same as local records if the map is not in multilap mode.
+     */
     get lapCount(): number { return RecordService.lapRecordCount },
 
+    // TODO AFTER MAKING GETTER FOR ROUND RECORDS IMPLEMENT HERE AND IN ROUNDS OBJECT
+
+    /**
+     * Current round records.
+     */
+    get roundRecords(): Readonly<tm.FinishInfo>[] { return RoundsService.roundRecords },
+
+    /**
+     * Number of current round records.
+     */
+    get roundRecordCount(): number { return RoundsService.roundRecordCount },
+
+    // TODO REMOVE
     get teamScores() {
       return RoundsService.teamScores
     }
@@ -176,15 +190,55 @@ namespace trakman {
 
   export const rounds = {
 
+    /**
+     * Current round records.
+     */
     get currentRecords() { return RoundsService.roundRecords },
 
+    /**
+     * Number of current round records.
+     */
     get currentRecordCount(): number { return RoundsService.roundRecordCount },
 
+    /**
+     * Current team scores (Teams mode only).
+     */
     get teamScores() { return RoundsService.teamScores },
 
+    /**
+     * Point system for Rounds and Cup mode.
+     */
+    get roundsPointSystem() { return RoundsService.roundsPointSystem },
+
+    /**
+     * Amount of points to end the map in Rounds mode.
+     */
+    get roundsPointsLimit() { return RoundsService.roundsPointsLimit },
+
+    /**
+     * Amount of points to become a finalist in Cup mode.
+     */
+    get cupPointsLimit() { return RoundsService.cupPointsLimit },
+
+    /**
+     * Amount of points to end map in Teams mode.
+     */
+    get teamsPointsLimit() { return RoundsService.teamsPointsLimit },
+
+    /**
+     * Current round points ranking (Rounds/Cup mode only).
+     */
     get pointsRanking() { return RoundsService.pointsRanking },
 
-    get teamsPointsLimit() { return RoundsService.teamsPointsLimit }
+    /**
+     * Max amount of winners in Cup mode.
+     */
+    get cupMaxWinnersCount() { return RoundsService.cupMaxWinnersCount },
+
+    /**
+     * Current Cup winners (Cup mode only).
+     */
+    get cupWinners() { return RoundsService.cupWinners }
 
   }
 
@@ -515,7 +569,22 @@ namespace trakman {
     /**
      * Number of guests.
      */
-    get guestCount(): number { return AdministrationService.guestCount }
+    get guestCount(): number { return AdministrationService.guestCount },
+
+    /**
+     * Privilege levels for each of the administrative actions.
+     */
+    get privileges() { return AdministrationService.privileges },
+
+    /**
+     * Relative path (/GameData/Config/) to the blacklist file.
+     */
+    get blacklistFile() { return AdministrationService.blacklistFile },
+
+    /**
+     * Relative path (/GameData/Config/) to the guestlist file.
+     */
+    get guestlistFile() { return AdministrationService.guestlistFile }
 
   }
 

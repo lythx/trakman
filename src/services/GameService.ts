@@ -313,7 +313,9 @@ export class GameService {
     return this._mapStartTimestamp
   }
 
-  // TODO DOCUMENT
+  /**
+   * Current server gamemode. ('Rounds', 'TimeAttack', 'Teams', 'Laps', 'Stunts', 'Cup')
+   */
   static get gameMode(): tm.GameMode {
     return this.gameModeMap[this._game.gameMode]
   }

@@ -158,9 +158,9 @@ export default abstract class StaticComponent {
   static onComponentCreated(callback: (component: StaticComponent) => void) {
     this.componentCreateListeners.push(callback)
   }
- // TODO DOC
+
   /**
-   * Game modes in which the widget will be displayed.
+   * Game modes in which the widget will be displayed
    */
   get gameModes(): tm.GameMode[] {
     return [...this._gameModes]

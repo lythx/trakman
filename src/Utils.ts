@@ -306,7 +306,15 @@ export const Utils = {
     return s[0].player
   },
 
-  // TODO DOCUMENTATE AND USE IN SERVICE
+  // TODO USE IN SERVICE
+  /**
+   * Converts date string to time in miliseconds. 
+   * This method is used to parse time in chat commands.
+   * @param dateStr Date string, number followed by optional modifier 
+   * [s - seconds, m - minutes, h - hours, d - days]). 
+   * If no modifier is specified the number will be treated as minutes.
+   * @returns Time in miliseconds
+   */
   parseTimeString(dateStr: string): number | Error {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
       if (isNaN(new Date(Number(dateStr)).getTime())) {

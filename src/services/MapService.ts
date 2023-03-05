@@ -196,7 +196,7 @@ export class MapService {
     Events.emit('MapAdded', { ...obj, callerLogin: caller?.login })
     return obj
   }
-  // TODO UPDATE DOC
+
   /**
    * Writes a map file to the server, adds it to the current Match Settings and to the jukebox.
    * @param fileName Map file name (file will be saved with this name on the server)
