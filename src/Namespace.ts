@@ -523,7 +523,7 @@ declare global {
       readonly forceSpectator: number
       /** Whether the player */
       readonly isReferee: boolean
-      /** Might be cup mode related */ // TODO CUP
+      /** True if the player pressed delete/backspace in result screen. Pressing it again makes it false */
       readonly isPodiumReady: boolean
       /** Whether the player is using 3D mode */
       readonly isUsingStereoscopy: boolean
@@ -537,7 +537,7 @@ declare global {
       readonly isSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** Seems to be always the same as isSpectator */ // TODO UPDATE
+      /** True if the player is in non-temporary spectator mode and didn't finish the current map */
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
@@ -612,11 +612,13 @@ declare global {
       teamPointSystemType: boolean
       /** Amount of laps in Laps mode */
       lapsModeLapsAmount: number
+      // TODO RENAME AND CHANGE DOC THIS IS LAPS TIME LIMIT
       /** Amount of time left for players to finish the track after the leader in Laps mode */
       lapsModeFinishTimeout: number
-      /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */ // TODO CHECK IF AFFECTS CUP/TEAMS
+      // TODO RENAME AND CHANGE DOC THIS IS FINISH TIMEOUT FOR LAPS/ROUNDS and proabably other modes
+      /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */
       roundsModeFinishTimeout: number
-      /** Duration of the warm-up in Rounds mode */ // TODO CHECK IF AFFECTS TEAMS
+      /** Duration of the warm-up in all modes */
       warmUpDuration: number
       /** Whether disabled respawning on checkpoints is active */
       disableRespawn: boolean
