@@ -12,20 +12,17 @@ export class RoundsService {
   private static _roundsPointSystem: number[] = []
   private static _roundsPointsLimit: number
   private static _cupPointsLimit: number
-  private static _cupWarmUpRounds: number
+  private static _cupWarmUpRounds: number // TODO REMOVE
   private static _cupMaxWinnersCount: number
   private static readonly _cupWinners: tm.Player[] = []
   private static _teamsPointsLimit: number
-  private static teamMaxPoints: number // TODO FIND OUT WHAT IS THIS
+  private static teamMaxPoints: number // TODO REMOVE
   private static _ranking: tm.Player[]
   private static readonly _roundRecords: tm.FinishInfo[] = []
   private static noRoundFinishes = true
   private static finishedRounds = 0
   private static roundFinishCount = 0
 
-  /**
-   * Fetches and stores records on the current map and ranks of all online players on maps in current MatchSettings
-   */
   static async initialize(): Promise<void> {
     await Client.call('SetCupRoundsPerChallenge', [{ int: 0 }])
     const status = await this.updateRoundsSettings()
@@ -80,9 +77,9 @@ export class RoundsService {
       { method: 'GetRoundCustomPoints' },
       { method: 'GetRoundPointsLimit' },
       { method: 'GetTeamPointsLimit' },
-      { method: 'GetMaxPointsTeam' },
+      { method: 'GetMaxPointsTeam' }, // TODO REMOVE
       { method: 'GetCupPointsLimit' },
-      { method: 'GetCupWarmUpDuration' },
+      { method: 'GetCupWarmUpDuration' }, // TODO REMOVE
       { method: 'GetCupNbWinners' }])
     if (settings instanceof Error) {
       return new Error(`Failed to fetch round settings, server responded with error: ${settings.message}`)
@@ -91,7 +88,7 @@ export class RoundsService {
     if (err !== undefined) {
       return new Error(`Failed to fetch round settings, server responded with error: ${err.message}`)
     }
-    const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints,
+    const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints, // TODO REMOVE TEAMMAXPOINTS and CUPWARMUPROUNDS
       cupPointsLimit, cupWarmUpRounds, cupMaxWinnersCount] =
       (settings as { method: string; params: any; }[]).map(a => a.params)
     this._roundsPointSystem = roundPointSystem
@@ -251,7 +248,8 @@ export class RoundsService {
     }
     this._ranking.splice(index, 0, obj)
   }
-  // TODO DOCUMENTATA
+
+  // TODO MAKE A GETTER FOR ROUND RECORDS
   /**
    * Current round records
    */
@@ -267,26 +265,60 @@ export class RoundsService {
   }
 
   /**
-   * Get current team scores (teams mode only)
+   * Current team scores (Teams mode only)
    */
   static get teamScores(): typeof this._teamScores {
     return { ...this._teamScores }
   }
 
+  /** 
+   * Point system for Rounds and Cup mode
+   */
   static get roundsPointSystem(): number[] {
     return [...this._roundsPointSystem]
   }
 
+  /**
+   * Amount of points to end the map in Rounds mode
+   */
   static get roundsPointsLimit(): number {
     return this._roundsPointsLimit
   }
 
+  /**
+   * Amount of points to become a finalist in Cup mode
+   */
+  static get cupPointsLimit(): number {
+    return this._cupPointsLimit
+  }
+
+  /**
+   * Amount of points to end map in Teams mode
+   */
   static get teamsPointsLimit(): number {
     return this._teamsPointsLimit
   }
 
+  /**
+   * Current round points ranking (Rounds/Cup mode only)
+   */
   static get pointsRanking(): Readonly<tm.Player>[] {
     return [...this._ranking]
   }
+
+  /**
+   * Max amount of winners in Cup mode
+   */
+  static get cupMaxWinnersCount(): number {
+    return this._cupMaxWinnersCount
+  }
+
+  /**
+   * Current Cup winners (Cup mode only)
+   */
+  static get cupWinners(): Readonly<tm.Player>[] {
+    return [...this._cupWinners]
+  }
+
 
 }

@@ -287,10 +287,10 @@ export class PlayerService {
   }
 
   /**
-   * Sets spectator status in player object
-   * @param login Player login
-   * @returns True if successfull
-   */ // TODO CHANGE DOCS
+   * Sets spectator status, player slot and team in the player object.
+   * @param info Player login
+   * @returns True if successfull, false if the player is not in the runtime memory
+   */
   static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
     const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
     if (player === undefined) { return false }
@@ -298,10 +298,11 @@ export class PlayerService {
     player.isPureSpectator = info.isPureSpectator
     player.isTemporarySpectator = info.isTemporarySpectator
     player.hasPlayerSlot = info.hasPlayerSlot
-    if (info.teamId === -1) { player.team = undefined } // TODO CHECK
+    if (info.teamId === -1) { player.team = undefined }
     else {
       player.team = info.teamId === 0 ? 'blue' : 'red'
     }
+    console.log(info.login, info.teamId, player.team)
     return true
   }
 
