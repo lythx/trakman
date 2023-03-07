@@ -219,7 +219,7 @@ export class MapService {
       return new Error(`Failed to write map file ${fileName}.`)
     }
     const map: tm.Map | Error = await this.add(fileName, caller, options?.dontJuke)
-    if ((options as any)?.cancelIfAlreadyAdded === true) {
+    if ((options as any)?.cancelIfAlreadyAdded === true && map instanceof Error) {
       return { wasAlreadyAdded: true } as any
     }
     if (map instanceof Error) {
