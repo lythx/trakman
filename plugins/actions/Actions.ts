@@ -5,7 +5,7 @@ interface CallerInfo { login: string, nickname: string, title: string, privilege
 const sendNoPrivilegeMessage = (): void =>
   tm.sendMessage(config.noPermission)
 
-export const adminActions = {
+export const actions = {
   kick: (info: CallerInfo, login: string, reason?: string): void => {
     if (info.privilege < config.kick.privilege) {
       sendNoPrivilegeMessage()

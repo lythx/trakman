@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { adminActions } from '../../../admin_actions/AdminActions.js'
+import { actions } from '../../../actions/Actions.js'
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Mutelist.config.js'
 
@@ -24,7 +24,7 @@ export default class Mutelist extends PopupWindow<number> {
     addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
       const target = tm.admin.mutelist[offset]
       if (target === undefined) { return }
-      adminActions.unmute(info, target.login)
+      actions.unmute(info, target.login)
     })
     tm.addListener(['Mute', 'Unmute'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.muteCount / (config.entries - 1)))

@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { adminActions } from '../../../admin_actions/AdminActions.js'
+import { actions } from '../../../actions/Actions.js'
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Guestlist.config.js'
 
@@ -24,7 +24,7 @@ export default class Guestlist extends PopupWindow<number> {
     addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
       const target = tm.admin.guestlist[offset]
       if (target === undefined) { return }
-      adminActions.removeGuest(info, target.login)
+      actions.removeGuest(info, target.login)
     })
     tm.addListener(['AddGuest', 'RemoveGuest'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.guestCount / (config.entries - 1)))

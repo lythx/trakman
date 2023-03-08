@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { adminActions } from '../../../admin_actions/AdminActions.js'
+import { actions } from '../../../actions/Actions.js'
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Blacklist.config.js'
 
@@ -24,7 +24,7 @@ export default class Blacklist extends PopupWindow<number> {
     addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
       const target = tm.admin.blacklist[offset]
       if (target === undefined) { return }
-      adminActions.unblacklist(info, target.login)
+      actions.unblacklist(info, target.login)
     })
     tm.addListener(['Blacklist', 'Unblacklist'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.blacklistCount / (config.entries - 1)))

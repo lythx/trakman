@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { adminActions } from '../../../admin_actions/AdminActions.js'
+import { actions } from '../../../actions/Actions.js'
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Banlist.config.js'
 
@@ -24,7 +24,7 @@ export default class Banlist extends PopupWindow<number> {
     addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
       const target = tm.admin.banlist[offset]
       if (target === undefined) { return }
-      adminActions.unban(info, target.login)
+      actions.unban(info, target.login)
     })
     tm.addListener(['Ban', 'Unban'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.banCount / (config.entries - 1)))

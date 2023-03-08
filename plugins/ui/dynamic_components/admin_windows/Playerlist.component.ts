@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { adminActions } from '../../../admin_actions/AdminActions.js'
+import { actions } from '../../../actions/Actions.js'
 import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Playerlist.config.js'
 
@@ -47,44 +47,44 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
     addManialinkListener(this.openId + this.actions.kick, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
-      adminActions.kick(info, target.login)
+      actions.kick(info, target.login)
     })
     addManialinkListener(this.openId + this.actions.forceSpec, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
       if (target.isSpectator) {
-        adminActions.forcePlay(info, target.login)
+        actions.forcePlay(info, target.login)
       } else {
-        adminActions.forceSpectator(info, target.login)
+        actions.forceSpectator(info, target.login)
       }
     })
     addManialinkListener(this.openId + this.actions.mute, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
       if (tm.admin.getMute(target.login) === undefined) {
-        adminActions.mute(info, target.login)
+        actions.mute(info, target.login)
       } else {
-        adminActions.unmute(info, target.login)
+        actions.unmute(info, target.login)
       }
     })
     addManialinkListener(this.openId + this.actions.addGuest, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
       if (tm.admin.getGuest(target.login) === undefined) {
-        adminActions.addGuest(info, target.login)
+        actions.addGuest(info, target.login)
       } else {
-        adminActions.removeGuest(info, target.login)
+        actions.removeGuest(info, target.login)
       }
     })
     addManialinkListener(this.openId + this.actions.blacklist, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
-      adminActions.blacklist(info, target.login)
+      actions.blacklist(info, target.login)
     })
     addManialinkListener(this.openId + this.actions.ban, 1000, (info, offset) => {
       const target = tm.players.list[offset]
       if (target === undefined) { return }
-      adminActions.ban(info, target.login)
+      actions.ban(info, target.login)
     })
   }
 
