@@ -27,7 +27,6 @@ export class AdministrationService {
   static readonly blacklistFile: string = config.blacklistFile
   /** Relative path (/GameData/Config/) to the guestlist file. */
   static readonly guestlistFile: string = config.guestlistFile
-  // TODO USE PRIVILEGE OBJECT INSTEAD OF VARS AND ADD KICK
   /** Privilege levels for each of the administrative actions. */
   static readonly privileges: {
     readonly ban: number,
@@ -35,11 +34,6 @@ export class AdministrationService {
     readonly mute: number,
     readonly addGuest: number
   } = config.privileges
-  // TODO REMOVE
-  private static readonly banPrivilege: number = config.privileges.ban
-  private static readonly blacklistPrivilege: number = config.privileges.blacklist
-  private static readonly mutePrivilege: number = config.privileges.mute
-  private static readonly addGuestPrivilege: number = config.privileges.addGuest
 
   static async initialize(): Promise<void> {
     void this.setOwner()
@@ -339,7 +333,7 @@ export class AdministrationService {
    */
   static async ban(ip: string, login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
-    if (caller.privilege < this.banPrivilege || login.length > 25) { return false }
+    if (caller.privilege < this.privileges.ban || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
     const date: Date = new Date()
@@ -388,7 +382,7 @@ export class AdministrationService {
    */
   static async unban(login: string, caller?: { login: string, privilege: number, nickname: string }):
     Promise<boolean | 'Player not banned' | Error> {
-    if (caller !== undefined && caller.privilege < this.banPrivilege) { return false }
+    if (caller !== undefined && caller.privilege < this.privileges.ban) { return false }
     const serverBanIndex = this.serverBanlist.findIndex(a => a.login === login)
     const banOnJoinIndex = this.banOnJoin.findIndex(a => a.login === login)
     if (serverBanIndex === -1 && banOnJoinIndex === -1) { return 'Player not banned' }
@@ -428,7 +422,7 @@ export class AdministrationService {
    */
   static async addToBlacklist(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean | Error> {
-    if (caller.privilege < this.blacklistPrivilege || login.length > 25) { return false }
+    if (caller.privilege < this.privileges.blacklist || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
     const date: Date = new Date()
@@ -472,7 +466,7 @@ export class AdministrationService {
    */
   static async unblacklist(login: string, caller?: { login: string, privilege: number, nickname: string }):
     Promise<boolean | 'Player not blacklisted' | Error> {
-    if (caller !== undefined && caller.privilege < this.blacklistPrivilege) { return false }
+    if (caller !== undefined && caller.privilege < this.privileges.blacklist) { return false }
     const blIndex = this._blacklist.findIndex(a => a.login === login)
     if (blIndex === -1) { return 'Player not blacklisted' }
     if (!this.serverBanlist.some(a => a.login === login)) {
@@ -503,7 +497,7 @@ export class AdministrationService {
    */
   static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
-    if (caller.privilege < this.mutePrivilege || login.length > 25) { return false }
+    if (caller.privilege < this.privileges.mute || login.length > 25) { return false }
     const date: Date = new Date()
     let entry = this.muteOnJoin.find(a => a.login === login)
     if (entry === undefined) {
@@ -547,7 +541,7 @@ export class AdministrationService {
    */
   static async unmute(login: string, caller?: { login: string, privilege: number, nickname: string }):
     Promise<boolean | 'Player not muted' | Error> {
-    if (caller !== undefined && caller.privilege < this.mutePrivilege) { return false }
+    if (caller !== undefined && caller.privilege < this.privileges.mute) { return false }
     const serverMuteIndex = this.serverMutelist.findIndex(a => a.login === login)
     const muteOnJoinIndex = this.muteOnJoin.findIndex(a => a.login === login)
     if (serverMuteIndex === -1 && muteOnJoinIndex === -1) { return 'Player not muted' }
@@ -581,7 +575,7 @@ export class AdministrationService {
    */
   static async addGuest(login: string, caller: { login: string, privilege: number, nickname: string }, nickname?: string):
     Promise<boolean | 'Already guest' | Error> {
-    if (caller.privilege < this.addGuestPrivilege || login.length > 25) { return false }
+    if (caller.privilege < this.privileges.addGuest || login.length > 25) { return false }
     const date: Date = new Date()
     const entry = this._guestlist.find(a => a.login === login)
     if (entry !== undefined) { return 'Already guest' }
@@ -608,7 +602,7 @@ export class AdministrationService {
    */
   static async removeGuest(login: string, caller?: { login: string, privilege: number, nickname: string }):
     Promise<boolean | 'Player not in guestlist' | Error> {
-    if (caller !== undefined && caller.privilege < this.addGuestPrivilege) { return false }
+    if (caller !== undefined && caller.privilege < this.privileges.addGuest) { return false }
     const guestIndex = this._guestlist.findIndex(a => a.login === login)
     if (guestIndex === -1) { return 'Player not in guestlist' }
     const res = await Client.call('RemoveGuest', [{ string: login }])

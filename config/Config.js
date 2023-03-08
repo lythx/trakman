@@ -16,7 +16,8 @@ export default {
     ban: 2,
     blacklist: 2,
     mute: 1,
-    addGuest: 1
+    addGuest: 1,
+    kick: 1
   },
   /** Point system for rounds and cup gamemode */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
