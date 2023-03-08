@@ -1,11 +1,12 @@
 import icons from '../../config/Icons.js'
 import ids from '../../config/ComponentIds.js'
 const p = tm.utils.palette
+const priv = tm.admin.privileges
 
 export default {
   title: " Players ",
-  kickPrivilege: 1,
-  forceSpecPrivilege: 1,
+  kickPrivilege: priv.kick,
+  forceSpecPrivilege: priv.forceSpectator,
   privilege: 1, // Privilege required to open the window
   icon: icons.playerList,
   iconWidth: 2,
@@ -65,21 +66,6 @@ export default {
     background: "9996",
     margin: 0.15,
     headerBackground: "333C"
-  },
-  messages: {
-    kick: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has kicked ${p.highlight}#{name}${p.admin}.`,
-    forceSpec: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced ${p.highlight}#{name} ${p.admin}into spectator mode.`,
-    forcePlay: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced ${p.highlight}#{name} ${p.admin}into player mode.`,
-    mute: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has muted ${p.highlight}#{name}${p.admin}.`,
-    unmute: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unmuted ${p.highlight}#{name}${p.admin}.`,
-    unmuteError: `${p.error}Could not unmute ${p.highlight}#{login}${p.error}.`,
-    addGuest: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has added ${p.highlight}#{name} ${p.admin}to the guestlist.`,
-    addGuestError: `${p.error}Could not add ${p.highlight}#{login}${p.error} to the guestlist.`,
-    removeGuest: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name} ${p.admin}from the guestlist.`,
-    removeGuestError: `${p.error}Could not remove ${p.highlight}#{login}${p.error} from the guestlist.`,
-    blacklist: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has blacklisted ${p.highlight}#{name}${p.admin}.`,
-    blacklistError: `${p.error}Could not blacklist ${p.highlight}#{login}${p.error}.`,
-    ban: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has banned ${p.highlight}#{name}${p.admin}.`
   },
   command: {
     aliases: ['players', 'playerl', 'playerlist'],
