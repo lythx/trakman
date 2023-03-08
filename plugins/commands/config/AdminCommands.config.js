@@ -28,6 +28,8 @@ export default {
     help: `Force a player into player mode.`
   },
   kickghost: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has kicked ${p.highlight}#{name}${p.admin}.`,
+    public: true,
     privilege: priv.kick,
     aliases: ['kg', 'gk', 'kickghost', 'ghostkick'],
     help: `Manipulate every soul on the server that you kicked someone.`
