@@ -263,7 +263,7 @@ namespace trakman {
     get count(): number { return ChatService.messageCount },
 
 
-    setMessageStyle: ChatService.setMessageStyle.bind(ChatService)
+    addMessageStyle: ChatService.addMessageStyle.bind(ChatService)
 
   }
 

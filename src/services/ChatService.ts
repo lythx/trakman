@@ -20,7 +20,7 @@ export abstract class ChatService {
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
   private static readonly customPrefixes: { callback: PrefixFunction, position: number }[] = []
-  private static messageStyleCallback?: PrefixFunction
+  private static readonly messageStyleFunctions: { importance: number, callback: PrefixFunction }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -230,9 +230,16 @@ export abstract class ChatService {
         for (const e of this.customPrefixes.filter(a => a.position < 0)) {
           str += await e.callback(messageInfo)
         }
-        if (this.messageStyleCallback !== undefined) {
-          str += this.messageStyleCallback(messageInfo)
-        } else {
+        let customMessage = false
+        for (const e of this.messageStyleFunctions) {
+          const result = await e.callback(messageInfo)
+          if (result !== undefined) {
+            str += result
+            customMessage = true
+            break
+          }
+        }
+        if (!customMessage) {
           str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
         }
         for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
@@ -313,8 +320,9 @@ export abstract class ChatService {
     return this._commandList.length
   }
 
-  static setMessageStyle(callback: PrefixFunction) {
-    this.messageStyleCallback = callback
+  static addMessageStyle(callback: PrefixFunction, importance: number) {
+    this.messageStyleFunctions.push({ callback, importance })
+    this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
   }
 
 }
