@@ -40,11 +40,9 @@ export const Utils = {
     const d = new Date(time)
     const h = d.getUTCHours().toString()
     const m = d.getUTCMinutes().toString()
-    const s = d.getUTCSeconds().toString()
-    const ms = d.getUTCMilliseconds().toString()
-    return h !== '0'
-      ? (`${h.padStart(2, '0')}:${m.padStart(2, '0')}:${s.padStart(2, '0')}.${ms.padStart(2, '0')}`)
-      : (`${m.padStart(2, '0')}:${s.padStart(2, '0')}.${ms.padStart(2, '0')}`)
+    const s = d.getUTCSeconds().toString().padStart(2, '0')
+    const ms = d.getUTCMilliseconds().toString().padStart(3, '0').slice(0, -1)
+    return h !== '0' ? (`${h}:${m.padStart(2, '0')}:${s}.${ms}`) : (`${m}:${s}.${ms}`)
   },
 
   /**
