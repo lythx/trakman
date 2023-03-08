@@ -6,6 +6,7 @@
 import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
 import { maniakarma, MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidget.config.js'
+import { actions } from '../../../actions/Actions.js'
 
 export default class KarmaWidget extends StaticComponent {
 
@@ -24,7 +25,7 @@ export default class KarmaWidget extends StaticComponent {
     tm.addListener('KarmaVote', (): void => this.display())
     maniakarma.onMapFetch((): void => this.display())
     maniakarma.onVote((): void => this.display())
-    addManialinkListener(this.id + 1, 6, (info, offset): void => tm.karma.add(info, this.options[offset]))
+    addManialinkListener(this.id + 1, 6, (info, offset): void => actions.addVote(info, this.options[offset]))
     tm.addListener('VotesPrefetch', (): void => this.display())
   }
 

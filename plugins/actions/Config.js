@@ -2,6 +2,18 @@ const p = tm.utils.palette
 
 export default {
   noPermission: `${p.error} You have no permission to perform this action.`,
+  addVote: {
+    voteTexts: {
+      '3': 'fantastic',
+      '2': 'beautiful',
+      '1': 'good',
+      '-1': 'bad',
+      '-2': 'poor',
+      '-3': 'waste'
+    },
+    public: true,
+    message: `${p.highlight}#{nickname}${p.vote} thinks this map is ${p.highlight}#{voteText}${p.vote}.`
+  },
   kick: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has kicked ${p.highlight}#{name}${p.admin}.`,
     error: `${p.error}Player is not on the server.`,

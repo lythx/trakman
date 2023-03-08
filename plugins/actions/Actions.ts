@@ -6,6 +6,13 @@ const sendNoPrivilegeMessage = (): void =>
   tm.sendMessage(config.noPermission)
 
 export const actions = {
+  addVote: (info: { login: string, nickname: string }, voteValue: -3 | -2 | -1 | 1 | 2 | 3) => {
+    tm.karma.add(info, voteValue)
+    tm.sendMessage(tm.utils.strVar(config.addVote.message, {
+      nickname: tm.utils.strip(info.nickname),
+      voteText: config.addVote.voteTexts[String(voteValue) as keyof typeof config.addVote.voteTexts]
+    }), config.addVote.public === true ? undefined : info.login)
+  },
   kick: (info: CallerInfo, login: string, reason?: string): void => {
     if (info.privilege < config.kick.privilege) {
       sendNoPrivilegeMessage()
