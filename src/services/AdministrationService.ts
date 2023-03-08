@@ -32,7 +32,9 @@ export class AdministrationService {
     readonly ban: number,
     readonly blacklist: number,
     readonly mute: number,
-    readonly addGuest: number
+    readonly addGuest: number,
+    readonly kick: number,
+    readonly forceSpectator: number
   } = config.privileges
 
   static async initialize(): Promise<void> {
