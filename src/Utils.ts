@@ -37,11 +37,14 @@ export const Utils = {
    * @returns Formatted time string
    */
   getTimeString(time: number): string {
-    const timeLength: number = time.toString().length
-    const m: string = Math.floor(time / (1000 * 60)).toString()
-    const s: string = Math.floor((time - Number(m) * 60 * 1000) / 1000).toString()
-    const hs: string = time.toString().substring(timeLength - 3, timeLength - 1)
-    return `${m.padStart(1, '0')}:${s.padStart(2, '0')}.${hs.padStart(2, '0')}`
+    const d = new Date(time)
+    const h = d.getUTCHours().toString()
+    const m = d.getUTCMinutes().toString()
+    const s = d.getUTCSeconds().toString()
+    const ms = d.getUTCMilliseconds().toString()
+    return h !== '0'
+      ? (`${h.padStart(2, '0')}:${m.padStart(2, '0')}:${s.padStart(2, '0')}.${ms.padStart(2, '0')}`)
+      : (`${m.padStart(2, '0')}:${s.padStart(2, '0')}.${ms.padStart(2, '0')}`)
   },
 
   /**
