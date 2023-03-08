@@ -78,6 +78,65 @@ export const Utils = {
   },
 
   /**
+   * Generates a colour gradient for the specified string with the passed colours
+   * @param text Text to apply the generated colours to
+   * @param startColour Start gradient colour (in hex)
+   * @param endColour End gradient colour (in hex)
+   * @returns String with gradient applied to it (colours are 3-digit hex)
+   */
+  makeGradient(text: string, startColour: string, endColour: string): string {
+    const length: number = text.length
+    if (length === 0) { // Why
+      return ''
+    }
+    const textSplit: string[] = text.split('')
+    let gradient: string = ''
+    let [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
+    let colours: string[] = []
+    // https://stackoverflow.com/a/32257791
+    let alpha: number = 0.0
+    for (let i = 0; i !== length; i++) {
+      let cc: Array<number> = []
+      alpha += (1.0 / length)
+      cc = [
+        startRGB[0] * alpha + (1 - alpha) * endRGB[0],
+        startRGB[1] * alpha + (1 - alpha) * endRGB[1],
+        startRGB[2] * alpha + (1 - alpha) * endRGB[2]
+      ]
+      colours.push(this.getHex(cc, false))
+    }
+    for (let i = 0; i !== length; i++) {
+      gradient += `$${colours[i] + textSplit[i]}`
+    }
+    return gradient
+  },
+
+  /**
+   * Gives RGB representation of the supplied hex colour
+   * @param hex Hex colour to get RGB values for
+   * @returns Array of RGB values
+   */
+  getRGB(hex: string): Array<number> {
+    if (hex.length === 3) {
+      hex = hex.split('').map((a): string => { return a + a }).join('')
+    }
+    // https://stackoverflow.com/a/5624139
+    const sh: RegExpExecArray | null = (/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i).exec(hex)
+    return sh ? [parseInt(sh[1], 16), parseInt(sh[2], 16), parseInt(sh[3], 16)] : []
+  },
+
+  /**
+   * Gives hex representation of the supplied RGB colour array
+   * @param rgb Array of RGB values
+   * @param getFull Whether to obtain full hex (6 chars)
+   * @returns Hex colour string
+   */
+  getHex(rgb: Array<number>, getFull: boolean = true): string {
+    let hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
+    return getFull ? hex : hex[0] + hex[2] + hex[4] // idk maybe this can be done better
+  },
+
+  /**
    * Attempts to convert supplied string to latin text based on the special charmap.
    * @param str String to convert
    * @returns Converted string
