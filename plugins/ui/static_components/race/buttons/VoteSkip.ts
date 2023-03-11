@@ -128,6 +128,7 @@ export class VoteSkip extends UiButton {
       this.isLastMapReplay = true
     }
     this.triesCount = 0
+    this.failedVoteTimestamp = 0
     this.isSkip = false
     this.isReplay = false
     this.emitUpdate()

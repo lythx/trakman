@@ -13,6 +13,7 @@ export class VoteReplay extends UiButton {
   replayCount = 0
   triesCount = 0
   failedVoteTimestamp = 0
+  lastExtensionTimestamp = 0
   isReplay = false
   isSkip = false
   parentId: number
@@ -25,9 +26,25 @@ export class VoteReplay extends UiButton {
       aliases: cfg.command.aliases,
       help: cfg.command.help,
       callback: info => {
-        this.handleClick(info.login, info.nickname)
+        if (!tm.timer.isDynamic) {
+          this.handleClick(info.login, info.nickname)
+        } else {
+          tm.sendMessage(msg.cantReplay, info.login)
+        }
       },
       privilege: cfg.command.privilege
+    })
+    tm.commands.add({
+      aliases: cfg.extendCommand.aliases,
+      help: cfg.extendCommand.help,
+      callback: info => {
+        if (tm.timer.isDynamic) {
+          this.handleClick(info.login, info.nickname)
+        } else {
+          tm.sendMessage(msg.cantExtend, info.login)
+        }
+      },
+      privilege: cfg.extendCommand.privilege
     })
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -50,8 +67,16 @@ export class VoteReplay extends UiButton {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
+    if (Date.now() - this.lastExtensionTimestamp < cfg.timeout * 1000) {
+      tm.sendMessage(msg.extendedRecently, login)
+      return
+    }
     if (this.triesCount >= cfg.triesLimit) {
       tm.sendMessage(msg.tooManyFailed, login)
+      return
+    }
+    if (cfg.extensionsLimit !== 0 && this.replayCount >= cfg.extensionsLimit) {
+      tm.sendMessage(msg.tooManyExtensions, login)
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })
@@ -68,12 +93,20 @@ export class VoteReplay extends UiButton {
       tm.sendMessage(tm.utils.strVar(msg.didntPass, { action }))
     } else if (result === true) {
       this.replayCount++
-      this.isReplay = true
+      if (!tm.timer.isDynamic) {
+        this.isReplay = true
+      } else {
+        this.handleTimeExtension()
+      }
       tm.sendMessage(tm.utils.strVar(msg.success, { action }))
       this.replayOrExtendTime()
     } else if (result.result === true) {
       this.replayCount++
-      this.isReplay = true
+      if (!tm.timer.isDynamic) {
+        this.isReplay = true
+      } else {
+        this.handleTimeExtension()
+      }
       if (result.caller === undefined) {
         tm.sendMessage(tm.utils.strVar(msg.success, { action }))
       } else {
@@ -110,7 +143,12 @@ export class VoteReplay extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) { this.replayCount = 0 }
+    if (tm.timer.isDynamic) {
+      this.replayCount = 0
+      this.isReplay = false
+    } else if (this.isReplay === false) {
+      this.replayCount = 0
+    }
     if (this.replayCount >= cfg.replayLimit) {
       this.buttonData = {
         icon: cfg.icon,
@@ -128,6 +166,8 @@ export class VoteReplay extends UiButton {
     this.triesCount = 0
     this.isReplay = false
     this.isSkip = false
+    this.failedVoteTimestamp = 0
+    this.lastExtensionTimestamp = 0
     this.emitUpdate()
   }
 
@@ -173,6 +213,17 @@ export class VoteReplay extends UiButton {
     this.buttonData.equalTexts = cfg.texts[3].equal
     this.buttonData.actionId = undefined
     this.emitUpdate()
+  }
+
+  private handleTimeExtension(): void {
+    this.lastExtensionTimestamp = Date.now()
+    if (this.replayCount === cfg.extensionsLimit) {
+      this.buttonData.text1 = cfg.texts[5][0]
+      this.buttonData.text2 = cfg.texts[5][1]
+      this.buttonData.equalTexts = cfg.texts[5].equal
+      this.buttonData.actionId = undefined
+      this.emitUpdate()
+    }
   }
 
 }
