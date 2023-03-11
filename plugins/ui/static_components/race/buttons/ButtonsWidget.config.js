@@ -109,9 +109,11 @@ export default {
       { 0: "$AF4RES$z$s LIMIT", 1: "REACHED", equal: true },
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true },
-      { 0: "VOTE TO", 1: "$AF4EXTEND", equal: true }
+      { 0: "VOTE TO", 1: "$AF4EXTEND", equal: true },
+      { 0: "LIMIT", 1: "$AF4REACHED", equal: true }
     ],
     timeExtension: 1000 * 60 * 5, // 5 minutes
+    extensionsLimit: 2, // 0 to disable limit
     resHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}REPLAY${tm.utils.palette.highlight} the ongoing map`,
     extendHeader: `${tm.utils.palette.highlight}Vote to $${tm.utils.palette.green}EXTEND${tm.utils.palette.highlight} the time on the ongoing map`,
     icon: icons.voteReplay,
@@ -129,6 +131,11 @@ export default {
     command: {
       aliases: ['r', 'res', 'replay'],
       help: `Start a vote to replay the ongoing map.`,
+      privilege: 0
+    },
+    extendCommand: {
+      aliases: ['ext', 'extend'],
+      help: `Start a vote to extend the time on the ongoing map.`,
       privilege: 0
     }
   },
