@@ -104,8 +104,8 @@ export class Vote {
    */
   start(eligibleLogins: string[]): boolean {
     if (Vote.isDisplayed === true) { return false }
-    Vote.onUpdate = this.onUpdate
     Vote.onEnd = this.onEnd
+    Vote.onUpdate = this.onUpdate
     Vote.onInterrupt = this.onInterrupt
     Vote.onSecondsChanged = this.onSecondsChanged
     Vote.isDisplayed = true
@@ -120,11 +120,6 @@ export class Vote {
           else if (info.actionId === this.noId) { vote.vote = false }
         }
         Vote.onUpdate(this.votes, this.seconds, info)
-        if (this.votes.length === this.loginList.length) {
-          Vote.onEnd(this.conclude(), this.votes)
-          this.clearListeners()
-          Vote.isDisplayed = false
-        }
       }
     }
     Vote.startMapListener = (): void => {
@@ -144,6 +139,13 @@ export class Vote {
           Vote.onInterrupt(this.interrupted, this.votes)
           this.clearListeners()
           Vote.isDisplayed = false
+          return
+        }
+        if (this.votes.length === this.loginList.length) {
+          Vote.onEnd(this.conclude(), this.votes)
+          this.clearListeners()
+          Vote.isDisplayed = false
+          clearInterval(interval)
           return
         }
         this.seconds--
