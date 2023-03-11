@@ -302,7 +302,6 @@ export class PlayerService {
     else {
       player.team = info.teamId === 0 ? 'blue' : 'red'
     }
-    console.log(info.login, info.teamId, player.team)
     return true
   }
 
