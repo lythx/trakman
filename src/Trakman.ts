@@ -133,6 +133,8 @@ namespace trakman {
 
     getLap: RecordService.getLap.bind(RecordService),
 
+    getRound: RoundsService.getRoundRecord.bind(RecordService),
+
     /**
      * Current map local records.
      */
@@ -169,8 +171,6 @@ namespace trakman {
      */
     get lapCount(): number { return RecordService.lapRecordCount },
 
-    // TODO AFTER MAKING GETTER FOR ROUND RECORDS IMPLEMENT HERE AND IN ROUNDS OBJECT
-
     /**
      * Current round records.
      */
@@ -184,6 +184,8 @@ namespace trakman {
   }
 
   export const rounds = {
+
+    getRecord: RoundsService.getRoundRecord.bind(RecordService),
 
     /**
      * Current round records.

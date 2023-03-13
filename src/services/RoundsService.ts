@@ -243,7 +243,26 @@ export class RoundsService {
     this._ranking.splice(index, 0, obj)
   }
 
-  // TODO MAKE A GETTER FOR ROUND RECORDS
+  /**
+   * Gets the players current round record.
+   * @param login Player login
+   * @returns Round record object or undefined if the player doesn't have a round record
+   */
+  static getRoundRecord(login: string): tm.FinishInfo | undefined
+  /**
+   * Gets multiple round records. If some player has no round record 
+   * his record object wont be returned. Returned array is sorted primary by time ascending, secondary by date ascending.
+   * @param logins Array of player logins
+   * @returns Array of round record objects
+   */
+  static getRoundRecord(logins: string[]): tm.FinishInfo[]
+  static getRoundRecord(logins: string | string[]): tm.FinishInfo | undefined | tm.FinishInfo[] {
+    if (typeof logins === 'string') {
+      return this._roundRecords.find(a => a.login === logins)
+    }
+    return this._roundRecords.filter(a => logins.includes(a.login))
+  }
+
   /**
    * Current round records
    */
