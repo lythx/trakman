@@ -1,4 +1,5 @@
 import { Client } from "./client/Client.js"
+import { Events } from "./Events.js"
 import { Logger } from "./Logger.js"
 
 export class ServerConfig {
@@ -91,6 +92,7 @@ export class ServerConfig {
       version: version.Version,
       build: version.Build,
     }
+    Events.emit('ServerConfigChanged', this._config)
   }
 
   /**

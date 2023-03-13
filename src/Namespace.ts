@@ -777,6 +777,7 @@ declare global {
       "BeginRound": Readonly<FinishInfo>[]
       "EndRound": Readonly<FinishInfo>[]
       "GameConfigChanged": Readonly<Game> // TODO RENAME
+      "ServerConfigChanged": Readonly<ServerInfo>
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
