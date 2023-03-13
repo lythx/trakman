@@ -151,7 +151,7 @@ namespace trakman {
     /**
      * Number of live records.
      */
-    get liveCount(): number { return RecordService.liveRecordsCount },
+    get liveCount(): number { return RecordService.liveRecordCount },
 
     /**
      * Maximum amount of local records. 

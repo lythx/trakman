@@ -661,11 +661,11 @@ export class RecordService {
   static get liveRecords(): Readonly<tm.FinishInfo>[] {
     return [...this._liveRecords]
   }
-  // TODO SINGULAR
+
   /**
    * Number of live records
    */
-  static get liveRecordsCount(): number { // TODO FIX PLURAL
+  static get liveRecordCount(): number {
     return this._liveRecords.length
   }
 
