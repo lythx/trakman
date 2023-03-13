@@ -181,11 +181,6 @@ namespace trakman {
      */
     get roundRecordCount(): number { return RoundsService.roundRecordCount },
 
-    // TODO REMOVE
-    get teamScores() {
-      return RoundsService.teamScores
-    }
-
   }
 
   export const rounds = {

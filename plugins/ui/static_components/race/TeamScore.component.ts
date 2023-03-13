@@ -37,7 +37,7 @@ export default class TeamScore extends StaticComponent {
 
   private constructXml() {
     const colours = [config.colours.left, config.colours.middle, config.colours.right]
-    const teamScores = tm.records.teamScores
+    const teamScores = tm.rounds.teamScores
     const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : 0, teamScores.red]
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${colours[j]}"/>
