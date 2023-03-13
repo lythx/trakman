@@ -263,7 +263,9 @@ namespace trakman {
     get count(): number { return ChatService.messageCount },
 
 
-    addMessageStyle: ChatService.addMessageStyle.bind(ChatService)
+    addMessageStyle: ChatService.addMessageStyle.bind(ChatService),
+
+    addMessageTextModifier: ChatService.addMessageTextModifier.bind(ChatService)
 
   }
 

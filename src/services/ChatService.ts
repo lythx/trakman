@@ -8,7 +8,7 @@ import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
 
-type PrefixFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
+type MessageFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
 
 /**
  * This service manages chat table and chat commands
@@ -19,8 +19,9 @@ export abstract class ChatService {
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
-  private static readonly customPrefixes: { callback: PrefixFunction, position: number }[] = []
-  private static readonly messageStyleFunctions: { importance: number, callback: PrefixFunction }[] = []
+  private static readonly customPrefixes: { callback: MessageFunction, position: number }[] = []
+  private static readonly messageStyleFunctions: { importance: number, callback: MessageFunction }[] = []
+  private static readonly messageTextModifiers: { importance: number, callback: MessageFunction }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -221,26 +222,31 @@ export abstract class ChatService {
       date: message.date,
       ...player
     }
-    if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
-      this._messages.unshift(message)
-      void this.repo.add(login, text, message.date)
+    if (text[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
       Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
       if (this.manualChatRoutingEnabled) {
         let str = ''
         for (const e of this.customPrefixes.filter(a => a.position < 0)) {
           str += await e.callback(messageInfo)
         }
-        let customMessage = false
+        let customStyle = false
         for (const e of this.messageStyleFunctions) {
           const result = await e.callback(messageInfo)
           if (result !== undefined) {
             str += result
-            customMessage = true
+            customStyle = true
             break
           }
         }
-        if (!customMessage) {
+        if (!customStyle) {
           str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
+        }
+        for (const e of this.messageTextModifiers) {
+          const result = await e.callback(messageInfo)
+          if (result !== undefined) {
+            text = result
+            break
+          }
         }
         for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
           str += await e.callback(messageInfo)
@@ -249,17 +255,19 @@ export abstract class ChatService {
           string: str + text
         }])
       }
+      this._messages.unshift(message)
+      void this.repo.add(login, text, message.date)
     }
     this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo
   }
 
-  static addCustomPrefix(callback: PrefixFunction, position: number) {
+  static addCustomPrefix(callback: MessageFunction, position: number) {
     this.customPrefixes.push({ callback, position })
     this.customPrefixes.sort((a, b) => b.position - a.position)
   }
 
-  static removeCustomPrefix(callback: PrefixFunction) {
+  static removeCustomPrefix(callback: MessageFunction) {
     const index = this.customPrefixes.findIndex(a => a.callback === callback)
     this.customPrefixes.splice(index, 1)
   }
@@ -320,9 +328,14 @@ export abstract class ChatService {
     return this._commandList.length
   }
 
-  static addMessageStyle(callback: PrefixFunction, importance: number) {
+  static addMessageStyle(callback: MessageFunction, importance: number) {
     this.messageStyleFunctions.push({ callback, importance })
     this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
+  }
+
+  static addMessageTextModifier(callback: MessageFunction, importance: number) {
+    this.messageTextModifiers.push({ callback, importance })
+    this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
 
 }
