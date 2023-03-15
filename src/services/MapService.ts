@@ -413,8 +413,8 @@ export class MapService {
    * Fills queue with maps until its size matches target queue length
    */
   private static fillQueue(): void {
-    while (this._queue.length < this.queueSize) {
-      let currentIndex: number = this._maps.findIndex(a => a.id === this._current.id)
+    const currentIndex: number = this._maps.findIndex(a => a.id === this._current.id)
+    while (this._queue.length < Math.min(this.queueSize + this._history.length + 1, this._maps.length)) {
       const lgt: number = this._maps.length
       let current: tm.Map
       let i: number = 0
@@ -422,10 +422,9 @@ export class MapService {
         i++
         current = this._maps[(i + currentIndex) % lgt]
         // Prevents adding maps in current queue and history unless there is less maps than queue size
-      } while ([...this._queue.map(a => a.map), ...this._history, this._current].some(a => a.id === current.id) && i < lgt)
-      if (current !== undefined) { this._queue.push({ map: current, isForced: false }) }
-      // Adds first map from history to queue if there is not enough maps
-      else { this._queue.push({ map: this._history[0], isForced: false }) }
+      } while ((this._queue.some(a => a.map.id === current.id) ||
+      this._history.some(a => a.id === current.id) || current.id === this._current.id) && i < lgt)
+      this._queue.push({ map: current, isForced: false })
     }
   }
 
