@@ -354,6 +354,46 @@ const commands: tm.Command[] = [
       tm.client.callNoRes(`StopServer`)
     },
     privilege: config.shutdown.privilege
+  },
+  {
+    aliases: config.call.aliases,
+    help: config.call.help,
+    params: [{ name: 'method' }, { name: 'params', type: 'multiword', optional: true }],
+    callback: async (info: tm.MessageInfo, method: string, params?: string): Promise<void> => {
+      if (params === undefined) { params = '' }
+      const paramsArr = params.split(' ').map(a => a.trim()).filter(a => a !== '')
+      const parsedParams: tm.CallParams[] = []
+      for (const e of paramsArr) {
+        if (e[0] === '"' && e[e.length - 1] === '"') { // TODO HANDLE SPACE IN STRINGS
+          parsedParams.push({ string: e.slice(1, -1) })
+          continue
+        }
+        try {
+          const parsed = JSON.parse(e)
+          if (Number.isInteger(parsed)) {
+            parsedParams.push({ int: parsed })
+          } else if (typeof parsed === 'number') {
+            parsedParams.push({ double: parsed })
+          } else if (typeof parsed === 'boolean') {
+            parsedParams.push({ boolean: parsed })
+          } else if (Array.isArray(parsed)) {
+            parsedParams.push({ array: parsed })
+          } else if (typeof parsed === 'object') {
+            parsedParams.push({ struct: parsed })
+          }
+        } catch (err: any) {
+          tm.sendMessage(`${tm.utils.palette.error}Parse error: ${err.message}`, info.login)
+          return
+        }
+      }
+      const response = await tm.client.call(method, parsedParams)
+      if (response instanceof Error) {
+        tm.sendMessage(`${tm.utils.palette.error}Error: ${response.message}`, info.login)
+      } else {
+        tm.sendMessage(JSON.stringify(response), info.login)
+      }
+    },
+    privilege: config.call.privilege
   }
 ]
 
