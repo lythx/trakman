@@ -423,7 +423,7 @@ export class MapService {
         current = this._maps[(i + currentIndex) % lgt]
         // Prevents adding maps in current queue and history unless there is less maps than queue size
       } while ((this._queue.some(a => a.map.id === current.id) ||
-      this._history.some(a => a.id === current.id) || current.id === this._current.id) && i < lgt)
+        this._history.some(a => a.id === current.id) || current.id === this._current.id) && i < lgt)
       this._queue.push({ map: current, isForced: false })
     }
   }
@@ -595,6 +595,19 @@ export class MapService {
       return obj === undefined ? undefined : { map: obj.map, callerLogin: obj.callerLogin }
     }
     return this._queue.filter(a => uids.includes(a.map.id) && a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
+  }
+
+  /**
+   * Clears the map history
+   * @param caller Object containing login and nickname of the player who called the method
+   */
+  static clearHistory(caller?: { login: string, nickname: string }): void {
+    this._history.length = 0
+    if (caller !== undefined) {
+      Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
+    } else {
+      Logger.info(`Maplist shuffled`)
+    }
   }
 
   /**

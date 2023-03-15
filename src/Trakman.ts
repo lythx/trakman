@@ -353,6 +353,8 @@ namespace trakman {
 
     getFromHistory: MapService.getFromHistory.bind(MapService),
 
+    clearHistory: MapService.clearHistory.bind(MapService),
+
     /**
      * Amout of maps in the queue (maps juked by the players and the server). 
      * This is always equal to maxQueueCount.
