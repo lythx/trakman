@@ -362,6 +362,23 @@ const commands: tm.Command[] = [
     callback: async (info: tm.MessageInfo, method: string, params?: string): Promise<void> => {
       if (params === undefined) { params = '' }
       const paramsArr = params.split(' ').map(a => a.trim()).filter(a => a !== '')
+      let quot: [number, number] | undefined
+      for (let i = 0; i < paramsArr.length; i++) {
+        for (let j = 0; j < paramsArr[i].length; j++) {
+          if (paramsArr[i][j] === '"' && paramsArr[i][j - 1] !== "\\") {
+            if (quot === undefined) {
+              quot = [i, j]
+            } else {
+              const str = paramsArr.slice(quot[0], i + 1).join('')
+              const endIndex = str.length + j - paramsArr[i].length
+              const sliced = str.slice(quot[1] + 1, endIndex)
+              paramsArr.splice(quot[0], (i + 1) - quot[0], sliced)
+              quot = undefined
+              break
+            }
+          }
+        }
+      }
       const parsedParams: tm.CallParams[] = []
       for (const e of paramsArr) {
         if (e[0] === '"' && e[e.length - 1] === '"') { // TODO HANDLE SPACE IN STRINGS
