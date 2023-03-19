@@ -422,6 +422,27 @@ export const Utils = {
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
+ 
+  // TODO DOC
+  stringifyCommandParams(commandParams: tm.Command['params']): string {
+    let text: string = ''
+    let hasOptionals: boolean = false
+    if (commandParams !== undefined) {
+      for (const [i, e] of commandParams.entries()) {
+        if (e.optional === true && hasOptionals === false) {
+          text += `[`
+          hasOptionals = true
+        }
+        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}> ` }
+        else { text += `, ${e.name} <${e.type ?? 'string'}> ` }
+      }
+    }
+    text = text.slice(0, -1)
+    if (hasOptionals) {
+      text += ']'
+    }
+    return text
+  },
 
   strVar,
 
