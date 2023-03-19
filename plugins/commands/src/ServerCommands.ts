@@ -370,8 +370,8 @@ const commands: tm.Command[] = [
               quot = [i, j]
             } else {
               const str = paramsArr.slice(quot[0], i + 1).join('')
-              const endIndex = str.length + j - paramsArr[i].length
-              const sliced = str.slice(quot[1] + 1, endIndex)
+              const endIndex = str.length + j + 1 - paramsArr[i].length
+              const sliced = str.slice(quot[1], endIndex)
               paramsArr.splice(quot[0], (i + 1) - quot[0], sliced)
               quot = undefined
               break
@@ -381,7 +381,7 @@ const commands: tm.Command[] = [
       }
       const parsedParams: tm.CallParams[] = []
       for (const e of paramsArr) {
-        if (e[0] === '"' && e[e.length - 1] === '"') { // TODO HANDLE SPACE IN STRINGS
+        if (e[0] === '"' && e[e.length - 1] === '"') {
           parsedParams.push({ string: e.slice(1, -1) })
           continue
         }
