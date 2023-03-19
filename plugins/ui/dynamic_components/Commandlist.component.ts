@@ -132,7 +132,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const paginator = new Paginator(paginatorId, this.contentWidth,
       this.footerHeight, Math.ceil(list.length / config.entries))
     paginator.onPageChange = (login: string, page: number, info): void => {
-      this.displayToPlayer(login, { page, paginator, commands: list, privilege }, 
+      this.displayToPlayer(login, { page, paginator, commands: list, privilege },
         `${page}/${paginator.pageCount}`, info.privilege)
     }
     this.searchQueries.push({
@@ -184,20 +184,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
-      let text: string = ''
-      let hasOptionals: boolean = false
-      const commandParams = command.params
-      if (commandParams !== undefined) {
-        for (const [i, e] of commandParams.entries()) {
-          if (e.optional === true && hasOptionals === false) {
-            text += `[`
-            hasOptionals = true
-          }
-          if (i === 0) { text += `${e.name} <${e.type ?? 'string'}> ` }
-          else { text += `, ${e.name} <${e.type ?? 'string'}> ` }
-        }
-      }
-      if (hasOptionals === true) { text += ']' }
+      const text = tm.utils.stringifyCommandParams(command.params)
       return centeredText(tm.utils.safeString(tm.utils.strip(text, true)), w, h)
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {

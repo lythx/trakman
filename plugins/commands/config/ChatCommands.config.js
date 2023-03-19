@@ -152,6 +152,14 @@ export default {
     aliases: ['st', 'session', 'sessiontime'],
     help: `Find out about current session time of specified player.`
   },
+  man: {
+    text: `${p.highlight}#{name}: ${p.dedirecord}#{params}${p.admin}#{help}`,
+    error: `${p.error}Command ${p.highlight}#{name} ${p.error}doesn't exist or has no help.`,
+    public: false,
+    privilege: 0,
+    aliases: ['man'],
+    help: `Display help and params for given command.`
+  },
   admin: {
     text: `${p.error}Use //[command] for admin commands.`,
     privilege: 0,

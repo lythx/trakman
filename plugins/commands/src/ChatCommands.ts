@@ -230,6 +230,34 @@ const commands: tm.Command[] = [
     privilege: config.sessiontime.privilege
   },
   {
+    aliases: config.man.aliases,
+    help: config.man.help,
+    params: [{ name: 'command' }],
+    callback: (info: tm.MessageInfo, commandName: string): void => {
+      const command = tm.commands.list.filter(a => a.aliases.some(a => a === commandName))
+      let str = ''
+      for (const e of command) {
+        if (e.help === undefined || e.privilege > info.privilege) { continue }
+        str += '\n'
+        const par = tm.utils.stringifyCommandParams(e.params)
+        str += tm.utils.strVar(config.man.text, {
+          name: commandName,
+          params: par.length === 0 ? '' : `(${par}) `,
+          help: e.help
+        })
+      }
+      str = str.slice(1)
+      if (str.length === 0) {
+        tm.sendMessage(tm.utils.strVar(config.man.error, {
+          name: commandName
+        }), info.login)
+        return
+      }
+      tm.sendMessage(str, info.login)
+    },
+    privilege: config.man.privilege
+  },
+  {
     aliases: ['admin', 'a'],
     callback: (info: tm.MessageInfo): void => {
       if (info.privilege > 0) {
