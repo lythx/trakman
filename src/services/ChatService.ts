@@ -35,6 +35,28 @@ export abstract class ChatService {
         { boolean: true }
       ])
     })
+    Events.addListener('PlayerChat', (info): void => {
+      const input: string = info.text?.trim()
+      const [alias, ...params] = input.split(' ').filter(a => a !== '')
+      const aliasUsed: string | undefined = alias?.toLowerCase()
+      const matches = this._commandList.filter(command => {
+        const prefix: string = command.privilege === 0 ? '/' : '//'
+        return command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))
+      })
+      if (matches.length === 1) {
+        void this.commandCallback(matches[0], info, input, params, aliasUsed)
+      } else if (matches.length > 1) {
+        for (const e of matches) {
+          if (params.length === 0 && (e.params === undefined || e.params.length === 0)) {
+            this.commandCallback(e, info, input, params, aliasUsed)
+            return
+          } else if (params.length === e.params?.length) {
+            this.commandCallback(e, info, input, params, aliasUsed)
+            return
+          }
+        }
+      }
+    })
   }
 
   /**
@@ -44,22 +66,15 @@ export abstract class ChatService {
   static addCommand(...commands: tm.Command[]): void {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
-    for (const command of commands) {
-      Events.addListener('PlayerChat', (info): void => void this.commandCallback(command, info))
-    }
   }
 
-  private static async commandCallback(command: tm.Command, info: tm.MessageInfo): Promise<void> {
-    const prefix: string = command.privilege === 0 ? '/' : '//'
-    const input: string = info.text?.trim()
-    const [alias, ...params] = input.split(' ').filter(a => a !== '')
-    const aliasUsed: string | undefined = alias?.toLowerCase()
-    if (!command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))) { return }
+  private static async commandCallback(command: tm.Command, info: tm.MessageInfo,
+    input: string, params: string[], alias: string): Promise<void> {
     if (info.privilege < command.privilege) {
       this.sendErrorMessage(messages.noPermission, info.login)
       return
     }
-    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${aliasUsed}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
     const parsedParams: (string | number | boolean | undefined | tm.Player | tm.OfflinePlayer)[] = []
     if (command.params !== undefined) {
       for (const [i, param] of command.params.entries()) {
@@ -189,7 +204,7 @@ export abstract class ChatService {
     const messageInfo: tm.MessageInfo & { aliasUsed: string } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
-      aliasUsed: aliasUsed.slice(1)
+      aliasUsed: alias.slice(1)
     }
     command.callback(messageInfo, ...parsedParams)
   }
