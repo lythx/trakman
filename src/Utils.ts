@@ -179,6 +179,24 @@ export const Utils = {
     return { region: r, country, countryCode }
   },
 
+  /**
+   * Converts Trakman environment type to Nadeo environment type
+   * @param environment Environment of type tm.Environment
+   * @returns Whatever on earth Nadeo wanted to call their environment
+   */
+  environmentToNadeoEnvironment(environment: tm.Environment): Omit<tm.Environment, 'Desert' | 'Snow'> | 'Speed' | 'Alpine' {
+    const environmentMap: { [environment in tm.Environment]: string } = {
+      Stadium: 'Stadium',
+      Island: 'Island',
+      Desert: 'Speed',
+      Rally: 'Rally',
+      Bay: 'Bay',
+      Coast: 'Coast',
+      Snow: 'Alpine'
+    }
+    return environmentMap[environment]
+  },
+
   matchString,
 
   /**
@@ -422,7 +440,7 @@ export const Utils = {
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
- 
+
   // TODO DOC
   stringifyCommandParams(commandParams: tm.Command['params']): string {
     let text: string = ''

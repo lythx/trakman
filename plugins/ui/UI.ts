@@ -33,18 +33,23 @@ import flagIcons from './config/FlagIcons.js'
 import utilIds from './config/UtilIds.js'
 
 let customUi: CustomUi
+
+let currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
+
 const loadMod = (): void => {
-  const mods: {
-    struct: {
-      Env: { string: string },
-      Url: { string: string }
-    }
-  }[] = modConfig.map(a => ({
-    struct: {
-      Env: { string: a.environment },
-      Url: { string: a.modUrl }
-    }
-  }))
+  let mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
+  for (const obj of modConfig) {
+    mods.push({
+      struct: {
+        Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
+        Url: {
+          string: obj.randomOrder
+            ? obj.modLinks[~~(Math.random() * obj.modLinks.length)]
+            : obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length]
+        }
+      }
+    })
+  }
   tm.client.callNoRes('SetForcedMods',
     [{
       boolean: true
@@ -71,7 +76,7 @@ StaticComponent.onComponentCreated((component) => staticComponents.push(componen
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
 // Static UI needs to update on the next map if the gamemode changes
 let staticUpdateNeeded = false
-tm.client.addProxy(['SetGameMode'], () => { 
+tm.client.addProxy(['SetGameMode'], () => {
   staticUpdateNeeded = true
 })
 const events: tm.Listener[] = [
@@ -94,7 +99,7 @@ const events: tm.Listener[] = [
   },
   {
     event: 'BeginMap',
-    callback: async () => {
+    callback: async (): Promise<void> => {
       loadMod()
       if (staticUpdateNeeded) {
         staticUpdateNeeded = false
@@ -103,8 +108,15 @@ const events: tm.Listener[] = [
     }
   },
   {
+    event: 'EndMap',
+    callback: async (): Promise<void> => {
+      currentModIndex[tm.maps.current.environment]++
+      loadMod()
+    }
+  },
+  {
     event: 'PlayerJoin',
-    callback: (info: tm.JoinInfo) => {
+    callback: (info: tm.JoinInfo): void => {
       preloadIcons(info.login)
     }
   }

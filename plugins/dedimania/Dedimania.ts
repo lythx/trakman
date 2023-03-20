@@ -19,15 +19,6 @@ const recordModeEnum: { [mode in DediLeaderboard]: number } = {
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
-const environmentMap: { [environment in tm.Environment]: string } = { // For Dedimania Snow is Alpine and Desert is Speed
-  Stadium: 'Stadium',
-  Island: 'Island',
-  Desert: 'Speed',
-  Rally: 'Rally',
-  Bay: 'Bay',
-  Coast: 'Coast',
-  Snow: 'Alpine'
-}
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -70,7 +61,7 @@ const initialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
@@ -94,7 +85,7 @@ const reinitialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
@@ -369,12 +360,12 @@ if (config.isEnabled === true) {
     if (uploadLaps && tm.getGameMode() !== 'Laps') {
       tm.sendMessage(config.modifiedLapsMessage)
     }
-    void getRecords(info.id, info.name, environmentMap[info.environment], info.author)
+    void getRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
     let cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
-    void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, cpAmount)
+    void sendRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author, cpAmount)
   })
 
   tm.addListener('PlayerJoin', (info): void => {
