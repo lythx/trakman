@@ -4,37 +4,40 @@ export default
   [
     {
       environment: 'Stadium',
-      modLinks: [''],
+      modLinks: [
+        'https://cdn.discordapp.com/attachments/599381118633902080/1001923942249934990/TrakmanDefaultNoGanyu.zip',
+        'https://cdn.discordapp.com/attachments/599381118633902080/979148807998697512/TrakmanDefault.zip'
+      ],
       randomOrder: true,
     },
     {
       environment: 'Desert',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
     {
       environment: 'Snow',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
     {
       environment: 'Bay',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
     {
       environment: 'Coast',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
     {
       environment: 'Island',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
     {
       environment: 'Rally',
-      modLinks: [''],
+      modLinks: [],
       randomOrder: true,
     },
   ]

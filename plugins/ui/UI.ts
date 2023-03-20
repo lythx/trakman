@@ -39,6 +39,7 @@ let currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast':
 const loadMod = (): void => {
   let mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
   for (const obj of modConfig) {
+    if (obj.modLinks.length === 0) { continue }
     mods.push({
       struct: {
         Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
