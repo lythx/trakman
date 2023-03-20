@@ -49,15 +49,11 @@ export class GameService {
   }
 
   static async initialize(): Promise<void> {
-    Client.callNoRes(`SetCallVoteRatios`,
-      [{
-        array: [{
-          struct: {
-            Command: { string: `*` },
-            Ratio: { double: -1 }
-          }
-        }]
-      }]
+    Client.callNoRes(`system.multicall`,
+      [
+        { method: `SetCallVoteRatios`, params: [{ array: [{ struct: { Command: { string: `*` }, Ratio: { double: -1 } } }] }] },
+        { method: `SetVehicleNetQuality`, params: [{ int: 1 }] }
+      ]
     )
     Client.addProxy(this.proxyMethods, async (method: string, params: tm.CallParams[]): Promise<void> => {
       Logger.info(`Game info changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
