@@ -44,8 +44,8 @@ const loadMod = (): void => {
         Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
         Url: {
           string: obj.randomOrder
-            ? obj.modLinks[~~(Math.random() * obj.modLinks.length)]
-            : obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length]
+            ? obj.modLinks[~~(Math.random() * obj.modLinks.length)].replace(/^https:\/\//, '')
+            : obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length].replace(/^https:\/\//, '')
         }
       }
     })
@@ -100,7 +100,6 @@ const events: tm.Listener[] = [
   {
     event: 'BeginMap',
     callback: async (): Promise<void> => {
-      loadMod()
       if (staticUpdateNeeded) {
         staticUpdateNeeded = false
         for (const e of staticComponents) { e.updatePosition() }
