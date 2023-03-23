@@ -15,6 +15,9 @@ export interface ServerInfo {
   name: string
   lastUpdate: number
   playerCount: number
+  maxPlayerCount: number
+  currentMap: string
+  currentMapAuthor: string
   gameMode: tm.GameMode
   environment: tm.Environment
   minLadderLimit: number
@@ -47,7 +50,10 @@ async function updateDataFile() {
     gameMode: tm.getGameMode(),
     environment: tm.maps.current.environment,
     minLadderLimit: res.LadderServerLimitMin,
-    maxLadderLimit: res.LadderServerLimitMax
+    maxLadderLimit: res.LadderServerLimitMax,
+    maxPlayerCount: tm.config.server.currentMaxPlayers,
+    currentMap: tm.maps.current.name,
+    currentMapAuthor: tm.maps.current.author
   }
   try {
     await fs.writeFile(config.dataFilePath, JSON.stringify(data))
@@ -76,26 +82,7 @@ async function refreshOtherServersData() {
       }
     }
   }
-  ui.update([{
-    login: 'login',
-    name: 'name',
-    playerCount: 11,
-    lastUpdate: 20,
-    environment: 'Stadium',
-    minLadderLimit: 0,
-    maxLadderLimit: 60000,
-    gameMode: 'TimeAttack'
-  },
-  {
-    login: 'login',
-    name: 'name',
-    playerCount: 11,
-    lastUpdate: 20,
-    environment: 'Stadium',
-    minLadderLimit: 0,
-    maxLadderLimit: 60000,
-    gameMode: 'TimeAttack'
-  }])
+  ui.update(serverInfos)
 }
 
 function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInfo | undefined {
@@ -109,7 +96,10 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     gameMode: info.gameMode ?? 'TimeAttack',
     environment: info.environment ?? 'Stadium',
     minLadderLimit: info.minLadderLimit ?? 0,
-    maxLadderLimit: info.maxLadderLimit ?? 0
+    maxLadderLimit: info.maxLadderLimit ?? 0,
+    maxPlayerCount: info.maxPlayerCount ?? 0,
+    currentMap: info.currentMap ?? '--', // TODO CONFIG
+    currentMapAuthor: info.currentMapAuthor ?? '--'
   }
 
 }
