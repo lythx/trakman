@@ -3,8 +3,8 @@ import { raceConfig as cfg, icons } from '../../ui/UI.js'
 export default {
   height: 33,
   width: cfg.width,
-  title: "Server Neighbourhood",
-  icon: icons.chartLocal,
+  title: "Linked Servers",
+  icon: icons.infoList,
   margin: cfg.margin,
   entries: 5,
   icons: {
@@ -12,8 +12,18 @@ export default {
     map: icons.ongoingMap,
     author: icons.personBuilder,
     playerCount: icons.person,
-    environment: icons.carExplode,
-    gameMode: icons.placeholder
+    nextPage: icons.pageRight,
+    prevPage: icons.pageLeft,
+    nextPageHover: icons.pageRightHover,
+    prevPageHover: icons.pageLeftHover,
+    gameMode: {
+      TimeAttack: icons.clockFire,
+      Rounds: icons.roundsMode,
+      Cup: icons.trophyClassic,
+      Teams: icons.teamsMode,
+      Laps: icons.lapsMode,
+      Stunts: icons.stuntsMode
+    }
   },
   iconBackground: "000a",
   textBackground: cfg.background,

@@ -29,11 +29,13 @@ const serverInfos: ServerInfo[] = []
 let ui: UiComponent
 
 tm.addListener('Startup', () => {
+  ui = new UiComponent()
+  void updateDataFile()
+  void refreshOtherServersData()
   setInterval(() => {
     void updateDataFile()
     void refreshOtherServersData()
   }, config.refreshTimeout * 1000)
-  ui = new UiComponent()
 })
 
 async function updateDataFile() {
