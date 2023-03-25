@@ -28,15 +28,17 @@ const servers: Server[] = config.servers
 const serverInfos: ServerInfo[] = []
 let ui: UiComponent
 
-tm.addListener('Startup', () => {
-  ui = new UiComponent()
-  void updateDataFile()
-  void refreshOtherServersData()
-  setInterval(() => {
+if (config.isEnabled === true) {
+  tm.addListener('Startup', () => {
+    ui = new UiComponent()
     void updateDataFile()
     void refreshOtherServersData()
-  }, config.refreshTimeout * 1000)
-})
+    setInterval(() => {
+      void updateDataFile()
+      void refreshOtherServersData()
+    }, config.refreshTimeout * 1000)
+  })
+}
 
 async function updateDataFile() {
   const res: { LadderServerLimitMin: number, LadderServerLimitMax: number } | Error =
