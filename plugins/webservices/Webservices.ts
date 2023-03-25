@@ -4,6 +4,15 @@ import http from 'http'
 const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
 const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD
 
+type FetchReturnType = {
+  id: number
+  login: string
+  nickname: string
+  united: boolean
+  path: string
+  idZone: number
+} | Error
+
 export interface WebservicesInfo {
   id: number,
   login: string,
@@ -30,14 +39,7 @@ const emitNextAuthorFetch = () => {
   for (const e of nextAuthorListeners) { e(nextAuthor) }
 }
 
-const fetchWebservices = async (login: string): Promise<{
-  id: number
-  login: string
-  nickname: string
-  united: boolean
-  path: string
-  idZone: number
-} | Error> => {
+const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   if (config.isEnabled === false) {
     return new Error('Use webservices is set to false')
   }
@@ -49,7 +51,7 @@ const fetchWebservices = async (login: string): Promise<{
       'Authorization': au,
     }
   }
-  return new Promise((resolve): void => {
+  return new Promise<FetchReturnType>((resolve): void => {
     http.request(options, (res): void => {
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
@@ -59,6 +61,9 @@ const fetchWebservices = async (login: string): Promise<{
       }
       res.on('end', (): void => resolve(new Error(data)))
     }).end()
+  }).catch(err => {
+    tm.log.debug(`Webserivces http request error: ${err.message} ${err}`) // TODO CHANGE TO WARN IF WORKS
+    return new Error() // TODO WRITE ERROR STR HERE
   })
 }
 

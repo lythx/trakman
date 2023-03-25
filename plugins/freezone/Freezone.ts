@@ -36,7 +36,7 @@ const sendLive = async (): Promise<true | Error> => {
       'Authorization': auth,
     }
   }
-  return new Promise((resolve): void => {
+  return new Promise<true | Error>((resolve): void => {
     const req: ClientRequest = http.request(options, (res): void => {
       if (res.statusCode === 200) {
         resolve(true)
@@ -49,6 +49,9 @@ const sendLive = async (): Promise<true | Error> => {
     })
     req.write(JSON.stringify(data))
     req.end()
+  }).catch(err => {
+    tm.log.debug(`Freezone http request error: ${err.message} ${err}`) // TODO CHANGE TO WARN IF WORKS
+    return new Error() // TODO WRITE ERROR STR HERE
   })
 }
 
