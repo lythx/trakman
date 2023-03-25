@@ -140,4 +140,9 @@ export default {
     flagFinish:"https://cdn.discordapp.com/attachments/793464821030322196/1080545346519838820/FlagFinish.png",
     trophySilver: "https://cdn.discordapp.com/attachments/793464821030322196/1080545347014762537/TrophySilver.png",
     trophyBronze: "https://cdn.discordapp.com/attachments/793464821030322196/1080545346788261928/TrophyBronze.png",
+    clockFire: "https://cdn.discordapp.com/attachments/793464821030322196/1089215233870016675/ClockFire.png",
+    lapsMode: "https://cdn.discordapp.com/attachments/793464821030322196/1089215233161179166/LapsMode.png",
+    teamsMode: "https://cdn.discordapp.com/attachments/793464821030322196/1089215233404436510/TeamsMode.png",
+    roundsMode: "https://cdn.discordapp.com/attachments/793464821030322196/1089215233664491602/RoundsMode.png",
+    stuntsMode: "https://cdn.discordapp.com/attachments/793464821030322196/1089215232955654234/StuntsMode.png"
 }
