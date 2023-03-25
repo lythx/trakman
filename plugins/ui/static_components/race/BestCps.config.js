@@ -22,5 +22,7 @@ export default {
   textScale: 0.87,
   textPadding: 0.2,
   upIcon: icons.pageLeft,
-  downIcon: icons.pageRight
+  downIcon: icons.pageRight,
+  upIconHover: icons.pageLeftHover,
+  downIconHover: icons.pageRightHover,
 }
