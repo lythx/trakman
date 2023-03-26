@@ -24,9 +24,9 @@ export default {
     alreadyRunning: `${p.error}A vote is already running.`,
     didntPass: `${p.vote}Vote to ${p.highlight}skip ${p.vote}the ongoing map ${p.highlight}did not pass${p.vote}.`,
     success: `${p.vote}Vote to ${p.highlight}skip ${p.vote}the ongoing map ${p.highlight}has passed${p.vote}.`,
-    forcePass: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has passed the vote to skip the ongoing map.`,
-    cancelled: `${p.admin} Vote to skip the ongoing map was cancelled.`,
-    cancelledBy: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has cancelled the vote to skip the ongoing map.`
+    forcePass: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has passed the vote to skip the ongoing map.`,
+    cancelled: `${p.vote} Vote to skip the ongoing map was cancelled.`,
+    cancelledBy: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has cancelled the vote to skip the ongoing map.`
   },
   voteReplay: {
     replayStr: `${p.highlight}replay${p.vote}`,
@@ -44,8 +44,8 @@ export default {
     alreadyRunning: `${p.error}A vote is already running.`,
     didntPass: `${p.vote}Vote to #{action} the ongoing map ${p.highlight}did not pass${p.vote}.`,
     success: `${p.vote}Vote to #{action} the ongoing map ${p.highlight}has passed${p.vote}.`,
-    forcePass: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has passed the vote to #{action} the ongoing map.`,
-    cancelled: `${p.admin} Vote to #{action} the ongoing map was cancelled.`,
-    cancelledBy: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has cancelled the vote to #{action} the ongoing map.`
+    forcePass: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has passed the vote to #{action} the ongoing map.`,
+    cancelled: `${p.vote} Vote to #{action} the ongoing map was cancelled.`,
+    cancelledBy: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has cancelled the vote to #{action} the ongoing map.`
   }
 } 
