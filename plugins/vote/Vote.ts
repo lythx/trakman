@@ -17,6 +17,7 @@ export class Vote {
   readonly noId: number = IDS.VoteWindow.voteNo
   /** Manialink action ID of yes vote */
   readonly goal: number
+  static readonly passCancelPrivilege: number = config.passCancelPrivilege
   private readonly votes: { login: string, vote: boolean }[] = []
   private static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
   private static endMapListener: () => void = () => undefined
@@ -51,7 +52,7 @@ export class Vote {
    */
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   /** Logins of players who can vote */
-  loginList: string[] = []
+  loginList: { login: string, privilege: number }[] = []
   private isActive: boolean = false
   private seconds: number
   private interrupted: { caller?: tm.Player, result: boolean } | undefined
@@ -127,7 +128,7 @@ export class Vote {
    * @param eligibleLogins List of logins of players that can vote
    * @returns False if there is another vote running, true if vote gets started successfully
    */
-  start(eligibleLogins: string[]): boolean {
+  start(eligibleLogins: { login: string, privilege: number }[]): boolean {
     if (Vote.isDisplayed === true) { return false }
     Vote.onEnd = this.onEnd
     Vote.onUpdate = this.onUpdate
@@ -137,7 +138,7 @@ export class Vote {
     Vote.pass = this.pass.bind(this)
     Vote.isDisplayed = true
     Vote.listener = (info: tm.ManialinkClickInfo): void => {
-      if (this.isActive === true && this.loginList.includes(info.login)) {
+      if (this.isActive === true && this.loginList.some(a => a.login === info.login)) {
         const vote = this.votes.find(a => a.login === info.login)
         if (vote === undefined) {
           if (info.actionId === this.yesId) { this.votes.push({ login: info.login, vote: true }) }

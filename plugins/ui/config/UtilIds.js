@@ -16,9 +16,11 @@ export default {
     VoteWindow: {
         window: 10,
         voteNo: 11,
-        voteYes: 12
+        voteYes: 12,
+        pass: 13,
+        cancel: 14
     },
-    F5: 13,
-    F6: 14,
-    F7: 15
+    F5: 15,
+    F6: 16,
+    F7: 17
 }
