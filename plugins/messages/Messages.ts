@@ -80,16 +80,23 @@ const events: tm.Listener[] = [
     event: 'EndMap',
     callback: async (info: tm.EndMapInfo): Promise<void> => {
       if (info.winnerLogin !== undefined && info.winnerWins !== undefined) {
-        tm.sendMessage(tm.utils.strVar(c.win, {
-          wins: tm.utils.getPositionString(info.winnerWins)
-        }), info.winnerLogin)
+        const player: tm.OfflinePlayer | undefined = tm.players.get(info.winnerLogin) ?? await tm.players.fetch(info.winnerLogin)
+        if (info.winnerWins % 50 === 0) {
+          tm.sendMessage(tm.utils.strVar(c.winPublic, {
+            nickname: tm.utils.strip(player?.nickname ?? '', true),
+            wins: tm.utils.getPositionString(info.winnerWins)
+          }), undefined)
+        } else {
+          tm.sendMessage(tm.utils.strVar(c.win, {
+            wins: tm.utils.getPositionString(info.winnerWins)
+          }), info.winnerLogin)
+        }
       }
       if (tm.jukebox.juked.length !== 0 && tm.jukebox.juked[0].callerLogin !== undefined) {
-        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin) ?? undefined
-        if (player === undefined) { return } // Not even possible
+        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin)
         tm.sendMessage(tm.utils.strVar(c.nextJuke, {
           map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
-          nickname: tm.utils.strip(player?.nickname, true)
+          nickname: tm.utils.strip(player?.nickname ?? '', true)
         }))
       }
     }

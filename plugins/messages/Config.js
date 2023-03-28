@@ -18,6 +18,8 @@ export default {
     + `#{country} ${p.servermsg}Visits${p.highlight}: #{visits}${p.servermsg}.`,
   win: `${p.record}You have won your `
     + `${p.rank}#{wins}${p.record} race.`,
+  winPublic: `${p.record}Congratulations to ${p.highlight}#{nickname} `
+    + `${p.record}for winning their ${p.rank}#{wins} ${p.record}race.`,
   leave: `${p.highlight}#{nickname}${p.servermsg} `
     + `has quit after ${p.highlight}#{time}${p.servermsg}.`,
   record: `${p.highlight}#{nickname}${p.record} has `
