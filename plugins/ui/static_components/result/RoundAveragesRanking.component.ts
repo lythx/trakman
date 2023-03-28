@@ -23,7 +23,7 @@ export default class RoundAveragesRanking extends StaticComponent {
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
       } else {
-        entry.average = ~~((entry.average + info.time) / entry.finishcount)
+        entry.average = ~~(((entry.average * entry.finishcount) + info.time) / entry.finishcount)
         entry.finishcount++
       }
       this.averages.sort((a, b): number => a.average - b.average)
