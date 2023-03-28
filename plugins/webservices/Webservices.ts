@@ -43,27 +43,28 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
   if (config.isEnabled === false) {
     return new Error('Use webservices is set to false')
   }
-  const au: string = "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64')
   const options = {
     host: `ws.trackmania.com`,
     path: `/tmf/players/${login}/`,
+    method: 'GET',
     headers: {
-      'Authorization': au,
+      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
     }
   }
-  return new Promise<FetchReturnType>((resolve): void => {
+
+  return new Promise<FetchReturnType>((resolve, reject): void => {
     http.request(options, (res): void => {
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
       if (res.statusCode === 200) {
-        res.on('end', (): void => resolve(JSON.parse(data)))
-        return
+        res.on('end', (): void => { resolve(JSON.parse(data)) })
       }
-      res.on('end', (): void => resolve(new Error(data)))
-    }).end()
-  }).catch(err => {
-    tm.log.debug(`Webserivces http request error: ${err.message} ${err}`) // TODO CHANGE TO WARN IF WORKS
-    return new Error() // TODO WRITE ERROR STR HERE
+    }).on('error', (): void => { reject(new Error(`Webservices HTTP request error.`)) })
+      .on('timeout', (): void => { reject(new Error(`Webservices HTTP request timeout.`)) })
+      .end()
+  }).catch((err): Error => {
+    tm.log.debug(`Webservices HTTP request error: ${JSON.stringify(err)}`)
+    return new Error()
   })
 }
 
