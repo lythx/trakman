@@ -1,7 +1,8 @@
 import config from './Config.js'
 import fs from 'fs/promises'
 import UiComponent from './ui/ServerLinks.component.js'
-// TODO HANDLE URLS
+import http from 'http'
+import fetch from 'node-fetch'
 
 export interface Server {
   name: string
@@ -26,6 +27,7 @@ export interface ServerInfo {
 
 const servers: Server[] = config.servers
 const serverInfos: ServerInfo[] = []
+let serverData: Omit<ServerInfo, 'name'>
 let ui: UiComponent
 
 if (config.isEnabled === true) {
@@ -33,6 +35,9 @@ if (config.isEnabled === true) {
     ui = new UiComponent()
     void updateDataFile()
     void refreshOtherServersData()
+    if (config.useHttpServer) {
+      startHttpServer()
+    }
     setInterval(() => {
       void updateDataFile()
       void refreshOtherServersData()
@@ -47,7 +52,7 @@ async function updateDataFile() {
     tm.log.error(`Error when getting server ladder limits`, res.message)
     return
   }
-  const data: Omit<ServerInfo, 'name'> = {
+  serverData = {
     login: tm.config.server.login,
     lastUpdate: Date.now(),
     playerCount: tm.players.count,
@@ -60,31 +65,42 @@ async function updateDataFile() {
     currentMapAuthor: tm.maps.current.author
   }
   try {
-    await fs.writeFile(config.dataFilePath, JSON.stringify(data))
+    await fs.writeFile(config.dataFilePath, JSON.stringify(serverData))
   } catch { }
 }
 
 async function refreshOtherServersData() {
   for (const e of servers) {
+    let file: string
     if (e.path !== undefined && e.path.length !== 0) {
-      const file: Buffer | Error = await fs.readFile(e.path).catch(err => err)
-      if (file instanceof Error) {
+      const rawFile = await fs.readFile(e.path).catch(err => err)
+      if (rawFile instanceof Error) {
         continue
       }
-      let newInfo: Partial<ServerInfo>
-      try {
-        newInfo = JSON.parse(file.toString())
-      } catch (err) {
+      file = rawFile.toString()
+    } else if (e.url !== undefined && e.url.length !== 0) {
+      const res = await fetch(e.url).catch((err: Error) => err)
+      if (res instanceof Error) {
         continue
       }
-      const infoObj = constructInfoObject(newInfo, e.name)
-      const index = serverInfos.findIndex(a => a.login === e.login)
-      if (infoObj !== undefined) {
-        serverInfos[index] = infoObj
-      } else {
-        serverInfos.splice(index, 1)
-      }
+      file = await res.text()
+    } else {
+      continue
     }
+    let newInfo: Partial<ServerInfo>
+    try {
+      newInfo = JSON.parse(file)
+    } catch (err) {
+      continue
+    }
+    const infoObj = constructInfoObject(newInfo, e.name)
+    const index = serverInfos.findIndex(a => a.login === e.login)
+    if (infoObj !== undefined) {
+      serverInfos[index] = infoObj
+    } else {
+      serverInfos.splice(index, 1)
+    }
+
   }
   ui.update(serverInfos)
 }
@@ -105,6 +121,20 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     currentMap: info.currentMap ?? '--', // TODO CONFIG
     currentMapAuthor: info.currentMapAuthor ?? '--'
   }
+
+}
+
+function startHttpServer() {
+
+  const server = http.createServer((req, res) => {
+    res.statusCode = 200;
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(JSON.stringify(serverData));
+  });
+
+  server.listen(config.httpPort, config.httpAddress, () => {
+    tm.log.info(`Server links server running at http://${config.httpAddress}:${config.httpPort}`);
+  });
 
 }
 
