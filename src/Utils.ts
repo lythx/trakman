@@ -462,6 +462,11 @@ export const Utils = {
     return text
   },
 
+  // TODO DOCUMENT AND USE https://docs.google.com/spreadsheets/d/1B_WUKayLJAMCklKaGrrjQZve1JJyFQ7h6SrbO0qdqkQ/pubhtml
+  getCoppersAfterTax(coppers: number) {
+    return Math.round(coppers * 1.05) + 2 - coppers
+  },
+
   strVar,
 
   /**
