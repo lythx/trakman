@@ -1,6 +1,7 @@
 import config from './Config.js'
 import songList from './SongList.js'
 import { Song, SongAddedCallback, SongRemovedCallback, QueueChangedCallback, Caller } from './Types.js'
+import SongList from './ui/SongList.component.js'
 import fs from 'fs/promises'
 
 let songs: Omit<Song, 'isJuked' | 'caller'>[] = songList
@@ -10,6 +11,7 @@ const songRemoveCallbacks: SongRemovedCallback[] = []
 const queue: Song[] = []
 const history: Song[] = []
 let current: Song | undefined
+let listUi: SongList
 
 export const music = {
 
@@ -48,6 +50,7 @@ export const music = {
       return false
     }
     const song = queue.splice(index, 1)[0]
+    listUi.updateSongs(queue)
     emitEvent(songRemoveCallbacks, song, caller)
     emitEvent(queueChangeCallbacks, queue, {
       song, action: 'removed'
@@ -72,6 +75,7 @@ export const music = {
     }
     const song = queue.splice(index, 1)[0]
     queue.push(song)
+    listUi.updateSongs(queue)
     emitEvent(queueChangeCallbacks, queue, {
       song, action: 'removedFromQueue'
     })
@@ -90,7 +94,9 @@ export const music = {
 
 if (config.isEnabled) {
   tm.addListener('Startup', () => {
+    listUi = new SongList()
     queue.push(...songs.map(a => ({ ...a, isJuked: false })))
+    listUi.updateSongs(queue)
     emitEvent(queueChangeCallbacks, queue)
   })
 
@@ -106,6 +112,7 @@ if (config.isEnabled) {
     }
     current = queue[0]
     queue.shift()
+    listUi.updateSongs(queue)
     tm.client.callNoRes('SetForcedMusic', [
       { boolean: config.overrideMapMusic },
       { string: current.url }
@@ -114,8 +121,6 @@ if (config.isEnabled) {
   }, true)
 
   const add = config.addCommand
-  const rm = config.removeCommand
-
   tm.commands.add({
     aliases: add.aliases,
     help: add.help,
@@ -127,6 +132,7 @@ if (config.isEnabled) {
     privilege: add.privilege
   })
 
+  const rm = config.removeCommand
   tm.commands.add({
     aliases: rm.aliases,
     help: rm.help,
@@ -137,6 +143,24 @@ if (config.isEnabled) {
     },
     privilege: rm.privilege
   })
+
+  const ol = config.openListCommand
+  tm.commands.add({
+    aliases: ol.aliases,
+    help: ol.help,
+    params: [{ name: 'query', type: 'multiword', optional: true }],
+    callback: (info, query?: string) => {
+      if (query === undefined || query.trim().length === 0) {
+        listUi.open(info)
+      } else if (query.startsWith('$a')) {
+        listUi.openWithQuery(info, query.slice(2), 'author')
+      } else {
+        listUi.openWithQuery(info, query)
+      }
+    },
+    privilege: 0
+  })
+
 }
 
 function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...params: Parameters<T[number]>) {
@@ -158,6 +182,7 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller) {
   song.caller = caller
   const newIndex = queue.findIndex(a => a.isJuked === false)
   queue.splice(newIndex, 0, song)
+  listUi.updateSongs(queue)
   if (caller !== undefined) {
     tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) queued song ${song.name} by ${song.author}`)
   } else {

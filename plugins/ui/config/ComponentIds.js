@@ -72,5 +72,6 @@ export default {
   roundsPointsRanking: 400000,
   lapRanking: 410000,
   serverLinks: 420000,
-  warnWindow: 430000
+  warnWindow: 430000,
+  songList: 440000
 }

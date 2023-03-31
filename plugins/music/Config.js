@@ -14,5 +14,9 @@ export default {
     help: 'Remove a song.',
     privilege: 1,
     public: true
+  },
+  openListCommand: {
+    aliases: ['songs', 'songlist'],
+    help: 'Open song list.'
   }
 }
