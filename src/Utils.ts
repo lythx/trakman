@@ -441,7 +441,11 @@ export const Utils = {
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
 
-  // TODO DOC
+  /**
+   * Creates string representation of chat command parameters.
+   * @param commandParams Chat command paramaters
+   * @returns Stringified parameters
+   */
   stringifyCommandParams(commandParams: tm.Command['params']): string {
     let text: string = ''
     let hasOptionals: boolean = false
@@ -462,8 +466,13 @@ export const Utils = {
     return text
   },
 
-  // TODO DOCUMENT AND USE https://docs.google.com/spreadsheets/d/1B_WUKayLJAMCklKaGrrjQZve1JJyFQ7h6SrbO0qdqkQ/pubhtml
-  getCoppersAfterTax(coppers: number) {
+  /**
+   * Calculates nadeo tax for given coppers amount and subtracts it from the amount.
+   * Nadeo tax formula: https://docs.google.com/spreadsheets/d/1B_WUKayLJAMCklKaGrrjQZve1JJyFQ7h6SrbO0qdqkQ/pubhtml
+   * @param coppers Coppers amount
+   * @returns Coppers amount after subtracting tax
+   */
+  getCoppersAfterTax(coppers: number): number {
     return Math.round(coppers * 1.05) + 2 - coppers
   },
 

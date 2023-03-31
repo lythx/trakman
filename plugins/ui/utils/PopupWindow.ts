@@ -58,12 +58,12 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param headerIcon Header image url
    * @param title Header title
    * @param navbar Array of objects containing navbar entry name, action ID and optional privilege
-   * @param windowHeight Window height
    * @param windowWidth Window width
+   * @param windowHeight Window height
    */
   constructor(windowId: number, headerIcon: string, title: string,
     navbar: { name: string, actionId: number, privilege?: number }[] = [],
-    windowWidth: number = config.windowWidth, windowHeight: number = config.windowHeight) { // TODO UPDATE DOC
+    windowWidth: number = config.windowWidth, windowHeight: number = config.windowHeight) {
     super(componentIds.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
@@ -195,6 +195,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param topRightText Text displayed in right part of the header
    * @param privilege Player privilege
    * @param title If set given title is displayed instead of the title passed in constructor
+   * @param icon If set given icon is displayed instead of the icon passed in constructor
    */
   async displayToPlayer(login: string, params?: DisplayParams, topRightText?: string, privilege?: number,
     title?: string, icon?: string): Promise<void> {

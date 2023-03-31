@@ -20,7 +20,7 @@ export class ServerConfig {
     'SetServerOptions'
   ]
 
-  static async initialize(): Promise<void> { // TODO MAKE EVENT ON CHANGE
+  static async initialize(): Promise<void> {
     await this.update()
     Client.addProxy(this.proxyMethods, async (method: string, params: tm.CallParams[]): Promise<void> => {
       Logger.info(`Server config changed. Dedicated server method used: ${method}, params: `, JSON.stringify(params))
