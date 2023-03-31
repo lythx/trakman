@@ -64,23 +64,7 @@ export const music = {
     return addToQueue(songName, true, caller)
   },
 
-  removeSongFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not queued' {
-    if (!queue.filter(a => a.isJuked === true).some(a => a.name === name)) { return 'not queued' }
-    const index: number = queue.findIndex(a => a.name === name)
-    if (caller !== undefined) {
-      tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) removed song ` +
-        `${tm.utils.strip(queue[index].name)} by ${queue[index].author} from the queue`)
-    } else {
-      tm.log.trace(`Song ${tm.utils.strip(queue[index].name)} by ${queue[index].author} has been removed from the queue`)
-    }
-    const song = queue.splice(index, 1)[0]
-    queue.push(song)
-    listUi.updateSongs(queue)
-    emitEvent(queueChangeCallbacks, queue, {
-      song, action: 'removedFromQueue'
-    })
-    return song
-  },
+  removeSongFromQueue: removeFromQueue,
 
   async fetchCurrentServerMusic() {
     tm.client.call('GetForcedMusic') // TODO
@@ -96,7 +80,17 @@ if (config.isEnabled) {
   tm.addListener('Startup', () => {
     listUi = new SongList()
     queue.push(...songs.map(a => ({ ...a, isJuked: false })))
+    const duplicatesExist = fixDuplicateNames()
+    if (duplicatesExist) {
+      tm.log.warn(`Song name duplicates present in SongList, to fix them edit SongList.js file or use ingame commands.`)
+    }
     listUi.updateSongs(queue)
+    listUi.onSongJuked = (song, info) => {
+      addToQueue(song.name, true, info)
+    }
+    listUi.onSongUnjuked = (song, info) => {
+      removeFromQueue(song.name, info)
+    }
     emitEvent(queueChangeCallbacks, queue)
   })
 
@@ -127,7 +121,7 @@ if (config.isEnabled) {
     params: [{ name: 'name' }, { name: 'author' }, { name: 'url' }],
     callback: (info, name: string, author: string, url: string) => {
       tm.sendMessage(`Added song ${name}`, add.public ? undefined : info.login)
-      console.log(music.addSong(name, author, url, info))
+      music.addSong(name, author, url, info)
     },
     privilege: add.privilege
   })
@@ -139,7 +133,7 @@ if (config.isEnabled) {
     params: [{ name: 'name' }],
     callback: (info, name: string) => {
       tm.sendMessage(`Removed song ${name}`, rm.public ? undefined : info.login)
-      console.log(music.removeSong(name, info))
+      music.removeSong(name, info)
     },
     privilege: rm.privilege
   })
@@ -194,6 +188,45 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller) {
     })
   }
   return song
+}
+
+function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not queued' {
+  if (!queue.filter(a => a.isJuked === true).some(a => a.name === name)) { return 'not queued' }
+  const index: number = queue.findIndex(a => a.name === name)
+  if (caller !== undefined) {
+    tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) removed song ` +
+      `${tm.utils.strip(queue[index].name)} by ${queue[index].author} from the queue`)
+  } else {
+    tm.log.trace(`Song ${tm.utils.strip(queue[index].name)} by ${queue[index].author} has been removed from the queue`)
+  }
+  const song = queue.splice(index, 1)[0]
+  song.isJuked = false
+  song.caller = undefined
+  queue.push(song)
+  listUi.updateSongs(queue)
+  emitEvent(queueChangeCallbacks, queue, {
+    song, action: 'removedFromQueue'
+  })
+  return song
+}
+
+function fixDuplicateNames(): boolean {
+  let isChanged = false
+  for (let i = 0; i < queue.length; i++) {
+    const song = queue[i]
+    const prev = queue.slice(0, i)
+    let j = 1
+    if (prev.some(a => a.name === song.name)) {
+      isChanged = true
+      song.name = song.name + `(${j})`
+    }
+    while ((prev.some(a => a.name === song.name))) {
+      j++
+      const sliceIndex = song.name.lastIndexOf('(')
+      song.name = song.name.slice(0, sliceIndex) + `(${j})`
+    }
+  }
+  return isChanged
 }
 
 async function updateSongsConfigFile(action: 'add' | 'remove', song: Song): Promise<void> {
