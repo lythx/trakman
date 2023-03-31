@@ -5,7 +5,7 @@ import config from '../../config/Config.js'
 
 export class GameService {
 
-  private static _game: tm.Game
+  private static _config: tm.GameInfo
   private static readonly proxyMethods = [
     'SetGameMode',
     'SetChatTime',
@@ -60,7 +60,7 @@ export class GameService {
       await this.update()
     })
     await this.update()
-    if (this._game.timeAttackLimit === 0) {
+    if (this._config.timeAttackLimit === 0) {
       this._enableDynamicTimer()
     }
     await this.loadGamemodeConfig()
@@ -71,11 +71,11 @@ export class GameService {
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
     this._mapStartTimestamp = Date.now()
-    if ((this._game.timeAttackLimit !== 0 || this.gameMode === 'Teams')
+    if ((this._config.timeAttackLimit !== 0 || this.gameMode === 'Teams')
       && this.dynamicTimerEnabled) {
       this._disableDynamicTimer()
       stateChange = 'disabled'
-    } else if (this._game.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
+    } else if (this._config.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
       this._enableDynamicTimer()
       stateChange = 'enabled'
     }
@@ -121,17 +121,17 @@ export class GameService {
       cupWinnersAmount: res.CupNbWinners,
       cupWarmUpDuration: res.CupWarmUpDuration
     }
-    if (this._game !== undefined && !this.isGameInfoChanged(obj)) { return }
-    this._game = obj
-    if (this._game.timeAttackLimit !== 0) {
-      this.timeAttackLimit = this._game.timeAttackLimit
+    if (this._config !== undefined && !this.isGameInfoChanged(obj)) { return }
+    this._config = obj
+    if (this._config.timeAttackLimit !== 0) {
+      this.timeAttackLimit = this._config.timeAttackLimit
     }
-    Events.emit('GameConfigChanged', this._game)
+    Events.emit('GameConfigChanged', this._config)
   }
 
   private static isGameInfoChanged(obj: any): boolean {
-    for (const key in this._game) {
-      if (obj[key] !== this._game[key as keyof typeof this._game]) {
+    for (const key in this._config) {
+      if (obj[key] !== this._config[key as keyof typeof this._config]) {
         return true
       }
     }
@@ -144,8 +144,8 @@ export class GameService {
     Events.emit('ServerStateChanged', state)
   }
 
-  static get config(): tm.Game {
-    return this._game
+  static get config(): tm.GameInfo {
+    return this._config
   }
 
   /**
@@ -278,7 +278,7 @@ export class GameService {
    * Result time limit in the current round in milliseconds.
    */
   static get resultTimeLimit(): number {
-    return this._game.resultTime
+    return this._config.resultTime
   }
 
   /**
@@ -313,7 +313,7 @@ export class GameService {
    * Current server gamemode. ('Rounds', 'TimeAttack', 'Teams', 'Laps', 'Stunts', 'Cup')
    */
   static get gameMode(): tm.GameMode {
-    return this.gameModeMap[this._game.gameMode]
+    return this.gameModeMap[this._config.gameMode]
   }
 
   private static _enableDynamicTimer(): void {

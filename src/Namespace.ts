@@ -581,7 +581,7 @@ declare global {
       readonly callback: ((params: any) => void)
     }
     /** Game information object */
-    export interface Game {
+    export interface GameInfo {
       /** Current server gamemode (Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)) */
       gameMode: number
       /** Amount of time (in msec) to be spent at scoretable */
@@ -776,7 +776,7 @@ declare global {
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "BeginRound": Readonly<FinishInfo>[]
       "EndRound": Readonly<FinishInfo>[]
-      "GameConfigChanged": Readonly<Game> // TODO RENAME
+      "GameConfigChanged": Readonly<GameInfo> // TODO RENAME
       "ServerConfigChanged": Readonly<ServerInfo>
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
