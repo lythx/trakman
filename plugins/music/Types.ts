@@ -1,6 +1,7 @@
 interface Caller {
   readonly login: string
   readonly nickname: string
+  readonly privilege: number
 }
 interface Song {
   name: string

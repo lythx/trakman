@@ -1,6 +1,7 @@
 
 
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
+import pluginConfig from '../Config.js'
 import { Song } from '../Types.js'
 import config from './SongList.config.js'
 
@@ -14,9 +15,12 @@ interface DisplayParams {
   }
 }
 
+// TODO PAGINATOR ON QUERY, CURRENT SONG
+
 export default class SongList extends PopupWindow<DisplayParams> {
 
   private songs: (Song & { index: number })[] = []
+  private previousSongs: Song[] = []
   readonly grid: Grid
   readonly paginator: Paginator
   readonly addActionIdOffset = 100
@@ -46,8 +50,13 @@ export default class SongList extends PopupWindow<DisplayParams> {
   open = this.onOpen.bind(this)
 
   updateSongs(songs: Song[]) {
-    this.songs = [...songs].map((a, i) => ({ ...a, index: i })).sort((a, b) => a.name > b.name ? 1 : -1)
+    this.songs = [...songs].map((a, i) => ({ ...a, index: i + 1 })).sort((a, b) => a.name > b.name ? 1 : -1)
     this.paginator.setPageCount(Math.ceil(songs.length / (config.entries - 1)))
+    this.reRender()
+  }
+
+  updatePreviousSongs(previousSongs: Song[]) {
+    this.previousSongs = [...previousSongs]
     this.reRender()
   }
 
@@ -121,8 +130,16 @@ export default class SongList extends PopupWindow<DisplayParams> {
         icon = config.removeIcon
         iconHover = config.removeIconHover
       }
-      return `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
-      imagefocus="${iconHover}" halign="center" valign="center" action="${actionId}" /> `
+      let action = `action="${actionId}"`
+      let cover = ''
+      if (privilege < pluginConfig.forceQueuePrivilege && this.previousSongs.some(a => a.name === song.name)) {
+        action = ''
+        cover = `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" 
+        bgcolor="${config.overlayColour}" halign="center" valign="center" />`
+      }
+      return `${cover}
+      <quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
+      imagefocus="${iconHover}" halign="center" valign="center" ${action} /> `
     }
     const rows = Math.min(config.entries - 1, list.length - (index + 1))
     const arr = headers

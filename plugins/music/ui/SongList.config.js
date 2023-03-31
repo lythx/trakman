@@ -9,6 +9,7 @@ export default {
   addIconHover: icons.cash,
   removeIcon: icons.F5,
   removeIconHover: icons.F6,
+  overlayColour: '7777',
   entries: 15,
   defaultText: '--',
   columnProportions: [

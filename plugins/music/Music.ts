@@ -13,6 +13,8 @@ const history: Song[] = []
 let current: Song | undefined
 let listUi: SongList
 
+// TODO MESSAGES, SHUFFLE, DUPLICATE REMOVAL (removes all for now)
+
 export const music = {
 
   onQueueChanged(callback: QueueChangedCallback) {
@@ -60,7 +62,7 @@ export const music = {
   },
 
   addSongToQueue(songName: string, caller?: Caller):
-    Readonly<Song> | 'already queued' | 'not in songlist' {
+    Readonly<Song> | 'already queued' | 'not in songlist' | 'no privilege' {
     return addToQueue(songName, true, caller)
   },
 
@@ -94,11 +96,12 @@ if (config.isEnabled) {
     emitEvent(queueChangeCallbacks, queue)
   })
 
-  tm.addListener('EndMap', () => {
+  tm.addListener('BeginMap', () => {
     if (current !== undefined) {
       current.isJuked = false
       current.caller = undefined
       history.unshift(current)
+      history.length = Math.min(config.historySize, history.length)
       // If song gets juked again when played prevent it from being added twice
       if (!queue.some(a => a.name === current?.name)) {
         queue.push(current)
@@ -107,9 +110,10 @@ if (config.isEnabled) {
     current = queue[0]
     queue.shift()
     listUi.updateSongs(queue)
+    listUi.updatePreviousSongs(history)
     tm.client.callNoRes('SetForcedMusic', [
       { boolean: config.overrideMapMusic },
-      { string: current.url }
+      { string: queue[0]?.url } // TODO TEST
     ])
     emitEvent(queueChangeCallbacks, queue)
   }, true)
@@ -163,13 +167,19 @@ function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...pa
   }
 }
 
-function addToQueue(songName: string, emitEvents: boolean, caller?: Caller) {
+function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
+  Song | "already queued" | "not in songlist" | "no privilege" {
   const songIndex = queue.findIndex(a => a.name === songName)
   if (songIndex === -1) {
     return 'not in songlist'
   }
   if (queue[songIndex].isJuked) {
     return 'already queued'
+  }
+  if (caller !== undefined && caller.privilege < config.forceQueuePrivilege) {
+    if (queue.some(a => a.caller?.login === caller.login) || history.some(a => a.name === songName)) {
+      return 'no privilege'
+    }
   }
   const song = queue.splice(songIndex, 1)[0]
   song.isJuked = true
