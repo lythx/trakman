@@ -15,11 +15,11 @@ const returnCoppers = (login: string) => {
   if (prize === undefined) {
     throw new Error(`Prize undefined while returning coppers in betting plugin`)
   }
-  void tm.utils.payCoppers(login, prize * 0.75, tm.utils.strVar(config.copperReturnMessage,
+  void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(prize), tm.utils.strVar(config.copperReturnMessage,
     {
       amount: prize,
       serverName: tm.utils.strip(tm.config.server.name, false)
-    })) // todo maybe implement a function to get more accurate nadeo tax return instead of putting 0.75
+    }))
 }
 
 const onTimeRunOut = (wasInterrupted: boolean = false) => {
@@ -127,7 +127,7 @@ if (config.isEnabled) {
       tm.sendMessage(config.messages.noWinner)
       return
     }
-    tm.utils.payCoppers(bestRecord.login, prize * betLogins.length * 0.75,
+    tm.utils.payCoppers(bestRecord.login, tm.utils.getCoppersAfterTax(prize * betLogins.length),
       tm.utils.strVar(config.winMessage,
         {
           amount: prize * betLogins.length,

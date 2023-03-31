@@ -51,7 +51,7 @@ export class PayReplay extends UiButton {
         let refundMessage = ''
         if (cost >= 100) { // Its not worth to return under 100 due to nadeo tax growing exponentially
           refundMessage = msg.refund
-          void tm.utils.payCoppers(login, cost * 0.7, msg.refundMail)
+          void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(cost), msg.refundMail)
         }
         tm.sendMessage(tm.utils.strVar(msg.interrupt, {
           event: this.isReplay ? msg.replayEvent : msg.skipEvent,
