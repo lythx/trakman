@@ -5,6 +5,7 @@ export default {
   overrideMapMusic: true,
   // If song is in history it can't be requeued without force queue privileges
   historySize: 3,
+  // Privilege required to queue recently queued songs, queue more than one song and shuffle songs
   forceQueuePrivilege: 1,
   addCommand: {
     aliases: ['addsong'],
@@ -15,6 +16,12 @@ export default {
   removeCommand: {
     aliases: ['removesong'],
     help: 'Remove a song.',
+    privilege: 1,
+    public: true
+  },
+  shuffleCommand: {
+    aliases: ['shufflesongs'],
+    help: 'Shuffle the songlist.',
     privilege: 1,
     public: true
   },

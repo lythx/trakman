@@ -8,12 +8,12 @@ let songs: Omit<Song, 'isJuked' | 'caller'>[] = songList
 const queueChangeCallbacks: QueueChangedCallback[] = []
 const songAddCallbacks: SongAddedCallback[] = []
 const songRemoveCallbacks: SongRemovedCallback[] = []
-const queue: Song[] = []
+let queue: Song[] = []
 const history: Song[] = []
 let current: Song | undefined
 let listUi: SongList
 
-// TODO MESSAGES, SHUFFLE, DUPLICATE REMOVAL (removes all for now)
+// TODO MESSAGES
 
 export const music = {
 
@@ -160,6 +160,16 @@ if (config.isEnabled) {
     privilege: 0
   })
 
+  const sh = config.shuffleCommand // TODO TEST
+  tm.commands.add({
+    aliases: sh.aliases,
+    help: sh.help,
+    callback: (info) => {
+      shuffleQueue(info)
+    },
+    privilege: sh.privilege
+  })
+
 }
 
 function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...params: Parameters<T[number]>) {
@@ -219,6 +229,20 @@ function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not q
     song, action: 'removedFromQueue'
   })
   return song
+}
+
+function shuffleQueue(caller?: Caller): boolean {
+  if (caller !== undefined && caller.privilege < config.forceQueuePrivilege) {
+    return false
+  }
+  queue = queue.map(a => ({ song: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.song)
+  emitEvent(queueChangeCallbacks, queue)
+  if (caller !== undefined) {
+    tm.log.info(`${tm.utils.strip(caller.nickname)} (${caller.login}) shuffled the song list`)
+  } else {
+    tm.log.info(`Song list shuffled`)
+  }
+  return true
 }
 
 function fixDuplicateNames(): boolean {
