@@ -81,11 +81,12 @@ export const music = {
 if (config.isEnabled) {
   tm.addListener('Startup', () => {
     listUi = new SongList()
-    queue.push(...songs.map(a => ({ ...a, isJuked: false })))
     const duplicatesExist = fixDuplicateNames()
     if (duplicatesExist) {
       tm.log.warn(`Song name duplicates present in SongList, to fix them edit SongList.js file or use ingame commands.`)
+      updateSongsConfigFile()
     }
+    queue.push(...songs.map(a => ({ ...a, isJuked: false })))
     listUi.updateSongs(queue)
     listUi.onSongJuked = (song, info) => {
       addToQueue(song.name, true, info)
@@ -222,9 +223,9 @@ function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not q
 
 function fixDuplicateNames(): boolean {
   let isChanged = false
-  for (let i = 0; i < queue.length; i++) {
-    const song = queue[i]
-    const prev = queue.slice(0, i)
+  for (let i = 0; i < songs.length; i++) {
+    const song = songs[i]
+    const prev = songs.slice(0, i)
     let j = 1
     if (prev.some(a => a.name === song.name)) {
       isChanged = true
@@ -239,10 +240,10 @@ function fixDuplicateNames(): boolean {
   return isChanged
 }
 
-async function updateSongsConfigFile(action: 'add' | 'remove', song: Song): Promise<void> {
-  if (action === 'add') {
+async function updateSongsConfigFile(action?: 'add' | 'remove', song?: Song): Promise<void> {
+  if (action === 'add' && song !== undefined) {
     songs.push({ name: song.name, author: song.author, url: song.url })
-  } else {
+  } else if (action === 'remove' && song !== undefined) {
     songs = songs.filter(a => a.name !== song.name)
   }
   try {
