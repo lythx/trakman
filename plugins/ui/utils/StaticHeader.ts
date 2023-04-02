@@ -80,7 +80,7 @@ export default class StaticHeader {
     for (const [k, v] of Object.entries(options)) {
       (cfg as any)[k] = v
     }
-    if (side === true) {
+    if (side) {
       let label: string = ''
       if (cfg.centerText) {
         label = centeredText(text, cfg.rectangleWidth, cfg.height,

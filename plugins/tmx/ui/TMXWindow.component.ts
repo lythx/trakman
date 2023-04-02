@@ -207,7 +207,7 @@ image="${image}" url="${url}" /> `
       lbRating = 'Nadeo'
       lbIcon = ic.leaderboardRating.nadeo
     }
-    else if (map.isClassic === true) {
+    else if (map.isClassic) {
       lbRating = 'Classic'
       lbIcon = ic.leaderboardRating.classic
     }

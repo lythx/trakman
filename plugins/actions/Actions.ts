@@ -11,7 +11,7 @@ export const actions = {
     tm.sendMessage(tm.utils.strVar(config.addVote.message, {
       nickname: tm.utils.strip(info.nickname),
       voteText: config.addVote.voteTexts[String(voteValue) as keyof typeof config.addVote.voteTexts]
-    }), config.addVote.public === true ? undefined : info.login)
+    }), config.addVote.public ? undefined : info.login)
   },
   kick: (info: CallerInfo, login: string, reason?: string): void => {
     if (info.privilege < config.kick.privilege) {

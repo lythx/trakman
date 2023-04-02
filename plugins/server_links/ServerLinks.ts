@@ -30,7 +30,7 @@ const serverInfos: ServerInfo[] = []
 let serverData: Omit<ServerInfo, 'name'>
 let ui: UiComponent
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
   tm.addListener('Startup', () => {
     ui = new UiComponent()
     void updateDataFile()

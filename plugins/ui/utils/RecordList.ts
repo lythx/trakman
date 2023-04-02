@@ -264,14 +264,14 @@ export default class RecordList {
     const diff: number = this.rows - this.topCount
     const ret: { index: number, record: RLRecord }[] = []
     for (const [i, e] of records.entries()) {
-      if (ret.length === this.rows || (this.noRecordEntry === true && playerRecord === undefined && ret.length === this.rows - 1)) { break }
+      if (ret.length === this.rows || (this.noRecordEntry && playerRecord === undefined && ret.length === this.rows - 1)) { break }
       else if (i < this.topCount ||
-        (this.noRecordEntry === true && playerRecord === undefined && i + diff > records.length)
+        (this.noRecordEntry && playerRecord === undefined && i + diff > records.length)
         || (playerRecord !== undefined && (i + diff / 2 >= playerRecordIndex || i + diff >= records.length))) {
         ret.push({ index: i, record: e })
       }
     }
-    if (this.noRecordEntry === true && playerRecord === undefined) {
+    if (this.noRecordEntry && playerRecord === undefined) {
       const player: tm.Player | undefined = tm.players.get(login)
       if (player !== undefined) {
         ret.push({ index: -1, record: { name: player.nickname, time: -1 } })
@@ -384,7 +384,7 @@ export default class RecordList {
 
   private getTimeColours(login: string, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
-    if (this.getColoursFromPb === true && playerIndex === -1) {
+    if (this.getColoursFromPb && playerIndex === -1) {
       const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
         for (let i: number = 0; i < records.length; i++) {
@@ -420,7 +420,7 @@ export default class RecordList {
     const h: number = this.rowHeight - this.rowGap
     const w: number = width - this.infoIconWidth
     let posX: number
-    if (this.side === true) {
+    if (this.side) {
       posX = -(width + (this.columnGap * 2) + (offset * (width + this.columnGap))) + this.columnGap
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? tm.utils.formatDate(a, true) : a

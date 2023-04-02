@@ -180,7 +180,7 @@ const commands: tm.Command[] = [
             adminName: info.nickname,
             coppers: amount,
             target: player?.nickname ?? login
-          }), config.pay.public === true ? undefined : info.login)
+          }), config.pay.public ? undefined : info.login)
         }
       }
     },

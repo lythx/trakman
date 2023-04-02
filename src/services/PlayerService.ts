@@ -172,7 +172,7 @@ export class PlayerService {
     }
     this._players.push(player)
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
+      Logger.info(`${player.isSpectator ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
         `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player

@@ -46,7 +46,7 @@ const updateRecordMode = () => {
 const initialize = async (): Promise<void> => {
   const status = await client.connect(config.host, config.port)
   if (status !== true) {
-    if (status.isAuthenticationError === true) {
+    if (status.isAuthenticationError) {
       tm.log.error('Failed to connect to dedimania', status.error.message)
       isFailedAuthentication = true
     } else {
@@ -73,7 +73,7 @@ const reinitialize = async (): Promise<void> => {
   do {
     await new Promise((resolve) => setTimeout(resolve, 60000))
     status = await client.connect(config.host, config.port)
-    if (status !== true && status.isAuthenticationError === true) {
+    if (status !== true && status.isAuthenticationError) {
       tm.log.error('Failed to connect to dedimania', status.error.message)
       return
     }
@@ -89,7 +89,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
-  if (isFailedAuthentication === true) { return }
+  if (isFailedAuthentication) { return }
   currentDedis.length = 0
   newDedis.length = 0
   if (!client.connected) {
@@ -101,7 +101,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     do {
       await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
       status = await client.connect('dedimania.net', config.port)
-      if (status !== true && status.isAuthenticationError === true) {
+      if (status !== true && status.isAuthenticationError) {
         tm.log.error('Failed to connect to dedimania', status.error.message)
         return
       }
@@ -152,7 +152,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
     isLapRecord: uploadLaps
   }))
-  if (config.syncName === true) {
+  if (config.syncName) {
     void tm.updatePlayerInfo(...currentDedis)
   }
   emitFetchEvent(currentDedis)
@@ -348,7 +348,7 @@ const getLogString = (previousPosition: number | undefined, position: number,
   return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
 
   tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Dedimania...')

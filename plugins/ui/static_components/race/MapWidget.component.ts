@@ -105,10 +105,10 @@ export default class MapWidget extends StaticComponent {
         return e.icon
       }
     }
-    if (map.isNadeo === true) {
+    if (map.isNadeo) {
       return config.icons.tags.nadeo
     }
-    if (map.isClassic === true) {
+    if (map.isClassic) {
       return config.icons.tags.classic
     }
     return config.icons.tags.normal

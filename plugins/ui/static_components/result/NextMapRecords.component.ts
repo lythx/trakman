@@ -21,7 +21,7 @@ export default class NextMapRecords extends StaticComponent {
       this.displayToPlayer(info.login)
     })
     tm.addListener('EndMap', async (info): Promise<void> => {
-      if (info.isRestart === true) {
+      if (info.isRestart) {
         this.records = tm.records.local
         this.display()
       } else {

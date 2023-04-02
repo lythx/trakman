@@ -129,7 +129,7 @@ export class Vote {
    * @returns False if there is another vote running, true if vote gets started successfully
    */
   start(eligibleLogins: { login: string, privilege: number }[]): boolean {
-    if (Vote.isDisplayed === true) { return false }
+    if (Vote.isDisplayed) { return false }
     Vote.onEnd = this.onEnd
     Vote.onUpdate = this.onUpdate
     Vote.onInterrupt = this.onInterrupt
@@ -138,7 +138,7 @@ export class Vote {
     Vote.pass = this.pass.bind(this)
     Vote.isDisplayed = true
     Vote.listener = (info: tm.ManialinkClickInfo): void => {
-      if (this.isActive === true && this.loginList.some(a => a.login === info.login)) {
+      if (this.isActive && this.loginList.some(a => a.login === info.login)) {
         const vote = this.votes.find(a => a.login === info.login)
         if (vote === undefined) {
           if (info.actionId === this.yesId) { this.votes.push({ login: info.login, vote: true }) }

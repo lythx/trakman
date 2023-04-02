@@ -130,7 +130,7 @@ tm.commands.add({
  * @returns True if successfull, false if player refuses payment, Error if dedicated server call fails
  */
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<boolean | Error> => {
-  if(amount < config.minimalAmount) { 
+  if (amount < config.minimalAmount) {
     tm.sendMessage(config.amountTooLow, payerLogin)
     return new Error(`Coppers amount too low`)
   }

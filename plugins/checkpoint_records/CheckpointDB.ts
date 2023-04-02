@@ -29,7 +29,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
 
 // Use client because queries happen quite often in this plugin
 const getQueryDBFunction = async (): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> => {
-  if (config.useDBClient === true && config.isEnabled === true) {
+  if (config.useDBClient && config.isEnabled) {
     return await tm.db.getClient()
   }
   return tm.db.query

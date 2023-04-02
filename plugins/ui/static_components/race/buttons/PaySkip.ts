@@ -38,8 +38,8 @@ export class PaySkip extends UiButton {
   }
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
-    if (this.isLastMapReplay === true || this.isReplay === true
-      || this.isSkip === true || tm.getState() === 'result') { return }
+    if (this.isLastMapReplay || this.isReplay
+      || this.isSkip || tm.getState() === 'result') { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail)
@@ -107,9 +107,9 @@ export class PaySkip extends UiButton {
   }
 
   private handleReplay(): void {
-    if (this.isReplay === true) { return }
+    if (this.isReplay) { return }
     this.isReplay = true
-    if (this.isSkip === true || this.isLastMapReplay === true) { return }
+    if (this.isSkip || this.isLastMapReplay) { return }
     this.buttonData.text1 = cfg.texts[2][0]
     this.buttonData.text2 = cfg.texts[2][1]
     this.buttonData.equalTexts = cfg.texts[2].equal
@@ -118,7 +118,7 @@ export class PaySkip extends UiButton {
   }
 
   private handleSkipNoCountdown(): void {
-    if (this.isSkip === true) { return }
+    if (this.isSkip) { return }
     this.isSkip = true
     this.buttonData.text1 = cfg.texts[3][0]
     this.buttonData.text2 = cfg.texts[3][1]
