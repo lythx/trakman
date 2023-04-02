@@ -311,10 +311,7 @@ export class PlayerService {
    * @returns Number of wins
    */
   static async addWin(login: string): Promise<number> {
-    let player: any = this.get(login)
-    if (player === undefined) {
-      player = await this.fetch(login)
-    }
+    const player: any = this.get(login) ?? await this.fetch(login)
     await this.repo.updateOnWin(login, ++player.wins)
     Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getPositionString(player.wins)} time.`)
     return player.wins

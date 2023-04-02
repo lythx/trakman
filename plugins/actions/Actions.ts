@@ -32,10 +32,7 @@ export const actions = {
       sendNoPrivilegeMessage()
       return
     }
-    let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
-    if (targetInfo === undefined) {
-      targetInfo = await tm.players.fetch(login)
-    }
+    const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     await tm.admin.mute(login, info, targetInfo?.nickname, reason, expireDate)
     const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
@@ -51,10 +48,7 @@ export const actions = {
       sendNoPrivilegeMessage()
       return
     }
-    let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
-    if (targetInfo === undefined) {
-      targetInfo = await tm.players.fetch(login)
-    }
+    const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.unmute(login, info)
     let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
@@ -160,10 +154,7 @@ export const actions = {
       sendNoPrivilegeMessage()
       return
     }
-    let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
-    if (targetInfo === undefined) {
-      targetInfo = await tm.players.fetch(login)
-    }
+    const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     const result = await tm.admin.addToBlacklist(login, info, targetInfo?.nickname, reason, expireDate)
     let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
@@ -200,10 +191,7 @@ export const actions = {
       sendNoPrivilegeMessage()
       return
     }
-    let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
-    if (targetInfo === undefined) {
-      targetInfo = await tm.players.fetch(login)
-    }
+    const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.addGuest(login, info, targetInfo?.nickname)
     let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
@@ -222,10 +210,7 @@ export const actions = {
       sendNoPrivilegeMessage()
       return
     }
-    let targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login)
-    if (targetInfo === undefined) {
-      targetInfo = await tm.players.fetch(login)
-    }
+    const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.removeGuest(login, info)
     let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
