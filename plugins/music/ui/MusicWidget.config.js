@@ -3,15 +3,15 @@ import { icons, raceConfig as cfg } from '../../ui/UI.js'
 export default {
   height: 7,
   title: 'Current Song',
-  icon: icons.placeholder,
+  icon: icons.music,
   margin: cfg.margin,
   width: cfg.width,
   background: cfg.background,
   noSongText: "N/A",
   iconBackground: "000a",
   icons: {
-    name: icons.placeholder,
-    author: icons.placeholder
+    name: icons.disk,
+    author: icons.personMusic
   },
   side: true,
   textBackground: cfg.background,

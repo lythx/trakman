@@ -3,13 +3,13 @@ const p = tm.utils.palette
 
 export default {
   title: " Song List ",
-  icon: icons.placeholder,
+  icon: icons.musicList,
   iconWidth: 2,
   iconHeight: 2,
-  addIcon: icons.placeholder,
-  addIconHover: icons.cash,
-  removeIcon: icons.F5,
-  removeIconHover: icons.F6,
+  addIcon: icons.musicAdd,
+  addIconHover: icons.musicAddHover,
+  removeIcon: icons.musicRemove,
+  removeIconHover: icons.musicRemoveHover,
   currentSongText: `$${p.green}Currently played`,
   overlayColour: '7777',
   entries: 15,

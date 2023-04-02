@@ -10,7 +10,7 @@ export default {
   textBackground: '666C',
   warn: {
     title: ' Warning ',
-    icon: icons.placeholder,
+    icon: icons.warn,
     chatMessage: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has warned ${p.highlight}#{name}${p.admin}.`,
     message: `$sWarning issued by: #{name}$z$s\n#{message}`,
     // TODO
@@ -22,7 +22,7 @@ export default {
   },
   wall: {
     title: ' Admin Message ',
-    icon: icons.placeholder,
+    icon: icons.exclamation,
     message: `$sMessage from: #{name}$z$s\n#{message}`,
     aliases: ['wall', 'adminmsg', 'mta'],
     help: 'Display a message to all players.',
