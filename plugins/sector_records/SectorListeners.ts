@@ -188,7 +188,7 @@ if (config.isEnabled === true) {
             title: info.title,
             nickname: tm.utils.strip(info.nickname, true),
             index: tm.utils.getPositionString(sectorIndex)
-          }), config.commands.deletesector.public === false ? info.login : undefined)
+          }), config.commands.deletesector.public ? undefined : info.login)
           if (deleted !== undefined) {
             emitEvent('DeleteBestSector', [{ ...deleted, index: sectorIndex }])
           }

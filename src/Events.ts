@@ -63,7 +63,7 @@ const removeListener = (callback: Function): void => {
  */
 const emit = <T extends keyof tm.Events>(event: T,
   params: tm.Events[T]): void => {
-  if (controllerReady === false) { return }
+  if (!controllerReady) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event)
   for (const listener of matchingEvents) {
     listener.callback(params)

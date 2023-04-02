@@ -71,7 +71,7 @@ export class PayReplay extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) { this.costIndex = 0 }
+    if (!this.isReplay) { this.costIndex = 0 }
     if (cfg.costs[this.costIndex] !== undefined) {
       this.buttonData = {
         icon: cfg.icon,

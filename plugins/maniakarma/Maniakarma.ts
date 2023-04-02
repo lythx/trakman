@@ -269,7 +269,7 @@ const fixCoherence = async (): Promise<void> => {
 
 const onBeginMap = async (isRestart: boolean): Promise<void> => {
   const newV = newVotes
-  if (isRestart === false) { // Reset the votes on before fetch
+  if (!isRestart) { // Reset the votes on before fetch
     playerVotes.length = 0
     newVotes.length = 0
     mapKarmaValue = 0
@@ -277,7 +277,7 @@ const onBeginMap = async (isRestart: boolean): Promise<void> => {
     emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
   }
   await sendVotes(newV)
-  if (isRestart === false) {
+  if (!isRestart) {
     await fetchVotes(...tm.players.list.map(a => a.login))
   }
   emitMapFetch(playerVotes, mapKarmaValue, mapKarma)
@@ -296,7 +296,7 @@ if (config.isEnabled === true) {
     tm.log.trace('Connecting to Maniakarma...')
     void initialize()
     setInterval((): void => {
-      if (isConnected === false) { void initialize() }
+      if (!isConnected) { void initialize() }
     }, config.reconnectTimeout * 1000)
   }, true)
   tm.addListener('PlayerJoin', (info): void => {

@@ -54,7 +54,7 @@ export default class CpCounter extends StaticComponent {
           cpIndex, index: info.lap, best: pb,
           current: info.lapCheckpointTime,
           isFinish: info.isLapFinish
-        } 
+        }
       }
       this.displayToPlayer(info.player.login, {
         index: info.index + 1,
@@ -88,7 +88,7 @@ export default class CpCounter extends StaticComponent {
             index: 0, best: pb,
             current: time - player.currentCheckpoints[startIndex].time,
             isFinish: true
-          } 
+          }
         }
       }
       this.displayToPlayer(login, {
@@ -104,7 +104,7 @@ export default class CpCounter extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
@@ -149,7 +149,7 @@ export default class CpCounter extends StaticComponent {
   }
 
   displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
     if (cpAmount === params?.index) {

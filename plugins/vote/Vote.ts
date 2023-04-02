@@ -73,7 +73,7 @@ export class Vote {
     this.seconds = seconds
     this.cancelOnRoundEnd = options?.dontCancelOnRoundEnd === undefined
     this.cancelOnRoundStart = options?.dontCancelOnRoundStart === undefined
-    if (Vote.isListenerAdded === false) {
+    if (!Vote.isListenerAdded) {
       Vote.isListenerAdded = true
       tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => Vote.listener(info))
       if (!['F5', 'F6', 'F7'].includes(config.yesKey)) {
@@ -202,7 +202,7 @@ export class Vote {
    * @param caller Caller player object
    */
   pass(caller?: tm.Player): void {
-    if (this.isActive === false) { return }
+    if (!this.isActive) { return }
     this.interrupted = { caller, result: true }
   }
 
@@ -211,7 +211,7 @@ export class Vote {
    * @param caller Caller player object
    */
   cancel(caller?: tm.Player): void {
-    if (this.isActive === false) { return }
+    if (!this.isActive) { return }
     this.interrupted = { caller, result: false }
   }
 

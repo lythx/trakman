@@ -27,6 +27,7 @@ export abstract class Logger {
     cyan: 0x00FFFF,
     white: 0xFFFFFF
   }
+  private static readonly separator: string = '---------------------------------------------'
   private static readonly logDir: string = './logs'
   private static readonly logTypes = {
     fatal: {
@@ -74,7 +75,7 @@ export abstract class Logger {
       this.logLevel = envLogLevel
     }
     await fs.mkdir(this.logDir).catch((err: Error): void => {
-      if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
+      if (!err.message.startsWith('EEXIST')) { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
@@ -206,7 +207,7 @@ export abstract class Logger {
       if (this.thumbs.length !== 0) {
         embed.setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
       }
-      const separator: string | undefined = this.isFirstLog === false ? undefined : '---------------------------------------------'
+      const separator: string | undefined = this.isFirstLog ? this.separator : undefined
       if (tag === 'fatal') {
         await this.webhook.send({
           content: (separator ?? '') + '\n' + this.users.join(' '),

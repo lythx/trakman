@@ -298,7 +298,7 @@ export default class RecordList {
         }
       }
     }
-    return this.isFullRow === false ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
+    return !this.isFullRow ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
   }
 
   private getCpTypes = (login: string, cps: (number | undefined)[][], records: RLRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
@@ -507,7 +507,7 @@ export default class RecordList {
 
   private constructMarker(marker: Marker | undefined): string {
     if (marker === undefined || marker === null) { return '' }
-    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
+    const posX: number = !this.side ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
     if (typeof marker === 'object') {
       const color = marker.colour === undefined ? '' : `bgcolor="${marker.colour}"`

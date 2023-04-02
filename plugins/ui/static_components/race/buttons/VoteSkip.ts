@@ -64,7 +64,7 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return } 
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list)
     if (result === undefined) {
@@ -103,7 +103,7 @@ export class VoteSkip extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) {
+    if (!this.isReplay) {
       this.buttonData = {
         icon: cfg.icon,
         text1: cfg.texts[0][0],

@@ -38,8 +38,8 @@ export default class TMXSearchWindow extends PopupWindow<{
         tm.log.error('Error while adding map to queue TMX search window', `Map index out of range`)
         return
       }
-      const gotQueued = await this.handleMapClick(mapId, info.login, info.nickname, info.privilege, info.title)
-      if (gotQueued === false) { return }
+      const gotQueued: boolean = await this.handleMapClick(mapId, info.login, info.nickname, info.privilege, info.title)
+      if (!gotQueued) { return }
     })
     tm.commands.add({
       aliases: config.command.aliases,
@@ -130,7 +130,7 @@ export default class TMXSearchWindow extends PopupWindow<{
         author = ''
       }
       const actionId = this.getActionId(maps[index].id)
-      const header = this.getHeader(index, maps[index].id, actionId, w, h, 
+      const header = this.getHeader(index, maps[index].id, actionId, w, h,
         maps[index].pageUrl.replace(/^https:\/\//, ''), params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth

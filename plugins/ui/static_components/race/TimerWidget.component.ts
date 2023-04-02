@@ -52,7 +52,7 @@ export default class TimerWidget extends StaticComponent {
     })
     tm.addListener('PlayerFinish', () => {
       if (this.isRoundsOrientedGamemode()) {
-        if (this.roundCountdownDisplayed === false) {
+        if (!this.roundCountdownDisplayed) {
           this.roundCountdownDisplayed = true
           this.display()
         }
@@ -96,8 +96,8 @@ export default class TimerWidget extends StaticComponent {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
-      const subtracted = tm.timer.subtractTime(config.timeSubtractedOnClick)
-      if (subtracted === false) { return }
+      const subtracted: boolean = tm.timer.subtractTime(config.timeSubtractedOnClick)
+      if (!subtracted) { return }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
@@ -117,14 +117,15 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
+    if (tm.timer.isPaused) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
   }
 
   displayToPlayer(login: string, privilege?: number): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     if (this.isRoundsOrientedGamemode()) {
       if (this.roundCountdownDisplayed) {
         tm.sendManialink(this.noButtonXml, login)

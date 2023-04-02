@@ -37,7 +37,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         return
       }
       const gotQueued: boolean = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
-      if (gotQueued === false) { return }
+      if (!gotQueued) { return }
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
