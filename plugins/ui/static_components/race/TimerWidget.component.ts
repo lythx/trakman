@@ -117,14 +117,15 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
+    if (tm.timer.isPaused) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
   }
 
   displayToPlayer(login: string, privilege?: number): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     if (this.isRoundsOrientedGamemode()) {
       if (this.roundCountdownDisplayed) {
         tm.sendManialink(this.noButtonXml, login)

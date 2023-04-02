@@ -36,7 +36,7 @@ const sendLive = async (): Promise<true | Error> => {
       'Authorization': auth,
     }
   }
-  return new Promise<true | Error>((resolve): void => {
+  return new Promise<true | Error>((resolve, reject): void => {
     const req: ClientRequest = http.request(options, (res): void => {
       if (res.statusCode === 200) {
         resolve(true)
@@ -48,8 +48,10 @@ const sendLive = async (): Promise<true | Error> => {
       res.on('end', (): void => resolve(new Error(data)))
     })
     req.write(JSON.stringify(data))
-    req.end()
-  }).catch(err => {
+    req.on('error', (): void => { reject(new Error(`Freezone HTTP request error.`)) })
+      .on('timeout', (): void => { reject(new Error(`Freezone HTTP request timeout.`)) })
+      .end()
+  }).catch((err): Error => {
     tm.log.debug(`Freezone http request error: ${err.message} ${err}`) // TODO CHANGE TO WARN IF WORKS
     return new Error() // TODO WRITE ERROR STR HERE
   })
