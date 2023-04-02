@@ -9,8 +9,12 @@ export default class MusicWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.musicWidget, 'race')
+    super(componentIds.musicWidget)
     this.header = new StaticHeader('race')
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   setCurrentSong(song: Song | undefined) {

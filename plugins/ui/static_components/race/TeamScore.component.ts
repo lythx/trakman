@@ -12,7 +12,7 @@ export default class TeamScore extends StaticComponent {
   private xml: string = ''
 
   constructor(private maxScore = tm.rounds.teamsPointsLimit) {
-    super(componentIds.teamScore, 'race', ['Teams'])
+    super(componentIds.teamScore)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height + config.margin - this.header.options.height,
       new Array(3).fill(1), [1], { margin: config.margin })
@@ -22,6 +22,10 @@ export default class TeamScore extends StaticComponent {
     tm.addListener('EndRound', () => this.display())
     tm.addListener('BeginRound', () => this.display())
     tm.addListener('PlayerFinish', () => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

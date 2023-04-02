@@ -13,7 +13,7 @@ export default class LapRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.lapRanking, 'race', ['Laps'])
+    super(componentIds.lapRanking)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LapRecord', (): void => this.display())
@@ -27,6 +27,10 @@ export default class LapRanking extends StaticComponent {
       if (tm.records.lap.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

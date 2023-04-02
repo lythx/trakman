@@ -17,7 +17,7 @@ export default class MapWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.map, 'race')
+    super(componentIds.map)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     webservices.onCurrentAuthorChange((): void => {
@@ -25,6 +25,10 @@ export default class MapWidget extends StaticComponent {
     })
     tmx.onMapChange((): void => this.display())
     tmx.onQueueChange((): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

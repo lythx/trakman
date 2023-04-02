@@ -17,7 +17,7 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(componentIds.bestFinishes, 'race')
+    super(componentIds.bestFinishes)
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
@@ -46,6 +46,10 @@ export default class BestFinishes extends StaticComponent {
       this.bestFinishes.length = 0
       this.display()
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

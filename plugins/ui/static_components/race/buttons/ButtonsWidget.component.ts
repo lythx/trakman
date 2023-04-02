@@ -23,7 +23,7 @@ export default class ButtonsWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.buttons, 'race')
+    super(componentIds.buttons)
     this.grid = new Grid(this.width + config.margin, this.height + config.margin,
       new Array(config.columns).fill(1), new Array(config.rows).fill(1))
     const allButtons = [
@@ -49,6 +49,10 @@ export default class ButtonsWidget extends StaticComponent {
       this.constructXml()
       this.display()
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

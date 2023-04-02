@@ -21,7 +21,7 @@ export default class CpCounter extends StaticComponent {
   private prevLapTimes: { login: string, best?: number, current: number, isFinish: boolean }[] = []
 
   constructor() {
-    super(componentIds.cpCounter, 'race')
+    super(componentIds.cpCounter)
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
     tm.addListener('PlayerCheckpoint', (info): void => {
       const local: tm.LocalRecord | undefined = tm.records.getLocal(info.player.login)
@@ -86,7 +86,7 @@ export default class CpCounter extends StaticComponent {
           lap = {
             cpIndex: 0,
             index: 0, best: pb,
-            current: time - player.currentCheckpoints[startIndex].time,
+            current: time - (player.currentCheckpoints[startIndex]?.time ?? 0),
             isFinish: true
           }
         }
@@ -101,6 +101,10 @@ export default class CpCounter extends StaticComponent {
       this.prevLapTimes.length = 0
       this.display()
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

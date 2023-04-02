@@ -12,7 +12,7 @@ export default class LocalRankingResult extends StaticComponent {
   private readonly recordList: RecordList
 
   constructor() {
-    super(componentIds.localsResult, 'result')
+    super(componentIds.localsResult)
     this.header = new StaticHeader('result')
     this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
@@ -29,6 +29,10 @@ export default class LocalRankingResult extends StaticComponent {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

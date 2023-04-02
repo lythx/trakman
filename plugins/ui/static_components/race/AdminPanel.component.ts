@@ -22,7 +22,7 @@ export default class AdminPanel extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(componentIds.admin, 'race')
+    super(componentIds.admin)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info): void => {
@@ -71,6 +71,10 @@ export default class AdminPanel extends StaticComponent {
         config.public ? undefined : info.login)
       tm.client.callNoRes('ForceEndRound')
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

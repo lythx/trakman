@@ -14,7 +14,7 @@ export default class DediRankingResult extends StaticComponent {
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
-    super(componentIds.dedisResult, 'result')
+    super(componentIds.dedisResult)
     this.header = new StaticHeader('result')
     this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
@@ -28,6 +28,10 @@ export default class DediRankingResult extends StaticComponent {
     tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

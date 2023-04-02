@@ -13,7 +13,7 @@ export default class NextMapRecords extends StaticComponent {
   private readonly list: RecordList
 
   constructor() {
-    super(componentIds.nextMapRecords, 'result')
+    super(componentIds.nextMapRecords)
     this.header = new StaticHeader('result')
     this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
@@ -41,6 +41,10 @@ export default class NextMapRecords extends StaticComponent {
     tm.addListener('BeginMap', (): void => {
       this.records.length = 0
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

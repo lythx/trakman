@@ -12,8 +12,17 @@ export default class RankWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.rank, 'race')
+    super(componentIds.rank)
     this.constructXml()
+  }
+
+  getHeight(): number {
+    return config.height
+  }
+
+  protected onPositionChange(): void {
+    this.constructXml()
+    this.display()
   }
 
   display(): void {

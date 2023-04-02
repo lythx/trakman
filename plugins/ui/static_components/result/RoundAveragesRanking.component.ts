@@ -14,7 +14,7 @@ export default class RoundAveragesRanking extends StaticComponent {
   private averages: { nickname: string, login: string, average: number, finishcount: number }[] = []
 
   constructor() {
-    super(componentIds.roundAveragesRanking, 'result')
+    super(componentIds.roundAveragesRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
@@ -34,6 +34,10 @@ export default class RoundAveragesRanking extends StaticComponent {
     tm.addListener('PlayerDataUpdated', (info): void => {
       if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

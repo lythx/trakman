@@ -12,7 +12,7 @@ export default class RoundsPointsRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundsPointsRanking, 'race', ['Rounds', 'Cup'])
+    super(componentIds.roundsPointsRanking)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
@@ -28,6 +28,13 @@ export default class RoundsPointsRanking extends StaticComponent {
         .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('PlayerFinish', (): void => this.display())
+  }
+
+  getHeight(): number {
+    if (tm.getGameMode() === 'Cup') {
+      return config.cupHeight
+    }
+    return config.height
   }
 
   display(): void {

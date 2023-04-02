@@ -11,8 +11,12 @@ export default class RankWidgetResult extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.rankResult, 'result')
+    super(componentIds.rankResult)
     this.constructXml()
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

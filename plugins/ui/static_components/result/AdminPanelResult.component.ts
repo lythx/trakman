@@ -21,7 +21,7 @@ export default class AdminPanelResult extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(componentIds.adminResult, 'result')
+    super(componentIds.adminResult)
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(5).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info): void => {
@@ -53,6 +53,10 @@ export default class AdminPanelResult extends StaticComponent {
         config.public ? undefined : info.login)
       tm.jukebox.shuffle(info)
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

@@ -18,7 +18,7 @@ export default class MapWidgetResult extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.mapResult, 'result')
+    super(componentIds.mapResult)
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled) {
@@ -34,6 +34,10 @@ export default class MapWidgetResult extends StaticComponent {
     tm.addListener('EndMap', (info): void => {
       this.isRestart = info.isRestart
     }, true)
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

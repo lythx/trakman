@@ -13,7 +13,7 @@ export default class RoundScore extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundScore, 'race', ['Teams', 'Rounds', 'Cup'])
+    super(componentIds.roundScore)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerFinish', (): void => this.display())
@@ -21,6 +21,15 @@ export default class RoundScore extends StaticComponent {
     tm.addListener('PlayerDataUpdated', (info): void => {
       if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
+  }
+
+  getHeight(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsHeight
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupHeight
+    }
+    return config.roundsHeight
   }
 
   display(): void {

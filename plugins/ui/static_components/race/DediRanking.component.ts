@@ -15,7 +15,7 @@ export default class DediRanking extends StaticComponent {
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
-    super(componentIds.dedis, 'race')
+    super(componentIds.dedis)
     this.header = new StaticHeader('race')
     this.getRecordList()
     dedimania.onFetch((): void => this.display())
@@ -49,6 +49,19 @@ export default class DediRanking extends StaticComponent {
     </manialink>`,
       login
     )
+  }
+
+  getHeight(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsHeight
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsHeight
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupHeight
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsHeight
+    }
+    return config.height
   }
 
   protected onPositionChange(): void {

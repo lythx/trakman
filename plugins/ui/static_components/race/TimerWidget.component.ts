@@ -19,7 +19,7 @@ export default class TimerWidget extends StaticComponent {
   private roundCountdownDisplayed = false
 
   constructor() {
-    super(componentIds.timer, 'race')
+    super(componentIds.timer)
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
@@ -105,6 +105,10 @@ export default class TimerWidget extends StaticComponent {
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   private startDynamicTimerInterval() {

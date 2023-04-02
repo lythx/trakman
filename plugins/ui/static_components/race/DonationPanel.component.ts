@@ -13,7 +13,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.liveCheckpoint, 'race')
+    super(componentIds.liveCheckpoint)
     this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
@@ -22,6 +22,10 @@ export default class DonationPanel extends StaticComponent {
         void donations.donate(info.login, info.nickname, amount)
       }
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

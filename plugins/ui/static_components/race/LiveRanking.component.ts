@@ -13,7 +13,7 @@ export default class LiveRanking extends StaticComponent {
   private title!: string
 
   constructor() {
-    super(componentIds.live, 'race', ['TimeAttack', 'Laps'])
+    super(componentIds.live)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LiveRecord', (): void => {
@@ -33,6 +33,13 @@ export default class LiveRanking extends StaticComponent {
         this.display()
       }
     })
+  }
+
+  getHeight(): number {
+    if (tm.getGameMode() === 'Laps') {
+      return config.lapsHeight
+    }
+    return config.height
   }
 
   display(): void {

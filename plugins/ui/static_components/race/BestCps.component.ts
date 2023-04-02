@@ -19,7 +19,7 @@ export default class BestCps extends StaticComponent {
   private grid: Grid
 
   constructor() {
-    super(componentIds.bestCps, 'race')
+    super(componentIds.bestCps)
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
@@ -56,6 +56,10 @@ export default class BestCps extends StaticComponent {
     this.paginator.onPageChange = (login: string): void => {
       this.displayToPlayer(login)
     }
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

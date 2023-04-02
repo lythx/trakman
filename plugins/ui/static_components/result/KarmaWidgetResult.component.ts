@@ -17,7 +17,7 @@ export default class KarmaWidgetResult extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(componentIds.karmaResult, 'result')
+    super(componentIds.karmaResult)
     this.header = new StaticHeader('result')
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
@@ -27,6 +27,10 @@ export default class KarmaWidgetResult extends StaticComponent {
     maniakarma.onVote((): void => this.display())
     addManialinkListener(this.id + 1, 6, (info, offset): void => actions.addVote(info, this.options[offset]))
     tm.addListener('VotesPrefetch', (): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

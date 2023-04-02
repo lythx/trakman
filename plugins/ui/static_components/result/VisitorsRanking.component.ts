@@ -14,12 +14,16 @@ export default class VisitorsRanking extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.visitorsRanking, 'result')
+    super(componentIds.visitorsRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     stats.visits.onUpdate((): void => this.display())
     stats.visits.onNicknameChange((): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

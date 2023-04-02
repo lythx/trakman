@@ -14,12 +14,16 @@ export default class DonatorsRanking extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.donatorsRanking, 'result')
+    super(componentIds.donatorsRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     stats.donations.onUpdate((): void => this.display())
     stats.donations.onNicknameChange((): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

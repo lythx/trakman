@@ -14,7 +14,7 @@ export default class MostRecordsRanking extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.mostRecordsRanking, 'result')
+    super(componentIds.mostRecordsRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
@@ -24,6 +24,10 @@ export default class MostRecordsRanking extends StaticComponent {
     })
     stats.records.onUpdate((): void => this.display())
     stats.records.onNicknameChange((): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {

@@ -83,7 +83,7 @@ tm.client.addProxy(['SetGameMode'], () => {
 const events: tm.Listener[] = [
   {
     event: 'Startup',
-    callback: async (status: 'race' | 'result'): Promise<void> => {
+    callback: async (): Promise<void> => {
       await tm.client.call('SendHideManialinkPage')
       preloadIcons()
       loadMod()
@@ -91,8 +91,9 @@ const events: tm.Listener[] = [
       customUi = new CustomUi()
       customUi.display()
       for (const c of Object.values(staticComponents)) {
-        if (c.gameModes.includes(tm.getGameMode()) &&
-          (c.displayMode === status || c.displayMode === 'always')) { c.display() }
+        c.updateIsDisplayed()
+        c.updatePosition()
+        c.display()
       }
       new TestWindow()
       for (const e of loadListeners) { e() }
@@ -122,7 +123,7 @@ const events: tm.Listener[] = [
   }
 ]
 
-for (const event of events) { tm.addListener(event.event, event.callback) }
+for (const event of events) { tm.addListener(event.event, event.callback, true) }
 
 /**
  * Manialink UI components.

@@ -13,7 +13,7 @@ export default class LocalRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.locals, 'race')
+    super(componentIds.locals)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LocalRecord', (): void => this.display())
@@ -27,6 +27,19 @@ export default class LocalRanking extends StaticComponent {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
     })
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
+  }
+
+  getHeight(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsHeight
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsHeight
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupHeight
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsHeight
+    }
+    return config.height
   }
 
   display(): void {

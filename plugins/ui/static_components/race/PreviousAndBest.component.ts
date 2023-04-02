@@ -11,8 +11,17 @@ export default class PreviousAndBest extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.previousAndBest, 'race')
+    super(componentIds.previousAndBest)
     this.constructXml()
+  }
+
+  getHeight(): number {
+    return config.height
+  }
+
+  protected onPositionChange(): void {
+    this.constructXml()
+    this.display()
   }
 
   display(): void {

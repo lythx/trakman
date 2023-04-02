@@ -21,7 +21,7 @@ export default class ServerLinks extends StaticComponent {
   private pageSwitchTimeouts: string[] = []
 
   constructor() {
-    super(componentIds.serverLinks, 'race')
+    super(componentIds.serverLinks)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width,
       config.height - this.header.options.height,
@@ -30,6 +30,10 @@ export default class ServerLinks extends StaticComponent {
     this.paginator.onPageChange = (login) => {
       this.displayToPlayer(login)
     }
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   update(newList: ServerInfo[]) {

@@ -5,10 +5,10 @@ const p = tm.utils.palette
 const width = 10
 export default {
   posX: raceConfig.rightPosition - (width + raceConfig.marginBig),
-  posY: raceConfig.topBorder - (raceConfig.rightSideOrder[0].height + raceConfig.rightSideOrder[1].height
-    + raceConfig.rightSideOrder[2].height + raceConfig.marginBig * 3),
+  posY: 10, //TODO //raceConfig.topBorder - (raceConfig.rightSideOrder[0].height + raceConfig.rightSideOrder[1].height
+  //  + raceConfig.rightSideOrder[2].height + raceConfig.marginBig * 3),
   headerText: `Bet`,
-  height: raceConfig.rightSideOrder[3].height,
+  height: 3, // TODO // raceConfig.rightSideOrder[3].height,
   width,
   options: [50, 100, 200, 500, 1000, 10000],
   margin: raceConfig.margin,

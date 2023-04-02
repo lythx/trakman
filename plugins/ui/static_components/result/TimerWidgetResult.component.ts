@@ -11,8 +11,17 @@ export default class TimerWidgetResult extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.timerResult, 'result')
+    super(componentIds.timerResult)
     this.constructXml()
+  }
+
+  getHeight(): number {
+    return config.height
+  }
+  
+  protected onPositionChange(): void {
+    this.constructXml()
+    this.display()
   }
 
   display(): void {

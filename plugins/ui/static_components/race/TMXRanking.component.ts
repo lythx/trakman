@@ -14,7 +14,7 @@ export default class TMXRanking extends StaticComponent {
   private readonly header: StaticHeader
 
   constructor() {
-    super(componentIds.tmx, 'race')
+    super(componentIds.tmx)
     this.header = new StaticHeader('race')
     this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
@@ -32,6 +32,10 @@ export default class TMXRanking extends StaticComponent {
     })
     tmx.onMapChange((): void => this.display())
     tmx.onQueueChange((): void => this.display())
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   display(): void {
