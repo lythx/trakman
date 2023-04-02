@@ -15,22 +15,48 @@ let current: Song | undefined
 let listUi: SongList
 let widgetUi: MusicWidget
 
-// TODO MESSAGES
-
+/**
+ * Manages server music and renders music related UI.
+ * @author lythx
+ * @since 1.3
+ */
 export const music = {
 
+  /**
+   * Add a callback function to execute on a song queue change
+   * @param callback Function to execute on event. 
+   * It takes song queue and optional change information object as parameters.
+   */
   onQueueChanged(callback: QueueChangedCallback) {
     queueChangeCallbacks.push(callback)
   },
 
+  /**
+   * Add a callback function to execute when a new song gets added to the song list
+   * @param callback Function to execute on event. 
+   * It takes song object and caller object as parameters. (Caller is the player who added the song)
+   */
   onSongAdded(callback: SongAddedCallback) {
     songAddCallbacks.push(callback)
   },
 
+  /**
+   * Add a callback function to execute when a song gets removed from the song list
+   * @param callback Function to execute on event. 
+   * It takes song object and caller object as parameters. (Caller is the player who removed the song)
+   */
   onSongRemoved(callback: SongRemovedCallback) {
     songRemoveCallbacks.push(callback)
   },
 
+  /**
+   * Add a new song to the song list
+   * @param name Song name
+   * @param author Song author
+   * @param url Song url (link to an .ogg file)
+   * @param caller Caller player object
+   * @returns Boolean indicating whether the song got added
+   */
   addSong(name: string, author: string, url: string, caller?: Caller): boolean {
     if (queue.some(a => a.name === name)) {
       return false
@@ -40,7 +66,7 @@ export const music = {
     emitEvent(songAddCallbacks, song, caller)
     const status = addToQueue(name, false, caller)
     if (typeof status !== 'string') {
-      emitEvent(queueChangeCallbacks, queue, {
+      emitEvent(queueChangeCallbacks, queue, { // TODO CHECk URL
         song, action: 'added'
       })
     }
@@ -48,6 +74,12 @@ export const music = {
     return true
   },
 
+  /**
+   * Remove a song from the song list
+   * @param name Song name
+   * @param caller Caller player object
+   * @returns Boolean indicating whether the song got removed
+   */
   removeSong(name: string, caller?: Caller): boolean {
     const index = queue.findIndex(a => a.name === name)
     if (index === -1) {
@@ -63,6 +95,12 @@ export const music = {
     return true
   },
 
+  /**
+   * Add a song to the song queue
+   * @param songName Song name
+   * @param caller Caller player object
+   * @returns Song object if it got added, error message if unsuccessfull
+   */
   addSongToQueue(songName: string, caller?: Caller):
     Readonly<Song> | 'already queued' | 'not in songlist' | 'no privilege' {
     return addToQueue(songName, true, caller)
@@ -70,6 +108,9 @@ export const music = {
 
   removeSongFromQueue: removeFromQueue,
 
+  /**
+   * Song list in queue order
+   */
   get songs(): Readonly<Song>[] {
     return [...queue]
   }
@@ -249,6 +290,12 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   return song
 }
 
+/**
+  * Removes a song from the song queue
+  * @param songName Song name
+  * @param caller Caller player object
+  * @returns Song object if it got removed, error message if unsuccessfull
+  */
 function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not queued' {
   if (!queue.filter(a => a.isJuked === true).some(a => a.name === name)) { return 'not queued' }
   const index: number = queue.findIndex(a => a.name === name)
