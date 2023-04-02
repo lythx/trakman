@@ -80,7 +80,7 @@ export class MapRepository extends Repository {
   async get(mapId: string): Promise<tm.Map | undefined>
   async get(mapIds: string[]): Promise<tm.Map[]>
   async get(mapIds: string | string[]): Promise<tm.Map | tm.Map[] | undefined> {
-    let isArr = true
+    let isArr: boolean = true
     if (typeof mapIds === 'string') {
       isArr = false
       mapIds = [mapIds]
@@ -96,7 +96,7 @@ export class MapRepository extends Repository {
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
     const res = (await this.query(query, ...ids.map(a => a.id)))
-    if (isArr === false) {
+    if (!isArr) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
     }
     return res.map(a => this.constructMapObject(a))
@@ -105,7 +105,7 @@ export class MapRepository extends Repository {
   async getByFilename(fileName: string): Promise<tm.Map | undefined>
   async getByFilename(fileNames: string[]): Promise<tm.Map[]>
   async getByFilename(fileNames: string | string[]): Promise<tm.Map | tm.Map[] | undefined> {
-    let isArr = true
+    let isArr: boolean = true
     if (typeof fileNames === 'string') {
       isArr = false
       fileNames = [fileNames]
@@ -119,7 +119,7 @@ export class MapRepository extends Repository {
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
-    if (isArr === false) {
+    if (!isArr) {
       return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
     }
     return res.map((a, i) => this.constructMapObject({ ...a, filename: fileNames[i] }))
@@ -129,7 +129,7 @@ export class MapRepository extends Repository {
   async getVoteCountAndRatio(mapIds: string[]): Promise<{ uid: string, ratio: number, count: number }[]>
   async getVoteCountAndRatio(mapIds: string | string[]): Promise<{ ratio: number, count: number } |
     { uid: string, ratio: number, count: number }[] | undefined> {
-    let isArr = true
+    let isArr: boolean = true
     if (typeof mapIds === 'string') {
       isArr = false
       mapIds = [mapIds]
@@ -141,7 +141,7 @@ export class MapRepository extends Repository {
     WHERE ${ids.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY uid;`
     const res = (await this.query(query, ...ids.map(a => a.id)))
-    if (isArr === false) {
+    if (!isArr) {
       return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count }
     }
     return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))

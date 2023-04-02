@@ -117,7 +117,7 @@ export class RecordService {
           continue
         }
       }
-      if (mapPresent === false) { continue }
+      if (!mapPresent) { continue }
       if (logins.includes(records[i].login)) {
         this._playerRanks.push({
           login: records[i].login,

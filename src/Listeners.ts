@@ -33,8 +33,8 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo.IPAddress.split(':')[0]
-        const canJoin = await AdministrationService.handleJoin(login, ip)
-        if (canJoin === false) {
+        const canJoin: boolean = await AdministrationService.handleJoin(login, ip)
+        if (!canJoin) {
           Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
@@ -209,7 +209,7 @@ export class Listeners {
         // Update server parameters
         await GameService.update()
         // Check whether the map was restarted
-        if (isRestart === false) {
+        if (!isRestart) {
           // In case it wasn't, update the votes and records
           await MapService.update()
           await RecordService.nextMap()

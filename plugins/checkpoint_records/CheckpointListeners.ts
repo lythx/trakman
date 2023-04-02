@@ -159,7 +159,7 @@ if (config.isEnabled === true) {
             title: info.title,
             nickname: tm.utils.strip(info.nickname, true),
             index: tm.utils.getPositionString(cpIndex)
-          }), config.commands.deletecp.public === false ? info.login : undefined)
+          }), config.commands.deletecp.public ? undefined : info.login)
           if (deleted !== undefined) {
             emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])
           }

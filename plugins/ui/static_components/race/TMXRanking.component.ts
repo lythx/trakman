@@ -35,14 +35,14 @@ export default class TMXRanking extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {

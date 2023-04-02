@@ -146,7 +146,7 @@ export class VoteReplay extends UiButton {
     if (tm.timer.isDynamic) {
       this.replayCount = 0
       this.isReplay = false
-    } else if (this.isReplay === false) {
+    } else if (!this.isReplay) {
       this.replayCount = 0
     }
     if (this.replayCount >= cfg.replayLimit) {

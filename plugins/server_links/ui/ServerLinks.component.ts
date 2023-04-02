@@ -50,14 +50,14 @@ export default class ServerLinks extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const page: number = this.paginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
     const functions: GridCellFunction[] = []

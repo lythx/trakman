@@ -36,14 +36,14 @@ export default class LiveRanking extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     let content: string
     this.title = config.title
     if (tm.getGameMode() === 'Laps') {
@@ -100,8 +100,8 @@ export default class LiveRanking extends StaticComponent {
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry, 
-      { dontParseTime, noRecordEntryText   })
+      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      { dontParseTime, noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

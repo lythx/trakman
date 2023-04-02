@@ -5,14 +5,14 @@ export class PrivilegeRepository extends Repository {
   async get(login: string): Promise<number>
   async get(logins: string[]): Promise<{ login: string, privilege: number }[]>
   async get(logins: string[] | string): Promise<{ login: string, privilege: number }[] | number> {
-    let isArr = true
+    let isArr: boolean = true
     if (typeof logins === 'string') {
       logins = [logins]
       isArr = false
     } else if (logins.length === 0) { return [] }
     const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...logins)
-    return isArr === false ? res[0]?.privilege ?? 0 : res
+    return isArr ? res : res[0]?.privilege ?? 0
   }
 
   async set(login: string, privilege: number): Promise<void> {

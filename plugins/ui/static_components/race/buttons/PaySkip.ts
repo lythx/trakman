@@ -77,7 +77,7 @@ export class PaySkip extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) {
+    if (!this.isReplay) {
       this.buttonData = {
         icon: cfg.icon,
         text1: tm.utils.strVar(cfg.texts[0][0], { cost: cfg.cost }),

@@ -40,7 +40,7 @@ const emitNextAuthorFetch = () => {
 }
 
 const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
-  if (config.isEnabled === false) {
+  if (!config.isEnabled) {
     return new Error('Use webservices is set to false')
   }
   const options = {

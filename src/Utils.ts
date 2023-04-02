@@ -51,10 +51,10 @@ export const Utils = {
    * @returns Number with the suffix
    */
   getPositionString(pos: number): string {
-    if (Number.isInteger(pos) === false || pos === 0) {
+    if (!Number.isInteger(pos) || pos === 0) {
       return pos.toString()
     }
-    let prefix = ''
+    let prefix: string = ''
     if (pos < 0) {
       prefix = '-'
       pos = -pos
@@ -451,7 +451,7 @@ export const Utils = {
     let hasOptionals: boolean = false
     if (commandParams !== undefined) {
       for (const [i, e] of commandParams.entries()) {
-        if (e.optional === true && hasOptionals === false) {
+        if (e.optional === true && !hasOptionals) {
           text += `[`
           hasOptionals = true
         }

@@ -52,7 +52,7 @@ export default class TimerWidget extends StaticComponent {
     })
     tm.addListener('PlayerFinish', () => {
       if (this.isRoundsOrientedGamemode()) {
-        if (this.roundCountdownDisplayed === false) {
+        if (!this.roundCountdownDisplayed) {
           this.roundCountdownDisplayed = true
           this.display()
         }
@@ -96,8 +96,8 @@ export default class TimerWidget extends StaticComponent {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
-      const subtracted = tm.timer.subtractTime(config.timeSubtractedOnClick)
-      if (subtracted === false) { return }
+      const subtracted: boolean = tm.timer.subtractTime(config.timeSubtractedOnClick)
+      if (!subtracted) { return }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),

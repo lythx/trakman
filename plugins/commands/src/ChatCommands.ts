@@ -270,7 +270,7 @@ const commands: tm.Command[] = [
     aliases: config.coppers.aliases,
     help: config.coppers.help,
     callback: async (info: tm.MessageInfo): Promise<void> => {
-      if (tm.config.server.isUnited === false) {
+      if (!tm.config.server.isUnited) {
         tm.sendMessage(config.coppers.notUnited, info.login)
         return
       }

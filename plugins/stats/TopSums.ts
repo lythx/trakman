@@ -37,7 +37,7 @@ const initialize = async () => {
         continue
       }
     }
-    if (mapPresent === false) { continue }
+    if (!mapPresent) { continue }
     const find = topList.find(a => a.login === res[i].login)
     if (find !== undefined) {
       if (rank <= 3) {

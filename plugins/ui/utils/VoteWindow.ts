@@ -80,7 +80,7 @@ export default class VoteWindow {
       this.vote.onSecondsChanged = (seconds, votes): void => {
         this.display(votes, seconds)
       }
-      if (this.vote.start(eligibleLogins) === false) { return }
+      if (!this.vote.start(eligibleLogins)) { return }
       addManialinkListener(this.passId, this.passListener)
       addManialinkListener(this.cancelId, this.cancelListener)
       for (const e of this.vote.loginList) {

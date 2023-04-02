@@ -59,14 +59,14 @@ export default class BestCps extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string, params?: { page?: number }): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
     tm.sendManialink(`

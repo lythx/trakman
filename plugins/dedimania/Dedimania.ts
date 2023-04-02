@@ -92,7 +92,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
   if (isFailedAuthentication === true) { return }
   currentDedis.length = 0
   newDedis.length = 0
-  if (client.connected === false) {
+  if (!client.connected) {
     emitFetchEvent(currentDedis)
     let status: true | {
       error: Error;
@@ -159,7 +159,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
 }
 
 const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
-  if (client.connected === false || newDedis.length === 0) { return }
+  if (!client.connected || newDedis.length === 0) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -190,7 +190,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
 
 const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   time: number, checkpoints: number[]): void => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
@@ -238,7 +238,7 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
 
 const updateServerPlayers = (): void => {
   setInterval(async (): Promise<void> => {
-    if (client.connected === false) { return }
+    if (!client.connected) { return }
     const cfg: tm.ServerInfo = tm.config.server
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
@@ -275,7 +275,7 @@ const updateServerPlayers = (): void => {
  */
 const playerJoin = async (player:
   { login: string, nickname: string, region: string, isSpectator: boolean, ladderRank: number }): Promise<void> => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
     [
       { string: 'TMF' },
@@ -296,7 +296,7 @@ const playerJoin = async (player:
  * @param player Player object
  */
 const playerLeave = async (player: { login: string, nickname: string }): Promise<void> => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerLeave',
     [
       { string: 'TMF' },
