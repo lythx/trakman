@@ -2,6 +2,7 @@ import config from './Config.js'
 import songList from './SongList.js'
 import { Song, SongAddedCallback, SongRemovedCallback, QueueChangedCallback, Caller } from './Types.js'
 import SongList from './ui/SongList.component.js'
+import MusicWidget from './ui/MusicWidget.component.js'
 import fs from 'fs/promises'
 
 let songs: Omit<Song, 'isJuked' | 'caller'>[] = songList
@@ -12,6 +13,7 @@ let queue: Song[] = []
 const history: Song[] = []
 let current: Song | undefined
 let listUi: SongList
+let widgetUi: MusicWidget
 
 // TODO MESSAGES
 
@@ -81,6 +83,7 @@ export const music = {
 if (config.isEnabled) {
   tm.addListener('Startup', () => {
     listUi = new SongList()
+    widgetUi = new MusicWidget()
     const duplicatesExist = fixDuplicateNames()
     if (duplicatesExist) {
       tm.log.warn(`Song name duplicates present in SongList, to fix them edit SongList.js file or use ingame commands.`)
@@ -112,6 +115,7 @@ if (config.isEnabled) {
     queue.shift()
     listUi.updateSongs(current, queue)
     listUi.updatePreviousSongs(history)
+    widgetUi.setCurrentSong(current)
     tm.client.callNoRes('SetForcedMusic', [
       { boolean: config.overrideMapMusic },
       { string: queue[0]?.url } // TODO TEST

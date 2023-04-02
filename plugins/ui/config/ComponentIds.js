@@ -73,5 +73,6 @@ export default {
   lapRanking: 410000,
   serverLinks: 420000,
   warnWindow: 430000,
-  songList: 440000
+  songList: 440000,
+  musicWidget: 450000
 }
