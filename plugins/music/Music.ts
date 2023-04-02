@@ -55,18 +55,22 @@ export const music = {
    * @param author Song author
    * @param url Song url (link to an .ogg file)
    * @param caller Caller player object
-   * @returns Boolean indicating whether the song got added
+   * @returns True if successfull, error message otherwise
    */
-  addSong(name: string, author: string, url: string, caller?: Caller): boolean {
-    if (queue.some(a => a.name === name)) {
-      return false
+  addSong(name: string, author: string, url: string, caller?: Caller): true | 'name taken' | 'invalid file extension' {
+    if (!(url.endsWith('.ogg') || url.endsWith('.mux'))) {
+      return 'invalid file extension'
     }
+    if (queue.some(a => a.name === name)) {
+      return 'name taken'
+    }
+    url = url.replace(/^https:\/\//, '')
     const song: Song = { name, author, url, isJuked: false }
     queue.push(song)
     emitEvent(songAddCallbacks, song, caller)
     const status = addToQueue(name, false, caller)
     if (typeof status !== 'string') {
-      emitEvent(queueChangeCallbacks, queue, { // TODO CHECk URL
+      emitEvent(queueChangeCallbacks, queue, {
         song, action: 'added'
       })
     }
@@ -187,14 +191,16 @@ if (config.isEnabled) {
     help: add.help,
     params: [{ name: 'name' }, { name: 'author' }, { name: 'url' }],
     callback: (info, name: string, author: string, url: string) => {
-      const added = music.addSong(name, author, url, info)
-      if (added) {
+      const status = music.addSong(name, author, url, info)
+      if (status === true) {
         tm.sendMessage(tm.utils.strVar(msg.add, {
           nickname: tm.utils.strip(info.nickname),
           song: name, author
         }), add.public ? undefined : info.login)
-      } else {
-        tm.sendMessage(tm.utils.strVar(msg.addError, { name }), info.login)
+      } else if (status === 'name taken') {
+        tm.sendMessage(tm.utils.strVar(msg.addNameError, { name }), info.login)
+      } else if (status === 'invalid file extension') {
+        tm.sendMessage(tm.utils.strVar(msg.addFileExtensionError, { url }), info.login)
       }
     },
     privilege: add.privilege

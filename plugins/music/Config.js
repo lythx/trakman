@@ -17,7 +17,9 @@ export default {
     removeFromQueueError: `${p.error}Error while removing the song from the queue.`,
     add: `${p.highlight}#{nickname} ${p.vote}has added and queued song ${p.highlight}#{song}${p.vote}` +
       ` by ${p.highlight}#{author}${p.vote}.`,
-    addError: `${p.error}Song named ${p.highlight}#{name} ${p.error}already exists.`,
+    addNameError: `${p.error}Song named ${p.highlight}#{name} ${p.error}already exists.`,
+    addFileExtensionError: `${p.error}Song url file extension needs to be ` +
+      `${p.highlight}.ogg ${p.error}or ${p.highlight}.mux${p.error}, ${p.highlight}#{url} ${p.error}is invalid.`,
     remove: `${p.highlight}#{nickname} ${p.vote}has deleted song ${p.highlight}#{song}${p.vote}.`,
     removeError: `${p.error}Song named ${p.highlight}#{name} ${p.error}doesn't exist.`,
     shuffle: `${p.highlight}#{nickname} ${p.vote}has shuffled the song queue.`
