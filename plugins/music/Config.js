@@ -3,7 +3,6 @@ const p = tm.utils.palette
 export default {
   isEnabled: true,
   songListPath: './plugins/music/SongList.js', // Needed for updates on song add/remove
-  autoplay: false,
   overrideMapMusic: true,
   // If song is in history it can't be requeued without force queue privileges
   historySize: 3,

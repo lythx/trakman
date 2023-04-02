@@ -111,11 +111,7 @@ if (config.isEnabled) {
         queue.push(current)
       }
     }
-    if (config.autoplay) {
-      current = queue[0]
-    } else {
-      current = queue[0]?.isJuked === true ? queue[0] : undefined
-    }
+    current = queue[0]
     queue.shift()
     listUi.updateSongs(current, queue)
     listUi.updatePreviousSongs(history)
