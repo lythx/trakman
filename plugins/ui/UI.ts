@@ -160,6 +160,10 @@ const components = {
    */
   get dynamicList(): DynamicComponent[] {
     return [...dynamicComponents]
+  },
+  // TODO DOC
+  get staticHeights(): typeof StaticComponent['components'] {
+    return StaticComponent.components
   }
 
 }
