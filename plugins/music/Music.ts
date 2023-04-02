@@ -70,10 +70,6 @@ export const music = {
 
   removeSongFromQueue: removeFromQueue,
 
-  async fetchCurrentServerMusic() {
-    tm.client.call('GetForcedMusic') // TODO
-  },
-
   get songs(): Readonly<Song>[] {
     return [...queue]
   }
@@ -91,11 +87,31 @@ if (config.isEnabled) {
     }
     queue.push(...songs.map(a => ({ ...a, isJuked: false })))
     listUi.updateSongs(current, queue)
+    const msg = config.messages
     listUi.onSongJuked = (song, info) => {
-      addToQueue(song.name, true, info)
+      const status = addToQueue(song.name, true, info)
+      if (typeof status !== 'string') {
+        tm.sendMessage(tm.utils.strVar(msg.addToQueue, {
+          nickname: tm.utils.strip(info.nickname),
+          song: song.name,
+          author: song.author
+        }), config.publicQueue ? undefined : info.login)
+      } else if (status === 'no privilege') {
+        tm.sendMessage(msg.cantAddMoreThanOne, info.login)
+      } else {
+        tm.sendMessage(msg.addToQueueError, info.login)
+      }
     }
     listUi.onSongUnjuked = (song, info) => {
-      removeFromQueue(song.name, info)
+      const status = removeFromQueue(song.name, info)
+      if (typeof status !== 'string') {
+        tm.sendMessage(tm.utils.strVar(msg.removeFromQueue, {
+          nickname: tm.utils.strip(info.nickname),
+          song: song.name
+        }), config.publicQueue ? undefined : info.login)
+      } else {
+        tm.sendMessage(msg.removeFromQueueError, info.login)
+      }
     }
     emitEvent(queueChangeCallbacks, queue)
   })
@@ -122,6 +138,7 @@ if (config.isEnabled) {
     ])
     emitEvent(queueChangeCallbacks, queue)
   }, true)
+  const msg = config.messages
 
   const add = config.addCommand
   tm.commands.add({
@@ -129,8 +146,15 @@ if (config.isEnabled) {
     help: add.help,
     params: [{ name: 'name' }, { name: 'author' }, { name: 'url' }],
     callback: (info, name: string, author: string, url: string) => {
-      tm.sendMessage(`Added song ${name}`, add.public ? undefined : info.login)
-      music.addSong(name, author, url, info)
+      const added = music.addSong(name, author, url, info)
+      if (added) {
+        tm.sendMessage(tm.utils.strVar(msg.add, {
+          nickname: tm.utils.strip(info.nickname),
+          song: name, author
+        }), add.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(msg.addError, { name }), info.login)
+      }
     },
     privilege: add.privilege
   })
@@ -141,8 +165,15 @@ if (config.isEnabled) {
     help: rm.help,
     params: [{ name: 'name' }],
     callback: (info, name: string) => {
-      tm.sendMessage(`Removed song ${name}`, rm.public ? undefined : info.login)
-      music.removeSong(name, info)
+      const removed = music.removeSong(name, info)
+      if (removed) {
+        tm.sendMessage(tm.utils.strVar(msg.remove, {
+          nickname: tm.utils.strip(info.nickname),
+          song: name
+        }), rm.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(msg.removeError, { name }), info.login)
+      }
     },
     privilege: rm.privilege
   })
@@ -164,12 +195,15 @@ if (config.isEnabled) {
     privilege: 0
   })
 
-  const sh = config.shuffleCommand // TODO TEST
+  const sh = config.shuffleCommand
   tm.commands.add({
     aliases: sh.aliases,
     help: sh.help,
     callback: (info) => {
       shuffleQueue(info)
+      tm.sendMessage(tm.utils.strVar(msg.shuffle, {
+        nickname: tm.utils.strip(info.nickname),
+      }), sh.public ? undefined : info.login)
     },
     privilege: sh.privilege
   })
@@ -182,7 +216,7 @@ function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...pa
   }
 }
 
-function addToQueue(songName: string, emitEventsAndMessages: boolean, caller?: Caller):
+function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   Song | "already queued" | "not in songlist" | "no privilege" {
   const songIndex = queue.findIndex(a => a.name === songName)
   if (songIndex === -1) {
@@ -207,14 +241,7 @@ function addToQueue(songName: string, emitEventsAndMessages: boolean, caller?: C
   } else {
     tm.log.trace(`Song ${song.name} by ${song.author} queued`)
   }
-  if (emitEventsAndMessages) {
-    if (caller !== undefined) {
-      tm.sendMessage(tm.utils.strVar(config.messages.addToQueue, {
-        nickname: tm.utils.strip(caller.nickname),
-        song: song.name,
-        author: song.author
-      }))
-    }
+  if (emitEvents) {
     emitEvent(queueChangeCallbacks, queue, {
       song, action: 'addedToQueue'
     })

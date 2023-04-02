@@ -11,8 +11,19 @@ export default {
   messages: {
     addToQueue: `${p.highlight}#{nickname} ${p.vote}has added ${p.highlight}#{song}${p.vote}` +
       ` by ${p.highlight}#{author}${p.vote} to the song queue.`,
+    cantAddMoreThanOne: `${p.error}You can't add more than one song to the queue.`,
+    addToQueueError: `${p.error}Error while adding the song to the queue.`,
     removeFromQueue: `${p.highlight}#{nickname} ${p.vote}has removed ${p.highlight}#{song}${p.vote} from the song queue.`,
+    removeFromQueueError: `${p.error}Error while removing the song from the queue.`,
+    add: `${p.highlight}#{nickname} ${p.vote}has added and queued song ${p.highlight}#{song}${p.vote}` +
+      ` by ${p.highlight}#{author}${p.vote}.`,
+    addError: `${p.error}Song named ${p.highlight}#{name} ${p.error}already exists.`,
+    remove: `${p.highlight}#{nickname} ${p.vote}has deleted song ${p.highlight}#{song}${p.vote}.`,
+    removeError: `${p.error}Song named ${p.highlight}#{name} ${p.error}doesn't exist.`,
+    shuffle: `${p.highlight}#{nickname} ${p.vote}has shuffled the song queue.`
   },
+  // Whether add and remove from queue messages are public
+  publicQueue: true,
   addCommand: {
     aliases: ['addsong'],
     help: 'Add and queue a song.',

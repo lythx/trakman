@@ -1,5 +1,3 @@
-
-
 import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
 import pluginConfig from '../Config.js'
 import { Song } from '../Types.js'
