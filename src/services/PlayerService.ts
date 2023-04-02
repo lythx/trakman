@@ -172,7 +172,7 @@ export class PlayerService {
     }
     this._players.push(player)
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
+      Logger.info(`${player.isSpectator ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
         `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
@@ -311,10 +311,7 @@ export class PlayerService {
    * @returns Number of wins
    */
   static async addWin(login: string): Promise<number> {
-    let player: any = this.get(login)
-    if (player === undefined) {
-      player = await this.fetch(login)
-    }
+    const player: any = this.get(login) ?? await this.fetch(login)
     await this.repo.updateOnWin(login, ++player.wins)
     Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getPositionString(player.wins)} time.`)
     return player.wins

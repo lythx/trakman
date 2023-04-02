@@ -30,7 +30,7 @@ const onMapStart = async (): Promise<void> => {
   emitEvent('CheckpointsFetch', currentBestCps, playerCps)
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
 
   tm.addListener('Startup', async (): Promise<void> => {
     await onMapStart()

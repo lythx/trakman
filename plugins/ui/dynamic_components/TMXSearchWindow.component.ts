@@ -214,14 +214,14 @@ export default class TMXSearchWindow extends PopupWindow<{
       tm.sendMessage(config.messages.error, login)
       return false
     }
-    if (status.wasAlreadyAdded === true) {
+    if (status.wasAlreadyAdded) {
       tm.sendMessage(tm.utils.strVar(config.messages.alreadyAdded,
         { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public === true ? undefined : login)
+        config.public ? undefined : login)
     } else {
       tm.sendMessage(tm.utils.strVar(config.messages.added,
         { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public === true ? undefined : login)
+        config.public ? undefined : login)
     }
     this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
     this.reRender()

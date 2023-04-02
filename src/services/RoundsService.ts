@@ -104,7 +104,7 @@ export class RoundsService {
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
     if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
       GameService.gameMode === 'Laps') { return }
-    if (this.noRoundFinishes === true) {
+    if (this.noRoundFinishes) {
       this.noRoundFinishes = false
       this.finishedRounds++
     }

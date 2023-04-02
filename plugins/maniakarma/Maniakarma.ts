@@ -291,7 +291,7 @@ const onPlayerJoin = async (login: string): Promise<void> => {
   }
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
   tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Maniakarma...')
     void initialize()

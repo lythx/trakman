@@ -37,7 +37,7 @@ export class MapIdsRepository extends Repository {
     ON CONFLICT (uid) DO UPDATE SET uid=EXCLUDED.uid
     RETURNING id, uid`
     const res = (await this.query(query, ...mapUids))
-    return isArr === true ? res : res[0]?.id
+    return isArr ? res : res[0]?.id
   }
 
 }

@@ -63,7 +63,7 @@ export class ClientSocket extends net.Socket {
       const poll = (): void => {
         const response: ClientResponse | undefined = this.responses.find(a => a.id === id && a.status === 'completed')
         if (response !== undefined) {
-          if (response.isError === true) {
+          if (response.isError) {
             resolve(new Error(`${response.errorString} Code: ${response.errorCode}`))
             return
           }

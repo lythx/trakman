@@ -208,7 +208,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       }
       let icon = config.icons.forceSpec
       let hoverIcon = config.hoverIcons.forceSpec
-      if (players[i + index].isSpectator === true) {
+      if (players[i + index].isSpectator) {
         icon = config.icons.forcePlay
         hoverIcon = config.hoverIcons.forcePlay
       }

@@ -77,7 +77,7 @@ const update = async (updateCurrent?: true): Promise<void> => {
   emitQueueChangeEvent()
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
   tm.addListener('Startup', () => {
     tm.log.trace('Initializing TMX...')
     void initialize()

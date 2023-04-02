@@ -57,7 +57,7 @@ export class VoteReplay extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isReplay === true || this.isSkip === true) { return }
+    if (this.isReplay || this.isSkip) { return }
     const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
     if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(tm.utils.strVar(msg.tooLate, { action }), login)

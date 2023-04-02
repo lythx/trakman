@@ -86,7 +86,7 @@ export class MapRepository extends Repository {
       mapIds = [mapIds]
     }
     const ids = await mapIdsRepo.get(mapIds)
-    if (ids.length === 0) { return isArr === true ? [] : undefined }
+    if (ids.length === 0) { return isArr ? [] : undefined }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
     count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
@@ -135,7 +135,7 @@ export class MapRepository extends Repository {
       mapIds = [mapIds]
     }
     const ids = await mapIdsRepo.get(mapIds)
-    if (ids.length === 0) { return isArr === true ? [] : undefined }
+    if (ids.length === 0) { return isArr ? [] : undefined }
     const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote) FROM map_ids
     LEFT JOIN votes ON votes.map_id=map_ids.id
     WHERE ${ids.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}

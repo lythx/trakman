@@ -102,7 +102,7 @@ export class DedimaniaClient {
   }
 
   async call(method: string, params: tm.CallParams[] = []): Promise<any[] | Error> {
-    while (this.receivingResponse === true) { await new Promise((resolve) => setTimeout(resolve, 2000)) }
+    while (this.receivingResponse) { await new Promise((resolve) => setTimeout(resolve, 2000)) }
     if (!this._connected) { return new Error('Not connected to dedimania') }
     this.receivingResponse = true
     const request: DedimaniaRequest = new DedimaniaRequest(method, params, this.sessionId)

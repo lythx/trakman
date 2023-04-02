@@ -211,11 +211,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale })}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
-    ${noNavbar === true ? this.noNavbarMidTop : this.frameMidTop}
+    ${noNavbar ? this.noNavbarMidTop : this.frameMidTop}
     ${content}
     ${this.frameMidBottom}
     ${footer}
-    ${noNavbar === true ? this.noNavbarBottom : this.frameBottom}`, login)
+    ${noNavbar ? this.noNavbarBottom : this.frameBottom}`, login)
   }
 
   /**

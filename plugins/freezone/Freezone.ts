@@ -72,7 +72,7 @@ const initialize = async (): Promise<true | Error> => {
   return true
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
   tm.addListener('Startup', async (): Promise<void> => {
     tm.log.trace('Connecting to ManiaLive...')
     const status: true | Error = await initialize()

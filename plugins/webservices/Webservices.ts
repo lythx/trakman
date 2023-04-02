@@ -76,7 +76,7 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
 const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
   const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find(a => a.login === login)
   if (cacheEntry !== undefined) { return cacheEntry }
-  if (regex.test(login) === true) { return new Error(`Login doesn't pass regex test`) }
+  if (regex.test(login)) { return new Error(`Login doesn't pass regex test`) }
   const player = await fetchWebservices(login)
   if (player instanceof Error) { // UNKOWN PLAYER MOMENT
     return player
@@ -175,7 +175,7 @@ export const webservices = {
    * Next map author webservices data
    */
   get nextAuthor(): WebservicesInfo | undefined {
-    if (isMapRestart === true) { return curAuthor }
+    if (isMapRestart) { return curAuthor }
     return nextAuthor
   },
 

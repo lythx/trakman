@@ -40,7 +40,7 @@ export class PayReplay extends UiButton {
   }
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
-    if (this.isReplay === true || this.isSkip === true) { return }
+    if (this.isReplay || this.isSkip) { return }
     const cost: number = cfg.costs[this.costIndex]
     if (cost === undefined) { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cost, cfg.billMessage)

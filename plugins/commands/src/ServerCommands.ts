@@ -174,16 +174,13 @@ const commands: tm.Command[] = [
             coppers: amount,
           }), info.login)
         } else {
-          let player: tm.Player | tm.OfflinePlayer | undefined = tm.players.get(login)
-          if (player === undefined) {
-            player = await tm.players.fetch(login)
-          }
+          const player: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
           tm.sendMessage(tm.utils.strVar(config.pay.text, {
             title: info.title,
             adminName: info.nickname,
             coppers: amount,
             target: player?.nickname ?? login
-          }), config.pay.public === true ? undefined : info.login)
+          }), config.pay.public ? undefined : info.login)
         }
       }
     },

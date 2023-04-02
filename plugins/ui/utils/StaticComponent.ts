@@ -50,7 +50,7 @@ export default abstract class StaticComponent {
       this._isDisplayed ? this.display() : this.hide()
     }, true)
     tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
-      if (this._isDisplayed === true) { this.displayToPlayer(info.login) }
+      if (this._isDisplayed) { this.displayToPlayer(info.login) }
     })
     if (!this.dislayStates[displayMode].includes(tm.getState())
       || !gameModes.includes(tm.getGameMode())) {
@@ -121,7 +121,7 @@ export default abstract class StaticComponent {
       if (e.name === widgetName) { break }
       positionSum += e.height + cfg.marginBig
     }
-    return { y: cfg.topBorder - positionSum, x: side === true ? cfg.rightPosition : cfg.leftPosition, side }
+    return { y: cfg.topBorder - positionSum, x: side ? cfg.rightPosition : cfg.leftPosition, side }
   }
 
   /**
