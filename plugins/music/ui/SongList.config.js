@@ -1,4 +1,5 @@
 import { icons } from '../../ui/UI.js'
+const p = tm.utils.palette
 
 export default {
   title: " Song List ",
@@ -9,6 +10,7 @@ export default {
   addIconHover: icons.cash,
   removeIcon: icons.F5,
   removeIconHover: icons.F6,
+  currentSongText: `$${p.green}Currently played`,
   overlayColour: '7777',
   entries: 15,
   defaultText: '--',

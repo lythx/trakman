@@ -9,22 +9,29 @@ type SearchTarget = 'name' | 'author'
 
 interface DisplayParams {
   page: number
-  search?: {
-    query: string,
-    target: SearchTarget
-  }
+  isSearch: boolean
+  paginator?: Paginator,
+  list?: (Song & { index: number })[]
+  query?: string
+  target?: SearchTarget
 }
-
-// TODO PAGINATOR ON QUERY, CURRENT SONG
 
 export default class SongList extends PopupWindow<DisplayParams> {
 
+  private currentSong: Song | undefined
   private songs: (Song & { index: number })[] = []
   private previousSongs: Song[] = []
+  private readonly queries: {
+    paginator: Paginator, list: (Song & { index: number })[],
+    login: string, query: string, target: SearchTarget
+  }[] = []
   readonly grid: Grid
   readonly paginator: Paginator
-  readonly addActionIdOffset = 100
-  readonly songListSizeLimit = 9000
+  readonly paginatorIdOffset = 100
+  nextPaginatorId = 0
+  readonly paginatorIdLimit = 100
+  readonly addActionIdOffset = 1000
+  readonly songListSizeLimit = 8000
   onSongJuked: (song: Song, info: tm.ManialinkClickInfo) => void = () => undefined
   onSongUnjuked: (song: Song, info: tm.ManialinkClickInfo) => void = () => undefined
 
@@ -34,7 +41,7 @@ export default class SongList extends PopupWindow<DisplayParams> {
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, 1)
     this.paginator.onPageChange = (login, page, info) => {
-      this.displayToPlayer(login, { page },
+      this.displayToPlayer(login, { page, isSearch: false },
         `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     addManialinkListener(this.openId + this.addActionIdOffset, this.songListSizeLimit, (info, offset) => {
@@ -49,9 +56,11 @@ export default class SongList extends PopupWindow<DisplayParams> {
 
   open = this.onOpen.bind(this)
 
-  updateSongs(songs: Song[]) {
-    this.songs = [...songs].map((a, i) => ({ ...a, index: i + 1 })).sort((a, b) => a.name > b.name ? 1 : -1)
-    this.paginator.setPageCount(Math.ceil(songs.length / (config.entries - 1)))
+  updateSongs(currentSong: Song | undefined, queue: Song[]) {
+    this.currentSong = currentSong
+    queue = currentSong === undefined ? [...queue] : [...queue, currentSong]
+    this.songs = queue.map((a, i) => ({ ...a, index: i + 1 })).sort((a, b) => a.name > b.name ? 1 : -1)
+    this.paginator.setPageCount(Math.ceil(queue.length / (config.entries - 1)))
     this.reRender()
   }
 
@@ -61,25 +70,50 @@ export default class SongList extends PopupWindow<DisplayParams> {
   }
 
   openWithQuery(player: tm.Player, query: string, searchTarget: SearchTarget = 'name') {
-    this.displayToPlayer(player.login, {
-      page: 1, search: {
-        target: searchTarget, query
-      }
-    }, `1/1`, player.privilege)
+    const list = this.getSearchResult(query, searchTarget)
+    const paginator = this.getPaginator(player.login, list, player.privilege, query, searchTarget)
+    this.displayToPlayer(player.login, { page: 1, isSearch: true, paginator, list, query, target: searchTarget },
+      `1/${paginator.pageCount}`, player.privilege)
+  }
+
+  private getPaginator(login: string, list: (Song & { index: number })[],
+    privilege: number, query: string, target: SearchTarget): Paginator {
+    const pageCount: number = Math.ceil(list.length / (config.entries - 1))
+    const playerQuery = this.queries.find(a => a.login === login)
+    let paginator: Paginator //
+    if (playerQuery !== undefined) {
+      playerQuery.list = list
+      paginator = playerQuery.paginator
+      paginator.setPageForLogin(login, 1)
+      paginator.setPageCount(pageCount)
+    } else {
+      paginator = new Paginator(this.openId + this.paginatorIdOffset + this.nextPaginatorId,
+        this.windowWidth, this.footerHeight, pageCount)
+      this.nextPaginatorId += 10
+      this.nextPaginatorId = (this.nextPaginatorId % this.paginatorIdLimit) + this.paginatorIdOffset
+      this.queries.push({ paginator, login, list, query, target })
+    }
+    paginator.onPageChange = (login: string, page: number): Promise<void> => this.displayToPlayer(login,
+      { page, isSearch: true, paginator, list }, `${page}/${pageCount}`, privilege)
+    return paginator
   }
 
   protected onOpen(info: { login: string, privilege: number }): void {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, { page },
+    this.displayToPlayer(info.login, { page, isSearch: false },
       `${page}/${this.paginator.pageCount}`, info.privilege)
   }
 
   private reRender(): void {
     const players = this.getPlayersWithWindowOpen(true)
     for (const player of players) {
-      const page = this.paginator.getPageByLogin(player.login)
+      const paginator = player.params.paginator ?? this.paginator
+      const page = paginator.getPageByLogin(player.login)
+      if (player.params.query !== undefined) {
+        player.params.list = this.getSearchResult(player.params.query, player.params.target ?? 'name')
+      }
       this.displayToPlayer(player.login, player.params,
-        `${page}/${this.paginator.pageCount}`, tm.players.get(player.login)?.privilege ?? 0)
+        `${page}/${paginator.pageCount}`, tm.players.get(player.login)?.privilege ?? 0)
     }
   }
 
@@ -88,17 +122,9 @@ export default class SongList extends PopupWindow<DisplayParams> {
   }
 
   protected async constructContent(login: string, params?: DisplayParams, privilege: number = 0): Promise<string> {
-    let page = 1
-    let search: DisplayParams['search'] //
-    if (params !== undefined) {
-      ({ page, search } = params)
-    }
-    let list = this.songs
+    let page = params?.page ?? 1
+    let list = params?.list ?? this.songs
     let index = (page - 1) * (config.entries - 1) - 1
-    if (search !== undefined) {
-      index = -1
-      list = this.getSearchResult(search.query, search.target)
-    }
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Name ', w, h),
@@ -113,29 +139,45 @@ export default class SongList extends PopupWindow<DisplayParams> {
       centeredText(list[index + i].name, w, h)
     const authorCell: GridCellFunction = (i, j, w, h) =>
       centeredText(list[index + i].author, w, h)
-    const queueIndex: GridCellFunction = (i, j, w, h) =>
-      centeredText(list[index + i].index.toString(), w, h)
+    const queueIndex: GridCellFunction = (i, j, w, h) => {
+      const song = list[index + i]
+      if (this.currentSong?.name === song.name) {
+        return centeredText(config.currentSongText, w, h)
+      }
+      return centeredText(song.index.toString(), w, h)
+    }
     const queuedByCell: GridCellFunction = (i, j, w, h) =>
       centeredText(list[index + i].caller?.nickname ?? config.defaultText, w, h)
     const addToQueueCell: GridCellFunction = (i, j, w, h) => {
       const song = list[index + i]
       let actionId = this.openId + this.addActionIdOffset + index + i
-      if (params?.search !== undefined) {
+      if (params?.isSearch === true) {
         const songIndex = this.songs.findIndex(a => a.name === song.name)
         actionId = this.openId + this.addActionIdOffset + songIndex
       }
+      const isCurrent = this.currentSong?.name === song.name
       let icon = config.addIcon
       let iconHover = config.addIconHover
-      if (song.isJuked) {
+      if (song.isJuked && !isCurrent) {
         icon = config.removeIcon
         iconHover = config.removeIconHover
       }
       let action = `action="${actionId}"`
       let cover = ''
-      if (privilege < pluginConfig.forceQueuePrivilege && this.previousSongs.some(a => a.name === song.name)) {
+      if (isCurrent ||
+        ((privilege < pluginConfig.forceQueuePrivilege &&
+          this.previousSongs.some(a => a.name === song.name))
+          && !song.isJuked)) {
+        iconHover = ''
         action = ''
         cover = `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" 
         bgcolor="${config.overlayColour}" halign="center" valign="center" />`
+      } else if (song.caller !== undefined &&
+        privilege < pluginConfig.forceQueuePrivilege && song.caller.login !== login) {
+        iconHover = ''
+        action = ''
+        cover = `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" 
+          bgcolor="${config.overlayColour}" halign="center" valign="center" />`
       }
       return `${cover}
       <quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
@@ -151,7 +193,7 @@ export default class SongList extends PopupWindow<DisplayParams> {
 
   protected constructFooter(login: string, params?: DisplayParams): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) +
-      (params?.search === undefined ? this.paginator.constructXml(login) : '')
+      (params?.paginator ?? this.paginator).constructXml(login)
   }
 
 }

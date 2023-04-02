@@ -52,7 +52,7 @@ export const music = {
       return false
     }
     const song = queue.splice(index, 1)[0]
-    listUi.updateSongs(queue)
+    listUi.updateSongs(current, queue)
     emitEvent(songRemoveCallbacks, song, caller)
     emitEvent(queueChangeCallbacks, queue, {
       song, action: 'removed'
@@ -87,7 +87,7 @@ if (config.isEnabled) {
       updateSongsConfigFile()
     }
     queue.push(...songs.map(a => ({ ...a, isJuked: false })))
-    listUi.updateSongs(queue)
+    listUi.updateSongs(current, queue)
     listUi.onSongJuked = (song, info) => {
       addToQueue(song.name, true, info)
     }
@@ -110,7 +110,7 @@ if (config.isEnabled) {
     }
     current = queue[0]
     queue.shift()
-    listUi.updateSongs(queue)
+    listUi.updateSongs(current, queue)
     listUi.updatePreviousSongs(history)
     tm.client.callNoRes('SetForcedMusic', [
       { boolean: config.overrideMapMusic },
@@ -178,7 +178,7 @@ function emitEvent<T extends ((...args: any) => any)[]>(eventCallbacks: T, ...pa
   }
 }
 
-function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
+function addToQueue(songName: string, emitEventsAndMessages: boolean, caller?: Caller):
   Song | "already queued" | "not in songlist" | "no privilege" {
   const songIndex = queue.findIndex(a => a.name === songName)
   if (songIndex === -1) {
@@ -197,13 +197,20 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   song.caller = caller
   const newIndex = queue.findIndex(a => a.isJuked === false)
   queue.splice(newIndex, 0, song)
-  listUi.updateSongs(queue)
+  listUi.updateSongs(current, queue)
   if (caller !== undefined) {
     tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) queued song ${song.name} by ${song.author}`)
   } else {
     tm.log.trace(`Song ${song.name} by ${song.author} queued`)
   }
-  if (emitEvents) {
+  if (emitEventsAndMessages) {
+    if (caller !== undefined) {
+      tm.sendMessage(tm.utils.strVar(config.messages.addToQueue, {
+        nickname: tm.utils.strip(caller.nickname),
+        song: song.name,
+        author: song.author
+      }))
+    }
     emitEvent(queueChangeCallbacks, queue, {
       song, action: 'addedToQueue'
     })
@@ -224,7 +231,7 @@ function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not q
   song.isJuked = false
   song.caller = undefined
   queue.push(song)
-  listUi.updateSongs(queue)
+  listUi.updateSongs(current, queue)
   emitEvent(queueChangeCallbacks, queue, {
     song, action: 'removedFromQueue'
   })
@@ -235,7 +242,11 @@ function shuffleQueue(caller?: Caller): boolean {
   if (caller !== undefined && caller.privilege < config.forceQueuePrivilege) {
     return false
   }
-  queue = queue.map(a => ({ song: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.song)
+  queue = queue
+    .map(a => ({ song: { ...a, isJuked: false, caller: undefined }, rand: Math.random() }))
+    .sort((a, b): number => a.rand - b.rand)
+    .map(a => a.song)
+  listUi.updateSongs(current, queue)
   emitEvent(queueChangeCallbacks, queue)
   if (caller !== undefined) {
     tm.log.info(`${tm.utils.strip(caller.nickname)} (${caller.login}) shuffled the song list`)

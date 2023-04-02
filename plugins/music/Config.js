@@ -1,3 +1,5 @@
+const p = tm.utils.palette
+
 export default {
   isEnabled: true,
   songListPath: './plugins/music/SongList.js', // Needed for updates on song add/remove
@@ -7,6 +9,11 @@ export default {
   historySize: 3,
   // Privilege required to queue recently queued songs, queue more than one song and shuffle songs
   forceQueuePrivilege: 1,
+  messages: {
+    addToQueue: `${p.highlight}#{nickname} ${p.vote}has added ${p.highlight}#{song}${p.vote}` +
+      ` by ${p.highlight}#{author}${p.vote} to the song queue.`,
+    removeFromQueue: `${p.highlight}#{nickname} ${p.vote}has removed ${p.highlight}#{song}${p.vote} from the song queue.`,
+  },
   addCommand: {
     aliases: ['addsong'],
     help: 'Add and queue a song.',
