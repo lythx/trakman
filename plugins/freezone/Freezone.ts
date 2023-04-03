@@ -44,16 +44,18 @@ const sendLive = async (): Promise<true | Error> => {
       }
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
-      tm.log.error(`Couldn't send Freezone Manialive request`)
-      res.on('end', (): void => resolve(new Error(data)))
+      res.on('end', (): void => reject(new Error(`Status code: ${res.statusCode}, message: ${data}`)))
     })
     req.write(JSON.stringify(data))
-    req.on('error', (): void => { reject(new Error(`Freezone HTTP request error.`)) })
-      .on('timeout', (): void => { reject(new Error(`Freezone HTTP request timeout.`)) })
-      .end()
+    req.on('error', (): void => {
+      reject(new Error(`HTTP request error.`))
+    }).on('timeout', (): void => {
+      reject(new Error(`HTTP request timeout.`))
+    }).end()
   }).catch((err): Error => {
-    tm.log.debug(`Freezone http request error: ${err.message} ${err}`) // TODO CHANGE TO WARN IF WORKS
-    return new Error() // TODO WRITE ERROR STR HERE
+    const errStr = `Couldn't send Freezone Manialive request. Error: ${err?.message}`
+    tm.log.error(errStr)
+    return new Error(errStr)
   })
 }
 

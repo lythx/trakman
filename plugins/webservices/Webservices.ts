@@ -58,13 +58,16 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
       res.on('data', (chunk): void => { data += chunk })
       if (res.statusCode === 200) {
         res.on('end', (): void => { resolve(JSON.parse(data)) })
+      } else {
+        reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
       }
-    }).on('error', (): void => { reject(new Error(`Webservices HTTP request error.`)) })
-      .on('timeout', (): void => { reject(new Error(`Webservices HTTP request timeout.`)) })
+    }).on('error', (): void => { reject(new Error(`HTTP request error.`)) })
+      .on('timeout', (): void => { reject(new Error(`HTTP request timeout.`)) })
       .end()
-  }).catch((err): Error => {
-    tm.log.debug(`Webservices HTTP request error: ${JSON.stringify(err)}`)
-    return new Error()
+  }).catch((err: Error): Error => {
+    const errStr = `Webservices fetch error: ${err?.message}`
+    tm.log.warn(errStr)
+    return new Error(errStr)
   })
 }
 
