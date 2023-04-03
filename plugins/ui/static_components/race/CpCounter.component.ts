@@ -13,7 +13,7 @@ interface CheckpointData {
   current?: number,
   isFinish: boolean,
 }
-// TODO FIX NEXTMAPRECORDS DOUBLE REC BUG
+
 export default class CpCounter extends StaticComponent {
 
   private readonly header: StaticHeader

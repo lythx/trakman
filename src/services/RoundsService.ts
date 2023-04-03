@@ -22,7 +22,7 @@ export class RoundsService {
   private static roundFinishCount = 0
 
   static async initialize(): Promise<void> {
-    await Client.call('system.multicall', [ // TODO TEST
+    await Client.call('system.multicall', [
       { method: 'SetCupRoundsPerChallenge', params: [{ int: 0 }] },
       { method: 'SetUseNewRulesTeam', params: [{ boolean: true }] }])
     const status = await this.updateRoundsSettings()

@@ -5,7 +5,6 @@ export default {
   title: 'Map Info',
   navbar: [
     { name: 'Map List', actionId: ids.mapList }
-    // TODO add detailed map info here too
   ],
   itemsPerPage: 3,
   queueCount: 4,

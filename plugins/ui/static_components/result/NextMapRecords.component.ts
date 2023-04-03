@@ -6,6 +6,7 @@
 import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 
+// TODO THERES A BUG WHICH CAUSES RECORDS TO BE DISPLAYED TWICE, HAPPENED AFTER CHANGING GAMEMODES
 export default class NextMapRecords extends StaticComponent {
 
   private readonly header: StaticHeader

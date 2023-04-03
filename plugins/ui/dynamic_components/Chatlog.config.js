@@ -18,7 +18,6 @@ export default {
     7,
   ],
   navbar: [
-    // TODO
   ],
   selfColour: p.green,
   grid: {
