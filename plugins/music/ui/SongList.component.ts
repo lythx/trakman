@@ -14,7 +14,7 @@ interface DisplayParams {
   target?: SearchTarget
 }
 
-// TODO GRAY OUT ENTIRE ENTRY, CHANGE REMOVE ICON TO RED
+// TODO CHANGE REMOVE ICON TO RED
 
 export default class SongList extends PopupWindow<DisplayParams> {
 
@@ -134,8 +134,11 @@ export default class SongList extends PopupWindow<DisplayParams> {
       (i, j, w, h) => centeredText(' Queued by ', w, h),
       (i, j, w, h) => centeredText(' Queue ', w, h),
     ]
-    const indexCell: GridCellFunction = (i, j, w, h) =>
-      centeredText((i + index + 1).toString(), w, h)
+    const indexCell: GridCellFunction = (i, j, w, h) => {
+      let cover = ''
+      return centeredText((i + index + 1).toString(), w, h) + cover
+    }
+
     const nameCell: GridCellFunction = (i, j, w, h) =>
       centeredText(list[index + i].name, w, h)
     const authorCell: GridCellFunction = (i, j, w, h) =>
@@ -156,29 +159,19 @@ export default class SongList extends PopupWindow<DisplayParams> {
         const songIndex = this.songs.findIndex(a => a.name === song.name)
         actionId = this.openId + this.addActionIdOffset + songIndex
       }
-      const isCurrent = this.currentSong?.name === song.name
       let icon = config.addIcon
       let iconHover = config.addIconHover
-      if (song.isJuked && !isCurrent) {
+      if (song.isJuked && this.currentSong?.name !== song.name) {
         icon = config.removeIcon
         iconHover = config.removeIconHover
       }
       let action = `action="${actionId}"`
       let cover = ''
-      if (isCurrent ||
-        ((privilege < pluginConfig.forceQueuePrivilege &&
-          this.previousSongs.some(a => a.name === song.name))
-          && !song.isJuked)) {
+      if (!this.checkQueuePrivilege(login, privilege, song)) {
         iconHover = ''
         action = ''
-        cover = `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" 
+        cover = `<quad posn="${w / 2} ${-h / 2} 7" sizen="${w} ${h}" 
         bgcolor="${config.overlayColour}" halign="center" valign="center" />`
-      } else if (song.caller !== undefined &&
-        privilege < pluginConfig.forceQueuePrivilege && song.caller.login !== login) {
-        iconHover = ''
-        action = ''
-        cover = `<quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" 
-          bgcolor="${config.overlayColour}" halign="center" valign="center" />`
       }
       return `${cover}
       <quad posn="${w / 2} ${-h / 2} 1" sizen="${config.iconWidth} ${config.iconHeight}" image="${icon}"
@@ -190,6 +183,15 @@ export default class SongList extends PopupWindow<DisplayParams> {
       arr.push(indexCell, nameCell, authorCell, queueIndex, queuedByCell, addToQueueCell)
     }
     return this.grid.constructXml(arr)
+  }
+
+  private checkQueuePrivilege(login: string, privilege: number, song: Song): boolean {
+    if (this.currentSong?.name === song.name) { return false }
+    if (song.caller?.login === login) { return true }
+    return !((privilege < pluginConfig.forceQueuePrivilege &&
+      (this.previousSongs.some(a => a.name === song.name) ||
+        this.songs.some(a => a.caller?.login === login))) ||
+      (song.isJuked && privilege < pluginConfig.forceQueuePrivilege))
   }
 
   protected constructFooter(login: string, params?: DisplayParams): string {
