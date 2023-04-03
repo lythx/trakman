@@ -9,7 +9,7 @@ export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
-  private static readonly environments = {
+  private static readonly environments: { [key: number]: tm.Environment } = {
     1: 'Snow',
     2: 'Desert',
     3: 'Rally',
@@ -17,33 +17,33 @@ export abstract class TMXFetcher {
     5: 'Coast',
     6: 'Bay',
     7: 'Stadium'
-  } as const
-  private static readonly difficulties = {
+  }
+  private static readonly difficulties: { [key: number]: tm.TMXDifficulty } = {
     0: 'Beginner',
     1: 'Intermediate',
     2: 'Expert',
     3: 'Lunatic'
-  } as const
-  private static readonly moods = {
+  }
+  private static readonly moods: { [key: number]: tm.Mood } = {
     0: 'Sunrise',
     1: 'Day',
     2: 'Sunset',
     3: 'Night'
-  } as const
-  private static readonly routes = {
+  }
+  private static readonly routes: { [key: number]: tm.TMXRoutes } = {
     0: 'Single',
     1: 'Multiple',
     2: 'Symmetrical'
-  } as const
-  private static readonly mapTypes = {
+  }
+  private static readonly mapTypes: { [key: number]: tm.TMXMapType } = {
     0: 'Race',
     1: 'Puzzle',
     2: 'Platform',
     3: 'Stunts',
     4: 'Shortcut',
     5: 'Laps'
-  } as const
-  private static readonly cars = { // TODO MAKE TYPE USE ENUM
+  }
+  private static readonly cars: { [key: number]: tm.TMXCar } = { // TODO MAKE TYPE USE ENUM
     1: 'SnowCar',
     2: 'DesertCar',
     3: 'RallyCar',
@@ -51,8 +51,8 @@ export abstract class TMXFetcher {
     5: 'CoastCar',
     6: 'BayCar',
     7: 'StadiumCar'
-  } as const
-  private static readonly styles = {
+  }
+  private static readonly styles: { [key: number]: tm.TMXStyle } = {
     0: 'Normal',
     1: 'Stunt',
     2: 'Maze',
@@ -66,7 +66,7 @@ export abstract class TMXFetcher {
     10: 'PressForward',
     11: 'Trial',
     12: 'Grass'
-  } as const
+  }
 
   /**
    * Fetches map file from TMX via its UID.

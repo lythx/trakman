@@ -915,9 +915,18 @@ declare global {
     export type Mood = 'Sunrise' | 'Day' | 'Sunset' | 'Night'
     /** Server command data type */
     export type CommandParameterType = 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword'
-    /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
+    /** TMX map difficulty ('Beginner', 'Expert', etc.) */
     export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
+    /** TMX map routes ('Single', 'Multiple', 'Symmetrical') */
+    export type TMXRoutes = 'Single' | 'Multiple' | 'Symmetrical'
+    /** TMX map type ('Race', 'Puzzle', etc.) */
+    export type TMXMapType = 'Race' | 'Puzzle' | 'Platform' | 'Stunts' | 'Shortcut' | 'Laps'
+    /** TMX map car ('SnowCar', 'DesertCar', etc.) */
+    export type TMXCar = 'SnowCar' | 'DesertCar' | 'RallyCar' | 'IslandCar' | 'CoastCar' | 'BayCar' | 'StadiumCar'
+    /** TMX map style ('Normal', 'Stunt', etc.) */
+    export type TMXStyle = 'Normal' | 'Stunt' | 'Maze' | 'Offroad' | 'Laps' | 'Fullspeed' | 'LOL' |
+      'Tech' | 'SpeedTech' | 'RPG' | 'PressForward' | 'Trial' | 'Grass'
   }
 }
