@@ -162,7 +162,7 @@ export default class TimerWidget extends StaticComponent {
         timeXml = centeredText(config.pausedText, config.width, bottomH,
           { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
       } else {
-        const time = ~~(tm.timer.remainingRaceTime / 1000)
+        const time = Math.floor(tm.timer.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
         if (time < config.colourChangeThresholds[1]) {
           timeColour = config.timeColours[2]
