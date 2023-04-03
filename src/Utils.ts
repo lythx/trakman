@@ -350,6 +350,15 @@ export const Utils = {
   },
 
   /**
+   * In Trackmania, https links won't work
+   * @param str Original URL
+   * @returns URL that will likely function properly
+   */
+  fixProto(url: string): string {
+    return url.replace(/^https:\/\//, 'http://')
+  },
+
+  /**
    * Attempts to convert the player nickname to their login via charmap.
    * @param nickname Player nickname
    * @param options Options to modify search similarity goals
