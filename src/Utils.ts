@@ -405,7 +405,7 @@ export const Utils = {
    */
   parseTimeString(dateStr: string): number | Error {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
-      if (isNaN(new Date(Number(dateStr)).getTime())) {
+      if (isNaN(new Date(Number(dateStr) * 1000 * 60).getTime())) {
         return new Error(`Time amount too big`)
       }
       return Number(dateStr) * 1000 * 60

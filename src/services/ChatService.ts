@@ -119,7 +119,7 @@ export abstract class ChatService {
             }
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
-          case 'time': // TODO TEST
+          case 'time':
             const timeOrError = Utils.parseTimeString(params[i])
             if (timeOrError instanceof Error) {
               if (timeOrError.message === 'Time amount too big') {
