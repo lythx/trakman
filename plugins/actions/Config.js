@@ -1,7 +1,7 @@
 const p = tm.utils.palette
 
 export default {
-  noPermission: `${p.error} You have no permission to perform this action.`,
+  noPermission: `${p.error}You have no permission to perform this action.`,
   addVote: {
     voteTexts: {
       '3': 'fantastic',
@@ -38,12 +38,14 @@ export default {
   forcespec: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced ${p.highlight}#{name} ${p.admin}into spectator mode.`,
     error: `${p.error}Player is not on the server.`,
+    tooManySpecs: `${p.error}Could not forcespec ${p.highlight}#{name}${p.error} because there are too many spectators.`,
     public: true,
     privilege: 1,
   },
   forceplay: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced ${p.highlight}#{name} ${p.admin}into player mode.`,
     error: `${p.error}Player is not on the server.`,
+    tooManyPlayers: `${p.error}Could not forceplay ${p.highlight}#{name}${p.error} because there are too many players.`,
     public: true,
     privilege: 1,
   },

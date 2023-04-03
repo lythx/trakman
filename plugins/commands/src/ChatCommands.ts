@@ -84,8 +84,7 @@ const commands: tm.Command[] = [
     aliases: config.afk.aliases,
     help: config.afk.help,
     callback: async (info: tm.MessageInfo): Promise<void> => {
-      tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
-      await tm.client.call('system.multicall',
+      const res = await tm.client.call('system.multicall',
         [{
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 1 }]
@@ -94,7 +93,12 @@ const commands: tm.Command[] = [
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]
         }])
-      tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      if (res instanceof Error || res[0] instanceof Error) {
+        tm.sendMessage(config.afk.tooManySpecs, info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
+        tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      }
     },
     privilege: config.afk.privilege
   },

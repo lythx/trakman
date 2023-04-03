@@ -67,6 +67,7 @@ export default {
   },
   afk: {
     text: `$g[#{nickname}$z$s$g] ${prefix}Away from keyboard!`,
+    tooManySpecs: `${p.error}Could not switch to spectator mode because there are too many spectators.`,
     public: true,
     privilege: 0,
     aliases: ['afk', 'imstupid'],

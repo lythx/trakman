@@ -95,7 +95,7 @@ export const actions = {
    * @param info Caller player information
    * @param login Login of player to force into spectator mode
    */
-  forceSpectator: (info: CallerInfo, login: string): void => {
+  forceSpectator: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.forcespec.privilege) {
       sendNoPrivilegeMessage()
       return
@@ -105,12 +105,7 @@ export const actions = {
       tm.sendMessage(config.forcespec.error, info.login)
       return
     }
-    tm.sendMessage(tm.utils.strVar(config.forcespec.text, {
-      title: info.title,
-      adminName: tm.utils.strip(info.nickname),
-      name: tm.utils.strip(targetInfo.nickname)
-    }), config.forcespec.public ? undefined : info.login)
-    tm.client.callNoRes('system.multicall',
+    const res = await tm.client.call('system.multicall',
       [{
         method: 'ForceSpectator',
         params: [{ string: login }, { int: 1 }]
@@ -120,13 +115,23 @@ export const actions = {
         params: [{ string: login }, { int: 0 }]
       }]
     )
+    const name = tm.utils.strip(targetInfo.nickname)
+    if (res instanceof Error || res[0] instanceof Error) {
+      tm.sendMessage(tm.utils.strVar(config.forcespec.tooManySpecs, { name }), info.login)
+    } else {
+      tm.sendMessage(tm.utils.strVar(config.forcespec.text, {
+        title: info.title,
+        adminName: tm.utils.strip(info.nickname),
+        name: tm.utils.strip(targetInfo.nickname)
+      }), config.forcespec.public ? undefined : info.login)
+    }
   },
   /**
    * Forces a player into play mode and sends a chat message
    * @param info Caller player information
    * @param login Login of player to force into play mode
    */
-  forcePlay: (info: CallerInfo, login: string): void => {
+  forcePlay: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.forceplay.privilege) {
       sendNoPrivilegeMessage()
       return
@@ -136,12 +141,7 @@ export const actions = {
       tm.sendMessage(config.forceplay.error, info.login)
       return
     }
-    tm.sendMessage(tm.utils.strVar(config.forceplay.text, {
-      title: info.title,
-      adminName: tm.utils.strip(info.nickname),
-      name: tm.utils.strip(targetInfo.nickname)
-    }), config.forceplay.public ? undefined : info.login)
-    tm.client.callNoRes('system.multicall',
+    const res = await tm.client.call('system.multicall',
       [{
         method: 'ForceSpectator',
         params: [{ string: login }, { int: 2 }]
@@ -151,6 +151,15 @@ export const actions = {
         params: [{ string: login }, { int: 0 }]
       }]
     )
+    const name = tm.utils.strip(targetInfo.nickname)
+    if (res instanceof Error || res[0] instanceof Error) {
+      tm.sendMessage(tm.utils.strVar(config.forceplay.tooManyPlayers, { name }), info.login)
+    } else {
+      tm.sendMessage(tm.utils.strVar(config.forceplay.text, {
+        title: info.title,
+        adminName: tm.utils.strip(info.nickname), name
+      }), config.forceplay.public ? undefined : info.login)
+    }
   },
   /**
    * Bans a player and sends a chat message
