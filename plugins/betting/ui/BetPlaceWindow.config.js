@@ -28,11 +28,11 @@ export default {
   },
   prizeColour: tm.utils.palette.green,
   betAcceptedText: {
-    scale: 1,
+    textScale: 0.8,
     yOffset: -0.03
   },
   prizeText: {
-    scale: 1.1,
+    textScale: 1.1,
     yOffset: -0.03
   },
   betAmountText: {

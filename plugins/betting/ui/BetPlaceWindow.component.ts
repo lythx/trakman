@@ -4,8 +4,6 @@ import {
 } from '../../ui/UI.js'
 import config from './BetPlaceWindow.config.js'
 
-// TODO OPTIMIZE POSITION UPDATES
-
 export default class BetPlaceWindow extends DynamicComponent {
 
   private readonly header: StaticHeader
@@ -32,7 +30,11 @@ export default class BetPlaceWindow extends DynamicComponent {
       async (info) => this.onBetAccept(info))
   }
 
-  updatePosYAndHeight(): void {
+  onBeginMap(): void {
+    this.updatePosYAndHeight()
+  }
+
+  private updatePosYAndHeight(): void {
     const side = config.relativePos.side === true ? 'right' : 'left'
     const data = components.staticHeights[tm.getGameMode()]
     this.height = config.staticPos.height ?? data[side][config.relativePos.widgetNumber]?.getHeight() ?? 0
@@ -42,7 +44,6 @@ export default class BetPlaceWindow extends DynamicComponent {
   }
 
   displayToPlayer(login: string, params: { seconds: number, placedBet: boolean }): void {
-    this.updatePosYAndHeight()
     const grid = new Grid(config.width + config.margin * 2,
       this.height + config.margin - StaticHeader.raceHeight, [1, 1, 1], [1, 1], {
       background: config.background, margin: config.margin
@@ -53,20 +54,21 @@ export default class BetPlaceWindow extends DynamicComponent {
     }
     let content: string
     if (params.placedBet) {
-      const h = grid.height - grid.margin
+      const h = grid.height - grid.margin * 2
       content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${h}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
       ${centeredText(`Bet accepted`, config.width, h / 2, config.betAcceptedText)}
       ${centeredText(`Prize: $${tm.utils.palette.green}${(this.prize ?? 0) * this.betLogins.length}C`, config.width,
-        h / 2, { yOffset: h / 2 + config.prizeText.yOffset, textScale: config.prizeText.scale })}`
+        h / 2, { yOffset: h / 2 + config.prizeText.yOffset, textScale: config.prizeText.textScale })}`
     } else if (this.prize === undefined) {
       const cells: GridCellFunction[] = []
       for (let i = 0; i < config.options.length; i++) { cells.push(cell) }
       content = grid.constructXml(cells)
     } else {
-      content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${grid.height}" 
+      const h = grid.height - grid.margin * 2 // TODO TEST
+      content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${h}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
-      ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, grid.height, config.betAmountText)}`
+      ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, h, config.betAmountText)}`
     }
     const headerW = this.header.options.squareWidth + this.headerRectW + config.margin * 2
     const topRightW = config.width - headerW

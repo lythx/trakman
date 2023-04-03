@@ -84,6 +84,8 @@ if (config.isEnabled) {
 
   tm.addListener('ServerStateChanged', (state) => {
     if (!isActive || state !== 'race') { return }
+    betPlaceWindow.onBeginMap()
+    betInfoWidget.onBeginMap()
     const unitedLogins = tm.players.list.filter(a => a.isUnited).map(a => a.login)
     tm.sendMessage(config.messages.begin, unitedLogins)
     isOpen = true
