@@ -123,11 +123,11 @@ export default class TimerWidget extends StaticComponent {
 
   display(): void {
     if (!this.isDisplayed) { return }
-    if (this.isPaused) { return }
+    if (this.isPaused && tm.timer.isPaused) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
-    if (tm.timer.isPaused) { this.isPaused = true }
+    if (tm.timer.isPaused) { this.isPaused = true } else { this.isPaused = false }
   }
 
   displayToPlayer(login: string, privilege?: number): void {
