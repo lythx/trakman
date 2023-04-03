@@ -118,8 +118,8 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     minLadderLimit: info.minLadderLimit ?? 0,
     maxLadderLimit: info.maxLadderLimit ?? 0,
     maxPlayerCount: info.maxPlayerCount ?? 0,
-    currentMap: info.currentMap ?? '--', // TODO CONFIG
-    currentMapAuthor: info.currentMapAuthor ?? '--'
+    currentMap: info.currentMap ?? config.noDataText,
+    currentMapAuthor: info.currentMapAuthor ?? config.noDataText
   }
 
 }
