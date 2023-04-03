@@ -355,7 +355,7 @@ export const Utils = {
    * @returns URL that will likely function properly
    */
   fixProto(url: string): string {
-    return url.replace(/^https:\/\//, 'http://')
+    return `http://${url.replace(/^https?:\/\//, '')}`
   },
 
   /**
