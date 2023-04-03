@@ -90,6 +90,9 @@ export const music = {
       return false
     }
     const song = queue.splice(index, 1)[0]
+    if (index === 0) {
+      updateNextSong(queue[0]?.url)
+    }
     listUi.updateSongs(current, queue)
     emitEvent(songRemoveCallbacks, song, caller)
     emitEvent(queueChangeCallbacks, queue, {
@@ -158,6 +161,7 @@ if (config.isEnabled) {
         tm.sendMessage(msg.removeFromQueueError, info.login)
       }
     }
+    updateNextSong(queue[0]?.url)
     emitEvent(queueChangeCallbacks, queue)
   })
 
@@ -177,10 +181,7 @@ if (config.isEnabled) {
     listUi.updateSongs(current, queue)
     listUi.updatePreviousSongs(history)
     widgetUi.setCurrentSong(current)
-    tm.client.callNoRes('SetForcedMusic', [
-      { boolean: config.overrideMapMusic },
-      { string: queue[0]?.url } // TODO TEST
-    ])
+    updateNextSong(queue[0]?.url)
     emitEvent(queueChangeCallbacks, queue)
   }, true)
   const msg = config.messages
@@ -282,6 +283,9 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   song.caller = caller
   const newIndex = queue.findIndex(a => a.isJuked === false)
   queue.splice(newIndex, 0, song)
+  if (newIndex === 0) {
+    updateNextSong(song.url)
+  }
   listUi.updateSongs(current, queue)
   if (caller !== undefined) {
     tm.log.trace(`${tm.utils.strip(caller.nickname)} (${caller.login}) queued song ${song.name} by ${song.author}`)
@@ -312,6 +316,9 @@ function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not q
     tm.log.trace(`Song ${tm.utils.strip(queue[index].name)} by ${queue[index].author} has been removed from the queue`)
   }
   const song = queue.splice(index, 1)[0]
+  if (index === 0) {
+    updateNextSong(queue[0].url)
+  }
   song.isJuked = false
   song.caller = undefined
   queue.push(song)
@@ -331,6 +338,7 @@ function shuffleQueue(caller?: Caller): boolean {
     .sort((a, b): number => a.rand - b.rand)
     .map(a => a.song)
   listUi.updateSongs(current, queue)
+  updateNextSong(queue[0]?.url)
   emitEvent(queueChangeCallbacks, queue)
   if (caller !== undefined) {
     tm.log.info(`${tm.utils.strip(caller.nickname)} (${caller.login}) shuffled the song list`)
@@ -338,6 +346,13 @@ function shuffleQueue(caller?: Caller): boolean {
     tm.log.info(`Song list shuffled`)
   }
   return true
+}
+
+function updateNextSong(url: string) {
+  tm.client.callNoRes('SetForcedMusic', [
+    { boolean: config.overrideMapMusic },
+    { string: url }
+  ])
 }
 
 function fixDuplicateNames(): boolean {
