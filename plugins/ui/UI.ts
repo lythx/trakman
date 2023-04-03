@@ -45,8 +45,8 @@ const loadMod = (): void => {
         Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
         Url: {
           string: obj.randomOrder
-            ? obj.modLinks[~~(Math.random() * obj.modLinks.length)].replace(/^https:\/\//, '')
-            : obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length].replace(/^https:\/\//, '')
+            ? obj.modLinks[~~(Math.random() * obj.modLinks.length)].replace(/^https:\/\//, 'http://')
+            : obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length].replace(/^https:\/\//, 'http://')
         }
       }
     })

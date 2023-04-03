@@ -440,7 +440,7 @@ export default class RecordList {
          sizen="${width - ((this.infoIconWidth + this.columnGap) * 2)} ${h}" bgcolor="${this.headerBackground}"/>
         ${this.centeredText(topInfo[0], width - ((this.infoIconWidth * 2) + this.columnGap), h, posX + this.infoIconWidth + this.columnGap)}
         <quad posn="${posX + this.infoIconWidth + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} 0 1"
-         sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
+         sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}" url="${topInfo[1].replace(/^https:\/\//, 'http://')}"/>
         <quad posn="${posX + this.infoIconWidth + this.iconHorizontalPadding + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} ${-this.iconVerticalPadding} 6"
          sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.downloadIcon}"/>`
       } else if (topInfo.length === 2) {

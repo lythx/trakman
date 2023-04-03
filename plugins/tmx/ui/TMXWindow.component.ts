@@ -122,8 +122,8 @@ image="${image}" url="${url}" /> `
     }
     return `${this.constructEntry(title, config.icons.header, width - (config.iconWidth + config.margin) * 3, height, config.iconWidth)}
     <frame posn="${width - ((config.iconWidth + config.margin) * 3 + config.margin)} 0 4">
-      ${icon(0, 0, config.icons.maniaExchange, TMXMap.pageUrl.replace(/^https:\/\//, ''))}
-      ${icon(config.iconWidth + config.margin, 0, config.icons.downloadGreen, TMXMap.downloadUrl.replace(/^https:\/\//, ''))}
+      ${icon(0, 0, config.icons.maniaExchange, TMXMap.pageUrl.replace(/^https:\/\//, 'http://'))}
+      ${icon(config.iconWidth + config.margin, 0, config.icons.downloadGreen, TMXMap.downloadUrl.replace(/^https:\/\//, 'http://'))}
       ${icon((config.iconWidth + config.margin) * 2, 0, config.icons.dedimania, tm.utils.safeString(`dedimania.net/tmstats/?do=stat&Uid=${map.id}&Show=RECORDS`))}
     </frame>`
   }
@@ -270,7 +270,7 @@ image="${image}" url="${url}" /> `
     const downloadCell: GridCellObject = {
       callback: (i, j, w, h) => replays[i - 1] !== undefined ?
         `<quad posn="${config.margin} ${-config.margin} 5" sizen="${w - config.margin * 2} ${h - config.margin * 2}" 
-      image="${config.icons.download}" url="${replays[i - 1].url.replace(/^https:\/\//, '')}"
+      image="${config.icons.download}" url="${replays[i - 1].url.replace(/^https:\/\//, 'http://')}"
       imagefocus="${config.icons.downloadGreen}"/>` : '',
       background: config.iconBackground
     }
