@@ -63,7 +63,6 @@ export class GameService {
     if (this._config.timeAttackLimit === 0) {
       this._enableDynamicTimer()
     }
-    await this.loadGamemodeConfig()
     this.startTimer()
     this._mapStartTimestamp = Date.now()
   }
@@ -335,10 +334,6 @@ export class GameService {
     this._dynamicTimerEnabled = false
     this._dynamicTimerOnNextRound = false
     clearInterval(this.dynamicTimerInterval)
-  }
-
-  private static async loadGamemodeConfig(): Promise<void> {
-    await Client.call('SetUseNewRulesTeam', [{ boolean: true }]) // TODO CONFIG
   }
 
 }
