@@ -351,7 +351,7 @@ export const Utils = {
 
   /**
    * In Trackmania, https links won't work
-   * @param str Original URL
+   * @param url Original URL
    * @returns URL that will likely function properly
    */
   fixProto(url: string): string {
