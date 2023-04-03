@@ -119,7 +119,7 @@ export class GameService {
       cupPointsLimit: res.CupPointsLimit,
       cupRoundsPerMap: res.CupRoundsPerChallenge,
       cupWinnersAmount: res.CupNbWinners,
-      cupWarmUpDuration: res.CupWarmUpDuration
+      cupWarmUpRounds: res.CupWarmUpDuration
     }
     if (this._config !== undefined && !this.isGameInfoChanged(obj)) { return }
     this._config = obj

@@ -635,8 +635,8 @@ declare global {
       cupRoundsPerMap: number
       /** Amount of winners in Cup mode */
       cupWinnersAmount: number
-      /** Warm-up rounds count in Cup mode */ // TODO RENAME
-      cupWarmUpDuration: number
+      /** Warm-up rounds count in Cup mode */
+      cupWarmUpRounds: number
     }
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PlayerDataUpdatedInfo {
@@ -776,7 +776,7 @@ declare global {
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "BeginRound": Readonly<FinishInfo>[]
       "EndRound": Readonly<FinishInfo>[]
-      "GameConfigChanged": Readonly<GameInfo> // TODO RENAME
+      "GameConfigChanged": Readonly<GameInfo>
       "ServerConfigChanged": Readonly<ServerInfo>
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
