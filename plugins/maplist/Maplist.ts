@@ -181,7 +181,8 @@ export const maplist = {
   searchByName: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'name')?.list
     if (list === undefined) {
-      list = (tm.utils.matchString(query, authorSort, 'name', true)).filter(a => a.value > 0.1).map(a => a.obj)
+      list = (tm.utils.matchString(query, authorSort, 'name', true))
+        .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj)
       cache.unshift({ query, list, type: 'name' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
@@ -196,7 +197,8 @@ export const maplist = {
   searchByAuthor: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'author')?.list
     if (list === undefined) {
-      list = (tm.utils.matchString(query, nameSort, 'author', true)).filter(a => a.value > 0.1).map(a => a.obj)
+      list = (tm.utils.matchString(query, nameSort, 'author', true))
+        .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj)
       cache.unshift({ query, list, type: 'author' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
