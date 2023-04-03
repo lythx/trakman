@@ -6,6 +6,8 @@ import config from './Config.js'
  * @since 1.3
  */
 
+let currentInterval: NodeJS.Timer
+
 const getRandomMessage = (): string => {
     return config.messages[~~(Math.random() * config.messages.length)]
 }
@@ -22,11 +24,27 @@ if (config.isEnabled) {
             tm.log.warn(`There aren't any info messages available for display.`)
             return
         }
-        setInterval(async (): Promise<void> => {
+        // This is here because we don't emit BeginMap on Startup
+        currentInterval = setInterval(async (): Promise<void> => {
+            sendInfoMessage()
+        }, config.messageInterval * 1000)
+    })
+    // On EndMap, clear the interval for BeginMap
+    // Also clears up whatever left from Startup, which can happen whenever
+    tm.addListener(`EndMap`, (): void => {
+        // Can happen if the message amount is 0
+        if (currentInterval !== undefined) {
+            clearInterval(currentInterval)
+        }
+    })
+    // On BeginMap, reset the interval so the messages are always sent at the same time
+    tm.addListener(`BeginMap`, (): void => {
+        currentInterval = setInterval(async (): Promise<void> => {
             sendInfoMessage()
         }, config.messageInterval * 1000)
     })
     config.events.forEach(e => {
+        // If fake event it just won't work
         tm.addListener(e as keyof tm.Events, (): void => {
             sendInfoMessage()
         })
