@@ -43,7 +43,7 @@ export abstract class TMXFetcher {
     4: 'Shortcut',
     5: 'Laps'
   }
-  private static readonly cars: { [key: number]: tm.TMXCar } = { // TODO MAKE TYPE USE ENUM
+  private static readonly cars: { [key: number]: tm.TMXCar } = {
     1: 'SnowCar',
     2: 'DesertCar',
     3: 'RallyCar',

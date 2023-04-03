@@ -15,4 +15,4 @@ export type NewDediRecord = Omit<tm.Player & DediRecord & {
   }
 }, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>
 
-export type DediLeaderboard = 'TimeAttack' | 'Rounds'
+export type DediLeaderboard = 'TimeAttack' | 'Rounds' | 'Disabled'
