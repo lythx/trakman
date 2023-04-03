@@ -4,6 +4,8 @@ import {
 } from '../../ui/UI.js'
 import config from './BetPlaceWindow.config.js'
 
+// TODO OPTIMIZE POSITION UPDATES
+
 export default class BetPlaceWindow extends DynamicComponent {
 
   private readonly header: StaticHeader
@@ -34,7 +36,6 @@ export default class BetPlaceWindow extends DynamicComponent {
     const side = config.relativePos.side === true ? 'right' : 'left'
     const data = components.staticHeights[tm.getGameMode()]
     this.height = config.staticPos.height ?? data[side][config.relativePos.widgetNumber]?.getHeight() ?? 0
-    console.log(data[side][config.relativePos.widgetNumber]?.constructor.name, this.height)
     this.posY = config.staticPos.posY ??
       (config.topBorder - data[side].slice(0, config.relativePos.widgetNumber)
         .reduce((acc, cur) => acc += cur.getHeight() + config.marginBig, 0))
@@ -46,7 +47,6 @@ export default class BetPlaceWindow extends DynamicComponent {
       this.height + config.margin - StaticHeader.raceHeight, [1, 1, 1], [1, 1], {
       background: config.background, margin: config.margin
     })
-    console.log(this.posY, this.height)
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" action="${this.id + j + (i * 3) + config.actionIdOffset}"/>
       ${centeredText(config.options[j + (i * 3)].toString(), w, h)}`

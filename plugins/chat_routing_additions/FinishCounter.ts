@@ -7,7 +7,7 @@ if (config.isEnabled) {
     const arr = ['[', ...amount.toString(), ']']
     for (let i = 0; i <= config.colours.length; i++) {
       if (config.colours[i] === undefined || config.colours[i].amount > amount) {
-        const c = config.colours[i - 1]
+        const c = config.colours[i - 1] // TODO HANDLE UNDEF
         if (Array.isArray(c.colour)) {
           for (let j = 0; j < c.colour.length && j < arr.length; j += 2) {
             arr.splice(j, 0, c.colour[j])

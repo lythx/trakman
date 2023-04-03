@@ -14,6 +14,8 @@ interface DisplayParams {
   target?: SearchTarget
 }
 
+// TODO GRAY OUT ENTIRE ENTRY, CHANGE REMOVE ICON TO RED
+
 export default class SongList extends PopupWindow<DisplayParams> {
 
   private currentSong: Song | undefined
