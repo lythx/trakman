@@ -82,7 +82,7 @@ tm.addListener('MapRemoved', (map): void => {
 })
 
 /**
- * Provides utilities for filtering and sorting maplist
+ * Provides utilities for filtering and sorting maplist.
  * @author lythx
  * @since 0.1
  */

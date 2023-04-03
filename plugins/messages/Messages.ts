@@ -2,7 +2,7 @@ import { dedimania } from '../dedimania/Dedimania.js'
 import c from './Config.js'
 
 /**
- * Sends server messages on events
+ * Sends server messages on events.
  * @author lythx & wiseraven
  * @since 0.1
  */

@@ -1,3 +1,9 @@
+/**
+ * Adds custom prefixes and postfixes to chat messages.
+ * @author lythx
+ * @since 1.3
+ */
+
 import config from './FinishCounter.config.js'
 import { stats } from '../stats/Stats.js'
 

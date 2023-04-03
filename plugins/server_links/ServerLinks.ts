@@ -138,7 +138,14 @@ function startHttpServer() {
 
 }
 
+/**
+ * Provides utilites for sharing the server data with related servers, fetching related servers data
+ * and renders UI components with related servers information.
+ * @author lythx
+ * @since 1.3
+ */
 export const serverLinks = {
+  // TODO COMMENTS AND METHODS
   get infos(): Readonly<ServerInfo>[] {
     return [...serverInfos]
   }

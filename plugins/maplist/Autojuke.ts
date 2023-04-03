@@ -1,5 +1,5 @@
 /**
- * Adds commands used to quickly add maps to queue based on given conditions
+ * Adds commands used to quickly add maps to queue based on given conditions.
  * @author lythx
  * @since 0.4
  */
