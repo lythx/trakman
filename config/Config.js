@@ -1,5 +1,8 @@
 export default {
-  // TODO DOCUMENT
+  /** 
+   * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
+   * Enabling it makes the chat a bit slower.
+   */
   manualChatRoutingEnabled: true,
   /** Local records limit for rank calculation and plugins */
   localRecordsLimit: 30,
