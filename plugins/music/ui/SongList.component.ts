@@ -117,7 +117,7 @@ export default class SongList extends PopupWindow<DisplayParams> {
 
   private getSearchResult(query: string, target: SearchTarget): (Song & { index: number })[] {
     return (tm.utils.matchString(query, this.songs, target, true))
-      .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj) // TODO val in config and in maplist too
+      .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj)
   }
 
   protected async constructContent(login: string, params?: DisplayParams, privilege: number = 0): Promise<string> {

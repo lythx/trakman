@@ -65,7 +65,6 @@ export default abstract class StaticComponent {
   /**
    * Abstract class for static manialink components
    * @param id Component manialink ID
-   * @param displayMode Events preset on which manialink will get displayed and hidden
    */
   constructor(id: number) {
     if (!StaticComponent.componentListCreated) {
@@ -107,9 +106,16 @@ export default abstract class StaticComponent {
     })
   }
 
+  /**
+   * Gets component height. Used for static UI positioning
+   * @returns Component height
+   */
   abstract getHeight(): number
 
-  updatePosition() {
+  /**
+   * Updates positionX, positionY, and side props, calls onPositionChange
+   */
+  updatePosition(): void {
     const pos = this.getRelativePosition()
     this.positionX = pos.x
     this.positionY = pos.y
@@ -117,7 +123,10 @@ export default abstract class StaticComponent {
     this.onPositionChange()
   }
 
-  protected onPositionChange() {
+  /**
+   * Executed on static UI layout change, by default calls the display() method
+   */
+  protected onPositionChange(): void {
     this.display()
   }
 
@@ -129,7 +138,10 @@ export default abstract class StaticComponent {
     }
   }
 
-  updateIsDisplayed() {
+  /**
+   * Updates _isDisplayed prop based on current static UI layout
+   */
+  updateIsDisplayed(): void {
     this._isDisplayed = (StaticComponent.displayedComponents.left.some(a => a.name === this.constructor.name) ||
       StaticComponent.displayedComponents.right.some(a => a.name === this.constructor.name) ||
       StaticComponent.displayedComponents.other.some(a => a.name === this.constructor.name))
@@ -145,7 +157,7 @@ export default abstract class StaticComponent {
     return ret
   }
 
-  static createComponentList() {
+  private static createComponentList() {
     const c = this.components
     const r = RaceUi
     const res = ResultUi
@@ -189,7 +201,7 @@ export default abstract class StaticComponent {
   }
 
   /**
-   * Gets position relative to other static manialinks based on config.
+   * Gets position relative to other static manialinks based on current static UI layout.
    * @returns Object containing coordinates and side of the component
    */
   private getRelativePosition(): { x: number, y: number, side: boolean } {
@@ -244,7 +256,7 @@ export default abstract class StaticComponent {
    * Add a callback function to execute when new component object gets created 
    * @param callback Function to execute on event
    */
-  static onComponentCreated(callback: (component: StaticComponent) => void) {
+  static onComponentCreated(callback: (component: StaticComponent) => void): void {
     this.componentCreateListeners.push(callback)
   }
 
