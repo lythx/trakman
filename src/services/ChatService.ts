@@ -119,44 +119,23 @@ export abstract class ChatService {
             }
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
-          case 'time':
-            if (!isNaN(Number(params[i])) && Number(params[i]) > 0) {
-              if (isNaN(new Date(Number(params[i])).getTime())) {
-                this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
+          case 'time': // TODO TEST
+            const timeOrError = Utils.parseTimeString(params[i])
+            if (timeOrError instanceof Error) {
+              if (timeOrError.message === 'Time amount too big') {
+                this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
+                  { name: param.name }), info.login)
+                return
+              } else if (timeOrError.message === `Invalid time string`) {
+                this.sendErrorMessage(Utils.strVar(messages.notTime,
+                  { name: param.name }), info.login)
+                return
+              } else {
+                Logger.error(`Unhandled error received from parseTimeString in ChatService: ${timeOrError.message}`,)
                 return
               }
-              parsedParams.push(Number(params[i]) * 1000 * 60)
-              break
-            } // If there's no modifier then time is treated as minutes
-            const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
-            const time: number = Number(params[i].substring(0, params[i].length - 1))
-            if (isNaN(time) || time < 0) {
-              this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
-              return
             }
-            let parsedTime: number
-            switch (unit) {
-              case 's':
-                parsedTime = time * 1000
-                break
-              case 'm':
-                parsedTime = time * 1000 * 60
-                break
-              case 'h':
-                parsedTime = time * 1000 * 60 * 60
-                break
-              case 'd':
-                parsedTime = time * 1000 * 60 * 60 * 24
-                break
-              default:
-                this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
-                return
-            }
-            if (isNaN(new Date(parsedTime).getTime())) {
-              this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
-              return
-            }
-            parsedParams.push(parsedTime)
+            parsedParams.push(timeOrError)
             break
           case 'player': {
             let player = PlayerService.get(params[i])

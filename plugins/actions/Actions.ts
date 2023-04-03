@@ -5,7 +5,17 @@ interface CallerInfo { login: string, nickname: string, title: string, privilege
 const sendNoPrivilegeMessage = (): void =>
   tm.sendMessage(config.noPermission)
 
+/**
+ * Provides utilities for various actions.
+ * @author lythx & wiseraven
+ * @since 1.3
+ */
 export const actions = {
+  /**
+   * Adds a vote for the current map and sends a chat message
+   * @param info Player information
+   * @param voteValue Vote value
+   */
   addVote: (info: { login: string, nickname: string }, voteValue: -3 | -2 | -1 | 1 | 2 | 3) => {
     tm.karma.add(info, voteValue)
     tm.sendMessage(tm.utils.strVar(config.addVote.message, {
@@ -13,6 +23,12 @@ export const actions = {
       voteText: config.addVote.voteTexts[String(voteValue) as keyof typeof config.addVote.voteTexts]
     }), config.addVote.public ? undefined : info.login)
   },
+  /**
+   * Kicks a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to kick
+   * @param reason Optional kick reason
+   */
   kick: (info: CallerInfo, login: string, reason?: string): void => {
     if (info.privilege < config.kick.privilege) {
       sendNoPrivilegeMessage()
@@ -27,6 +43,13 @@ export const actions = {
     tm.sendMessage(tm.utils.strVar(config.kick.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo.nickname) }) + `${reasonString}`, config.kick.public ? undefined : info.login)
     tm.client.callNoRes(`Kick`, [{ string: login }, { string: reason === undefined ? 'No reason specified' : reason }])
   },
+  /**
+   * Mutes a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to mute
+   * @param duration Optional mute duration
+   * @param reason Optional mute reason
+   */
   mute: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.mute.privilege) {
       sendNoPrivilegeMessage()
@@ -43,6 +66,11 @@ export const actions = {
       duration: durationString
     }) + `${reasonString}`, config.mute.public ? undefined : info.login)
   },
+  /**
+   * Unmutes a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to unmute
+   */
   unmute: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unmute.privilege) {
       sendNoPrivilegeMessage()
@@ -62,6 +90,11 @@ export const actions = {
     }
     tm.sendMessage(tm.utils.strVar(config.unmute.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unmute.public ? undefined : info.login)
   },
+  /**
+   * Forces a player into spectator mode and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to force into spectator mode
+   */
   forceSpectator: (info: CallerInfo, login: string): void => {
     if (info.privilege < config.forcespec.privilege) {
       sendNoPrivilegeMessage()
@@ -88,6 +121,11 @@ export const actions = {
       }]
     )
   },
+  /**
+   * Forces a player into play mode and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to force into play mode
+   */
   forcePlay: (info: CallerInfo, login: string): void => {
     if (info.privilege < config.forceplay.privilege) {
       sendNoPrivilegeMessage()
@@ -114,6 +152,13 @@ export const actions = {
       }]
     )
   },
+  /**
+   * Bans a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to ban
+   * @param duration Optional ban duration
+   * @param reason Optional ban reason
+   */
   ban: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.ban.privilege) {
       sendNoPrivilegeMessage()
@@ -130,6 +175,11 @@ export const actions = {
     const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.ban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
   },
+  /**
+   * Unbans a a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to unban
+   */
   unban: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unban.privilege) {
       sendNoPrivilegeMessage()
@@ -149,6 +199,13 @@ export const actions = {
     }
     tm.sendMessage(tm.utils.strVar(config.unban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unban.public ? undefined : info.login)
   },
+  /**
+   * Blacklists a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to blacklist
+   * @param duration Optional blacklist duration
+   * @param reason Optional blacklist reason
+   */
   blacklist: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.blacklist.privilege) {
       sendNoPrivilegeMessage()
@@ -167,6 +224,11 @@ export const actions = {
     const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
   },
+  /**
+   * Unblacklists a player and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to unblacklist
+   */
   unblacklist: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unblacklist.privilege) {
       sendNoPrivilegeMessage()
@@ -186,6 +248,11 @@ export const actions = {
     }
     tm.sendMessage(tm.utils.strVar(config.unblacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.unblacklist.public ? undefined : info.login)
   },
+  /**
+   * Adds a player to the server guestlist and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to add to the guestlist
+   */
   addGuest: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.addguest.privilege) {
       sendNoPrivilegeMessage()
@@ -205,6 +272,11 @@ export const actions = {
     }
     tm.sendMessage(tm.utils.strVar(config.addguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.addguest.public ? undefined : info.login)
   },
+  /**
+   * Removes a player from the server guestlist and sends a chat message
+   * @param info Caller player information
+   * @param login Login of player to remove from the guestlist
+   */
   removeGuest: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.rmguest.privilege) {
       sendNoPrivilegeMessage()

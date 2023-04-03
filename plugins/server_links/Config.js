@@ -17,5 +17,6 @@ export default {
       name: '',
       url: ''
     }
-  ]
+  ],
+  noDataText: '--'
 }

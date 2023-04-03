@@ -118,8 +118,8 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     minLadderLimit: info.minLadderLimit ?? 0,
     maxLadderLimit: info.maxLadderLimit ?? 0,
     maxPlayerCount: info.maxPlayerCount ?? 0,
-    currentMap: info.currentMap ?? '--', // TODO CONFIG
-    currentMapAuthor: info.currentMapAuthor ?? '--'
+    currentMap: info.currentMap ?? config.noDataText,
+    currentMapAuthor: info.currentMapAuthor ?? config.noDataText
   }
 
 }
@@ -138,7 +138,14 @@ function startHttpServer() {
 
 }
 
+/**
+ * Provides utilites for sharing the server data with related servers, fetching related servers data
+ * and renders UI components with related servers information.
+ * @author lythx
+ * @since 1.3
+ */
 export const serverLinks = {
+  // TODO COMMENTS AND METHODS
   get infos(): Readonly<ServerInfo>[] {
     return [...serverInfos]
   }

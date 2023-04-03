@@ -1,7 +1,7 @@
 import config from './Config.js'
 
 /**
- * Sends informational messages periodically
+ * Sends informational messages periodically.
  * @author wiseraven
  * @since 1.3
  */

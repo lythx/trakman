@@ -161,7 +161,10 @@ const components = {
   get dynamicList(): DynamicComponent[] {
     return [...dynamicComponents]
   },
-  // TODO DOC
+
+  /**
+   * Heights of static components used for static UI positioning
+   */
   get staticHeights(): typeof StaticComponent['components'] {
     return StaticComponent.components
   }

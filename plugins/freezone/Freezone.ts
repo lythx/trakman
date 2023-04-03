@@ -82,7 +82,7 @@ if (config.isEnabled) {
 }
 
 /**
- * Sends manialive requests needed for freezone
+ * Sends manialive requests needed for freezone.
  * @author lythx & wiseraven
  * @since 0.3
  */

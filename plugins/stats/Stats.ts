@@ -9,7 +9,7 @@ import { topSums } from './TopSums.js'
 import './ui/StatsUi.js'
 
 /**
- * Creates and provides utilities for accessing rankings for various player stats
+ * Creates and provides utilities for accessing rankings for various player stats.
  * @author lythx
  * @since 0.3
  */

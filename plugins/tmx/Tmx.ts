@@ -128,7 +128,7 @@ function getFromQueue(uids: string | string[]): Readonly<tm.TMXMap> | undefined 
 
 /**
  * Fetches TMX data for current map and maps in the queue. 
- * Provides utilities for accessing TMX related data
+ * Provides utilities for accessing TMX related data.
  * @author lythx
  * @since 0.1
  */

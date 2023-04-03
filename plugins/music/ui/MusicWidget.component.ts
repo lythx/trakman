@@ -44,9 +44,11 @@ export default class MusicWidget extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/>
         ${this.header.constructXml(config.title, config.icon, config.side)}
         <frame posn="0 ${-(this.header.options.height + m)} 1">
-          ${this.icon(config.icons.name, iw, h)}${this.text(this.song?.name ?? '--', w - (iw + m), h, iw + m)}
+          ${this.icon(config.icons.name, iw, h)}
+          ${this.text(this.song?.name ?? config.noDataText, w - (iw + m), h, iw + m)}
           <frame posn="0 ${-(h + m)} 1">
-            ${this.icon(config.icons.author, iw, h)}${this.text(this.song?.author ?? '--', w - (iw + m), h, iw + m)}
+            ${this.icon(config.icons.author, iw, h)}
+            ${this.text(this.song?.author ?? config.noDataText, w - (iw + m), h, iw + m)}
           </frame>
         </frame>
       </frame>

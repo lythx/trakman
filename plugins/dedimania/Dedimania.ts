@@ -13,7 +13,8 @@ const client: DedimaniaClient = new DedimaniaClient()
 // 0 is Rounds, 1 is TimeAttack, Stunts mode records do not get sent
 const recordModeEnum: { [mode in DediLeaderboard]: number } = {
   Rounds: 0,
-  TimeAttack: 1
+  TimeAttack: 1,
+  Disabled: -1
 }
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
@@ -37,10 +38,11 @@ const updateRecordMode = () => {
   const gameMode = tm.getGameMode()
   if (gameMode === 'TimeAttack' || gameMode === 'Laps') {
     leaderboard = 'TimeAttack'
+  } else if (gameMode === 'Stunts') {
+    leaderboard = 'Disabled'
   } else {
     leaderboard = uploadLaps ? 'TimeAttack' : 'Rounds'
   }
-  // TODO HANDLE STUNT
 }
 
 const initialize = async (): Promise<void> => {

@@ -1,3 +1,9 @@
+/**
+ * Adds custom brackets to chat messages.
+ * @author lythx
+ * @since 1.3
+ */
+
 import config from './CustomBracket.config.js'
 
 if (config.isEnabled) {

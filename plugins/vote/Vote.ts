@@ -3,7 +3,7 @@ import IDS from '../ui/config/UtilIds.js'
 import config from './Config.js'
 
 /**
- * Provides utilites for in-game votes
+ * Provides utilites for in-game votes.
  * @author lythx
  * @since 0.1
  */

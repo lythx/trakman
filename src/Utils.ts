@@ -351,7 +351,7 @@ export const Utils = {
 
   /**
    * In Trackmania, https links won't work
-   * @param str Original URL
+   * @param url Original URL
    * @returns URL that will likely function properly
    */
   fixProto(url: string): string {
@@ -393,7 +393,6 @@ export const Utils = {
     return s[0].player
   },
 
-  // TODO USE IN SERVICE
   /**
    * Converts date string to time in miliseconds. 
    * This method is used to parse time in chat commands.
@@ -401,6 +400,8 @@ export const Utils = {
    * [s - seconds, m - minutes, h - hours, d - days]). 
    * If no modifier is specified the number will be treated as minutes.
    * @returns Time in miliseconds
+   * @throws Error with message `Time amount too big` if time is bigger than max js Date
+   * or `Invalid time string` if the dateStr is not a valid date string
    */
   parseTimeString(dateStr: string): number | Error {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {

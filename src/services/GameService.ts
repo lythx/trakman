@@ -63,7 +63,6 @@ export class GameService {
     if (this._config.timeAttackLimit === 0) {
       this._enableDynamicTimer()
     }
-    await this.loadGamemodeConfig()
     this.startTimer()
     this._mapStartTimestamp = Date.now()
   }
@@ -119,7 +118,7 @@ export class GameService {
       cupPointsLimit: res.CupPointsLimit,
       cupRoundsPerMap: res.CupRoundsPerChallenge,
       cupWinnersAmount: res.CupNbWinners,
-      cupWarmUpDuration: res.CupWarmUpDuration
+      cupWarmUpRounds: res.CupWarmUpDuration
     }
     if (this._config !== undefined && !this.isGameInfoChanged(obj)) { return }
     this._config = obj
@@ -335,10 +334,6 @@ export class GameService {
     this._dynamicTimerEnabled = false
     this._dynamicTimerOnNextRound = false
     clearInterval(this.dynamicTimerInterval)
-  }
-
-  private static async loadGamemodeConfig(): Promise<void> {
-    await Client.call('SetUseNewRulesTeam', [{ boolean: true }]) // TODO CONFIG
   }
 
 }

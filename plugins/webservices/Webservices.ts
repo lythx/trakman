@@ -140,7 +140,7 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
 
 /**
  * Provides utilites for fetching player data from Trackmania Webservices.
- * Fetches and stores current and next map author data
+ * Fetches and stores current and next map author data.
  * @author lythx & wiseraven
  * @since 0.1
  */
