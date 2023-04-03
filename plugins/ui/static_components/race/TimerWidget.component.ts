@@ -17,6 +17,7 @@ export default class TimerWidget extends StaticComponent {
   private readonly subtractButtonId = this.id + 3
   private isOnRestart = false
   private roundCountdownDisplayed = false
+  private isPaused = false
 
   constructor() {
     super(componentIds.timer)
@@ -122,10 +123,11 @@ export default class TimerWidget extends StaticComponent {
 
   display(): void {
     if (!this.isDisplayed) { return }
-    if (tm.timer.isPaused) { return }
+    if (this.isPaused) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
+    if (tm.timer.isPaused) { this.isPaused = true }
   }
 
   displayToPlayer(login: string, privilege?: number): void {
