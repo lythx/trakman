@@ -5,7 +5,8 @@ export default {
     // All the info messages will be prefixed with this text
     messagePrefix: `${p.record}[${p.highlight}INFO${p.record}]`,
     // Default formatting for the info messages
-    defaultFormatting: ``,
+    // That is put inbetween the prefix and the message
+    defaultFormatting: `$z$s `,
     // Controls whether the default chat prefix is shown
     chatPrefixEnabled: true,
     // Messages will be chosen randomly from this array
@@ -26,6 +27,8 @@ export default {
         `EndMap`,
         `adfadsfsdf`,
     ],
+    // Whether to send a random message on a specific interval
+    sendOnInterval: true,
     // Message sending interval
     messageInterval: 120, // Seconds
 }

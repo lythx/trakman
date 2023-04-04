@@ -14,7 +14,7 @@ const getRandomMessage = (): string => {
 
 const sendInfoMessage = (): void => {
     tm.sendMessage(config.messagePrefix
-        + `$z$s ${config.defaultFormatting}` // Reset codes in case somebody is very clever
+        + `${config.defaultFormatting}`
         + getRandomMessage(), undefined, config.chatPrefixEnabled)
 }
 
@@ -25,24 +25,27 @@ if (config.isEnabled) {
             return
         }
         // This is here because we don't emit BeginMap on Startup
+        if (!config.sendOnInterval) { return }
         currentInterval = setInterval(async (): Promise<void> => {
             sendInfoMessage()
         }, config.messageInterval * 1000)
     })
-    // On EndMap, clear the interval for BeginMap
-    // Also clears up whatever left from Startup, which can happen whenever
-    tm.addListener(`EndMap`, (): void => {
-        // Can happen if the message amount is 0
-        if (currentInterval !== undefined) {
-            clearInterval(currentInterval)
-        }
-    })
-    // On BeginMap, reset the interval so the messages are always sent at the same time
-    tm.addListener(`BeginMap`, (): void => {
-        currentInterval = setInterval(async (): Promise<void> => {
-            sendInfoMessage()
-        }, config.messageInterval * 1000)
-    })
+    if (config.sendOnInterval) {
+        // On EndMap, clear the interval for BeginMap
+        // Also clears up whatever left from Startup, which can happen whenever
+        tm.addListener(`EndMap`, (): void => {
+            // Can happen if the message amount is 0
+            if (currentInterval !== undefined) {
+                clearInterval(currentInterval)
+            }
+        })
+        // On BeginMap, reset the interval so the messages are always sent at the same time
+        tm.addListener(`BeginMap`, (): void => {
+            currentInterval = setInterval(async (): Promise<void> => {
+                sendInfoMessage()
+            }, config.messageInterval * 1000)
+        })
+    }
     config.events.forEach(e => {
         // If fake event it just won't work
         tm.addListener(e as keyof tm.Events, (): void => {
