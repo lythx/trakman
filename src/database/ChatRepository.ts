@@ -1,11 +1,13 @@
 import { Repository } from './Repository.js'
 import { PlayerRepository } from './PlayerRepository.js'
-import { Logger } from '../Logger.js' 
+import { Logger } from '../Logger.js'
 
 const playerRepo = new PlayerRepository()
 
 export class ChatRepository extends Repository {
-  
+
+  private lastMessageTimestamp: Date = new Date(0)
+
   async get(options?: { limit?: number, date?: Date }): Promise<tm.Message[]> {
     let i = 1
     let limitStr = ''
@@ -52,10 +54,15 @@ export class ChatRepository extends Repository {
 
   async add(login: string, text: string, date: Date): Promise<void> {
     const id = await playerRepo.getId(login)
-    if (id === undefined) { 
+    if (id === undefined) {
       Logger.error(`Failed to get id for player ${login} while inserting into chat table`)
       return
     }
+    if (date === this.lastMessageTimestamp) {
+      Logger.trace(`Last chat message has the same timestamp as the one prior. Incrementing..`)
+      date = new Date(date.getTime() + 1)
+    }
+    this.lastMessageTimestamp = date
     const query: string = 'INSERT INTO chat(player_id, message, date) VALUES ($1, $2, $3)'
     // Slice multibyte characters
     await this.query(query, id, text.slice(0, 150), date)
