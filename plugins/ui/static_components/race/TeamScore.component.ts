@@ -10,7 +10,7 @@ export default class TeamScore extends StaticComponent {
   private readonly header: StaticHeader
   private readonly grid: Grid
   private xml: string = ''
-
+  
   constructor(private maxScore = tm.rounds.teamsPointsLimit) {
     super(componentIds.teamScore)
     this.header = new StaticHeader('race')
@@ -42,7 +42,7 @@ export default class TeamScore extends StaticComponent {
   private constructXml() {
     const colours = [config.colours.left, config.colours.middle, config.colours.right]
     const teamScores = tm.rounds.teamScores
-    const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : 0, teamScores.red]
+    const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : this.maxScore, teamScores.red]
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${colours[j]}"/>
       ${centeredText(data[j].toString(), w, h, config.text)}`
