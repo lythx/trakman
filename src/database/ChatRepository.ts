@@ -14,7 +14,7 @@ export class ChatRepository extends Repository {
     let dateStr = ''
     const params = []
     if (options?.date !== undefined) {
-      dateStr = `WHERE date>$${i}`
+      dateStr = `WHERE date>$${i++}`
       params.push(options.date)
     }
     if (options?.limit !== undefined) {
@@ -36,7 +36,7 @@ export class ChatRepository extends Repository {
     let dateStr = ''
     const params = []
     if (options?.date !== undefined) {
-      dateStr = `AND date>$${i}`
+      dateStr = `AND date>$${i++}`
       params.push(options.date)
     }
     if (options?.limit !== undefined) {
@@ -58,7 +58,7 @@ export class ChatRepository extends Repository {
       Logger.error(`Failed to get id for player ${login} while inserting into chat table`)
       return
     }
-    if (date === this.lastMessageTimestamp) {
+    if (date.getTime() === this.lastMessageTimestamp.getTime()) {
       Logger.trace(`Last chat message has the same timestamp as the one prior. Incrementing..`)
       date = new Date(date.getTime() + 1)
     }
