@@ -613,9 +613,11 @@ declare global {
       /** Amount of laps in Laps mode */
       lapsModeLapsAmount: number
       // TODO RENAME AND CHANGE DOC THIS IS LAPS TIME LIMIT
+      // /** Laps mode time limit (no time limit if set to 0) */
       /** Amount of time left for players to finish the track after the leader in Laps mode */
       lapsModeFinishTimeout: number
       // TODO RENAME AND CHANGE DOC THIS IS FINISH TIMEOUT FOR LAPS/ROUNDS and proabably other modes
+      // /** Amount of time left for players to finish the track after the leader in round-oriented gamemodes */
       /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */
       roundsModeFinishTimeout: number
       /** Duration of the warm-up in all modes */
