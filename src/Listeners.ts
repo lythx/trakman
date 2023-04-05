@@ -333,7 +333,6 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        // If pure spectator is true then player doesn't have a player slot (so hes not counted in round scores for example) 
         PlayerService.setPlayerInfo(info)
         Events.emit('PlayerInfoChanged', info)
       }

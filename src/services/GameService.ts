@@ -95,26 +95,26 @@ export class GameService {
       Logger.fatal('Failed to update game info. Server responded with an error:', res.message)
       return
     }
-    const obj = {
+    const obj: tm.GameInfo = {
       gameMode: res.GameMode, // Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)
       resultTime: res.ChatTime,
       mapIndex: res.NbChallenge,
-      roundsPointsLimit: res.RoundsPointsLimit,
-      roundsPointSystemType: res.RoundsUseNewRules,
+      roundsPointLimitOld: res.RoundsPointsLimit,
+      roundsPointSystemType: res.RoundsUseNewRules ? 'new' : 'old',
       roundsModeLapsAmount: res.RoundsForcedLaps,
       timeAttackLimit: res.TimeAttackLimit,
       countdownAdditionalTime: res.TimeAttackSynchStartPeriod,
-      teamPointsLimit: res.TeamPointsLimit,
+      teamPointLimitOld: res.TeamPointsLimit,
       teamMaxPoints: res.TeamMaxPoints,
       teamPointSystemType: res.TeamUseNewRules,
       lapsModeLapsAmount: res.LapsNbLaps,
-      lapsModeFinishTimeout: res.LapsTimeLimit,
-      roundsModeFinishTimeout: res.FinishTimeout,
+      lapsModeTimeLimit: res.LapsTimeLimit,
+      finishTimeout: res.FinishTimeout,
       warmUpDuration: res.AllWarmUpDuration,
       disableRespawn: res.DisableRespawn,
       forceShowOpponents: res.ForceShowAllOpponents,
-      roundsPointLimitSystemType: res.RoundsPointsLimitNewRules,
-      teamPointLimitSystemType: res.TeamPointsLimitNewRules,
+      roundsPointLimitNew: res.RoundsPointsLimitNewRules,
+      teamPointLimitNew: res.TeamPointsLimitNewRules,
       cupPointsLimit: res.CupPointsLimit,
       cupRoundsPerMap: res.CupRoundsPerChallenge,
       cupWinnersAmount: res.CupNbWinners,

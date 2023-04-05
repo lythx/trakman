@@ -24,7 +24,8 @@ export class RoundsService {
   static async initialize(): Promise<void> {
     await Client.call('system.multicall', [
       { method: 'SetCupRoundsPerChallenge', params: [{ int: 0 }] },
-      { method: 'SetUseNewRulesTeam', params: [{ boolean: true }] }])
+      { method: 'SetUseNewRulesTeam', params: [{ boolean: true }] },
+      { method: 'SetUseNewRulesRound', params: [{ boolean: false }] }])
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
       await Logger.fatal(status.message)
@@ -71,7 +72,7 @@ export class RoundsService {
       }
     })
   }
-
+  // TODO TEAMS COMMANDS MESSAGES DONT SAY ITS TEAMS MODE
   static async updateRoundsSettings(): Promise<true | Error> {
     const settings = await Client.call('system.multicall', [
       { method: 'GetRoundCustomPoints' },
