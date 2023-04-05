@@ -14,8 +14,6 @@ interface DisplayParams {
   target?: SearchTarget
 }
 
-// TODO CHANGE REMOVE ICON TO RED
-
 export default class SongList extends PopupWindow<DisplayParams> {
 
   private currentSong: Song | undefined

@@ -233,7 +233,7 @@ export abstract class ChatService {
           }
         }
         if (!customStyle) {
-          str += Utils.strVar(prefixes.manualChatRoutingMessageFormat, { name: player.nickname })
+          str += Utils.strVar(prefixes.manualChatRoutingMessageStyle, { name: player.nickname })
         }
         for (const e of this.messageTextModifiers) {
           const result = await e.callback(messageInfo)
@@ -256,14 +256,37 @@ export abstract class ChatService {
     return messageInfo
   }
 
-  static addCustomPrefix(callback: MessageFunction, position: number) {
+  /**
+   * Registers a function to add a prefix or postfix to chat messages when using manual chat routing.
+   * @param callback The function takes MessageInfo object and returns string (the prefix) or undefined (then its ignored)
+   * @param position Prefixes are positioned based on this, lowest one is first, 
+   * negative values are positioned before the nickname, positive after it
+   */
+  static addMessagePrefix(callback: MessageFunction, position: number): void {
     this.customPrefixes.push({ callback, position })
     this.customPrefixes.sort((a, b) => b.position - a.position)
   }
 
-  static removeCustomPrefix(callback: MessageFunction) {
-    const index = this.customPrefixes.findIndex(a => a.callback === callback)
-    this.customPrefixes.splice(index, 1)
+  /**
+   * Registers a function to modify the player name on chat message.
+   * @param callback The function takes MessageInfo object and returns string (the name) or undefined (then its ignored)
+   * @param importance In case multiple functions are registered the most important one will be executed.
+   * If it returns undefined the 2nd most important function will be executed and so on
+   */
+  static setMessageStyle(callback: MessageFunction, importance: number) {
+    this.messageStyleFunctions.push({ callback, importance })
+    this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
+  }
+
+  /**
+   * Registers a function to modify chat message text.
+   * @param callback The function takes MessageInfo object and returns string (the name) or undefined (then its ignored)
+   * @param importance In case multiple functions are registered the most important one will be executed.
+   * If it returns undefined the 2nd most important will be executed and so on
+   */
+  static addMessageTextModifier(callback: MessageFunction, importance: number) {
+    this.messageTextModifiers.push({ callback, importance })
+    this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
 
   /**
@@ -320,16 +343,6 @@ export abstract class ChatService {
    */
   static get commandCount(): number {
     return this._commandList.length
-  }
-
-  static addMessageStyle(callback: MessageFunction, importance: number) {
-    this.messageStyleFunctions.push({ callback, importance })
-    this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
-  }
-
-  static addMessageTextModifier(callback: MessageFunction, importance: number) {
-    this.messageTextModifiers.push({ callback, importance })
-    this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
 
 }

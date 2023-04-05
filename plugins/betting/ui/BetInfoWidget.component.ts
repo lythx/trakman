@@ -2,7 +2,7 @@ import {
   DynamicComponent, StaticHeader, componentIds, centeredText, components
 } from '../../ui/UI.js'
 import config from './BetInfoWidget.config.js'
-// TODO TEST
+
 export default class BetInfoWidget extends DynamicComponent {
 
   readonly header: StaticHeader

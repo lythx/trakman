@@ -8,7 +8,7 @@ import config from './FinishCounter.config.js'
 import { stats } from '../stats/Stats.js'
 
 if (config.isEnabled) {
-  tm.messages.addCustomPrefix(async (info): Promise<string> => {
+  tm.chat.addMessagePrefix(async (info): Promise<string> => {
     const amount = stats.records.onlineList.find(a => a.login === info.login)?.amount ?? 0
     const arr = ['[', ...amount.toString(), ']']
     for (let i = 0; i <= config.colours.length; i++) {

@@ -239,7 +239,7 @@ namespace trakman {
 
   }
 
-  export const messages = {
+  export const chat = {
 
     fetch: ChatService.fetch.bind(ChatService),
 
@@ -247,22 +247,21 @@ namespace trakman {
 
     get: ChatService.get.bind(ChatService),
 
-    addCustomPrefix: ChatService.addCustomPrefix.bind(ChatService),
+    addMessagePrefix: ChatService.addMessagePrefix.bind(ChatService),
+
+    setMessageStyle: ChatService.setMessageStyle.bind(ChatService),
+
+    addMessageTextModifier: ChatService.addMessageTextModifier.bind(ChatService),
 
     /**
      * Recent chat messages. 
      */
-    get list(): tm.Message[] { return ChatService.messages },
+    get messages(): tm.Message[] { return ChatService.messages },
 
     /**
      * Number of recent chat messages.
      */
-    get count(): number { return ChatService.messageCount },
-
-
-    addMessageStyle: ChatService.addMessageStyle.bind(ChatService),
-
-    addMessageTextModifier: ChatService.addMessageTextModifier.bind(ChatService)
+    get messageCount(): number { return ChatService.messageCount }
 
   }
 

@@ -1,8 +1,8 @@
 import colours from '../src/data/Colours.js'
 
 export const prefixes = {
-  // TODO DOC
-  manualChatRoutingMessageFormat: `$g[#{name}$z$s$g] `,
+  /** Default chat message format when manual chat routing is enabled. This can be overwritten by tm.chat.setMessageStyle() method */
+  manualChatRoutingMessageStyle: `$g[#{name}$z$s$g] `,
   /** Characters with which every message sent to individual players will be prefixed (e.g. ChatSendServerMessageToLogin) */
   serverToPlayer: `${colours.yellow}» `,
   /** Characters with which every message sent in public will be prefixed (e.g. ChatSendServerMessage) */

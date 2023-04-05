@@ -94,7 +94,7 @@ export class PlayerService {
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> { // TODO ADD NEW PROPERTIES
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> {
     let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
       Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
