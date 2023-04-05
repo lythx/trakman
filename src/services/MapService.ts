@@ -337,7 +337,8 @@ export class MapService {
   static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
-    const index: number = setAsNextMap === true ? 0 : this._queue.findIndex(a => a.isForced === false) // TODO HANDLE -1
+    const qi = this._queue.findIndex(a => a.isForced === false)
+    const index: number = setAsNextMap === true ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
