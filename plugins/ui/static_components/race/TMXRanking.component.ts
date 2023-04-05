@@ -10,7 +10,7 @@ import config from './TMXRanking.config.js'
 
 export default class TMXRanking extends StaticComponent {
 
-  private readonly recordList: RecordList
+  private recordList: RecordList
   private readonly header: StaticHeader
 
   constructor() {
@@ -32,6 +32,12 @@ export default class TMXRanking extends StaticComponent {
     })
     tmx.onMapChange((): void => this.display())
     tmx.onQueueChange((): void => this.display())
+  }
+
+  onPositionChange(): void {
+    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+      this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
+    this.display()
   }
 
   getHeight(): number {
