@@ -46,7 +46,7 @@ export default class BetInfoWidget extends DynamicComponent {
     </frame>`
     tm.sendManialink(`<manialink id="${this.id}">
       <format textsize="1"/>
-      <frame posn="${config.posX} ${config.posY} 2">
+      <frame posn="${config.posX} ${this.posY} 2">
         ${this.header.constructXml(config.title, config.icon, config.side)}
         ${prizeXml}
       </frame>
