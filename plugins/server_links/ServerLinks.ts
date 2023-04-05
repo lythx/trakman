@@ -95,12 +95,11 @@ async function refreshOtherServersData() {
     }
     const infoObj = constructInfoObject(newInfo, e.name)
     const index = serverInfos.findIndex(a => a.login === e.login)
-    if (infoObj !== undefined) {
+    if (infoObj !== undefined && Date.now() - infoObj.lastUpdate < config.updateLimit * 1000) {
       serverInfos[index] = infoObj
     } else {
       serverInfos.splice(index, 1)
     }
-
   }
   ui.update(serverInfos)
 }
@@ -145,8 +144,22 @@ function startHttpServer() {
  * @since 1.3
  */
 export const serverLinks = {
-  // TODO COMMENTS AND METHODS
-  get infos(): Readonly<ServerInfo>[] {
+  /**
+   * Linked online servers current data
+   */
+  get otherServers(): Readonly<ServerInfo>[] {
     return [...serverInfos]
+  },
+  /**
+   * Data shared by this server
+   */
+  get thisServer(): Readonly<Omit<ServerInfo, 'name'>> {
+    return serverData
+  },
+  /**
+   * Linked servers config
+   */
+  get serversConfig(): Server[] {
+    return servers
   }
 }

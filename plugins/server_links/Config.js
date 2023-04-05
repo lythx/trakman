@@ -4,7 +4,8 @@ export default {
   httpAddress: '',
   httpPort: 7309,
   refreshTimeout: 10, // In seconds
-  updateLimit: 30, // TODO DOC
+  // In seconds. (If more time passes since other servers last update it will be considered down)
+  updateLimit: 30,
   dataFilePath: './plugins/server_links/temp/data.txt',
   servers: [
     {
