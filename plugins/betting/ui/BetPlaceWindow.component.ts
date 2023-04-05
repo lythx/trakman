@@ -65,7 +65,7 @@ export default class BetPlaceWindow extends DynamicComponent {
       for (let i = 0; i < config.options.length; i++) { cells.push(cell) }
       content = grid.constructXml(cells)
     } else {
-      const h = grid.height - grid.margin * 2 // TODO TEST
+      const h = grid.height - grid.margin * 2
       content = `<quad posn="${config.margin} ${-config.margin} 0" sizen="${config.width} ${h}" 
       bgcolor="${config.background}" action="${this.id + config.options.length + config.actionIdOffset}"/>
       ${centeredText(`Bet $${config.prizeColour}${this.prize}C`, config.width, h, config.betAmountText)}`

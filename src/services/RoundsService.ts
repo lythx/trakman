@@ -72,7 +72,7 @@ export class RoundsService {
       }
     })
   }
-  // TODO TEAMS COMMANDS MESSAGES DONT SAY ITS TEAMS MODE
+
   static async updateRoundsSettings(): Promise<true | Error> {
     const settings = await Client.call('system.multicall', [
       { method: 'GetRoundCustomPoints' },

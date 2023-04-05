@@ -47,7 +47,7 @@ export default {
     help: `Set the laps amount in rounds mode. Set 0 to use default map laps.`
   },
   setroundspointlimit: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the rounds mode points limit to ${p.highlight}#{amount}${p.admin}.`,
     insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
@@ -55,7 +55,7 @@ export default {
     help: `Set the points limit for rounds mode.`
   },
   setteamspointlimit: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the teams mode points limit to ${p.highlight}#{amount}${p.admin}.`,
     insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
@@ -71,7 +71,7 @@ export default {
     help: `Set the max obtainable points per round for teams mode.`
   },
   setcuppointlimit: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the points limit to ${p.highlight}#{amount}${p.admin}.`,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the cup mode points limit to ${p.highlight}#{amount}${p.admin}.`,
     insufficientPoints: `${p.error}Points amount cannot be less or equal to zero.`,
     public: true,
     privilege: 2,
