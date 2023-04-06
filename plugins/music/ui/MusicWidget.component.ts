@@ -1,4 +1,4 @@
-import { componentIds, Grid, StaticHeader, StaticComponent, leftAlignedText } from '../../ui/UI.js'
+import { componentIds, StaticHeader, StaticComponent, leftAlignedText } from '../../ui/UI.js'
 import { Song } from '../Types.js'
 import config from './MusicWidget.config.js'
 

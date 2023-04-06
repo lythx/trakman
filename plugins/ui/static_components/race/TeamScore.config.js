@@ -6,7 +6,7 @@ export default {
   width: cfg.width,
   margin: cfg.margin,
   title: "Team Score",
-  icon: icons.trakman,
+  icon: icons.teamsMode,
   entries: 3, 
   columnProportions: [
     1,

@@ -96,7 +96,7 @@ export default abstract class StaticComponent {
   }
 
   private static initialize() {
-    StaticComponent.createComponentList()
+    StaticComponent.refreshStaticLayouts()
     tm.addListener('EndMap', (info): void => {
       if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
       StaticComponent.updateDisplayedComponents()
@@ -157,7 +157,10 @@ export default abstract class StaticComponent {
     return ret
   }
 
-  private static createComponentList() {
+  /**
+   * Refreshes static UI layouts and updates displayed components
+   */
+  static refreshStaticLayouts(): void {
     const c = this.components
     const r = RaceUi
     const res = ResultUi

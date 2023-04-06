@@ -90,6 +90,7 @@ const events: tm.Listener[] = [
       initalizeKeyListeners()
       customUi = new CustomUi()
       customUi.display()
+      StaticComponent.refreshStaticLayouts()
       for (const c of Object.values(staticComponents)) {
         c.updateIsDisplayed()
         c.updatePosition()
@@ -97,6 +98,9 @@ const events: tm.Listener[] = [
       }
       new TestWindow()
       for (const e of loadListeners) { e() }
+      StaticComponent.onComponentCreated(() => {
+        StaticComponent.refreshStaticLayouts()
+      })
     }
   },
   {
