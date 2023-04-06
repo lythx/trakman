@@ -120,7 +120,17 @@ export const music = {
    */
   get songs(): Readonly<Song>[] {
     return [...queue]
-  }
+  },
+
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled,
+
+  /**
+   * If true songs will be played instead of map music
+   */
+  overrideMapMusic: config.overrideMapMusic
 
 }
 

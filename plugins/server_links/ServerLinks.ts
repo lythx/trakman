@@ -160,5 +160,21 @@ export const serverLinks = {
    */
   get serversConfig(): Server[] {
     return servers
-  }
+  },
+  /**
+   * Plugin status
+   */
+  isEnabled: config.isEnabled,
+  /**
+   * Whether the plugin is using HTTP server for remote links
+   */
+  isHTTPServerRunning: config.useHttpServer,
+  /**
+   * HTTP server address for remote links
+   */
+  httpAddress: config.httpAddress,
+  /**
+   * HTTP server port for remote links
+   */
+  httpPort: config.httpPort
 }
