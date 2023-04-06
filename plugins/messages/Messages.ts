@@ -92,7 +92,14 @@ const events: tm.Listener[] = [
           }), info.winnerLogin)
         }
       }
-      if (tm.jukebox.juked.length !== 0 && tm.jukebox.juked[0].callerLogin !== undefined) {
+      if (info.droppedMap !== undefined) {
+        tm.sendMessage(tm.utils.strVar(c.jukeSkipped, {
+          map: tm.utils.strip(info.droppedMap.map.name, true),
+          // TODO XDDDDDD
+          nickname: tm.utils.strip((await tm.players.fetch(info.droppedMap.callerLogin as any) as any).nickname)
+        }))
+      }
+      if (tm.jukebox.juked[0].callerLogin !== undefined) {
         const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin)
         tm.sendMessage(tm.utils.strVar(c.nextJuke, {
           map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),

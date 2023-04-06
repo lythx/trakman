@@ -819,6 +819,12 @@ declare global {
       /** Server side ranking objects. 
        * (Can differ from controller rankings only if it was restarted during the map) */
       readonly serverSideRankings: readonly TrackmaniaRankingInfo[]
+      /** If keep queue after leave is set to false, this is the object that stores the dropped map 
+       * This is the exact copy of the JukeboxMap interface off of MapService */
+      readonly droppedMap?: {
+        map: Map
+        callerLogin?: string
+      }
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Readonly<CurrentMap> & {

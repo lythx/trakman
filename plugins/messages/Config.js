@@ -34,4 +34,6 @@ export default {
     + `dedimania record. Time${p.highlight}: #{time}#{difference}`,
   nextJuke: `${p.vote}The next map will be ${p.highlight}#{map}${p.vote}, as requested `
     + `by ${p.highlight}#{nickname}${p.vote}.`,
+  jukeSkipped: `${p.vote}Map ${p.highlight}#{map} ${p.vote}will be dropped from the queue, as `
+    + `${p.highlight}#{nickname} ${p.vote}has left the server.`
 }

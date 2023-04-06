@@ -12,6 +12,8 @@ export default {
   jukeboxQueueSize: 30,
   /** Amount of maps kept in the map history */
   jukeboxHistorySize: 30,
+  /** Whether to keep the jukeboxed maps in the queue after the requester leaves */
+  keepQueueAfterLeave: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
   /** Privilege levels for each of the administrative actions */
