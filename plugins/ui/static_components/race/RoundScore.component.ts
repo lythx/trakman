@@ -23,13 +23,26 @@ export default class RoundScore extends StaticComponent {
     })
   }
 
-  getHeight(): number {
+  getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
-      return config.teamsHeight
+      return config.teamsEntries
     } if (tm.getGameMode() === 'Cup') {
-      return config.cupHeight
+      return config.cupEntries
     }
-    return config.roundsHeight
+    return config.roundsEntries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsTopCount
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    }
+    return config.roundsTopCount
   }
 
   display(): void {
@@ -67,18 +80,11 @@ export default class RoundScore extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.roundsHeight
-    let entries = config.roundsEntries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    }
+    const height = this.getHeight()
+    const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, 250, config.displayNoRecordEntry)
+      entries, this.side, this.getTopCount(), 250, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

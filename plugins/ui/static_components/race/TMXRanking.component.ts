@@ -16,7 +16,7 @@ export default class TMXRanking extends StaticComponent {
   constructor() {
     super(componentIds.tmx)
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -35,13 +35,13 @@ export default class TMXRanking extends StaticComponent {
   }
 
   onPositionChange(): void {
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.display()
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

@@ -30,7 +30,7 @@ export default class LapRanking extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {
@@ -41,8 +41,8 @@ export default class LapRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.height
     let entries = config.entries
+    let height = this.getHeight()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)

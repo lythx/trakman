@@ -51,17 +51,34 @@ export default class DediRanking extends StaticComponent {
     )
   }
 
-  getHeight(): number {
+  getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
-      return config.teamsHeight
+      return config.teamsEntries
     } if (tm.getGameMode() === 'Rounds') {
-      return config.roundsHeight
+      return config.roundsEntries
     } if (tm.getGameMode() === 'Cup') {
-      return config.cupHeight
+      return config.cupEntries
     } if (tm.getGameMode() === 'Laps') {
-      return config.lapsHeight
+      return config.lapsEntries
     }
-    return config.height
+    return config.entries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsTopCount
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsTopCount
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    }
+    return config.topCount
   }
 
   protected onPositionChange(): void {
@@ -70,24 +87,9 @@ export default class DediRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Rounds') {
-      height = config.roundsHeight
-      entries = config.roundsEntries
-    } else if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    } else if (tm.getGameMode() === 'Laps') {
-      height = config.lapsHeight
-      entries = config.lapsEntries
-    }
-    this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
+      this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
+      this.getEntries(), this.side, this.getTopCount(), this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

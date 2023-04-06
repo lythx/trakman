@@ -96,6 +96,7 @@ const events: tm.Listener[] = [
         c.updatePosition()
         c.display()
       }
+      StaticComponent.refreshStaticLayouts()
       new TestWindow()
       for (const e of loadListeners) { e() }
       StaticComponent.onComponentCreated(() => {

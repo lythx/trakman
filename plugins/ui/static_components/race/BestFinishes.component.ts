@@ -21,8 +21,8 @@ export default class BestFinishes extends StaticComponent {
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = config.height - (config.margin + this.headerHeight)
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions,
+    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
+    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
     tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
       let index: number = this.bestFinishes.findIndex(a => a.time > info.time)
@@ -49,7 +49,7 @@ export default class BestFinishes extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

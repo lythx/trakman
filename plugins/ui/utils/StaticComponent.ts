@@ -152,7 +152,7 @@ export default abstract class StaticComponent {
     for (const e of names) {
       const comp = components.findStatic(e)
       if (comp === undefined) { continue }
-      ret.push({ name: e, getHeight: comp.getHeight })
+      ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
     }
     return ret
   }

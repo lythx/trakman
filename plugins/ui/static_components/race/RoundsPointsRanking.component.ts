@@ -30,11 +30,22 @@ export default class RoundsPointsRanking extends StaticComponent {
     tm.addListener('PlayerFinish', (): void => this.display())
   }
 
-  getHeight(): number {
+  getEntries(): number {
     if (tm.getGameMode() === 'Cup') {
-      return config.cupHeight
-    }
-    return config.height
+      return config.cupEntries
+    } 
+    return config.entries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    } 
+    return config.topCount
   }
 
   display(): void {
@@ -45,15 +56,11 @@ export default class RoundsPointsRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
-    if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    }
+    let height = this.getHeight()
+    let entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime: true, columnProportions: config.columnProportions, noRecordEntryText: config.noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)

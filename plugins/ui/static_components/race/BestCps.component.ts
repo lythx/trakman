@@ -23,9 +23,10 @@ export default class BestCps extends StaticComponent {
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = config.height - (config.margin + this.headerHeight)
+    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
     this.cpAmount = tm.maps.current.checkpointsAmount - 1
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
+    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), { margin: config.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
     tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo): void => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
@@ -42,7 +43,8 @@ export default class BestCps extends StaticComponent {
       this.cpAmount = tm.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
       this.paginator.resetPlayerPages()
-      this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
+      this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
+        new Array(config.entries).fill(1), { margin: config.margin })
       this.bestCps.length = 0
       this.display()
     })
@@ -59,7 +61,7 @@ export default class BestCps extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

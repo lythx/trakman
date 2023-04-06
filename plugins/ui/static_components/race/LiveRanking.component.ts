@@ -35,11 +35,22 @@ export default class LiveRanking extends StaticComponent {
     })
   }
 
-  getHeight(): number {
+  getEntries(): number {
     if (tm.getGameMode() === 'Laps') {
-      return config.lapsHeight
+      return config.lapsEntries
     }
-    return config.height
+    return config.entries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    }
+    return config.topCount
   }
 
   display(): void {
@@ -95,19 +106,17 @@ export default class LiveRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
+    const entries = this.getEntries()
+    const height = this.getHeight()
     let dontParseTime = false
     let noRecordEntryText: string | undefined
     if (tm.getGameMode() === 'Laps') {
-      height = config.lapsHeight
-      entries = config.lapsEntries
       dontParseTime = true
       noRecordEntryText = config.lapsNoRecordEntry
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime, noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
