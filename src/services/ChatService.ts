@@ -9,6 +9,7 @@ import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
 
 type MessageFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
+type ModifyTextFunction = (info: tm.MessageInfo) => Promise<string | Error | undefined> | (string | Error | undefined)
 
 /**
  * This service manages chat table and chat commands
@@ -21,7 +22,7 @@ export abstract class ChatService {
   private static readonly _commandList: tm.Command[] = []
   private static readonly customPrefixes: { callback: MessageFunction, position: number }[] = []
   private static readonly messageStyleFunctions: { importance: number, callback: MessageFunction }[] = []
-  private static readonly messageTextModifiers: { importance: number, callback: MessageFunction }[] = []
+  private static readonly messageTextModifiers: { importance: number, callback: ModifyTextFunction }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -237,6 +238,9 @@ export abstract class ChatService {
         }
         for (const e of this.messageTextModifiers) {
           const result = await e.callback(messageInfo)
+          if (result instanceof Error) {
+            return result
+          }
           if (result !== undefined) {
             text = result
             break
@@ -280,11 +284,12 @@ export abstract class ChatService {
 
   /**
    * Registers a function to modify chat message text.
-   * @param callback The function takes MessageInfo object and returns string (the name) or undefined (then its ignored)
+   * @param callback The function takes MessageInfo object and returns string (the name), 
+   * error (prevents message from being sent) or undefined (then its ignored)
    * @param importance In case multiple functions are registered the most important one will be executed.
    * If it returns undefined the 2nd most important will be executed and so on
    */
-  static addMessageTextModifier(callback: MessageFunction, importance: number) {
+  static addMessageTextModifier(callback: ModifyTextFunction, importance: number) {
     this.messageTextModifiers.push({ callback, importance })
     this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
