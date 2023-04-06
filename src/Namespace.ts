@@ -822,7 +822,9 @@ declare global {
       /** If keep queue after leave is set to false, this is the object that stores the dropped map 
        * This is the exact copy of the JukeboxMap interface off of MapService */
       readonly droppedMap?: {
+        /** The dropped map object */
         map: Map
+        /** Login of the player who juked the map */
         callerLogin?: string
       }
     }
