@@ -825,7 +825,7 @@ declare global {
         /** The dropped map object */
         map: Map
         /** Login of the player who juked the map */
-        callerLogin?: string
+        callerLogin: string
       }
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */

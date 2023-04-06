@@ -90,6 +90,7 @@ const events: tm.Listener[] = [
       initalizeKeyListeners()
       customUi = new CustomUi()
       customUi.display()
+      StaticComponent.refreshStaticLayouts()
       for (const c of Object.values(staticComponents)) {
         c.updateIsDisplayed()
         c.updatePosition()

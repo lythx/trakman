@@ -1,6 +1,8 @@
 const p = tm.utils.palette
 
 export default {
+  // Special message on every win multiple of this
+  specialWin: 50,
   startup: `${p.highlight}$L[${tm.config.controller.repo}]Trakman`
     + ` v#{version}$L${p.servermsg} startup sequence successful.`,
   changelog: `${p.error}You can see the recent changes with` +

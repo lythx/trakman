@@ -63,9 +63,9 @@ export default class MusicWidget extends StaticComponent {
 
   private text(text: string, w: number, h: number, xOffset: number = 0, background?: string): string {
     xOffset = xOffset ?? 0
-    return `<quad posn="${xOffset ?? 0} 0 2" sizen="${w} ${h}" bgcolor="${background ?? config.textBackground}"/>
+    return `<quad posn="${xOffset} 0 2" sizen="${w} ${h}" bgcolor="${background ?? config.textBackground}"/>
     ${leftAlignedText(text, w, h,
-      { textScale: config.textScale, padding: config.textPadding, xOffset: xOffset + config.margin, })}`
+      { textScale: config.textScale, padding: config.textPadding, xOffset, })}`
   }
 
 }

@@ -359,6 +359,7 @@ function shuffleQueue(caller?: Caller): boolean {
 }
 
 function updateNextSong(url: string) {
+  if (url === undefined) { return }
   tm.client.callNoRes('SetForcedMusic', [
     { boolean: config.overrideMapMusic },
     { string: url }

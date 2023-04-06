@@ -232,10 +232,12 @@ export class Listeners {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         PlayerService.resetCheckpoints()
-        let droppedMap: undefined | typeof MapService.jukebox[number]
-        if (!config.keepQueueAfterLeave && PlayerService.get(MapService.jukebox[0]?.callerLogin ?? '') === undefined) {
-          droppedMap = MapService.jukebox[0]
-          MapService.removeFromJukebox(droppedMap.map.id)
+        let droppedMap: undefined | tm.EndMapInfo['droppedMap']
+        const nextJb = MapService.jukebox[0]
+        if (!config.keepQueueAfterLeave && nextJb.callerLogin !== undefined
+          && PlayerService.get(nextJb.callerLogin) === undefined) {
+          droppedMap = nextJb as tm.EndMapInfo['droppedMap']
+          MapService.removeFromJukebox(nextJb.map.id)
         }
         const winner = rankings[0]
         // Set game state to 'result'

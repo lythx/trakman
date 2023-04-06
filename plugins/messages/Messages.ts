@@ -81,7 +81,7 @@ const events: tm.Listener[] = [
     callback: async (info: tm.EndMapInfo): Promise<void> => {
       if (info.winnerLogin !== undefined && info.winnerWins !== undefined) {
         const player: tm.OfflinePlayer | undefined = tm.players.get(info.winnerLogin) ?? await tm.players.fetch(info.winnerLogin)
-        if (info.winnerWins % 50 === 0) {
+        if (info.winnerWins % c.specialWin === 0) {
           tm.sendMessage(tm.utils.strVar(c.winPublic, {
             nickname: tm.utils.strip(player?.nickname ?? '', true),
             wins: tm.utils.getOrdinalSuffix(info.winnerWins)
@@ -95,11 +95,10 @@ const events: tm.Listener[] = [
       if (info.droppedMap !== undefined) {
         tm.sendMessage(tm.utils.strVar(c.jukeSkipped, {
           map: tm.utils.strip(info.droppedMap.map.name, true),
-          // TODO XDDDDDD
-          nickname: tm.utils.strip((await tm.players.fetch(info.droppedMap.callerLogin as any) as any).nickname)
+          nickname: tm.utils.strip((await tm.players.fetch(info.droppedMap.callerLogin))?.nickname ?? '')
         }))
       }
-      if (tm.jukebox.juked[0].callerLogin !== undefined) {
+      if (tm.jukebox.juked[0]?.callerLogin !== undefined) {
         const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin)
         tm.sendMessage(tm.utils.strVar(c.nextJuke, {
           map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
