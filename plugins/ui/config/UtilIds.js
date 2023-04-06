@@ -22,5 +22,6 @@ export default {
     },
     F5: 15,
     F6: 16,
-    F7: 17
+    F7: 17,
+    buttons: 18
 }

@@ -7,7 +7,8 @@ interface StaticButtonOptions {
   link?: string,
   iconWidth?: number,
   iconHeight?: number,
-  topPadding?: number
+  topPadding?: number,
+  background?: string
 }
 
 /**
@@ -27,7 +28,7 @@ export default function (iconUrl: string, text1: string, text2: string, width: n
     horizontallyCenteredText(text1, width, height, { yOffset: config.yOffsetBig, textScale: config.textScaleBig, padding: config.padding })
   const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
   const link: string = options?.link === undefined ? '' : `url="${options.link}"`
-  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${config.background}" ${actionId} ${link}/>
+  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${options?.background ?? config.background}" ${actionId} ${link}/>
   <quad posn="${(width - (options?.iconWidth ?? config.iconWidth)) / 2} ${-(options?.topPadding ?? config.topPadding)} 5" 
   sizen="${(options?.iconWidth ?? config.iconWidth)} ${(options?.iconHeight ?? config.iconHeight)}" image="${iconUrl}"/>
   ${t1}

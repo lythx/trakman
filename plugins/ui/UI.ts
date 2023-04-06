@@ -31,6 +31,7 @@ import resultConfig from './config/ResultUi.js'
 import { fullScreenListener } from './utils/FullScreenListener.js'
 import flagIcons from './config/FlagIcons.js'
 import utilIds from './config/UtilIds.js'
+import Buttons from './Buttons.js'
 
 let customUi: CustomUi
 
@@ -97,6 +98,7 @@ const events: tm.Listener[] = [
         c.display()
       }
       StaticComponent.refreshStaticLayouts()
+      new Buttons()
       new TestWindow()
       for (const e of loadListeners) { e() }
       StaticComponent.onComponentCreated(() => {
