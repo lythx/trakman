@@ -70,11 +70,13 @@ export class GameService {
   static startTimer(): void {
     let stateChange: 'enabled' | 'disabled' | undefined
     this._mapStartTimestamp = Date.now()
-    if ((this._config.timeAttackLimit !== 0 || this.gameMode === 'Teams')
+    if ((this._config.timeAttackLimit !== 0 ||
+      (this.gameMode !== 'TimeAttack' && this.gameMode !== 'Stunts'))
       && this.dynamicTimerEnabled) {
       this._disableDynamicTimer()
       stateChange = 'disabled'
-    } else if (this._config.timeAttackLimit === 0 && !this.dynamicTimerEnabled) {
+    } else if (this._config.timeAttackLimit === 0 && !this.dynamicTimerEnabled &&
+      (this.gameMode === 'TimeAttack' || this.gameMode === 'Stunts')) {
       this._enableDynamicTimer()
       stateChange = 'enabled'
     }

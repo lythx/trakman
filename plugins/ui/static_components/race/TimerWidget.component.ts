@@ -16,7 +16,6 @@ export default class TimerWidget extends StaticComponent {
   private readonly addButtonid = this.id + 2
   private readonly subtractButtonId = this.id + 3
   private isOnRestart = false
-  private roundCountdownDisplayed = false
   private isPaused = false
 
   constructor() {
@@ -40,24 +39,16 @@ export default class TimerWidget extends StaticComponent {
     tm.addListener('EndMap', (info) => {
       if (info.isRestart) {
         this.isOnRestart = true
+        this.noButtonXml = this.constructXml(false)
+        this.xmlWithButtons = this.constructXml(true)
         this.display()
       }
     })
-    tm.addListener('EndRound', () => {
-      this.roundCountdownDisplayed = false
-      this.display()
-    })
     tm.addListener('BeginMap', () => {
-      this.roundCountdownDisplayed = false
+      this.isOnRestart = false
+      this.noButtonXml = this.constructXml(false)
+      this.xmlWithButtons = this.constructXml(true)
       this.display()
-    })
-    tm.addListener('PlayerFinish', () => {
-      if (this.isRoundsOrientedGamemode()) {
-        if (!this.roundCountdownDisplayed) {
-          this.roundCountdownDisplayed = true
-          this.display()
-        }
-      }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -127,18 +118,12 @@ export default class TimerWidget extends StaticComponent {
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
-    if (tm.timer.isPaused) { this.isPaused = true } else { this.isPaused = false }
+    this.isPaused = tm.timer.isPaused
   }
 
   displayToPlayer(login: string, privilege?: number): void {
     if (!this.isDisplayed) { return }
-    if (this.isRoundsOrientedGamemode()) {
-      if (this.roundCountdownDisplayed) {
-        tm.sendManialink(this.noButtonXml, login)
-      } else {
-        this.hide()
-      }
-    } else if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
+    if (this.isOnRestart || !tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)
@@ -222,10 +207,6 @@ export default class TimerWidget extends StaticComponent {
     }
     return this.header.constructXml(config.title, config.icon,
       this.side, { rectangleWidth: headerRectWidth }) + buttonXml
-  }
-
-  private isRoundsOrientedGamemode(): boolean {
-    return tm.getGameMode() !== 'Stunts' && tm.getGameMode() !== 'TimeAttack'
   }
 
 }
