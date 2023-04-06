@@ -6,7 +6,6 @@ import fetch from 'node-fetch'
 
 export interface Server {
   name: string
-  login: string
   path?: string
   url?: string
 }
@@ -94,10 +93,10 @@ async function refreshOtherServersData() {
       continue
     }
     const infoObj = constructInfoObject(newInfo, e.name)
-    const index = serverInfos.findIndex(a => a.login === e.login)
+    const index = serverInfos.findIndex(a => a.login === infoObj?.login)
     if (infoObj !== undefined && Date.now() - infoObj.lastUpdate < config.updateLimit * 1000) {
-      serverInfos[index] = infoObj
-    } else {
+      serverInfos[index === -1 ? serverInfos.length : index] = infoObj
+    } else if (index !== -1) {
       serverInfos.splice(index, 1)
     }
   }
