@@ -232,6 +232,10 @@ export class Listeners {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         PlayerService.resetCheckpoints()
+        let droppedMap
+        if (config.keepQueueAfterLeave === false && PlayerService.get(MapService.jukebox[0].callerLogin ?? '') === undefined) {
+          droppedMap = MapService.jukebox.shift()
+        }
         const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart
@@ -253,7 +257,8 @@ export class Listeners {
           winnerLogin: login,
           winnerWins: wins,
           serverSideRankings: rankings,
-          isRestart
+          isRestart,
+          droppedMap
         }
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
