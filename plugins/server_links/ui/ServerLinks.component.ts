@@ -83,7 +83,6 @@ export default class ServerLinks extends StaticComponent {
   }
 
   private constructHeader(page: number, pageCount: number): string {
-    if (this.serverList.length === 0) { return '' }
     let icons: (string | undefined)[] = [config.icons.prevPage, config.icons.nextPage]
     let iconsHover: (string | undefined)[] = [config.icons.prevPageHover, config.icons.nextPageHover]
     let ids: (number | undefined)[] = [this.paginator.ids[0], this.paginator.ids[1]]

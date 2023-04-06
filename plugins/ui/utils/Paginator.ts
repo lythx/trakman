@@ -149,6 +149,7 @@ export default class Paginator {
    * @param pageCount Page count
    */
   setPageCount(pageCount: number): void {
+    if (pageCount < 1) { pageCount = 1 }
     this._pageCount = pageCount
     this._buttonCount = 0
     if (pageCount > 1) { this._buttonCount = 1 }
