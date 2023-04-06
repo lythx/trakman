@@ -15,7 +15,7 @@ export default class KarmaRanking extends StaticComponent {
   constructor() {
     super(componentIds.karmaRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     tm.addListener('KarmaVote', (): void => {
       this.display()
@@ -23,7 +23,7 @@ export default class KarmaRanking extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

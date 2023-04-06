@@ -14,7 +14,7 @@ export default class LocalRankingResult extends StaticComponent {
   constructor() {
     super(componentIds.localsResult)
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.recordList = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -32,7 +32,7 @@ export default class LocalRankingResult extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

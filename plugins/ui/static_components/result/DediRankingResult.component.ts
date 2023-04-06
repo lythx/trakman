@@ -16,7 +16,7 @@ export default class DediRankingResult extends StaticComponent {
   constructor() {
     super(componentIds.dedisResult)
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.recordList = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -29,9 +29,9 @@ export default class DediRankingResult extends StaticComponent {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
   }
-
+  
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

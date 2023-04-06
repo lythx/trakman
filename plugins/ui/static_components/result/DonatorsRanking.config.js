@@ -2,7 +2,8 @@ import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  height: 12.92,
+  entries: 5,
+  entryHeight: 2.15,
   width: cfg.width,
   posX:  cfg.rightPosition - (cfg.marginBig + cfg.width) * 2,
   posY: cfg.topBorder,
@@ -11,7 +12,6 @@ export default {
   icon: icons.cash,
   margin: cfg.margin,
   background: cfg.background,
-  entries: 5,
   columnProportions: [
     1,
     1.9,

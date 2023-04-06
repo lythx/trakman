@@ -16,7 +16,7 @@ export default class NextMapRecords extends StaticComponent {
   constructor() {
     super(componentIds.nextMapRecords)
     this.header = new StaticHeader('result')
-    this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -45,7 +45,7 @@ export default class NextMapRecords extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

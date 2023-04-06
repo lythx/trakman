@@ -16,7 +16,7 @@ export default class RoundAveragesRanking extends StaticComponent {
   constructor() {
     super(componentIds.roundAveragesRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     tm.addListener('PlayerFinish', async (info): Promise<void> => {
       const entry = this.averages.find(a => a.login === info.login)
@@ -37,7 +37,7 @@ export default class RoundAveragesRanking extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {

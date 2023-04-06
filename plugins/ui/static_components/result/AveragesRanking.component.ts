@@ -17,14 +17,14 @@ export default class AveragesRanking extends StaticComponent {
     super(componentIds.averagesRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width,
-      config.height - (this.header.options.height + config.margin), config.columnProportions,
+      this.getHeight() - (this.header.options.height + config.margin), config.columnProportions,
       { background: config.background, headerBg: this.header.options.textBackground })
     stats.averages.onUpdate((): void => this.display())
     stats.averages.onNicknameChange((): void => this.display())
   }
 
   getHeight(): number {
-    return config.height
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
   display(): void {
