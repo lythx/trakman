@@ -184,7 +184,7 @@ const commands: tm.Command[] = [
     help: config.playtime.help,
     callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.playtime.text,
-        { time: tm.utils.msToTime(Date.now() - tm.timer.mapStartTimestamp) }),
+        { time: tm.utils.getVerboseTime(Date.now() - tm.timer.mapStartTimestamp) }),
         info.login)
     },
     privilege: config.playtime.privilege
@@ -215,7 +215,7 @@ const commands: tm.Command[] = [
     callback: async (info: tm.MessageInfo, login?: string): Promise<void> => {
       if (login === undefined || login === info.login) {
         tm.sendMessage(tm.utils.strVar(config.sessiontime.selfText, {
-          time: tm.utils.msToTime(Date.now() - info.joinTimestamp)
+          time: tm.utils.getVerboseTime(Date.now() - info.joinTimestamp)
         }), info.login)
         return
       }
@@ -228,7 +228,7 @@ const commands: tm.Command[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.sessiontime.text, {
         name: tm.utils.strip(player.nickname),
-        time: tm.utils.msToTime(Date.now() - player.joinTimestamp)
+        time: tm.utils.getVerboseTime(Date.now() - player.joinTimestamp)
       }), info.login)
     },
     privilege: config.sessiontime.privilege

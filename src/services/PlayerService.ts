@@ -222,7 +222,7 @@ export class PlayerService {
     }
     void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
     this._players.splice(playerIndex, 1)
-    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.msToTime(sessionTime)}`)
+    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.getVerboseTime(sessionTime)}`)
     return leaveInfo
   }
 
@@ -313,7 +313,7 @@ export class PlayerService {
   static async addWin(login: string): Promise<number> {
     const player: any = this.get(login) ?? await this.fetch(login)
     await this.repo.updateOnWin(login, ++player.wins)
-    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getPositionString(player.wins)} time.`)
+    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getOrdinalSuffix(player.wins)} time.`)
     return player.wins
   }
 

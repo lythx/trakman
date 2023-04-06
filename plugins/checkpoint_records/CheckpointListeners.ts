@@ -122,7 +122,7 @@ if (config.isEnabled) {
           }
           const deleted = cps.checkpoints[cpIndex - 1]
           cps.checkpoints[cpIndex - 1] = undefined
-          tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getOrdinalSuffix(cpIndex) }), info.login)
           if (deleted !== undefined) {
             emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: [{ time: deleted, index: cpIndex }] })
           }
@@ -158,7 +158,7 @@ if (config.isEnabled) {
           tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
             title: info.title,
             nickname: tm.utils.strip(info.nickname, true),
-            index: tm.utils.getPositionString(cpIndex)
+            index: tm.utils.getOrdinalSuffix(cpIndex)
           }), config.commands.deletecp.public ? undefined : info.login)
           if (deleted !== undefined) {
             emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])

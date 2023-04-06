@@ -64,7 +64,7 @@ export const music = {
     if (queue.some(a => a.name === name)) {
       return 'name taken'
     }
-    url = tm.utils.fixProto(url)
+    url = tm.utils.fixProtocol(url)
     const song: Song = { name, author, url, isJuked: false }
     queue.push(song)
     emitEvent(songAddCallbacks, song, caller)

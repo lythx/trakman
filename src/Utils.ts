@@ -34,7 +34,7 @@ export const Utils = {
   /**
    * Formats time for prettier display.
    * @param time Time to format
-   * @returns Formatted time string
+   * @returns Formatted time string (eg. 25:12.63, 0:56.92)
    */
   getTimeString(time: number): string {
     const d = new Date(time)
@@ -48,9 +48,9 @@ export const Utils = {
   /**
    * Adds an ordinal suffix to numbers.
    * @param pos Number to add the suffix to
-   * @returns Number with the suffix
+   * @returns Number with the suffix (eg. 1st, 9th)
    */
-  getPositionString(pos: number): string {
+  getOrdinalSuffix(pos: number): string {
     if (!Number.isInteger(pos) || pos === 0) {
       return pos.toString()
     }
@@ -164,9 +164,10 @@ export const Utils = {
   },
 
   /**
-   * Gets country information from region in Nadeo format
+   * Gets country information from region in Nadeo format (eg. World|Poland|Pomorskie)
    * @param region Region in Nadeo format, can start with World but doesn't have to
-   * @returns Object containing parsed region, country and country code if matching one was found
+   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and 
+   * country code (eg. POL) if matching one was found 
    */
   getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
     let split = region.split('|')
@@ -201,8 +202,8 @@ export const Utils = {
 
   /**
    * Gets the country code (non-ISO) for the specified country name
-   * @param country Country name
-   * @returns Country code
+   * @param country Country name (eg. Poland)
+   * @returns Country code (eg. POL)
    */
   countryToCode(country: string): string | undefined {
     return countries.find(a => a.name === country)?.code
@@ -212,9 +213,13 @@ export const Utils = {
    * Gets the appropriate verb and calculates record differences.
    * @param current Object containing current record time and position
    * @param previous Optional object containing previous record time and position
-   * @returns Object containing the string to use, whether calculation is needed, and the difference
+   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
+   * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
+  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): {
+    status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
+    difference?: string
+  } {
     let calc: boolean = false
     const obj: any = {
       status: ``,
@@ -312,9 +317,9 @@ export const Utils = {
   /**
    * Converts milliseconds to humanly readable time.
    * @param ms Time to convert (in milliseconds)
-   * @returns Humanly readable time string
+   * @returns Humanly readable time string (eg. 2 hours, 12 minutes and 30 seconds)
    */
-  msToTime(ms: number): string {
+  getVerboseTime(ms: number): string {
     const d: Date = new Date(ms)
     let str: string = ''
     const seconds: number = d.getUTCSeconds()
@@ -354,7 +359,7 @@ export const Utils = {
    * @param url Original URL
    * @returns URL that will likely function properly
    */
-  fixProto(url: string): string {
+  fixProtocol(url: string): string {
     return `http://${url.replace(/^https?:\/\//, '')}`
   },
 
@@ -399,21 +404,20 @@ export const Utils = {
    * @param dateStr Date string, number followed by optional modifier 
    * [s - seconds, m - minutes, h - hours, d - days]). 
    * If no modifier is specified the number will be treated as minutes.
-   * @returns Time in miliseconds
-   * @throws Error with message `Time amount too big` if time is bigger than max js Date
-   * or `Invalid time string` if the dateStr is not a valid date string
+   * @returns Time in miliseconds, RangeError if time is bigger than max js Date,
+   * TypeError if the dateStr is not a valid date string
    */
-  parseTimeString(dateStr: string): number | Error {
+  parseTimeString(dateStr: string): number | RangeError | TypeError {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
       if (isNaN(new Date(Number(dateStr) * 1000 * 60).getTime())) {
-        return new Error(`Time amount too big`)
+        return new RangeError(`Time amount too big`)
       }
       return Number(dateStr) * 1000 * 60
     } // If there's no modifier then time is treated as minutes
     const unit: string = dateStr.substring(dateStr.length - 1).toLowerCase()
     const time: number = Number(dateStr.substring(0, dateStr.length - 1))
     if (isNaN(time) || time < 0) {
-      return new Error(`Invalid time string`)
+      return new TypeError(`Invalid time string`)
     }
     let parsedTime: number
     switch (unit) {
@@ -430,10 +434,10 @@ export const Utils = {
         parsedTime = time * 1000 * 60 * 60 * 24
         break
       default:
-        return new Error(`Invalid time string`)
+        return new TypeError(`Invalid time string`)
     }
     if (isNaN(new Date(parsedTime).getTime())) {
-      return new Error(`Time amount too big`)
+      return new RangeError(`Time amount too big`)
     }
     return parsedTime
   },
@@ -442,7 +446,7 @@ export const Utils = {
    * Formats date into calendar display.
    * @param date Date to be formatted
    * @param displayDay Whether to display day
-   * @returns Formatted date string
+   * @returns Formatted date string (dd/mm/yyyy)
    */
   formatDate(date: Date, displayDay?: true): string {
     if (displayDay === true) {
@@ -454,7 +458,7 @@ export const Utils = {
   /**
    * Creates string representation of chat command parameters.
    * @param commandParams Chat command paramaters
-   * @returns Stringified parameters
+   * @returns Stringified parameters (eg. login <string>, duration<time>[, count<int>, reason<multiword>])
    */
   stringifyCommandParams(commandParams: tm.Command['params']): string {
     let text: string = ''
@@ -465,11 +469,10 @@ export const Utils = {
           text += `[`
           hasOptionals = true
         }
-        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}> ` }
-        else { text += `, ${e.name} <${e.type ?? 'string'}> ` }
+        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}>` }
+        else { text += `, ${e.name} <${e.type ?? 'string'}>` }
       }
     }
-    text = text.slice(0, -1)
     if (hasOptionals) {
       text += ']'
     }

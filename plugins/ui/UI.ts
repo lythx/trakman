@@ -45,8 +45,8 @@ const loadMod = (): void => {
         Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
         Url: {
           string: obj.randomOrder
-            ? tm.utils.fixProto(obj.modLinks[~~(Math.random() * obj.modLinks.length)])
-            : tm.utils.fixProto(obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length])
+            ? tm.utils.fixProtocol(obj.modLinks[~~(Math.random() * obj.modLinks.length)])
+            : tm.utils.fixProtocol(obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length])
         }
       }
     })

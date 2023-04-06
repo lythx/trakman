@@ -82,7 +82,7 @@ const commands: tm.Command[] = [
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
-          time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+          time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
         }))
       } else {
         tm.sendMessage(config.timelimit.tooLow, info.login)

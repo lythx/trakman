@@ -40,7 +40,7 @@ const commands: tm.Command[] = [
       tm.sendMessage(tm.utils.strVar(config.settimelimit.text,
         {
           title: info.title, adminName: tm.utils.strip(info.nickname),
-          time: tm.utils.msToTime(time)
+          time: tm.utils.getVerboseTime(time)
         }),
         config.settimelimit.public ? undefined : info.login)
       tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
@@ -54,7 +54,7 @@ const commands: tm.Command[] = [
     callback: (info: tm.MessageInfo, time: number): void => {
       tm.sendMessage(tm.utils.strVar(config.setchattime.text, {
         title: info.title,
-        adminName: tm.utils.strip(info.nickname), time: tm.utils.msToTime(time)
+        adminName: tm.utils.strip(info.nickname), time: tm.utils.getVerboseTime(time)
       }), config.setchattime.public ? undefined : info.login)
       tm.client.callNoRes(`SetChatTime`, [{ int: time }])
     },

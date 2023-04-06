@@ -433,7 +433,7 @@ export class RecordService {
     recordType: 'live' | 'local' | 'lap'): string[] {
     const rs = Utils.getRankingString({ time, position }, (previousPosition && previousTime) ? { position: previousPosition, time: previousTime } : undefined)
     return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
-      ` ${Utils.getPositionString(position)} ${recordType} record. Time: ` + `
+      ` ${Utils.getOrdinalSuffix(position)} ${recordType} record. Time: ` + `
     ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
   }
 

@@ -30,7 +30,7 @@ export default class ServerInfoWindow extends PopupWindow {
 
   private async getServerInfo(): Promise<string[]> {
     // Dedicated server
-    const dedicatedUptime: string = tm.utils.msToTime((await tm.client.call(`GetNetworkStats`)).Uptime * 1000)
+    const dedicatedUptime: string = tm.utils.getVerboseTime((await tm.client.call(`GetNetworkStats`)).Uptime * 1000)
     const dedicatedVersion: string = tm.config.server.version
     const dedicatedBuild: string = tm.config.server.build
     // Configurable (or not) server variables
@@ -50,7 +50,7 @@ export default class ServerInfoWindow extends PopupWindow {
 
   private async getHostInfo(): Promise<string[]> {
     // Host system information
-    const osUptime: string = tm.utils.msToTime(~~os.uptime() * 1000) // Seconds
+    const osUptime: string = tm.utils.getVerboseTime(~~os.uptime() * 1000) // Seconds
     const osArch: string = os.arch()
     const osCPU: string = os.cpus()[0].model
     const osCPULoad: string = String(os.loadavg()[0] + `%`)
@@ -58,7 +58,7 @@ export default class ServerInfoWindow extends PopupWindow {
     const osKernel: string = os.platform().toUpperCase()
     // Trakman information
     const trakmanVersion: string = tm.config.controller.version
-    const trakmanUptime: string = tm.utils.msToTime(~~process.uptime() * 1000) // Seconds
+    const trakmanUptime: string = tm.utils.getVerboseTime(~~process.uptime() * 1000) // Seconds
     // Node information
     const nodeVersion: string = process.version
     const nodeRAMUsage: string = String(~~(process.memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)

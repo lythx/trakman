@@ -59,7 +59,7 @@ export const actions = {
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     await tm.admin.mute(login, info, targetInfo?.nickname, reason, expireDate)
     const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
+    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.mute.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login),
@@ -181,7 +181,7 @@ export const actions = {
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     await tm.admin.ban(targetInfo.ip, targetInfo.login, info, targetInfo.nickname, reason, expireDate)
     const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
+    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.ban.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.ban.public ? undefined : info.login)
   },
   /**
@@ -230,7 +230,7 @@ export const actions = {
       return
     }
     const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.msToTime(duration)}`
+    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.blacklist.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login), duration: durationString }) + `${reasonString}`, config.blacklist.public ? undefined : info.login)
   },
   /**

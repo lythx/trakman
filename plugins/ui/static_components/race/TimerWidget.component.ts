@@ -78,7 +78,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -93,7 +93,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })

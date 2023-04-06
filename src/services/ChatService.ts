@@ -122,19 +122,14 @@ export abstract class ChatService {
             break
           case 'time':
             const timeOrError = Utils.parseTimeString(params[i])
-            if (timeOrError instanceof Error) {
-              if (timeOrError.message === 'Time amount too big') {
-                this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
-                  { name: param.name }), info.login)
-                return
-              } else if (timeOrError.message === `Invalid time string`) {
-                this.sendErrorMessage(Utils.strVar(messages.notTime,
-                  { name: param.name }), info.login)
-                return
-              } else {
-                Logger.error(`Unhandled error received from parseTimeString in ChatService: ${timeOrError.message}`,)
-                return
-              }
+            if(timeOrError instanceof RangeError) {
+              this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
+                { name: param.name }), info.login)
+              return
+            } else if(timeOrError instanceof TypeError) {
+              this.sendErrorMessage(Utils.strVar(messages.notTime,
+                { name: param.name }), info.login)
+              return
             }
             parsedParams.push(timeOrError)
             break
