@@ -15,17 +15,23 @@ export default class Buttons {
   }
 
   display(): void {
-    tm.sendManialink(tm.getState() === 'result' ?  this.resultXml : this.raceXml)
+    tm.sendManialink(tm.getState() === 'result' ? this.resultXml : this.raceXml)
   }
 
   private constructXml(): void {
     let raceButtonsXml = ''
     for (const e of config.race) {
-      raceButtonsXml += `<frame posn="${e.posX} ${e.posY} ${e.zIndex}">${staticButton(e.icon, e.text1, e.text2, e.width, e.height, e)}</frame>`
+      if (!e.displayed) { continue }
+      raceButtonsXml += `<frame posn="${e.posX} ${e.posY} ${e.zIndex}">
+      ${staticButton(e.icon, e.text1, e.text2, e.width, e.height, e)}
+      </frame>`
     }
     let resultButtonsXml = ''
     for (const e of config.result) {
-      resultButtonsXml += `<frame posn="${e.posX} ${e.posY} ${e.zIndex}">${staticButton(e.icon, e.text1, e.text2, e.width, e.height, e)}</frame>`
+      if (!e.displayed) { continue }
+      resultButtonsXml += `<frame posn="${e.posX} ${e.posY} ${e.zIndex}">
+      ${staticButton(e.icon, e.text1, e.text2, e.width, e.height, e)}
+      </frame>`
     }
     this.raceXml = `<manialink id="${utilIds.buttons}">
       ${raceButtonsXml}
