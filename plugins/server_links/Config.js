@@ -1,7 +1,7 @@
 export default {
-  isEnabled: true,
+  isEnabled: false,
   // http server can be used to connect servers running on different computers
-  useHttpServer: true,
+  useHttpServer: false,
   httpAddress: '127.0.0.1',
   httpPort: 7309,
   refreshTimeout: 10, // In seconds
