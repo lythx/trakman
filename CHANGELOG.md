@@ -1,5 +1,31 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
+## 1.3 
+**07/04/2023**
+× Removed mysterious checkpoint
++ Added manual chat routing features
++ Added a server links plugin
++ Added a music plugin
++ Added an actions plugin
++ Added custom buttons to UI
++ Added improvements to static UI
++ Added new utils
++ Added a warn widget
++ Added an info messages plugin
++ Added scripts to run the controller in the background
++ Added passing and cancelling votes
++ Added a command list search
++ Added a call chat command
++ Added multiple mod compatibility
+- Fixed the round averages window
+- Fixed the time utils
+- Fixed the vote automatically passing if there's one person on the server
+- Fixed the timer not displaying after gamemode change
+- Fixed util naming
+- Fixed controller crash on webservices HTTP error
+- Fixed addrandom adding maps in a loop bug fix
+- Fixed chat repository crashing in case two messages were sent at the same exact time
+
 ## 1.2
 **02/03/2023**
 + Added UI for Rounds/Teams/Laps/Cup gamemodes
