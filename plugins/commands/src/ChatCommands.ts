@@ -236,7 +236,7 @@ const commands: tm.Command[] = [
   {
     aliases: config.man.aliases,
     help: config.man.help,
-    params: [{ name: 'command' }],
+    params: [{ name: 'commandName' }],
     callback: (info: tm.MessageInfo, commandName: string): void => {
       const command = tm.commands.list.filter(a => a.aliases.some(a => a === commandName))
       let str = ''

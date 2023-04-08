@@ -54,7 +54,7 @@ export default {
   commands: {
     list: {
       aliases: ['l', 'ml', 'list'],
-      help: `Display list of maps. Start with $a to author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
+      help: `Display list of maps. Start with $$a for author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
       privilege: 0
     },
     best: {
