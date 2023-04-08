@@ -236,7 +236,7 @@ const commands: tm.Command[] = [
   {
     aliases: config.man.aliases,
     help: config.man.help,
-    params: [{ name: 'command' }],
+    params: [{ name: 'commandName' }],
     callback: (info: tm.MessageInfo, commandName: string): void => {
       const command = tm.commands.list.filter(a => a.aliases.some(a => a === commandName))
       let str = ''
@@ -247,8 +247,9 @@ const commands: tm.Command[] = [
         str += tm.utils.strVar(config.man.text, {
           name: commandName,
           params: par.length === 0 ? '' : `(${par}) `,
-          help: e.help
+          help: e.help.replace(/\$/g, '$$$$$$') // ???
         })
+        console.log(str)
       }
       str = str.slice(1)
       if (str.length === 0) {
