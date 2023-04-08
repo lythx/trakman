@@ -24,6 +24,7 @@ const initialize = async () => {
   }
   topList = res
   onlineList = await getFromDB(tm.players.list.map(a => a.login))
+  for (const e of updateListeners) { e(topList) }
   for (const e of nicknameChangeListeners) { e(topList) }
 }
 

@@ -16,6 +16,8 @@ const initialize = async () => {
   }
   for (const e of res) { e.playtime = e.playtime * 1000 } // Change playtime to miliseconds
   topList = res
+  for (const e of updateListeners) { e(topList) }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('PlayerDataUpdated', (info) => {

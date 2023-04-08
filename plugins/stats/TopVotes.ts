@@ -29,12 +29,11 @@ const initialize = async () => {
     return
   }
   topList.push(...res.filter(a => a.count !== 0))
-  for (const e of updateListeners) {
-    e(topList)
-  }
   for (const e of tm.players.list) {
     await addToOnlineList(e.login, e.nickname)
   }
+  for (const e of updateListeners) { e(topList) }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('PlayerDataUpdated', (info) => {
