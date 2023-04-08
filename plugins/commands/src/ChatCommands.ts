@@ -247,9 +247,8 @@ const commands: tm.Command[] = [
         str += tm.utils.strVar(config.man.text, {
           name: commandName,
           params: par.length === 0 ? '' : `(${par}) `,
-          help: e.help.replace(/\$/g, '$$$$$$') // ???
+          help: e.help
         })
-        console.log(str)
       }
       str = str.slice(1)
       if (str.length === 0) {
