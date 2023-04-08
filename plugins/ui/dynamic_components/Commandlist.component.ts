@@ -95,6 +95,10 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     this.adminPaginator?.destroy()
     this.masteradminPaginator?.destroy()
     this.ownerPaginator?.destroy()
+    for (const e of this.paginators) {
+      e.destroy()
+    }
+    this.paginators.length = 0
     const commandList = tm.commands.list
     this.userCommands = commandList.filter(a => a.help !== undefined && a.privilege === 0)
     this.opCommands = commandList.filter(a => a.help !== undefined && a.privilege === 1)
