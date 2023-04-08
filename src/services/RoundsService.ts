@@ -15,7 +15,7 @@ export class RoundsService {
   private static _cupMaxWinnersCount: number
   private static readonly _cupWinners: tm.Player[] = []
   private static _teamsPointsLimit: number
-  private static _ranking: tm.Player[]
+  private static _ranking: tm.Player[] = []
   private static readonly _roundRecords: tm.FinishInfo[] = []
   private static noRoundFinishes = true
   private static finishedRounds = 0
@@ -30,14 +30,17 @@ export class RoundsService {
     if (status instanceof Error) {
       await Logger.fatal(status.message)
     }
-    const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+    const ranking: any[] | Error = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
     const playerList = PlayerService.players as tm.Player[]
-    this._ranking = []
-    for (const e of ranking) {
-      const player = playerList.find(a => e.Login === a.login)
-      if (player !== undefined) {
-        player.roundsPoints = e.Score
-        this._ranking.push(player)
+    if (ranking instanceof Error) {
+      Logger.warn(`Failed to get current ranking: ${ranking.message}`)
+    } else {
+      for (const e of ranking) {
+        const player = playerList.find(a => e.Login === a.login)
+        if (player !== undefined) {
+          player.roundsPoints = e.Score
+          this._ranking.push(player)
+        }
       }
     }
     for (const e of playerList) {

@@ -17,57 +17,28 @@ interface DisplayParams {
 export default class CommandList extends PopupWindow<DisplayParams> {
 
   private readonly paginators: Paginator[] = []
-  private readonly userPaginator: Paginator
-  private readonly opPaginator: Paginator
-  private readonly adminPaginator: Paginator
-  private readonly masteradminPaginator: Paginator
-  private readonly ownerPaginator: Paginator
-  private readonly table: Grid
-  private readonly commandLists: tm.Command[][] = []
-  private readonly userCommands: tm.Command[]
-  private readonly opCommands: tm.Command[]
-  private readonly adminCommands: tm.Command[]
-  private readonly masteradminCommands: tm.Command[]
-  private readonly ownerCommands: tm.Command[]
-  private readonly searchQueries: { login: string, privilege: number, list: tm.Command[], paginator: Paginator }[] = []
+  private userPaginator!: Paginator
+  private opPaginator!: Paginator
+  private adminPaginator!: Paginator
+  private masteradminPaginator!: Paginator
+  private ownerPaginator!: Paginator
+  private table!: Grid
+  private commandLists: tm.Command[][] = []
+  private userCommands: tm.Command[] = []
+  private opCommands: tm.Command[] = []
+  private adminCommands: tm.Command[] = []
+  private masteradminCommands: tm.Command[] = []
+  private ownerCommands: tm.Command[] = []
+  private searchQueries: { login: string, privilege: number, list: tm.Command[], paginator: Paginator }[] = []
   private paginatorIdOffset = 0
   private readonly paginatorIdRange = 400 // Starts at 600
 
   constructor() {
     super(componentIds.commandList, config.icon, config.title, config.navbar)
-    const commandList = tm.commands.list
-    this.userCommands = commandList.filter(a => a.help !== undefined && a.privilege === 0)
-    this.opCommands = commandList.filter(a => a.help !== undefined && a.privilege === 1)
-    this.adminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 2)
-    this.masteradminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 3)
-    this.ownerCommands = commandList.filter(a => a.help !== undefined && a.privilege === 4)
-    this.userPaginator = new Paginator(this.openId + 100, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
-    this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.opCommands.length / config.entries))
-    this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.adminCommands.length / config.entries))
-    this.masteradminPaginator = new Paginator(this.openId + 400, this.contentWidth, this.footerHeight, Math.ceil(this.masteradminCommands.length / config.entries))
-    this.ownerPaginator = new Paginator(this.openId + 500, this.contentWidth, this.footerHeight, Math.ceil(this.ownerCommands.length / config.entries))
-    const paginators = [this.userPaginator, this.opPaginator, this.adminPaginator, this.masteradminPaginator, this.ownerPaginator]
-    const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands]
-    for (const e of paginators) {
-      e.onPageChange = (login: string, page: number): void => {
-        const privilege = tm.players.get(login)?.privilege ?? 0
-        this.displayToPlayer(login, {
-          page, paginator: e, commands: commands[paginators.indexOf(e)], privilege, singleType: true
-        }, `${page}/${e.pageCount}`, privilege)
-      }
-    }
-    for (let i: number = 0; i <= 4; i++) {
-      const arr = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, i + 1)
-      const commands: tm.Command[] = arr.flat(1)
-      this.commandLists.push(commands)
-      const pageCount: number = Math.ceil(commands.length / config.entries)
-      const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.footerHeight, pageCount)
-      paginator.onPageChange = (login: string, page: number, info): void => {
-        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page}/${paginator.pageCount}`, info.privilege)
-      }
-      this.paginators.push(paginator)
-    }
-    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
+    this.initializeListsAndPaginators()
+    // Some commands get added on startup so possibly after this code
+    // gets executed therefore need to check again after 10 seconds
+    setTimeout(() => this.initializeListsAndPaginators(), 10000)
     addManialinkListener(this.openId, 501, (info, offset) => {
       const arr: { [id: number]: [Paginator, tm.Command[], string] } = {
         100: [this.userPaginator, this.userCommands, 'User Commands'],
@@ -116,6 +87,48 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       },
       privilege: config.command.privilege
     })
+  }
+
+  private initializeListsAndPaginators() {
+    this.userPaginator?.destroy()
+    this.opPaginator?.destroy()
+    this.adminPaginator?.destroy()
+    this.masteradminPaginator?.destroy()
+    this.ownerPaginator?.destroy()
+    const commandList = tm.commands.list
+    this.userCommands = commandList.filter(a => a.help !== undefined && a.privilege === 0)
+    this.opCommands = commandList.filter(a => a.help !== undefined && a.privilege === 1)
+    this.adminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 2)
+    this.masteradminCommands = commandList.filter(a => a.help !== undefined && a.privilege === 3)
+    this.ownerCommands = commandList.filter(a => a.help !== undefined && a.privilege === 4)
+    this.userPaginator = new Paginator(this.openId + 100, this.contentWidth, this.footerHeight, Math.ceil(this.userCommands.length / config.entries))
+    this.opPaginator = new Paginator(this.openId + 200, this.contentWidth, this.footerHeight, Math.ceil(this.opCommands.length / config.entries))
+    this.adminPaginator = new Paginator(this.openId + 300, this.contentWidth, this.footerHeight, Math.ceil(this.adminCommands.length / config.entries))
+    this.masteradminPaginator = new Paginator(this.openId + 400, this.contentWidth, this.footerHeight, Math.ceil(this.masteradminCommands.length / config.entries))
+    this.ownerPaginator = new Paginator(this.openId + 500, this.contentWidth, this.footerHeight, Math.ceil(this.ownerCommands.length / config.entries))
+    const paginators = [this.userPaginator, this.opPaginator, this.adminPaginator, this.masteradminPaginator, this.ownerPaginator]
+    const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands]
+    for (const e of paginators) {
+      e.onPageChange = (login: string, page: number): void => {
+        const privilege = tm.players.get(login)?.privilege ?? 0
+        this.displayToPlayer(login, {
+          page, paginator: e, commands: commands[paginators.indexOf(e)], privilege, singleType: true
+        }, `${page}/${e.pageCount}`, privilege)
+      }
+    }
+    this.commandLists.length = 0
+    for (let i: number = 0; i <= 4; i++) {
+      const arr = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, i + 1)
+      const commands: tm.Command[] = arr.flat(1)
+      this.commandLists.push(commands)
+      const pageCount: number = Math.ceil(commands.length / config.entries)
+      const paginator: Paginator = new Paginator(this.openId + (i * 10), this.contentWidth, this.footerHeight, pageCount)
+      paginator.onPageChange = (login: string, page: number, info): void => {
+        this.displayToPlayer(login, { page, paginator, commands, privilege: i }, `${page}/${paginator.pageCount}`, info.privilege)
+      }
+      this.paginators.push(paginator)
+    }
+    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
   }
 
   openWithQuery(login: string, privilege: number, query: string) {
@@ -189,8 +202,8 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
-      if (command === undefined) { return '' }
-      return centeredText(tm.utils.safeString(tm.utils.strip(command.help ?? '', true)), w, h)
+      if (command?.help === undefined) { return '' }
+      return centeredText(tm.utils.safeString(command.help), w, h)
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)

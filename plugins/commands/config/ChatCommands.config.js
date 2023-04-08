@@ -105,7 +105,7 @@ export default {
     text: `${p.servermsg}Current server time is${p.highlight}: #{time}${p.servermsg}.`,
     privilege: 0,
     aliases: ['time'],
-    help: `Find out about the current server time.`
+    help: `Find out what the current server time is.`
   },
   bootme: {
     text: `${p.highlight}#{nickname}${p.servermsg} has passed away for good. May their soul ${p.highlight}rest in peace${p.servermsg}.`,
@@ -151,15 +151,15 @@ export default {
     error: `${p.error}Player ${p.highlight}#{name}${p.error} is not online.`,
     privilege: 0,
     aliases: ['st', 'session', 'sessiontime'],
-    help: `Find out about current session time of specified player.`
+    help: `Find out about the current session time of specified player.`
   },
   man: {
     text: `${p.highlight}#{name}: ${p.dedirecord}#{params}${p.admin}#{help}`,
-    error: `${p.error}Command ${p.highlight}#{name} ${p.error}doesn't exist or has no help.`,
+    error: `${p.error}Command ${p.highlight}#{name} ${p.error}doesn't exist or has no help message associated with it.`,
     public: false,
     privilege: 0,
     aliases: ['man'],
-    help: `Display help and params for given command.`
+    help: `Display help and params for a given command.`
   },
   admin: {
     text: `${p.error}Use //[command] for admin commands.`,
