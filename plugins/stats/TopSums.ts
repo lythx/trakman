@@ -37,7 +37,7 @@ const initialize = async () => {
         continue
       }
     }
-    if (mapPresent === false) { continue }
+    if (!mapPresent) { continue }
     const find = topList.find(a => a.login === res[i].login)
     if (find !== undefined) {
       if (rank <= 3) {
@@ -77,7 +77,7 @@ tm.addListener('Startup', (): void => {
 
 tm.addListener('BeginMap', (): void => {
   initialLocals = tm.records.local
-  if (refreshNeeded === true) { void initialize() }
+  if (refreshNeeded) { void initialize() }
 })
 
 tm.addListener('PlayerDataUpdated', (info) => {

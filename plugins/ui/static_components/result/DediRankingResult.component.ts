@@ -14,9 +14,9 @@ export default class DediRankingResult extends StaticComponent {
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
-    super(componentIds.dedisResult, 'result')
+    super(componentIds.dedisResult)
     this.header = new StaticHeader('result')
-    this.recordList = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.recordList = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -29,16 +29,20 @@ export default class DediRankingResult extends StaticComponent {
       if (dedimania.getRecord(info.login) !== undefined) { this.display() }
     })
   }
+  
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

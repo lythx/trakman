@@ -12,17 +12,26 @@ export default class RankWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.rank, 'race')
+    super(componentIds.rank)
     this.constructXml()
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
+  protected onPositionChange(): void {
+    this.constructXml()
+    this.display()
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

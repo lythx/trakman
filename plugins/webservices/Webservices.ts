@@ -4,6 +4,15 @@ import http from 'http'
 const wsLogin: string | undefined = process.env.WEBSERVICES_LOGIN
 const wsPassword: string | undefined = process.env.WEBSERVICES_PASSWORD
 
+type FetchReturnType = {
+  id: number
+  login: string
+  nickname: string
+  united: boolean
+  path: string
+  idZone: number
+} | Error
+
 export interface WebservicesInfo {
   id: number,
   login: string,
@@ -30,35 +39,35 @@ const emitNextAuthorFetch = () => {
   for (const e of nextAuthorListeners) { e(nextAuthor) }
 }
 
-const fetchWebservices = async (login: string): Promise<{
-  id: number
-  login: string
-  nickname: string
-  united: boolean
-  path: string
-  idZone: number
-} | Error> => {
-  if (config.isEnabled === false) {
+const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
+  if (!config.isEnabled) {
     return new Error('Use webservices is set to false')
   }
-  const au: string = "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64')
   const options = {
     host: `ws.trackmania.com`,
     path: `/tmf/players/${login}/`,
+    method: 'GET',
     headers: {
-      'Authorization': au,
+      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
     }
   }
-  return new Promise((resolve): void => {
+
+  return new Promise<FetchReturnType>((resolve, reject): void => {
     http.request(options, (res): void => {
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
       if (res.statusCode === 200) {
-        res.on('end', (): void => resolve(JSON.parse(data)))
-        return
+        res.on('end', (): void => { resolve(JSON.parse(data)) })
+      } else {
+        reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
       }
-      res.on('end', (): void => resolve(new Error(data)))
-    }).end()
+    }).on('error', (): void => { reject(new Error(`HTTP request error.`)) })
+      .on('timeout', (): void => { reject(new Error(`HTTP request timeout.`)) })
+      .end()
+  }).catch((err: Error): Error => {
+    const errStr = `Webservices fetch error: ${err?.message}`
+    tm.log.warn(errStr)
+    return new Error(errStr)
   })
 }
 
@@ -70,7 +79,7 @@ const fetchWebservices = async (login: string): Promise<{
 const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
   const cacheEntry: WebservicesInfo | undefined = cachedAuthors.find(a => a.login === login)
   if (cacheEntry !== undefined) { return cacheEntry }
-  if (regex.test(login) === true) { return new Error(`Login doesn't pass regex test`) }
+  if (regex.test(login)) { return new Error(`Login doesn't pass regex test`) }
   const player = await fetchWebservices(login)
   if (player instanceof Error) { // UNKOWN PLAYER MOMENT
     return player
@@ -134,7 +143,7 @@ tm.addListener('JukeboxChanged', async (): Promise<void> => {
 
 /**
  * Provides utilites for fetching player data from Trackmania Webservices.
- * Fetches and stores current and next map author data
+ * Fetches and stores current and next map author data.
  * @author lythx & wiseraven
  * @since 0.1
  */
@@ -169,7 +178,7 @@ export const webservices = {
    * Next map author webservices data
    */
   get nextAuthor(): WebservicesInfo | undefined {
-    if (isMapRestart === true) { return curAuthor }
+    if (isMapRestart) { return curAuthor }
     return nextAuthor
   },
 

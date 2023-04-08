@@ -16,10 +16,10 @@ export default class TimerWidget extends StaticComponent {
   private readonly addButtonid = this.id + 2
   private readonly subtractButtonId = this.id + 3
   private isOnRestart = false
-  private roundCountdownDisplayed = false
+  private isPaused = false
 
   constructor() {
-    super(componentIds.timer, 'race')
+    super(componentIds.timer)
     this.header = new StaticHeader('race')
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
@@ -39,24 +39,16 @@ export default class TimerWidget extends StaticComponent {
     tm.addListener('EndMap', (info) => {
       if (info.isRestart) {
         this.isOnRestart = true
+        this.noButtonXml = this.constructXml(false)
+        this.xmlWithButtons = this.constructXml(true)
         this.display()
       }
     })
-    tm.addListener('EndRound', () => {
-      this.roundCountdownDisplayed = false
-      this.display()
-    })
     tm.addListener('BeginMap', () => {
-      this.roundCountdownDisplayed = false
+      this.isOnRestart = false
+      this.noButtonXml = this.constructXml(false)
+      this.xmlWithButtons = this.constructXml(true)
       this.display()
-    })
-    tm.addListener('PlayerFinish', () => {
-      if (this.isRoundsOrientedGamemode()) {
-        if (this.roundCountdownDisplayed === false) {
-          this.roundCountdownDisplayed = true
-          this.display()
-        }
-      }
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -86,7 +78,7 @@ export default class TimerWidget extends StaticComponent {
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
@@ -96,15 +88,19 @@ export default class TimerWidget extends StaticComponent {
         tm.sendMessage(config.notDynamic, info.login)
         return
       }
-      const subtracted = tm.timer.subtractTime(config.timeSubtractedOnClick)
-      if (subtracted === false) { return }
+      const subtracted: boolean = tm.timer.subtractTime(config.timeSubtractedOnClick)
+      if (!subtracted) { return }
       const strObject = {
         title: info.title,
         adminName: tm.utils.strip(info.nickname),
-        time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+        time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
       }
       tm.sendMessage(tm.utils.strVar(config.set, strObject))
     })
+  }
+
+  getHeight(): number {
+    return config.height
   }
 
   private startDynamicTimerInterval() {
@@ -117,21 +113,17 @@ export default class TimerWidget extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
+    if (this.isPaused && tm.timer.isPaused) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login, e.privilege)
     }
+    this.isPaused = tm.timer.isPaused
   }
 
   displayToPlayer(login: string, privilege?: number): void {
-    if (this.isDisplayed === false) { return }
-    if (this.isRoundsOrientedGamemode()) {
-      if (this.roundCountdownDisplayed) {
-        tm.sendManialink(this.noButtonXml, login)
-      } else {
-        this.hide()
-      }
-    } else if (!tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
+    if (!this.isDisplayed) { return }
+    if (this.isOnRestart || !tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)
@@ -155,7 +147,7 @@ export default class TimerWidget extends StaticComponent {
         timeXml = centeredText(config.pausedText, config.width, bottomH,
           { specialFont: true, yOffset: -0.3, xOffset: 0.2 })
       } else {
-        const time = ~~(tm.timer.remainingRaceTime / 1000)
+        const time = Math.floor(tm.timer.remainingRaceTime / 1000)
         let timeColour = config.timeColours[0]
         if (time < config.colourChangeThresholds[1]) {
           timeColour = config.timeColours[2]
@@ -215,10 +207,6 @@ export default class TimerWidget extends StaticComponent {
     }
     return this.header.constructXml(config.title, config.icon,
       this.side, { rectangleWidth: headerRectWidth }) + buttonXml
-  }
-
-  private isRoundsOrientedGamemode(): boolean {
-    return tm.getGameMode() !== 'Stunts' && tm.getGameMode() !== 'TimeAttack'
   }
 
 }

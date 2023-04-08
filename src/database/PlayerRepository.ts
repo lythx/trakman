@@ -134,7 +134,7 @@ export class PlayerRepository extends Repository {
     const res = await this.query(query, ...logins)
     this.cachedIds.push(...res)
     this.cachedIds.length = Math.min(this.cachedIds.length, 300)
-    return isArr === true ? ret.concat(res) : res[0]?.id
+    return isArr ? ret.concat(res) : res[0]?.id
   }
 
   private constructPlayerObject(entry: TableEntry): tm.OfflinePlayer {

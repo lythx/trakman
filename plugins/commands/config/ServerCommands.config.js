@@ -166,5 +166,10 @@ export default {
     privilege: 3,
     aliases: ['sd', 'shutdown'],
     help: `Stop the dedicated server.`
+  },
+  call: {
+    privilege: 4,
+    aliases: ['call'],
+    help: `Execute a dedicated server method. Params need to be specified in a valid json format or in "" for strings.`
   }
 }

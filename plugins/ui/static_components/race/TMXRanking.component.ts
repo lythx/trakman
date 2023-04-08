@@ -10,13 +10,13 @@ import config from './TMXRanking.config.js'
 
 export default class TMXRanking extends StaticComponent {
 
-  private readonly recordList: RecordList
+  private recordList: RecordList
   private readonly header: StaticHeader
 
   constructor() {
-    super(componentIds.tmx, 'race')
+    super(componentIds.tmx)
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, config.height - (this.header.options.height + config.margin), config.entries,
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
@@ -34,15 +34,25 @@ export default class TMXRanking extends StaticComponent {
     tmx.onQueueChange((): void => this.display())
   }
 
+  onPositionChange(): void {
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
+      this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
+    this.display()
+  }
+
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {

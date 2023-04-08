@@ -3,7 +3,8 @@
  * @since 0.1
  */
 
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow } from '../../UI.js'
+import { actions } from '../../../actions/Actions.js'
+import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Banlist.config.js'
 
 export default class Banlist extends PopupWindow<number> {
@@ -20,21 +21,10 @@ export default class Banlist extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
-    tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {
-      if (info.actionId >= this.openId + 1000 && info.actionId < this.openId + 2000) {
-        const target = tm.admin.banlist[info.actionId - this.openId - 1000]
-        if (target === undefined) { return }
-        const status = await tm.admin.unban(target.login, info)
-        if (status instanceof Error) {
-          tm.sendMessage(tm.utils.strVar(config.messages.error, { login: target.login }), info.login)
-        } else if (status === true) {
-          tm.sendMessage(tm.utils.strVar(config.messages.text, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname, true),
-            name: tm.utils.strip(target.nickname ?? target.login, true)
-          }))
-        }
-      }
+    addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
+      const target = tm.admin.banlist[offset]
+      if (target === undefined) { return }
+      actions.unban(info, target.login)
     })
     tm.addListener(['Ban', 'Unban'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.banCount / (config.entries - 1)))

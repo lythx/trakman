@@ -27,6 +27,7 @@ export abstract class Logger {
     cyan: 0x00FFFF,
     white: 0xFFFFFF
   }
+  private static readonly separator: string = '---------------------------------------------'
   private static readonly logDir: string = './logs'
   private static readonly logTypes = {
     fatal: {
@@ -74,7 +75,7 @@ export abstract class Logger {
       this.logLevel = envLogLevel
     }
     await fs.mkdir(this.logDir).catch((err: Error): void => {
-      if (err.message.startsWith('EEXIST') === false) { // ignore dir exists error
+      if (!err.message.startsWith('EEXIST')) { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
@@ -84,7 +85,7 @@ export abstract class Logger {
     process.on('unhandledRejection', (err: Error): void => {
       void this.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
-    if (this.useDiscord === true) {
+    if (this.useDiscord) {
       const envDcLog = Number(process.env.DISCORD_LOG_LEVEL)
       if (isNaN(envDcLog)) {
         this.warn(`DISCORD_LOG_LEVEL is undefined or not a number, ` +
@@ -108,7 +109,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static async fatal(...lines: any[]): Promise<void> {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     this.crashed = true
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
@@ -124,7 +125,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static error(...lines: any[]): void {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'error'
@@ -136,7 +137,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static warn(...lines: any[]): void {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'warn'
@@ -148,7 +149,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static info(...lines: any[]): void {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'info'
@@ -160,7 +161,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static debug(...lines: any[]): void {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'debug'
@@ -172,7 +173,7 @@ export abstract class Logger {
    * @param lines Message lines
    */
   static trace(...lines: any[]): void {
-    if (this.crashed === true) { return }
+    if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
     const tag: Tag = 'trace'
@@ -191,7 +192,7 @@ export abstract class Logger {
     if (str.length > 500) {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
     }
-    if (this.useDiscord === true && this.logTypes[tag].level <= this.discordLogLevel) {
+    if (this.useDiscord && this.logTypes[tag].level <= this.discordLogLevel) {
       const embed: EmbedBuilder = new EmbedBuilder()
         .setTitle(`${tag.toUpperCase()} on server ${tm.config.server.login}`)
         .setColor(this.logTypes[tag].discordColour)
@@ -206,7 +207,7 @@ export abstract class Logger {
       if (this.thumbs.length !== 0) {
         embed.setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
       }
-      const separator: string | undefined = this.isFirstLog === false ? undefined : '---------------------------------------------'
+      const separator: string | undefined = this.isFirstLog ? this.separator : undefined
       if (tag === 'fatal') {
         await this.webhook.send({
           content: (separator ?? '') + '\n' + this.users.join(' '),

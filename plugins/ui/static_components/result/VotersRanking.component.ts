@@ -14,22 +14,26 @@ export default class VotersRanking extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.votersRanking, 'result')
+    super(componentIds.votersRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     stats.votes.onUpdate((): void => this.display())
     stats.votes.onNicknameChange((): void => this.display())
   }
 
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.constructXml()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

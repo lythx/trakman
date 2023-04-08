@@ -28,7 +28,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
 );`]
 
 const getQueryDBFunction = async (): Promise<(query: string, ...params: any[]) => Promise<any[] | Error>> => {
-  if (config.useDBClient === true && config.isEnabled) {
+  if (config.useDBClient && config.isEnabled) {
     return await tm.db.getClient()
   }
   return tm.db.query

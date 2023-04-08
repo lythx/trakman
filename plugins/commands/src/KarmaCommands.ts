@@ -1,3 +1,4 @@
+import { actions } from '../../actions/Actions.js'
 import config from '../config/KarmaCommands.config.js'
 
 const options = {
@@ -13,11 +14,7 @@ const processVote = (vote: '---' | '--' | '-' | '+' | '++' | '+++', info: tm.Mes
   const voteValue = options[vote as keyof typeof options]
   if (voteValue === undefined ||
     voteValue === tm.karma.current.find(a => a.login === info.login)?.vote) { return }
-  tm.karma.add(info, voteValue)
-  tm.sendMessage(tm.utils.strVar(config.message, {
-    nickname: tm.utils.strip(info.nickname),
-    voteText: config.voteTexts[vote as keyof typeof config.voteTexts]
-  }), config.public === true ? undefined : info.login)
+  actions.addVote(info, voteValue)
 }
 
 tm.addListener('PlayerChat', (info): void => {

@@ -30,7 +30,7 @@ const onMapStart = async (): Promise<void> => {
   emitEvent('SectorsFetch', currentBestSecs, currentPlayerSecs)
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
 
   tm.addListener('Startup', async (): Promise<void> => {
     await onMapStart()
@@ -151,7 +151,7 @@ if (config.isEnabled === true) {
           }
           const deleted = secs.sectors[sectorIndex - 1]
           secs.sectors[sectorIndex - 1] = undefined
-          tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getPositionString(sectorIndex) }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.playerSectorRemoved, { index: tm.utils.getOrdinalSuffix(sectorIndex) }), info.login)
           if (deleted !== undefined) {
             emitEvent('DeletePlayerSector', { ...info, deletedSectors: [{ time: deleted, index: sectorIndex }] })
           }
@@ -187,8 +187,8 @@ if (config.isEnabled === true) {
           tm.sendMessage(tm.utils.strVar(config.bestSectorRemoved, {
             title: info.title,
             nickname: tm.utils.strip(info.nickname, true),
-            index: tm.utils.getPositionString(sectorIndex)
-          }), config.commands.deletesector.public === false ? info.login : undefined)
+            index: tm.utils.getOrdinalSuffix(sectorIndex)
+          }), config.commands.deletesector.public ? undefined : info.login)
           if (deleted !== undefined) {
             emitEvent('DeleteBestSector', [{ ...deleted, index: sectorIndex }])
           }

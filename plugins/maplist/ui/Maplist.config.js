@@ -25,7 +25,6 @@ export default {
   },
   navbar: [
     { name: 'Map Info', actionId: ids.TMXWindow }
-    // TODO add detailed map info here too
   ],
   icons: [
     icons.ongoingMap,

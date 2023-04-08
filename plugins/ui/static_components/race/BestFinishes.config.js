@@ -2,7 +2,8 @@ import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  height: 14.5,
+  entryHeight: 2.16,
+  entries: 6,
   width: cfg.width,
   posX:  cfg.rightPosition - (cfg.marginBig + cfg.width),
   posY: cfg.topBorder,
@@ -11,7 +12,6 @@ export default {
   icon: icons.bestFinishes,
   margin: cfg.margin,
   background: cfg.background,
-  entries: 6,
   columnProportions: [
     1,
     2.8,

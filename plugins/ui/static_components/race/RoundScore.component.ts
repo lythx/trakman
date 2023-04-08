@@ -13,7 +13,7 @@ export default class RoundScore extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.roundScore, 'race', ['Teams', 'Rounds', 'Cup'])
+    super(componentIds.roundScore)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('PlayerFinish', (): void => this.display())
@@ -23,15 +23,37 @@ export default class RoundScore extends StaticComponent {
     })
   }
 
+  getEntries(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsEntries
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupEntries
+    }
+    return config.roundsEntries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsTopCount
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    }
+    return config.roundsTopCount
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
@@ -58,18 +80,11 @@ export default class RoundScore extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.roundsHeight
-    let entries = config.roundsEntries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    }
+    const height = this.getHeight()
+    const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, 250, config.displayNoRecordEntry)
+      entries, this.side, this.getTopCount(), 250, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

@@ -16,12 +16,12 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
-      Math.ceil(tm.messages.count / (config.entries - 1)))
+      Math.ceil(tm.chat.messageCount / (config.entries - 1)))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
     }
     tm.addListener(['PlayerChat'], () => {
-      this.paginator.setPageCount(Math.ceil(tm.messages.count / (config.entries - 1)))
+      this.paginator.setPageCount(Math.ceil(tm.chat.messageCount / (config.entries - 1)))
       this.reRender()
     })
     tm.commands.add({
@@ -49,7 +49,7 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
   protected constructContent(login: string, params: { page: number }): string {
     const page = params.page
     const index = (page - 1) * (config.entries - 1) - 1
-    const messages = tm.messages.list.reverse()
+    const messages = tm.chat.messages.reverse()
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Date ', w, h),
       (i, j, w, h) => centeredText(' Nickname ', w, h),

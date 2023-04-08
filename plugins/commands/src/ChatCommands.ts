@@ -84,8 +84,7 @@ const commands: tm.Command[] = [
     aliases: config.afk.aliases,
     help: config.afk.help,
     callback: async (info: tm.MessageInfo): Promise<void> => {
-      tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
-      await tm.client.call('system.multicall',
+      const res = await tm.client.call('system.multicall',
         [{
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 1 }]
@@ -94,7 +93,12 @@ const commands: tm.Command[] = [
           method: 'ForceSpectator',
           params: [{ string: info.login }, { int: 0 }]
         }])
-      tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      if (res instanceof Error || res[0] instanceof Error) {
+        tm.sendMessage(config.afk.tooManySpecs, info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.afk.text, { nickname: info.nickname }), config.afk.public ? undefined : info.login, false)
+        tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: info.login }])
+      }
     },
     privilege: config.afk.privilege
   },
@@ -180,7 +184,7 @@ const commands: tm.Command[] = [
     help: config.playtime.help,
     callback: (info: tm.MessageInfo): void => {
       tm.sendMessage(tm.utils.strVar(config.playtime.text,
-        { time: tm.utils.msToTime(Date.now() - tm.timer.mapStartTimestamp) }),
+        { time: tm.utils.getVerboseTime(Date.now() - tm.timer.mapStartTimestamp) }),
         info.login)
     },
     privilege: config.playtime.privilege
@@ -211,7 +215,7 @@ const commands: tm.Command[] = [
     callback: async (info: tm.MessageInfo, login?: string): Promise<void> => {
       if (login === undefined || login === info.login) {
         tm.sendMessage(tm.utils.strVar(config.sessiontime.selfText, {
-          time: tm.utils.msToTime(Date.now() - info.joinTimestamp)
+          time: tm.utils.getVerboseTime(Date.now() - info.joinTimestamp)
         }), info.login)
         return
       }
@@ -224,10 +228,38 @@ const commands: tm.Command[] = [
       }
       tm.sendMessage(tm.utils.strVar(config.sessiontime.text, {
         name: tm.utils.strip(player.nickname),
-        time: tm.utils.msToTime(Date.now() - player.joinTimestamp)
+        time: tm.utils.getVerboseTime(Date.now() - player.joinTimestamp)
       }), info.login)
     },
     privilege: config.sessiontime.privilege
+  },
+  {
+    aliases: config.man.aliases,
+    help: config.man.help,
+    params: [{ name: 'command' }],
+    callback: (info: tm.MessageInfo, commandName: string): void => {
+      const command = tm.commands.list.filter(a => a.aliases.some(a => a === commandName))
+      let str = ''
+      for (const e of command) {
+        if (e.help === undefined || e.privilege > info.privilege) { continue }
+        str += '\n'
+        const par = tm.utils.stringifyCommandParams(e.params)
+        str += tm.utils.strVar(config.man.text, {
+          name: commandName,
+          params: par.length === 0 ? '' : `(${par}) `,
+          help: e.help
+        })
+      }
+      str = str.slice(1)
+      if (str.length === 0) {
+        tm.sendMessage(tm.utils.strVar(config.man.error, {
+          name: commandName
+        }), info.login)
+        return
+      }
+      tm.sendMessage(str, info.login)
+    },
+    privilege: config.man.privilege
   },
   {
     aliases: ['admin', 'a'],
@@ -242,7 +274,7 @@ const commands: tm.Command[] = [
     aliases: config.coppers.aliases,
     help: config.coppers.help,
     callback: async (info: tm.MessageInfo): Promise<void> => {
-      if (tm.config.server.isUnited === false) {
+      if (!tm.config.server.isUnited) {
         tm.sendMessage(config.coppers.notUnited, info.login)
         return
       }

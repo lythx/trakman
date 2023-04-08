@@ -31,20 +31,27 @@ import resultConfig from './config/ResultUi.js'
 import { fullScreenListener } from './utils/FullScreenListener.js'
 import flagIcons from './config/FlagIcons.js'
 import utilIds from './config/UtilIds.js'
+import Buttons from './Buttons.js'
 
 let customUi: CustomUi
+
+let currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
+
 const loadMod = (): void => {
-  const mods: {
-    struct: {
-      Env: { string: string },
-      Url: { string: string }
-    }
-  }[] = modConfig.map(a => ({
-    struct: {
-      Env: { string: a.environment },
-      Url: { string: a.modUrl }
-    }
-  }))
+  let mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
+  for (const obj of modConfig) {
+    if (obj.modLinks.length === 0) { continue }
+    mods.push({
+      struct: {
+        Env: { string: (tm.utils.environmentToNadeoEnvironment(obj.environment as tm.Environment) as string) },
+        Url: {
+          string: obj.randomOrder
+            ? tm.utils.fixProtocol(obj.modLinks[~~(Math.random() * obj.modLinks.length)])
+            : tm.utils.fixProtocol(obj.modLinks[currentModIndex[obj.environment as keyof typeof currentModIndex] % obj.modLinks.length])
+        }
+      }
+    })
+  }
   tm.client.callNoRes('SetForcedMods',
     [{
       boolean: true
@@ -71,31 +78,37 @@ StaticComponent.onComponentCreated((component) => staticComponents.push(componen
 DynamicComponent.onComponentCreated((component) => dynamicComponents.push(component))
 // Static UI needs to update on the next map if the gamemode changes
 let staticUpdateNeeded = false
-tm.client.addProxy(['SetGameMode'], () => { 
+tm.client.addProxy(['SetGameMode'], () => {
   staticUpdateNeeded = true
 })
 const events: tm.Listener[] = [
   {
     event: 'Startup',
-    callback: async (status: 'race' | 'result'): Promise<void> => {
+    callback: async (): Promise<void> => {
       await tm.client.call('SendHideManialinkPage')
       preloadIcons()
       loadMod()
       initalizeKeyListeners()
       customUi = new CustomUi()
       customUi.display()
+      StaticComponent.refreshStaticLayouts()
       for (const c of Object.values(staticComponents)) {
-        if (c.gameModes.includes(tm.getGameMode()) &&
-          (c.displayMode === status || c.displayMode === 'always')) { c.display() }
+        c.updateIsDisplayed()
+        c.updatePosition()
+        c.display()
       }
+      StaticComponent.refreshStaticLayouts()
+      new Buttons()
       new TestWindow()
       for (const e of loadListeners) { e() }
+      StaticComponent.onComponentCreated(() => {
+        StaticComponent.refreshStaticLayouts()
+      })
     }
   },
   {
     event: 'BeginMap',
-    callback: async () => {
-      loadMod()
+    callback: async (): Promise<void> => {
       if (staticUpdateNeeded) {
         staticUpdateNeeded = false
         for (const e of staticComponents) { e.updatePosition() }
@@ -103,14 +116,21 @@ const events: tm.Listener[] = [
     }
   },
   {
+    event: 'EndMap',
+    callback: async (): Promise<void> => {
+      currentModIndex[tm.maps.current.environment]++
+      loadMod()
+    }
+  },
+  {
     event: 'PlayerJoin',
-    callback: (info: tm.JoinInfo) => {
+    callback: (info: tm.JoinInfo): void => {
       preloadIcons(info.login)
     }
   }
 ]
 
-for (const event of events) { tm.addListener(event.event, event.callback) }
+for (const event of events) { tm.addListener(event.event, event.callback, true) }
 
 /**
  * Manialink UI components.
@@ -147,6 +167,13 @@ const components = {
    */
   get dynamicList(): DynamicComponent[] {
     return [...dynamicComponents]
+  },
+
+  /**
+   * Heights of static components used for static UI positioning
+   */
+  get staticHeights(): typeof StaticComponent['components'] {
+    return StaticComponent.components
   }
 
 }

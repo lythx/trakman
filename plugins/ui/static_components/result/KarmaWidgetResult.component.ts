@@ -6,6 +6,7 @@
 import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
 import { maniakarma, MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidgetResult.config.js'
+import { actions } from '../../../actions/Actions.js'
 
 export default class KarmaWidgetResult extends StaticComponent {
 
@@ -16,7 +17,7 @@ export default class KarmaWidgetResult extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(componentIds.karmaResult, 'result')
+    super(componentIds.karmaResult)
     this.header = new StaticHeader('result')
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
@@ -24,19 +25,23 @@ export default class KarmaWidgetResult extends StaticComponent {
     tm.addListener('KarmaVote', (): void => this.display())
     maniakarma.onMapFetch((): void => this.display())
     maniakarma.onVote((): void => this.display())
-    addManialinkListener(this.id + 1, 6, (info, offset): void => tm.karma.add(info, this.options[offset]))
+    addManialinkListener(this.id + 1, 6, (info, offset): void => actions.addVote(info, this.options[offset]))
     tm.addListener('VotesPrefetch', (): void => this.display())
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.constructXml(login), login)
   }
 

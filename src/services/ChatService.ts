@@ -8,6 +8,9 @@ import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
 
+type MessageFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
+type ModifyTextFunction = (info: tm.MessageInfo) => Promise<string | Error | undefined> | (string | Error | undefined)
+
 /**
  * This service manages chat table and chat commands
  */
@@ -17,12 +20,44 @@ export abstract class ChatService {
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
+  private static readonly customPrefixes: { callback: MessageFunction, position: number }[] = []
+  private static readonly messageStyleFunctions: { importance: number, callback: MessageFunction }[] = []
+  private static readonly messageTextModifiers: { importance: number, callback: ModifyTextFunction }[] = []
+  static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
    * Fetches messages from database
    */
   static async initialize(): Promise<void> {
     this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
+    tm.addListener('Startup', () => {
+      Client.callNoRes('ChatEnableManualRouting', [
+        { boolean: this.manualChatRoutingEnabled },
+        { boolean: true }
+      ])
+    })
+    Events.addListener('PlayerChat', (info): void => {
+      const input: string = info.text?.trim()
+      const [alias, ...params] = input.split(' ').filter(a => a !== '')
+      const aliasUsed: string | undefined = alias?.toLowerCase()
+      const matches = this._commandList.filter(command => {
+        const prefix: string = command.privilege === 0 ? '/' : '//'
+        return command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))
+      })
+      if (matches.length === 1) {
+        void this.commandCallback(matches[0], info, input, params, aliasUsed)
+      } else if (matches.length > 1) {
+        for (const e of matches) {
+          if (params.length === 0 && (e.params === undefined || e.params.length === 0)) {
+            this.commandCallback(e, info, input, params, aliasUsed)
+            return
+          } else if (params.length === e.params?.length) {
+            this.commandCallback(e, info, input, params, aliasUsed)
+            return
+          }
+        }
+      }
+    })
   }
 
   /**
@@ -32,22 +67,15 @@ export abstract class ChatService {
   static addCommand(...commands: tm.Command[]): void {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
-    for (const command of commands) {
-      Events.addListener('PlayerChat', (info): void => void this.commandCallback(command, info))
-    }
   }
 
-  private static async commandCallback(command: tm.Command, info: tm.MessageInfo): Promise<void> {
-    const prefix: string = command.privilege === 0 ? '/' : '//'
-    const input: string = info.text?.trim()
-    const [alias, ...params] = input.split(' ').filter(a => a !== '')
-    const aliasUsed: string | undefined = alias?.toLowerCase()
-    if (!command.aliases.some((alias: string): boolean => aliasUsed === (prefix + alias))) { return }
+  private static async commandCallback(command: tm.Command, info: tm.MessageInfo,
+    input: string, params: string[], alias: string): Promise<void> {
     if (info.privilege < command.privilege) {
       this.sendErrorMessage(messages.noPermission, info.login)
       return
     }
-    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${aliasUsed}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
     const parsedParams: (string | number | boolean | undefined | tm.Player | tm.OfflinePlayer)[] = []
     if (command.params !== undefined) {
       for (const [i, param] of command.params.entries()) {
@@ -93,43 +121,17 @@ export abstract class ChatService {
             parsedParams.push(config.truthyParams.includes(params[i].toLowerCase()))
             break
           case 'time':
-            if (!isNaN(Number(params[i])) && Number(params[i]) > 0) {
-              if (isNaN(new Date(Number(params[i])).getTime())) {
-                this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
-                return
-              }
-              parsedParams.push(Number(params[i]) * 1000 * 60)
-              break
-            } // If there's no modifier then time is treated as minutes
-            const unit: string = params[i].substring(params[i].length - 1).toLowerCase()
-            const time: number = Number(params[i].substring(0, params[i].length - 1))
-            if (isNaN(time) || time < 0) {
-              this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
+            const timeOrError = Utils.parseTimeString(params[i])
+            if(timeOrError instanceof RangeError) {
+              this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
+                { name: param.name }), info.login)
+              return
+            } else if(timeOrError instanceof TypeError) {
+              this.sendErrorMessage(Utils.strVar(messages.notTime,
+                { name: param.name }), info.login)
               return
             }
-            let parsedTime: number
-            switch (unit) {
-              case 's':
-                parsedTime = time * 1000
-                break
-              case 'm':
-                parsedTime = time * 1000 * 60
-                break
-              case 'h':
-                parsedTime = time * 1000 * 60 * 60
-                break
-              case 'd':
-                parsedTime = time * 1000 * 60 * 60 * 24
-                break
-              default:
-                this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
-                return
-            }
-            if (isNaN(new Date(parsedTime).getTime())) {
-              this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
-              return
-            }
-            parsedParams.push(parsedTime)
+            parsedParams.push(timeOrError)
             break
           case 'player': {
             let player = PlayerService.get(params[i])
@@ -177,7 +179,7 @@ export abstract class ChatService {
     const messageInfo: tm.MessageInfo & { aliasUsed: string } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
-      aliasUsed: aliasUsed.slice(1)
+      aliasUsed: alias.slice(1)
     }
     command.callback(messageInfo, ...parsedParams)
   }
@@ -192,7 +194,7 @@ export abstract class ChatService {
    * @param text Message text
    * @returns Message object or Error if unsuccessfull
    */
-  static add(login: string, text: string): tm.MessageInfo | Error {
+  static async add(login: string, text: string): Promise<tm.MessageInfo | Error> {
     const player: tm.Player | undefined = PlayerService.get(login)
     if (player === undefined) {
       const errStr: string = `Error while adding message. Cannot find player ${login} in the memory`
@@ -210,13 +212,81 @@ export abstract class ChatService {
       date: message.date,
       ...player
     }
-    if (text?.[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
+    if (text[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
+      Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
+      if (this.manualChatRoutingEnabled) {
+        let str = ''
+        for (const e of this.customPrefixes.filter(a => a.position < 0)) {
+          str += await e.callback(messageInfo)
+        }
+        let customStyle = false
+        for (const e of this.messageStyleFunctions) {
+          const result = await e.callback(messageInfo)
+          if (result !== undefined) {
+            str += result
+            customStyle = true
+            break
+          }
+        }
+        if (!customStyle) {
+          str += Utils.strVar(prefixes.manualChatRoutingMessageStyle, { name: player.nickname })
+        }
+        for (const e of this.messageTextModifiers) {
+          const result = await e.callback(messageInfo)
+          if (result instanceof Error) {
+            return result
+          }
+          if (result !== undefined) {
+            text = result
+            break
+          }
+        }
+        for (const e of this.customPrefixes.filter(a => a.position >= 0)) {
+          str += await e.callback(messageInfo)
+        }
+        Client.callNoRes('ChatSendServerMessage', [{
+          string: str + text
+        }])
+      }
       this._messages.unshift(message)
       void this.repo.add(login, text, message.date)
-      Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
     }
     this._messages.length = Math.min(this.messagesArraySize, this._messages.length)
     return messageInfo
+  }
+
+  /**
+   * Registers a function to add a prefix or postfix to chat messages when using manual chat routing.
+   * @param callback The function takes MessageInfo object and returns string (the prefix) or undefined (then its ignored)
+   * @param position Prefixes are positioned based on this, lowest one is first, 
+   * negative values are positioned before the nickname, positive after it
+   */
+  static addMessagePrefix(callback: MessageFunction, position: number): void {
+    this.customPrefixes.push({ callback, position })
+    this.customPrefixes.sort((a, b) => b.position - a.position)
+  }
+
+  /**
+   * Registers a function to modify the player name on chat message.
+   * @param callback The function takes MessageInfo object and returns string (the name) or undefined (then its ignored)
+   * @param importance In case multiple functions are registered the most important one will be executed.
+   * If it returns undefined the 2nd most important function will be executed and so on
+   */
+  static setMessageStyle(callback: MessageFunction, importance: number) {
+    this.messageStyleFunctions.push({ callback, importance })
+    this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
+  }
+
+  /**
+   * Registers a function to modify chat message text.
+   * @param callback The function takes MessageInfo object and returns string (the name), 
+   * error (prevents message from being sent) or undefined (then its ignored)
+   * @param importance In case multiple functions are registered the most important one will be executed.
+   * If it returns undefined the 2nd most important will be executed and so on
+   */
+  static addMessageTextModifier(callback: ModifyTextFunction, importance: number) {
+    this.messageTextModifiers.push({ callback, importance })
+    this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
 
   /**

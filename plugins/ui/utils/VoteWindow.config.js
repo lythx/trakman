@@ -6,7 +6,7 @@ const p = tm.utils.palette
 export default {
   title: " Vote ",
   width: 25,
-  height: 10,
+  height: 10, // Without the admin buttons
   margin: cfg.margin,
   background: cfg.background,
   posX: cfg.leftPosition + cfg.marginBig + cfg.width,
@@ -26,5 +26,12 @@ export default {
     timer: ['FFF', p.yellow, p.red]
   },
   timerColourChanges: [20, 5],
-  message: `Votes needed to pass: #{colour}#{amount}$FFF.`
+  message: `Votes needed to pass: #{colour}#{amount}$FFF.`,
+  adminButtons: {
+    height: 3,
+    width: 6,
+    cancelText: `$${p.red}Cancel`,
+    passText: `$${p.green}Pass`,
+    textScale: 1.2
+  }
 }

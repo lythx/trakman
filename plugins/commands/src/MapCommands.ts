@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 
 let eraseObject: { id: string, admin: tm.Player } | undefined
 tm.addListener('BeginMap', (info): void => {
-  if (info.isRestart === true) { return }
+  if (info.isRestart) { return }
   if (eraseObject !== undefined) {
     void tm.maps.remove(eraseObject.id, eraseObject.admin)
     eraseObject = undefined
@@ -35,7 +35,7 @@ const commands: tm.Command[] = [
         tm.log.warn(obj.message)
         tm.sendMessage(config.add.addError, info.login)
         return
-      } else if (obj.wasAlreadyAdded === true) {
+      } else if (obj.wasAlreadyAdded) {
         tm.sendMessage(tm.utils.strVar(config.add.alreadyAdded, {
           map: tm.utils.strip(obj.map.name, true),
           nickname: tm.utils.strip(info.nickname, true)
@@ -86,7 +86,7 @@ const commands: tm.Command[] = [
         }
         obj = await tm.maps.writeFileAndAdd(file.name, file.content, info, { cancelIfAlreadyAdded: true })
         iteration++
-      } while (!(obj instanceof Error) && obj.wasAlreadyAdded === true && iteration < 10)
+      } while (!(obj instanceof Error) && obj.wasAlreadyAdded && iteration < 10)
       if (obj instanceof Error) {
         tm.log.warn(obj.message)
         tm.sendMessage(config.addrandom.addError, info.login)
@@ -137,7 +137,7 @@ const commands: tm.Command[] = [
         tm.log.warn(obj.message)
         tm.sendMessage(config.addfromurl.addError, info.login)
         return
-      } else if (obj.wasAlreadyAdded === true) {
+      } else if (obj.wasAlreadyAdded) {
         tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
           map: tm.utils.strip(obj.map.name, true),
           nickname: tm.utils.strip(info.nickname, true)

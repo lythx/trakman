@@ -17,7 +17,7 @@ export default class MapWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.map, 'race')
+    super(componentIds.map)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     webservices.onCurrentAuthorChange((): void => {
@@ -27,14 +27,18 @@ export default class MapWidget extends StaticComponent {
     tmx.onQueueChange((): void => this.display())
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.updateXML()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 
@@ -105,10 +109,10 @@ export default class MapWidget extends StaticComponent {
         return e.icon
       }
     }
-    if (map.isNadeo === true) {
+    if (map.isNadeo) {
       return config.icons.tags.nadeo
     }
-    if (map.isClassic === true) {
+    if (map.isClassic) {
       return config.icons.tags.classic
     }
     return config.icons.tags.normal

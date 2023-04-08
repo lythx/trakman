@@ -94,7 +94,7 @@ export class PlayerService {
    */
   static async join(login: string, nickname: string, fullRegion: string,
     isSpectator: boolean, id: number, ip: string, isUnited: boolean,
-    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> { // TODO ADD NEW PROPERTIES
+    ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> {
     let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
       Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
@@ -172,7 +172,7 @@ export class PlayerService {
     }
     this._players.push(player)
     if (serverStart === undefined) {
-      Logger.info(`${player.isSpectator === true ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
+      Logger.info(`${player.isSpectator ? 'Spectator' : 'Player'} ${Utils.strip(player.nickname)} (${player.login}) joined the server, visits: ${player.visits}, ` +
         `region: ${player.region}, wins: ${player.wins}, privilege: ${player.privilege}`)
     }
     return player
@@ -222,7 +222,7 @@ export class PlayerService {
     }
     void this.repo.updateOnLeave(player.login, totalTimePlayed, date)
     this._players.splice(playerIndex, 1)
-    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.msToTime(sessionTime)}`)
+    Logger.info(`${Utils.strip(player.nickname)} (${player.login}) has quit after playing for ${Utils.getVerboseTime(sessionTime)}`)
     return leaveInfo
   }
 
@@ -311,12 +311,9 @@ export class PlayerService {
    * @returns Number of wins
    */
   static async addWin(login: string): Promise<number> {
-    let player: any = this.get(login)
-    if (player === undefined) {
-      player = await this.fetch(login)
-    }
+    const player: any = this.get(login) ?? await this.fetch(login)
     await this.repo.updateOnWin(login, ++player.wins)
-    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getPositionString(player.wins)} time.`)
+    Logger.trace(`Player ${Utils.strip(player.nickname)} (${player.login}) won for the ${Utils.getOrdinalSuffix(player.wins)} time.`)
     return player.wins
   }
 

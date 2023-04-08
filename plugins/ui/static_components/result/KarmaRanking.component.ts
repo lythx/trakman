@@ -13,23 +13,27 @@ export default class KarmaRanking extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.karmaRanking, 'result')
+    super(componentIds.karmaRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     tm.addListener('KarmaVote', (): void => {
       this.display()
     })
   }
 
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.constructXml()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

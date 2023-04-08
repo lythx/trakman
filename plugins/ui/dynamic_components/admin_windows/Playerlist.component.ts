@@ -3,7 +3,8 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../../UI.js'
+import { actions } from '../../../actions/Actions.js'
+import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{ page: number, privilege: number }> {
@@ -43,128 +44,47 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       privilege: config.command.privilege
     })
     tm.addListener('PlayerDataUpdated', () => this.reRender())
-    tm.addListener('ManialinkClick', async (info: tm.ManialinkClickInfo) => {
-      if (info.actionId >= this.openId + this.actions.kick
-        && info.actionId < this.openId + this.actions.kick + 1000) { // Kick
-        const target = tm.players.list[info.actionId - this.openId - this.actions.kick]
-        if (target === undefined) { return }
-        tm.client.callNoRes('Kick', [{ string: target.login }])
-        tm.sendMessage(tm.utils.strVar(config.messages.kick, {
-          title: info.title,
-          adminName: tm.utils.strip(info.nickname),
-          name: tm.utils.strip(target.nickname)
-        }), config.public === true ? undefined : info.login)
-      } else if (info.actionId >= this.openId + this.actions.forceSpec
-        && info.actionId < this.openId + this.actions.forceSpec + 1000) { // ForceSpec and ForcePlay
-        const target = tm.players.list[info.actionId - this.openId - this.actions.forceSpec]
-        if (target === undefined) { return }
-        if (target.isSpectator === true) { // ForcePlay
-          tm.client.callNoRes('system.multicall',
-            [{
-              method: 'ForceSpectator',
-              params: [{ string: target.login }, { int: 2 }]
-            },
-            {
-              method: 'ForceSpectator',
-              params: [{ string: target.login }, { int: 0 }]
-            }])
-          tm.sendMessage(tm.utils.strVar(config.messages.forcePlay, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname),
-            name: tm.utils.strip(target.nickname)
-          }), config.public === true ? undefined : info.login)
-        } else { // ForceSpec
-          await tm.client.call('system.multicall',
-            [{
-              method: 'ForceSpectator',
-              params: [{ string: target.login }, { int: 1 }]
-            },
-            {
-              method: 'ForceSpectator',
-              params: [{ string: target.login }, { int: 0 }]
-            }])
-          tm.client.callNoRes('SpectatorReleasePlayerSlot', [{ string: target.login }])
-          tm.sendMessage(tm.utils.strVar(config.messages.forceSpec, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname),
-            name: tm.utils.strip(target.nickname)
-          }), config.public === true ? undefined : info.login)
-        }
-      } else if (info.actionId >= this.openId + this.actions.mute
-        && info.actionId < this.openId + this.actions.mute + 1000) { // Mute
-        const target = tm.players.list[info.actionId - this.openId - this.actions.mute]
-        if (target === undefined) { return }
-        if (tm.admin.getMute(target.login) === undefined) { // Mute
-          await tm.admin.mute(target.login, info, target.nickname)
-          tm.sendMessage(tm.utils.strVar(config.messages.mute, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname),
-            name: tm.utils.strip(target.nickname)
-          }), config.public === true ? undefined : info.login)
-        } else { // Unmute
-          const status = await tm.admin.unmute(target.login, info)
-          if (status instanceof Error) {
-            tm.sendMessage(tm.utils.strVar(config.messages.unmuteError, { login: info.login }), info.login)
-          } else {
-            tm.sendMessage(tm.utils.strVar(config.messages.unmute, {
-              title: info.title,
-              adminName: tm.utils.strip(info.nickname),
-              name: tm.utils.strip(target.nickname)
-            }), config.public === true ? undefined : info.login)
-          }
-        }
-      } else if (info.actionId >= this.openId + this.actions.addGuest
-        && info.actionId < this.openId + this.actions.addGuest + 1000) { // AddGuest and RemoveGuest
-        const target = tm.players.list[info.actionId - this.openId - this.actions.addGuest]
-        if (target === undefined) { return }
-        if (tm.admin.getGuest(target.login) === undefined) { // Add Guest
-          const status = await tm.admin.addGuest(target.login, info, target.nickname)
-          if (status instanceof Error) {
-            tm.sendMessage(tm.utils.strVar(config.messages.addGuestError, { login: info.login }), info.login)
-          } else {
-            tm.sendMessage(tm.utils.strVar(config.messages.addGuest, {
-              title: info.title,
-              adminName: tm.utils.strip(info.nickname),
-              name: tm.utils.strip(target.nickname)
-            }), config.public === true ? undefined : info.login)
-          }
-        } else { // Remove Guest
-          const status = await tm.admin.removeGuest(target.login, info)
-          if (status instanceof Error) {
-            tm.sendMessage(tm.utils.strVar(config.messages.removeGuestError, { login: info.login }), info.login)
-          } else {
-            tm.sendMessage(tm.utils.strVar(config.messages.removeGuest, {
-              title: info.title,
-              adminName: tm.utils.strip(info.nickname),
-              name: tm.utils.strip(target.nickname)
-            }), config.public === true ? undefined : info.login)
-          }
-        }
-      } else if (info.actionId >= this.openId + this.actions.blacklist
-        && info.actionId < this.openId + this.actions.blacklist + 1000) { // Blacklist
-        const target = tm.players.list[info.actionId - this.openId - this.actions.blacklist]
-        if (target === undefined) { return }
-        const status = await tm.admin.addToBlacklist(target.login, info)
-        if (status instanceof Error) {
-          tm.sendMessage(tm.utils.strVar(config.messages.blacklistError, { login: info.login }), info.login)
-        } else {
-          tm.sendMessage(tm.utils.strVar(config.messages.blacklist, {
-            title: info.title,
-            adminName: tm.utils.strip(info.nickname),
-            name: tm.utils.strip(target.nickname)
-          }), config.public === true ? undefined : info.login)
-        }
-      } else if (info.actionId >= this.openId + this.actions.ban
-        && info.actionId < this.openId + this.actions.ban + 1000) { // Ban
-        const target = tm.players.list[info.actionId - this.openId - this.actions.ban]
-        if (target === undefined) { return }
-        await tm.admin.ban(target.ip, target.login, info)
-        tm.sendMessage(tm.utils.strVar(config.messages.ban, {
-          title: info.title,
-          adminName: tm.utils.strip(info.nickname),
-          name: tm.utils.strip(target.nickname)
-        }))
+    addManialinkListener(this.openId + this.actions.kick, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      actions.kick(info, target.login)
+    })
+    addManialinkListener(this.openId + this.actions.forceSpec, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      if (target.isSpectator) {
+        actions.forcePlay(info, target.login)
+      } else {
+        actions.forceSpectator(info, target.login)
       }
+    })
+    addManialinkListener(this.openId + this.actions.mute, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      if (tm.admin.getMute(target.login) === undefined) {
+        actions.mute(info, target.login)
+      } else {
+        actions.unmute(info, target.login)
+      }
+    })
+    addManialinkListener(this.openId + this.actions.addGuest, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      if (tm.admin.getGuest(target.login) === undefined) {
+        actions.addGuest(info, target.login)
+      } else {
+        actions.removeGuest(info, target.login)
+      }
+    })
+    addManialinkListener(this.openId + this.actions.blacklist, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      actions.blacklist(info, target.login)
+    })
+    addManialinkListener(this.openId + this.actions.ban, 1000, (info, offset) => {
+      const target = tm.players.list[offset]
+      if (target === undefined) { return }
+      actions.ban(info, target.login)
     })
   }
 
@@ -288,7 +208,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       }
       let icon = config.icons.forceSpec
       let hoverIcon = config.hoverIcons.forceSpec
-      if (players[i + index].isSpectator === true) {
+      if (players[i + index].isSpectator) {
         icon = config.icons.forcePlay
         hoverIcon = config.hoverIcons.forcePlay
       }

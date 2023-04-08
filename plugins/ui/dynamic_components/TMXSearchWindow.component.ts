@@ -38,8 +38,8 @@ export default class TMXSearchWindow extends PopupWindow<{
         tm.log.error('Error while adding map to queue TMX search window', `Map index out of range`)
         return
       }
-      const gotQueued = await this.handleMapClick(mapId, info.login, info.nickname, info.privilege, info.title)
-      if (gotQueued === false) { return }
+      const gotQueued: boolean = await this.handleMapClick(mapId, info.login, info.nickname, info.privilege, info.title)
+      if (!gotQueued) { return }
     })
     tm.commands.add({
       aliases: config.command.aliases,
@@ -130,8 +130,7 @@ export default class TMXSearchWindow extends PopupWindow<{
         author = ''
       }
       const actionId = this.getActionId(maps[index].id)
-      const header = this.getHeader(index, maps[index].id, actionId, w, h, 
-        maps[index].pageUrl.replace(/^https:\/\//, ''), params?.privilege ?? 0)
+      const header = this.getHeader(index, maps[index].id, actionId, w, h, tm.utils.fixProtocol(maps[index].pageUrl), params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth
       const dateW = width - (config.timeWidth + config.awardsWidth + this.margin * 4 + config.iconWidth * 2)
@@ -214,14 +213,14 @@ export default class TMXSearchWindow extends PopupWindow<{
       tm.sendMessage(config.messages.error, login)
       return false
     }
-    if (status.wasAlreadyAdded === true) {
+    if (status.wasAlreadyAdded) {
       tm.sendMessage(tm.utils.strVar(config.messages.alreadyAdded,
         { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public === true ? undefined : login)
+        config.public ? undefined : login)
     } else {
       tm.sendMessage(tm.utils.strVar(config.messages.added,
         { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public === true ? undefined : login)
+        config.public ? undefined : login)
     }
     this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
     this.reRender()

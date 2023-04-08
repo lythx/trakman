@@ -1,4 +1,9 @@
 export default {
+  /** 
+   * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
+   * Enabling it makes the chat a bit slower.
+   */
+  manualChatRoutingEnabled: true,
   /** Local records limit for rank calculation and plugins */
   localRecordsLimit: 30,
   /** Amount of chat messages stored in runtime memory */
@@ -7,6 +12,8 @@ export default {
   jukeboxQueueSize: 30,
   /** Amount of maps kept in the map history */
   jukeboxHistorySize: 30,
+  /** Whether to keep the jukeboxed maps in the queue after the requester leaves */
+  keepQueueAfterLeave: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
   /** Privilege levels for each of the administrative actions */
@@ -14,7 +21,9 @@ export default {
     ban: 2,
     blacklist: 2,
     mute: 1,
-    addGuest: 1
+    addGuest: 1,
+    kick: 1,
+    forceSpectator: 1
   },
   /** Point system for rounds and cup gamemode */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
@@ -43,7 +52,7 @@ export default {
    * Used in nickname to login translation in commands. 0.15 is default value */
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.2",
+  version: "1.3.0",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }

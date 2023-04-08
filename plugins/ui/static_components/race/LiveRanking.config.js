@@ -2,16 +2,16 @@ import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  height: 15.07,
-  lapsHeight: 17.22,
+  entries: 6,
+  lapsEntries: 12,
+  entryHeight: 2.15,
   width: cfg.width,
   title: "Live Records",
   lapsTitle: "Live Ranking",
   icon: icons.chartLive,
   margin: cfg.margin,
-  entries: 6,
-  lapsEntries: 7,
-  topCount: 5,
+  topCount: 3,
+  lapsTopCount: 5,
   displayNoRecordEntry: true,
   lapsNoRecordEntry: '--/--',
   cpsCollectedColour: tm.utils.palette.green,

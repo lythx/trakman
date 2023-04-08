@@ -61,6 +61,7 @@ import Changelog from './dynamic_components/Changelog.component.js'
 import ChatLog from './dynamic_components/Chatlog.component.js'
 import TMXSearchWindow from './dynamic_components/TMXSearchWindow.component.js'
 import ServerInfoWindow from './dynamic_components/ServerInfo.component.js'
+import Warn from './dynamic_components/WarnWindow.component.js'
 
 tm.addListener(`Startup`, (): void => {
   new RankWidget()
@@ -113,5 +114,6 @@ tm.addListener(`Startup`, (): void => {
   new TeamScore()
   new RoundsPointsRanking()
   new LapRanking()
+  new Warn()
 }, true)
 

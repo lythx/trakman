@@ -3,7 +3,7 @@ import IDS from '../ui/config/UtilIds.js'
 import config from './Config.js'
 
 /**
- * Provides utilites for in-game votes
+ * Provides utilites for in-game votes.
  * @author lythx
  * @since 0.1
  */
@@ -17,6 +17,7 @@ export class Vote {
   readonly noId: number = IDS.VoteWindow.voteNo
   /** Manialink action ID of yes vote */
   readonly goal: number
+  static readonly passCancelPrivilege: number = config.passCancelPrivilege
   private readonly votes: { login: string, vote: boolean }[] = []
   private static listener: ((info: tm.ManialinkClickInfo) => void) = () => undefined
   private static endMapListener: () => void = () => undefined
@@ -28,6 +29,8 @@ export class Vote {
     result: boolean
   }, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   private static onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
+  private static pass: (caller?: tm.Player) => void = () => undefined
+  private static cancel: (caller?: tm.Player) => void = () => undefined
   /** 
    * Callback function to execute on vote ratio update. It takes votes array, seconds left, and ManialinkClickInfo as parameters
    */
@@ -49,7 +52,7 @@ export class Vote {
    */
   onSecondsChanged: ((seconds: number, votes: { login: string, vote: boolean }[]) => void) = () => undefined
   /** Logins of players who can vote */
-  loginList: string[] = []
+  loginList: { login: string, privilege: number }[] = []
   private isActive: boolean = false
   private seconds: number
   private interrupted: { caller?: tm.Player, result: boolean } | undefined
@@ -70,7 +73,7 @@ export class Vote {
     this.seconds = seconds
     this.cancelOnRoundEnd = options?.dontCancelOnRoundEnd === undefined
     this.cancelOnRoundStart = options?.dontCancelOnRoundStart === undefined
-    if (Vote.isListenerAdded === false) {
+    if (!Vote.isListenerAdded) {
       Vote.isListenerAdded = true
       tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => Vote.listener(info))
       if (!['F5', 'F6', 'F7'].includes(config.yesKey)) {
@@ -83,13 +86,36 @@ export class Vote {
       tm.commands.add(
         {
           aliases: config.commands.yes.aliases,
+          help: config.commands.yes.help,
           callback: (info): void => tm.openManialink(this.yesId, info.login),
           privilege: config.commands.yes.privilege
         },
         {
           aliases: config.commands.no.aliases,
+          help: config.commands.no.help,
           callback: (info): void => tm.openManialink(this.noId, info.login),
           privilege: config.commands.no.privilege
+        },
+        {
+          aliases: config.commands.pass.aliases,
+          help: config.commands.pass.help,
+          callback: (info): void => {
+            if (Vote.isDisplayed) {
+              Vote.pass(info)
+            }
+          },
+          privilege: config.commands.pass.privilege
+        },
+        {
+          aliases: config.commands.cancel.aliases,
+          help: config.commands.cancel.help,
+          callback: (info): void => {
+            if (Vote.isDisplayed) {
+              Vote.cancel(info)
+            }
+
+          },
+          privilege: config.commands.cancel.privilege
         }
       )
       tm.addListener("EndMap", (): void => Vote.endMapListener())
@@ -102,15 +128,17 @@ export class Vote {
    * @param eligibleLogins List of logins of players that can vote
    * @returns False if there is another vote running, true if vote gets started successfully
    */
-  start(eligibleLogins: string[]): boolean {
-    if (Vote.isDisplayed === true) { return false }
+  start(eligibleLogins: { login: string, privilege: number }[]): boolean {
+    if (Vote.isDisplayed) { return false }
     Vote.onEnd = this.onEnd
     Vote.onUpdate = this.onUpdate
     Vote.onInterrupt = this.onInterrupt
     Vote.onSecondsChanged = this.onSecondsChanged
+    Vote.cancel = this.cancel.bind(this)
+    Vote.pass = this.pass.bind(this)
     Vote.isDisplayed = true
     Vote.listener = (info: tm.ManialinkClickInfo): void => {
-      if (this.isActive === true && this.loginList.includes(info.login)) {
+      if (this.isActive && this.loginList.some(a => a.login === info.login)) {
         const vote = this.votes.find(a => a.login === info.login)
         if (vote === undefined) {
           if (info.actionId === this.yesId) { this.votes.push({ login: info.login, vote: true }) }
@@ -174,7 +202,7 @@ export class Vote {
    * @param caller Caller player object
    */
   pass(caller?: tm.Player): void {
-    if (this.isActive === false) { return }
+    if (!this.isActive) { return }
     this.interrupted = { caller, result: true }
   }
 
@@ -183,7 +211,7 @@ export class Vote {
    * @param caller Caller player object
    */
   cancel(caller?: tm.Player): void {
-    if (this.isActive === false) { return }
+    if (!this.isActive) { return }
     this.interrupted = { caller, result: false }
   }
 
@@ -192,6 +220,8 @@ export class Vote {
     Vote.onEnd = () => undefined
     Vote.onInterrupt = () => undefined
     Vote.onSecondsChanged = () => undefined
+    Vote.pass = () => undefined
+    Vote.cancel = () => undefined
   }
 
 }

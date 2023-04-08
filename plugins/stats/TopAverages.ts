@@ -47,10 +47,7 @@ tm.addListener('RanksAndAveragesUpdated', async (info) => {
       updated.push(entry)
       topList.sort((a, b) => a.average - b.average)
     } else {
-      let nickname = tm.players.get(e.login)?.nickname
-      if (nickname === undefined) {
-        nickname = (await tm.players.fetch(e.login))?.nickname
-      }
+      const nickname: string | undefined = tm.players.get(e.login)?.nickname ?? (await tm.players.fetch(e.login))?.nickname
       const obj = { login: e.login, nickname: nickname ?? e.login, average: e.average }
       updated.push(obj)
       topList.push(obj)

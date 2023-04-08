@@ -32,11 +32,6 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  messages: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has unbanned ${p.highlight}#{name}${p.admin}.`,
-    error: `${p.error}Could not unban ${p.highlight}#{login}${p.error}.`,
-    public: true
-  },
   command: {
     aliases: ['banl', 'banlist'],
     help: `Display the banned players list.`,

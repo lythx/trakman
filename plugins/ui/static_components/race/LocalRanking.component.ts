@@ -13,7 +13,7 @@ export default class LocalRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.locals, 'race')
+    super(componentIds.locals)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LocalRecord', (): void => this.display())
@@ -29,32 +29,49 @@ export default class LocalRanking extends StaticComponent {
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }
 
+  getEntries(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsEntries
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsEntries
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupEntries
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsEntries
+    }
+    return config.entries
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsTopCount
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsTopCount
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    }
+    return config.topCount
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Rounds') {
-      height = config.roundsHeight
-      entries = config.roundsEntries
-    } else if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    } else if (tm.getGameMode() === 'Laps') {
-      height = config.lapsHeight
-      entries = config.lapsEntries
-    }
+    const height = this.getHeight()
+    const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
@@ -66,7 +83,7 @@ export default class LocalRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

@@ -37,7 +37,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         return
       }
       const gotQueued: boolean = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
-      if (gotQueued === false) { return }
+      if (!gotQueued) { return }
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
@@ -283,7 +283,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
       tm.jukebox.remove(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.remove,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public === true ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public ? undefined : login)
     }
     else {
       if (privilege <= 0 && tm.jukebox.juked.some(a => a.callerLogin === login)) {
@@ -292,7 +292,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       }
       tm.jukebox.add(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.add,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public === true ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public ? undefined : login)
     }
     return true
   }
@@ -303,7 +303,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     for (let i: number = 0; i < mapIds.length; i++) {
       const r = ranks.find(a => a.mapId === mapIds[i])
       if (r === undefined) { ret.push(config.texts.noRank) }
-      else { ret.push(tm.utils.getPositionString(r.rank)) }
+      else { ret.push(tm.utils.getOrdinalSuffix(r.rank)) }
     }
     return ret
   }
@@ -345,7 +345,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
             ${centeredText(`$${config.colour}${config.texts.queued}`, config.queueWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           <frame posn="${config.queueWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${config.queueNumberWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
-            ${centeredText(`$${config.colour}${tm.utils.getPositionString(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
+            ${centeredText(`$${config.colour}${tm.utils.getOrdinalSuffix(index + 1)}`, config.queueNumberWidth, height / 4 - this.margin, { padding: config.padding, textScale: config.textScale })}
           </frame>
           </frame>`
     }

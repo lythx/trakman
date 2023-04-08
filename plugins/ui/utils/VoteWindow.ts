@@ -1,7 +1,7 @@
 import IDS from '../config/UtilIds.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../vote/Vote.js'
-import { StaticHeader, StaticHeaderOptions } from '../UI.js'
+import { addManialinkListener, removeManialinkListener, StaticHeader, StaticHeaderOptions } from '../UI.js'
 import config from './VoteWindow.config.js'
 
 /**
@@ -27,6 +27,10 @@ export default class VoteWindow {
   private readonly rightW: number = this.buttonW * 2 + 3 * this.margin
   private readonly leftW: number = this.width - this.rightW
   private readonly chatMessage: string
+  private readonly passId: number = IDS.VoteWindow.pass
+  private readonly cancelId: number = IDS.VoteWindow.cancel
+  private readonly passListener: (info: tm.ManialinkClickInfo) => void
+  private readonly cancelListener: (info: tm.ManialinkClickInfo) => void
 
   /**
    * Util to manage votes and render vote manialink window
@@ -42,6 +46,12 @@ export default class VoteWindow {
     this.chatMessage = chatMessage
     this.message = headerMessage
     this.icon = iconUrl
+    this.passListener = (info: tm.ManialinkClickInfo) => {
+      this.pass(info)
+    }
+    this.cancelListener = (info: tm.ManialinkClickInfo) => {
+      this.cancel(info)
+    }
   }
 
   /**
@@ -50,25 +60,31 @@ export default class VoteWindow {
    * @returns Vote result as boolean if time ran out or all the players voted, object containing result and optional caller player object
    * if vote got passed or cancelled, undefined if there is another vote running
    */
-  startAndGetResult(eligibleLogins: string[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
+  startAndGetResult(eligibleLogins: { login: string, privilege: number }[]): Promise<boolean | { result: boolean, caller?: tm.Player }> | undefined {
     return new Promise((resolve): void => {
       this.vote.onUpdate = (votes, seconds): void => {
         this.display(votes, seconds)
       }
       this.vote.onInterrupt = (info): void => {
         this.hide()
+        removeManialinkListener(this.passListener)
+        removeManialinkListener(this.cancelListener)
         resolve(info)
       }
       this.vote.onEnd = (info): void => {
         this.hide()
+        removeManialinkListener(this.passListener)
+        removeManialinkListener(this.cancelListener)
         resolve(info)
       }
       this.vote.onSecondsChanged = (seconds, votes): void => {
         this.display(votes, seconds)
       }
-      if (this.vote.start(eligibleLogins) === false) { return }
+      if (!this.vote.start(eligibleLogins)) { return }
+      addManialinkListener(this.passId, this.passListener)
+      addManialinkListener(this.cancelId, this.cancelListener)
       for (const e of this.vote.loginList) {
-        tm.sendMessage(this.chatMessage, e)
+        tm.sendMessage(this.chatMessage, e.login)
       }
     })
   }
@@ -102,7 +118,11 @@ export default class VoteWindow {
         <frame posn="${this.positionX + this.leftW + this.margin} ${this.positionY - (this.headerHeight + this.margin)}">
           ${this.constructRight(votes, seconds)}
         </frame>
-      </manialink>`, e)
+        ${e.privilege < Vote.passCancelPrivilege ? '' :
+          `<frame posn="${this.positionX} ${this.positionY - (this.height + this.margin)}">
+            ${this.constructAdminButtons()}
+          </frame>`}
+      </manialink>`, e.login)
     }
   }
 
@@ -162,6 +182,18 @@ export default class VoteWindow {
       <quad posn="${this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${config.F6Button}"/>
       <quad posn="${w / 2} 0 1" sizen="${w / 2 - this.margin} ${this.buttonH}" bgcolor="${this.bg}" action="${this.vote.yesId}"/>
       <quad posn="${w / 2 + this.margin} ${-this.margin} 3" sizen="${w / 2 - this.margin * 3} ${this.buttonH - this.margin * 2}" image="${config.F5Button}"/>
+    </frame>`
+  }
+
+  private constructAdminButtons() {
+    const cfg = config.adminButtons
+    const w = cfg.width
+    const h = cfg.height
+    return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}" action="${this.cancelId}"/>
+      ${centeredText(cfg.cancelText, w, h, { textScale: cfg.textScale })} 
+    <frame posn="${w + this.margin} 0 1">
+      <quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.bg}" action="${this.passId}"/>
+       ${centeredText(cfg.passText, w, h, { textScale: cfg.textScale })} 
     </frame>`
   }
 

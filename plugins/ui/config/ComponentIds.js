@@ -70,5 +70,9 @@ export default {
   roundScore: 380000,
   teamScore: 390000,
   roundsPointsRanking: 400000,
-  lapRanking: 410000
+  lapRanking: 410000,
+  serverLinks: 420000,
+  warnWindow: 430000,
+  songList: 440000,
+  musicWidget: 450000
 }

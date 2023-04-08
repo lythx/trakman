@@ -15,7 +15,7 @@ export default class DediRanking extends StaticComponent {
   private readonly maxDedis: number = dedimania.recordCountLimit
 
   constructor() {
-    super(componentIds.dedis, 'race')
+    super(componentIds.dedis)
     this.header = new StaticHeader('race')
     this.getRecordList()
     dedimania.onFetch((): void => this.display())
@@ -30,14 +30,14 @@ export default class DediRanking extends StaticComponent {
   }
 
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
@@ -51,30 +51,45 @@ export default class DediRanking extends StaticComponent {
     )
   }
 
+  getEntries(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsEntries
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsEntries
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupEntries
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsEntries
+    }
+    return config.entries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Teams') {
+      return config.teamsTopCount
+    } if (tm.getGameMode() === 'Rounds') {
+      return config.roundsTopCount
+    } if (tm.getGameMode() === 'Cup') {
+      return config.cupTopCount
+    } if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    }
+    return config.topCount
+  }
+
   protected onPositionChange(): void {
     this.getRecordList()
     this.display()
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
-    if (tm.getGameMode() === 'Teams') {
-      height = config.teamsHeight
-      entries = config.teamsEntries
-    } else if (tm.getGameMode() === 'Rounds') {
-      height = config.roundsHeight
-      entries = config.roundsEntries
-    } else if (tm.getGameMode() === 'Cup') {
-      height = config.cupHeight
-      entries = config.cupEntries
-    } else if (tm.getGameMode() === 'Laps') {
-      height = config.lapsHeight
-      entries = config.lapsEntries
-    }
-    this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, this.maxDedis, config.displayNoRecordEntry)
+      this.recordList?.destroy?.()
+    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
+      this.getEntries(), this.side, this.getTopCount(), this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

@@ -13,7 +13,7 @@ interface CheckpointData {
   current?: number,
   isFinish: boolean,
 }
-// TODO FIX NEXTMAPRECORDS DOUBLE REC BUG
+
 export default class CpCounter extends StaticComponent {
 
   private readonly header: StaticHeader
@@ -21,7 +21,7 @@ export default class CpCounter extends StaticComponent {
   private prevLapTimes: { login: string, best?: number, current: number, isFinish: boolean }[] = []
 
   constructor() {
-    super(componentIds.cpCounter, 'race')
+    super(componentIds.cpCounter)
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
     tm.addListener('PlayerCheckpoint', (info): void => {
       const local: tm.LocalRecord | undefined = tm.records.getLocal(info.player.login)
@@ -54,7 +54,7 @@ export default class CpCounter extends StaticComponent {
           cpIndex, index: info.lap, best: pb,
           current: info.lapCheckpointTime,
           isFinish: info.isLapFinish
-        } 
+        }
       }
       this.displayToPlayer(info.player.login, {
         index: info.index + 1,
@@ -86,9 +86,9 @@ export default class CpCounter extends StaticComponent {
           lap = {
             cpIndex: 0,
             index: 0, best: pb,
-            current: time - player.currentCheckpoints[startIndex].time,
+            current: time - (player.currentCheckpoints[startIndex]?.time ?? 0),
             isFinish: true
-          } 
+          }
         }
       }
       this.displayToPlayer(login, {
@@ -103,8 +103,12 @@ export default class CpCounter extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
@@ -149,7 +153,7 @@ export default class CpCounter extends StaticComponent {
   }
 
   displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
     if (cpAmount === params?.index) {

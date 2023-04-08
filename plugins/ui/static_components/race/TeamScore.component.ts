@@ -10,9 +10,9 @@ export default class TeamScore extends StaticComponent {
   private readonly header: StaticHeader
   private readonly grid: Grid
   private xml: string = ''
-
+  
   constructor(private maxScore = tm.rounds.teamsPointsLimit) {
-    super(componentIds.teamScore, 'race', ['Teams'])
+    super(componentIds.teamScore)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height + config.margin - this.header.options.height,
       new Array(3).fill(1), [1], { margin: config.margin })
@@ -24,21 +24,25 @@ export default class TeamScore extends StaticComponent {
     tm.addListener('PlayerFinish', () => this.display())
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.constructXml()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 
   private constructXml() {
     const colours = [config.colours.left, config.colours.middle, config.colours.right]
-    const teamScores = tm.records.teamScores
-    const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : 0, teamScores.red]
+    const teamScores = tm.rounds.teamScores
+    const data = [teamScores.blue, this.maxScore === 0 ? config.noMaxScore : this.maxScore, teamScores.red]
     const cell: GridCellFunction = (i, j, w, h) => {
       return `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${colours[j]}"/>
       ${centeredText(data[j].toString(), w, h, config.text)}`

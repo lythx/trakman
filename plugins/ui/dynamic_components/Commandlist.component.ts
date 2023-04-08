@@ -29,6 +29,9 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   private readonly adminCommands: tm.Command[]
   private readonly masteradminCommands: tm.Command[]
   private readonly ownerCommands: tm.Command[]
+  private readonly searchQueries: { login: string, privilege: number, list: tm.Command[], paginator: Paginator }[] = []
+  private paginatorIdOffset = 0
+  private readonly paginatorIdRange = 400 // Starts at 600
 
   constructor() {
     super(componentIds.commandList, config.icon, config.title, config.navbar)
@@ -85,6 +88,11 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     tm.addListener("PrivilegeChanged", (info) => {
       const p: { login: string, params: DisplayParams } | undefined = this.getPlayersWithWindowOpen(true).find(a => a.login === info.login)
       if (p !== undefined) {
+        // Handling list change on search query would be quite complex and its 
+        // very unlikely to occur so I just leave the window as it is in that case
+        if (this.searchQueries.find(a => a.login === p.login) !== undefined) {
+          return
+        }
         if (info.newPrivilege < p.params.privilege || p.params.singleType === undefined) {
           const paginator: Paginator = this.paginators[info.newPrivilege]
           const commands: tm.Command[] = this.commandLists[info.newPrivilege]
@@ -98,9 +106,43 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     tm.commands.add({
       aliases: config.command.aliases,
       help: config.command.help,
-      callback: (info: tm.MessageInfo): void => tm.openManialink(this.openId, info.login),
+      params: [{ name: 'query', optional: true }],
+      callback: (info: tm.MessageInfo, query?: string): void => {
+        if (query !== undefined) {
+          this.openWithQuery(info.login, info.privilege, query)
+        } else {
+          tm.openManialink(this.openId, info.login)
+        }
+      },
       privilege: config.command.privilege
-    },)
+    })
+  }
+
+  openWithQuery(login: string, privilege: number, query: string) {
+    const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands,
+    this.ownerCommands].slice(0, privilege + 1).flat(1)
+    const list: tm.Command[] = tm.utils.matchString(query, commands, "help")
+      .sort((a, b) => b.value - a.value).filter(a => a.value > config.minimumMatchSimilarity).map(a => a.obj)
+    if (list.length === 0) {
+      tm.sendMessage(tm.utils.strVar(config.noMatchesMessage, { query }), login)
+      return
+    }
+    const paginatorId = (this.openId + 600 + this.paginatorIdOffset) % this.paginatorIdRange
+    this.paginatorIdOffset++
+    const paginator = new Paginator(paginatorId, this.contentWidth,
+      this.footerHeight, Math.ceil(list.length / config.entries))
+    paginator.onPageChange = (login: string, page: number, info): void => {
+      this.displayToPlayer(login, { page, paginator, commands: list, privilege },
+        `${page}/${paginator.pageCount}`, info.privilege)
+    }
+    this.searchQueries.push({
+      login,
+      privilege,
+      list,
+      paginator
+    })
+    this.displayToPlayer(login, { page: 1, commands: list, paginator, privilege },
+      `1/${paginator.pageCount}`, privilege)
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {
@@ -109,7 +151,21 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const paginator: Paginator = this.paginators[player.privilege]
     const commands: tm.Command[] = this.commandLists[player.privilege]
     const page = paginator.getPageByLogin(info.login)
+    const index: number = this.searchQueries.findIndex(a => a.login === info.login)
+    if (index !== -1) {
+      this.searchQueries[index].paginator.destroy()
+      this.searchQueries.splice(index, 1)
+    }
     this.displayToPlayer(info.login, { page, commands, paginator, privilege: player.privilege }, `${page}/${paginator.pageCount}`, info.privilege)
+  }
+
+  protected onClose(info: tm.ManialinkClickInfo): void {
+    const index: number = this.searchQueries.findIndex(a => a.login === info.login)
+    if (index !== -1) {
+      this.searchQueries[index].paginator.destroy()
+      this.searchQueries.splice(index, 1)
+    }
+    this.hideToPlayer(info.login)
   }
 
   protected constructContent(login: string, params: DisplayParams): string {
@@ -128,20 +184,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const paramsCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
-      let text: string = ''
-      let hasOptionals: boolean = false
-      const commandParams = command.params
-      if (commandParams !== undefined) {
-        for (const [i, e] of commandParams.entries()) {
-          if (e.optional === true && hasOptionals === false) {
-            text += `[`
-            hasOptionals = true
-          }
-          if (i === 0) { text += `${e.name} <${e.type ?? 'string'}> ` }
-          else { text += `, ${e.name} <${e.type ?? 'string'}> ` }
-        }
-      }
-      if (hasOptionals === true) { text += ']' }
+      const text = tm.utils.stringifyCommandParams(command.params)
       return centeredText(tm.utils.safeString(tm.utils.strip(text, true)), w, h)
     }
     const commentCell: GridCellFunction = (i, j, w, h) => {

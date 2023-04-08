@@ -13,7 +13,7 @@ export default class LapRanking extends StaticComponent {
   private recordList!: RecordList
 
   constructor() {
-    super(componentIds.lapRanking, 'race', ['Laps'])
+    super(componentIds.lapRanking)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LapRecord', (): void => this.display())
@@ -29,16 +29,20 @@ export default class LapRanking extends StaticComponent {
     tm.addListener('LocalRecordsRemoved', (): void => this.display())
   }
 
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   private getRecordList(): void {
-    let height = config.height
     let entries = config.entries
+    let height = this.getHeight()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry)
@@ -53,7 +57,7 @@ export default class LapRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 

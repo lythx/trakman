@@ -11,17 +11,21 @@ export default class RankWidgetResult extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.rankResult, 'result')
+    super(componentIds.rankResult)
     this.constructXml()
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

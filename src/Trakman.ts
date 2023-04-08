@@ -133,6 +133,8 @@ namespace trakman {
 
     getLap: RecordService.getLap.bind(RecordService),
 
+    getRound: RoundsService.getRoundRecord.bind(RecordService),
+
     /**
      * Current map local records.
      */
@@ -151,7 +153,7 @@ namespace trakman {
     /**
      * Number of live records.
      */
-    get liveCount(): number { return RecordService.liveRecordsCount },
+    get liveCount(): number { return RecordService.liveRecordCount },
 
     /**
      * Maximum amount of local records. 
@@ -169,8 +171,6 @@ namespace trakman {
      */
     get lapCount(): number { return RecordService.lapRecordCount },
 
-    // TODO AFTER MAKING GETTER FOR ROUND RECORDS IMPLEMENT HERE AND IN ROUNDS OBJECT
-
     /**
      * Current round records.
      */
@@ -181,14 +181,11 @@ namespace trakman {
      */
     get roundRecordCount(): number { return RoundsService.roundRecordCount },
 
-    // TODO REMOVE
-    get teamScores() {
-      return RoundsService.teamScores
-    }
-
   }
 
   export const rounds = {
+
+    getRecord: RoundsService.getRoundRecord.bind(RecordService),
 
     /**
      * Current round records.
@@ -242,7 +239,7 @@ namespace trakman {
 
   }
 
-  export const messages = {
+  export const chat = {
 
     fetch: ChatService.fetch.bind(ChatService),
 
@@ -250,15 +247,21 @@ namespace trakman {
 
     get: ChatService.get.bind(ChatService),
 
+    addMessagePrefix: ChatService.addMessagePrefix.bind(ChatService),
+
+    setMessageStyle: ChatService.setMessageStyle.bind(ChatService),
+
+    addMessageTextModifier: ChatService.addMessageTextModifier.bind(ChatService),
+
     /**
      * Recent chat messages. 
      */
-    get list(): tm.Message[] { return ChatService.messages },
+    get messages(): tm.Message[] { return ChatService.messages },
 
     /**
      * Number of recent chat messages.
      */
-    get count(): number { return ChatService.messageCount }
+    get messageCount(): number { return ChatService.messageCount }
 
   }
 
@@ -348,6 +351,8 @@ namespace trakman {
     getFromJukebox: MapService.getFromJukebox.bind(MapService),
 
     getFromHistory: MapService.getFromHistory.bind(MapService),
+
+    clearHistory: MapService.clearHistory.bind(MapService),
 
     /**
      * Amout of maps in the queue (maps juked by the players and the server). 

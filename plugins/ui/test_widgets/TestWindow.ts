@@ -38,7 +38,7 @@ export default class TestWindow {
   }
 
   async displayToPlayer(login: string): Promise<void> {
-    if (config.isEnabled === false) { return }
+    if (!config.isEnabled) { return }
     const file: Buffer | Error = await fs.readFile(`./plugins/ui/test_widgets/${config.file}`).catch((err: Error) => err)
     if (file instanceof Error) { return }
     tm.sendManialink(`<manialink id="test">${file.toString()}</manialink>`, login)

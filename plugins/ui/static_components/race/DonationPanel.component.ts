@@ -13,7 +13,7 @@ export default class DonationPanel extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.liveCheckpoint, 'race')
+    super(componentIds.liveCheckpoint)
     this.header = new StaticHeader('race')
     this.constructXML()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
@@ -24,16 +24,20 @@ export default class DonationPanel extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void | Promise<void> {
-    if (this.isDisplayed === false) { return }
-    if (tm.players.get(login)?.isUnited === true) {
+    if (!this.isDisplayed) { return }
+    if (tm.players.get(login)?.isUnited) {
       tm.sendManialink(this.xml, login)
     }
   }

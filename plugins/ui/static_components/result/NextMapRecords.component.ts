@@ -6,6 +6,7 @@
 import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 
+// TODO THERES A BUG WHICH CAUSES RECORDS TO BE DISPLAYED TWICE, HAPPENED AFTER CHANGING GAMEMODES
 export default class NextMapRecords extends StaticComponent {
 
   private readonly header: StaticHeader
@@ -13,15 +14,15 @@ export default class NextMapRecords extends StaticComponent {
   private readonly list: RecordList
 
   constructor() {
-    super(componentIds.nextMapRecords, 'result')
+    super(componentIds.nextMapRecords)
     this.header = new StaticHeader('result')
-    this.list = new RecordList('result', this.id, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })
     tm.addListener('EndMap', async (info): Promise<void> => {
-      if (info.isRestart === true) {
+      if (info.isRestart) {
         this.records = tm.records.local
         this.display()
       } else {
@@ -43,15 +44,19 @@ export default class NextMapRecords extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.positionX} ${this.positionY} 2">

@@ -49,8 +49,8 @@ export class VoteSkip extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isLastMapReplay === true || this.isReplay === true
-      || this.isSkip === true || tm.getState() === 'result') { return }
+    if (this.isLastMapReplay || this.isReplay
+      || this.isSkip || tm.getState() === 'result') { return }
     if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
@@ -64,9 +64,9 @@ export class VoteSkip extends UiButton {
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return } 
+    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
-    const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
+    const result = await voteWindow.startAndGetResult(tm.players.list)
     if (result === undefined) {
       tm.sendMessage(msg.alreadyRunning, login)
       return
@@ -103,7 +103,7 @@ export class VoteSkip extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) {
+    if (!this.isReplay) {
       this.buttonData = {
         icon: cfg.icon,
         text1: cfg.texts[0][0],
@@ -162,9 +162,9 @@ export class VoteSkip extends UiButton {
   }
 
   private handleReplay(): void {
-    if (this.isReplay === true) { return }
+    if (this.isReplay) { return }
     this.isReplay = true
-    if (this.isSkip === true || this.isLastMapReplay === true) { return }
+    if (this.isSkip || this.isLastMapReplay) { return }
     this.buttonData.text1 = cfg.texts[2][0]
     this.buttonData.text2 = cfg.texts[2][1]
     this.buttonData.equalTexts = cfg.texts[2].equal
@@ -173,7 +173,7 @@ export class VoteSkip extends UiButton {
   }
 
   private handleSkipNoCountdown(): void {
-    if (this.isSkip === true) { return }
+    if (this.isSkip) { return }
     this.isSkip = true
     this.buttonData.text1 = cfg.texts[3][0]
     this.buttonData.text2 = cfg.texts[3][1]

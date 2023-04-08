@@ -36,7 +36,7 @@ const sendLive = async (): Promise<true | Error> => {
       'Authorization': auth,
     }
   }
-  return new Promise((resolve): void => {
+  return new Promise<true | Error>((resolve, reject): void => {
     const req: ClientRequest = http.request(options, (res): void => {
       if (res.statusCode === 200) {
         resolve(true)
@@ -44,11 +44,18 @@ const sendLive = async (): Promise<true | Error> => {
       }
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
-      tm.log.error(`Couldn't send Freezone Manialive request`)
-      res.on('end', (): void => resolve(new Error(data)))
+      res.on('end', (): void => reject(new Error(`Status code: ${res.statusCode}, message: ${data}`)))
     })
     req.write(JSON.stringify(data))
-    req.end()
+    req.on('error', (): void => {
+      reject(new Error(`HTTP request error.`))
+    }).on('timeout', (): void => {
+      reject(new Error(`HTTP request timeout.`))
+    }).end()
+  }).catch((err): Error => {
+    const errStr = `Couldn't send Freezone Manialive request. Error: ${err?.message}`
+    tm.log.error(errStr)
+    return new Error(errStr)
   })
 }
 
@@ -67,7 +74,7 @@ const initialize = async (): Promise<true | Error> => {
   return true
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
   tm.addListener('Startup', async (): Promise<void> => {
     tm.log.trace('Connecting to ManiaLive...')
     const status: true | Error = await initialize()
@@ -77,7 +84,7 @@ if (config.isEnabled === true) {
 }
 
 /**
- * Sends manialive requests needed for freezone
+ * Sends manialive requests needed for freezone.
  * @author lythx & wiseraven
  * @since 0.3
  */

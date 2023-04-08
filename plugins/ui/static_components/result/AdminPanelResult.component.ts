@@ -10,6 +10,7 @@ export default class AdminPanelResult extends StaticComponent {
 
   private readonly header: StaticHeader
   private xml: string = ''
+  private noShuffleXml: string = ''
   private readonly actions = {
     jukebox: 10,
     requeue: 20,
@@ -20,7 +21,7 @@ export default class AdminPanelResult extends StaticComponent {
   private readonly grid: Grid
 
   constructor() {
-    super(componentIds.adminResult, 'result')
+    super(componentIds.adminResult)
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(5).fill(1), [1], { margin: config.margin })
     tm.addListener('PrivilegeChanged', (info): void => {
@@ -54,18 +55,25 @@ export default class AdminPanelResult extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    this.constructXml()
+    this.xml = this.constructXml()
+    this.noShuffleXml = this.constructXml(true)
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
-    if (privilege >= config.privilege) {
+    if (privilege >= config.shufflePrivilege) {
       tm.sendManialink(this.xml, login)
+    } else if (privilege >= config.privilege) {
+      tm.sendManialink(this.noShuffleXml, login)
     } else {
       tm.sendManialink(`<manialink id="${this.id}"></manialink>`, login)
     }
@@ -81,7 +89,7 @@ export default class AdminPanelResult extends StaticComponent {
     image="${icon}" imagefocus="${hoverIcon}"${actionIdStr}/>`
   }
 
-  private constructXml(): void {
+  private constructXml(noShuffle?: boolean): string {
     const playersButton: GridCellFunction = (i, j, w, h): string =>
       this.constructButton(w, h, config.icons.players, config.iconsHover.players, this.actions.players)
     const previousButton: GridCellFunction = (i, j, w, h): string => {
@@ -92,11 +100,15 @@ export default class AdminPanelResult extends StaticComponent {
     }
     const replayButton: GridCellFunction = (i, j, w, h): string =>
       this.constructButton(w, h, config.icons.requeue, config.iconsHover.requeue, this.actions.requeue)
-    const shuffleButton: GridCellFunction = (i, j, w, h): string =>
-      this.constructButton(w, h, config.icons.shuffle, config.iconsHover.shuffle, this.actions.shuffle)
+    const shuffleButton: GridCellFunction = (i, j, w, h): string => {
+      if (noShuffle) {
+        return this.constructButton(w, h, config.icons.shuffle, config.iconsHover.shuffle)
+      }
+      return this.constructButton(w, h, config.icons.shuffle, config.iconsHover.shuffle, this.actions.shuffle)
+    }
     const jukeboxButton: GridCellFunction = (i, j, w, h): string =>
       this.constructButton(w, h, config.icons.jukebox, config.iconsHover.jukebox, this.actions.jukebox)
-    this.xml = `
+    return `
     <manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} -38">
         <format textsize="1" textcolor="FFFF"/> 

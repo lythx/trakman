@@ -23,7 +23,7 @@ export default class ButtonsWidget extends StaticComponent {
   private xml: string = ''
 
   constructor() {
-    super(componentIds.buttons, 'race')
+    super(componentIds.buttons)
     this.grid = new Grid(this.width + config.margin, this.height + config.margin,
       new Array(config.columns).fill(1), new Array(config.rows).fill(1))
     const allButtons = [
@@ -51,15 +51,19 @@ export default class ButtonsWidget extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.height
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.constructXml()
     tm.sendManialink(this.xml)
   }
 
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

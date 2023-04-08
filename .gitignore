@@ -9,8 +9,8 @@
 **[Cc]onfig.js
 
 # Temp files
-**src/temp/
-!**src/temp/.gitkeep
+**temp/
+!**temp/.gitkeep
 
 # Coverage ???
 /coverage/

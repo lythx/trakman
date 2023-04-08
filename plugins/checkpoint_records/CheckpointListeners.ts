@@ -30,7 +30,7 @@ const onMapStart = async (): Promise<void> => {
   emitEvent('CheckpointsFetch', currentBestCps, playerCps)
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
 
   tm.addListener('Startup', async (): Promise<void> => {
     await onMapStart()
@@ -122,7 +122,7 @@ if (config.isEnabled === true) {
           }
           const deleted = cps.checkpoints[cpIndex - 1]
           cps.checkpoints[cpIndex - 1] = undefined
-          tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getPositionString(cpIndex) }), info.login)
+          tm.sendMessage(tm.utils.strVar(config.playerCpRemoved, { index: tm.utils.getOrdinalSuffix(cpIndex) }), info.login)
           if (deleted !== undefined) {
             emitEvent('DeletePlayerCheckpoint', { ...info, deletedCheckpoints: [{ time: deleted, index: cpIndex }] })
           }
@@ -158,8 +158,8 @@ if (config.isEnabled === true) {
           tm.sendMessage(tm.utils.strVar(config.bestCpRemoved, {
             title: info.title,
             nickname: tm.utils.strip(info.nickname, true),
-            index: tm.utils.getPositionString(cpIndex)
-          }), config.commands.deletecp.public === false ? info.login : undefined)
+            index: tm.utils.getOrdinalSuffix(cpIndex)
+          }), config.commands.deletecp.public ? undefined : info.login)
           if (deleted !== undefined) {
             emitEvent('DeleteBestCheckpoint', [{ ...deleted, index: cpIndex }])
           }

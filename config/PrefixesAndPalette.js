@@ -1,5 +1,14 @@
 import colours from '../src/data/Colours.js'
 
+export const prefixes = {
+  /** Default chat message format when manual chat routing is enabled. This can be overwritten by tm.chat.setMessageStyle() method */
+  manualChatRoutingMessageStyle: `$g[#{name}$z$s$g] `,
+  /** Characters with which every message sent to individual players will be prefixed (e.g. ChatSendServerMessageToLogin) */
+  serverToPlayer: `${colours.yellow}» `,
+  /** Characters with which every message sent in public will be prefixed (e.g. ChatSendServerMessage) */
+  serverToAll: `${colours.yellow}»» `
+}
+
 /** Controller messages palette object */
 export const palette = {
   /** All admin commands */
@@ -36,13 +45,6 @@ export const palette = {
   yellow: 'fc1',
   /** Purple */
   purple: '4af'
-}
-
-export const prefixes = {
-  /** Characters with which every message sent to individual players will be prefixed (e.g. ChatSendServerMessageToLogin) */
-  serverToPlayer: `${colours.yellow}» `,
-  /** Characters with which every message sent in public will be prefixed (e.g. ChatSendServerMessage) */
-  serverToAll: `${colours.yellow}»» `
 }
 
 export default {

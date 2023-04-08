@@ -5,10 +5,17 @@ const p = tm.utils.palette
 const width = 10
 export default {
   posX: raceConfig.rightPosition - (width + raceConfig.marginBig),
-  posY: raceConfig.topBorder - (raceConfig.rightSideOrder[0].height + raceConfig.rightSideOrder[1].height
-    + raceConfig.rightSideOrder[2].height + raceConfig.marginBig * 3),
   headerText: `Bet`,
-  height: raceConfig.rightSideOrder[3].height,
+  // To position the widget next to side ui widgets set these properties and keep staticPos props null
+  relativePos: {
+    side: true,
+    widgetNumber: 3
+  },
+  // To set fixed position set these props to numbers
+  staticPos: {
+    posY: null,
+    height: null
+  },
   width,
   options: [50, 100, 200, 500, 1000, 10000],
   margin: raceConfig.margin,
@@ -21,11 +28,11 @@ export default {
   },
   prizeColour: tm.utils.palette.green,
   betAcceptedText: {
-    scale: 1,
+    textScale: 0.8,
     yOffset: -0.03
   },
   prizeText: {
-    scale: 1.1,
+    textScale: 1.1,
     yOffset: -0.03
   },
   betAmountText: {
@@ -34,5 +41,7 @@ export default {
   countdownText: {
     specialFont: true,
     textScale: 0.27
-  }
+  },
+  topBorder: raceConfig.topBorder, // used for Y positioning
+  marginBig: raceConfig.marginBig
 }

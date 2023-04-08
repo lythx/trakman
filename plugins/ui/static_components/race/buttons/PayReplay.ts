@@ -40,7 +40,7 @@ export class PayReplay extends UiButton {
   }
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
-    if (this.isReplay === true || this.isSkip === true) { return }
+    if (this.isReplay || this.isSkip) { return }
     const cost: number = cfg.costs[this.costIndex]
     if (cost === undefined) { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cost, cfg.billMessage)
@@ -51,7 +51,7 @@ export class PayReplay extends UiButton {
         let refundMessage = ''
         if (cost >= 100) { // Its not worth to return under 100 due to nadeo tax growing exponentially
           refundMessage = msg.refund
-          void tm.utils.payCoppers(login, cost * 0.7, msg.refundMail)
+          void tm.utils.payCoppers(login, tm.utils.getCoppersAfterTax(cost), msg.refundMail)
         }
         tm.sendMessage(tm.utils.strVar(msg.interrupt, {
           event: this.isReplay ? msg.replayEvent : msg.skipEvent,
@@ -71,7 +71,7 @@ export class PayReplay extends UiButton {
   }
 
   private handleMapStart(): void {
-    if (this.isReplay === false) { this.costIndex = 0 }
+    if (!this.isReplay) { this.costIndex = 0 }
     if (cfg.costs[this.costIndex] !== undefined) {
       this.buttonData = {
         icon: cfg.icon,

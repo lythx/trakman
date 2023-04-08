@@ -90,12 +90,12 @@ declare global {
       privilege: number
       /** Whether the player is in the spectator mode */
       isSpectator: boolean
-      // TODO REMOVE
+      /** True if the player is in non-temporary spectator mode and has a player slot */
       isPureSpectator: boolean
-      // TODO REMOVE
+      /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       isTemporarySpectator: boolean
-      /** Whether the player has a player spot 
-       * (player spot is needed to switch to player mode, it's automatically assigned if the server is not full) */
+      /** Whether the player has a player slot 
+       * (player slot is needed to switch to player mode, it's automatically assigned if the server is not full) */
       hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
       rank?: number
@@ -537,7 +537,7 @@ declare global {
       readonly isSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       readonly isTemporarySpectator: boolean
-      /** True if the player is in non-temporary spectator mode and didn't finish the current map */
+      /** True if the player is in non-temporary spectator mode and has a player slot */
       readonly isPureSpectator: boolean
       /** Whether the player has autotarget enabled in spec-mode */
       readonly autoTarget: boolean
@@ -581,62 +581,60 @@ declare global {
       readonly callback: ((params: any) => void)
     }
     /** Game information object */
-    export interface Game {
+    export interface GameInfo {
       /** Current server gamemode (Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)) */
       gameMode: number
       /** Amount of time (in msec) to be spent at scoretable */
       resultTime: number
       /** Index of the currently played map */
       mapIndex: number
-      /** Amount of points to end the map in rounds mode */
-      roundsPointsLimit: number
-      /** Points system type used in Rounds mode (false is old, true is new).
-       *  The controller always uses custom one */
-      roundsPointSystemType: boolean
+      /** Points system type used in Rounds mode.
+       *  The controller always uses a custom point system, with "new" limit **/
+      roundsPointSystemType: 'new' | 'old'
+      /** Amount of points to end the map in rounds mode when using the "old" point system type.
+       *  The controller always uses a custom point system, with "new" limit **/
+      roundsPointLimitOld: number
+      /** Amount of points to end the map in rounds mode when using the "new" point system type.
+       *  The controller always uses a custom point system, with "new" limit **/
+      roundsPointLimitNew: number
       /** Amount of forced laps in Rounds mode */
       roundsModeLapsAmount: number
       /** Amount of time (in msec) to be spent in race */
       timeAttackLimit: number
       /** Amount of time (in msec) to be added to the start countdown */
       countdownAdditionalTime: number
-      /** Amount of points to end map in Teams mode.
-       *  THIS VALUE APPEARS TO BE WRONG, DEDICATED SERVER ALWAYS SENDS 50 FOR SOME REASON,
-       *  USE tm.rounds.teamsPointsLimit INSTEAD */
-      teamPointsLimit: number
-      /** Maximum amount of points that a team can get in one round when using the old point system
-       * (if the old point system is used teamPointSystemType is false).
-       * The controller always uses the new point system */
+      /** Points system type used in Rounds mode.
+       *  The controller always uses a custom point system, with "new" limit */
+      teamPointSystemType: 'new' | 'old'
+      /** Amount of points to end the map in teams mode when using the "old" point system type.
+       *  The controller always uses the "new" point system **/
+      teamPointLimitOld: number
+      /** Amount of points to end the map in teams mode when using the "new" point system type.
+       *  The controller always uses the "new" point system **/
+      teamPointLimitNew: number
+      /** Maximum amount of points that a team can get in one round when using the "old" point system.
+       *  The controller always uses the "new" point system */
       teamMaxPoints: number
-      /** Points system type used in Teams mode (false is old, true is new).
-       * The controller always uses the new point system */
-      teamPointSystemType: boolean
       /** Amount of laps in Laps mode */
       lapsModeLapsAmount: number
-      // TODO RENAME AND CHANGE DOC THIS IS LAPS TIME LIMIT
-      /** Amount of time left for players to finish the track after the leader in Laps mode */
-      lapsModeFinishTimeout: number
-      // TODO RENAME AND CHANGE DOC THIS IS FINISH TIMEOUT FOR LAPS/ROUNDS and proabably other modes
-      /** Amount of time left for players to finish the track after the leader in Rounds/Cup/Teams mode */
-      roundsModeFinishTimeout: number
+      /** Laps mode time limit (no time limit if set to 0) */
+      lapsModeTimeLimit: number
+      /** Amount of time left for players to finish the track after the leader in rounds-based gamemodes */
+      finishTimeout: number
       /** Duration of the warm-up in all modes */
       warmUpDuration: number
       /** Whether disabled respawning on checkpoints is active */
       disableRespawn: boolean
       /** Whether force display of all opponents is enabled */
       forceShowOpponents: boolean
-      /** Amount of points to end the map in rounds mode when using the new system type.
-       *  The controller always uses a custom point system */ // TODO CHECk
-      roundsPointLimitSystemType: number
-      /** Teams mode related */ // TODO CHECK AND DOC (Amount of points to end the map in teams mode when using "new rules")
-      teamPointLimitSystemType: number
       /** Amount of points to become a finalist in Cup mode */
       cupPointsLimit: number
       /** Amount of times the map will be replayed until skip in Cup mode */
       cupRoundsPerMap: number
       /** Amount of winners in Cup mode */
       cupWinnersAmount: number
-      /** Warm-up rounds count in Cup mode */ // TODO RENAME
-      cupWarmUpDuration: number
+      /** Warm-up rounds count in Cup mode */
+      cupWarmUpRounds: number
     }
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PlayerDataUpdatedInfo {
@@ -776,7 +774,8 @@ declare global {
       "DynamicTimerStateChanged": 'enabled' | 'disabled'
       "BeginRound": Readonly<FinishInfo>[]
       "EndRound": Readonly<FinishInfo>[]
-      "GameConfigChanged": Readonly<Game> // TODO RENAME
+      "GameConfigChanged": Readonly<GameInfo>
+      "ServerConfigChanged": Readonly<ServerInfo>
       "PlayerLap": Readonly<LapFinishInfo>
       "LapRecord": Readonly<LapRecordInfo>
       "TrackMania.PlayerConnect": readonly [string, boolean]
@@ -820,6 +819,14 @@ declare global {
       /** Server side ranking objects. 
        * (Can differ from controller rankings only if it was restarted during the map) */
       readonly serverSideRankings: readonly TrackmaniaRankingInfo[]
+      /** If keep queue after leave is set to false, this is the object that stores the dropped map 
+       * This is the exact copy of the JukeboxMap interface off of MapService */
+      readonly droppedMap?: {
+        /** The dropped map object */
+        map: Map
+        /** Login of the player who juked the map */
+        callerLogin: string
+      }
     }
     /** Object containing map information. Created and emitted on the BeginMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type BeginMapInfo = Readonly<CurrentMap> & {
@@ -914,9 +921,18 @@ declare global {
     export type Mood = 'Sunrise' | 'Day' | 'Sunset' | 'Night'
     /** Server command data type */
     export type CommandParameterType = 'int' | 'double' | 'boolean' | 'time' | 'player' | 'offlinePlayer' | 'multiword'
-    /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
+    /** TMX map difficulty ('Beginner', 'Expert', etc.) */
     export type TMXDifficulty = 'Beginner' | 'Intermediate' | 'Expert' | 'Lunatic'
     /** TMX site ('TMNF', 'TMU', etc.) */
     export type TMXSite = 'TMNF' | 'TMU' | 'TMN' | 'TMO' | 'TMS'
+    /** TMX map routes ('Single', 'Multiple', 'Symmetrical') */
+    export type TMXRoutes = 'Single' | 'Multiple' | 'Symmetrical'
+    /** TMX map type ('Race', 'Puzzle', etc.) */
+    export type TMXMapType = 'Race' | 'Puzzle' | 'Platform' | 'Stunts' | 'Shortcut' | 'Laps'
+    /** TMX map car ('SnowCar', 'DesertCar', etc.) */
+    export type TMXCar = 'SnowCar' | 'DesertCar' | 'RallyCar' | 'IslandCar' | 'CoastCar' | 'BayCar' | 'StadiumCar'
+    /** TMX map style ('Normal', 'Stunt', etc.) */
+    export type TMXStyle = 'Normal' | 'Stunt' | 'Maze' | 'Offroad' | 'Laps' | 'Fullspeed' | 'LOL' |
+      'Tech' | 'SpeedTech' | 'RPG' | 'PressForward' | 'Trial' | 'Grass'
   }
 }

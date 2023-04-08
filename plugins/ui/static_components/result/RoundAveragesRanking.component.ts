@@ -14,18 +14,19 @@ export default class RoundAveragesRanking extends StaticComponent {
   private averages: { nickname: string, login: string, average: number, finishcount: number }[] = []
 
   constructor() {
-    super(componentIds.roundAveragesRanking, 'result')
+    super(componentIds.roundAveragesRanking)
     this.header = new StaticHeader('result')
-    this.list = new List(config.entries, config.width, config.height - (this.header.options.height + config.margin),
+    this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
     tm.addListener('PlayerFinish', async (info): Promise<void> => {
       const entry = this.averages.find(a => a.login === info.login)
       if (entry === undefined) {
         this.averages.push({ nickname: info.nickname, login: info.login, average: info.time, finishcount: 1 })
       } else {
-        entry.average = (entry.average * entry.finishcount + info.time) / (entry.finishcount + 1)
+        entry.average = ~~((entry.average * entry.finishcount + info.time) / entry.finishcount + 1)
         entry.finishcount++
       }
+      this.averages.sort((a, b): number => a.average - b.average)
     })
     tm.addListener('BeginMap', (): void => {
       this.averages.length = 0
@@ -35,14 +36,18 @@ export default class RoundAveragesRanking extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     this.constructXml()
     tm.sendManialink(this.xml)
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(this.xml, login)
   }
 

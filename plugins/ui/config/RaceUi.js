@@ -11,87 +11,95 @@ export default {
   rightPosition: 49.13,
   leftPosition: -63.75,
   rightSideOrder: [
-    { name: "MapWidget", height: 9.13 },
-    { name: "PreviousAndBest", height: 4.95 },
-    { name: "TMXRanking", height: 8.68 },
-    { name: "TimerWidget", height: 6.45 },
-    { name: "LocalRanking", height: 34.12 }, // default recordlist row height is 2.15 (remember to include header height)
-    { name: "LiveRanking", height: 15.07 },
-    { name: "DonationPanel", height: 4.49 }
+    "MapWidget",
+    "PreviousAndBest",
+    "TMXRanking",
+    "TimerWidget",
+    "LocalRanking",
+    "LiveRanking",
+    "DonationPanel"
   ],
   leftSideOrder: [
-    { name: "ButtonsWidget", height: 14.5 },
-    { name: "RankWidget", height: 3.8 },
-    { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 34.12 },
-    { name: "AdminPanel", height: 5 }
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "DediRanking",
+    "AdminPanel"
   ],
-  teamsRightSideOrder: [
-    { name: "MapWidget", height: 9.13 },
-    { name: "PreviousAndBest", height: 4.95 },
-    { name: "TMXRanking", height: 8.68 },
-    { name: "TimerWidget", height: 6.45 },
-    { name: "RoundScore", height: 23.48 },
-    { name: "LocalRanking", height: 15.07 },
-    { name: "TeamScore", height: 5.5 },
-    { name: "DonationPanel", height: 4.49 }
-  ],
-  teamsLeftSideOrder: [
-    { name: "ButtonsWidget", height: 14.5 },
-    { name: "RankWidget", height: 3.8 },
-    { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 34.12 },
-    { name: "AdminPanel", height: 5 }
-  ],
+  otherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
   roundsRightSideOrder: [
-    { name: "MapWidget", height: 9.13 },
-    { name: "PreviousAndBest", height: 4.95 },
-    { name: "TMXRanking", height: 8.68 },
-    { name: "TimerWidget", height: 6.45 },
-    { name: "RoundScore", height: 17.22 },
-    { name: "RoundsPointsRanking", height: 17.22 },
-    { name: "DonationPanel", height: 4.49 }
+    "MapWidget",
+    "PreviousAndBest",
+    "TMXRanking",
+    "TimerWidget",
+    "RoundScore",
+    "RoundsPointsRanking",
+    "DonationPanel"
   ],
   roundsLeftSideOrder: [
-    { name: "ButtonsWidget", height: 14.5 },
-    { name: "RankWidget", height: 3.8 },
-    { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 17.22 },
-    { name: "LocalRanking", height: 17.22 },
-    { name: "AdminPanel", height: 5 }
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "DediRanking",
+    "LocalRanking",
+    "AdminPanel"
   ],
+  roundsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
   cupRightSideOrder: [
-    { name: "MapWidget", height: 9.13 },
-    { name: "PreviousAndBest", height: 4.95 },
-    { name: "TMXRanking", height: 8.68 },
-    { name: "TimerWidget", height: 6.45 },
-    { name: "RoundScore", height: 17.22 },
-    { name: "RoundsPointsRanking", height: 17.22 },
-    { name: "DonationPanel", height: 4.49 }
+    "MapWidget",
+    "PreviousAndBest",
+    "TMXRanking",
+    "TimerWidget",
+    "RoundScore",
+    "RoundsPointsRanking",
+    "DonationPanel"
   ],
   cupLeftSideOrder: [
-    { name: "ButtonsWidget", height: 14.5 },
-    { name: "RankWidget", height: 3.8 },
-    { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 17.22 },
-    { name: "LocalRanking", height: 17.22 },
-    { name: "AdminPanel", height: 5 }
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "DediRanking",
+    "LocalRanking",
+    "AdminPanel"
   ],
+  cupOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  teamsRightSideOrder: [
+    "MapWidget",
+    "PreviousAndBest",
+    "TMXRanking",
+    "TimerWidget",
+    "RoundScore",
+    "LocalRanking",
+    "TeamScore",
+    "DonationPanel"
+  ],
+  teamsLeftSideOrder: [
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "DediRanking",
+    "AdminPanel"
+  ],
+  teamsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
   lapsRightSideOrder: [
-    { name: "MapWidget", height: 9.13 },
-    { name: "PreviousAndBest", height: 4.95 },
-    { name: "TMXRanking", height: 8.68 },
-    { name: "TimerWidget", height: 6.45 },
-    { name: "LiveRanking", height: 17.22 },
-    { name: "LocalRanking", height: 17.22 },
-    { name: "DonationPanel", height: 4.49 }
+    "MapWidget",
+    "PreviousAndBest",
+    "TMXRanking",
+    "TimerWidget",
+    "LiveRanking",
+    "LocalRanking",
+    "DonationPanel"
   ],
   lapsLeftSideOrder: [
-    { name: "ButtonsWidget", height: 14.5 },
-    { name: "RankWidget", height: 3.8 },
-    { name: "KarmaWidget", height: 8.8 },
-    { name: "DediRanking", height: 17.22 },
-    { name: "LapRanking", height: 17.22 },
-    { name: "AdminPanel", height: 5 }
-  ]
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "DediRanking",
+    "LapRanking",
+    "AdminPanel"
+  ],
+  lapsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
+  stuntsRightSideOrder: [],
+  stuntsLeftSideOrder: [],
+  stuntsOtherComponents: []
 }

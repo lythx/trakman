@@ -264,14 +264,14 @@ export default class RecordList {
     const diff: number = this.rows - this.topCount
     const ret: { index: number, record: RLRecord }[] = []
     for (const [i, e] of records.entries()) {
-      if (ret.length === this.rows || (this.noRecordEntry === true && playerRecord === undefined && ret.length === this.rows - 1)) { break }
+      if (ret.length === this.rows || (this.noRecordEntry && playerRecord === undefined && ret.length === this.rows - 1)) { break }
       else if (i < this.topCount ||
-        (this.noRecordEntry === true && playerRecord === undefined && i + diff > records.length)
+        (this.noRecordEntry && playerRecord === undefined && i + diff > records.length)
         || (playerRecord !== undefined && (i + diff / 2 >= playerRecordIndex || i + diff >= records.length))) {
         ret.push({ index: i, record: e })
       }
     }
-    if (this.noRecordEntry === true && playerRecord === undefined) {
+    if (this.noRecordEntry && playerRecord === undefined) {
       const player: tm.Player | undefined = tm.players.get(login)
       if (player !== undefined) {
         ret.push({ index: -1, record: { name: player.nickname, time: -1 } })
@@ -298,7 +298,7 @@ export default class RecordList {
         }
       }
     }
-    return this.isFullRow === false ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
+    return !this.isFullRow ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
   }
 
   private getCpTypes = (login: string, cps: (number | undefined)[][], records: RLRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
@@ -384,7 +384,7 @@ export default class RecordList {
 
   private getTimeColours(login: string, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
-    if (this.getColoursFromPb === true && playerIndex === -1) {
+    if (this.getColoursFromPb && playerIndex === -1) {
       const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
         for (let i: number = 0; i < records.length; i++) {
@@ -420,7 +420,7 @@ export default class RecordList {
     const h: number = this.rowHeight - this.rowGap
     const w: number = width - this.infoIconWidth
     let posX: number
-    if (this.side === true) {
+    if (this.side) {
       posX = -(width + (this.columnGap * 2) + (offset * (width + this.columnGap))) + this.columnGap
       const arr: (string | undefined)[] = [record.login, record.date, record.url].map(a => {
         return a instanceof Date ? tm.utils.formatDate(a, true) : a
@@ -440,7 +440,7 @@ export default class RecordList {
          sizen="${width - ((this.infoIconWidth + this.columnGap) * 2)} ${h}" bgcolor="${this.headerBackground}"/>
         ${this.centeredText(topInfo[0], width - ((this.infoIconWidth * 2) + this.columnGap), h, posX + this.infoIconWidth + this.columnGap)}
         <quad posn="${posX + this.infoIconWidth + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} 0 1"
-         sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}" url="${topInfo[1].replace(/^https:\/\//, '')}"/>
+         sizen="${this.infoIconWidth} ${h}" bgcolor="${this.headerBackground}" url="${tm.utils.fixProtocol(topInfo[1])}"/>
         <quad posn="${posX + this.infoIconWidth + this.iconHorizontalPadding + this.columnGap + (width - ((this.infoIconWidth + this.columnGap) * 2)) + this.columnGap} ${-this.iconVerticalPadding} 6"
          sizen="${this.infoIconWidth - (this.iconHorizontalPadding * 2)} ${h - (this.iconVerticalPadding * 2)}" image="${this.downloadIcon}"/>`
       } else if (topInfo.length === 2) {
@@ -507,7 +507,7 @@ export default class RecordList {
 
   private constructMarker(marker: Marker | undefined): string {
     if (marker === undefined || marker === null) { return '' }
-    const posX: number = this.side === false ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
+    const posX: number = !this.side ? this.columnWidths.reduce((acc, cur): number => acc + cur, 0) : -(this.markerWidth + this.columnGap)
     let icon: string = ''
     if (typeof marker === 'object') {
       const color = marker.colour === undefined ? '' : `bgcolor="${marker.colour}"`

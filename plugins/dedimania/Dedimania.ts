@@ -13,21 +13,13 @@ const client: DedimaniaClient = new DedimaniaClient()
 // 0 is Rounds, 1 is TimeAttack, Stunts mode records do not get sent
 const recordModeEnum: { [mode in DediLeaderboard]: number } = {
   Rounds: 0,
-  TimeAttack: 1
+  TimeAttack: 1,
+  Disabled: -1
 }
 
 const recordListeners: ((record: NewDediRecord) => void)[] = []
 const fetchListeners: ((dedis: DediRecord[]) => void)[] = []
 const nicknameUpdateListeners: ((dedis: DediRecord[]) => void)[] = []
-const environmentMap: { [environment in tm.Environment]: string } = { // For Dedimania Snow is Alpine and Desert is Speed
-  Stadium: 'Stadium',
-  Island: 'Island',
-  Desert: 'Speed',
-  Rally: 'Rally',
-  Bay: 'Bay',
-  Coast: 'Coast',
-  Snow: 'Alpine'
-}
 
 const emitRecordEvent = (record: NewDediRecord): void => {
   for (const e of recordListeners) { e(record) }
@@ -46,16 +38,17 @@ const updateRecordMode = () => {
   const gameMode = tm.getGameMode()
   if (gameMode === 'TimeAttack' || gameMode === 'Laps') {
     leaderboard = 'TimeAttack'
+  } else if (gameMode === 'Stunts') {
+    leaderboard = 'Disabled'
   } else {
     leaderboard = uploadLaps ? 'TimeAttack' : 'Rounds'
   }
-  // TODO HANDLE STUNT
 }
 
 const initialize = async (): Promise<void> => {
   const status = await client.connect(config.host, config.port)
   if (status !== true) {
-    if (status.isAuthenticationError === true) {
+    if (status.isAuthenticationError) {
       tm.log.error('Failed to connect to dedimania', status.error.message)
       isFailedAuthentication = true
     } else {
@@ -70,7 +63,7 @@ const initialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
@@ -82,7 +75,7 @@ const reinitialize = async (): Promise<void> => {
   do {
     await new Promise((resolve) => setTimeout(resolve, 60000))
     status = await client.connect(config.host, config.port)
-    if (status !== true && status.isAuthenticationError === true) {
+    if (status !== true && status.isAuthenticationError) {
       tm.log.error('Failed to connect to dedimania', status.error.message)
       return
     }
@@ -94,14 +87,14 @@ const reinitialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, environmentMap[current.environment], current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
-  if (isFailedAuthentication === true) { return }
+  if (isFailedAuthentication) { return }
   currentDedis.length = 0
   newDedis.length = 0
-  if (client.connected === false) {
+  if (!client.connected) {
     emitFetchEvent(currentDedis)
     let status: true | {
       error: Error;
@@ -110,7 +103,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     do {
       await new Promise((resolve) => setTimeout(resolve, config.reconnectTimeout * 1000))
       status = await client.connect('dedimania.net', config.port)
-      if (status !== true && status.isAuthenticationError === true) {
+      if (status !== true && status.isAuthenticationError) {
         tm.log.error('Failed to connect to dedimania', status.error.message)
         return
       }
@@ -161,14 +154,14 @@ const getRecords = async (id: string, name: string, environment: string, author:
     checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
     isLapRecord: uploadLaps
   }))
-  if (config.syncName === true) {
+  if (config.syncName) {
     void tm.updatePlayerInfo(...currentDedis)
   }
   emitFetchEvent(currentDedis)
 }
 
 const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
-  if (client.connected === false || newDedis.length === 0) { return }
+  if (!client.connected || newDedis.length === 0) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
     recordsArray.push(
@@ -199,7 +192,7 @@ const sendRecords = async (mapId: string, name: string, environment: string, aut
 
 const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
   time: number, checkpoints: number[]): void => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const pb: number | undefined = currentDedis.find(a => a.login === player.login)?.time
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
@@ -247,7 +240,7 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
 
 const updateServerPlayers = (): void => {
   setInterval(async (): Promise<void> => {
-    if (client.connected === false) { return }
+    if (!client.connected) { return }
     const cfg: tm.ServerInfo = tm.config.server
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
@@ -284,7 +277,7 @@ const updateServerPlayers = (): void => {
  */
 const playerJoin = async (player:
   { login: string, nickname: string, region: string, isSpectator: boolean, ladderRank: number }): Promise<void> => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
     [
       { string: 'TMF' },
@@ -305,7 +298,7 @@ const playerJoin = async (player:
  * @param player Player object
  */
 const playerLeave = async (player: { login: string, nickname: string }): Promise<void> => {
-  if (client.connected === false) { return }
+  if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerLeave',
     [
       { string: 'TMF' },
@@ -354,10 +347,10 @@ const getLogString = (previousPosition: number | undefined, position: number,
   previousTime: number | undefined, time: number, player: { login: string, nickname: string }): string[] => {
   const rs = tm.utils.getRankingString({ position, time }, (previousPosition && previousTime) ?
     { time: previousTime, position: previousPosition } : undefined)
-  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getPositionString(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
+  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
 }
 
-if (config.isEnabled === true) {
+if (config.isEnabled) {
 
   tm.addListener('Startup', (): void => {
     tm.log.trace('Connecting to Dedimania...')
@@ -369,12 +362,12 @@ if (config.isEnabled === true) {
     if (uploadLaps && tm.getGameMode() !== 'Laps') {
       tm.sendMessage(config.modifiedLapsMessage)
     }
-    void getRecords(info.id, info.name, environmentMap[info.environment], info.author)
+    void getRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
     let cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
-    void sendRecords(info.id, info.name, environmentMap[info.environment], info.author, cpAmount)
+    void sendRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author, cpAmount)
   })
 
   tm.addListener('PlayerJoin', (info): void => {

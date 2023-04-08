@@ -34,26 +34,27 @@ export const Utils = {
   /**
    * Formats time for prettier display.
    * @param time Time to format
-   * @returns Formatted time string
+   * @returns Formatted time string (eg. 25:12.63, 0:56.92)
    */
   getTimeString(time: number): string {
-    const timeLength: number = time.toString().length
-    const m: string = Math.floor(time / (1000 * 60)).toString()
-    const s: string = Math.floor((time - Number(m) * 60 * 1000) / 1000).toString()
-    const hs: string = time.toString().substring(timeLength - 3, timeLength - 1)
-    return `${m.padStart(1, '0')}:${s.padStart(2, '0')}.${hs.padStart(2, '0')}`
+    const d = new Date(time)
+    const h = d.getUTCHours().toString()
+    const m = d.getUTCMinutes().toString()
+    const s = d.getUTCSeconds().toString().padStart(2, '0')
+    const ms = d.getUTCMilliseconds().toString().padStart(3, '0').slice(0, -1)
+    return h !== '0' ? (`${h}:${m.padStart(2, '0')}:${s}.${ms}`) : (`${m}:${s}.${ms}`)
   },
 
   /**
    * Adds an ordinal suffix to numbers.
    * @param pos Number to add the suffix to
-   * @returns Number with the suffix
+   * @returns Number with the suffix (eg. 1st, 9th)
    */
-  getPositionString(pos: number): string {
-    if (Number.isInteger(pos) === false || pos === 0) {
+  getOrdinalSuffix(pos: number): string {
+    if (!Number.isInteger(pos) || pos === 0) {
       return pos.toString()
     }
-    let prefix = ''
+    let prefix: string = ''
     if (pos < 0) {
       prefix = '-'
       pos = -pos
@@ -75,6 +76,65 @@ export const Utils = {
       regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]/gi
     }
     return str.replace('$$', '💀').replace(regex, '').replace('💀', '$$$$')
+  },
+
+  /**
+   * Generates a colour gradient for the specified string with the passed colours
+   * @param text Text to apply the generated colours to
+   * @param startColour Start gradient colour (in hex)
+   * @param endColour End gradient colour (in hex)
+   * @returns String with gradient applied to it (colours are 3-digit hex)
+   */
+  makeGradient(text: string, startColour: string, endColour: string): string {
+    const length: number = text.length
+    if (length === 0) { // Why
+      return ''
+    }
+    const textSplit: string[] = text.split('')
+    let gradient: string = ''
+    let [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
+    let colours: string[] = []
+    // https://stackoverflow.com/a/32257791
+    let alpha: number = 0.0
+    for (let i = 0; i !== length; i++) {
+      let cc: Array<number> = []
+      alpha += (1.0 / length)
+      cc = [
+        startRGB[0] * alpha + (1 - alpha) * endRGB[0],
+        startRGB[1] * alpha + (1 - alpha) * endRGB[1],
+        startRGB[2] * alpha + (1 - alpha) * endRGB[2]
+      ]
+      colours.push(this.getHex(cc, false))
+    }
+    for (let i = 0; i !== length; i++) {
+      gradient += `$${colours[i] + textSplit[i]}`
+    }
+    return gradient
+  },
+
+  /**
+   * Gives RGB representation of the supplied hex colour
+   * @param hex Hex colour to get RGB values for
+   * @returns Array of RGB values
+   */
+  getRGB(hex: string): Array<number> {
+    if (hex.length === 3) {
+      hex = hex.split('').map((a): string => { return a + a }).join('')
+    }
+    // https://stackoverflow.com/a/5624139
+    const sh: RegExpExecArray | null = (/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i).exec(hex)
+    return sh ? [parseInt(sh[1], 16), parseInt(sh[2], 16), parseInt(sh[3], 16)] : []
+  },
+
+  /**
+   * Gives hex representation of the supplied RGB colour array
+   * @param rgb Array of RGB values
+   * @param getFull Whether to obtain full hex (6 chars)
+   * @returns Hex colour string
+   */
+  getHex(rgb: Array<number>, getFull: boolean = true): string {
+    let hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
+    return getFull ? hex : hex[0] + hex[2] + hex[4] // idk maybe this can be done better
   },
 
   /**
@@ -104,9 +164,10 @@ export const Utils = {
   },
 
   /**
-   * Gets country information from region in Nadeo format
+   * Gets country information from region in Nadeo format (eg. World|Poland|Pomorskie)
    * @param region Region in Nadeo format, can start with World but doesn't have to
-   * @returns Object containing parsed region, country and country code if matching one was found
+   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and 
+   * country code (eg. POL) if matching one was found 
    */
   getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
     let split = region.split('|')
@@ -119,12 +180,30 @@ export const Utils = {
     return { region: r, country, countryCode }
   },
 
+  /**
+   * Converts Trakman environment type to Nadeo environment type
+   * @param environment Environment of type tm.Environment
+   * @returns Whatever on earth Nadeo wanted to call their environment
+   */
+  environmentToNadeoEnvironment(environment: tm.Environment): Omit<tm.Environment, 'Desert' | 'Snow'> | 'Speed' | 'Alpine' {
+    const environmentMap: { [environment in tm.Environment]: string } = {
+      Stadium: 'Stadium',
+      Island: 'Island',
+      Desert: 'Speed',
+      Rally: 'Rally',
+      Bay: 'Bay',
+      Coast: 'Coast',
+      Snow: 'Alpine'
+    }
+    return environmentMap[environment]
+  },
+
   matchString,
 
   /**
    * Gets the country code (non-ISO) for the specified country name
-   * @param country Country name
-   * @returns Country code
+   * @param country Country name (eg. Poland)
+   * @returns Country code (eg. POL)
    */
   countryToCode(country: string): string | undefined {
     return countries.find(a => a.name === country)?.code
@@ -134,9 +213,13 @@ export const Utils = {
    * Gets the appropriate verb and calculates record differences.
    * @param current Object containing current record time and position
    * @param previous Optional object containing previous record time and position
-   * @returns Object containing the string to use, whether calculation is needed, and the difference
+   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
+   * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): { status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved', difference?: string } {
+  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): {
+    status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
+    difference?: string
+  } {
     let calc: boolean = false
     const obj: any = {
       status: ``,
@@ -234,9 +317,9 @@ export const Utils = {
   /**
    * Converts milliseconds to humanly readable time.
    * @param ms Time to convert (in milliseconds)
-   * @returns Humanly readable time string
+   * @returns Humanly readable time string (eg. 2 hours, 12 minutes and 30 seconds)
    */
-  msToTime(ms: number): string {
+  getVerboseTime(ms: number): string {
     const d: Date = new Date(ms)
     let str: string = ''
     const seconds: number = d.getUTCSeconds()
@@ -269,6 +352,15 @@ export const Utils = {
       '"': '&quot;',
     }
     return str.replace(/[&"]/g, (m): string => { return map[m as keyof typeof map] })
+  },
+
+  /**
+   * In Trackmania, https links won't work
+   * @param url Original URL
+   * @returns URL that will likely function properly
+   */
+  fixProtocol(url: string): string {
+    return `http://${url.replace(/^https?:\/\//, '')}`
   },
 
   /**
@@ -306,26 +398,26 @@ export const Utils = {
     return s[0].player
   },
 
-  // TODO USE IN SERVICE
   /**
    * Converts date string to time in miliseconds. 
    * This method is used to parse time in chat commands.
    * @param dateStr Date string, number followed by optional modifier 
    * [s - seconds, m - minutes, h - hours, d - days]). 
    * If no modifier is specified the number will be treated as minutes.
-   * @returns Time in miliseconds
+   * @returns Time in miliseconds, RangeError if time is bigger than max js Date,
+   * TypeError if the dateStr is not a valid date string
    */
-  parseTimeString(dateStr: string): number | Error {
+  parseTimeString(dateStr: string): number | RangeError | TypeError {
     if (!isNaN(Number(dateStr)) && Number(dateStr) > 0) {
-      if (isNaN(new Date(Number(dateStr)).getTime())) {
-        return new Error(`Time amount too big`)
+      if (isNaN(new Date(Number(dateStr) * 1000 * 60).getTime())) {
+        return new RangeError(`Time amount too big`)
       }
       return Number(dateStr) * 1000 * 60
     } // If there's no modifier then time is treated as minutes
     const unit: string = dateStr.substring(dateStr.length - 1).toLowerCase()
     const time: number = Number(dateStr.substring(0, dateStr.length - 1))
     if (isNaN(time) || time < 0) {
-      return new Error(`Invalid time string`)
+      return new TypeError(`Invalid time string`)
     }
     let parsedTime: number
     switch (unit) {
@@ -342,10 +434,10 @@ export const Utils = {
         parsedTime = time * 1000 * 60 * 60 * 24
         break
       default:
-        return new Error(`Invalid time string`)
+        return new TypeError(`Invalid time string`)
     }
     if (isNaN(new Date(parsedTime).getTime())) {
-      return new Error(`Time amount too big`)
+      return new RangeError(`Time amount too big`)
     }
     return parsedTime
   },
@@ -354,13 +446,47 @@ export const Utils = {
    * Formats date into calendar display.
    * @param date Date to be formatted
    * @param displayDay Whether to display day
-   * @returns Formatted date string
+   * @returns Formatted date string (dd/mm/yyyy)
    */
   formatDate(date: Date, displayDay?: true): string {
     if (displayDay === true) {
       return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+  },
+
+  /**
+   * Creates string representation of chat command parameters.
+   * @param commandParams Chat command paramaters
+   * @returns Stringified parameters (eg. login <string>, duration<time>[, count<int>, reason<multiword>])
+   */
+  stringifyCommandParams(commandParams: tm.Command['params']): string {
+    let text: string = ''
+    let hasOptionals: boolean = false
+    if (commandParams !== undefined) {
+      for (const [i, e] of commandParams.entries()) {
+        if (e.optional === true && !hasOptionals) {
+          text += `[`
+          hasOptionals = true
+        }
+        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}>` }
+        else { text += `, ${e.name} <${e.type ?? 'string'}>` }
+      }
+    }
+    if (hasOptionals) {
+      text += ']'
+    }
+    return text
+  },
+
+  /**
+   * Calculates nadeo tax for given coppers amount and subtracts it from the amount.
+   * Nadeo tax formula: https://docs.google.com/spreadsheets/d/1B_WUKayLJAMCklKaGrrjQZve1JJyFQ7h6SrbO0qdqkQ/pubhtml
+   * @param coppers Coppers amount
+   * @returns Coppers amount after subtracting tax
+   */
+  getCoppersAfterTax(coppers: number): number {
+    return Math.round(coppers * 1.05) + 2 - coppers
   },
 
   strVar,

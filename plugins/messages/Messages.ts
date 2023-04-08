@@ -2,7 +2,7 @@ import { dedimania } from '../dedimania/Dedimania.js'
 import c from './Config.js'
 
 /**
- * Sends server messages on events
+ * Sends server messages on events.
  * @author lythx & wiseraven
  * @since 0.1
  */
@@ -26,7 +26,7 @@ const events: tm.Listener[] = [
           const rec: tm.LocalRecord = tm.records.local[index]
           tm.sendMessage(tm.utils.strVar(c.pb, {
             time: tm.utils.getTimeString(rec.time),
-            rank: tm.utils.getPositionString(index + 1)
+            rank: tm.utils.getOrdinalSuffix(index + 1)
           }), player.login)
         }
         const playerRank: number | undefined = player.rank
@@ -34,7 +34,7 @@ const events: tm.Listener[] = [
           tm.sendMessage(c.noRank, player.login)
         } else {
           tm.sendMessage(tm.utils.strVar(c.rank, {
-            rank: tm.utils.getPositionString(playerRank),
+            rank: tm.utils.getOrdinalSuffix(playerRank),
             total: tm.players.totalCount
           }), player.login)
         }
@@ -56,7 +56,7 @@ const events: tm.Listener[] = [
         const rec: tm.LocalRecord = tm.records.local[index]
         tm.sendMessage(tm.utils.strVar(c.pb, {
           time: tm.utils.getTimeString(rec.time),
-          rank: tm.utils.getPositionString(index + 1)
+          rank: tm.utils.getOrdinalSuffix(index + 1)
         }), player.login)
       }
       const playerRank: number | undefined = player.rank
@@ -64,7 +64,7 @@ const events: tm.Listener[] = [
         tm.sendMessage(c.noRank, player.login)
       } else {
         tm.sendMessage(tm.utils.strVar(c.rank, {
-          rank: tm.utils.getPositionString(playerRank),
+          rank: tm.utils.getOrdinalSuffix(playerRank),
           total: tm.players.totalCount
         }), player.login)
       }
@@ -80,16 +80,29 @@ const events: tm.Listener[] = [
     event: 'EndMap',
     callback: async (info: tm.EndMapInfo): Promise<void> => {
       if (info.winnerLogin !== undefined && info.winnerWins !== undefined) {
-        tm.sendMessage(tm.utils.strVar(c.win, {
-          wins: tm.utils.getPositionString(info.winnerWins)
-        }), info.winnerLogin)
+        const player: tm.OfflinePlayer | undefined = tm.players.get(info.winnerLogin) ?? await tm.players.fetch(info.winnerLogin)
+        if (info.winnerWins % c.specialWin === 0) {
+          tm.sendMessage(tm.utils.strVar(c.winPublic, {
+            nickname: tm.utils.strip(player?.nickname ?? '', true),
+            wins: tm.utils.getOrdinalSuffix(info.winnerWins)
+          }), undefined)
+        } else {
+          tm.sendMessage(tm.utils.strVar(c.win, {
+            wins: tm.utils.getOrdinalSuffix(info.winnerWins)
+          }), info.winnerLogin)
+        }
       }
-      if (tm.jukebox.juked.length !== 0 && tm.jukebox.juked[0].callerLogin !== undefined) {
-        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin) ?? undefined
-        if (player === undefined) { return } // Not even possible
+      if (info.droppedMap !== undefined) {
+        tm.sendMessage(tm.utils.strVar(c.jukeSkipped, {
+          map: tm.utils.strip(info.droppedMap.map.name, true),
+          nickname: tm.utils.strip((await tm.players.fetch(info.droppedMap.callerLogin))?.nickname ?? '')
+        }))
+      }
+      if (tm.jukebox.juked[0]?.callerLogin !== undefined) {
+        const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin)
         tm.sendMessage(tm.utils.strVar(c.nextJuke, {
           map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
-          nickname: tm.utils.strip(player?.nickname, true)
+          nickname: tm.utils.strip(player?.nickname ?? '', true)
         }))
       }
     }
@@ -99,7 +112,7 @@ const events: tm.Listener[] = [
     callback: (player: tm.LeaveInfo): void => {
       tm.sendMessage(tm.utils.strVar(c.leave, {
         nickname: tm.utils.strip(player.nickname, true),
-        time: tm.utils.msToTime(player.sessionTime)
+        time: tm.utils.getVerboseTime(player.sessionTime)
       }))
     }
   },
@@ -114,7 +127,7 @@ const events: tm.Listener[] = [
       tm.sendMessage(tm.utils.strVar(c.record, {
         nickname: tm.utils.strip(info.nickname, true),
         status: rs.status,
-        position: tm.utils.getPositionString(info.position),
+        position: tm.utils.getOrdinalSuffix(info.position),
         time: tm.utils.getTimeString(info.time),
         difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
           position: info.previous?.position,
@@ -134,7 +147,7 @@ const events: tm.Listener[] = [
       tm.sendMessage(tm.utils.strVar(c.lapRecord, {
         nickname: tm.utils.strip(info.nickname, true),
         status: rs.status,
-        position: tm.utils.getPositionString(info.position),
+        position: tm.utils.getOrdinalSuffix(info.position),
         time: tm.utils.getTimeString(info.time),
         difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
           position: info.previous?.position,
@@ -152,7 +165,7 @@ dedimania.onRecord((record) => {
   tm.sendMessage(tm.utils.strVar(c.dediRecord, {
     nickname: tm.utils.strip(record.nickname, true),
     status: rs.status,
-    position: tm.utils.getPositionString(record.position),
+    position: tm.utils.getOrdinalSuffix(record.position),
     time: tm.utils.getTimeString(record.time),
     difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
       position: record.previous?.position,

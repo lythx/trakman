@@ -23,5 +23,12 @@ export default {
     privilege: 2,
     aliases: ['shuf', 'shuffle'],
     help: `Shuffle the map queue.`
+  },
+  clearhistory: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has cleared the map history.`,
+    public: true,
+    privilege: 2,
+    aliases: ['ch', 'clearhistory'],
+    help: `Clear the map history.`
   }
 }

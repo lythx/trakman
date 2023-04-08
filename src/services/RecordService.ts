@@ -117,7 +117,7 @@ export class RecordService {
           continue
         }
       }
-      if (mapPresent === false) { continue }
+      if (!mapPresent) { continue }
       if (logins.includes(records[i].login)) {
         this._playerRanks.push({
           login: records[i].login,
@@ -433,7 +433,7 @@ export class RecordService {
     recordType: 'live' | 'local' | 'lap'): string[] {
     const rs = Utils.getRankingString({ time, position }, (previousPosition && previousTime) ? { position: previousPosition, time: previousTime } : undefined)
     return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
-      ` ${Utils.getPositionString(position)} ${recordType} record. Time: ` + `
+      ` ${Utils.getOrdinalSuffix(position)} ${recordType} record. Time: ` + `
     ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
   }
 
@@ -661,11 +661,11 @@ export class RecordService {
   static get liveRecords(): Readonly<tm.FinishInfo>[] {
     return [...this._liveRecords]
   }
-  // TODO SINGULAR
+
   /**
    * Number of live records
    */
-  static get liveRecordsCount(): number { // TODO FIX PLURAL
+  static get liveRecordCount(): number {
     return this._liveRecords.length
   }
 

@@ -33,8 +33,8 @@ export class Listeners {
           return
         }
         const ip: string = playerInfo.IPAddress.split(':')[0]
-        const canJoin = await AdministrationService.handleJoin(login, ip)
-        if (canJoin === false) {
+        const canJoin: boolean = await AdministrationService.handleJoin(login, ip)
+        if (!canJoin) {
           Logger.info(`Banned player ${playerInfo.Login} (${Utils.strip(playerInfo.NickName)}) attempted to join.`)
           return
         }
@@ -71,13 +71,13 @@ export class Listeners {
     },
     {
       event: 'TrackMania.PlayerChat',
-      callback: ([playerId, login, text]: tm.Events['TrackMania.PlayerChat']): void => {
+      callback: async ([playerId, login, text]: tm.Events['TrackMania.PlayerChat']): Promise<void> => {
         // [0] = PlayerUid, [1] = Login, [2] = Text, [3] = IsRegisteredCommand
         // Ignore server messages (PID 0 = Server)
         if (playerId === 0) {
           return
         }
-        const messageInfo: tm.MessageInfo | Error = ChatService.add(login, text)
+        const messageInfo: tm.MessageInfo | Error = await ChatService.add(login, text)
         if (!(messageInfo instanceof Error)) {
           Events.emit('PlayerChat', messageInfo)
         }
@@ -209,7 +209,7 @@ export class Listeners {
         // Update server parameters
         await GameService.update()
         // Check whether the map was restarted
-        if (isRestart === false) {
+        if (!isRestart) {
           // In case it wasn't, update the votes and records
           await MapService.update()
           await RecordService.nextMap()
@@ -232,6 +232,13 @@ export class Listeners {
         // [0] = Rankings[struct], [1] = Challenge, [2] = WasWarmUp, [3] = MatchContinuesOnNextChallenge, [4] = RestartChallenge
         // If rankings are non-existent, index 0 becomes the current map, unsure whose fault is that, but I blame Nadeo usually
         PlayerService.resetCheckpoints()
+        let droppedMap: undefined | tm.EndMapInfo['droppedMap']
+        const nextJb = MapService.jukebox[0]
+        if (!config.keepQueueAfterLeave && nextJb.callerLogin !== undefined
+          && PlayerService.get(nextJb.callerLogin) === undefined) {
+          droppedMap = nextJb as tm.EndMapInfo['droppedMap']
+          MapService.removeFromJukebox(nextJb.map.id)
+        }
         const winner = rankings[0]
         // Set game state to 'result'
         isRestart = restart
@@ -253,7 +260,8 @@ export class Listeners {
           winnerLogin: login,
           winnerWins: wins,
           serverSideRankings: rankings,
-          isRestart
+          isRestart,
+          droppedMap
         }
         // Update the player record averages, this can take a long time
         void PlayerService.calculateAveragesAndRanks()
@@ -333,7 +341,6 @@ export class Listeners {
           isServer: flags?.[flags.length - 6] === '1',
           hasPlayerSlot: flags?.[flags.length - 7] === '1'
         }
-        // If pure spectator is true then player doesn't have a player slot (so hes not counted in round scores for example) 
         PlayerService.setPlayerInfo(info)
         Events.emit('PlayerInfoChanged', info)
       }

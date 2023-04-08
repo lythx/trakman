@@ -1,4 +1,4 @@
-export default { 
+export default {
   margin: 0.15,
   marginBig: 0.27,
   format: "$s",
@@ -11,21 +11,22 @@ export default {
   rightPosition: 49.13,
   leftPosition: -63.75,
   rightSideOrder: [
-    { name: "MapWidgetResult", height: 11.4 },
-    { name: "NextMapRecords", height: 12.92 },
-    { name: "TimerWidgetResult", height: 6.1 },
-    { name: "KarmaRanking", height: 12.92 },
-    { name: "VotersRanking", height: 12.92 },
-    { name: "VisitorsRanking", height: 12.92 },
-    { name: "DonationPanelResult", height: 8 }
+    "MapWidgetResult",
+    "NextMapRecords",
+    "TimerWidgetResult",
+    "KarmaRanking",
+    "VotersRanking",
+    "VisitorsRanking",
+    "DonationPanelResult"
   ],
   leftSideOrder: [
-    { name: "AveragesRanking", height:  12.92 },
-    { name: "RankWidgetResult", height: 6.5 },
-    { name: "KarmaWidgetResult", height:  8.8 },
-    { name: "LocalRankingResult", height: 12.92 },
-    { name: "DediRankingResult", height: 12.92 },
-    { name: "RoundAveragesRanking", height: 12.92 },
-    { name: "AdminPanelResult", height: 5 }
-  ]
+    "AveragesRanking",
+    "RankWidgetResult",
+    "KarmaWidgetResult",
+    "LocalRankingResult",
+    "DediRankingResult",
+    "RoundAveragesRanking",
+    "AdminPanelResult"
+  ],
+  otherComponents: ["DonatorsRanking", "MostRecordsRanking", "PlaytimeRanking", "WinnersRanking"]
 }

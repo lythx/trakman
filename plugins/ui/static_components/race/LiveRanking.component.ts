@@ -13,7 +13,7 @@ export default class LiveRanking extends StaticComponent {
   private title!: string
 
   constructor() {
-    super(componentIds.live, 'race', ['TimeAttack', 'Laps'])
+    super(componentIds.live)
     this.header = new StaticHeader('race')
     this.getRecordList()
     tm.addListener('LiveRecord', (): void => {
@@ -35,15 +35,33 @@ export default class LiveRanking extends StaticComponent {
     })
   }
 
+  getEntries(): number {
+    if (tm.getGameMode() === 'Laps') {
+      return config.lapsEntries
+    }
+    return config.entries
+  }
+
+  getHeight(): number {
+    return config.entryHeight * this.getEntries() + StaticHeader.raceHeight + config.margin
+  }
+
+  getTopCount(): number {
+    if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    }
+    return config.topCount
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const player of tm.players.list) {
       this.displayToPlayer(player.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     let content: string
     this.title = config.title
     if (tm.getGameMode() === 'Laps') {
@@ -88,20 +106,18 @@ export default class LiveRanking extends StaticComponent {
   }
 
   private getRecordList(): void {
-    let height = config.height
-    let entries = config.entries
+    const entries = this.getEntries()
+    const height = this.getHeight()
     let dontParseTime = false
     let noRecordEntryText: string | undefined
     if (tm.getGameMode() === 'Laps') {
-      height = config.lapsHeight
-      entries = config.lapsEntries
       dontParseTime = true
       noRecordEntryText = config.lapsNoRecordEntry
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, config.topCount, tm.records.maxLocalsAmount, config.displayNoRecordEntry, 
-      { dontParseTime, noRecordEntryText   })
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      { dontParseTime, noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       this.displayToPlayer(info.login)
     })

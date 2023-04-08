@@ -1,6 +1,8 @@
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
 
+const p = tm.utils.palette
+
 export default {
   title: "Command List",
   entries: 15,
@@ -45,7 +47,9 @@ export default {
   },
   command: {
     aliases: ['h', 'help', 'helpall'],
-    help: `Display the list of controller commands.`,
+    help: `Display the list of controller commands. Can be used with optional search query.`,
     privilege: 0
-  }
+  },
+  noMatchesMessage: `${p.error}Nothing found for ${p.highlight}#{query}${p.error}.`,
+  minimumMatchSimilarity: 0.1 // The higher it is the less results are considered matching
 }

@@ -2,12 +2,12 @@ import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  height: 8.68,
+  entries: 3,
+  entryHeight: 2.15,
   width: cfg.width,
   margin: cfg.margin,
   title: "TMX Records",
   icon: icons.maniaExchange,
-  entries: 3,
   columnProportions: [
     1,
     1,

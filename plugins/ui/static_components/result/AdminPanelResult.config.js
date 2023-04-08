@@ -8,6 +8,7 @@ export default {
   privilege: 1,
   margin: cfg.margin,
   background: cfg.background,
+  shufflePrivilege: 2,
   title: "Admin Panel",
   icon: icons.gears,
   disabledColour: '333C',

@@ -17,12 +17,12 @@ export default class BestFinishes extends StaticComponent {
   private newestFinish: number = -1
 
   constructor() {
-    super(componentIds.bestFinishes, 'race')
+    super(componentIds.bestFinishes)
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = config.height - (config.margin + this.headerHeight)
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions,
+    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
+    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
     tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
       let index: number = this.bestFinishes.findIndex(a => a.time > info.time)
@@ -48,15 +48,19 @@ export default class BestFinishes extends StaticComponent {
     })
   }
 
+  getHeight(): number {
+    return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     tm.sendManialink(`
     <manialink id="${this.id}">
     <frame posn="${config.posX} ${config.posY} 1">

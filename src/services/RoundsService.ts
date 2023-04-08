@@ -12,11 +12,9 @@ export class RoundsService {
   private static _roundsPointSystem: number[] = []
   private static _roundsPointsLimit: number
   private static _cupPointsLimit: number
-  private static _cupWarmUpRounds: number // TODO REMOVE
   private static _cupMaxWinnersCount: number
   private static readonly _cupWinners: tm.Player[] = []
   private static _teamsPointsLimit: number
-  private static teamMaxPoints: number // TODO REMOVE
   private static _ranking: tm.Player[]
   private static readonly _roundRecords: tm.FinishInfo[] = []
   private static noRoundFinishes = true
@@ -24,7 +22,10 @@ export class RoundsService {
   private static roundFinishCount = 0
 
   static async initialize(): Promise<void> {
-    await Client.call('SetCupRoundsPerChallenge', [{ int: 0 }])
+    await Client.call('system.multicall', [
+      { method: 'SetCupRoundsPerChallenge', params: [{ int: 0 }] },
+      { method: 'SetUseNewRulesTeam', params: [{ boolean: true }] },
+      { method: 'SetUseNewRulesRound', params: [{ boolean: false }] }])
     const status = await this.updateRoundsSettings()
     if (status instanceof Error) {
       await Logger.fatal(status.message)
@@ -77,9 +78,7 @@ export class RoundsService {
       { method: 'GetRoundCustomPoints' },
       { method: 'GetRoundPointsLimit' },
       { method: 'GetTeamPointsLimit' },
-      { method: 'GetMaxPointsTeam' }, // TODO REMOVE
       { method: 'GetCupPointsLimit' },
-      { method: 'GetCupWarmUpDuration' }, // TODO REMOVE
       { method: 'GetCupNbWinners' }])
     if (settings instanceof Error) {
       return new Error(`Failed to fetch round settings, server responded with error: ${settings.message}`)
@@ -88,16 +87,14 @@ export class RoundsService {
     if (err !== undefined) {
       return new Error(`Failed to fetch round settings, server responded with error: ${err.message}`)
     }
-    const [roundPointSystem, roundPointsLimit, teamPointsLimit, teamMaxPoints, // TODO REMOVE TEAMMAXPOINTS and CUPWARMUPROUNDS
-      cupPointsLimit, cupWarmUpRounds, cupMaxWinnersCount] =
+    const [roundPointSystem, roundPointsLimit, teamPointsLimit,
+      cupPointsLimit, cupMaxWinnersCount] =
       (settings as { method: string; params: any; }[]).map(a => a.params)
     this._roundsPointSystem = roundPointSystem
     this._roundsPointSystem = roundPointSystem
     this._roundsPointsLimit = roundPointsLimit.CurrentValue
     this._teamsPointsLimit = teamPointsLimit.CurrentValue
-    this.teamMaxPoints = teamMaxPoints.CurrentValue
     this._cupPointsLimit = cupPointsLimit.CurrentValue
-    this._cupWarmUpRounds = cupWarmUpRounds.CurrentValue
     this._cupMaxWinnersCount = cupMaxWinnersCount.CurrentValue
     if (this._roundsPointSystem.length === 0) {
       this._roundsPointSystem = config.roundsModePointSystem
@@ -110,7 +107,7 @@ export class RoundsService {
   static registerRoundRecord(record: tm.FinishInfo, player: tm.Player) {
     if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' ||
       GameService.gameMode === 'Laps') { return }
-    if (this.noRoundFinishes === true) {
+    if (this.noRoundFinishes) {
       this.noRoundFinishes = false
       this.finishedRounds++
     }
@@ -249,7 +246,26 @@ export class RoundsService {
     this._ranking.splice(index, 0, obj)
   }
 
-  // TODO MAKE A GETTER FOR ROUND RECORDS
+  /**
+   * Gets the players current round record.
+   * @param login Player login
+   * @returns Round record object or undefined if the player doesn't have a round record
+   */
+  static getRoundRecord(login: string): tm.FinishInfo | undefined
+  /**
+   * Gets multiple round records. If some player has no round record 
+   * his record object wont be returned. Returned array is sorted primary by time ascending, secondary by date ascending.
+   * @param logins Array of player logins
+   * @returns Array of round record objects
+   */
+  static getRoundRecord(logins: string[]): tm.FinishInfo[]
+  static getRoundRecord(logins: string | string[]): tm.FinishInfo | undefined | tm.FinishInfo[] {
+    if (typeof logins === 'string') {
+      return this._roundRecords.find(a => a.login === logins)
+    }
+    return this._roundRecords.filter(a => logins.includes(a.login))
+  }
+
   /**
    * Current round records
    */

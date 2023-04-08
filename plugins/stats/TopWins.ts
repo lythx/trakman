@@ -47,10 +47,7 @@ tm.addListener('EndMap', async (info) => {
     obj = entry
     topList.sort((a, b) => b.wins - a.wins)
   } else {
-    let nickname = tm.players.get(login)?.nickname
-    if (nickname === undefined) {
-      nickname = (await tm.players.fetch(login))?.nickname
-    }
+    const nickname: string | undefined = tm.players.get(login)?.nickname ?? (await tm.players.fetch(login))?.nickname
     obj = { login, wins, nickname: nickname ?? login }
     topList.push(obj)
     topList.sort((a, b) => b.wins - a.wins)

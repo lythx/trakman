@@ -57,7 +57,7 @@ export class VoteReplay extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isReplay === true || this.isSkip === true) { return }
+    if (this.isReplay || this.isSkip) { return }
     const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
     if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(tm.utils.strVar(msg.tooLate, { action }), login)
@@ -82,7 +82,7 @@ export class VoteReplay extends UiButton {
     const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })
     const header = tm.timer.isDynamic ? cfg.extendHeader : cfg.resHeader
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, header, startMsg, cfg.time, cfg.voteIcon)
-    const result = await voteWindow.startAndGetResult(tm.players.list.map(a => a.login))
+    const result = await voteWindow.startAndGetResult(tm.players.list)
     if (result === undefined) {
       tm.sendMessage(msg.alreadyRunning, login)
       return
@@ -146,7 +146,7 @@ export class VoteReplay extends UiButton {
     if (tm.timer.isDynamic) {
       this.replayCount = 0
       this.isReplay = false
-    } else if (this.isReplay === false) {
+    } else if (!this.isReplay) {
       this.replayCount = 0
     }
     if (this.replayCount >= cfg.replayLimit) {

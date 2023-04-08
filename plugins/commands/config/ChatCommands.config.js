@@ -67,6 +67,7 @@ export default {
   },
   afk: {
     text: `$g[#{nickname}$z$s$g] ${prefix}Away from keyboard!`,
+    tooManySpecs: `${p.error}Could not switch to spectator mode because there are too many spectators.`,
     public: true,
     privilege: 0,
     aliases: ['afk', 'imstupid'],
@@ -151,6 +152,14 @@ export default {
     privilege: 0,
     aliases: ['st', 'session', 'sessiontime'],
     help: `Find out about current session time of specified player.`
+  },
+  man: {
+    text: `${p.highlight}#{name}: ${p.dedirecord}#{params}${p.admin}#{help}`,
+    error: `${p.error}Command ${p.highlight}#{name} ${p.error}doesn't exist or has no help.`,
+    public: false,
+    privilege: 0,
+    aliases: ['man'],
+    help: `Display help and params for given command.`
   },
   admin: {
     text: `${p.error}Use //[command] for admin commands.`,

@@ -175,6 +175,10 @@ export class ClientResponse {
     if (isMulticall === true) {
       const values = obj.params[0].param[0].value[0].array[0].data[0].value
       for (const value of values) {
+        if (value.struct !== undefined) {
+          arr.push(parseType(value.struct[0], 'struct'))
+          continue
+        }
         const element = value.array[0].data[0].value[0]
         const type = Object.keys(element)[0]
         arr.push(parseType(element[type][0], type))

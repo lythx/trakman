@@ -19,13 +19,14 @@ export default class BestCps extends StaticComponent {
   private grid: Grid
 
   constructor() {
-    super(componentIds.bestCps, 'race')
+    super(componentIds.bestCps)
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = config.height - (config.margin + this.headerHeight)
+    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
     this.cpAmount = tm.maps.current.checkpointsAmount - 1
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
+    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), { margin: config.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
     tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo): void => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
@@ -42,7 +43,8 @@ export default class BestCps extends StaticComponent {
       this.cpAmount = tm.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
       this.paginator.resetPlayerPages()
-      this.grid = new Grid(config.width + config.margin * 2, this.contentHeight + config.margin * 2, config.columnProportions, new Array(config.entries).fill(1), { margin: config.margin })
+      this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
+        new Array(config.entries).fill(1), { margin: config.margin })
       this.bestCps.length = 0
       this.display()
     })
@@ -58,15 +60,19 @@ export default class BestCps extends StaticComponent {
     }
   }
 
+  getHeight(): number {
+    return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
+  }
+
   display(): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     for (const e of tm.players.list) {
       this.displayToPlayer(e.login)
     }
   }
 
   displayToPlayer(login: string, params?: { page?: number }): void {
-    if (this.isDisplayed === false) { return }
+    if (!this.isDisplayed) { return }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
     tm.sendManialink(`
@@ -85,13 +91,17 @@ export default class BestCps extends StaticComponent {
   private constructHeader(page: number, pageCount: number): string {
     if (this.bestCps.length === 0) { return '' }
     let icons: (string | undefined)[] = [config.upIcon, config.downIcon]
+    let iconsHover: (string | undefined)[] = [config.upIconHover, config.downIconHover]
     let ids: (number | undefined)[] = [this.paginator.ids[0], this.paginator.ids[1]]
     let buttonAmount: number = 2
     if (page === 1) {
       ids = [undefined, this.paginator.ids[1]]
+      iconsHover = [undefined, config.downIconHover]
       icons = [undefined, config.downIcon]
+
     } else if (page === pageCount) {
       icons = [config.upIcon]
+      iconsHover = [config.upIconHover]
       ids = [this.paginator.ids[0]]
     }
     if (pageCount === 1) {
@@ -100,10 +110,11 @@ export default class BestCps extends StaticComponent {
     const headerCfg: StaticHeaderOptions = this.header.options
     let buttonsXml: string = ''
     for (let i: number = 0; i < buttonAmount; i++) {
-      const icon: string = icons[i] === undefined ? '' : `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${icons[i]}"/>`
       const action: string = ids[i] === undefined ? '' : `action="${ids[i]}"`
+      const icon: string = icons[i] === undefined ? '' : `<quad posn="${headerCfg.iconHorizontalPadding} ${-headerCfg.iconVerticalPadding} 4" 
+      sizen="${headerCfg.iconWidth} ${headerCfg.iconHeight}" image="${icons[i]}" imagefocus="${iconsHover[i]}" ${action}/>`
       buttonsXml += `<frame posn="${(config.width + config.margin) - (headerCfg.squareWidth + config.margin) * ((buttonAmount - i) + 1)} 0 1">
-        <quad posn="0 0 1" sizen="${headerCfg.squareWidth} ${this.headerHeight}" bgcolor="${this.headerBg}" ${action}/>
+        <quad posn="0 0 1" sizen="${headerCfg.squareWidth} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
         ${icon}
       </frame>`
     }

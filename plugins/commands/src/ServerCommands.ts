@@ -82,7 +82,7 @@ const commands: tm.Command[] = [
         tm.sendMessage(tm.utils.strVar(config.timelimit.set, {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
-          time: tm.utils.msToTime(tm.timer.remainingRaceTime)
+          time: tm.utils.getVerboseTime(tm.timer.remainingRaceTime)
         }))
       } else {
         tm.sendMessage(config.timelimit.tooLow, info.login)
@@ -174,16 +174,13 @@ const commands: tm.Command[] = [
             coppers: amount,
           }), info.login)
         } else {
-          let player: tm.Player | tm.OfflinePlayer | undefined = tm.players.get(login)
-          if (player === undefined) {
-            player = await tm.players.fetch(login)
-          }
+          const player: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
           tm.sendMessage(tm.utils.strVar(config.pay.text, {
             title: info.title,
             adminName: info.nickname,
             coppers: amount,
             target: player?.nickname ?? login
-          }), config.pay.public === true ? undefined : info.login)
+          }), config.pay.public ? undefined : info.login)
         }
       }
     },
@@ -354,6 +351,63 @@ const commands: tm.Command[] = [
       tm.client.callNoRes(`StopServer`)
     },
     privilege: config.shutdown.privilege
+  },
+  {
+    aliases: config.call.aliases,
+    help: config.call.help,
+    params: [{ name: 'method' }, { name: 'params', type: 'multiword', optional: true }],
+    callback: async (info: tm.MessageInfo, method: string, params?: string): Promise<void> => {
+      if (params === undefined) { params = '' }
+      const paramsArr = params.split(' ').map(a => a.trim()).filter(a => a !== '')
+      let quot: [number, number] | undefined
+      for (let i = 0; i < paramsArr.length; i++) {
+        for (let j = 0; j < paramsArr[i].length; j++) {
+          if (paramsArr[i][j] === '"' && paramsArr[i][j - 1] !== "\\") {
+            if (quot === undefined) {
+              quot = [i, j]
+            } else {
+              const str = paramsArr.slice(quot[0], i + 1).join('')
+              const endIndex = str.length + j + 1 - paramsArr[i].length
+              const sliced = str.slice(quot[1], endIndex)
+              paramsArr.splice(quot[0], (i + 1) - quot[0], sliced)
+              quot = undefined
+              break
+            }
+          }
+        }
+      }
+      const parsedParams: tm.CallParams[] = []
+      for (const e of paramsArr) {
+        if (e[0] === '"' && e[e.length - 1] === '"') {
+          parsedParams.push({ string: e.slice(1, -1) })
+          continue
+        }
+        try {
+          const parsed = JSON.parse(e)
+          if (Number.isInteger(parsed)) {
+            parsedParams.push({ int: parsed })
+          } else if (typeof parsed === 'number') {
+            parsedParams.push({ double: parsed })
+          } else if (typeof parsed === 'boolean') {
+            parsedParams.push({ boolean: parsed })
+          } else if (Array.isArray(parsed)) {
+            parsedParams.push({ array: parsed })
+          } else if (typeof parsed === 'object') {
+            parsedParams.push({ struct: parsed })
+          }
+        } catch (err: any) {
+          tm.sendMessage(`${tm.utils.palette.error}Parse error: ${err.message}`, info.login)
+          return
+        }
+      }
+      const response = await tm.client.call(method, parsedParams)
+      if (response instanceof Error) {
+        tm.sendMessage(`${tm.utils.palette.error}Error: ${response.message}`, info.login)
+      } else {
+        tm.sendMessage(JSON.stringify(response), info.login)
+      }
+    },
+    privilege: config.call.privilege
   }
 ]
 
