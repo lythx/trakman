@@ -1,8 +1,9 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
+
 ## 1.3 
 **07/04/2023**
-× Removed mysterious checkpoint
+* Removed mysterious checkpoint
 + Added manual chat routing features
 + Added a server links plugin
 + Added a music plugin
@@ -67,8 +68,8 @@ Changelog can also be found in the controller (/changes)
 
 ## 1.0
 **07/11/2022**
-× Removed the redundant welcome window
-× Removed UI utils (merged into UI)
+* Removed the redundant welcome window
+* Removed UI utils (merged into UI)
 + Added Chat Log
 + Added TMX Search (aka /xlist)
 + Added configurable karma messages
@@ -86,7 +87,7 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.6
 **29/09/2022**
-× Removed JSON files and configs
+* Removed JSON files and configs
 + Added player stats windows and related commands
 + Added player ladder rank to player object
 + Added GZip compression for Dedimania request and response
@@ -113,7 +114,7 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.5
 **04/09/2022**
-× Removed unnecessary things from source
+* Removed unnecessary things from source
 + Added actual plugin system
 + Added config files for each plugin/window/command
 + Added TMX (Map Info) Window and related commands
@@ -129,8 +130,8 @@ Changelog can also be found in the controller (/changes)
 
 ## 0.4
 **10/08/2022**
-× Removed unused dependencies
-× Removed the sole broken test
+* Removed unused dependencies
+* Removed the sole broken test
 + Added result UI
 + Added result display support to static component
 + Added scripts for easier build/startup
