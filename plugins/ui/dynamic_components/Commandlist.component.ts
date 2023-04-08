@@ -116,6 +116,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
         }, `${page}/${e.pageCount}`, privilege)
       }
     }
+    this.commandLists.length = 0
     for (let i: number = 0; i <= 4; i++) {
       const arr = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, i + 1)
       const commands: tm.Command[] = arr.flat(1)
