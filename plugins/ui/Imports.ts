@@ -39,6 +39,7 @@ import RoundScore from './static_components/race/RoundScore.component.js'
 import TeamScore from './static_components/race/TeamScore.component.js'
 import RoundsPointsRanking from './static_components/race/RoundsPointsRanking.component.js'
 import LapRanking from './static_components/race/LapRanking.component.js'
+import BannerWidget from './static_components/result/BannerWidget.component.js'
 
 /*
 ------------------
@@ -115,5 +116,6 @@ tm.addListener(`Startup`, (): void => {
   new RoundsPointsRanking()
   new LapRanking()
   new Warn()
+  new BannerWidget()
 }, true)
 

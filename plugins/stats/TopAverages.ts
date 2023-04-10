@@ -16,6 +16,7 @@ const initialize = async () => {
   }
   topList = res.filter(a => a.average !== tm.records.maxLocalsAmount)
   for (const e of updateListeners) { e(topList) }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('Startup', (): void => void initialize(), true)

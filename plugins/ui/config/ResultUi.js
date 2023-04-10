@@ -28,5 +28,5 @@ export default {
     "RoundAveragesRanking",
     "AdminPanelResult"
   ],
-  otherComponents: ["DonatorsRanking", "MostRecordsRanking", "PlaytimeRanking", "WinnersRanking"]
+  otherComponents: ["DonatorsRanking", "MostRecordsRanking", "PlaytimeRanking", "WinnersRanking", "BannerWidget"]
 }

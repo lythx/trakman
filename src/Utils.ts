@@ -574,12 +574,24 @@ function strVar(str: string, variables: any[]): string
 function strVar(str: string, vars: { [name: string]: any }): string {
   if (Array.isArray(vars)) {
     for (const e of vars) {
-      str = str.replace(/#{([^}]*)}/, e)
+      if (typeof e === 'string') {
+        let arr: string[] = e.split('')
+        arr = arr.map(a => a === '$' ? '$$' : a)
+        str = str.replace(/#{([^}]*)}/, arr.join(''))
+      } else {
+        str = str.replace(/#{([^}]*)}/, e)
+      }
     }
     return str
   }
   for (const [k, v] of Object.entries(vars)) {
-    str = str.replace(`#{${k}}`, v)
+    if (typeof v === 'string') {
+      let arr: string[] = v.split('')
+      arr = arr.map(a => a === '$' ? '$$' : a)
+      str = str.replace(`#{${k}}`, arr.join(''))
+    } else {
+      str = str.replace(`#{${k}}`, v)
+    }
   }
   return str
 }

@@ -15,6 +15,8 @@ const initialize = async () => {
     return
   }
   topList = res
+  for (const e of updateListeners) { e(topList) }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('Startup', (): void => void initialize())

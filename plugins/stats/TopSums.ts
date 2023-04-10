@@ -68,6 +68,7 @@ const initialize = async () => {
   topList.sort((a, b) => b.sums[0] - a.sums[0])
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(topList) }
+  for (const e of nicknameChangeListeners) { e(topList) }
 }
 
 tm.addListener('Startup', (): void => {
