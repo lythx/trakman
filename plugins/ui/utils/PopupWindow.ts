@@ -1,6 +1,6 @@
 import { componentIds } from '../UI.js'
 import DynamicComponent from './DynamicComponent.js'
-import uitlIds from '../config/UtilIds.js'
+import utilIds from '../config/UtilIds.js'
 import Navbar from './Navbar.js'
 import config from '../config/PopupWindow.js'
 import { centeredText } from '../UI.js'
@@ -67,8 +67,8 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     super(componentIds.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
-    this.openId = windowId + uitlIds.PopupWindow.open
-    this.closeId = windowId + uitlIds.PopupWindow.close
+    this.openId = windowId + utilIds.PopupWindow.open
+    this.closeId = windowId + utilIds.PopupWindow.close
     this.windowHeight = windowHeight
     this.windowWidth = windowWidth
     this.navbar = new Navbar(navbar, this.windowWidth)
