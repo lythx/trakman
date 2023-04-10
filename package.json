@@ -16,9 +16,9 @@
     "ts-node": "^10.7.0"
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc",
     "start": "node ./built/src/Main.js",
-    "daemon": "pm2 start ./built/src/Main.js",
+    "daemon": "pm2 start ./built/src/Main.js --attach --name Trakman",
     "restart": "pm2 restart ./built/src/Main.js",
     "stop": "pm2 delete ./built/src/Main.js"
   },
