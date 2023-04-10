@@ -25,7 +25,6 @@ export default class BannerWidget extends StaticComponent {
     const h = this.getHeight()
     const m = config.margin
     const bh = config.buttonHeight
-    console.log(w - m * 2, h - (bh + m * 3))
     this.xml = `<manialink id="${this.id}">
     <frame posn="${this.getPosX()} ${config.topBorder} 1">
       <format textsize="1" textcolor="FFFF"/> 
