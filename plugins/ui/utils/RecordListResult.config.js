@@ -41,5 +41,6 @@ export default {
     bgColor: "0009",
     icon: icons.infoCircle
   },
-  noRecordEntryText: '-:--.--'
+  noRecordEntryText: '-:--.--',
+  maxCpCount: 500 // prevents crashes in case theres too many cps to display
 }

@@ -109,6 +109,7 @@ export default class RecordList {
     top: string
   }>
   private readonly noRecordEntryText: string
+  private readonly maxCpCount: number
 
   /**
    * Util to display record data in manialinks. 
@@ -166,6 +167,7 @@ export default class RecordList {
     this.background = this.config.background
     this.headerBackground = this.config.headerBackground
     this.noRecordEntryText = options?.noRecordEntryText ?? this.config.noRecordEntryText
+    this.maxCpCount = this.config.maxCpCount
     if (options?.dontParseTime === true) {
       this.parseTime = false
     }
@@ -205,7 +207,8 @@ export default class RecordList {
       } else {
         ret += `<quad posn="0 0 5" sizen="${this.width} ${this.rowHeight}" action="${this.parentId + 2 + i}"/>`
       }
-      if (info !== undefined && parsedRecs?.[i] !== undefined && parsedRecs?.[i]?.record?.time !== -1) {
+      if (info !== undefined && parsedRecs?.[i] !== undefined && parsedRecs?.[i]?.record?.time !== -1
+        && (i + 1) * cpAmount < this.maxCpCount) {
         ret += this.constructInfo(info.offset, parsedRecs?.[i]?.record, cpTypes?.[i], cpAmount)
       } else {
         ret += this.constructMarker(markers?.[i])
