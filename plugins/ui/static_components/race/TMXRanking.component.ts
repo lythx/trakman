@@ -10,17 +10,13 @@ import config from './TMXRanking.config.js'
 
 export default class TMXRanking extends StaticComponent {
 
-  private recordList: RecordList
+  private recordList!: RecordList
   private readonly header: StaticHeader
 
   constructor() {
     super(componentIds.tmx)
     this.header = new StaticHeader('race')
-    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
-      this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
-    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
-    })
+    this.createRecordList()
     tm.addListener('LiveRecord', (info): void => {
       this.displayToPlayer(info.login)
     })
@@ -35,9 +31,17 @@ export default class TMXRanking extends StaticComponent {
   }
 
   onPositionChange(): void {
+    this.createRecordList()
+    this.display()
+  }
+
+  createRecordList(): void {
+    this.recordList?.destroy()
     this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
-    this.display()
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      this.displayToPlayer(info.login)
+    })
   }
 
   getHeight(): number {
