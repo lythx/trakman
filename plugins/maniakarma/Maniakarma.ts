@@ -2,6 +2,7 @@ import fetch from 'node-fetch'
 import xml2js from 'xml2js'
 import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
+import countries from './Countries.js'
 
 let authCode: string
 let isConnected: boolean = false
@@ -72,7 +73,7 @@ const authenticate = async (): Promise<true | Error> => {
     name: Buffer.from(tm.config.server.name).toString('base64'),
     game: tm.config.server.game,
     zone: tm.config.server.zone,
-    nation: tm.utils.countryToCode(tm.config.server.zone.split('|')[0]) ?? 'OTH'
+    nation: countries.find(a => a.name === tm.config.server.zone.split('|')[0])?.code ?? 'POL' // SEE EXPLANATION WHY POLAND IN THE COUNTRIES.JS FILE
   })}`
   const res = await fetch(url).catch((err: Error) => err)
   if (res instanceof Error) {
