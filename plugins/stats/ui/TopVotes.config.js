@@ -2,7 +2,7 @@ import { icons, componentIds as ids } from '../../ui/UI.js'
 
 export default {
   title: "Top Votes",
-  icon: icons.cash,
+  icon: icons.karmaStats,
   gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
   headers: ['Lp.', 'Nickname', 'Login', 'Votes', 'Lp.', 'Nickname', 'Login', 'Votes'],
   entries: 30, // Has to be even number
