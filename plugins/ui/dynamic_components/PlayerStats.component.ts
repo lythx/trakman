@@ -40,17 +40,18 @@ export default class PlayerStatsWindow extends PopupWindow {
     }
 
     protected onOpen(info: tm.ManialinkClickInfo): void {
-        this.displayToPlayer(info.login)
+        this.displayToPlayer(info.login, { player: info })
     }
 
     private reRender(): void {
-        const logins: string[] = this.getPlayersWithWindowOpen()
-        for (const login of logins) {
-            this.displayToPlayer(login)
+        const players = this.getPlayersWithWindowOpen(true)
+        for (const player of players) {
+            this.displayToPlayer(player.login, player.params)
         }
     }
 
-    protected async constructContent(login: string, params: { player: tm.OfflinePlayer }): Promise<string> {
+    protected constructContent(login: string, params?: { player: tm.OfflinePlayer }): string {
+        if(params === undefined) { return '' }
         const data: string[] = [
             params.player.login,
             tm.utils.strip(params.player.nickname, false),
@@ -61,7 +62,8 @@ export default class PlayerStatsWindow extends PopupWindow {
             tm.utils.getVerboseTime(params.player.timePlayed),
             stats.records.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
             stats.votes.list.find(a => a.login === params.player.login)?.count.toString() ?? `0`,
-            stats.sums.list.find(a => a.login === params.player.login)?.sums.toString() ?? `None`,
+            stats.sums.list.find(a => a.login === params.player.login)?.sums
+              .map((a, i)=> `$${config.sumsColours[i]}${a}$FFF`).join(' / ') ?? `None`,
             params.player.visits.toString(),
             stats.donations.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
             params.player.wins.toString(),
@@ -83,8 +85,7 @@ export default class PlayerStatsWindow extends PopupWindow {
             }
         }
         const infoCell: GridCellFunction = (i, j, w, h): string => {
-            const arr: string[] = data
-            return centeredText(arr[i - 1], w, h)
+            return centeredText(data[i - 1], w, h)
         }
         const rows: number = config.cells.length
         const arr: (GridCellObject | GridCellFunction)[] = header
@@ -94,7 +95,7 @@ export default class PlayerStatsWindow extends PopupWindow {
         return this.grid.constructXml(arr)
     }
 
-    protected constructFooter(): string | Promise<string> {
+    protected constructFooter(): string {
         return closeButton(this.closeId, this.windowWidth, this.footerHeight)
     }
 }

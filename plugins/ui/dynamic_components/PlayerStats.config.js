@@ -15,6 +15,7 @@ export default {
         margin: 0.15,
         headerBackground: '333C'
     },
+    sumsColours: ['FD0','CCC', 'C73', 'FFF'],
     nameColumnBackground: '5559',
     columnProportions: [
         2,
