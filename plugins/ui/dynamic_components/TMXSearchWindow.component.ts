@@ -86,9 +86,10 @@ export default class TMXSearchWindow extends PopupWindow<{
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       if (obj === undefined) { continue }
+      const page = obj.paginator.getPageByLogin(login)
       this.displayToPlayer(login, {
-        page: 1, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
-      }, `1/${obj.paginator.pageCount}`)
+        page, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
+      }, `${page}/${obj.paginator.pageCount}`)
     }
   }
 
