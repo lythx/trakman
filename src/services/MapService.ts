@@ -312,10 +312,12 @@ export class MapService {
     let res: any | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
     let i = 1
     while (res instanceof Error) {
+      if (i > 1) {
+        Logger.error(`Server call to queue map ${map.name} failed. Try ${i - 1}.`, res.message)
+      }
       if (i === 4) {
         await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
       }
-      Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
       i++
       const list = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
       if (list instanceof Error) { continue }
