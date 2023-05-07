@@ -51,7 +51,7 @@ export default class PlayerStatsWindow extends PopupWindow {
     }
 
     protected constructContent(login: string, params?: { player: tm.OfflinePlayer }): string {
-        if(params === undefined) { return '' }
+        if (params === undefined) { return '' }
         const data: string[] = [
             params.player.login,
             tm.utils.strip(params.player.nickname, false),
@@ -62,8 +62,9 @@ export default class PlayerStatsWindow extends PopupWindow {
             tm.utils.getVerboseTime(params.player.timePlayed),
             stats.records.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
             stats.votes.list.find(a => a.login === params.player.login)?.count.toString() ?? `0`,
-            stats.sums.list.find(a => a.login === params.player.login)?.sums
-              .map((a, i)=> `$${config.sumsColours[i]}${a}$FFF`).join(' / ') ?? `None`,
+            stats.sums.list.find(a => a.login === params.player.login)?.sums.slice(0, 4)
+                // TODO: Find out how does the index go out of bounds here
+                .map((a, i) => `$${config.sumsColours[i]}${a}$FFF`).join(' / ') ?? `None`,
             params.player.visits.toString(),
             stats.donations.list.find(a => a.login === params.player.login)?.amount.toString() ?? `0`,
             params.player.wins.toString(),
