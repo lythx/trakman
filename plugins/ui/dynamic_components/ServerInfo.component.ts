@@ -124,7 +124,7 @@ export default class ServerInfoWindow extends PopupWindow {
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(): string | Promise<string> {
+  protected constructFooter(): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 }
