@@ -98,7 +98,8 @@ export default {
         format: '$s',
         padding: 1,
         textSize: 1,
-        textLength: 450,
+        textLength: 550,
+        lineLength: 40,
         textBackground: '666C',
         defaultText: 'The author has not provided a description for this map.'
     },
