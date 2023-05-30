@@ -5,6 +5,7 @@
 
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
 import { Paginator } from "../UI.js"
+import { VoteWindow } from "../UI.js"
 import config from './TMXSearchWindow.config.js'
 
 export default class TMXSearchWindow extends PopupWindow<{
@@ -197,7 +198,23 @@ export default class TMXSearchWindow extends PopupWindow<{
   }
 
   private async handleMapClick(mapId: string, login: string, nickname: string, privilege: number, title: string): Promise<boolean> {
-    if (privilege < config.addPrivilege) { return false }
+    if (privilege < config.addPrivilege && !tm.config.controller.allowPublicAdd) { return false }
+    if (tm.config.controller.voteOnPublicAdd && privilege < config.addPrivilege) {
+      // todo remove magic etc
+      const voteWindow: VoteWindow = new VoteWindow(
+        login,
+        0.51,
+        `Vote to ADD ${mapId}`, // todo get map name (pass in this function )
+        `testmesage`,
+        30,
+        '')
+      const result = await voteWindow.startAndGetResult(tm.players.list)
+      if (result === undefined) { return false }
+      if (result === false) {
+        tm.sendMessage(`RIP guys`)
+        return false
+      }
+    }
     this.requestedMaps.push(mapId)
     this.reRender()
     const map = await tm.tmx.fetchMapFile(mapId)
@@ -242,7 +259,7 @@ export default class TMXSearchWindow extends PopupWindow<{
     const height = h - this.margin
     const isInMapList = (tm.maps.get(mapId) !== undefined) || this.requestedMaps.includes(mapId)
     let overlay: string | undefined
-    if (isInMapList || privilege < config.addPrivilege) {
+    if (isInMapList || (privilege < config.addPrivilege && !tm.config.controller.allowPublicAdd)) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
       <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }

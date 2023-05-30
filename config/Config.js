@@ -1,7 +1,7 @@
 export default {
   /** 
    * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
-   * Enabling it makes the chat a bit slower.
+   * Enabling it makes the chat a bit slower, as all input has to go through the controller first.
    */
   manualChatRoutingEnabled: true,
   /** Local records limit for rank calculation and plugins */
@@ -14,6 +14,10 @@ export default {
   jukeboxHistorySize: 30,
   /** Whether to keep the jukeboxed maps in the queue after the requester leaves */
   keepQueueAfterLeave: true,
+  /** Whether to enable the /add functionality for all players */
+  allowPublicAdd: true,
+  /** Whether to start a vote to add maps with /add */
+  voteOnPublicAdd: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
   /** Privilege levels for each of the administrative actions */
