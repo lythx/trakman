@@ -100,13 +100,15 @@ export class MapService {
     // Get current map id from dedicated server
     const res: any | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
-      Logger.error('Unable to retrieve current map info.', res.message)
+      await Logger.fatal('Unable to retrieve current map info.', res.message)
       return
     }
     const mapInfo: Partial<{ -readonly [K in keyof tm.CurrentMap]: tm.CurrentMap[K] }> | undefined =
       this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
+      await this.add(res.FileName, undefined, true)
+      await this.setCurrent()
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
