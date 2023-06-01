@@ -96,7 +96,7 @@ export class MapService {
   /**
    * Sets the current map
    */
-  static async setCurrent(): Promise<void> {
+  static async setCurrent(_try = 1): Promise<void> {
     // Get current map id from dedicated server
     const res: any | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
@@ -108,7 +108,11 @@ export class MapService {
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
       await this.add(res.FileName, undefined, true)
-      await this.setCurrent()
+      if (_try > 3) {
+        await Logger.fatal('Failed to get map info from memory')
+        return
+      }
+      await this.setCurrent(_try++)
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
