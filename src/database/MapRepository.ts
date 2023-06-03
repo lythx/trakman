@@ -55,7 +55,7 @@ export class MapRepository extends Repository {
     if (arr.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
       bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)}`
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)} ON CONFLICT DO NOTHING`
     const values: any[] = []
     for (const [i, map] of arr.entries()) {
       values.push(ids[i].id, map.name,

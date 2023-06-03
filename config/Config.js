@@ -15,7 +15,7 @@ export default {
   /** Whether to keep the jukeboxed maps in the queue after the requester leaves */
   keepQueueAfterLeave: true,
   /** Whether to enable the /add functionality for all players */
-  allowPublicAdd: true,
+  allowPublicAdd: false,
   /** Whether to start a vote to add maps with /add */
   voteOnPublicAdd: true,
   /** Default amount of maps fetched from the TMX search API */
