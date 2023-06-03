@@ -311,7 +311,7 @@ export const actions = {
       login,
       config.publicAdd.voteGoal,
       tm.utils.strVar(config.publicAdd.voteText, { mapName }), // todo get map name (pass in this function )
-      tm.utils.strVar(config.publicAdd.voteStart, { nickname, mapName }),
+      tm.utils.strVar(config.publicAdd.voteStart, { nickname: tm.utils.strip(nickname, true), mapName }),
       config.publicAdd.voteTime,
       config.publicAdd.voteIcon
     )
@@ -330,14 +330,14 @@ export const actions = {
       if (result.caller === undefined) {
         tm.sendMessage(tm.utils.strVar(config.publicAdd.success, { mapName }))
       } else {
-        tm.sendMessage(tm.utils.strVar(config.publicAdd.forcePass, { title, nickname, mapName }))
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.forcePass, { title, nickname: tm.utils.strip(result.caller.nickname, true), mapName }))
       }
       return true
     } else {
       if (result.caller === undefined) {
         tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelled, { mapName }))
       } else {
-        tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelledBy, { title, nickname, mapName }))
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelledBy, { title, nickname: tm.utils.strip(result.caller.nickname, true), mapName }))
       }
       return false
     }
