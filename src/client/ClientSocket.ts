@@ -70,7 +70,8 @@ export class ClientSocket extends net.Socket {
           resolve(response.json(method))
           return
         }
-        if (Date.now() - startTimestamp > 30000) {
+        // TODO: See what's the minimum value for normal usage
+        if (Date.now() - startTimestamp > 5000) {
           resolve(new Error(`No server response for call ${method}`))
           return
         }
