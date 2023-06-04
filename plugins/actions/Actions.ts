@@ -310,7 +310,7 @@ export const actions = {
     const voteWindow: VoteWindow = new VoteWindow(
       login,
       config.publicAdd.voteGoal,
-      tm.utils.strVar(config.publicAdd.voteText, { mapName }), // todo get map name (pass in this function )
+      tm.utils.strVar(config.publicAdd.voteText, { mapName }),
       tm.utils.strVar(config.publicAdd.voteStart, { nickname: tm.utils.strip(nickname, true), mapName }),
       config.publicAdd.voteTime,
       config.publicAdd.voteIcon

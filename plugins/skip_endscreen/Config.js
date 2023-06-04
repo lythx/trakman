@@ -1,5 +1,5 @@
 export default {
-    isEnabled: true,
-    // For how long to wait before forcing everybody into specmode
+    isEnabled: false,
+    // For how long to wait before forcing everybody into specmode (in seconds)
     waitTime: 5
 }
