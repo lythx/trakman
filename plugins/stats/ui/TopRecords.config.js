@@ -1,7 +1,7 @@
 import { icons, componentIds as ids } from '../../ui/UI.js'
 export default {
   title: "Top Records",
-  icon: icons.cash,
+  icon: icons.stats,
   gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
   headers: ['Lp.', 'Nickname', 'Login', 'Records', 'Lp.', 'Nickname', 'Login', 'Records'],
   entries: 30, // Has to be even number

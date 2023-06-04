@@ -91,7 +91,7 @@ export default {
     timeout: 30,
     time: 30,
     minimumRemainingTime: 30000, // msec
-    goal: 0.5,
+    goal: 0.51,
     width: 1.8,
     height: 1.8,
     padding: 0.2,

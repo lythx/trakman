@@ -2,7 +2,7 @@ import { icons, componentIds as ids } from '../../ui/UI.js'
 
 export default {
   title: "Top Playtimes",
-  icon: icons.cash,
+  icon: icons.clockList,
   gridColumns: [0.8, 4, 3, 3, 0.8, 4, 3, 3],
   headers: ['Lp.', 'Nickname', 'Login', 'Hours Played', 'Lp.', 'Nickname', 'Login', 'Hours Played'],
   entries: 30, // Has to be even number

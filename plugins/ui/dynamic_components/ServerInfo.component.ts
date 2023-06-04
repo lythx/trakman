@@ -34,7 +34,7 @@ export default class ServerInfoWindow extends PopupWindow {
     const dedicatedVersion: string = tm.config.server.version
     const dedicatedBuild: string = tm.config.server.build
     // Configurable (or not) server variables
-    const serverName: string = tm.config.server.name
+    const serverName: string = tm.utils.strip(tm.config.server.name, false)
     const serverLogin: string = tm.config.server.login
     const serverZone: string = (tm.config.server.zone).split(`|`, 2).join(`|`)
     const serverRights: string = tm.config.server.isUnited ? `United` : `Nations`
@@ -84,7 +84,7 @@ export default class ServerInfoWindow extends PopupWindow {
   }
 
   private reRender(): void {
-    const logins = this.getPlayersWithWindowOpen()
+    const logins: string[] = this.getPlayersWithWindowOpen()
     for (const login of logins) {
       this.displayToPlayer(login)
     }
@@ -97,12 +97,12 @@ export default class ServerInfoWindow extends PopupWindow {
       {
         background: config.grid.headerBackground,
         colspan: 2,
-        callback: (i, j, w, h): string => centeredText(` Server Information `, w, h),
+        callback: (i, j, w, h): string => centeredText(config.serverCellHeader, w, h),
       },
       {
         background: config.grid.headerBackground,
         colspan: 2,
-        callback: (i, j, w, h): string => centeredText(` Host Information `, w, h),
+        callback: (i, j, w, h): string => centeredText(config.hostCellHeader, w, h),
       },
     ]
     const nameCell: GridCellObject = {
@@ -124,7 +124,7 @@ export default class ServerInfoWindow extends PopupWindow {
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(): string | Promise<string> {
+  protected constructFooter(): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
 }

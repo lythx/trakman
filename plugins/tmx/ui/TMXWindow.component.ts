@@ -55,7 +55,7 @@ class TMXWindow extends PopupWindow<number> {
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected async constructContent(login: string, page: number): Promise<string> {
+  protected constructContent(login: string, page: number): string {
     const historyCount = Math.min(config.historyCount, tm.jukebox.historyCount)
     let maps: (tm.Map | undefined)[]
     let TMXMaps: (tm.TMXMap | null | undefined)[]

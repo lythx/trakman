@@ -123,7 +123,8 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number): void {
     if (!this.isDisplayed) { return }
-    if (this.isOnRestart || !tm.timer.isDynamic || (privilege ?? 0) < config.timerActionsPrivilege) {
+    privilege ??= tm.players.get(login)?.privilege ?? 0
+    if (this.isOnRestart || !tm.timer.isDynamic || privilege < config.timerActionsPrivilege) {
       tm.sendManialink(this.noButtonXml, login)
     } else {
       tm.sendManialink(this.xmlWithButtons, login)

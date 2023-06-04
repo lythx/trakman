@@ -4,7 +4,8 @@ export default {
   icon: icons.ongoingMap,
   title: 'Map Info',
   navbar: [
-    { name: 'Map List', actionId: ids.mapList }
+    { name: 'Map List', actionId: ids.mapList },
+    { name: 'Current Map Details', actionId: ids.TMXDetailsWindow }
   ],
   itemsPerPage: 3,
   queueCount: 4,

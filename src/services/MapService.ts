@@ -96,17 +96,23 @@ export class MapService {
   /**
    * Sets the current map
    */
-  static async setCurrent(): Promise<void> {
+  static async setCurrent(_try = 1): Promise<void> {
     // Get current map id from dedicated server
     const res: any | Error = await Client.call('GetCurrentChallengeInfo')
     if (res instanceof Error) {
-      Logger.error('Unable to retrieve current map info.', res.message)
+      await Logger.fatal('Unable to retrieve current map info.', res.message)
       return
     }
     const mapInfo: Partial<{ -readonly [K in keyof tm.CurrentMap]: tm.CurrentMap[K] }> | undefined =
       this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
       Logger.error('Failed to get map info from memory')
+      await this.add(res.FileName, undefined, true)
+      if (_try > 3) {
+        await Logger.fatal('Failed to get map info from memory')
+        return
+      }
+      await this.setCurrent(_try++)
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
@@ -312,10 +318,12 @@ export class MapService {
     let res: any | Error = await Client.call('ChooseNextChallenge', [{ string: map.fileName }])
     let i = 1
     while (res instanceof Error) {
+      if (i > 1) {
+        Logger.error(`Server call to queue map ${map.name} failed. Try ${i - 1}.`, res.message)
+      }
       if (i === 4) {
         await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
       }
-      Logger.error(`Server call to queue map ${map.name} failed. Try ${i}.`, res.message)
       i++
       const list = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
       if (list instanceof Error) { continue }

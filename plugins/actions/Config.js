@@ -1,4 +1,5 @@
 const p = tm.utils.palette
+import icons from '../ui/config/Icons.js'
 
 export default {
   noPermission: `${p.error}You have no permission to perform this action.`,
@@ -95,5 +96,18 @@ export default {
     notGuest: `${p.highlight}#{login} ${p.error}is not in the guestlist.`,
     public: true,
     privilege: 2,
+  },
+  publicAdd: {
+    voteGoal: 0.51,
+    voteText: `${p.highlight}Vote to $${p.green}ADD #{mapName}${p.highlight} from TMX.`,
+    voteStart: `${p.highlight}#{nickname} ${p.vote}started a vote to ${p.highlight}add #{mapName}${p.vote} from TMX.`,
+    voteTime: 30,
+    voteIcon: icons.tagGreen,
+    alreadyRunning: `${p.error}A vote is already running.`,
+    didntPass: `${p.vote}Vote to add ${p.highlight}#{mapName} ${p.vote}from TMX ${p.highlight}did not pass${p.vote}.`,
+    success: `${p.vote}Vote to add ${p.highlight}#{mapName} ${p.vote}from TMX ${p.highlight}has passed${p.vote}.`,
+    forcePass: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has passed the vote to add ${p.highlight}#{mapName} ${p.vote}from TMX.`,
+    cancelled: `${p.vote} Vote to add ${p.highlight}#{mapName} ${p.vote}from TMX the was cancelled.`,
+    cancelledBy: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has cancelled the vote to add ${p.highlight}#{mapName} ${p.vote}from TMX.`
   }
 }

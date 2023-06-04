@@ -2,7 +2,7 @@ import { icons, componentIds as ids } from '../../ui/UI.js'
 
 export default {
   title: "Top Sums",
-  icon: icons.cash,
+  icon: icons.stats,
   gridColumns: [0.8, 4, 3, 1, 1, 1, 1.3, 0.8, 4, 3, 1, 1, 1, 1.3],
   headers: ['Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other',
     'Lp.', 'Nickname', 'Login', '1st', '2nd', '3rd', 'Other',],

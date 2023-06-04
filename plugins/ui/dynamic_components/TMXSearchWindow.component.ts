@@ -5,6 +5,7 @@
 
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow } from '../UI.js'
 import { Paginator } from "../UI.js"
+import { actions } from '../../actions/Actions.js'
 import config from './TMXSearchWindow.config.js'
 
 export default class TMXSearchWindow extends PopupWindow<{
@@ -17,6 +18,7 @@ export default class TMXSearchWindow extends PopupWindow<{
   private readonly mapAddId = 1000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
+  private readonly mapNames: string[] = []
   private readonly playerQueries: {
     paginator: Paginator,
     list: tm.TMXSearchResult[],
@@ -33,12 +35,13 @@ export default class TMXSearchWindow extends PopupWindow<{
       new Array(config.rows).fill(1), config.grid)
     addManialinkListener(this.openId + this.mapAddId, 5000, async (info, mapIndex) => {
       const mapId = this.mapActionIds[mapIndex]
+      const mapName = this.mapNames[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
         tm.log.error('Error while adding map to queue TMX search window', `Map index out of range`)
         return
       }
-      const gotQueued: boolean = await this.handleMapClick(mapId, info.login, info.nickname, info.privilege, info.title)
+      const gotQueued: boolean = await this.handleMapClick(mapId, mapName, info.login, info.nickname, info.privilege, info.title)
       if (!gotQueued) { return }
     })
     tm.commands.add({
@@ -86,9 +89,10 @@ export default class TMXSearchWindow extends PopupWindow<{
     for (const login of players) {
       const obj = this.playerQueries.find(a => a.login === login)
       if (obj === undefined) { continue }
+      const page = obj.paginator.getPageByLogin(login)
       this.displayToPlayer(login, {
-        page: 1, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
-      }, `1/${obj.paginator.pageCount}`)
+        page, paginator: obj.paginator, list: obj.list, privilege: obj.privilege
+      }, `${page}/${obj.paginator.pageCount}`)
     }
   }
 
@@ -129,7 +133,7 @@ export default class TMXSearchWindow extends PopupWindow<{
       if (this.isMultiByte(author)) {
         author = ''
       }
-      const actionId = this.getActionId(maps[index].id)
+      const actionId = this.getActionId(maps[index].id, name)
       const header = this.getHeader(index, maps[index].id, actionId, w, h, tm.utils.fixProtocol(maps[index].pageUrl), params?.privilege ?? 0)
       const rowH = (h - this.margin) / 4
       const width = (w - this.margin * 3) - config.iconWidth
@@ -195,8 +199,12 @@ export default class TMXSearchWindow extends PopupWindow<{
       (params.paginator).constructXml(login))
   }
 
-  private async handleMapClick(mapId: string, login: string, nickname: string, privilege: number, title: string): Promise<boolean> {
-    if (privilege < config.addPrivilege) { return false }
+  private async handleMapClick(mapId: string, mapName: string, login: string, nickname: string, privilege: number, title: string): Promise<boolean> {
+    if (privilege < config.addPrivilege && !tm.config.controller.allowPublicAdd) { return false }
+    if (tm.config.controller.voteOnPublicAdd && privilege < config.addPrivilege) {
+      const result: boolean = await actions.publicAdd(login, nickname, title, mapName)
+      if (!result) { return false }
+    }
     this.requestedMaps.push(mapId)
     this.reRender()
     const map = await tm.tmx.fetchMapFile(mapId)
@@ -227,11 +235,12 @@ export default class TMXSearchWindow extends PopupWindow<{
     return true
   }
 
-  private getActionId(mapId: string): number {
+  private getActionId(mapId: string, mapName: string): number {
     const mapActionId = this.mapActionIds.indexOf(mapId)
     if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId }
     else {
       this.mapActionIds.push(mapId)
+      this.mapNames.push(mapName)
       return this.mapActionIds.length + this.openId + this.mapAddId - 1
     }
   }
@@ -241,7 +250,7 @@ export default class TMXSearchWindow extends PopupWindow<{
     const height = h - this.margin
     const isInMapList = (tm.maps.get(mapId) !== undefined) || this.requestedMaps.includes(mapId)
     let overlay: string | undefined
-    if (isInMapList || privilege < config.addPrivilege) {
+    if (isInMapList || (privilege < config.addPrivilege && !tm.config.controller.allowPublicAdd)) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
       <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }

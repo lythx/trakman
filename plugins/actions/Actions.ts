@@ -1,4 +1,5 @@
 import config from './Config.js'
+import { VoteWindow, flagIcons } from '../ui/UI.js'
 
 interface CallerInfo { login: string, nickname: string, title: string, privilege: number }
 
@@ -305,4 +306,40 @@ export const actions = {
     }
     tm.sendMessage(tm.utils.strVar(config.rmguest.text, { title: info.title, adminName: tm.utils.strip(info.nickname), name: tm.utils.strip(targetInfo?.nickname ?? login) }), config.rmguest.public ? undefined : info.login)
   },
+  publicAdd: async (login: string, nickname: string, title: string, mapName: string): Promise<boolean> => {
+    const voteWindow: VoteWindow = new VoteWindow(
+      login,
+      config.publicAdd.voteGoal,
+      tm.utils.strVar(config.publicAdd.voteText, { mapName }),
+      tm.utils.strVar(config.publicAdd.voteStart, { nickname: tm.utils.strip(nickname, true), mapName }),
+      config.publicAdd.voteTime,
+      config.publicAdd.voteIcon
+    )
+    const result = await voteWindow.startAndGetResult(tm.players.list)
+    if (result === undefined) {
+      tm.sendMessage(config.publicAdd.alreadyRunning)
+      return false
+    }
+    if (result === false) {
+      tm.sendMessage(tm.utils.strVar(config.publicAdd.didntPass, { mapName }))
+      return false
+    } else if (result === true) {
+      tm.sendMessage(tm.utils.strVar(config.publicAdd.success, { mapName }))
+      return true
+    } else if (result.result === true) {
+      if (result.caller === undefined) {
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.success, { mapName }))
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.forcePass, { title, nickname: tm.utils.strip(result.caller.nickname, true), mapName }))
+      }
+      return true
+    } else {
+      if (result.caller === undefined) {
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelled, { mapName }))
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelledBy, { title, nickname: tm.utils.strip(result.caller.nickname, true), mapName }))
+      }
+      return false
+    }
+  }
 }

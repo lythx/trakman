@@ -1,5 +1,6 @@
 import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
+import { actions } from '../../actions/Actions.js'
 
 let eraseObject: { id: string, admin: tm.Player } | undefined
 tm.addListener('BeginMap', (info): void => {
@@ -167,6 +168,55 @@ const commands: tm.Command[] = [
       }
     },
     privilege: config.addallfromdb.privilege
+  },
+  {
+    aliases: config.publicadd.aliases,
+    help: config.publicadd.help,
+    params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
+    callback: async (info: tm.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
+      if (!tm.config.controller.allowPublicAdd) {
+        tm.sendMessage(config.publicadd.notAvailable, info.login)
+        return
+      }
+      const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+      const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
+      let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
+      if (file instanceof Error) {
+        const remainingSites: tm.TMXSite[] = tmxSites.filter(a => a !== tmxSite)
+        for (const e of remainingSites) {
+          file = await tm.tmx.fetchMapFile(id, e).catch((err: Error) => err)
+          if (!(file instanceof Error)) { break }
+        }
+      }
+      if (file instanceof Error) {
+        tm.sendMessage(config.publicadd.fetchError, info.login)
+        return
+      }
+      if (tm.config.controller.voteOnPublicAdd) {
+        const voteResult: boolean = await actions.publicAdd(info.login, info.nickname, info.title, file.name.slice(0, -14))
+        if (!voteResult) {
+          return
+        }
+      }
+      const obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
+      if (obj instanceof Error) {
+        tm.log.warn(obj.message)
+        tm.sendMessage(config.publicadd.addError, info.login)
+        return
+      } else if (obj.wasAlreadyAdded) {
+        tm.sendMessage(tm.utils.strVar(config.publicadd.alreadyAdded, {
+          map: tm.utils.strip(obj.map.name, true),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.publicadd.public ? undefined : info.login)
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.publicadd.added, {
+          title: info.title,
+          map: tm.utils.strip(obj.map.name, true),
+          nickname: tm.utils.strip(info.nickname, true)
+        }), config.publicadd.public ? undefined : info.login)
+      }
+    },
+    privilege: config.publicadd.privilege
   }
 ]
 

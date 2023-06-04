@@ -2,7 +2,7 @@
 <h1>TRAKMAN</h1>
 
 [![License](https://img.shields.io/github/license/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/blob/main/LICENSE/)
-[![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/commits/main/)
+[![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman/dev?style=flat-square)](https://github.com/lythx/trakman/commits/dev/)
 [![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues/)
 [![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers/)
 

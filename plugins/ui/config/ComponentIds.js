@@ -75,5 +75,7 @@ export default {
   warnWindow: 430000,
   songList: 440000,
   musicWidget: 450000,
-  bannerWidget: 460000
+  bannerWidget: 460000,
+  playerStats: 470000,
+  TMXDetailsWindow: 480000,
 }

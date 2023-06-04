@@ -19,6 +19,7 @@ export default {
     2,
     2
   ],
+  serverCellHeader: ` Server Information `,
   serverCells: [
     ` Dedicated Server Uptime `,
     ` Dedicated Server Version `,
@@ -33,6 +34,7 @@ export default {
     ` Server Map Count `,
     ` Server Visitor Count`,
   ],
+  hostCellHeader: ` Host Information `,
   hostCells: [
     ` System Uptime `,
     ` System Architecture `,
@@ -48,7 +50,7 @@ export default {
     ` PostgreSQL DB Size `
   ],
   command: {
-    aliases: ['server', 'serverinfo', 'sinfo'],
+    aliases: ['server', 'serverinfo', 'sinfo', 'si'],
     help: `Display the detailed server information.`,
     privilege: 0
   }
