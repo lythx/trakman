@@ -10,6 +10,7 @@ export abstract class Client {
   private static readonly proxies: { methods: readonly string[], callback: ((method: string, params: tm.CallParams[], response: any) => void) }[] = []
   private static host: string
   private static port: number
+  private static lastCallTimestamp = Date.now()
 
   static async connect(host = 'localhost', port = 5000): Promise<void> {
     if (port < 0 || port >= 65536 || isNaN(port)) {
@@ -59,6 +60,10 @@ export abstract class Client {
    */
   static async call<T extends string>(method: T, params: T extends 'system.multicall' ? tm.Call[] : tm.CallParams[] = []):
     Promise<T extends 'system.multicall' ? ({ method: string, params: any } | Error)[] | Error : any | Error> {
+    if (Date.now() - this.lastCallTimestamp < 1) {
+      this.lastCallTimestamp = Date.now()
+      await new Promise((r): NodeJS.Immediate => setImmediate(r))
+    }
     let callParams: tm.CallParams[] = params
     if (method === 'system.multicall') {
       const calls: tm.Call[] = params as any
@@ -101,6 +106,11 @@ export abstract class Client {
    * @param params Optional params for the dedicated server method
    */
   static callNoRes<T extends string>(method: T, params: T extends 'system.multicall' ? tm.Call[] : tm.CallParams[] = []): void {
+    if (Date.now() - this.lastCallTimestamp < 1) {
+      setTimeout((): void => this.callNoRes(method, params), 1)
+      return
+    }
+    this.lastCallTimestamp = Date.now()
     let callParams: tm.CallParams[] = params
     if (method === 'system.multicall') {
       const calls: tm.Call[] = params as any
