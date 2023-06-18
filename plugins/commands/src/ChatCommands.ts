@@ -194,9 +194,10 @@ const commands: tm.Command[] = [
     help: config.laston.help,
     params: [{ name: 'login' }],
     callback: async (info: tm.MessageInfo, login: string): Promise<void> => {
+      login = login.toLowerCase()
       const res = await tm.db.query(`SELECT last_online, nickname FROM players WHERE login=$1`, login) as any[]
       if (res[0] === undefined) {
-        tm.sendMessage(tm.utils.strVar(config.laston.error, { name: login }))
+        tm.sendMessage(tm.utils.strVar(config.laston.error, { name: login }), info.login)
         return
       }
       const lastOnline: number = res[0].last_online
