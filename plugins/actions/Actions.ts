@@ -18,6 +18,7 @@ export const actions = {
    * @param voteValue Vote value
    */
   addVote: (info: { login: string, nickname: string }, voteValue: -3 | -2 | -1 | 1 | 2 | 3) => {
+    if (voteValue === undefined || voteValue === tm.karma.current.find(a => a.login === info.login)?.vote) { return }
     tm.karma.add(info, voteValue)
     tm.sendMessage(tm.utils.strVar(config.addVote.message, {
       nickname: tm.utils.strip(info.nickname),
