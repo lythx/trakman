@@ -81,6 +81,15 @@ tm.addListener('MapRemoved', (map): void => {
   for (const e of updateListeners) { e('remove', map) }
 })
 
+tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {
+  if (tm.records.getLocal(info.login)?.time === info.time) {
+    return
+  }
+  let list: tm.Map[] | undefined = cache.find(a => a.query === info.login && a.type === 'best')?.list
+  list = undefined
+  // this will not update the manialink tho
+})
+
 /**
  * Provides utilities for filtering and sorting maplist.
  * @author lythx
