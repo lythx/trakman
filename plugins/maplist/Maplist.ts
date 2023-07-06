@@ -10,7 +10,7 @@ const worstAtSort: tm.Map[] = []
 const newestSort: tm.Map[] = []
 const oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
-const cache: {
+let cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
   query: string, list: tm.Map[]
 }[] = []
@@ -82,12 +82,16 @@ tm.addListener('MapRemoved', (map): void => {
 })
 
 tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {
-  if (tm.records.getLocal(info.login)?.time === info.time) {
+  const time: number | undefined = tm.records.getLocal(info.login)?.time
+  if (time !== undefined && info.time >= time) {
     return
   }
-  let list: tm.Map[] | undefined = cache.find(a => a.query === info.login && a.type === 'best')?.list
-  list = undefined
-  // this will not update the manialink tho
+  cache = cache.filter(a => a.type !== 'best' && a.type !== 'worst')
+})
+
+tm.addListener('BeginMap', (): void => {
+  // DESTRUCTION 200000000
+  cache.length = 0
 })
 
 /**
