@@ -93,6 +93,9 @@ export class MapService {
     void this.repo.add(...mapsNotInDBObjects)
   }
 
+  /**
+   * Updates map list based on the current Match Settings
+   */
   static async updateList(): Promise<void> {
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
     if (mapList instanceof Error) {
