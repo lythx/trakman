@@ -132,7 +132,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       }
       this.paginators.push(paginator)
     }
-    this.table = new Grid(this.contentWidth, this.contentHeight, [1, 2, 2], new Array(config.entries).fill(1), config.grid)
+    this.table = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries).fill(1), config.grid)
   }
 
   openWithQuery(login: string, privilege: number, query: string) {
@@ -188,10 +188,17 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   protected constructContent(login: string, params: DisplayParams): string {
     const n = ((params.page - 1) * config.entries) - 1
     const headers: GridCellFunction[] = [
+      (i, j, w, h) => centeredText(' P ', w, h),
       (i, j, w, h) => centeredText(' Aliases ', w, h),
       (i, j, w, h) => centeredText(' Arguments ', w, h),
       (i, j, w, h) => centeredText(' Comment ', w, h), // Space to prevent translation
     ]
+    const privCell: GridCellFunction = (i, j, w, h) => {
+      const command: tm.Command = params.commands[i + n]
+      if (command === undefined) { return '' }
+      const text: string = config.slashesForPrivilege ? (command.privilege > 0 ? '//' : '/') : command.privilege.toString()
+      return centeredText(tm.utils.safeString(tm.utils.strip(text, true)), w, h)
+    }
     const nameCell: GridCellFunction = (i, j, w, h) => {
       const command: tm.Command = params.commands[i + n]
       if (command === undefined) { return '' }
@@ -212,7 +219,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     const arr: GridCellFunction[] = []
     arr.push(...headers)
     for (let i: number = 0; i < config.entries, params.commands[i + n + 1] !== undefined; i++) {
-      arr.push(nameCell, paramsCell, commentCell)
+      arr.push(privCell, nameCell, paramsCell, commentCell)
     }
     return this.table.constructXml(arr)
   }
