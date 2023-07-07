@@ -3,8 +3,8 @@ import { VoteWindow, flagIcons } from '../ui/UI.js'
 
 interface CallerInfo { login: string, nickname: string, title: string, privilege: number }
 
-const sendNoPrivilegeMessage = (): void =>
-  tm.sendMessage(config.noPermission)
+const sendNoPrivilegeMessage = (info: CallerInfo): void =>
+  tm.sendMessage(config.noPermission, info.login)
 
 /**
  * Provides utilities for various actions.
@@ -33,7 +33,7 @@ export const actions = {
    */
   kick: (info: CallerInfo, login: string, reason?: string): void => {
     if (info.privilege < config.kick.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -54,7 +54,7 @@ export const actions = {
    */
   mute: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.mute.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
@@ -75,7 +75,7 @@ export const actions = {
    */
   unmute: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unmute.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
@@ -99,7 +99,7 @@ export const actions = {
    */
   forceSpectator: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.forcespec.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -135,7 +135,7 @@ export const actions = {
    */
   forcePlay: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.forceplay.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -172,7 +172,7 @@ export const actions = {
    */
   ban: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.ban.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.Player | undefined = tm.players.get(login)
@@ -193,7 +193,7 @@ export const actions = {
    */
   unban: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unban.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
@@ -219,7 +219,7 @@ export const actions = {
    */
   blacklist: async (info: CallerInfo, login: string, duration?: number, reason?: string): Promise<void> => {
     if (info.privilege < config.blacklist.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
@@ -242,7 +242,7 @@ export const actions = {
    */
   unblacklist: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.unblacklist.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
@@ -266,7 +266,7 @@ export const actions = {
    */
   addGuest: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.addguest.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
@@ -290,7 +290,7 @@ export const actions = {
    */
   removeGuest: async (info: CallerInfo, login: string): Promise<void> => {
     if (info.privilege < config.rmguest.privilege) {
-      sendNoPrivilegeMessage()
+      sendNoPrivilegeMessage(info)
       return
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
