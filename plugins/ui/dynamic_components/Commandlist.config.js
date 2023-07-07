@@ -45,6 +45,13 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
+  slashesForPrivilege: true, // Whether to display slashes or privilege level in the window
+  columnProportions: [
+    0.2,
+    1,
+    2,
+    2
+  ],
   command: {
     aliases: ['h', 'help', 'helpall'],
     help: `Display the list of controller commands. Can be used with optional search query.`,

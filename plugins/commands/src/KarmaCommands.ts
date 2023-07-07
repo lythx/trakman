@@ -12,8 +12,6 @@ const options = {
 
 const processVote = (vote: '---' | '--' | '-' | '+' | '++' | '+++', info: tm.MessageInfo): void => {
   const voteValue = options[vote as keyof typeof options]
-  if (voteValue === undefined ||
-    voteValue === tm.karma.current.find(a => a.login === info.login)?.vote) { return }
   actions.addVote(info, voteValue)
 }
 

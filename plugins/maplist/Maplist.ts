@@ -10,7 +10,7 @@ const worstAtSort: tm.Map[] = []
 const newestSort: tm.Map[] = []
 const oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
-const cache: {
+let cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
   query: string, list: tm.Map[]
 }[] = []
@@ -79,6 +79,19 @@ tm.addListener('MapRemoved', (map): void => {
   oldestSort.splice(oldestSort.findIndex(a => a.id === map.id), 1)
   cache.length = 0
   for (const e of updateListeners) { e('remove', map) }
+})
+
+tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {
+  const time: number | undefined = tm.records.getLocal(info.login)?.time
+  if (time !== undefined && info.time >= time) {
+    return
+  }
+  cache = cache.filter(a => a.type !== 'best' && a.type !== 'worst')
+})
+
+tm.addListener('BeginMap', (): void => {
+  // DESTRUCTION 200000000
+  cache.length = 0
 })
 
 /**

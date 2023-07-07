@@ -311,9 +311,12 @@ export class Listeners {
     },
     {
       event: 'TrackMania.ChallengeListModified',
-      callback: (): void => {
+      callback: async ([currentIndex, nextIndex, isListModified]: [number, number, boolean]): Promise<void> => {
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         Client.callNoRes('SaveMatchSettings', [{ string: config.matchSettingsFile }])
+        if(config.updateMatchSettingsOnChange && isListModified) {
+          void MapService.updateList()
+        }
       }
     },
     {

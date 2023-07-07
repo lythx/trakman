@@ -42,7 +42,7 @@ export class PaySkip extends UiButton {
       || this.isSkip || tm.getState() === 'result') { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
-      tm.sendMessage(msg.paymentFail)
+      tm.sendMessage(msg.paymentFail, login)
     } else if (res === true) {
       let countDown: number = cfg.countdown
       const startTime: number = Date.now()

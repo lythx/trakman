@@ -94,6 +94,69 @@ export class MapService {
   }
 
   /**
+   * Updates map list based on the current Match Settings
+   */
+  static async updateList(): Promise<void> {
+    const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+    if (mapList instanceof Error) {
+      Logger.error('Error while getting the map list', mapList.message)
+      return
+    }
+    const addedMaps = []
+    for (let i = 0; i < mapList.length; i++) {
+      const map = mapList[i]
+      if (!this._maps.some(a => a.id === map.UId)) {
+        addedMaps.push(map)
+      }
+    }
+    const removedMaps = []
+    for (let i = 0; i < this._maps.length; i++) {
+      const map = this._maps[i]
+      if (map.id === this._current.id) {
+        continue
+      }
+      if (!mapList.some(a => a.UId === map.id)) {
+        removedMaps.push(map)
+        this._maps.splice(i, 1)
+        i--
+      }
+    }
+    if(addedMaps.length === 0 && removedMaps.length === 0) {
+      return
+    }
+    const addedMapObjects = []
+    for (const e of addedMaps) {
+      const dbEntry: tm.Map | undefined = await this.repo.getByFilename(e.FileName)
+      let obj: tm.Map
+      if (dbEntry !== undefined) { // If map is present in the database use the database info
+        obj = { ...dbEntry }
+      } else { // Otherwise fetch the info from server and save it in the database
+        const res: any | Error = await Client.call('GetChallengeInfo', [{ string: e.FileName }])
+        if (res instanceof Error) {
+          Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
+          continue
+        }
+        const voteRatios = await this.repo.getVoteCountAndRatio(res.UId)
+        const serverData = this.constructNewMapObject(res)
+        obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
+        void this.repo.add(obj)
+      }
+      this._maps.push(obj)
+      addedMapObjects.push(obj)
+    }
+    void this.repo.remove(...removedMaps.map(a => a.id))
+    for (const e of removedMaps) {
+      this.removeFromJukebox(e.id)
+    }
+    for (const e of addedMapObjects) {
+      Events.emit('MapAdded', e)
+    }
+    for (const e of removedMaps) {
+      Events.emit('MapRemoved', e)
+    }
+  }
+
+  /**
    * Sets the current map
    */
   static async setCurrent(_try = 1): Promise<void> {

@@ -29,6 +29,9 @@ export default {
     kick: 1,
     forceSpectator: 1
   },
+  /** Whether the maplist gets reloaded on Match Settings updates.
+   *  Enable this if you use external tools to modify the Match Settings */
+  updateMatchSettingsOnChange: false,
   /** Point system for rounds and cup gamemode */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
   /** Default time limit in TimeAttack mode (in miliseconds) */
@@ -56,7 +59,7 @@ export default {
    * Used in nickname to login translation in commands. 0.15 is default value */
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.3.3",
+  version: "1.3.4",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }
