@@ -147,7 +147,8 @@ export class MapRepository extends Repository {
     return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
-  async remove(...mapIds: string[]): Promise<void> {
+  async remove(...mapIds: string[]): Promise<void> { 
+    if(mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     if (ids.length !== mapIds.length) {
