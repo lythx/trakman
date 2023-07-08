@@ -83,10 +83,9 @@ tm.addListener('MapRemoved', (map): void => {
 
 tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {
   const time: number | undefined = tm.records.getLocal(info.login)?.time
-  if (time !== undefined && info.time >= time) {
-    return
+  if (time !== undefined && info.time === time) {
+    cache.length = 0
   }
-  cache = cache.filter(a => a.type !== 'best' && a.type !== 'worst')
 })
 
 tm.addListener('BeginMap', (): void => {
