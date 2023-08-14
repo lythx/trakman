@@ -40,6 +40,7 @@ export default {
     cantExtend: `${p.error}Can't vote for time extension when the dynamic timer is disabled.` +
       ` Use ${p.highlight}/${buttonCfg.voteReplay.command.aliases[0]}${p.error} to vote for replay instead.`,
     tooManyFailed: `${p.error}Too many votes failed.`,
+    tooManyReplays: `${p.error}Too many replays.`,
     tooManyExtensions: `${p.error}Too many time extensions.`,
     alreadyRunning: `${p.error}A vote is already running.`,
     didntPass: `${p.vote}Vote to #{action} the ongoing map ${p.highlight}did not pass${p.vote}.`,
