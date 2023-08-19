@@ -167,7 +167,7 @@ dedimania.onRecord((record) => {
     status: rs.status,
     position: tm.utils.getOrdinalSuffix(record.position),
     time: tm.utils.getTimeString(record.time),
-    difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
+    difference: rs.difference !== undefined ? tm.utils.strVar(c.dediDifference, {
       position: record.previous?.position,
       time: rs.difference
     }) : ''
