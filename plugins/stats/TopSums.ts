@@ -62,10 +62,7 @@ const initialize = async () => {
     prevMap = res[i].uid
     curMap = res[i + 1]?.uid
   }
-  topList.sort((a, b) => b.sums[3] - a.sums[3])
-  topList.sort((a, b) => b.sums[2] - a.sums[2])
-  topList.sort((a, b) => b.sums[1] - a.sums[1])
-  topList.sort((a, b) => b.sums[0] - a.sums[0])
+  sortToplist()
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(topList) }
   for (const e of nicknameChangeListeners) { e(topList) }
@@ -100,12 +97,12 @@ tm.addListener('PlayerDataUpdated', (info) => {
 tm.addListener('LocalRecord', (info) => {
   const prevRecordIndex = initialLocals.findIndex(a => a.login === info.login)
   let oldArrPos = prevRecordIndex === -1 ? undefined : prevRecordIndex
-  if (info.position > 3) {
-    oldArrPos = 4
+  if (oldArrPos !== undefined && oldArrPos > 2) {
+    oldArrPos = 3
   }
   let newArrPos = info.position - 1
-  if (info.position > 3) {
-    newArrPos = 4
+  if (info.position > 2) {
+    newArrPos = 3
   }
   if (oldArrPos === newArrPos) { return }
   const obj = topList.find(a => a.login === info.login)
@@ -126,10 +123,7 @@ tm.addListener('LocalRecord', (info) => {
       updated.push(obj)
     }
   }
-  topList.sort((a, b) => b.sums[3] - a.sums[3])
-  topList.sort((a, b) => b.sums[2] - a.sums[2])
-  topList.sort((a, b) => b.sums[1] - a.sums[1])
-  topList.sort((a, b) => b.sums[0] - a.sums[0])
+  sortToplist()
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(updated) }
 })
@@ -170,4 +164,18 @@ export const topSums = {
     nicknameChangeListeners.push(callback)
   }
 
+}
+
+function sortToplist() {
+  topList.sort((a, b) => {
+    if (a.sums[0] < b.sums[0]) return 1
+    if (a.sums[0] > b.sums[0]) return -1
+    if (a.sums[1] < b.sums[1]) return 1
+    if (a.sums[1] > b.sums[1]) return -1
+    if (a.sums[2] < b.sums[2]) return 1
+    if (a.sums[2] > b.sums[2]) return -1
+    if (a.sums[3] < b.sums[3]) return 1
+    if (a.sums[3] > b.sums[3]) return -1
+    return 0
+  })
 }
