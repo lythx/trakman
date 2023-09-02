@@ -86,7 +86,7 @@ export default class Masteradminlist extends PopupWindow<{ page: number, privile
 		const demoteButton: GridCellFunction = (i, j, w, h) => {
 			let actionStr = ` action="${this.openId + i + 2000 + index}"`
 			let cover = ''
-			if (params.privilege < 4) {
+			if (params.privilege < 4 || masteradminlist[i + index]?.privilege === params.privilege) {
 				actionStr = ''
 				cover = `<quad posn="0 0 4" sizen="${w} ${h}" bgcolor="${config.disabledColour}"/>`
 			}
