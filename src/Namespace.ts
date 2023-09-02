@@ -248,6 +248,15 @@ declare global {
       /** Nickname of the admin who added the guest */
       callerNickname: string
     }
+
+    /** Controller privilege object */
+    export interface PrivilegeEntry {
+      /** Privileges table login */
+      readonly login: string
+      /** Privileges table privilege */
+      readonly privilege: number
+    }
+
     /** Controller checkpoint object */
     export interface Checkpoint {
       /** Checkpoint index */

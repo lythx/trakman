@@ -65,6 +65,9 @@ import ServerInfoWindow from './dynamic_components/ServerInfo.component.js'
 import Warn from './dynamic_components/WarnWindow.component.js'
 import PlayerStatsWindow from './dynamic_components/PlayerStats.component.js'
 import TMXDetailsWindow from './dynamic_components/TMXDetailsWindow.component.js'
+import Operatorlist from './dynamic_components/admin_lists/Operatorlist.component.js'
+import Adminlist from './dynamic_components/admin_lists/Adminlist.component.js'
+import Masteradminlist from './dynamic_components/admin_lists/Masteradminlist.component.js'
 
 tm.addListener(`Startup`, (): void => {
   new RankWidget()
@@ -121,5 +124,7 @@ tm.addListener(`Startup`, (): void => {
   new BannerWidget()
   new PlayerStatsWindow()
   new TMXDetailsWindow()
+  new Operatorlist()
+  new Adminlist()
+  new Masteradminlist()
 }, true)
-
