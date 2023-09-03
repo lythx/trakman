@@ -28,17 +28,17 @@ export default class BestCps extends StaticComponent {
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
-    tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo): void => {
+    this.renderOnEvent('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
         this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickname }
         this.paginator.setPageCount(Math.ceil(this.bestCps.length / config.entries))
         this.newestCp = info.index
-        this.display()
+        return this.display()
       }
       const page: number = this.paginator.setPageForLogin(info.player.login, Math.ceil((info.index + 1) / config.entries))
-      this.displayToPlayer(info.player.login, { page })
+      return this.displayToPlayer(info.player.login, { page })
     })
-    tm.addListener('BeginMap', (): void => {
+    this.renderOnEvent('BeginMap', () => {
       this.newestCp = -1
       this.cpAmount = tm.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
@@ -46,17 +46,17 @@ export default class BestCps extends StaticComponent {
       this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
         new Array(config.entries).fill(1), { margin: config.margin })
       this.bestCps.length = 0
-      this.display()
+      return this.display()
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
       for (const e of this.bestCps) {
         const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }
       }
-      this.display()
+      return this.display()
     })
     this.paginator.onPageChange = (login: string): void => {
-      this.displayToPlayer(login)
+      tm.sendManialink(this.displayToPlayer(login)?.xml ?? '</>', login)
     }
   }
 
@@ -64,18 +64,21 @@ export default class BestCps extends StaticComponent {
     return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
-    if (!this.isDisplayed) { return }
+  display() {
+    if (!this.isDisplayed) { return  }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string, params?: { page?: number }): void {
+  displayToPlayer(login: string, params?: { page?: number }) {
     if (!this.isDisplayed) { return }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
-    tm.sendManialink(`
+    return {
+      xml: `
     <manialink id="${this.id}">
     <frame posn="${config.posX} ${config.posY} 1">
       <format textsize="1"/>
@@ -85,7 +88,8 @@ export default class BestCps extends StaticComponent {
       <format textsize="1"/>
       ${this.constructText(login, page)}
     </frame>
-    </manialink>`, login)
+    </manialink>`, login
+    }
   }
 
   private constructHeader(page: number, pageCount: number): string {

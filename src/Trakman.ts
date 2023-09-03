@@ -622,9 +622,9 @@ namespace trakman {
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  export const sendManialink = (manialink: string, login?: string | string[],
+  export const sendManialink = (manialink: string | undefined, login?: string | string[],
     deleteOnClick: boolean = false, expireTime: number = 0): void => {
-    if (tm.players.count === 0) { return }
+    if (tm.players.count === 0 || manialink === undefined) { return }
     if (login !== undefined) {
       Client.callNoRes('SendDisplayManialinkPageToLogin', [
         { string: typeof login === 'string' ? login : login.join(',') },

@@ -63,7 +63,7 @@ export default abstract class StaticComponent {
   static componentListCreated = false
   private static listeners: {
     event: keyof tm.Events,
-    callback: (params: any) => string | void | { xml: string, login?: string }
+    callback: (params: any) => string | void | { xml: string, login?: string } | ({ login: string, xml: string } | void)[]
   }[] = []
   private static listenersAdded = false
 
@@ -76,13 +76,13 @@ export default abstract class StaticComponent {
       StaticComponent.initialize()
     }
     this.id = id
-    this.renderOnEvent('EndMap', (info): string | void => {
+    this.renderOnEvent('EndMap', (info) => {
       if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
       this.updateIsDisplayed()
       this.updatePosition()
       return this._isDisplayed ? this.display() : this.hide()
     })
-    this.renderOnEvent('BeginMap', (): string | void => {
+    this.renderOnEvent('BeginMap', () => {
       this.updateIsDisplayed()
       this.updatePosition()
       return this._isDisplayed ? this.display() : this.hide()
@@ -102,15 +102,18 @@ export default abstract class StaticComponent {
     }
   }
 
-  private static addWildcardListener() {
+  private static addListeners() {
     this.listenersAdded = true
     tm.addListener('*', ({ event, params }) => {
       const manialinks = []
       for (let i = 0; i < StaticComponent.listeners.length; i++) {
         if (StaticComponent.listeners[i].event === event) {
-          const str = StaticComponent.listeners[i].callback(params)
-          if (str !== undefined) {
-            manialinks.push(str)
+          const ret = StaticComponent.listeners[i].callback(params)
+          if (Array.isArray(ret)) {
+            manialinks.push(...ret)
+
+          } else if (ret !== undefined) {
+            manialinks.push(ret)
           }
         }
       }
@@ -127,7 +130,7 @@ export default abstract class StaticComponent {
 
   private static initialize() {
     if (!this.listenersAdded) {
-      this.addWildcardListener()
+      this.addListeners()
     }
     StaticComponent.refreshStaticLayouts()
   }
@@ -265,7 +268,7 @@ export default abstract class StaticComponent {
    * Displays the manialink to all the players
    * @param params Optional params
    */
-  abstract display(params?: any): string | void
+  abstract display(params?: any): string | void | ({ login: string, xml: string } | void)[]
 
   /**
    * Displays the manialink to given player
@@ -290,19 +293,32 @@ export default abstract class StaticComponent {
   }
 
   protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => string |
-  { xml: string, login: string } | void) {
+  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[]) {
     StaticComponent.listeners.push({ event, callback })
   }
 
-  private static async sendMultipleManialinks(manialinks: (string | {
+  protected async sendMultipleManialinks(manialinks?: (string | void | {
     xml: string
     login?: string
   })[]) {
+    await StaticComponent.sendMultipleManialinks(manialinks)
+  }
+
+  private static async sendMultipleManialinks(manialinks?: (string | void | {
+    xml: string
+    login?: string
+  })[]) {
+    if (manialinks === undefined) { return }
+    if (Array.isArray(manialinks)) {
+      manialinks = manialinks.filter(a => a !== undefined)
+    }
     let xmls: { [login: string]: string } = {}
     for (let i = 0; i < manialinks.length; i++) {
-      const ml = manialinks[i]
-      const login = (ml as any).login ?? '*'
-      if ((xmls[login] + ml).length > 64000) {
+      const ml: string | void | { xml: string, login?: string } = manialinks[i]
+      const login: string = (ml as any).login ?? '*'
+      if (!(login in xmls)) {
+        xmls[login] = ''
+      } else if ((xmls[login] + ml).length > 64000) {
         if (login === '*') {
           tm.sendManialink('<manialinks>' + xmls[login] + '</manialinks>')
         } else {
@@ -311,7 +327,7 @@ export default abstract class StaticComponent {
         await new Promise(r => setImmediate(r))
         xmls[login] = ''
       }
-      xmls[login] += manialinks[i]
+      xmls[login] += (ml as any).xml ?? ml
     }
     const entries = Object.entries(xmls)
     for (let i = 0; i < entries.length; i++) {

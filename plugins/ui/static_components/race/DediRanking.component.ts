@@ -18,27 +18,30 @@ export default class DediRanking extends StaticComponent {
     super(componentIds.dedis)
     this.header = new StaticHeader('race')
     this.getRecordList()
-    dedimania.onFetch((): void => this.display())
-    dedimania.onRecord((): void => this.display())
-    dedimania.onNicknameUpdate((): void => this.display())
-    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (dedimania.getRecord(info.login) !== undefined) { this.display() }
+    dedimania.onFetch(() => this.sendMultipleManialinks(this.display()))
+    dedimania.onRecord(() => this.sendMultipleManialinks(this.display()))
+    dedimania.onNicknameUpdate(() => this.sendMultipleManialinks(this.display()))
+    this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
+      if (dedimania.getRecord(info.login) !== undefined) { return this.display() }
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (dedimania.getRecord(info.login) !== undefined) { this.display() }
+    this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
+      if (dedimania.getRecord(info.login) !== undefined) { return this.display() }
     })
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return {
+      xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.dediCps })}
@@ -48,7 +51,7 @@ export default class DediRanking extends StaticComponent {
       </frame>
     </manialink>`,
       login
-    )
+    }
   }
 
   getEntries(): number {
@@ -83,15 +86,18 @@ export default class DediRanking extends StaticComponent {
 
   protected onPositionChange(): void {
     this.getRecordList()
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
   private getRecordList(): void {
-      this.recordList?.destroy?.()
+    this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       this.getEntries(), this.side, this.getTopCount(), this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
+      const obj = this.displayToPlayer(info.login)
+      if(obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     })
   }
 

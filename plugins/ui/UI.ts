@@ -95,9 +95,17 @@ const events: tm.Listener[] = [
       for (const c of Object.values(staticComponents)) {
         c.updateIsDisplayed()
         c.updatePosition()
-        const str = c.display()
-        if (str !== undefined) {
-          tm.sendManialink(str)
+        const ret = c.display()
+        if (ret !== undefined) {
+          if(typeof ret === 'string') {
+            tm.sendManialink(ret)
+          } else {
+            for(const e of ret) {
+              if(e !== undefined) {
+                tm.sendManialink(e.xml, e.login)
+              }
+            }
+          }
         }
       }
       StaticComponent.refreshStaticLayouts()
