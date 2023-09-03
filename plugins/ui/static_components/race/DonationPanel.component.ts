@@ -35,7 +35,7 @@ export default class DonationPanel extends StaticComponent {
     }
   }
 
-  displayToPlayer(login: string): void | Promise<void> {
+  displayToPlayer(login: string): void {
     if (!this.isDisplayed) { return }
     if (tm.players.get(login)?.isUnited) {
       tm.sendManialink(this.xml, login)

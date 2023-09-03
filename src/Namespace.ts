@@ -747,6 +747,7 @@ declare global {
     }
     /** Object containing event names and types that get passed as parameters */
     export interface Events {
+      "*": { event: keyof Events, params: any }
       "Startup": 'result' | 'race'
       "ServerStateChanged": ServerState
       "PlayerChat": MessageInfo

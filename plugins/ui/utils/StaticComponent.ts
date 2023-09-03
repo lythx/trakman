@@ -61,6 +61,11 @@ export default abstract class StaticComponent {
   protected positionX: number
   protected side: boolean
   static componentListCreated = false
+  private static listeners: {
+    event: keyof tm.Events,
+    callback: (params: any) => string | void | { xml: string, login?: string }
+  }[] = []
+  private static listenersAdded = false
 
   /**
    * Abstract class for static manialink components
@@ -71,19 +76,21 @@ export default abstract class StaticComponent {
       StaticComponent.initialize()
     }
     this.id = id
-    tm.addListener('EndMap', (info): void => {
+    this.renderOnEvent('EndMap', (info): string | void => {
       if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
       this.updateIsDisplayed()
       this.updatePosition()
-      this._isDisplayed ? this.display() : this.hide()
+      return this._isDisplayed ? this.display() : this.hide()
     })
-    tm.addListener('BeginMap', (): void => {
+    this.renderOnEvent('BeginMap', (): string | void => {
       this.updateIsDisplayed()
       this.updatePosition()
-      this._isDisplayed ? this.display() : this.hide()
+      return this._isDisplayed ? this.display() : this.hide()
     })
-    tm.addListener('PlayerJoin', async (info: tm.JoinInfo): Promise<void> => {
-      if (this._isDisplayed) { this.displayToPlayer(info.login) }
+    this.renderOnEvent('PlayerJoin', (info) => {
+      if (this._isDisplayed) {
+        return this.displayToPlayer(info.login)
+      }
     })
     this.updateIsDisplayed()
     const pos = this.getRelativePosition()
@@ -95,15 +102,34 @@ export default abstract class StaticComponent {
     }
   }
 
-  private static initialize() {
-    StaticComponent.refreshStaticLayouts()
+  private static addWildcardListener() {
+    this.listenersAdded = true
+    tm.addListener('*', ({ event, params }) => {
+      const manialinks = []
+      for (let i = 0; i < StaticComponent.listeners.length; i++) {
+        if (StaticComponent.listeners[i].event === event) {
+          const str = StaticComponent.listeners[i].callback(params)
+          if (str !== undefined) {
+            manialinks.push(str)
+          }
+        }
+      }
+      StaticComponent.sendMultipleManialinks(manialinks)
+    })
     tm.addListener('EndMap', (info): void => {
       if (info.isRestart && info.serverSideRankings[0]?.BestTime === -1) { return } // ignore the short restart
       StaticComponent.updateDisplayedComponents()
-    })
+    }, true)
     tm.addListener('BeginMap', (): void => {
       StaticComponent.updateDisplayedComponents()
-    })
+    }, true)
+  }
+
+  private static initialize() {
+    if (!this.listenersAdded) {
+      this.addWildcardListener()
+    }
+    StaticComponent.refreshStaticLayouts()
   }
 
   /**
@@ -239,14 +265,14 @@ export default abstract class StaticComponent {
    * Displays the manialink to all the players
    * @param params Optional params
    */
-  abstract display(params?: any): void
+  abstract display(params?: any): string | void
 
   /**
    * Displays the manialink to given player
    * @param login Player login
    * @param params Optional params
    */
-  abstract displayToPlayer(login: string, params?: any): void
+  abstract displayToPlayer(login: string, params?: any): { login: string, xml: string } | void
 
   /**
    * Hides the manialink for all players
@@ -261,6 +287,43 @@ export default abstract class StaticComponent {
    */
   static onComponentCreated(callback: (component: StaticComponent) => void): void {
     this.componentCreateListeners.push(callback)
+  }
+
+  protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => string |
+  { xml: string, login: string } | void) {
+    StaticComponent.listeners.push({ event, callback })
+  }
+
+  private static async sendMultipleManialinks(manialinks: (string | {
+    xml: string
+    login?: string
+  })[]) {
+    let xmls: { [login: string]: string } = {}
+    for (let i = 0; i < manialinks.length; i++) {
+      const ml = manialinks[i]
+      const login = (ml as any).login ?? '*'
+      if ((xmls[login] + ml).length > 64000) {
+        if (login === '*') {
+          tm.sendManialink('<manialinks>' + xmls[login] + '</manialinks>')
+        } else {
+          tm.sendManialink('<manialinks>' + xmls[login] + '</manialinks>', login)
+        }
+        await new Promise(r => setImmediate(r))
+        xmls[login] = ''
+      }
+      xmls[login] += manialinks[i]
+    }
+    const entries = Object.entries(xmls)
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i][1] !== '') {
+        if (entries[i][0] === '*') {
+          tm.sendManialink('<manialinks>' + entries[i][1] + '</manialinks>')
+        } else {
+          tm.sendManialink('<manialinks>' + entries[i][1] + '</manialinks>', entries[i][0])
+        }
+      }
+    }
+
   }
 
 }

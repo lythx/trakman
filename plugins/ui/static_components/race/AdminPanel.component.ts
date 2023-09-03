@@ -84,7 +84,7 @@ export default class AdminPanel extends StaticComponent {
     }
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (privilege >= config.privilege) {

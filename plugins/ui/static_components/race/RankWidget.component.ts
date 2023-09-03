@@ -25,9 +25,9 @@ export default class RankWidget extends StaticComponent {
     this.display()
   }
 
-  display(): void {
+  display(): string | void {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
   displayToPlayer(login: string): void {

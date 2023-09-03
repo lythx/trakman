@@ -23,18 +23,18 @@ export default class MapWidget extends StaticComponent {
     webservices.onCurrentAuthorChange((): void => {
       void this.display()
     })
-    tmx.onMapChange((): void => this.display())
-    tmx.onQueueChange((): void => this.display())
+    tmx.onMapChange((): void => tm.sendManialink(this.display() ?? '</>'))
+    tmx.onQueueChange((): void => tm.sendManialink(this.display() ?? '</>'))
   }
 
   getHeight(): number {
     return config.height
   }
 
-  display(): void {
+  display(): string | void {
     if (!this.isDisplayed) { return }
     this.updateXML()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
   displayToPlayer(login: string): void {
