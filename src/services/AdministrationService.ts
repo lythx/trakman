@@ -740,26 +740,44 @@ export class AdministrationService {
     return [...this._guestlist]
   }
 
+  /**
+   * Server operators.
+   */
   static get oplist(): Readonly<tm.PrivilegeEntry>[] {
     return [...this._oplist]
   }
 
+  /**
+   * Number of server operators.
+   */
   static get opCount(): number {
     return this._oplist.length
   }
 
+  /**
+   * Server admins.
+   */
   static get adminlist(): Readonly<tm.PrivilegeEntry>[] {
     return [...this._adminlist]
   }
 
+  /**
+   * Number of server admins.
+   */
   static get adminCount(): number {
     return this._adminlist.length
   }
 
+  /**
+   * Server masteradmins.
+   */
   static get masteradminlist(): Readonly<tm.PrivilegeEntry>[] {
     return [...this._masteradminlist]
   }
 
+  /**
+   * Number of server masteradmins.
+   */
   static get masteradminCount(): number {
     return this._masteradminlist.length
   }
