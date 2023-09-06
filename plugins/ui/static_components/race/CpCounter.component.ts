@@ -95,7 +95,9 @@ export default class CpCounter extends StaticComponent {
         index: 0, current: time === 0 ? undefined : time,
         best, isFinish: time !== 0, lap
       })
-      tm.sendManialink(obj?.xml, obj?.login)
+      if(obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     }, true)
     this.renderOnEvent('BeginMap', () => {
       this.prevTimes.length = 0
