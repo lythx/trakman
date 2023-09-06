@@ -21,7 +21,7 @@ export default class PreviousAndBest extends StaticComponent {
 
   protected onPositionChange(): void {
     this.constructXml()
-    this.display()
+    tm.sendManialink(this.display() ?? '</>')
   }
 
   display(): string | void {
@@ -29,9 +29,9 @@ export default class PreviousAndBest extends StaticComponent {
     return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   private constructXml(): void {

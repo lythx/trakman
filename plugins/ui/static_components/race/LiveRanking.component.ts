@@ -16,21 +16,19 @@ export default class LiveRanking extends StaticComponent {
     super(componentIds.live)
     this.header = new StaticHeader('race')
     this.getRecordList()
-    tm.addListener('LiveRecord', (): void => {
-      this.display()
+    this.renderOnEvent('LiveRecord', () => this.display())
+    this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
+      if (tm.records.live.some(a => a.login === info.login)) { return this.display() }
     })
-    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
-      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
+    this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
+      if (tm.records.live.some(a => a.login === info.login)) { return this.display() }
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
-      if (tm.records.live.some(a => a.login === info.login)) { this.display() }
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
+      if (tm.records.live.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.live.some(a => info.some(b => b.login === a.login))) { this.display() }
-    })
-    tm.addListener('PlayerCheckpoint', (): void => {
+    this.renderOnEvent('PlayerCheckpoint', () => {
       if (tm.getGameMode() === 'Laps') {
-        this.display()
+        return this.display()
       }
     })
   }
@@ -53,14 +51,16 @@ export default class LiveRanking extends StaticComponent {
     return config.topCount
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     let content: string
     this.title = config.title
@@ -92,7 +92,8 @@ export default class LiveRanking extends StaticComponent {
       content = this.recordList.constructXml(login, tm.records.live
         .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))
     }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return {
+      xml: `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(this.title, config.icon, this.side, { actionId: componentIds.liveCps })}
@@ -102,7 +103,7 @@ export default class LiveRanking extends StaticComponent {
       </frame>
     </manialink>`,
       login
-    )
+    }
   }
 
   private getRecordList(): void {
@@ -119,13 +120,16 @@ export default class LiveRanking extends StaticComponent {
       entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime, noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
+      const obj = this.displayToPlayer(info.login)
+      if(obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     })
   }
 
   protected onPositionChange(): void {
     this.getRecordList()
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
 }

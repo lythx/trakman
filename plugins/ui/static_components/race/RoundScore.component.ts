@@ -16,10 +16,10 @@ export default class RoundScore extends StaticComponent {
     super(componentIds.roundScore)
     this.header = new StaticHeader('race')
     this.getRecordList()
-    tm.addListener('PlayerFinish', (): void => this.display())
-    tm.addListener('BeginRound', () => this.display())
-    tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { this.display() }
+    this.renderOnEvent('PlayerFinish', () => this.display())
+    this.renderOnEvent('BeginRound', () => this.display())
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
+      if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
   }
 
@@ -45,16 +45,18 @@ export default class RoundScore extends StaticComponent {
     return config.roundsTopCount
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return { xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
@@ -71,12 +73,12 @@ export default class RoundScore extends StaticComponent {
       </frame>
     </manialink>`,
       login
-    )
+    }
   }
 
   protected onPositionChange(): void {
     this.getRecordList()
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
   private getRecordList(): void {
@@ -86,7 +88,10 @@ export default class RoundScore extends StaticComponent {
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, this.getTopCount(), 250, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
+      const obj = this.displayToPlayer(info.login)
+      if(obj !== undefined) {
+        tm.sendManialink(obj.login, obj.xml)
+      }
     })
   }
 

@@ -15,19 +15,19 @@ export default class RoundsPointsRanking extends StaticComponent {
     super(componentIds.roundsPointsRanking)
     this.header = new StaticHeader('race')
     this.getRecordList()
-    tm.addListener('PlayerJoin', (info: tm.JoinInfo): void => {
+    this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
       if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
-        .some(a => a.login === info.login)) { this.display() }
+        .some(a => a.login === info.login)) { return this.display() }
     })
-    tm.addListener('PlayerLeave', (info: tm.LeaveInfo): void => {
+    this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
       if (tm.rounds.pointsRanking.filter(a => a.roundsPoints !== 0)
-        .some(a => a.login === info.login)) { this.display() }
+        .some(a => a.login === info.login)) { return this.display() }
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
       if (info.some(a => tm.rounds.pointsRanking
-        .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { this.display() }
+        .filter(b => b.roundsPoints !== 0).some(b => b.login === a.login))) { return this.display() }
     })
-    tm.addListener('PlayerFinish', (): void => this.display())
+    this.renderOnEvent('PlayerFinish', () => this.display())
   }
 
   getEntries(): number {
@@ -48,11 +48,13 @@ export default class RoundsPointsRanking extends StaticComponent {
     return config.topCount
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
   private getRecordList(): void {
@@ -63,18 +65,21 @@ export default class RoundsPointsRanking extends StaticComponent {
       entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime: true, columnProportions: config.columnProportions, noRecordEntryText: config.noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
+      const obj = this.displayToPlayer(info.login)
+      if(obj !== undefined) {
+        return tm.sendManialink(obj.xml, obj.login)
+      }
     })
   }
 
   protected onPositionChange(): void {
     this.getRecordList()
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return { xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side)}
@@ -90,7 +95,7 @@ export default class RoundsPointsRanking extends StaticComponent {
       </frame>
     </manialink>`,
       login
-    )
+    }
   }
 
   private getCupImage(player: tm.Player): RLImage | undefined {

@@ -28,23 +28,25 @@ export default class DonationPanel extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     if (tm.players.get(login)?.isUnited) {
-      tm.sendManialink(this.xml, login)
+      return { xml: this.xml, login }
     }
   }
 
   protected onPositionChange(): void {
     this.constructXML()
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
   private constructXML(): void {

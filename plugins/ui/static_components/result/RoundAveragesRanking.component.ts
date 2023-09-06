@@ -31,8 +31,8 @@ export default class RoundAveragesRanking extends StaticComponent {
     tm.addListener('BeginMap', (): void => {
       this.averages.length = 0
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
-      if (this.averages.some(a => info.some(b => b.login === a.login))) { this.display() }
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
+      if (this.averages.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
   }
 
@@ -40,15 +40,15 @@ export default class RoundAveragesRanking extends StaticComponent {
     return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.constructXml()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   constructXml(): void {

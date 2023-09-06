@@ -21,7 +21,7 @@ export default class MapWidget extends StaticComponent {
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     webservices.onCurrentAuthorChange((): void => {
-      void this.display()
+      tm.sendManialink(this.display() ?? '</>')
     })
     tmx.onMapChange((): void => tm.sendManialink(this.display() ?? '</>'))
     tmx.onQueueChange((): void => tm.sendManialink(this.display() ?? '</>'))
@@ -37,9 +37,9 @@ export default class MapWidget extends StaticComponent {
     return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   private updateXML(): void {

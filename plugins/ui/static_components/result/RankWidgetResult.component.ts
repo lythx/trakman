@@ -19,19 +19,20 @@ export default class RankWidgetResult extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   protected onPositionChange(): void {
     this.constructXml()
-    this.display()
+    const xml = this.display()
+    if (xml !== undefined) { tm.sendManialink(xml) }
   }
 
   private constructXml(): void {
