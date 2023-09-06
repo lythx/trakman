@@ -19,7 +19,7 @@ export default {
         `${p.highlight}Use ${p.rank}/list ${p.highlight}& ${p.rank}click any map ${p.highlight}to add it to the queue. See ${p.rank}/man list ${p.highlight}for options.`,
         `${p.highlight}Use ${p.rank}/server ${p.highlight}to find the server information & setup.`,
         `${p.highlight}Use the ${p.rank}/best ${p.highlight}& ${p.rank}/worst ${p.highlight}commands to find your best & worst times.`,
-        `${p.highlight}Use ${p.rank}/chatlog ${p.highlight}to access the past ${tm.chat.messageCount} chat messages.`,
+        `${p.highlight}Use ${p.rank}/chatlog ${p.highlight}to access the past ${tm.config.controller.chatMessagesInRuntime} chat messages.`,
         `${p.highlight}Use ${p.rank}/laston ${p.highlight}to see when the specified player was last online.`,
         `${p.highlight}Use ${p.rank}/sessiontime ${p.highlight}to see for how long you've been playing.`,
         `${p.highlight}Use ${p.rank}/donate ${p.highlight}to donate coppers to the server.`,
