@@ -24,8 +24,8 @@ export default class AdminPanelResult extends StaticComponent {
     super(componentIds.adminResult)
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(5).fill(1), [1], { margin: config.margin })
-    tm.addListener('PrivilegeChanged', (info): void => {
-      this.displayToPlayer(info.login)
+    this.renderOnEvent('PrivilegeChanged', (info) => {
+      return this.displayToPlayer(info.login)
     })
     addManialinkListener(this.id + this.actions.requeue, info => {
       tm.sendMessage(tm.utils.strVar(config.messages.requeue, {
@@ -59,23 +59,25 @@ export default class AdminPanelResult extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     this.xml = this.constructXml()
     this.noShuffleXml = this.constructXml(true)
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (privilege >= config.shufflePrivilege) {
-      tm.sendManialink(this.xml, login)
+      return { xml: this.xml, login }
     } else if (privilege >= config.privilege) {
-      tm.sendManialink(this.noShuffleXml, login)
+      return { xml: this.noShuffleXml, login }
     } else {
-      tm.sendManialink(`<manialink id="${this.id}"></manialink>`, login)
+      return { xml: `<manialink id="${this.id}"></manialink>`, login }
     }
   }
 
