@@ -280,8 +280,8 @@ export default abstract class StaticComponent {
   /**
    * Hides the manialink for all players
    */
-  hide(): void {
-    tm.sendManialink(`<manialink id="${this.id}"></manialink>`)
+  hide(): string | void {
+    return `<manialink id="${this.id}"></manialink>`
   }
 
   /**
