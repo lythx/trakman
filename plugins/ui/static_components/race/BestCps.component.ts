@@ -65,7 +65,8 @@ export default class BestCps extends StaticComponent {
   }
 
   display() {
-    if (!this.isDisplayed) { return  }
+    if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -75,6 +76,7 @@ export default class BestCps extends StaticComponent {
 
   displayToPlayer(login: string, params?: { page?: number }) {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { params = { page: 1 } }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
     return {
@@ -94,6 +96,7 @@ export default class BestCps extends StaticComponent {
 
   private constructHeader(page: number, pageCount: number): string {
     if (this.bestCps.length === 0) { return '' }
+    if (this.reduxModeEnabled) { pageCount = 1 }
     let icons: (string | undefined)[] = [config.upIcon, config.downIcon]
     let iconsHover: (string | undefined)[] = [config.upIconHover, config.downIconHover]
     let ids: (number | undefined)[] = [this.paginator.ids[0], this.paginator.ids[1]]
@@ -134,6 +137,7 @@ export default class BestCps extends StaticComponent {
 
   private constructText(login: string, page: number): string {
     if (this.bestCps.length === 0) { return '' }
+    if (this.reduxModeEnabled) { login === '' }
     // bestCps[i] can be undefined if someone was driving while controller was off (first indexes dont exist) so im just returning empty cells
     const cpIndex: number = config.entries * (page - 1)
 
