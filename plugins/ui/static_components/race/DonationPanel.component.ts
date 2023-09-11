@@ -30,11 +30,7 @@ export default class DonationPanel extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
-    const arr = []
-    for (const player of tm.players.list) {
-      arr.push(this.displayToPlayer(player.login))
-    }
-    return arr
+    return { xml: this.xml, login: tm.players.list.filter(a => a.isUnited).map(a=> a.login) }
   }
 
   displayToPlayer(login: string) {

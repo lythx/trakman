@@ -2,6 +2,10 @@ import RaceUi from "../config/RaceUi.js"
 import ResultUi from "../config/ResultUi.js"
 import { components } from '../UI.js'
 
+interface PlayerML { login: string | string[], xml: string }
+type PlayerMLList = (string | PlayerML | void)[]
+type MLLike = string | PlayerML | PlayerMLList
+
 /**
  * Abstract class for static manialink components.
  */
@@ -63,7 +67,7 @@ export default abstract class StaticComponent {
   static componentListCreated = false
   private static listeners: {
     event: keyof tm.Events,
-    callback: (params: any) => string | void | { xml: string, login?: string } | ({ login: string, xml: string } | void)[]
+    callback: (params: any) => MLLike | void
   }[] = []
   private static listenersAdded = false
   private static reduxModeEnabled = false
@@ -145,10 +149,10 @@ export default abstract class StaticComponent {
 
   private static updateReduxModeStatus() {
     let prev = this.reduxModeEnabled
-    if(this.reduxModeEnabled) {
+    if (this.reduxModeEnabled) {
       this.reduxModeEnabled = tm.players.count > RaceUi.reduxModeDisablePlayerAmount
     } else {
-      this.reduxModeEnabled = tm.players.count >= RaceUi.reduxModeEnablePlayerAmount 
+      this.reduxModeEnabled = tm.players.count >= RaceUi.reduxModeEnablePlayerAmount
     }
     if (prev !== this.reduxModeEnabled) {
       const manialinks = []
@@ -300,14 +304,14 @@ export default abstract class StaticComponent {
    * Displays the manialink to all the players
    * @param params Optional params
    */
-  abstract display(params?: any): string | void | ({ login: string, xml: string } | void)[]
+  abstract display(params?: any): MLLike | void
 
   /**
    * Displays the manialink to given player
    * @param login Player login
    * @param params Optional params
    */
-  abstract displayToPlayer(login: string, params?: any): { login: string, xml: string } | void
+  abstract displayToPlayer(login: string, params?: any): PlayerML | void
 
   /**
    * Hides the manialink for all players
@@ -324,33 +328,28 @@ export default abstract class StaticComponent {
     this.componentCreateListeners.push(callback)
   }
 
-  protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => string |
-  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[]) {
+  protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => MLLike | void) {
     StaticComponent.listeners.push({ event, callback })
   }
 
-  static reduxModeChangeListeners: (() => string |
-  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[])[] = []
+  static reduxModeChangeListeners: (() => MLLike | void)[] = []
 
-  protected onReduxModeChange(callback: () => string |
-  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[]) {
+  protected onReduxModeChange(callback: () => MLLike | void) {
     StaticComponent.reduxModeChangeListeners.push(callback)
   }
 
-  protected async sendMultipleManialinks(manialinks?: string | (string | void | {
-    xml: string
-    login?: string
-  })[]) {
+  protected async sendMultipleManialinks(manialinks?: MLLike | undefined) {
     await StaticComponent.sendMultipleManialinks(manialinks)
   }
 
-  private static async sendMultipleManialinks(manialinks?: string | (string | void | {
-    xml: string
-    login?: string
-  })[]) {
+  static async sendMultipleManialinks(manialinks?: MLLike | void) {
     if (manialinks === undefined) { return }
     if (typeof manialinks === 'string') {
-      tm.sendManialink('<manialinks>' + manialinks + '</manialinks>')
+      tm.sendManialink(manialinks)
+      return
+    }
+    if (this.isPlayerML(manialinks)) {
+      tm.sendManialink(manialinks.xml, manialinks.login)
       return
     }
     if (Array.isArray(manialinks)) {
@@ -358,8 +357,9 @@ export default abstract class StaticComponent {
     }
     let xmls: { [login: string]: string } = {}
     for (let i = 0; i < manialinks.length; i++) {
-      const ml: string | void | { xml: string, login?: string } = manialinks[i]
-      const login: string = (ml as any).login ?? '*'
+      const ml: string | PlayerML | void = manialinks[i]
+      let login: string | string[] = (ml as any).login ?? '*'
+      if (Array.isArray(login)) { login = login.join(',') }
       if (!(login in xmls)) {
         xmls[login] = ''
       } else if ((xmls[login] + ml).length > 64000) {
@@ -383,7 +383,10 @@ export default abstract class StaticComponent {
         }
       }
     }
+  }
 
+  private static isPlayerML(obj: any): obj is PlayerML {
+    return typeof obj.xml === 'string'
   }
 
   protected get reduxModeEnabled() {

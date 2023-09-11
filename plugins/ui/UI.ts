@@ -96,17 +96,7 @@ const events: tm.Listener[] = [
         c.updateIsDisplayed()
         c.updatePosition()
         const ret = c.display()
-        if (ret !== undefined) {
-          if(typeof ret === 'string') {
-            tm.sendManialink(ret)
-          } else {
-            for(const e of ret) {
-              if(e !== undefined) {
-                tm.sendManialink(e.xml, e.login)
-              }
-            }
-          }
-        }
+        StaticComponent.sendMultipleManialinks(ret)
       }
       StaticComponent.refreshStaticLayouts()
       new Buttons()
