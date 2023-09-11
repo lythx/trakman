@@ -54,6 +54,7 @@ export default class BestFinishes extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -63,7 +64,8 @@ export default class BestFinishes extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: `
+    return {
+      xml: `
     <manialink id="${this.id}">
     <frame posn="${config.posX} ${config.posY} 1">
       <format textsize="1"/>
@@ -73,7 +75,8 @@ export default class BestFinishes extends StaticComponent {
       <format textsize="1"/>
       ${this.constructText(login)}
     </frame>
-    </manialink>`, login}
+    </manialink>`, login
+    }
   }
 
   private constructHeader(): string {
@@ -90,7 +93,7 @@ export default class BestFinishes extends StaticComponent {
   }
 
   private constructText(login: string): string {
-
+    if (this.reduxModeEnabled) { login = '' }
     const indexCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
       return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((i + 1).toString(), w, h,
