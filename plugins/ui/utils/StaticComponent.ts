@@ -66,6 +66,7 @@ export default abstract class StaticComponent {
     callback: (params: any) => string | void | { xml: string, login?: string } | ({ login: string, xml: string } | void)[]
   }[] = []
   private static listenersAdded = false
+  private static reduxModeEnabled = false
 
   /**
    * Abstract class for static manialink components
@@ -92,6 +93,11 @@ export default abstract class StaticComponent {
         return this.displayToPlayer(info.login)
       }
     })
+    this.onReduxModeChange(() => {
+      if (this._isDisplayed) {
+        return this.display()
+      }
+    })
     this.updateIsDisplayed()
     const pos = this.getRelativePosition()
     this.positionX = pos.x
@@ -111,7 +117,6 @@ export default abstract class StaticComponent {
           const ret = StaticComponent.listeners[i].callback(params)
           if (Array.isArray(ret)) {
             manialinks.push(...ret)
-
           } else if (ret !== undefined) {
             manialinks.push(ret)
           }
@@ -126,13 +131,37 @@ export default abstract class StaticComponent {
     tm.addListener('BeginMap', (): void => {
       StaticComponent.updateDisplayedComponents()
     }, true)
+    tm.addListener('PlayerJoin', () => this.updateReduxModeStatus())
+    tm.addListener('PlayerLeave', () => this.updateReduxModeStatus())
   }
 
   private static initialize() {
+    this.updateReduxModeStatus()
     if (!this.listenersAdded) {
       this.addListeners()
     }
     StaticComponent.refreshStaticLayouts()
+  }
+
+  private static updateReduxModeStatus() {
+    let prev = this.reduxModeEnabled
+    if(this.reduxModeEnabled) {
+      this.reduxModeEnabled = tm.players.count > RaceUi.reduxModeDisablePlayerAmount
+    } else {
+      this.reduxModeEnabled = tm.players.count >= RaceUi.reduxModeEnablePlayerAmount 
+    }
+    if (prev !== this.reduxModeEnabled) {
+      const manialinks = []
+      for (const e of this.reduxModeChangeListeners) {
+        const ret = e()
+        if (Array.isArray(ret)) {
+          manialinks.push(...ret)
+        } else if (ret !== undefined) {
+          manialinks.push(ret)
+        }
+      }
+      this.sendMultipleManialinks(manialinks)
+    }
   }
 
   /**
@@ -156,7 +185,10 @@ export default abstract class StaticComponent {
    * Executed on static UI layout change, by default calls the display() method
    */
   protected onPositionChange(): void {
-    this.display()
+    const obj = this.display()
+    if (obj !== undefined) {
+      this.sendMultipleManialinks(obj)
+    }
   }
 
   private static updateDisplayedComponents() {
@@ -297,18 +329,30 @@ export default abstract class StaticComponent {
     StaticComponent.listeners.push({ event, callback })
   }
 
-  protected async sendMultipleManialinks(manialinks?: (string | void | {
+  static reduxModeChangeListeners: (() => string |
+  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[])[] = []
+
+  protected onReduxModeChange(callback: () => string |
+  { xml: string, login: string } | void | ({ login: string, xml: string } | void)[]) {
+    StaticComponent.reduxModeChangeListeners.push(callback)
+  }
+
+  protected async sendMultipleManialinks(manialinks?: string | (string | void | {
     xml: string
     login?: string
   })[]) {
     await StaticComponent.sendMultipleManialinks(manialinks)
   }
 
-  private static async sendMultipleManialinks(manialinks?: (string | void | {
+  private static async sendMultipleManialinks(manialinks?: string | (string | void | {
     xml: string
     login?: string
   })[]) {
     if (manialinks === undefined) { return }
+    if (typeof manialinks === 'string') {
+      tm.sendManialink('<manialinks>' + manialinks + '</manialinks>')
+      return
+    }
     if (Array.isArray(manialinks)) {
       manialinks = manialinks.filter(a => a !== undefined)
     }
@@ -340,6 +384,10 @@ export default abstract class StaticComponent {
       }
     }
 
+  }
+
+  protected get reduxModeEnabled() {
+    return StaticComponent.reduxModeEnabled
   }
 
 }

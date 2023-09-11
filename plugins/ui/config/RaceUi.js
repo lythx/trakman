@@ -1,4 +1,6 @@
 export default {
+  reduxModeEnablePlayerAmount: 2,
+  reduxModeDisablePlayerAmount: 1,
   margin: 0.15,
   marginBig: 0.27,
   format: "$s",

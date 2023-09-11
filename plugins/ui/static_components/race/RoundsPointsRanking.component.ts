@@ -33,7 +33,7 @@ export default class RoundsPointsRanking extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Cup') {
       return config.cupEntries
-    } 
+    }
     return config.entries
   }
 
@@ -44,12 +44,13 @@ export default class RoundsPointsRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
-    } 
+    }
     return config.topCount
   }
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -65,8 +66,9 @@ export default class RoundsPointsRanking extends StaticComponent {
       entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime: true, columnProportions: config.columnProportions, noRecordEntryText: config.noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
-      if(obj !== undefined) {
+      if (obj !== undefined) {
         return tm.sendManialink(obj.xml, obj.login)
       }
     })
@@ -79,18 +81,19 @@ export default class RoundsPointsRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: `<manialink id="${this.id}">
+    return {
+      xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, tm.rounds.pointsRanking
-      .filter(a => a.roundsPoints !== 0)
-      .map(a => ({
-        name: a.nickname, time: a.roundsPoints, login: a.login,
-        checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a), image: this.getCupImage(a)
-      }))
-      .slice(0, tm.records.maxLocalsAmount))}
+          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.rounds.pointsRanking
+        .filter(a => a.roundsPoints !== 0)
+        .map(a => ({
+          name: a.nickname, time: a.roundsPoints, login: a.login,
+          checkpoints: a.roundTimes.map(a => a === -1 ? undefined : a), image: this.getCupImage(a)
+        }))
+        .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,

@@ -61,6 +61,7 @@ export default class LocalRanking extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -75,6 +76,7 @@ export default class LocalRanking extends StaticComponent {
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
       entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
@@ -95,7 +97,7 @@ export default class LocalRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, tm.records.local
+          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.local
         .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))
         .slice(0, tm.records.maxLocalsAmount))}
         </frame>

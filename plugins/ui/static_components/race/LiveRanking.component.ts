@@ -53,6 +53,7 @@ export default class LiveRanking extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -87,9 +88,9 @@ export default class LiveRanking extends StaticComponent {
       }).filter(a => a !== null) as any)
         .sort((a: any, b: any) => b.cpCount - a.cpCount) // Sort secondary by cp amount
         .sort((a: any, b: any) => a.finishTime - b.finishTime) as RLRecord[]) // Sort primary by finish time
-      content = this.recordList.constructXml(login, list)
+      content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, list)
     } else {
-      content = this.recordList.constructXml(login, tm.records.live
+      content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.live
         .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))
     }
     return {
@@ -120,8 +121,9 @@ export default class LiveRanking extends StaticComponent {
       entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
       { dontParseTime, noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
-      if(obj !== undefined) {
+      if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
       }
     })

@@ -34,6 +34,7 @@ export default class TMXRanking extends StaticComponent {
     this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
       this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
+      if(this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
@@ -47,6 +48,7 @@ export default class TMXRanking extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const player of tm.players.list) {
       arr.push(this.displayToPlayer(player.login))
@@ -67,7 +69,7 @@ export default class TMXRanking extends StaticComponent {
       <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.TMXDetailsWindow })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(login, replays)}
+          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, replays)}
         </frame>
       </frame>
     </manialink>`,

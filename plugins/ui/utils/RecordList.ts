@@ -187,7 +187,7 @@ export default class RecordList {
    * @param allRecords Array of record objects
    * @returns Record list XML string
    */
-  constructXml(login: string, allRecords: RLRecord[]): string {
+  constructXml(login: string | undefined, allRecords: RLRecord[]): string {
     const checkpointAmounts = allRecords.map(a =>
       a?.checkpoints?.length).filter(a => a !== undefined) as number[]
     const cpAmount: number = checkpointAmounts.length === 0 ? 0 : Math.max(...checkpointAmounts)
@@ -195,7 +195,7 @@ export default class RecordList {
     const parsedRecs = this.getDisplayedRecords(login, allRecords)
     const info = this.infos.find(a => a.login === login)
     const [infos, infoPositions, cpTypes] = info !== undefined ? this.getInfos(login, cpAmount, info, parsedRecs) : [[], [], []]
-    const playerIndex: number = parsedRecs.map(a => a.record).findIndex(a => a.login === login)
+    const playerIndex: number = login === undefined ? -1 : parsedRecs.map(a => a.record).findIndex(a => a.login === login)
     const markers: Marker[] = this.getMarkers(playerIndex, infoPositions, parsedRecs.map(a => a.record))
     const timeColours = this.getTimeColours(login, playerIndex, parsedRecs.map(a => a.record))
     let ret: string = `<quad posn="-70 50 -100" sizen="140 100" action="${IDS.ClearAlerts}"/>`
@@ -261,11 +261,17 @@ export default class RecordList {
     tm.addListener('ManialinkClick', this.clickListener)
   }
 
-  private getDisplayedRecords(login: string, records: RLRecord[]): { index: number, record: RLRecord }[] {
+  private getDisplayedRecords(login: string | undefined, records: RLRecord[]): { index: number, record: RLRecord }[] {
     const playerRecord: RLRecord | undefined = records.find(a => a.login === login)
     const playerRecordIndex: number = playerRecord !== undefined ? records.indexOf(playerRecord) : -1
     const diff: number = this.rows - this.topCount
     const ret: { index: number, record: RLRecord }[] = []
+    if (login === undefined) {
+      for (let i = 0; i < records.length; i++) {
+        ret.push({ index: i, record: records[i] })
+      }
+      return ret
+    }
     for (const [i, e] of records.entries()) {
       if (ret.length === this.rows || (this.noRecordEntry && playerRecord === undefined && ret.length === this.rows - 1)) { break }
       else if (i < this.topCount ||
@@ -283,7 +289,7 @@ export default class RecordList {
     return ret
   }
 
-  private getInfos(login: string, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: RLRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
+  private getInfos(login: string | undefined, cpAmount: number, info: { login: string, indexes: number[] }, records: { record: RLRecord, index: number }[]): [{ index: number, offset: number }[], boolean[][], ('best' | 'worst' | 'equal' | undefined)[][]] {
     const cps: (number | undefined)[][] = Array.from(Array(cpAmount), (): never[] => [])
     const infos: { index: number, offset: number }[] = []
     const infoPositions: boolean[][] = Array.from(Array(records.length), (): any[] => new Array(Math.ceil(cpAmount / this.infoColumns) + 1).fill(false))
@@ -304,7 +310,7 @@ export default class RecordList {
     return !this.isFullRow ? [infos, infoPositions.map(a => a.slice(0, a.length - 1)), this.getCpTypes(login, cps, records.map(a => a.record))] : [infos, infoPositions, this.getCpTypes(login, cps, records.map(a => a.record))]
   }
 
-  private getCpTypes = (login: string, cps: (number | undefined)[][], records: RLRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
+  private getCpTypes = (login: string | undefined, cps: (number | undefined)[][], records: RLRecord[]): ('best' | 'worst' | 'equal' | undefined)[][] => {
     if (cps.length === 0 || cps?.[0]?.length === 0) {
       return []
     }
@@ -385,8 +391,13 @@ export default class RecordList {
     return ret
   }
 
-  private getTimeColours(login: string, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
+  private getTimeColours(login: string | undefined, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
+    if(login === undefined) {
+      for (let i: number = 0; i < records.length; i++) {
+        ret.push('slower')
+      }
+    }
     if (this.getColoursFromPb && playerIndex === -1) {
       const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
