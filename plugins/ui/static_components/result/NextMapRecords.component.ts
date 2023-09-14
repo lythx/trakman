@@ -19,6 +19,7 @@ export default class NextMapRecords extends StaticComponent {
     this.list = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
+      if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
@@ -53,6 +54,7 @@ export default class NextMapRecords extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login))
@@ -68,7 +70,7 @@ export default class NextMapRecords extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} 2">
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(login, this.records.map(a => ({
+        ${this.list.constructXml(this.reduxModeEnabled ? undefined : login, this.records.map(a => ({
         name: a.nickname, time: a.time,
         date: a.date, checkpoints: a.checkpoints, login: a.login
       })))}
