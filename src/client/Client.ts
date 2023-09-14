@@ -44,11 +44,12 @@ export abstract class Client {
     if (status instanceof Error) {
       await Logger.fatal('Connection to the dedicated server failed:', status.message)
     }
-    const mapInfo = await this.call('GetCurrentChallengeInfo')
+    const mapInfo: tm.TrackmaniaMapInfo | Error = await this.call('GetCurrentChallengeInfo')
     if (mapInfo instanceof Error) {
       await Logger.fatal('Connection to the dedicated server failed:', mapInfo.message)
+      return
     }
-    Events.emit('TrackMania.BeginChallenge', mapInfo)
+    Events.emit('TrackMania.BeginChallenge', [mapInfo, false, false])
   }
 
   /**
