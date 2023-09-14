@@ -19,8 +19,8 @@ export default class AveragesRanking extends StaticComponent {
     this.list = new List(config.entries, config.width,
       this.getHeight() - (this.header.options.height + config.margin), config.columnProportions,
       { background: config.background, headerBg: this.header.options.textBackground })
-    stats.averages.onUpdate(() => tm.sendManialink(this.display() ?? '</>'))
-    stats.averages.onNicknameChange(() => tm.sendManialink(this.display() ?? '</>'))
+    stats.averages.onUpdate(() => this.sendMultipleManialinks(this.display()))
+    stats.averages.onNicknameChange(() => this.sendMultipleManialinks(this.display()))
   }
 
   getHeight(): number {

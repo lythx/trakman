@@ -23,14 +23,14 @@ export default class MapWidgetResult extends StaticComponent {
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled) {
       webservices.onNextAuthorChange(() => {
-        tm.sendManialink(this.display() ?? '</>')
+        this.sendMultipleManialinks(this.display())
       })
     }
     this.renderOnEvent('JukeboxChanged', () => {
       return this.display()
     })
-    tmx.onMapChange(() => tm.sendManialink(this.display() ?? '</>'))
-    tmx.onQueueChange(() => tm.sendManialink(this.display() ?? '</>'))
+    tmx.onMapChange(() => this.sendMultipleManialinks(this.display()))
+    tmx.onQueueChange(() => this.sendMultipleManialinks(this.display()))
     tm.addListener('EndMap', (info) => {
       this.isRestart = info.isRestart
     }, true)

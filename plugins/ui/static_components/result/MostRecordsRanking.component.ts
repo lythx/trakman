@@ -22,8 +22,8 @@ export default class MostRecordsRanking extends StaticComponent {
     tm.addListener('EndMap', (): void => {
       this.constructXml()
     })
-    stats.records.onUpdate(() => tm.sendManialink(this.display() ?? '</>'))
-    stats.records.onNicknameChange(() => tm.sendManialink(this.display() ?? '</>'))
+    stats.records.onUpdate(() => this.sendMultipleManialinks(this.display()))
+    stats.records.onNicknameChange(() => this.sendMultipleManialinks(this.display()))
   }
 
   getHeight(): number {

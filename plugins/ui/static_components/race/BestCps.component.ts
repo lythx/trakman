@@ -56,7 +56,11 @@ export default class BestCps extends StaticComponent {
       return this.display()
     })
     this.paginator.onPageChange = (login: string): void => {
-      tm.sendManialink(this.displayToPlayer(login)?.xml ?? '</>', login)
+      if(this.reduxModeEnabled) { return }
+      const obj = this.displayToPlayer(login)
+      if(obj!== undefined) {
+        tm.sendManialink(obj.xml, login)
+      }
     }
   }
 

@@ -22,10 +22,10 @@ export default class RankWidget extends StaticComponent {
 
   protected onPositionChange(): void {
     this.constructXml()
-    tm.sendManialink(this.display() ?? '</>')
+    this.sendMultipleManialinks(this.display())
   }
 
-  display(): string | void {
+  display() {
     if (!this.isDisplayed) { return }
     return this.xml
   }
