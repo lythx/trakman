@@ -60,6 +60,7 @@ export default class AdminPanelResult extends StaticComponent {
   }
 
   display() {
+    if (!this.isDisplayed) { return }
     this.xml = this.constructXml()
     this.noShuffleXml = this.constructXml(true)
     const playerList = tm.players.list
