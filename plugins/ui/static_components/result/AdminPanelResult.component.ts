@@ -62,11 +62,19 @@ export default class AdminPanelResult extends StaticComponent {
   display() {
     this.xml = this.constructXml()
     this.noShuffleXml = this.constructXml(true)
-    const arr = []
-    for (const e of tm.players.list) {
-      arr.push(this.displayToPlayer(e.login))
-    }
-    return arr
+    const playerList = tm.players.list
+    const shuffleLogins = playerList
+      .filter(a => a.privilege >= config.shufflePrivilege)
+      .map(a => a.login)
+    const noShuffleLogins = playerList
+      .filter(a => a.privilege < config.shufflePrivilege && a.privilege >= config.privilege)
+      .map(a => a.login)
+    const noPrivilegeLogins = playerList
+      .filter(a => a.privilege < config.privilege)
+      .map(a => a.login)
+    return [{ xml: this.xml, login: shuffleLogins },
+    { xml: this.noShuffleXml, login: noShuffleLogins },
+    { xml: `<manialink id="${this.id}"></manialink>`, login: noPrivilegeLogins }]
   }
 
   displayToPlayer(login: string) {
