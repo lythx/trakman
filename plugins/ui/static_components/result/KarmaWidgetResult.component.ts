@@ -22,27 +22,30 @@ export default class KarmaWidgetResult extends StaticComponent {
     this.headerH = this.header.options.height
     this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
       new Array(3).fill(1), new Array(3).fill(1), { background: config.background, margin: config.margin })
-    tm.addListener('KarmaVote', (): void => this.display())
-    maniakarma.onMapFetch((): void => this.display())
-    maniakarma.onVote((): void => this.display())
+    this.renderOnEvent('KarmaVote', () => { return this.display() })
+    maniakarma.onMapFetch(() => this.sendMultipleManialinks(this.display()))
+    maniakarma.onVote(() => this.sendMultipleManialinks(this.display()))
     addManialinkListener(this.id + 1, 6, (info, offset): void => actions.addVote(info, this.options[offset]))
-    tm.addListener('VotesPrefetch', (): void => this.display())
+    this.renderOnEvent('VotesPrefetch', () => { return this.display() })
   }
 
   getHeight(): number {
     return config.height
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.constructXml(login), login)
+    return { xml: this.constructXml(login), login }
   }
 
   private constructXml(login: string): string {

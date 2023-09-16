@@ -584,7 +584,37 @@ namespace trakman {
     /**
      * Relative path (/GameData/Config/) to the guestlist file.
      */
-    get guestlistFile() { return AdministrationService.guestlistFile }
+    get guestlistFile() { return AdministrationService.guestlistFile },
+
+    /**
+     * Server operators.
+     */
+    get oplist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.oplist },
+
+    /**
+     * Number of server operators.
+     */
+    get opCount(): number { return AdministrationService.opCount },
+
+    /**
+     * Server admins.
+     */
+    get adminlist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.adminlist },
+
+    /**
+     * Number of server admins.
+     */
+    get adminCount(): number { return AdministrationService.adminCount },
+
+    /**
+     * Server masteradmins.
+     */
+    get masteradminlist(): Readonly<tm.PrivilegeEntry>[] { return AdministrationService.masteradminlist },
+
+    /**
+     * Number of server masteradmins.
+     */
+    get masteradminCount(): number { return AdministrationService.masteradminCount },
 
   }
 

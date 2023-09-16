@@ -18,23 +18,23 @@ export default class DonatorsRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.donations.onUpdate((): void => this.display())
-    stats.donations.onNicknameChange((): void => this.display())
+    stats.donations.onUpdate(() => this.sendMultipleManialinks(this.display()))
+    stats.donations.onNicknameChange(() => this.sendMultipleManialinks(this.display()))
   }
 
   getHeight(): number {
     return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.constructXml()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   constructXml(): void {

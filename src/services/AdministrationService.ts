@@ -23,6 +23,9 @@ export class AdministrationService {
   private static serverMutelist: tm.MutelistEntry[] = []
   private static muteOnJoin: tm.MutelistEntry[] = []
   private static _guestlist: tm.GuestlistEntry[] = []
+  private static _oplist: tm.PrivilegeEntry[] = []
+  private static _adminlist: tm.PrivilegeEntry[] = []
+  private static _masteradminlist: tm.PrivilegeEntry[] = []
   /** Relative path (/GameData/Config/) to the blacklist file. */
   static readonly blacklistFile: string = config.blacklistFile
   /** Relative path (/GameData/Config/) to the guestlist file. */
@@ -43,6 +46,9 @@ export class AdministrationService {
     this._blacklist = await this.blacklistRepo.get()
     this.muteOnJoin = await this.mutelistRepo.get()
     this._guestlist = await this.guestlistRepo.get()
+    this._oplist = await this.privilegeRepo.getOperators()
+    this._adminlist = await this.privilegeRepo.getAdmins()
+    this._masteradminlist = await this.privilegeRepo.getMasteradmins()
     await this.fixBanlistCoherence()
     await this.fixBlacklistCoherence()
     await this.fixMutelistCoherence()
@@ -313,6 +319,8 @@ export class AdministrationService {
       return
     }
     PlayerService.updateInfo({ login, title: PlayerService.getTitle(login, privilege, player.country, player.countryCode) })
+    await this.privilegeRepo.set(login, privilege)
+    await this.updatePrivilegeArrays()
     Events.emit('PrivilegeChanged', {
       player: player === undefined ? undefined : { ...player, privilege },
       login,
@@ -320,7 +328,6 @@ export class AdministrationService {
       newPrivilege: privilege,
       caller
     })
-    void this.privilegeRepo.set(login, privilege)
   }
 
   /**
@@ -622,6 +629,13 @@ export class AdministrationService {
     return true
   }
 
+  private static async updatePrivilegeArrays(): Promise<void> {
+    // the idea was not to call the database but who cares ig
+    this._oplist = await this.privilegeRepo.getOperators()
+    this._adminlist = await this.privilegeRepo.getAdmins()
+    this._masteradminlist = await this.privilegeRepo.getMasteradmins()
+  }
+
   /**
    * Gets ban information for given login
    * @param login Player login
@@ -724,6 +738,48 @@ export class AdministrationService {
    */
   static get guestlist(): Readonly<tm.GuestlistEntry>[] {
     return [...this._guestlist]
+  }
+
+  /**
+   * Server operators.
+   */
+  static get oplist(): Readonly<tm.PrivilegeEntry>[] {
+    return [...this._oplist]
+  }
+
+  /**
+   * Number of server operators.
+   */
+  static get opCount(): number {
+    return this._oplist.length
+  }
+
+  /**
+   * Server admins.
+   */
+  static get adminlist(): Readonly<tm.PrivilegeEntry>[] {
+    return [...this._adminlist]
+  }
+
+  /**
+   * Number of server admins.
+   */
+  static get adminCount(): number {
+    return this._adminlist.length
+  }
+
+  /**
+   * Server masteradmins.
+   */
+  static get masteradminlist(): Readonly<tm.PrivilegeEntry>[] {
+    return [...this._masteradminlist]
+  }
+
+  /**
+   * Number of server masteradmins.
+   */
+  static get masteradminCount(): number {
+    return this._masteradminlist.length
   }
 
   /**

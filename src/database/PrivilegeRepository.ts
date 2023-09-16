@@ -1,5 +1,9 @@
 import { Repository } from "./Repository.js"
 
+interface TableEntry {
+  readonly login: string
+  readonly privilege: number
+}
 export class PrivilegeRepository extends Repository {
 
   async get(login: string): Promise<number>
@@ -13,6 +17,24 @@ export class PrivilegeRepository extends Repository {
     const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...logins)
     return isArr ? res : res[0]?.privilege ?? 0
+  }
+
+  async getOperators(): Promise<tm.PrivilegeEntry[]> {
+    const query = `select login, privilege from privileges where privilege=1`
+    const res = await this.query(query)
+    return res.map(a => this.constructPrivilegeObject(a))
+  }
+
+  async getAdmins(): Promise<tm.PrivilegeEntry[]> {
+    const query = `select login, privilege from privileges where privilege=2`
+    const res = await this.query(query)
+    return res.map(a => this.constructPrivilegeObject(a))
+  }
+
+  async getMasteradmins(): Promise<tm.PrivilegeEntry[]> {
+    const query = `select login, privilege from privileges where privilege>2`
+    const res = await this.query(query)
+    return res.map(a => this.constructPrivilegeObject(a))
   }
 
   async set(login: string, privilege: number): Promise<void> {
@@ -35,6 +57,13 @@ export class PrivilegeRepository extends Repository {
   async removeOwner(): Promise<void> {
     const query = 'DELETE FROM privileges WHERE privilege=4'
     await this.query(query)
+  }
+
+  private constructPrivilegeObject(entry: TableEntry): tm.PrivilegeEntry {
+    return {
+      login: entry.login,
+      privilege: entry.privilege,
+    }
   }
 
 }

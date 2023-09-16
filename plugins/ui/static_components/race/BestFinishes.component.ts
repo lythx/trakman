@@ -24,27 +24,27 @@ export default class BestFinishes extends StaticComponent {
     this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
-    tm.addListener('PlayerFinish', (info: tm.FinishInfo): void => {
+    this.renderOnEvent('PlayerFinish', (info: tm.FinishInfo) => {
       let index: number = this.bestFinishes.findIndex(a => a.time > info.time)
       if (index === -1) { index = this.bestFinishes.length }
       if (index < config.entries) {
         this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickname })
         this.bestFinishes.length = Math.min(config.entries, this.bestFinishes.length)
         this.newestFinish = index
-        this.display()
+        return this.display()
       }
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
       for (const e of this.bestFinishes) {
         const newNickname: string | undefined = info.find(a => a.login === e.login)?.nickname
         if (newNickname !== undefined) { e.nickname = newNickname }
       }
-      this.display()
+      return this.display()
     })
-    tm.addListener('BeginMap', (): void => {
+    this.renderOnEvent('BeginMap', () => {
       this.newestFinish = -1
       this.bestFinishes.length = 0
-      this.display()
+      return this.display()
     })
   }
 
@@ -52,16 +52,20 @@ export default class BestFinishes extends StaticComponent {
     return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(`
+    return {
+      xml: `
     <manialink id="${this.id}">
     <frame posn="${config.posX} ${config.posY} 1">
       <format textsize="1"/>
@@ -71,7 +75,8 @@ export default class BestFinishes extends StaticComponent {
       <format textsize="1"/>
       ${this.constructText(login)}
     </frame>
-    </manialink>`, login)
+    </manialink>`, login
+    }
   }
 
   private constructHeader(): string {
@@ -88,7 +93,7 @@ export default class BestFinishes extends StaticComponent {
   }
 
   private constructText(login: string): string {
-
+    if (this.reduxModeEnabled) { login = '' }
     const indexCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
       return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((i + 1).toString(), w, h,

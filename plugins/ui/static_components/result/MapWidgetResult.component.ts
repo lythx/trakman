@@ -22,16 +22,16 @@ export default class MapWidgetResult extends StaticComponent {
     this.header = new StaticHeader('result')
     this.grid = new Grid(config.width, config.height + config.margin, [1], new Array(this.rows).fill(1))
     if (webservices.isEnabled) {
-      webservices.onNextAuthorChange((): void => {
-        void this.display()
+      webservices.onNextAuthorChange(() => {
+        this.sendMultipleManialinks(this.display())
       })
     }
-    tm.addListener('JukeboxChanged', (): void => {
-      void this.display()
+    this.renderOnEvent('JukeboxChanged', () => {
+      return this.display()
     })
-    tmx.onMapChange((): void => this.display())
-    tmx.onQueueChange((): void => this.display())
-    tm.addListener('EndMap', (info): void => {
+    tmx.onMapChange(() => this.sendMultipleManialinks(this.display()))
+    tmx.onQueueChange(() => this.sendMultipleManialinks(this.display()))
+    tm.addListener('EndMap', (info) => {
       this.isRestart = info.isRestart
     }, true)
   }
@@ -40,15 +40,15 @@ export default class MapWidgetResult extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.updateXML()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   private updateXML(): void {

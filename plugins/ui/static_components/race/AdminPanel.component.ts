@@ -25,8 +25,8 @@ export default class AdminPanel extends StaticComponent {
     super(componentIds.admin)
     this.header = new StaticHeader('race')
     this.grid = new Grid(config.width + config.margin * 2, config.height - this.header.options.height, new Array(6).fill(1), [1], { margin: config.margin })
-    tm.addListener('PrivilegeChanged', (info): void => {
-      this.displayToPlayer(info.login)
+    this.renderOnEvent('PrivilegeChanged', (info) => {
+      return this.displayToPlayer(info.login)
     })
     addManialinkListener(this.id + this.actions.skip, async info => {
       tm.sendMessage(tm.utils.strVar(config.messages.skip, {
@@ -77,20 +77,22 @@ export default class AdminPanel extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     this.constructXml()
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (privilege >= config.privilege) {
-      tm.sendManialink(this.xml, login)
+      return { xml: this.xml, login }
     } else {
-      tm.sendManialink(`<manialink id="${this.id}"></manialink>`, login)
+      return { xml: `<manialink id="${this.id}"></manialink>`, login }
     }
   }
 

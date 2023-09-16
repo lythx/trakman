@@ -19,18 +19,21 @@ export default class MusicWidget extends StaticComponent {
 
   setCurrentSong(song: Song | undefined) {
     this.song = song
-    this.display()
+    const xml = this.display()
+    if(xml !== undefined) {
+      tm.sendManialink(xml)
+    }
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.updateXML()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   private updateXML(): void {

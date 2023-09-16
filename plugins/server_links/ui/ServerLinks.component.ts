@@ -28,7 +28,10 @@ export default class ServerLinks extends StaticComponent {
       [1], new Array(config.entries).fill(1))
     this.paginator = new Paginator(this.id, 0, 0, 4)
     this.paginator.onPageChange = (login) => {
-      this.displayToPlayer(login)
+      const obj = this.displayToPlayer(login)
+      if (obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     }
   }
 
@@ -50,17 +53,19 @@ export default class ServerLinks extends StaticComponent {
         this.paginator.setPageForLogin(e.login, this.currentDefaultPage)
       }
     }
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const player of tm.players.list) {
-      this.displayToPlayer(player.login)
+      arr.push(this.displayToPlayer(player.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
     const page: number = this.paginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
@@ -69,7 +74,8 @@ export default class ServerLinks extends StaticComponent {
     for (let i = 0; i < config.entries && this.serverList.length !== 0; i++) {
       functions.push((i, j, w, h) => this.constructEntry(i, j, w, h, startIndex))
     }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return {
+      xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
           ${this.constructHeader(page, pageCount)}
@@ -79,7 +85,7 @@ export default class ServerLinks extends StaticComponent {
       </frame>
     </manialink>`,
       login
-    )
+    }
   }
 
   private constructHeader(page: number, pageCount: number): string {

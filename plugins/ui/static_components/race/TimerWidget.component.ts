@@ -26,7 +26,7 @@ export default class TimerWidget extends StaticComponent {
     if (tm.timer.isDynamic) {
       this.startDynamicTimerInterval()
     }
-    tm.addListener('DynamicTimerStateChanged', (state) => {
+    this.renderOnEvent('DynamicTimerStateChanged', (state) => {
       if (state === 'enabled') {
         this.startDynamicTimerInterval()
       } else {
@@ -34,21 +34,21 @@ export default class TimerWidget extends StaticComponent {
       }
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
-      this.display()
+      return this.display()
     })
-    tm.addListener('EndMap', (info) => {
+    this.renderOnEvent('EndMap', (info) => {
       if (info.isRestart) {
         this.isOnRestart = true
         this.noButtonXml = this.constructXml(false)
         this.xmlWithButtons = this.constructXml(true)
-        this.display()
+        return this.display()
       }
     })
-    tm.addListener('BeginMap', () => {
+    this.renderOnEvent('BeginMap', () => {
       this.isOnRestart = false
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
-      this.display()
+      return this.display()
     })
     addManialinkListener(this.pauseButtonId, (info) => {
       if (info.privilege < config.timerActionsPrivilege) { return }
@@ -108,33 +108,35 @@ export default class TimerWidget extends StaticComponent {
     this.dynamicTimerInterval = setInterval(() => {
       this.noButtonXml = this.constructXml(false)
       this.xmlWithButtons = this.constructXml(true)
-      this.display()
+      this.sendMultipleManialinks(this.display())
     }, 300)
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     if (this.isPaused && tm.timer.isPaused) { return }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login, e.privilege)
+      arr.push(this.displayToPlayer(e.login, e.privilege))
     }
     this.isPaused = tm.timer.isPaused
+    return arr
   }
 
-  displayToPlayer(login: string, privilege?: number): void {
+  displayToPlayer(login: string, privilege?: number) {
     if (!this.isDisplayed) { return }
     privilege ??= tm.players.get(login)?.privilege ?? 0
     if (this.isOnRestart || !tm.timer.isDynamic || privilege < config.timerActionsPrivilege) {
-      tm.sendManialink(this.noButtonXml, login)
+      return { xml: this.noButtonXml, login }
     } else {
-      tm.sendManialink(this.xmlWithButtons, login)
+      return  { xml: this.xmlWithButtons, login }
     }
   }
 
   protected onPositionChange(): void {
     this.noButtonXml = this.constructXml(false)
     this.xmlWithButtons = this.constructXml(true)
-    this.display()
+    this.sendMultipleManialinks(this.display())
   }
 
   private constructXml(isDynamic: boolean): string {

@@ -13,5 +13,5 @@ export default {
     help: `Juke a random map. Options: nofinish(nofin), norank, noauthor`,
     privilege: 0
   },
-  searchMinSimilatiryValue: 0.1
+  searchMinSimilarityValue: 0.1
 }

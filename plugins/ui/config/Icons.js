@@ -155,5 +155,9 @@ export default {
     music: "https://cdn.discordapp.com/attachments/793464821030322196/1092092358599901255/Music.png",
     exclamation: "https://cdn.discordapp.com/attachments/793464821030322196/1092095314690834523/Exclamation.png",
     warn: "https://cdn.discordapp.com/attachments/793464821030322196/1092095314883792996/Warn.png",
-    personMusic: "https://cdn.discordapp.com/attachments/793464821030322196/1092095315072532654/PersonMusic.png"
+    personMusic: "https://cdn.discordapp.com/attachments/793464821030322196/1092095315072532654/PersonMusic.png",
+    promotePlayer: "https://cdn.discordapp.com/attachments/793464821030322196/1146317497356795935/PromotePlayer.png",
+    promotePlayerHover: "https://cdn.discordapp.com/attachments/793464821030322196/1146317497117724682/PromotePlayerHover.png",
+    demotePlayer: "https://cdn.discordapp.com/attachments/793464821030322196/1146317496882831361/DemotePlayer.png",
+    demotePlayerHover: "https://cdn.discordapp.com/attachments/793464821030322196/1146317496438243328/DemotePlayerHover.png",
 }

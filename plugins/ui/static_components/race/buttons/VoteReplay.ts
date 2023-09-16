@@ -76,7 +76,11 @@ export class VoteReplay extends UiButton {
       return
     }
     if (cfg.extensionsLimit !== 0 && this.replayCount >= cfg.extensionsLimit) {
-      tm.sendMessage(msg.tooManyExtensions, login)
+      if (tm.timer.isDynamic) {
+        tm.sendMessage(msg.tooManyExtensions, login)
+      } else {
+        tm.sendMessage(msg.tooManyReplays, login)
+      }
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })

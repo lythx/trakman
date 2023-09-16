@@ -67,7 +67,7 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
       return centeredText(login === playerLogin ? "$" + config.selfColour + playerLogin : playerLogin, w, h)
     }
     const messageCell: GridCellFunction = (i, j, w, h) => {
-      return leftAlignedText(tm.utils.safeString(tm.utils.strip(messages[index + i].text)), w, h)
+      return leftAlignedText(tm.utils.safeString(tm.utils.strip(messages[index + i].text.replace(`\n`, ` `))), w, h)
     }
     const rows = Math.min(config.entries - 1, messages.length - (index + 1))
     const arr = headers

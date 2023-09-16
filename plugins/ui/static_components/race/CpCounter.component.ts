@@ -23,7 +23,7 @@ export default class CpCounter extends StaticComponent {
   constructor() {
     super(componentIds.cpCounter)
     this.header = new StaticHeader('race', { rectangleWidth: config.rectangleWidth })
-    tm.addListener('PlayerCheckpoint', (info): void => {
+    this.renderOnEvent('PlayerCheckpoint', (info) => {
       const local: tm.LocalRecord | undefined = tm.records.getLocal(info.player.login)
       const dedi: DediRecord | undefined = dedimania.isUploadingLaps ? undefined : dedimania.getRecord(info.player.login)
       let pb: number | undefined = dedi?.checkpoints?.[info.index] ?? local?.checkpoints?.[info.index]
@@ -56,7 +56,7 @@ export default class CpCounter extends StaticComponent {
           isFinish: info.isLapFinish
         }
       }
-      this.displayToPlayer(info.player.login, {
+      return this.displayToPlayer(info.player.login, {
         index: info.index + 1,
         best: pb, current: info.time, isFinish: false, lap
       })
@@ -91,15 +91,18 @@ export default class CpCounter extends StaticComponent {
           }
         }
       }
-      this.displayToPlayer(login, {
+      const obj = this.displayToPlayer(login, {
         index: 0, current: time === 0 ? undefined : time,
         best, isFinish: time !== 0, lap
       })
+      if(obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     }, true)
-    tm.addListener('BeginMap', (): void => {
+    this.renderOnEvent('BeginMap', () => {
       this.prevTimes.length = 0
       this.prevLapTimes.length = 0
-      this.display()
+      return this.display()
     })
   }
 
@@ -107,11 +110,13 @@ export default class CpCounter extends StaticComponent {
     return config.height
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
   private constructTimeXml(login: string, isLap: boolean, icon: string,
@@ -152,7 +157,7 @@ export default class CpCounter extends StaticComponent {
     </frame>`
   }
 
-  displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }): void {
+  displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }) {
     if (!this.isDisplayed) { return }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
@@ -166,7 +171,12 @@ export default class CpCounter extends StaticComponent {
     let counter: string = `$${colour}${params?.index ?? 0}/${cpAmount}`
     if (params?.isFinish === true) {
       counter = config.finishText
-      setTimeout((): void => this.displayToPlayer(login), config.finishTextDuration)
+      setTimeout((): void => {
+        const obj = this.displayToPlayer(login)
+        if (obj !== undefined) {
+          tm.sendManialink(obj.xml, obj.login)
+        }
+      }, config.finishTextDuration)
     }
     let counterXml: string = `
     <frame posn="${h.squareWidth + h.margin * 2 + h.rectangleWidth} 0 3">
@@ -178,7 +188,8 @@ export default class CpCounter extends StaticComponent {
       text = config.noCpsText
       counterXml = ''
     }
-    tm.sendManialink(`
+    return {
+      xml: `
         <manialink id="${this.id}">
             <frame posn="${config.posX} ${config.posY} 4">
               ${this.getLapsXml(login, params?.lap)}
@@ -187,10 +198,11 @@ export default class CpCounter extends StaticComponent {
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
                 ${cpAmount === 0 ? '' : this.constructTimeXml(login, false, config.iconBottom,
-      params?.isFinish, params?.current, params?.best)}
+        params?.isFinish, params?.current, params?.best)}
               </frame>
             </frame>
-        </manialink>`, login)
+        </manialink>`, login
+    }
   }
 
   private getLapsXml(login: string, data?: CheckpointData & { cpIndex: number }) {

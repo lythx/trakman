@@ -78,4 +78,7 @@ export default {
   bannerWidget: 460000,
   playerStats: 470000,
   TMXDetailsWindow: 480000,
+  oplist: 490000,
+  adminlist: 500000,
+  masteradminlist: 510000,
 }

@@ -10,7 +10,7 @@ export default class TeamScore extends StaticComponent {
   private readonly header: StaticHeader
   private readonly grid: Grid
   private xml: string = ''
-  
+
   constructor(private maxScore = tm.rounds.teamsPointsLimit) {
     super(componentIds.teamScore)
     this.header = new StaticHeader('race')
@@ -19,24 +19,24 @@ export default class TeamScore extends StaticComponent {
     tm.addListener('BeginMap', () => {
       this.maxScore = tm.rounds.teamsPointsLimit
     })
-    tm.addListener('EndRound', () => this.display())
-    tm.addListener('BeginRound', () => this.display())
-    tm.addListener('PlayerFinish', () => this.display())
+    this.renderOnEvent('EndRound', () => this.display())
+    this.renderOnEvent('BeginRound', () => this.display())
+    this.renderOnEvent('PlayerFinish', () => this.display())
   }
 
   getHeight(): number {
     return config.height
   }
 
-  display(): void {
+  display(): string | void {
     if (!this.isDisplayed) { return }
     this.constructXml()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   private constructXml() {

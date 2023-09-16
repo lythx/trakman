@@ -146,8 +146,18 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
       nickname: tm.utils.strip(payerNickname),
       amount
     }))
-    const info: DonationInfo | undefined = onlineDonators.find(a => a.login === payerLogin)
-    if (info === undefined) { return true }
+    let info: DonationInfo | undefined = onlineDonators.find(a => a.login === payerLogin)
+    const isOnline = tm.players.get(payerLogin) !== undefined
+    if (info === undefined) {
+      if (isOnline) {
+        info = {
+          login: payerLogin, nickname: payerNickname, sum: 0, history: []
+        }
+        onlineDonators.push(info)
+      } else {
+        return true
+      }
+    }
     info.history.push({ amount, date })
     info.sum += amount
     for (const e of listeners) {

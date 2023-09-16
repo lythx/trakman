@@ -18,23 +18,29 @@ export default class VisitorsRanking extends StaticComponent {
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
-    stats.visits.onUpdate((): void => this.display())
-    stats.visits.onNicknameChange((): void => this.display())
+    stats.visits.onUpdate((): void => {
+      const xml = this.display()
+      if (xml !== undefined) { tm.sendManialink(xml) }
+    })
+    stats.visits.onNicknameChange((): void => {
+      const xml = this.display()
+      if (xml !== undefined) { tm.sendManialink(xml) }
+    })
   }
 
   getHeight(): number {
     return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.constructXml()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   constructXml(): void {

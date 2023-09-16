@@ -1,10 +1,10 @@
 import config from './Config.js'
-import { VoteWindow, flagIcons } from '../ui/UI.js'
+import { VoteWindow } from '../ui/UI.js'
+import { titles } from '../../config/Titles.js'
 
 interface CallerInfo { login: string, nickname: string, title: string, privilege: number }
 
-const sendNoPrivilegeMessage = (info: CallerInfo): void =>
-  tm.sendMessage(config.noPermission, info.login)
+const sendNoPrivilegeMessage = (info: CallerInfo): void => tm.sendMessage(config.noPermission, info.login)
 
 /**
  * Provides utilities for various actions.
@@ -341,6 +341,48 @@ export const actions = {
         tm.sendMessage(tm.utils.strVar(config.publicAdd.cancelledBy, { title, nickname: tm.utils.strip(result.caller.nickname, true), mapName }))
       }
       return false
+    }
+  },
+  setPlayerPrivilege: async (targetLogin: string, caller: tm.Player, privilege: number) => {
+    const target: tm.OfflinePlayer | undefined = tm.players.get(targetLogin) ?? await tm.players.fetch(targetLogin)
+    if (target === undefined) {
+      tm.sendMessage(config.setPlayerPrivilege.unknownPlayer, caller.login)
+      return
+    }
+    if (target.privilege >= caller.privilege) {
+      tm.sendMessage(config.setPlayerPrivilege.noPrivilege, caller.login)
+      return
+    }
+    if (target.privilege < privilege) {
+      tm.sendMessage(tm.utils.strVar(config.setPlayerPrivilege.promote, {
+        title: caller.title,
+        adminNickname: tm.utils.strip(caller.nickname),
+        nickname: tm.utils.strip(target.nickname),
+        rank: titles.privileges[privilege as keyof typeof titles.privileges]
+      }))
+      await tm.admin.setPrivilege(target.login, privilege, caller)
+    } else if (target.privilege === privilege) {
+      tm.sendMessage(tm.utils.strVar(config.setPlayerPrivilege.alreadyIs, {
+        nickname: tm.utils.strip(target.nickname),
+        rank: titles.privileges[privilege as keyof typeof titles.privileges]
+      }), caller.login)
+      return
+    } else {
+      if (privilege === 0) {
+        tm.sendMessage(tm.utils.strVar(config.setPlayerPrivilege.rightsRemoved, {
+          title: caller.title,
+          adminNickname: tm.utils.strip(caller.nickname),
+          nickname: tm.utils.strip(target.nickname)
+        }))
+      } else {
+        tm.sendMessage(tm.utils.strVar(config.setPlayerPrivilege.demote, {
+          title: caller.title,
+          adminNickname: tm.utils.strip(caller.nickname),
+          nickname: tm.utils.strip(target.nickname),
+          rank: titles.privileges[privilege as keyof typeof titles.privileges]
+        }))
+      }
+      await tm.admin.setPrivilege(target.login, privilege, caller)
     }
   }
 }

@@ -95,7 +95,8 @@ const events: tm.Listener[] = [
       for (const c of Object.values(staticComponents)) {
         c.updateIsDisplayed()
         c.updatePosition()
-        c.display()
+        const ret = c.display()
+        StaticComponent.sendMultipleManialinks(ret)
       }
       StaticComponent.refreshStaticLayouts()
       new Buttons()

@@ -30,7 +30,8 @@ export default {
   lapRecord: `${p.highlight}#{nickname}${p.message} has `
     + `#{status} the ${p.rank}#{position}${p.message} `
     + `lap record. Time${p.highlight}: #{time}#{difference}`,
-  recordDifference: ` ${p.record}$n(${p.rank}#{position} ${p.highlight}-#{time}${p.record})`,
+  recordDifference: ` $n${p.record}(${p.rank}#{position} ${p.highlight}-#{time}${p.record})`,
+  dediDifference: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}-#{time}${p.dedirecord})`,
   dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
     + `#{status} the ${p.rank}#{position}${p.dedirecord} `
     + `dedimania record. Time${p.highlight}: #{time}#{difference}`,

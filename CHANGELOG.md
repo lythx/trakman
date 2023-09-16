@@ -1,6 +1,36 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
 
+## 1.4
+**16/09/2023**
++ Added optimisations for UI display and hide
++ Added lighter UI for when there are too many players
++ Added the banner widget on result
++ Added the player stats window
++ Added the TMX detailed info window
++ Added the public /add vote
++ Added the skip endscreen plugin
++ Added matchsettings change handling
++ Added privilege levels to commandlist
++ Added admin lists to admin service
++ Added admin list windows
+- Fixed client reconnect crash
+- Fixed handling of newlines in chatlog
+- Fixed the round averages calculation
+- Fixed the controller stalling for 30 seconds on failed call
+- Fixed vote ratios to disallow passing on 1 to 1 votes
+- Fixed /laston not finding the player
+- Fixed karma spam clicking
+- Fixed cache in maplist
+- Fixed possible infinite recursion in the map service
+- Fixed the current map not being in memory bug
+- Fixed the dollar character handling in utils
+- Fixed stats not updating on init
+- Fixed no log output in daemon mode
+- Fixed pagination in Commandlist
+- Fixed pagination in TMX search
+- Fixed various sent messages
+
 ## 1.3 
 **07/04/2023**
 * Removed mysterious checkpoint

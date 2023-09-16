@@ -22,23 +22,23 @@ export default class MostRecordsRanking extends StaticComponent {
     tm.addListener('EndMap', (): void => {
       this.constructXml()
     })
-    stats.records.onUpdate((): void => this.display())
-    stats.records.onNicknameChange((): void => this.display())
+    stats.records.onUpdate(() => this.sendMultipleManialinks(this.display()))
+    stats.records.onNicknameChange(() => this.sendMultipleManialinks(this.display()))
   }
 
   getHeight(): number {
     return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
     this.constructXml()
-    tm.sendManialink(this.xml)
+    return this.xml
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(this.xml, login)
+    return { xml: this.xml, login }
   }
 
   constructXml(): void {

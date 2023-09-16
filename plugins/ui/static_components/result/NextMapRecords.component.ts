@@ -19,25 +19,29 @@ export default class NextMapRecords extends StaticComponent {
     this.list = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
     this.list.onClick((info: tm.ManialinkClickInfo): void => {
-      this.displayToPlayer(info.login)
+      if (this.reduxModeEnabled) { return }
+      const obj = this.displayToPlayer(info.login)
+      if (obj !== undefined) {
+        tm.sendManialink(obj.xml, obj.login)
+      }
     })
-    tm.addListener('EndMap', async (info): Promise<void> => {
+    this.renderOnEvent('EndMap', (info) => {
       if (info.isRestart) {
         this.records = tm.records.local
-        this.display()
+        return this.display()
       } else {
         const mapId: string = tm.jukebox.queue[0].id
         this.records = tm.records.getFromQueue(mapId)
-        this.display()
+        return this.display()
       }
     })
-    tm.addListener('RecordsPrefetch', async (): Promise<void> => {
+    this.renderOnEvent('RecordsPrefetch', () => {
       const mapId: string = tm.jukebox.queue[0].id
       this.records = tm.records.getFromQueue(mapId)
-      this.display()
+      return this.display()
     })
-    tm.addListener('PlayerDataUpdated', (info): void => {
-      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { this.display() }
+    this.renderOnEvent('PlayerDataUpdated', (info) => {
+      if (tm.records.local.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
     tm.addListener('BeginMap', (): void => {
       this.records.length = 0
@@ -48,27 +52,33 @@ export default class NextMapRecords extends StaticComponent {
     return config.entryHeight * config.entries + StaticHeader.raceHeight + config.margin
   }
 
-  display(): void {
+  display() {
     if (!this.isDisplayed) { return }
+    if (this.reduxModeEnabled) { return this.displayToPlayer('')?.xml }
+    const arr = []
     for (const e of tm.players.list) {
-      this.displayToPlayer(e.login)
+      arr.push(this.displayToPlayer(e.login))
     }
+    return arr
   }
 
-  displayToPlayer(login: string): void {
+  displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    tm.sendManialink(`<manialink id="${this.id}">
+    return {
+      xml: `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.positionX} ${this.positionY} 2">
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(login, this.records.map(a => ({
-      name: a.nickname, time: a.time,
-      date: a.date, checkpoints: a.checkpoints, login: a.login
-    })))}
+        ${this.list.constructXml(this.reduxModeEnabled ? undefined : login, this.records.map(a => ({
+        name: a.nickname, time: a.time,
+        date: a.date, checkpoints: a.checkpoints, login: a.login
+      })))}
         </frame>
       </frame>
-    </manialink>`, login)
+    </manialink>`,
+      login
+    }
   }
 
 }
