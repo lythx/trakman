@@ -23,7 +23,7 @@ export abstract class Client {
     this.socket.on('error', (error) => setTimeout(() => {
       Logger.error('Client socket error:', error.message)
       void this.handleError()
-    }, 5000)) // 5 sec timeout before reconnect try
+    }, 10000)) // 10 sec timeout before reconnect try
     const status = await this.socket.awaitHandshake()
     if (status instanceof Error) {
       await Logger.fatal('Connection to the dedicated server failed:', status.message)
@@ -39,7 +39,7 @@ export abstract class Client {
     this.socket.on('error', (error) => setTimeout(() => {
       Logger.error('Client socket error:', error.message)
       void this.handleError()
-    }, 5000))
+    }, 10000))
     const status = await this.socket.awaitHandshake()
     if (status instanceof Error) {
       await Logger.fatal('Connection to the dedicated server failed:', status.message)
