@@ -61,7 +61,25 @@ const loadMod = (): void => {
     }])
 }
 
-const iconArr = Object.values(icons).map(a =>
+// paginator shit
+const preloadedIcons = [
+  icons.close,
+  icons.closeHover,
+  icons.pageDoubleLeft,
+  icons.pageDoubleLeftHover,
+  icons.pageDoubleRight,
+  icons.pageDoubleRightHover,
+  icons.pageFirst,
+  icons.pageFirstHover,
+  icons.pageLast,
+  icons.pageLastHover,
+  icons.pageLeft,
+  icons.pageLeftHover,
+  icons.pageRight,
+  icons.pageRightHover
+]
+
+const iconArr = Object.values(preloadedIcons).map(a =>
   `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
 
 const preloadIcons = (login?: string): void => {
