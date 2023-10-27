@@ -61,7 +61,7 @@ const loadMod = (): void => {
     }])
 }
 
-const iconArr = Object.values(icons).map(a =>
+const iconArr = Object.values(icons.preloadedIcons).map(a =>
   `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
 
 const preloadIcons = (login?: string): void => {
