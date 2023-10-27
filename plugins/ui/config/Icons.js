@@ -160,4 +160,23 @@ export default {
     promotePlayerHover: "https://trakman.ptrk.eu/icons/PromotePlayerHover.png",
     demotePlayer: "https://trakman.ptrk.eu/icons/DemotePlayer.png",
     demotePlayerHover: "https://trakman.ptrk.eu/icons/DemotePlayerHover.png",
+
+    get preloadedIcons() {
+        return [
+            this.close,
+            this.closeHover,
+            this.pageDoubleLeft,
+            this.pageDoubleLeftHover,
+            this.pageDoubleRight,
+            this.pageDoubleRightHover,
+            this.pageFirst,
+            this.pageFirstHover,
+            this.pageLast,
+            this.pageLastHover,
+            this.pageLeft,
+            this.pageLeftHover,
+            this.pageRight,
+            this.pageRightHover
+        ]
+    }
 }
