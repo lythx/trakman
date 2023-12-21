@@ -24,6 +24,8 @@ const p = tm.utils.palette
  * - link (str) - internet link to open on click (eg. discord server link)
  * - text1Scale (num) - text1 size, this overwrites equalTexts if set
  * - text2Scale (num) - text2 size, this overwrites equalTexts if set
+ * - text1PositionOffset (num) - text1 position offset, makes the text go lower
+ * - text2PositionOffset (num) - text2 position offset, makes the text go lower
  */
 export default {
   /**
@@ -33,21 +35,23 @@ export default {
     {
       displayed: false,
       icon: icons.placeholder,
-      posX: 43,
-      posY: 25,
+      posX: 44.9,
+      posY: 24.2,
       width: 4,
-      height: 5,
+      height: 6.45,
       zIndex: 1,
       text1: `$${p.purple}DISCORD`,
       text2: 'SERVER',
-      iconWidth: 2,
-      iconHeight: 2,
+      iconWidth: 3,
+      iconHeight: 3,
       topPadding: 0.3,
       equalTexts: false,
       // actionId: ,
-      link: '',
+      // link: '',
       // text1Scale: , 
       // text2Scale: ,
+      text1PositionOffset: 1.75,
+      text2PositionOffset: 1.75,
     }
   ],
   /**
@@ -57,20 +61,24 @@ export default {
     {
       displayed: false,
       icon: icons.placeholder,
-      posX: 43,
-      posY: 25,
+      posX: 44.9,
+      posY: 22.85,
       width: 4,
-      height: 5,
+      height: 6.1,
       zIndex: 1,
       text1: `$${p.purple}DISCORD`,
       text2: 'SERVER',
-      iconWidth: 2,
-      iconHeight: 2,
+      iconWidth: 3,
+      iconHeight: 3,
       topPadding: 0.3,
       equalTexts: false,
       // actionId: ,
       background: resultUi.background,
-      link: ''
+      link: '',
+      // text1Scale: , 
+      // text2Scale: ,
+      text1PositionOffset: 1.75,
+      text2PositionOffset: 1.75,
     }
   ]
 }
