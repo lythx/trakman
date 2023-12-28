@@ -1,11 +1,15 @@
+version: "3.0"
+
 services:
   trakman:
     image: trakman
     container_name: trakman-server
     restart: unless-stopped
     volumes:
-      - ./tmf-config:/home/server/GameData/Config/
-      - ./trakman:/home/server/trakman/
+      - ./tmf-config:/app/server/GameData/Config
+      - ./tracks:/app/server/GameData/Tracks
+      - ./trakman:/app/server/trakman
+      - ./logs:/root/.pm2/logs
     environment:
       # Dedicated server config
       SERVER_IP: 127.0.0.1
@@ -52,7 +56,7 @@ services:
       - "3450:3450/udp"
     depends_on:
       postgres:
-        condition: "service_started"
+        condition: service_started
 
 # Remove everything below if you already have a database
   postgres:

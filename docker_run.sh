@@ -1,6 +1,8 @@
 #!/bin/sh
-# Do NOT run this script locally,
-# it is meant to only be used in the provided docker environment
+# Do **NOT** run this script locally,
+# it is meant to only be used in the provided docker environment.
+
+# create and copy dedicated config
 if find /app/server/GameData/Config -mindepth 1 -maxdepth 1 | read; then
   echo 'Server config exists, skipping initial setup.'
   rm dedicated_cfg.txt.bk
@@ -21,6 +23,15 @@ else
   xml ed -L -u "/dedicated/system_config/xmlrpc_port" -v "$SERVER_PORT" dedicated_cfg.txt.bk
   mv /app/server/dedicated_cfg.txt.bk /app/server/GameData/Config/dedicated_cfg.txt
 fi
+# copy over default tracks
+if find /app/server/GameData/Tracks -mindepth 1 -maxdepth 1 | read; then
+  echo 'Tracks exist, skipping initial setup.'
+  rm -r Tracksbk
+else
+  echo 'Setting up tracks...'
+  mv /app/server/Tracksbk/* /app/server/GameData/Tracks/
+fi
+# copy over trakman directory
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
   echo 'Trakman exists, skipping initial setup.'
   rm -r trakmanbk
@@ -28,6 +39,7 @@ else
   echo 'Setting up trakman...'
   mv /app/server/trakmanbk/* /app/server/trakman/
 fi
+# build and actually run everything
 npm run build --prefix /app/server/trakman
 /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt
 npm run daemon --prefix /app/server/trakman
