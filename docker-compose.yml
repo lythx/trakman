@@ -12,6 +12,13 @@ services:
       SERVER_PORT: 5000
       SUPER_ADMIN_NAME: "SuperAdmin"
       SUPER_ADMIN_PASSWORD: ""
+      SERVER_ACC_LOGIN: ""
+      SERVER_ACC_PASSWORD: ""
+      SERVER_ACC_KEY: ""
+      SERVER_NAME: "Docker Trakman Server"
+      SERVER_PASSWORD: ""
+      SERVER_NET_PORT: 2350
+      SERVER_P2P_PORT: 3450
       # Database config - preconfigured for included database
       DB_USER: "trakman"
       DB_PASSWORD: "trakman"
