@@ -42,13 +42,15 @@ services:
       - "2350:2350/udp"
       - "3450:3450/tcp"
       - "3450:3450/udp"
-# Remove everything below if you already have a database
-#    networks:
-#      - trakman-db
+    depends_on:
+      trakman-db:
+        condition: "service_started"
 
+# Remove everything below if you already have a database
   postgres:
     image: postgres:alpine
     container_name: trakman-db
+    hostname: trakman-db
     restart: unless-stopped
     volumes:
       - ./db:/data/postgres
@@ -57,15 +59,8 @@ services:
       POSTGRES_PASSWORD: "trakman"
       PGDATA: /data/postgres
       POSTGRES_DB: "trakman"
-#    networks:
-#      - trakman-db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U trakman -d postgres" ]
       interval: 30s
       timeout: 10s
       retries: 5
-
-#networks:
-#  trakman-db:
-#    driver: bridge
-#    external: false
