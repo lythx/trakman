@@ -43,14 +43,15 @@ services:
       DISCORD_WEBHOOK_URL: ""
       DISCORD_EMBED_IMAGES: ""
       DISCORD_TAGGED_USERS: ""
-    ports: # Don't forget to change the first (host) ports
+    ports: # Don't forget to change the ports
            # if you already have another server running
+           # **The ports MUST match** because of the way the server works
       - "2350:2350/tcp"
       - "2350:2350/udp"
       - "3450:3450/tcp"
       - "3450:3450/udp"
     depends_on:
-      trakman-db:
+      postgres:
         condition: "service_started"
 
 # Remove everything below if you already have a database
