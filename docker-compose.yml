@@ -55,14 +55,12 @@ services:
       - "3450:3450/tcp"
       - "3450:3450/udp"
     depends_on:
-      postgres:
+      trakman-db:
         condition: service_started
 
 # Remove everything below if you already have a database
-  postgres:
+  trakman-db:
     image: postgres:alpine
-    container_name: trakman-db
-    hostname: trakman-db
     restart: unless-stopped
     volumes:
       - ./db:/data/postgres
