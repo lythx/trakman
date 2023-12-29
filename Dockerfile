@@ -7,30 +7,26 @@ WORKDIR /app/server
 COPY ./config ./trakmanbk/config
 COPY ./plugins ./trakmanbk/plugins
 COPY ./src ./trakmanbk/src
-COPY ./Plugins.ts ./trakmanbk/Plugins.ts
-COPY ./package.json ./trakmanbk/package.json
-COPY ./tsconfig.json ./trakmanbk/tsconfig.json
-COPY ./CHANGELOG.md ./trakmanbk/CHANGELOG.md
+COPY ./Plugins.ts ./package.json ./tsconfig.json ./CHANGELOG.md ./trakmanbk/
 COPY --chmod=0755 ./docker_run.sh ./docker_run.sh
 # download dedicated server and remove unnecessary files
-RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip
-RUN unzip serv.zip
-RUN rm -r serv.zip CommandLine.html ListCallbacks.html ListMethods.html \
+RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip && \
+    unzip serv.zip && \
+    rm -r serv.zip CommandLine.html ListCallbacks.html ListMethods.html \
     Readme_Dedicated.html RemoteControlExamples TrackmaniaServer.exe manialink_dedicatedserver.txt
 # get trakman dependencies and build
 WORKDIR /app/server/trakmanbk
-RUN npm i
-RUN npm i typescript@latest
-RUN npm run build
+RUN npm i typescript@latest && \
+    npm run build
 WORKDIR /app/server
 # backup important files to prevent them being deleted by mounting the volume
-RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk
-RUN mkdir -p Tracksbk/MatchSettings
-RUN mkdir -p Tracksbk/Campaigns/Nations
-RUN mv GameData/Tracks/MatchSettings/Nations/NationsBlue.txt Tracksbk/MatchSettings/MatchSettings.txt
-RUN mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/
-# install xml editing tool for it
-RUN apk add xmlstarlet
+# and install xml editing tool for server config
+RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
+    mkdir -p Tracksbk/MatchSettings && \
+    mkdir -p Tracksbk/Campaigns/Nations && \
+    mv GameData/Tracks/MatchSettings/Nations/NationsBlue.txt Tracksbk/MatchSettings/MatchSettings.txt && \
+    mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/ && \
+    apk add xmlstarlet
 # expose volumes
 VOLUME /app/server/GameData/Config
 VOLUME /app/server/GameData/Tracks
