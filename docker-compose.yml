@@ -46,6 +46,9 @@ services:
       DISCORD_LOG_LEVEL: 2
       DISCORD_WEBHOOK_URL: ""
       DISCORD_EMBED_IMAGES: ""
+      DISCORD_EMBED_TITLE: ""
+      DISCORD_EMBED_TITLE_URL: ""
+      DISCORD_EMBED_TITLE_ICON_URL: ""
       DISCORD_TAGGED_USERS: ""
     ports: # Don't forget to change the ports
            # if you already have another server running

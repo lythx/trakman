@@ -40,6 +40,6 @@ else
   mv /app/server/trakmanbk/* /app/server/trakman/
 fi
 # build and actually run everything
-npm run build --prefix /app/server/trakman
 /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt
+npm run build --prefix /app/server/trakman
 npm run daemon --prefix /app/server/trakman
