@@ -9,7 +9,7 @@ export default class Buttons {
   constructor() {
     this.constructXml()
     this.display()
-    tm.addListener(['BeginMap', 'EndMap'], () => {
+    tm.addListener(['BeginMap', 'EndMap', 'PlayerJoin'], () => {
       this.display()
     })
   }
