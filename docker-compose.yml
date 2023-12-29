@@ -63,7 +63,7 @@ services:
 
 # Remove everything below if you already have a database
   trakman-db:
-    image: postgres:alpine
+    image: postgres:16-alpine
     restart: unless-stopped
     volumes:
       - ./db:/data/postgres
