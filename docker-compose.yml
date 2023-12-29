@@ -1,0 +1,79 @@
+version: "3.0"
+
+services:
+  trakman:
+    image: trakman
+    container_name: trakman-server
+    restart: unless-stopped
+    volumes:
+      - ./tmf-config:/app/server/GameData/Config
+      - ./tracks:/app/server/GameData/Tracks
+      - ./trakman:/app/server/trakman
+      - ./logs:/root/.pm2/logs
+    environment:
+      # Dedicated server config
+      SERVER_IP: 127.0.0.1
+      SERVER_PORT: 5000
+      SUPER_ADMIN_NAME: "SuperAdmin"
+      SUPER_ADMIN_PASSWORD: ""
+      SERVER_ACC_LOGIN: ""
+      SERVER_ACC_PASSWORD: ""
+      SERVER_ACC_KEY: ""
+      SERVER_NAME: "Docker Trakman Server"
+      SERVER_PASSWORD: ""
+      SERVER_NET_PORT: 2350
+      SERVER_P2P_PORT: 3450
+      # Database config - preconfigured for included database
+      DB_USER: "trakman"
+      DB_PASSWORD: "trakman"
+      DB_NAME: "trakman"
+      DB_IP: "trakman-db"
+      DB_PORT: 5432
+      # Controller config
+      OWNER_LOGIN: ""
+      # Dedimania
+      # This is either server password or playerpage community code
+      DEDIMANIA_PASSWORD: ""
+      # Freezone
+      # Received on 'freezone:servers' manialink in-game
+      FREEZONE_PASSWORD: ""
+      # Webservices
+      WEBSERVICES_LOGIN: ""
+      WEBSERVICES_PASSWORD: ""
+      # Logging
+      LOG_LEVEL: 3
+      DISCORD_LOG_ENABLED: "NO"
+      DISCORD_LOG_LEVEL: 2
+      DISCORD_WEBHOOK_URL: ""
+      DISCORD_EMBED_IMAGES: ""
+      DISCORD_EMBED_TITLE: ""
+      DISCORD_EMBED_TITLE_URL: ""
+      DISCORD_EMBED_TITLE_ICON_URL: ""
+      DISCORD_TAGGED_USERS: ""
+    ports: # Don't forget to change the ports
+           # if you already have another server running
+           # **The ports MUST match** because of the way the server works
+      - "2350:2350/tcp"
+      - "2350:2350/udp"
+      - "3450:3450/tcp"
+      - "3450:3450/udp"
+    depends_on:
+      trakman-db:
+        condition: service_started
+
+# Remove everything below if you already have a database
+  trakman-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - ./db:/data/postgres
+    environment:
+      POSTGRES_USER: "trakman"
+      POSTGRES_PASSWORD: "trakman"
+      PGDATA: /data/postgres
+      POSTGRES_DB: "trakman"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U trakman -d postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
