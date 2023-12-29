@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import 'dotenv/config'
-import { WebhookClient, EmbedBuilder } from 'discord.js'
+import fetch from 'node-fetch'
 
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
@@ -57,9 +57,11 @@ export abstract class Logger {
   }
   private static readonly users: string[] = process.env.DISCORD_TAGGED_USERS?.split(',') ?? []
   private static readonly thumbs: string[] = process.env.DISCORD_EMBED_IMAGES?.split(',') ?? []
+  private static readonly embedTitle: string = process.env.DISCORD_EMBED_TITLE ?? 'Trakman Log'
+  private static readonly embedTitleUrl: string = process.env.DISCORD_EMBED_TITLE_URL ?? ''
+  private static readonly embedTitleIconUrl: string = process.env.DISCORD_EMBED_TITLE_ICON_URL ?? ''
   private static crashed: boolean = false
   private static readonly useDiscord: boolean = process.env.DISCORD_LOG_ENABLED === 'YES'
-  private static webhook: WebhookClient
   private static discordLogLevel: number = 2
   private static isFirstLog: boolean = true
 
@@ -100,7 +102,6 @@ export abstract class Logger {
         this.error('DISCORD_WEBHOOK_URL is undefined. Check your .env file to use discord logging')
         return
       }
-      this.webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_URL })
     }
   }
 
@@ -193,34 +194,42 @@ export abstract class Logger {
       str = `${str.substring(0, 500)} [${str.length - 500} more characters]...`
     }
     if (this.useDiscord && this.logTypes[tag].level <= this.discordLogLevel) {
-      const embed: EmbedBuilder = new EmbedBuilder()
-        .setTitle(`${tag.toUpperCase()} on server ${tm.config.server.login}`)
-        .setColor(this.logTypes[tag].discordColour)
-        .setTimestamp(new Date())
-        .addFields([
-          {
-            name: location,
-            value: str
-          }
-        ]
-        )
-      if (this.thumbs.length !== 0) {
-        embed.setThumbnail(this.thumbs[~~(Math.random() * this.thumbs.length)])
-      }
-      const separator: string | undefined = this.isFirstLog ? this.separator : undefined
-      if (tag === 'fatal') {
-        await this.webhook.send({
-          content: (separator ?? '') + '\n' + this.users.join(' '),
-          embeds: [embed]
-        })
-      } else {
-        await this.webhook.send({
-          content: separator,
-          embeds: [embed]
-        })
-      }
+      const message = JSON.stringify({
+        content: tag === 'fatal' ? this.users.join(' ') : (this.isFirstLog ? this.separator : undefined),
+        embeds: [{
+          author: {
+            name: this.embedTitle,
+            url: this.embedTitleUrl,
+            icon_url: this.embedTitleIconUrl
+          },
+          title: `${tag.toUpperCase()} on server ${tm.utils.strip(tm.config.server.name, true)}`,
+          timestamp: new Date(),
+          color: this.logTypes[tag].discordColour,
+          thumbnail: {
+            url: this.thumbs.length === 0 ? undefined : this.thumbs[~~(Math.random() * this.thumbs.length)]
+          },
+          footer: {
+            text: `📅`,
+          },
+          fields: [
+            {
+              name: `➡️ ${location}`,
+              value: `⚠️ ${str}`,
+            },
+          ],
+        }]
+      })
+      await this.sendDiscordMessage(message)
       this.isFirstLog = false
     }
+  }
+
+  private static async sendDiscordMessage(message: string) {
+    return fetch(process.env.DISCORD_WEBHOOK_URL!, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: message
+    })
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {
