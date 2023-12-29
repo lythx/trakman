@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import 'dotenv/config'
 import fetch from 'node-fetch'
-import axios from 'axios'
 
 type Tag = 'warn' | 'fatal' | 'debug' | 'error' | 'info' | 'trace'
 
@@ -210,7 +209,6 @@ export abstract class Logger {
             url: this.thumbs.length === 0 ? undefined : this.thumbs[~~(Math.random() * this.thumbs.length)]
           },
           footer: {
-            // icon_url: ``,
             text: `📅`,
           },
           fields: [
@@ -229,11 +227,7 @@ export abstract class Logger {
   private static async sendDiscordMessage(message: string) {
     return fetch(process.env.DISCORD_WEBHOOK_URL!, {
       method: 'POST',
-      headers:
-      {
-        'Authorization': '',
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: message
     })
   }
