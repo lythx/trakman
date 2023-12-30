@@ -2,7 +2,7 @@ version: "3.0"
 
 services:
   trakman:
-    image: trakman
+    image: borecek/trakman:main
     container_name: trakman-server
     restart: unless-stopped
     volumes:
