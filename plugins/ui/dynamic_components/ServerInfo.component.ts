@@ -5,8 +5,8 @@
 
 import { Grid, componentIds, GridCellFunction, GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
 import config from './ServerInfo.config.js'
-import * as os from 'node:os'
-import * as process from 'node:process'
+import { arch, cpus, loadavg, totalmem, freemem, platform } from 'node:os'
+import { uptime, version, memoryUsage } from 'node:process'
 import 'dotenv/config'
 
 export default class ServerInfoWindow extends PopupWindow {
@@ -50,18 +50,18 @@ export default class ServerInfoWindow extends PopupWindow {
 
   private async getHostInfo(): Promise<string[]> {
     // Host system information
-    const osUptime: string = tm.utils.getVerboseTime(~~os.uptime() * 1000) // Seconds
-    const osArch: string = os.arch()
-    const osCPU: string = os.cpus()[0].model
-    const osCPULoad: string = String(os.loadavg()[0] + `%`)
-    const osRAM: string = String(~~((os.totalmem() - os.freemem()) / (1024 ** 2)) + ` MB`) // Bytes
-    const osKernel: string = os.platform().toUpperCase()
+    const osUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
+    const osArch: string = arch()
+    const osCPU: string = cpus()[0].model
+    const osCPULoad: string = String(loadavg()[0] + `%`)
+    const osRAM: string = String(~~((totalmem() - freemem()) / (1024 ** 2)) + ` MB`) // Bytes
+    const osKernel: string = platform().toUpperCase()
     // Trakman information
     const trakmanVersion: string = tm.config.controller.version
-    const trakmanUptime: string = tm.utils.getVerboseTime(~~process.uptime() * 1000) // Seconds
+    const trakmanUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
     // Node information
-    const nodeVersion: string = process.version
-    const nodeRAMUsage: string = String(~~(process.memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
+    const nodeVersion: string = version
+    const nodeRAMUsage: string = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
     // Postgres information
     const postgresVersion: string = String(`v` + (await tm.db.query(`select version();`) as any)[0].version).split(` `)[1]
     const postgresDBSize: string = String((await tm.db.query(`select pg_size_pretty(pg_database_size('${process.env.DB_NAME}'));`) as any)[0].pg_size_pretty)
