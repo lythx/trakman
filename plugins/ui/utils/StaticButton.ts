@@ -9,8 +9,10 @@ interface StaticButtonOptions {
   iconHeight?: number,
   topPadding?: number,
   background?: string,
-  text1Scale?: number
-  text2Scale?: number
+  text1Scale?: number,
+  text2Scale?: number,
+  text1PositionOffset?: number,
+  text2PositionOffset?: number
 }
 
 /**
@@ -27,14 +29,14 @@ export default function (iconUrl: string, text1: string, text2: string, width: n
   options?: StaticButtonOptions): string {
   const t1: string = options?.equalTexts ?
     horizontallyCenteredText(text1, width, height,
-      { yOffset: config.yOffset, textScale: options?.text1Scale ?? config.textScale, padding: config.padding }) :
+      { yOffset: config.yOffset + (options?.text1PositionOffset ?? 0), textScale: options?.text1Scale ?? config.textScale, padding: config.padding }) :
     horizontallyCenteredText(text1, width, height,
-      { yOffset: config.yOffsetBig, textScale: options?.text1Scale ?? config.textScaleBig, padding: config.padding })
+      { yOffset: config.yOffsetBig + (options?.text1PositionOffset ?? 0), textScale: options?.text1Scale ?? config.textScaleBig, padding: config.padding })
   const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
   const link: string = options?.link === undefined ? '' : `url="${options.link}"`
   return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${options?.background ?? config.background}" ${actionId} ${link}/>
   <quad posn="${(width - (options?.iconWidth ?? config.iconWidth)) / 2} ${-(options?.topPadding ?? config.topPadding)} 5" 
   sizen="${(options?.iconWidth ?? config.iconWidth)} ${(options?.iconHeight ?? config.iconHeight)}" image="${iconUrl}"/>
   ${t1}
-  ${horizontallyCenteredText(text2, width, height, { yOffset: config.yOffsetBottom, textScale: options?.text2Scale ?? config.textScale, padding: config.padding })}`
+  ${horizontallyCenteredText(text2, width, height, { yOffset: config.yOffsetBottom + (options?.text2PositionOffset ?? 0), textScale: options?.text2Scale ?? config.textScale, padding: config.padding })}`
 }
