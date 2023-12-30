@@ -12,28 +12,30 @@
 
 </div>
 
-## Prerequisites
-- Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
-- Node.js [v16.9.0+](https://nodejs.org/en/download/)
-- PostgreSQL [v11+](https://www.postgresql.org/download/)
+## Installation
+The recommended and fastest way to install Trakman is by using Docker, you can find the instructions [here](https://github.com/lythx/trakman/wiki/Docker-Installation)
 
-On Linux, relevant versions of Node & Postgres should be available in your distro's repositories by default (see [[1]](https://repology.org/project/nodejs/versions),  [[2]](https://repology.org/project/postgresql/versions))
+If you prefer not to use containers and/or want to install manually, [see this page instead](https://github.com/lythx/trakman/wiki/Manual-Installation)
+
+## Manual Installation Requirements
+- Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
+- NodeJS [v14.21.3+](https://nodejs.org/en/download/) (we recommend using the latest LTS version)
+- PostgreSQL [v12+](https://www.postgresql.org/download/)
+
+On Linux, relevant versions of NodeJS & PostgreSQL should be available in your distro's repositories by default (see [here](https://repology.org/project/nodejs/versions) for NodeJS and [here](https://repology.org/project/postgresql/versions) for PostgreSQL)
 
 On Windows, the installation instructions should be covered by the projects' websites (see above)
 
-## Installation
-See the [relevant wiki page](https://github.com/lythx/trakman/wiki/Installation-Instructions) on the matter
-
 ## XASECO Migration
-Information about database migration is available on [this page](https://github.com/lythx/trakman/wiki/Migration-from-other-controllers)
+Information about XASECO database migration is available on [this page](https://github.com/lythx/trakman/wiki/Migration-from-other-controllers)
 
-## Default Plugins
+## Included Plugins
 The default shipment of the controller is (somewhat) outlined on [the wiki](https://github.com/lythx/trakman/wiki/Included-Plugins)
 
 ## Settings
-Most controller configs descriptions are available on [this wiki page](https://github.com/lythx/trakman/wiki/Controller-Configs)
+Most controller configuration options are available on [this wiki page](https://github.com/lythx/trakman/wiki/Controller-Configs)
 
 ## Limitations
-1. Only the TimeAttack gamemode was fully tested
-2. Stunts mode is NOT supported
-3. Bugs, while rare, can still happen
+1. Only the TimeAttack gamemode was thoroughly tested
+2. Stunts mode is currently not supported
+3. Bugs, while rare, can still happen, [reports are welcome](https://github.com/lythx/trakman/issues)
