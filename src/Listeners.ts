@@ -218,9 +218,9 @@ export class Listeners {
           MapService.restartMap()
           await RecordService.restartMap()
         }
+        await RoundsService.handleBeginMap()
         // Update server config
         await ServerConfig.update()
-        RoundsService.handleBeginMap()
         // Register map update
         Events.emit('BeginMap', { ...MapService.current, isRestart })
       }

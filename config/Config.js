@@ -20,6 +20,8 @@ export default {
   voteOnPublicAdd: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
+  /** Whether to reset Cup mode scores after restarting or skipping a map */
+  resetCupScoreOnSkipAndRestart: true,
   /** Privilege levels for each of the administrative actions */
   privileges: {
     ban: 2,
