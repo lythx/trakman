@@ -22,7 +22,7 @@ export default {
     public: true,
     privilege: 2,
     aliases: ['shuf', 'shuffle'],
-    help: `Shuffle the map queue.`
+    help: `Shuffle the map list.`
   },
   clearhistory: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has cleared the map history.`,
