@@ -58,5 +58,6 @@ export default {
     privilege: 0
   },
   noMatchesMessage: `${p.error}Nothing found for ${p.highlight}#{query}${p.error}.`,
-  minimumMatchSimilarity: 0.1 // The higher it is the less results are considered matching
+  minimumMatchSimilarity: 0.1, // The higher it is the less results are considered matching
+  aliasSearch: true // Whether to search for alias on query
 }
