@@ -69,6 +69,7 @@ export const Utils = {
    * @returns String without formatting
    */
   strip(str: string, removeColours: boolean = true): string {
+    if (str === undefined) { return '' }
     let regex: RegExp
     if (removeColours) {
       regex = /\${1}(L|H|P)\[.*?\](.*?)\$(L|H|P)|\${1}(L|H|P)\[.*?\](.*?)|\${1}(L|H|P)(.*?)|\${1}[SHWIPLONGTZ]|\$(?:[\da-f][^$][^$]|[\da-f][^$]|[^][hlp]|(?=[][])|$)|\${1}[^\💀]/gi
