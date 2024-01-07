@@ -26,14 +26,12 @@ RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
     mkdir -p Tracksbk/MatchSettings && \
     mkdir -p Tracksbk/Campaigns/Nations && \
     mv GameData/Tracks/MatchSettings/Nations/NationsBlue.txt Tracksbk/MatchSettings/MatchSettings.txt && \
-    mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/ && \
-    mkdir trakman
+    mv GameData/Tracks/Campaigns/Nations/Blue Tracksbk/Campaigns/Nations/
 # expose volumes
 VOLUME /app/server/GameData/Config
 VOLUME /app/server/GameData/Tracks
 VOLUME /app/server/trakman
 VOLUME /app/server/.pm2/logs
 # set user back to root to be able to chown volumes in the run script
-STOPSIGNAL SIGINT
 USER root
 CMD /app/server/docker_run.sh
