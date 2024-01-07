@@ -39,7 +39,12 @@ else
   echo 'Setting up trakman...'
   mv /app/server/trakmanbk/* /app/server/trakman/
 fi
+chown -R server:server /app/server
 # build and actually run everything
+echo "#!/bin/sh
 /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt
 npm run build --prefix /app/server/trakman
-npm run daemon --prefix /app/server/trakman
+npm run daemon --prefix /app/server/trakman" > run.sh
+chown server:server run.sh
+chmod +x run.sh
+exec su-exec server ./run.sh
