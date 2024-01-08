@@ -200,9 +200,10 @@ export abstract class TMXFetcher {
   * @param count Number of maps to fetch
   * @returns An array of searched map objects or Error if unsuccessfull
   */
-  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
+  static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
-    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
+    const params: [string, string][] = [['count', count.toString()], ['name', query?.trim() ?? ''], ['author', author?.trim() ?? '']]
+    if (author === undefined) { params.pop() }
     if (query === undefined) { params.pop() }
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
@@ -210,6 +211,7 @@ export abstract class TMXFetcher {
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
       ...params
     ])}`
+    console.log(url)
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)

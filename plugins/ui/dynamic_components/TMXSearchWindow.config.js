@@ -48,7 +48,7 @@ export default {
   },
   command: {
     aliases: ['xlist', 'searchtmx', 'searchmap'],
-    help: `Search for maps matching the specified name on TMX and display them in a window.`,
+    help: `Search for maps matching the specified name on TMX and display them in a window. Start with $$a for author search.`,
     privilege: 0
   }
 }

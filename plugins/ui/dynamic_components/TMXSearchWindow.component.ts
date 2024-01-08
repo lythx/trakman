@@ -49,7 +49,13 @@ export default class TMXSearchWindow extends PopupWindow<{
       help: config.command.help,
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
-        const maps = await tm.tmx.searchForMap(query)
+        let maps
+        if (query?.includes('$a')) {
+          const queryParts = query.split('$a')
+          maps = await tm.tmx.searchForMap(queryParts[0], queryParts[1])
+        } else {
+          maps = await tm.tmx.searchForMap(query)
+        }
         if (maps instanceof Error) {
           tm.sendMessage(config.messages.searchError, info.login)
           return
