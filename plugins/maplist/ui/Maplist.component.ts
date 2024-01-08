@@ -64,8 +64,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           void this.openWithOption(info.login, 'noauthor')
         } else if (option === 'norank') {
           void this.openWithOption(info.login, 'norank')
-        } else if (query.startsWith('$a')) {
-          void this.openWithQuery(info.login, query.slice(2), true)
+        } else if (query.startsWith(config.authorSearchSeparator)) {
+          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), true)
         } else {
           void this.openWithQuery(info.login, query)
         }

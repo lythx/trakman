@@ -196,16 +196,17 @@ export abstract class TMXFetcher {
   /**
   * Searches for maps matching the specified name on TMX.
   * @param query Search query
+  * @param author Map author to look for
   * @param site TMX Site to fetch from
   * @param count Number of maps to fetch
   * @returns An array of searched map objects or Error if unsuccessfull
   */
   static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
-    const params: [string, string][] = [['count', count.toString()], ['name', query ?? ''], ['author', author ?? '']]
+    const params: [string, string][] = [['count', count.toString()], ['name', (query ?? '').trim()], ['author', (author ?? '').trim()]]
     if (author === undefined) { params.pop() }
     if (query === undefined) { params.pop() }
-    params.map(a => a.map(b => b.trim()))
+    console.log(params)
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
       ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
