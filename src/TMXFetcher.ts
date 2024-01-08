@@ -211,7 +211,6 @@ export abstract class TMXFetcher {
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
       ...params
     ])}`
-    console.log(url)
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)

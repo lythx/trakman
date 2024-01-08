@@ -80,7 +80,6 @@ export default class RoundsPointsRanking extends StaticComponent {
   }
 
   displayToPlayer(login: string) {
-    console.log(tm.rounds.pointsRanking)
     if (!this.isDisplayed) { return }
     return {
       xml: `<manialink id="${this.id}">
