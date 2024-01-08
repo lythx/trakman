@@ -202,23 +202,25 @@ export abstract class TMXFetcher {
   */
   static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
-    const params: [string, string][] = [['count', count.toString()], ['name', query?.trim() ?? ''], ['author', author?.trim() ?? '']]
+    const params: [string, string][] = [['count', count.toString()], ['name', query ?? ''], ['author', author ?? '']]
     if (author === undefined) { params.pop() }
     if (query === undefined) { params.pop() }
+    params.map(a => a.map(b => b.trim()))
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
       ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
       ...params
-    ])}`
+    ])
+      }`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)
+      Logger.warn(`Error while searching for map on TMX(url: ${url}).`, res.message)
       return res
     }
     if (!res.ok) {
-      const error = new Error(`Error while searching for map on TMX (url: ${url}).`
-        + `\nCode: ${res.status} Text: ${res.statusText}`)
+      const error = new Error(`Error while searching for map on TMX(url: ${url}).`
+        + `\nCode: ${res.status} Text: ${res.statusText} `)
       Logger.warn(error.message)
       return error
     }

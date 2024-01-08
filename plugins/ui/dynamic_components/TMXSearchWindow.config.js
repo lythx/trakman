@@ -38,6 +38,7 @@ export default {
   plusImage: icons.addMap,
   blankImage: icons.blank,
   public: true,
+  authorSearchSeparator: '$a',
   messages: {
     searchError: `${p.error}Failed to search for the maps.`,
     fetchError: `${p.error}Failed to fetch the map from TMX.`,
@@ -48,7 +49,7 @@ export default {
   },
   command: {
     aliases: ['xlist', 'searchtmx', 'searchmap'],
-    help: `Search for maps matching the specified name on TMX and display them in a window. Start with $$a for author search.`,
+    help: `Search for maps matching the specified name on TMX and display them in a window.`,
     privilege: 0
   }
 }
