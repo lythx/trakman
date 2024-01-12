@@ -206,7 +206,6 @@ export abstract class TMXFetcher {
     const params: [string, string][] = [['count', count.toString()], ['name', (query ?? '').trim()], ['author', (author ?? '').trim()]]
     if (author === undefined) { params.pop() }
     if (query === undefined) { params.pop() }
-    console.log(params)
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
       ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
