@@ -29,7 +29,9 @@ export default {
     mute: 1,
     addGuest: 1,
     kick: 1,
-    forceSpectator: 1
+    forceSpectator: 1,
+    addMap: 1,
+    removeMap: 1,
   },
   /** Whether the maplist gets reloaded on Match Settings updates.
    *  Enable this if you use external tools to modify the Match Settings */

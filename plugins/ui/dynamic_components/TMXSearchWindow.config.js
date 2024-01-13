@@ -3,7 +3,7 @@ const p = tm.utils.palette
 
 export default {
   title: "TMX Search Result",
-  addPrivilege: 1,
+  addPrivilege: tm.config.controller.privileges.addMap,
   icon: icons.mapList,
   textScale: 1,
   padding: 0.1,
@@ -28,7 +28,7 @@ export default {
     icons.personBuilder, // Author name icon
     icons.clockAuthor, // Author time icon
     icons.trophy, // Map awards icon
-    icons.calendarPlus // Map upload date icon
+    icons.calendarPlus // Map upload date
   ],
   iconWidth: 2,
   timeWidth: 4.5,

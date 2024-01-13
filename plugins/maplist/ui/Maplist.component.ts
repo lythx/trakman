@@ -368,7 +368,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>
           </frame>`
     }
-    const deletePrivilege = tm.maps.current.id !== mapId && player.privilege >= 3
+    const deletePrivilege = tm.maps.current.id !== mapId && player.privilege >= config.removePrivilege
     if (deletePrivilege) {
       width = (w - this.margin * 4) - config.iconWidth * 2
     }

@@ -6,6 +6,7 @@ export default {
   icon: icons.mapList,
   textScale: 1,
   padding: 0.1,
+  removePrivilege: tm.config.controller.privileges.removeMap,
   overlayBackground: '7777',
   defaultText: '-',
   colour: p.green,
