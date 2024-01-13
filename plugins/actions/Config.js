@@ -119,5 +119,18 @@ export default {
       `${p.highlight}#{nickname}${p.admin} to #{rank}.`,
     rightsRemoved: `${p.admin}#{title} ${p.highlight}#{adminNickname}${p.admin} has removed privileges of ${p.highlight}#{nickname}${p.admin}.`,
     alreadyIs: `${p.highlight}#{nickname}${p.error} is already #{rank}.`,
+  },
+  addMap: {
+    fetchError: `${p.error}Failed to fetch the map file from TMX.`,
+    addError: `${p.error}Failed to add the map.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` +
+      `it will be ${p.highlight}queued ${p.admin}instead.`,
+    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`,
+    public: true,
+  },
+  removeMap: {
+    text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed ${p.highlight}#{map} ${p.admin}from the server.`,
+    error: `${p.error}The map is already getting removed.`,
+    public: true,
   }
 }

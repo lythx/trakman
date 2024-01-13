@@ -4,6 +4,7 @@
  */
 
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow, Paginator } from '../../ui/UI.js'
+import { actions } from '../../actions/Actions.js'
 import { maplist } from '../Maplist.js'
 import config from './Maplist.config.js'
 
@@ -48,8 +49,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         tm.log.error('Error while removing map', `Map index out of range`)
         return
       }
-      const status = await tm.maps.remove(mapId, info)
-      if (status !== true) { return }
+      await actions.removeMap(info.login, info.nickname, info.title, mapId)
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))

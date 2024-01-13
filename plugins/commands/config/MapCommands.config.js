@@ -2,13 +2,7 @@ const p = tm.utils.palette
 
 export default {
   add: {
-    fetchError: `${p.error}Failed to fetch the map file from TMX.`,
-    addError: `${p.error}Failed to add the map.`,
-    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` +
-      `it will be ${p.highlight}queued ${p.admin}instead.`,
-    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`,
-    public: true,
-    privilege: 1,
+    privilege: tm.config.controller.privileges.addMap,
     aliases: ['add', 'am', 'addmap'],
     help: `Add a map from TMX.`
   },
@@ -26,15 +20,12 @@ export default {
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued` +
       ` ${p.highlight}#{map}${p.admin} from TMX random.`,
     public: true,
-    privilege: 1,
+    privilege: tm.config.controller.privileges.addMap,
     aliases: ['ar', 'addr', 'addrandom'],
     help: `Add a random map from TMX.`
   },
   remove: {
-    text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed the current map.`,
-    error: `${p.error}The map is already getting removed.`,
-    public: true,
-    privilege: 1,
+    privilege: tm.config.controller.privileges.removeMap,
     aliases: ['et', 'rt', 'erase', 'erasethis'],
     help: `Remove a current map from maplist.`
   },
@@ -45,7 +36,7 @@ export default {
       `it will be ${p.highlight}queued ${p.admin}instead.`,
     added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from url.`,
     public: true,
-    privilege: 1,
+    privilege: tm.config.controller.privileges.addMap,
     aliases: ['afu', 'addfromurl'],
     help: `Add a map from url.`
   },
