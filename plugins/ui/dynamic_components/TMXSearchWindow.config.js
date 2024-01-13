@@ -22,13 +22,13 @@ export default {
   navbar: [
   ],
   icons: [
-    icons.ongoingMap,
-    icons.maniaExchange,
-    icons.tag,
-    icons.personBuilder,
-    icons.clockAuthor,
-    icons.trophy,
-    icons.calendarPlus
+    icons.ongoingMap, // Map header icon
+    icons.maniaExchange, // MX icon
+    icons.tag, // Map name icon
+    icons.personBuilder, // Author name icon
+    icons.clockAuthor, // Author time icon
+    icons.trophy, // Map awards icon
+    icons.calendarPlus // Map upload date icon
   ],
   iconWidth: 2,
   timeWidth: 4.5,

@@ -27,12 +27,14 @@ export default {
     { name: 'Map Info', actionId: ids.TMXWindow }
   ],
   icons: [
-    icons.ongoingMap,
-    icons.tag,
-    icons.personBuilder,
-    icons.clockAuthor,
-    icons.chartLocal,
-    icons.karmaPulse
+    icons.ongoingMap, // Map header icon
+    icons.tag, // Map name icon
+    icons.personBuilder, // Author name icon
+    icons.clockAuthor, // Author time icon
+    icons.chartLocal, // PB position icon
+    icons.karmaPulse, // Local karma icon
+    icons.close, // Remove map icon
+    icons.closeHover // Remove map icon
   ],
   iconWidth: 2,
   queueWidth: 5.2,

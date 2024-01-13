@@ -318,7 +318,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
-    const width: number = (w - this.margin * 3) - config.iconWidth
+    let width: number
     const height: number = h - this.margin
     const index: number = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
     const prevIndex: number = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
@@ -331,6 +331,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
         <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }
     if (index !== -1) {
+      width = (w - this.margin * 3) - config.iconWidth
       return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
             imagefocus="${config.minusImage}"/>`}
@@ -349,6 +350,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>
           </frame>`
     }
+    width = (w - this.margin * 3) - config.iconWidth * 2
     return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
             imagefocus="${config.plusImage}"/>`}
@@ -358,7 +360,12 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <frame posn="${config.iconWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
             ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
-          </frame>`
+          </frame>
+          <frame posn="${config.iconWidth + this.margin * 2 + width} 0 1">
+            <quad posn="0 0 7.9" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+            <quad posn="${this.margin} ${-this.margin} 8" sizen="${config.iconWidth - this.margin * 2} ${(height / 4) - this.margin * 3}" 
+             image="${config.icons[6]}" imagefocus="${config.icons[7]}" />
+          </frame>` //todo
   }
 
 }
