@@ -33,8 +33,8 @@ export default {
     icons.clockAuthor, // Author time icon
     icons.chartLocal, // PB position icon
     icons.karmaPulse, // Local karma icon
-    icons.close, // Remove map icon
-    icons.closeHover // Remove map icon
+    icons.trashcanDelete, // Remove map icon
+    icons.trashcanDeleteHover // Remove map icon
   ],
   iconWidth: 2,
   queueWidth: 5.2,
