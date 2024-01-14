@@ -130,7 +130,9 @@ export default {
   },
   removeMap: {
     text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed ${p.highlight}#{map} ${p.admin}from the server.`,
-    error: `${p.error}The map is already getting removed.`,
+    alreadyRemoved: `${p.error}The map is already getting removed.`,
+    error: `${p.error}Error while removing the map.`,
+    onlyMap: `${p.error}There are no more maps in the server playlist.`,
     public: true,
   }
 }

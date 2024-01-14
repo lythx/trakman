@@ -428,9 +428,13 @@ export const actions = {
     }
   },
   removeMap: async (login: string, nickname: string, title: string, id?: string) => {
+    if (tm.maps.count <= 1) {
+      tm.sendMessage(config.removeMap.onlyMap, login)
+      return
+    }
     if (id === undefined) {
       if (eraseObject !== undefined) {
-        tm.sendMessage(config.removeMap.error, login)
+        tm.sendMessage(config.removeMap.alreadyRemoved, login)
         return
       }
       id = tm.maps.current.id
