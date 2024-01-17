@@ -439,6 +439,13 @@ export const actions = {
       }
       id = tm.maps.current.id
       eraseObject = { id: id, admin: { login, nickname } }
+      tm.sendMessage(tm.utils.strVar(config.removeMap.removeThis, {
+        title: title,
+        nickname: tm.utils.strip(nickname, true),
+        map: tm.utils.strip(tm.maps.current.name, true)
+        
+      }), config.removeMap.public ? undefined : login)
+      return
     }
     const map = tm.maps.get(id)
     if (map === undefined) {
