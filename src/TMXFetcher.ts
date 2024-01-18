@@ -215,18 +215,24 @@ export abstract class TMXFetcher {
       }`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
-      Logger.warn(`Error while searching for map on TMX(url: ${url}).`, res.message)
+      Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)
       return res
     }
     if (!res.ok) {
-      const error = new Error(`Error while searching for map on TMX(url: ${url}).`
+      const error = new Error(`Error while searching for map on TMX (url: ${url}).`
         + `\nCode: ${res.status} Text: ${res.statusText} `)
       Logger.warn(error.message)
       return error
     }
-    const data = (await res.json() as any).Results
+    const data = await res.json().catch((data: Error) => data)
+    if (data instanceof Error) { // FOR WHATEVER REASON THE NEW API ALSO RETURNS A WEBPAGE INSTEAD OF AN ERROR (REAL HTTP 200 RESPONSE BY THE WAY!!!)
+      const error = new Error(`Error while processing TMX response (url: ${url}).`
+        + `\nCode: ${res.status} Text: ${res.statusText} `)
+      Logger.warn(error.message)
+      return error
+    }
     const ret: tm.TMXSearchResult[] = []
-    for (const e of data) {
+    for (const e of (data as any).Results) {
       ret.push({
         id: e.UId,
         TMXId: e.TrackId,
