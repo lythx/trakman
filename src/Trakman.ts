@@ -340,7 +340,7 @@ namespace trakman {
 
     add: MapService.addToJukebox.bind(MapService),
 
-    remove: MapService.removeFromJukebox.bind(MapService),
+    remove: MapService.removeFromQueue.bind(MapService),
 
     clear: MapService.clearJukebox.bind(MapService),
 

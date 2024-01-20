@@ -237,7 +237,7 @@ export class Listeners {
         if (!config.keepQueueAfterLeave && nextJb.callerLogin !== undefined
           && PlayerService.get(nextJb.callerLogin) === undefined) {
           droppedMap = nextJb as tm.EndMapInfo['droppedMap']
-          MapService.removeFromJukebox(nextJb.map.id)
+          MapService.removeFromQueue(nextJb.map.id)
         }
         const winner = rankings[0]
         // Set game state to 'result'

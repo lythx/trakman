@@ -146,7 +146,7 @@ export class MapService {
     }
     void this.repo.remove(...removedMaps.map(a => a.id))
     for (const e of removedMaps) {
-      this.removeFromJukebox(e.id)
+      this.removeFromQueue(e.id)
     }
     for (const e of addedMapObjects) {
       Events.emit('MapAdded', e)
@@ -337,7 +337,7 @@ export class MapService {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
-    this.removeFromQueue(id, caller)
+    this.removeFromQueue(id, caller, false)
     return true
   }
 
@@ -422,29 +422,16 @@ export class MapService {
   }
 
   /**
-   * Removes a map from the jukebox
-   * @param mapId Map UID
-   * @param caller Object containing login and nickname of player removing the map
-   * @returns True if the map was in the jukebox, false if it wasn't
-   */
-  static async removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): Promise<boolean> {
-    if (!this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) { return false }
-    const index: number = await this.removeFromQueue(mapId, caller, true)
-    if (index === -1) return false
-    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    return true
-  }
-
-  /**
-   * Helper method to remove a map from the queue
+   * Remove a map from the queue
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
    * @param jukebox report as removed from jukebox
    * @returns The index of the removed map
    */
-  static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox: boolean = false): Promise<number> {
+  static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox: boolean = true): Promise<boolean> {
+    if (jukebox && !this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) { return false }
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
-    if (index === -1) return -1
+    if (index === -1) return false
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) removed map ${Utils.strip(this._queue[index].map.name)} by ${this._queue[index].map.author} from the ${jukebox ? "jukebox" : "queue"}`)
     } else {
@@ -453,7 +440,8 @@ export class MapService {
     this._queue.splice(index, 1)
     this.fillQueue()
     await this.updateNextMap()
-    return index
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
+    return true
   }
 
   /**
