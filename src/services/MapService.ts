@@ -337,7 +337,7 @@ export class MapService {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
-    this.removeFromJukebox(id, caller)
+    this.removeFromQueue(id, caller)
     return true
   }
 
@@ -403,12 +403,12 @@ export class MapService {
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player adding the map
    * @param setAsNextMap If true map is going to be placed in front of the queue
-   * @returns True if successfull, Error if map is not in the memory
+   * @returns True if successful, Error if map is not in the memory
    */
   static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
-    const qi = this._queue.findIndex(a => a.isForced === false)
+    const qi = this._queue.findIndex(a => !a.isForced)
     const index: number = setAsNextMap === true ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
@@ -422,24 +422,38 @@ export class MapService {
   }
 
   /**
-   * Removes a map from the queue
+   * Removes a map from the jukebox
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
    * @returns True if the map was in the jukebox, false if it wasn't
    */
   static async removeFromJukebox(mapId: string, caller?: { login: string, nickname: string }): Promise<boolean> {
-    if (!this._queue.filter(a => a.isForced === true).some(a => a.map.id === mapId)) { return false }
+    if (!this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) { return false }
+    const index: number = await this.removeFromQueue(mapId, caller, true)
+    if (index === -1) return false
+    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
+    return true
+  }
+
+  /**
+   * Helper method to remove a map from the queue
+   * @param mapId Map UID
+   * @param caller Object containing login and nickname of player removing the map
+   * @param jukebox report as removed from jukebox
+   * @returns The index of the removed map
+   */
+  static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox: boolean = false): Promise<number> {
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
+    if (index === -1) return -1
     if (caller !== undefined) {
-      Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) removed map ${Utils.strip(this._queue[index].map.name)} by ${this._queue[index].map.author} from the jukebox`)
+      Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) removed map ${Utils.strip(this._queue[index].map.name)} by ${this._queue[index].map.author} from the ${jukebox ? "jukebox" : "queue"}`)
     } else {
-      Logger.trace(`Map ${Utils.strip(this._queue[index].map.name)} by ${this._queue[index].map.author} has been removed from the jukebox`)
+      Logger.trace(`Map ${Utils.strip(this._queue[index].map.name)} by ${this._queue[index].map.author} has been removed from the ${jukebox ? "jukebox" : "queue"}`)
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
-    return true
+    return index
   }
 
   /**
@@ -663,10 +677,10 @@ export class MapService {
   static getFromJukebox(uids: string[]): Readonly<{ map: tm.Map, callerLogin?: string }>[]
   static getFromJukebox(uids: string | string[]): Readonly<{ map: tm.Map, callerLogin?: string }> | Readonly<{ map: tm.Map, callerLogin?: string }>[] | undefined {
     if (typeof uids === 'string') {
-      const obj = this._queue.find(a => a.map.id === uids && a.isForced === true)
+      const obj = this._queue.find(a => a.map.id === uids && a.isForced)
       return obj === undefined ? undefined : { map: obj.map, callerLogin: obj.callerLogin }
     }
-    return this._queue.filter(a => uids.includes(a.map.id) && a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
+    return this._queue.filter(a => uids.includes(a.map.id) && a.isForced).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
   }
 
   /**
@@ -707,14 +721,14 @@ export class MapService {
    * Maps juked by the players.
    */
   static get jukebox(): ({ map: tm.Map, callerLogin?: string })[] {
-    return this._queue.filter(a => a.isForced === true).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
+    return this._queue.filter(a => a.isForced).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
   }
 
   /**
    * Amount of maps juked by the players.
    */
   static get jukeboxCount(): number {
-    return this._queue.filter(a => a.isForced === true).length
+    return this._queue.filter(a => a.isForced).length
   }
 
   /**
