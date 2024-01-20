@@ -31,8 +31,8 @@ export class RoundsService {
       await Logger.fatal(status.message)
     }
     this.fetchRanking()
-    Events.addListener('GameConfigChanged', () => {
-      const status = this.updateRoundsSettings()
+    Events.addListener('GameConfigChanged', async () => {
+      const status = await this.updateRoundsSettings()
       if (status instanceof Error) {
         Logger.error(status.message)
       }
@@ -228,8 +228,14 @@ export class RoundsService {
           roundTimes[this.finishedRounds - 1] = -1
         }
       }
-      // TODO REMOVE THIS IF NEVER HAPPENS  
-      const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+      let ranking: any[] | Error = []
+      let attempts = 0
+      // this is stupid but sometimes the server just doesn't respond for no reason
+      do {
+        ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+        if (attempts !== 0) Logger.error(`Could not get current ranking, trying again.`)
+        if (++attempts >= 5) await Logger.fatal(`Could not get current ranking. Error: ${ranking}`)
+      } while (ranking instanceof Error)
       for (const e of ranking) {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }
