@@ -15,6 +15,8 @@ export class Database {
     port: Number(process.env.DB_PORT)
   })
   private client: postgres.Pool | postgres.PoolClient = Database.pool
+  static dbVersion: string
+  static dbSize: string
 
   static async initialize(): Promise<void> {
     for (const e of createQueries) {
@@ -22,6 +24,8 @@ export class Database {
         await Logger.fatal(`Database create query failed.`, `Error: ${err.message}`, err.stack, `Query:`, e)
       })
     }
+    this.dbVersion = String((await this.pool.query(`select version();`) as any)?.rows[0]?.version?.split(` `, 2)[1])
+    this.dbSize = String((await this.pool.query(`select pg_size_pretty(pg_database_size('${process.env.DB_NAME}'));`) as any)?.rows[0]?.pg_size_pretty)
   }
 
   async enableClient(): Promise<void> {

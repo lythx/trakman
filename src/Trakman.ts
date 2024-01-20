@@ -64,7 +64,11 @@ namespace trakman {
         }
         return res.rows
       }
-    }
+    },
+
+    get dbSize() { return Database.dbSize },
+
+    get dbVersion() { return Database.dbVersion },
 
   }
 
