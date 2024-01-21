@@ -369,7 +369,7 @@ export const maniakarma = {
    * Adds a callback function to execute when maniakarma votes for new map get fetched
    * @param callback Function to execute on event. It takes object of votes array and map vote ratio
    */
-  onMapFetch(callback: ((dedis: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)) {
+  onMapFetch(callback: ((data: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)) {
     mapFetchListeners.push(callback)
   },
 

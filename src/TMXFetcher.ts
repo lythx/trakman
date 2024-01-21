@@ -71,14 +71,14 @@ export abstract class TMXFetcher {
   /**
    * Fetches map file from TMX via its UID.
    * @param mapId Map UID
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
   /**
    * Fetches map file from TMX via its TMX ID.
    * @param tmxId Map TMX ID
    * @param site Optional TMX site (TMNF by default)
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
   static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
@@ -199,7 +199,7 @@ export abstract class TMXFetcher {
   * @param author Map author to look for
   * @param site TMX Site to fetch from
   * @param count Number of maps to fetch
-  * @returns An array of searched map objects or Error if unsuccessfull
+  * @returns An array of searched map objects or Error if unsuccessful
   */
   static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
@@ -268,7 +268,7 @@ export abstract class TMXFetcher {
   /**
    * Fetches a random map file from TMX.
    * @param site Optional TMX site (TMNF by default)
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchRandomMapFile(site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
     const prefix = this.siteToPrefix(site)

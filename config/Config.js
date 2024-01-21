@@ -20,7 +20,7 @@ export default {
   voteOnPublicAdd: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
-  /** Whether to reset Cup mode scores after restarting or skipping a map */
+  /** Whether to reset Cup mode scores after a map is skipped or restarted */
   resetCupScoreOnSkipAndRestart: true,
   /** Privilege levels for each of the administrative actions */
   privileges: {
@@ -36,7 +36,7 @@ export default {
   /** Whether the maplist gets reloaded on Match Settings updates.
    *  Enable this if you use external tools to modify the Match Settings */
   updateMatchSettingsOnChange: false,
-  /** Point system for rounds and cup gamemode */
+  /** Point system for rounds and cup gamemodes */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
   /** Default time limit in TimeAttack mode (in miliseconds) */
   defaultTimeAttackTimeLimit: 300000,

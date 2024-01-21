@@ -121,7 +121,7 @@ export class MapService {
         i--
       }
     }
-    if(addedMaps.length === 0 && removedMaps.length === 0) {
+    if (addedMaps.length === 0 && removedMaps.length === 0) {
       return
     }
     const addedMapObjects = []
@@ -275,7 +275,7 @@ export class MapService {
    * @option `dontJuke` - If true the map doesn't get enqueued, false by default
    * @option `cancelIfAlreadyAdded` - If the map was already on the server returns from the function without searching for the map object.
    * If that happens the map in returned object will be undefined.
-   * @returns Error if unsuccessfull, object containing map object and boolean indicating whether the map was already on the server
+   * @returns Error if unsuccessful, object containing map object and boolean indicating whether the map was already on the server
    */
   static async writeFileAndAdd<T>(fileName: string, file: Buffer,
     caller?: { nickname: string, login: string },
@@ -425,8 +425,8 @@ export class MapService {
    * Remove a map from the queue
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player removing the map
-   * @param jukebox report as removed from jukebox
-   * @returns The index of the removed map
+   * @param jukebox If true, only removes the map if it is in the jukebox
+   * @returns The boolean representing whether the map was removed
    */
   static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox: boolean = true): Promise<boolean> {
     if (jukebox && !this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) { return false }

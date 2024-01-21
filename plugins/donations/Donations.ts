@@ -52,7 +52,7 @@ tm.addListener('PlayerDataUpdated', (info): void => {
 /**
  * Fetches donation info for the player
  * @param login Player login
- * @returns Donation object if successfull, undefined if player is not in the donators database
+ * @returns Donation object if successful, undefined if player is not in the donators database
  */
 async function getFromDB(login: string): Promise<DonationInfo | undefined>
 /**
@@ -127,7 +127,7 @@ tm.commands.add({
  * @param payerLogin Login of the player 
  * @param payerNickname Nickname of the player
  * @param amount Amount of coppers to donate
- * @returns True if successfull, false if player refuses payment, Error if dedicated server call fails
+ * @returns True if successful, false if player refuses payment, Error if dedicated server call fails
  */
 const donate = async (payerLogin: string, payerNickname: string, amount: number): Promise<boolean | Error> => {
   if (amount < config.minimalAmount) {
@@ -171,7 +171,7 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
 /**
  * Gets donation info for the player
  * @param login Player login
- * @returns Donation object if successfull, undefined if player is not in the donators database or is offline
+ * @returns Donation object if successful, undefined if player is not in the donators database or is offline
  */
 function getDonation(login: string): DonationInfo | undefined
 /**

@@ -288,7 +288,7 @@ export class PlayerService {
   /**
    * Sets spectator status, player slot and team in the player object.
    * @param info Player login
-   * @returns True if successfull, false if the player is not in the runtime memory
+   * @returns True if successful, false if the player is not in the runtime memory
    */
   static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
     const player: tm.Player | undefined = this._players.find(a => a.login === info.login)
