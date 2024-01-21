@@ -122,11 +122,11 @@ export abstract class ChatService {
             break
           case 'time':
             const timeOrError = Utils.parseTimeString(params[i])
-            if(timeOrError instanceof RangeError) {
+            if (timeOrError instanceof RangeError) {
               this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
                 { name: param.name }), info.login)
               return
-            } else if(timeOrError instanceof TypeError) {
+            } else if (timeOrError instanceof TypeError) {
               this.sendErrorMessage(Utils.strVar(messages.notTime,
                 { name: param.name }), info.login)
               return
@@ -192,7 +192,7 @@ export abstract class ChatService {
    * Adds message to the database and runtime memory
    * @param login Player login
    * @param text Message text
-   * @returns Message object or Error if unsuccessfull
+   * @returns Message object or Error if unsuccessful
    */
   static async add(login: string, text: string): Promise<tm.MessageInfo | Error> {
     const player: tm.Player | undefined = PlayerService.get(login)

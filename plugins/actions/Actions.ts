@@ -6,6 +6,15 @@ interface CallerInfo { login: string, nickname: string, title: string, privilege
 
 const sendNoPrivilegeMessage = (info: CallerInfo): void => tm.sendMessage(config.noPermission, info.login)
 
+let eraseObject: { id: string, admin: { login: string, nickname: string } } | undefined
+tm.addListener('BeginMap', (info): void => {
+  if (info.isRestart) { return }
+  if (eraseObject !== undefined) {
+    void tm.maps.remove(eraseObject.id, eraseObject.admin)
+    eraseObject = undefined
+  }
+})
+
 /**
  * Provides utilities for various actions.
  * @author lythx & wiseraven
@@ -384,5 +393,70 @@ export const actions = {
       }
       await tm.admin.setPrivilege(target.login, privilege, caller)
     }
+  },
+  addMap: async (login: string, nickname: string, title: string, id: number | string, tmxSite?: string, fromUrl: boolean = false) => {
+    const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
+    const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
+    let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id as any, site).catch((err: Error) => err)
+    if (file instanceof Error) {
+      const remainingSites: tm.TMXSite[] = tmxSites.filter(a => a !== tmxSite)
+      for (const e of remainingSites) {
+        file = await tm.tmx.fetchMapFile(id as any, e).catch((err: Error) => err)
+        if (!(file instanceof Error)) { break }
+      }
+    }
+    if (file instanceof Error) {
+      tm.sendMessage(config.addMap.fetchError, login)
+      return
+    }
+    const obj = await tm.maps.writeFileAndAdd(file.name, file.content, { login, nickname })
+    if (obj instanceof Error) {
+      tm.log.warn(obj.message)
+      tm.sendMessage(config.addMap.addError, login)
+      return
+    } else if (obj.wasAlreadyAdded) {
+      tm.sendMessage(tm.utils.strVar(config.addMap.alreadyAdded, {
+        map: tm.utils.strip(obj.map.name, true),
+        nickname: tm.utils.strip(nickname, true)
+      }), config.addMap.public ? undefined : login)
+    } else {
+      tm.sendMessage(tm.utils.strVar(config.addMap.added, {
+        title: title,
+        map: tm.utils.strip(obj.map.name, true),
+        nickname: tm.utils.strip(nickname, true)
+      }), config.addMap.public ? undefined : login)
+    }
+  },
+  removeMap: async (login: string, nickname: string, title: string, id?: string) => {
+    if (tm.maps.count <= 1) {
+      tm.sendMessage(config.removeMap.onlyMap, login)
+      return
+    }
+    if (id === undefined) {
+      if (eraseObject !== undefined) {
+        tm.sendMessage(config.removeMap.alreadyRemoved, login)
+        return
+      }
+      id = tm.maps.current.id
+      eraseObject = { id: id, admin: { login, nickname } }
+      tm.sendMessage(tm.utils.strVar(config.removeMap.removeThis, {
+        title: title,
+        nickname: tm.utils.strip(nickname, true),
+        map: tm.utils.strip(tm.maps.current.name, true)
+        
+      }), config.removeMap.public ? undefined : login)
+      return
+    }
+    const map = tm.maps.get(id)
+    if (map === undefined) {
+      tm.sendMessage(config.removeMap.error, login)
+      return
+    }
+    tm.sendMessage(tm.utils.strVar(config.removeMap.text, {
+      title: title,
+      nickname: tm.utils.strip(nickname, true),
+      map: tm.utils.strip(map.name, true)
+    }), config.removeMap.public ? undefined : login)
+    void tm.maps.remove(map.id, { login, nickname })
   }
 }

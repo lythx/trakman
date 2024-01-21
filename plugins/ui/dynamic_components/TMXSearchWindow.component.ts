@@ -49,7 +49,13 @@ export default class TMXSearchWindow extends PopupWindow<{
       help: config.command.help,
       params: [{ name: 'query', optional: true, type: 'multiword' }],
       callback: async (info: tm.MessageInfo, query?: string): Promise<void> => {
-        const maps = await tm.tmx.searchForMap(query)
+        let maps
+        if (query?.includes(config.authorSearchSeparator)) {
+          const queryParts = query.split(config.authorSearchSeparator)
+          maps = await tm.tmx.searchForMap(queryParts[0], queryParts[1])
+        } else {
+          maps = await tm.tmx.searchForMap(query)
+        }
         if (maps instanceof Error) {
           tm.sendMessage(config.messages.searchError, info.login)
           return
@@ -207,29 +213,7 @@ export default class TMXSearchWindow extends PopupWindow<{
     }
     this.requestedMaps.push(mapId)
     this.reRender()
-    const map = await tm.tmx.fetchMapFile(mapId)
-    if (map instanceof Error) {
-      this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
-      this.reRender()
-      tm.sendMessage(config.messages.fetchError, login)
-      return false
-    }
-    const status = await tm.maps.writeFileAndAdd(map.name, map.content, { login, nickname })
-    if (status instanceof Error) {
-      this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
-      this.reRender()
-      tm.sendMessage(config.messages.error, login)
-      return false
-    }
-    if (status.wasAlreadyAdded) {
-      tm.sendMessage(tm.utils.strVar(config.messages.alreadyAdded,
-        { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public ? undefined : login)
-    } else {
-      tm.sendMessage(tm.utils.strVar(config.messages.added,
-        { title, nickname: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name.split('.Challenge.Gbx').slice(0, -1).join(), true) }),
-        config.public ? undefined : login)
-    }
+    await actions.addMap(login, nickname, title, mapId)
     this.requestedMaps = this.requestedMaps.filter(a => a !== mapId)
     this.reRender()
     return true

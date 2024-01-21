@@ -210,7 +210,7 @@ export class GameService {
   }
 
   /**
-   * Adds remaining race time. This method works only if 
+   * Adds time to the timer. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
    * @param milliseconds Amount of time to add in milliseconds
    * @returns Boolean indicating whether the time got added
@@ -223,8 +223,8 @@ export class GameService {
   }
 
   /**
-   * Subtracts remaining race time. If the time is lower than 
-   * "dynamicTimerSubtractionLimit" from config
+   * Subtracts time from the timer. If the time is lower than 
+   * "dynamicTimerSubtractionLimit" from Config.js
    * it will be set to it. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
    * @param milliseconds Amount of time to subtract in milliseconds

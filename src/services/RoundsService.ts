@@ -30,6 +30,16 @@ export class RoundsService {
     if (status instanceof Error) {
       await Logger.fatal(status.message)
     }
+    this.fetchRanking()
+    Events.addListener('GameConfigChanged', async () => {
+      const status = await this.updateRoundsSettings()
+      if (status instanceof Error) {
+        Logger.error(status.message)
+      }
+    })
+  }
+
+  static async fetchRanking(): Promise<void> {
     const ranking: any[] | Error = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
     const playerList = PlayerService.players as tm.Player[]
     if (ranking instanceof Error) {
@@ -68,12 +78,6 @@ export class RoundsService {
       this._teamScores.blue = res.find(a => a.NickName === '$00FBlue Team')?.Score ?? 0
       this._teamScores.red = res.find(a => a.NickName === '$F00Red Team')?.Score ?? 0
     }
-    Events.addListener('GameConfigChanged', () => {
-      const status = this.updateRoundsSettings()
-      if (status instanceof Error) {
-        Logger.error(status.message)
-      }
-    })
   }
 
   static async updateRoundsSettings(): Promise<true | Error> {
@@ -176,20 +180,24 @@ export class RoundsService {
     this._ranking[index] = player
   }
 
-  static handleBeginMap(): void {
-    this._ranking = PlayerService.players
+  static async handleBeginMap(): Promise<void> {
     this.teamsRoundPoints = undefined
     this._teamScores = { blue: 0, red: 0 }
     this.finishedRounds = 0
-    // This method modifies the player objects so it needs to ignore the readonly constraint
-    const playerList = PlayerService.players as tm.Player[]
-    for (const e of playerList) {
-      e.roundsPoints = 0
-      e.roundTimes = []
-      e.isCupFinalist = false
-      e.cupPosition = undefined
+    if(!config.resetCupScoreOnSkipAndRestart) {
+      this._ranking = []
+      await this.fetchRanking()
+    } else { 
+      // This method modifies the player objects so it needs to ignore the readonly constraint
+      const playerList = PlayerService.players as tm.Player[]
+      for (const e of playerList) {
+        e.roundsPoints = 0
+        e.roundTimes = []
+        e.isCupFinalist = false
+        e.cupPosition = undefined
+      }
+      this._ranking = playerList
     }
-    this._ranking = playerList
   }
 
   static handleBeginRound(): void {
@@ -220,8 +228,14 @@ export class RoundsService {
           roundTimes[this.finishedRounds - 1] = -1
         }
       }
-      // TODO REMOVE THIS IF NEVER HAPPENS  
-      const ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+      let ranking: any[] | Error = []
+      let attempts = 0
+      // this is stupid but sometimes the server just doesn't respond for no reason
+      do {
+        ranking = await Client.call('GetCurrentRanking', [{ int: 250 }, { int: 0 }])
+        if (attempts !== 0) Logger.error(`Could not get current ranking, trying again.`)
+        if (++attempts >= 5) await Logger.fatal(`Could not get current ranking. Error: ${ranking}`)
+      } while (ranking instanceof Error)
       for (const e of ranking) {
         const obj = this._ranking.find(a => a.login === e.Login)
         if (obj === undefined) { continue }

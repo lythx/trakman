@@ -48,7 +48,7 @@ export default class ServerInfoWindow extends PopupWindow {
       serverMapCount, serverVisitorsCount]
   }
 
-  private async getHostInfo(): Promise<string[]> {
+  private getHostInfo(): string[] {
     // Host system information
     const osUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
     const osArch: string = arch()
@@ -62,12 +62,9 @@ export default class ServerInfoWindow extends PopupWindow {
     // Node information
     const nodeVersion: string = version
     const nodeRAMUsage: string = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
-    // Postgres information
-    const postgresVersion: string = String(`v` + (await tm.db.query(`select version();`) as any)[0].version).split(` `)[1]
-    const postgresDBSize: string = String((await tm.db.query(`select pg_size_pretty(pg_database_size('${process.env.DB_NAME}'));`) as any)[0].pg_size_pretty)
     return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
       trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
-      postgresVersion, postgresDBSize]
+      tm.db.dbVersion, tm.db.dbSize]
   }
 
   protected onOpen(info: tm.ManialinkClickInfo): void {

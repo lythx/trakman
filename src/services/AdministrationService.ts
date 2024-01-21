@@ -338,7 +338,7 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional ban reason
    * @param expireDate Optional ban expire date
-   * @returns True if successfull, false if caller privilege is too low or if it's not higher than target privilege
+   * @returns True if successful, false if caller privilege is too low or if it's not higher than target privilege
    */
   static async ban(ip: string, login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
@@ -386,7 +386,7 @@ export class AdministrationService {
    * from banlist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successfull, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low 
    * 'Player not banned' if player was not banned, Error if dedicated server call fails
    */
   static async unban(login: string, caller?: { login: string, privilege: number, nickname: string }):
@@ -426,7 +426,7 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional blacklist reason
    * @param expireDate Optional blacklist expire date
-   * @returns True if successfull, false if caller privilege is too low or if it's not higher than target privilege,
+   * @returns True if successful, false if caller privilege is too low or if it's not higher than target privilege,
    * Error if dedicated server call fails
    */
   static async addToBlacklist(login: string, caller: { login: string, privilege: number, nickname: string },
@@ -470,7 +470,7 @@ export class AdministrationService {
    * Unblacklists a player if he is not banned and deletes him from blacklist table. Saves the server blacklist
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successfull, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low 
    * 'Player not blacklisted' if player was not blacklisted, Error if dedicated server call fails
    */
   static async unblacklist(login: string, caller?: { login: string, privilege: number, nickname: string }):
@@ -502,7 +502,7 @@ export class AdministrationService {
    * @param nickname Optional player nickname
    * @param reason Optional mute reason
    * @param expireDate Optional mute expire date
-   * @returns True if successfull, false if caller privilege is too low
+   * @returns True if successful, false if caller privilege is too low
    */
   static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
     nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
@@ -545,7 +545,7 @@ export class AdministrationService {
    * Unmutes a player and deletes him from mutelist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successfull, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low 
    * 'Player not muted' if player was not muted, Error if dedicated server call fails
    */
   static async unmute(login: string, caller?: { login: string, privilege: number, nickname: string }):
@@ -579,7 +579,7 @@ export class AdministrationService {
    * @param login Player login
    * @param caller Caller player object
    * @param nickname Optional player nickname
-   * @returns True if successfull, false if caller privilege is too low,
+   * @returns True if successful, false if caller privilege is too low,
    * 'Already guest' if player was already in the guestlist, Error if server call fails
    */
   static async addGuest(login: string, caller: { login: string, privilege: number, nickname: string }, nickname?: string):
@@ -606,7 +606,7 @@ export class AdministrationService {
    * Removes a player from server guestlist, saves it and deletes him from guestlist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successfull, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low 
    * 'Player not in guestlist' if player was not in the guestlist, Error if dedicated server call fails
    */
   static async removeGuest(login: string, caller?: { login: string, privilege: number, nickname: string }):

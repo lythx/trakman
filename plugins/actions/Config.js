@@ -119,5 +119,21 @@ export default {
       `${p.highlight}#{nickname}${p.admin} to #{rank}.`,
     rightsRemoved: `${p.admin}#{title} ${p.highlight}#{adminNickname}${p.admin} has removed privileges of ${p.highlight}#{nickname}${p.admin}.`,
     alreadyIs: `${p.highlight}#{nickname}${p.error} is already #{rank}.`,
+  },
+  addMap: {
+    fetchError: `${p.error}Failed to fetch the map file from TMX.`,
+    addError: `${p.error}Failed to add the map.`,
+    alreadyAdded: `${p.admin}Map ${p.highlight}#{map}${p.admin} added by ${p.highlight}#{nickname}${p.admin} is already on the server, ` +
+      `it will be ${p.highlight}queued ${p.admin}instead.`,
+    added: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has added and queued ${p.highlight}#{map}${p.admin} from TMX.`,
+    public: true,
+  },
+  removeMap: {
+    text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed map ${p.highlight}#{map} ${p.admin}from the server.`,
+    removeThis:`${p.admin}#{title} ${p.highlight}#{nickname}${p    .admin} has removed the ongoing map ${p.highlight}#{map} ${p.admin}from the server.`,
+    alreadyRemoved: `${p.error}This map is already getting removed.`,
+    error: `${p.error}Error while removing the map.`,
+    onlyMap: `${p.error}There are no more maps in the server playlist.`,
+    public: true,
   }
 }

@@ -9,7 +9,7 @@ services:
       - ./tmf-config:/app/server/GameData/Config
       - ./tracks:/app/server/GameData/Tracks
       - ./trakman:/app/server/trakman
-      - ./logs:/root/.pm2/logs
+      - ./logs:/app/server/.pm2/logs
     environment:
       # Dedicated server config
       SERVER_IP: 127.0.0.1

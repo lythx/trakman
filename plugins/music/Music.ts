@@ -55,7 +55,7 @@ export const music = {
    * @param author Song author
    * @param url Song url (link to an .ogg file)
    * @param caller Caller player object
-   * @returns True if successfull, error message otherwise
+   * @returns True if successful, error message otherwise
    */
   addSong(name: string, author: string, url: string, caller?: Caller): true | 'name taken' | 'invalid file extension' {
     if (!(url.endsWith('.ogg') || url.endsWith('.mux'))) {
@@ -106,7 +106,7 @@ export const music = {
    * Add a song to the song queue
    * @param songName Song name
    * @param caller Caller player object
-   * @returns Song object if it got added, error message if unsuccessfull
+   * @returns Song object if it got added, error message if unsuccessful
    */
   addSongToQueue(songName: string, caller?: Caller):
     Readonly<Song> | 'already queued' | 'not in songlist' | 'no privilege' {
@@ -314,7 +314,7 @@ function addToQueue(songName: string, emitEvents: boolean, caller?: Caller):
   * Removes a song from the song queue
   * @param songName Song name
   * @param caller Caller player object
-  * @returns Song object if it got removed, error message if unsuccessfull
+  * @returns Song object if it got removed, error message if unsuccessful
   */
 function removeFromQueue(name: string, caller?: Caller): Readonly<Song> | 'not queued' {
   if (!queue.filter(a => a.isJuked === true).some(a => a.name === name)) { return 'not queued' }

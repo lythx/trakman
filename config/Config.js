@@ -20,6 +20,8 @@ export default {
   voteOnPublicAdd: true,
   /** Default amount of maps fetched from the TMX search API */
   defaultTMXSearchLimit: 50,
+  /** Whether to reset Cup mode scores after a map is skipped or restarted */
+  resetCupScoreOnSkipAndRestart: true,
   /** Privilege levels for each of the administrative actions */
   privileges: {
     ban: 2,
@@ -27,12 +29,14 @@ export default {
     mute: 1,
     addGuest: 1,
     kick: 1,
-    forceSpectator: 1
+    forceSpectator: 1,
+    addMap: 1,
+    removeMap: 1,
   },
   /** Whether the maplist gets reloaded on Match Settings updates.
    *  Enable this if you use external tools to modify the Match Settings */
   updateMatchSettingsOnChange: false,
-  /** Point system for rounds and cup gamemode */
+  /** Point system for rounds and cup gamemodes */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
   /** Default time limit in TimeAttack mode (in miliseconds) */
   defaultTimeAttackTimeLimit: 300000,
@@ -59,7 +63,7 @@ export default {
    * Used in nickname to login translation in commands. 0.15 is default value */
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.4.2",
+  version: "1.4.3",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }

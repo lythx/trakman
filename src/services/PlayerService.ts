@@ -2,7 +2,6 @@ import { Client } from '../client/Client.js'
 import { PlayerRepository } from '../database/PlayerRepository.js'
 import { PrivilegeRepository } from '../database/PrivilegeRepository.js'
 import { MapService } from './MapService.js'
-import { GameService } from './GameService.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
 import { Events } from '../Events.js'
@@ -289,7 +288,7 @@ export class PlayerService {
   /**
    * Sets spectator status, player slot and team in the player object.
    * @param info Player login
-   * @returns True if successfull, false if the player is not in the runtime memory
+   * @returns True if successful, false if the player is not in the runtime memory
    */
   static setPlayerInfo(info: tm.InfoChangedInfo): boolean {
     const player: tm.Player | undefined = this._players.find(a => a.login === info.login)

@@ -89,6 +89,7 @@ export abstract class Logger {
     })
     if (this.useDiscord) {
       const envDcLog = Number(process.env.DISCORD_LOG_LEVEL)
+      const envDcWebhook = process.env.DISCORD_WEBHOOK_URL
       if (isNaN(envDcLog)) {
         this.warn(`DISCORD_LOG_LEVEL is undefined or not a number, ` +
           `default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
@@ -98,7 +99,7 @@ export abstract class Logger {
       } else {
         this.discordLogLevel = envDcLog
       }
-      if (process.env.DISCORD_WEBHOOK_URL === undefined) {
+      if (envDcWebhook?.length === 0 || envDcWebhook === undefined) {
         this.error('DISCORD_WEBHOOK_URL is undefined. Check your .env file to use discord logging')
         return
       }

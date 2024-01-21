@@ -4,6 +4,7 @@
  */
 
 import { centeredText, closeButton, Grid, componentIds, leftAlignedText, addManialinkListener, PopupWindow, Paginator } from '../../ui/UI.js'
+import { actions } from '../../actions/Actions.js'
 import { maplist } from '../Maplist.js'
 import config from './Maplist.config.js'
 
@@ -15,6 +16,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private readonly mapActionIds: string[] = []
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
   private readonly paginatorIdOffset: number = 7000
+  private readonly mapDeleteId: number = 11000
   private nextPaginatorId: number = 0
 
   constructor() {
@@ -38,6 +40,16 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       }
       const gotQueued: boolean = this.handleMapClick(mapId, info.login, info.nickname, info.privilege)
       if (!gotQueued) { return }
+      this.reRender()
+    })
+    addManialinkListener(this.openId + this.mapDeleteId, 5000, async (info, mapIndex): Promise<void> => {
+      const mapId: string = this.mapActionIds[mapIndex]
+      if (mapId === undefined) {
+        tm.sendMessage(config.messages.error, info.login)
+        tm.log.error('Error while removing map', `Map index out of range`)
+        return
+      }
+      await actions.removeMap(info.login, info.nickname, info.title, mapId)
       this.reRender()
     })
     addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
@@ -64,8 +76,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           void this.openWithOption(info.login, 'noauthor')
         } else if (option === 'norank') {
           void this.openWithOption(info.login, 'norank')
-        } else if (query.startsWith('$a')) {
-          void this.openWithQuery(info.login, query.slice(2), true)
+        } else if (query.startsWith(config.authorSearchSeparator)) {
+          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), true)
         } else {
           void this.openWithQuery(info.login, query)
         }
@@ -207,8 +219,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       const gridIndex: number = (i * config.columns) + j
       const recordIndexString: string = recordIndexStrings[gridIndex]
       const index: number = startIndex + gridIndex
-      const actionId: number = this.getActionId(maps[index].id)
-      const header: string = this.getHeader(login, index, maps[index].id, actionId, w, h)
+      const { actionId, deleteId } = this.getActionAndDeleteId(maps[index].id)
+      const header: string = this.getHeader(login, index, maps[index].id, actionId, deleteId, w, h)
       const rowH: number = (h - this.margin) / 4
       const width: number = (w - this.margin * 3) - config.iconWidth
       const karmaW: number = width - (config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2)
@@ -308,17 +320,23 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     return ret
   }
 
-  private getActionId(mapId: string): number {
+  private getActionAndDeleteId(mapId: string): { actionId: number, deleteId: number } {
+    let actionId = -1
+    let deleteId = -1
     const mapActionId: number = this.mapActionIds.indexOf(mapId)
-    if (mapActionId !== -1) { return mapActionId + this.openId + this.mapAddId }
+    if (mapActionId !== -1) {
+      actionId = mapActionId + this.openId + this.mapAddId
+      deleteId = mapActionId + this.openId + this.mapDeleteId
+    }
     else {
       this.mapActionIds.push(mapId)
-      return this.mapActionIds.length + this.openId + this.mapAddId - 1
+      actionId = this.mapActionIds.length + this.openId + this.mapAddId - 1
+      deleteId = this.mapActionIds.length + this.openId + this.mapDeleteId - 1
     }
+    return { actionId, deleteId }
   }
 
-  private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, w: number, h: number): string {
-    const width: number = (w - this.margin * 3) - config.iconWidth
+  private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, deleteId: number, w: number, h: number): string {
     const height: number = h - this.margin
     const index: number = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
     const prevIndex: number = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
@@ -330,6 +348,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
         <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }
+    let width = (w - this.margin * 3) - config.iconWidth
     if (index !== -1) {
       return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
@@ -349,6 +368,16 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           </frame>
           </frame>`
     }
+    const deletePrivilege = tm.maps.current.id !== mapId && player.privilege >= config.removePrivilege
+    if (deletePrivilege) {
+      width = (w - this.margin * 4) - config.iconWidth * 2
+    }
+    const deleteButton = deletePrivilege ?
+      `<frame posn="${config.iconWidth + this.margin * 2 + width} 0 1">
+      <quad posn="0 0 7.9" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
+      <quad posn="${this.margin} ${-this.margin} 8" sizen="${config.iconWidth - this.margin * 2} ${(height / 4) - this.margin * 3}" 
+        image="${config.icons[6]}" imagefocus="${config.icons[7]}" action="${deleteId}"/>
+      </frame>` : ``
     return `${overlay ?? `<quad posn="${-this.margin} ${this.margin} 8" sizen="${w} ${h}" action="${actionId}"
             image="${config.blankImage}" 
             imagefocus="${config.plusImage}"/>`}
@@ -358,7 +387,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <frame posn="${config.iconWidth + this.margin} 0 1">
             <quad posn="0 0 3" sizen="${width} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>
             ${leftAlignedText(`${config.texts.map}${mapIndex + 1}`, width, height / 4 - this.margin, { textScale: config.textScale })}
-          </frame>`
+          </frame>
+          ${deleteButton}`
   }
 
 }

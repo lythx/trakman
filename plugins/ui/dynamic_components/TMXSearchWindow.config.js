@@ -3,7 +3,7 @@ const p = tm.utils.palette
 
 export default {
   title: "TMX Search Result",
-  addPrivilege: 1,
+  addPrivilege: tm.config.controller.privileges.addMap,
   icon: icons.mapList,
   textScale: 1,
   padding: 0.1,
@@ -22,13 +22,13 @@ export default {
   navbar: [
   ],
   icons: [
-    icons.ongoingMap,
-    icons.maniaExchange,
-    icons.tag,
-    icons.personBuilder,
-    icons.clockAuthor,
-    icons.trophy,
-    icons.calendarPlus
+    icons.ongoingMap, // Map header icon
+    icons.maniaExchange, // MX icon
+    icons.tag, // Map name icon
+    icons.personBuilder, // Author name icon
+    icons.clockAuthor, // Author time icon
+    icons.trophy, // Map awards icon
+    icons.calendarPlus // Map upload date
   ],
   iconWidth: 2,
   timeWidth: 4.5,
@@ -38,6 +38,7 @@ export default {
   plusImage: icons.addMap,
   blankImage: icons.blank,
   public: true,
+  authorSearchSeparator: '$a',
   messages: {
     searchError: `${p.error}Failed to search for the maps.`,
     fetchError: `${p.error}Failed to fetch the map from TMX.`,

@@ -160,6 +160,8 @@ export default {
     promotePlayerHover: "https://trakman.ptrk.eu/icons/PromotePlayerHover.png",
     demotePlayer: "https://trakman.ptrk.eu/icons/DemotePlayer.png",
     demotePlayerHover: "https://trakman.ptrk.eu/icons/DemotePlayerHover.png",
+    trashcanDelete: "https://trakman.ptrk.eu/icons/TrashDelete.png",
+    trashcanDeleteHover: "https://trakman.ptrk.eu/icons/TrashDeleteHover.png",
 
     get preloadedIcons() {
         return [

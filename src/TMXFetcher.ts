@@ -71,14 +71,14 @@ export abstract class TMXFetcher {
   /**
    * Fetches map file from TMX via its UID.
    * @param mapId Map UID
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchMapFile(mapId: string): Promise<{ name: string, content: Buffer } | Error>
   /**
    * Fetches map file from TMX via its TMX ID.
    * @param tmxId Map TMX ID
    * @param site Optional TMX site (TMNF by default)
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
   static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
@@ -196,20 +196,23 @@ export abstract class TMXFetcher {
   /**
   * Searches for maps matching the specified name on TMX.
   * @param query Search query
+  * @param author Map author to look for
   * @param site TMX Site to fetch from
   * @param count Number of maps to fetch
-  * @returns An array of searched map objects or Error if unsuccessfull
+  * @returns An array of searched map objects or Error if unsuccessful
   */
-  static async searchForMap(query?: string, site: tm.TMXSite = 'TMNF',
+  static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
-    const params: [string, string][] = [['count', count.toString()], ['name', query ?? '']]
+    const params: [string, string][] = [['count', count.toString()], ['name', (query ?? '').trim()], ['author', (author ?? '').trim()]]
+    if (author === undefined) { params.pop() }
     if (query === undefined) { params.pop() }
     const prefix = this.siteToPrefix(site)
     const url = `https://${prefix}.tm-exchange.com/api/tracks?${new URLSearchParams([
       ['fields', `TrackId,TrackName,UId,AuthorTime,GoldTarget,SilverTarget,BronzeTarget,Authors,UploadedAt,` +
         `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
       ...params
-    ])}`
+    ])
+      }`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.warn(`Error while searching for map on TMX (url: ${url}).`, res.message)
@@ -217,13 +220,19 @@ export abstract class TMXFetcher {
     }
     if (!res.ok) {
       const error = new Error(`Error while searching for map on TMX (url: ${url}).`
-        + `\nCode: ${res.status} Text: ${res.statusText}`)
+        + `\nCode: ${res.status} Text: ${res.statusText} `)
       Logger.warn(error.message)
       return error
     }
-    const data = (await res.json() as any).Results
+    const data = await res.json().catch((data: Error) => data)
+    if (data instanceof Error) { // FOR WHATEVER REASON THE NEW API ALSO RETURNS A WEBPAGE INSTEAD OF AN ERROR (REAL HTTP 200 RESPONSE BY THE WAY!!!)
+      const error = new Error(`Error while processing TMX response (url: ${url}).`
+        + `\nCode: ${res.status} Text: ${res.statusText} `)
+      Logger.warn(error.message)
+      return error
+    }
     const ret: tm.TMXSearchResult[] = []
-    for (const e of data) {
+    for (const e of (data as any).Results) {
       ret.push({
         id: e.UId,
         TMXId: e.TrackId,
@@ -259,7 +268,7 @@ export abstract class TMXFetcher {
   /**
    * Fetches a random map file from TMX.
    * @param site Optional TMX site (TMNF by default)
-   * @returns Object containing map name and file content, or Error if unsuccessfull
+   * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchRandomMapFile(site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
     const prefix = this.siteToPrefix(site)

@@ -6,6 +6,7 @@ export default {
   icon: icons.mapList,
   textScale: 1,
   padding: 0.1,
+  removePrivilege: tm.config.controller.privileges.removeMap,
   overlayBackground: '7777',
   defaultText: '-',
   colour: p.green,
@@ -27,12 +28,14 @@ export default {
     { name: 'Map Info', actionId: ids.TMXWindow }
   ],
   icons: [
-    icons.ongoingMap,
-    icons.tag,
-    icons.personBuilder,
-    icons.clockAuthor,
-    icons.chartLocal,
-    icons.karmaPulse
+    icons.ongoingMap, // Map header icon
+    icons.tag, // Map name icon
+    icons.personBuilder, // Author name icon
+    icons.clockAuthor, // Author time icon
+    icons.chartLocal, // PB position icon
+    icons.karmaPulse, // Local karma icon
+    icons.trashcanDelete, // Remove map icon
+    icons.trashcanDeleteHover // Remove map icon
   ],
   iconWidth: 2,
   queueWidth: 5.2,
@@ -45,6 +48,7 @@ export default {
   minusImage: icons.removeMap,
   blankImage: icons.blank,
   public: true,
+  authorSearchSeparator: '$a',
   messages: {
     error: `${p.error}Error while adding the map to queue.`,
     noPermission: `${p.error}You can't add more than one map to the queue.`,
@@ -54,7 +58,7 @@ export default {
   commands: {
     list: {
       aliases: ['l', 'ml', 'list'],
-      help: `Display list of maps. Start with $$a for author search. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
+      help: `Display list of maps. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
       privilege: 0
     },
     best: {

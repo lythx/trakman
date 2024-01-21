@@ -10,7 +10,7 @@ const commands: tm.Command[] = [
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.skip.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`)
+      tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
     },
     privilege: config.skip.privilege
   },
@@ -23,7 +23,7 @@ const commands: tm.Command[] = [
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.res.public ? undefined : info.login)
-      tm.client.callNoRes(`RestartChallenge`)
+      tm.client.callNoRes(`RestartChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
     },
     privilege: config.res.privilege
   },

@@ -35,7 +35,6 @@ export default {
   dediSectors: 9000,
   locals: 10000,
   mapList: 20000,
-  localSectors: 30000,
   liveSectors: 40000,
   liveCheckpoint: 70000,
   currentCps: 80000,
@@ -81,4 +80,5 @@ export default {
   oplist: 490000,
   adminlist: 500000,
   masteradminlist: 510000,
+  localSectors: 520000
 }

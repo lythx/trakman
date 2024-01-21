@@ -78,6 +78,8 @@ class TMXWindow extends PopupWindow<number> {
     }
     const m = maps.filter(a => a !== undefined).map(a => (a as any).id)
     const allRecords: Readonly<tm.Record[]> = [...tm.records.getFromHistory(...m), ...tm.records.local, ...tm.records.getFromQueue(...m)]
+        .sort((a, b) => a.time - b.time)
+        .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
     const cell: GridCellFunction = (i, j, w, h) => {
       const map = maps[j]
       if (map === undefined) { return '' }

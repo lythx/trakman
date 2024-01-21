@@ -6,7 +6,6 @@
 import { componentIds, RecordList, StaticHeader, StaticComponent } from '../../UI.js'
 import config from './NextMapRecords.config.js'
 
-// TODO THERES A BUG WHICH CAUSES RECORDS TO BE DISPLAYED TWICE, HAPPENED AFTER CHANGING GAMEMODES
 export default class NextMapRecords extends StaticComponent {
 
   private readonly header: StaticHeader
@@ -32,6 +31,8 @@ export default class NextMapRecords extends StaticComponent {
       } else {
         const mapId: string = tm.jukebox.queue[0].id
         this.records = tm.records.getFromQueue(mapId)
+            .sort((a, b) => a.time - b.time)
+            .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
         return this.display()
       }
     })

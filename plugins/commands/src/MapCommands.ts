@@ -2,52 +2,13 @@ import config from '../config/MapCommands.config.js'
 import fetch from 'node-fetch'
 import { actions } from '../../actions/Actions.js'
 
-let eraseObject: { id: string, admin: tm.Player } | undefined
-tm.addListener('BeginMap', (info): void => {
-  if (info.isRestart) { return }
-  if (eraseObject !== undefined) {
-    void tm.maps.remove(eraseObject.id, eraseObject.admin)
-    eraseObject = undefined
-  }
-})
-
 const commands: tm.Command[] = [
   {
     aliases: config.add.aliases,
     help: config.add.help,
     params: [{ name: 'id', type: 'int' }, { name: 'tmxSite', optional: true }],
     callback: async (info: tm.MessageInfo, id: number, tmxSite?: string): Promise<void> => {
-      const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
-      const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
-      let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id, site).catch((err: Error) => err)
-      if (file instanceof Error) {
-        const remainingSites: tm.TMXSite[] = tmxSites.filter(a => a !== tmxSite)
-        for (const e of remainingSites) {
-          file = await tm.tmx.fetchMapFile(id, e).catch((err: Error) => err)
-          if (!(file instanceof Error)) { break }
-        }
-      }
-      if (file instanceof Error) {
-        tm.sendMessage(config.add.fetchError, info.login)
-        return
-      }
-      const obj = await tm.maps.writeFileAndAdd(file.name, file.content, info)
-      if (obj instanceof Error) {
-        tm.log.warn(obj.message)
-        tm.sendMessage(config.add.addError, info.login)
-        return
-      } else if (obj.wasAlreadyAdded) {
-        tm.sendMessage(tm.utils.strVar(config.add.alreadyAdded, {
-          map: tm.utils.strip(obj.map.name, true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.add.public ? undefined : info.login)
-      } else {
-        tm.sendMessage(tm.utils.strVar(config.add.added, {
-          title: info.title,
-          map: tm.utils.strip(obj.map.name, true),
-          nickname: tm.utils.strip(info.nickname, true)
-        }), config.add.public ? undefined : info.login)
-      }
+      await actions.addMap(info.login, info.nickname, info.title, id, tmxSite)
     },
     privilege: config.add.privilege
   },
@@ -108,16 +69,8 @@ const commands: tm.Command[] = [
   {
     aliases: config.remove.aliases,
     help: config.remove.help,
-    callback: (info): void => {
-      if (eraseObject !== undefined) {
-        tm.sendMessage(config.remove.error, info.login)
-        return
-      }
-      eraseObject = { id: tm.maps.current.id, admin: info }
-      tm.sendMessage(tm.utils.strVar(config.remove.text, {
-        title: info.title,
-        nickname: tm.utils.strip(info.nickname, true)
-      }), config.remove.public ? undefined : info.login)
+    callback: async (info): Promise<void> => {
+      await actions.removeMap(info.login, info.nickname, info.title)
     },
     privilege: config.remove.privilege
   },
