@@ -6,3 +6,4 @@
 
 import './FinishCounter.js'
 import './CustomBracket.js'
+import './UrlFixer.js'
