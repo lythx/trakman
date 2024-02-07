@@ -44,7 +44,7 @@ export default class DediRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    if(this.hasPanelsHidden(login)) {
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
     return {
