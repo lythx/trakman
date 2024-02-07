@@ -185,9 +185,10 @@ export default class RecordList {
    * Constructs record list XML for given player from passed array of record objects
    * @param login Player login
    * @param allRecords Array of record objects
+   * @param pb Personal best time (if omitted current map pb will be used)
    * @returns Record list XML string
    */
-  constructXml(login: string | undefined, allRecords: RLRecord[]): string {
+  constructXml(login: string | undefined, allRecords: RLRecord[], pb?: number): string {
     const checkpointAmounts = allRecords.map(a =>
       a?.checkpoints?.length).filter(a => a !== undefined) as number[]
     const cpAmount: number = checkpointAmounts.length === 0 ? 0 : Math.max(...checkpointAmounts)
@@ -197,7 +198,7 @@ export default class RecordList {
     const [infos, infoPositions, cpTypes] = info !== undefined ? this.getInfos(login, cpAmount, info, parsedRecs) : [[], [], []]
     const playerIndex: number = login === undefined ? -1 : parsedRecs.map(a => a.record).findIndex(a => a.login === login)
     const markers: Marker[] = this.getMarkers(playerIndex, infoPositions, parsedRecs.map(a => a.record))
-    const timeColours = this.getTimeColours(login, playerIndex, parsedRecs.map(a => a.record))
+    const timeColours = this.getTimeColours(login, playerIndex, parsedRecs.map(a => a.record), pb)
     let ret: string = `<quad posn="-70 50 -100" sizen="140 100" action="${IDS.ClearAlerts}"/>`
     for (let i: number = 0; i < this.rows; i++) {
       const info = infos.find(a => a.index === i)
@@ -391,7 +392,7 @@ export default class RecordList {
     return ret
   }
 
-  private getTimeColours(login: string | undefined, playerIndex: number, records: RLRecord[]): ('slower' | 'faster' | 'top' | 'you')[] {
+  private getTimeColours(login: string | undefined, playerIndex: number, records: RLRecord[], personalBest?: number): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
     if(login === undefined) {
       for (let i: number = 0; i < records.length; i++) {
@@ -399,7 +400,7 @@ export default class RecordList {
       }
     }
     if (this.getColoursFromPb && playerIndex === -1) {
-      const pb: number | undefined = tm.records.local.find(a => a.login === login)?.time
+      const pb: number | undefined = personalBest ?? tm.records.local.find(a => a.login === login)?.time
       if (pb !== undefined) {
         for (let i: number = 0; i < records.length; i++) {
           if (pb <= records?.[i]?.time) {
