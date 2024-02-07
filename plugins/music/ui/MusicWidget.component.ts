@@ -11,6 +11,9 @@ export default class MusicWidget extends StaticComponent {
   constructor() {
     super(componentIds.musicWidget)
     this.header = new StaticHeader('race')
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -33,6 +36,9 @@ export default class MusicWidget extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return { xml: this.xml, login }
   }
 
