@@ -10,14 +10,14 @@ export default class NextMapRecords extends StaticComponent {
 
   private readonly header: StaticHeader
   private records: tm.Record[] = []
-  private readonly list: RecordList
+  private readonly recordList: RecordList
 
   constructor() {
     super(componentIds.nextMapRecords)
     this.header = new StaticHeader('result')
-    this.list = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
+    this.recordList = new RecordList('result', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
       config.entries, this.side, 5, 5, false, { getColoursFromPb: true })
-    this.list.onClick((info: tm.ManialinkClickInfo): void => {
+    this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
@@ -31,8 +31,8 @@ export default class NextMapRecords extends StaticComponent {
       } else {
         const mapId: string = tm.jukebox.queue[0].id
         this.records = tm.records.getFromQueue(mapId)
-            .sort((a, b) => a.time - b.time)
-            .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
+          .sort((a, b) => a.time - b.time)
+          .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
         return this.display()
       }
     })
@@ -65,16 +65,17 @@ export default class NextMapRecords extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    const pb = this.records.find(a => a.login === login)?.time
     return {
       xml: `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.positionX} ${this.positionY} 2">
         ${this.header.constructXml(config.title, config.icon, this.side)}
         <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(this.reduxModeEnabled ? undefined : login, this.records.map(a => ({
+        ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, this.records.map(a => ({
         name: a.nickname, time: a.time,
         date: a.date, checkpoints: a.checkpoints, login: a.login
-      })))}
+      })), pb)}
         </frame>
       </frame>
     </manialink>`,
