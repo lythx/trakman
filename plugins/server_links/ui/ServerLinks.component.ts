@@ -33,6 +33,9 @@ export default class ServerLinks extends StaticComponent {
         tm.sendManialink(obj.xml, obj.login)
       }
     }
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -67,6 +70,9 @@ export default class ServerLinks extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     const page: number = this.paginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
     const functions: GridCellFunction[] = []
