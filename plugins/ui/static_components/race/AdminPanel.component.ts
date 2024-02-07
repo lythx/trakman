@@ -71,6 +71,9 @@ export default class AdminPanel extends StaticComponent {
         config.public ? undefined : info.login)
       tm.client.callNoRes('ForceEndRound')
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -88,6 +91,9 @@ export default class AdminPanel extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     const privilege: number = tm.players.get(login)?.privilege ?? 0
     if (privilege >= config.privilege) {
       return { xml: this.xml, login }

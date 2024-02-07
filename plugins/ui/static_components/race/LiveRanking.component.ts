@@ -31,6 +31,9 @@ export default class LiveRanking extends StaticComponent {
         return this.display()
       }
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getEntries(): number {
@@ -63,6 +66,9 @@ export default class LiveRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     let content: string
     this.title = config.title
     if (tm.getGameMode() === 'Laps') {

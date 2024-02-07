@@ -22,6 +22,9 @@ export default class DonationPanel extends StaticComponent {
         void donations.donate(info.login, info.nickname, amount)
       }
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -30,11 +33,14 @@ export default class DonationPanel extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login: tm.players.list.filter(a => a.isUnited).map(a=> a.login) }
+    return { xml: this.xml, login: tm.players.list.filter(a => a.isUnited).map(a => a.login) }
   }
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     if (tm.players.get(login)?.isUnited) {
       return { xml: this.xml, login }
     }
