@@ -22,6 +22,9 @@ export default class TMXRanking extends StaticComponent {
     this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => this.displayToPlayer(info.login))
     tmx.onMapChange(() => this.sendMultipleManialinks(this.display()))
     tmx.onQueueChange(() => this.sendMultipleManialinks(this.display()))
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   onPositionChange(): void {
@@ -58,6 +61,9 @@ export default class TMXRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     let replays: { name: string, time: number, date: Date, login?: string }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     if (tmxInfo !== null) {
