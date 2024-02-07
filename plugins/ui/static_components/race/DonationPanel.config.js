@@ -8,6 +8,7 @@ export default {
   icon: icons.cash,
   margin: cfg.margin,
   background: cfg.background,
+  hidePanel: true,
   amounts: [
     50,
     100,

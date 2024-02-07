@@ -15,5 +15,6 @@ export default {
   displayNoRecordEntry: true,
   lapsNoRecordEntry: '--/--',
   cpsCollectedColour: tm.utils.palette.green,
+  hidePanel: true,
   maxRecordsAmount: 3000 // If more records than this get driven in one round the click listener will break
 }
