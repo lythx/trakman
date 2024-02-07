@@ -20,5 +20,6 @@ export default {
   markerBackgrounds: {
     red: tm.utils.palette.red + '6',
     blue: tm.utils.palette.purple + '6'
-  }
+  },
+  hidePanel: true
 }

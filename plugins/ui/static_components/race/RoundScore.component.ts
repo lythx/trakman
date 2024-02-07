@@ -21,6 +21,9 @@ export default class RoundScore extends StaticComponent {
     this.renderOnEvent('PlayerDataUpdated', (info) => {
       if (tm.records.roundRecords.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getEntries(): number {
@@ -57,6 +60,9 @@ export default class RoundScore extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
@@ -93,7 +99,7 @@ export default class RoundScore extends StaticComponent {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
       if (obj !== undefined) {
-        tm.sendManialink(obj.login, obj.xml)
+        tm.sendManialink(obj.xml, obj.login)
       }
     })
   }
