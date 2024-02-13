@@ -32,11 +32,15 @@ Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
 export const Utils = {
 
   /**
-   * Formats time for prettier display.
+   * Formats time for prettier display. If the current gamemode is Stunts treats the first param as score.
    * @param time Time to format
+   * @param ignoreGamemode If true won't treat the first param as score in Stunts mode
    * @returns Formatted time string (eg. 25:12.63, 0:56.92)
    */
-  getTimeString(time: number): string {
+  getTimeString(time: number, ignoreGamemode?: true): string {
+    if(!ignoreGamemode && tm.getGameMode() === 'Stunts') {
+      return time.toString()
+    }
     const d = new Date(time)
     const h = d.getUTCHours().toString()
     const m = d.getUTCMinutes().toString()
