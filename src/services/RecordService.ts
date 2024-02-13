@@ -231,7 +231,12 @@ export class RecordService {
     const records = isLap ? this._lapRecords : this._localRecords
     const recType = isLap ? 'lap' : 'local'
     const previousIndex = records.findIndex(a => a.login === player.login)
-    let position: number = records.findIndex(a => a.time > time) + 1
+    let position: number
+    if (GameService.gameMode === 'Stunts') {
+      position = records.findIndex(a => a.time < time) + 1
+    } else {
+      position = records.findIndex(a => a.time > time) + 1
+    }
     // If player gets the worst record on the server set position to array length + 1
     if (position === 0) { position = records.length + 1 }
     if (previousIndex === -1) {
@@ -251,7 +256,7 @@ export class RecordService {
       Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, recType))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
-    if (time < pb) {
+    if ((time > pb && GameService.gameMode === 'Stunts') || time < pb) {
       const previousTime: number | undefined = records[previousIndex].time
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       records.splice(previousIndex, 1)
@@ -279,7 +284,12 @@ export class RecordService {
    */
   private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): tm.RecordInfo | undefined {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
-    const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
+    let position: number
+    if (GameService.gameMode === 'Stunts') {
+      position = this._liveRecords.filter(a => a.time >= time).length + 1
+    } else {
+      position = this._liveRecords.filter(a => a.time <= time).length + 1
+    }
     if (pb === undefined) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
       this._liveRecords.splice(position - 1, 0, recordInfo)
@@ -292,7 +302,7 @@ export class RecordService {
       Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live'))
       return recordInfo
     }
-    if (time < pb) {
+    if ((time > pb && GameService.gameMode === 'Stunts') || time < pb) {
       const previousIndex: number = this._liveRecords.findIndex(a => a.login === player.login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${player.nickname} (${player.login}) in memory`)
