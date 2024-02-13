@@ -7,6 +7,7 @@ export default {
   width: cfg.width,
   margin: cfg.margin,
   title: "TMX Records",
+  stuntsTitle: "TMX Scores",
   icon: icons.maniaExchange,
   columnProportions: [
     1,

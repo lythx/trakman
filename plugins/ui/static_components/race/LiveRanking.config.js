@@ -7,6 +7,7 @@ export default {
   entryHeight: 2.15,
   width: cfg.width,
   title: "Live Records",
+  stuntsTitle: "Live Scores",
   lapsTitle: "Live Ranking",
   icon: icons.chartLive,
   margin: cfg.margin,

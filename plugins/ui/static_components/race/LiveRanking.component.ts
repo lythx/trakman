@@ -99,6 +99,9 @@ export default class LiveRanking extends StaticComponent {
       content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.live
         .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))
     }
+    if (tm.getGameMode() === 'Stunts') {
+      this.title = config.stuntsTitle
+    }
     return {
       xml: `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
