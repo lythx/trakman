@@ -711,7 +711,7 @@ declare global {
       readonly BestTime: number;
       /** Player checkpoints in the best run */
       readonly BestCheckpoints: number[];
-      /** Probably stunts mode related */ // TODO STUNTS
+      /** Player best Stunts Mode score */
       readonly Score: number;
       /** Amount of finished laps */
       readonly NbrLapsFinished: number;
