@@ -119,6 +119,8 @@ const events: tm.Listener[] = [
   {
     event: 'LocalRecord',
     callback: (info: tm.RecordInfo): void => {
+      const isStunts = tm.getGameMode() === 'Stunts'
+      const diffSign = isStunts ? '+' : '-'
       let prevObj: undefined | { time: number, position: number } = info.previous
       if (info.previous !== undefined && info.previous.position > tm.records.maxLocalsAmount) {
         prevObj = undefined
@@ -129,9 +131,10 @@ const events: tm.Listener[] = [
         status: rs.status,
         position: tm.utils.getOrdinalSuffix(info.position),
         time: tm.utils.getTimeString(info.time),
+        type: isStunts ? 'Score' : 'Time',
         difference: rs.difference !== undefined ? tm.utils.strVar(c.recordDifference, {
           position: info.previous?.position,
-          time: rs.difference
+          time: diffSign + rs.difference
         }) : ''
       }))
     }

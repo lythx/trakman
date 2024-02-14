@@ -32,6 +32,9 @@ const initialize = async (): Promise<void> => {
   }
   tm.log.trace('Connected to Ultimania')
   emitFetchEvent(currentUltis)
+  if (config.syncName) {
+    void tm.updatePlayerInfo(...currentUltis)
+  }
 }
 
 const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
@@ -130,6 +133,9 @@ if (config.isEnabled) {
     }
     currentUltis = records
     emitFetchEvent(currentUltis)
+    if (config.syncName) {
+      void tm.updatePlayerInfo(...currentUltis)
+    }
   })
 
   tm.addListener('LiveRecord', (info) => {

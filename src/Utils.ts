@@ -216,12 +216,13 @@ export const Utils = {
 
   /**
    * Gets the appropriate verb and calculates record differences.
-   * @param current Object containing current record time and position
+   * @param current Object containing current record time (treated as score in Stunts mode) and position
    * @param previous Optional object containing previous record time and position
+   * @param ignoreGamemode If true won't treat times as scores in Stunts Mode
    * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
    * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }): {
+  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number },  ignoreGamemode?: true): {
     status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
     difference?: string
   } {
@@ -244,7 +245,11 @@ export const Utils = {
       calc = true
     }
     if (calc && previous !== undefined) {
-      obj.difference = this.getTimeString(previous.time - current.time)
+      if(tm.getGameMode() === 'Stunts' && !ignoreGamemode) {
+        obj.difference = (current.time - previous.time).toString()
+      } else {
+        obj.difference = this.getTimeString(previous.time - current.time)
+      }
       let i: number = -1
       while (true) {
         i++
