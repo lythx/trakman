@@ -23,12 +23,12 @@ const emitNicknameUpdateEvent = (updatedRecords: UltiRecord[]): void => {
 
 const initialize = async (): Promise<void> => {
   const records = await fetchRecords(tm.maps.current.id)
-  if (records instanceof Error) {
-    return // TODO
+  if (!(records instanceof Error)) {
+    currentUltis = records
   }
-  currentUltis = records
   for (const e of tm.players.list) {
-    await updatePlayer(e)
+    const status = await updatePlayer(e)
+    if(status instanceof Error) { break }
   }
   tm.log.trace('Connected to Ultimania')
   emitFetchEvent(currentUltis)
@@ -127,11 +127,11 @@ if (config.isEnabled) {
 
   tm.addListener('BeginMap', async (info) => {
     newUltis = []
+    currentUltis = []
     const records = await fetchRecords(info.id)
-    if (records instanceof Error) {
-      return // TODO
+    if (!(records instanceof Error)) {
+      currentUltis = records
     }
-    currentUltis = records
     emitFetchEvent(currentUltis)
     if (config.syncName) {
       void tm.updatePlayerInfo(...currentUltis)
