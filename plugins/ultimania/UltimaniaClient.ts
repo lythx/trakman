@@ -1,20 +1,19 @@
 import fetch from "node-fetch"
 import { UltimaniaRecord } from "./UltimaniaTypes"
-export { }
+import config from './Config.js'
 
-const url = `http://ultimania5.askuri.de/api/v5`
 
 async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
-  const res = await fetch(`${url}/maps/${mapId}/records`)
+  const res = await fetch(`${config.host}/maps/${mapId}/records`)
   if (!res.ok) {
     return new Error() // TODO
   }
   const data = await res.json() as any
   return data.map((a: any) => ({
-    login: a.player_id,
+    login: a.player_login,
     nickname: a.player.nick,
     score: a.score,
-    date: new Date(a.updated_at)
+    date: new Date(Number(a.updated_at) * 1000)
   }))
 }
 
@@ -24,7 +23,7 @@ async function sendRecord(mapId: string, record: UltimaniaRecord) {
     map_uid: mapId,
     score: record.score
   })
-  const res = await fetch(`${url}/records`, {
+  const res = await fetch(`${config.host}/records`, {
     method: 'PUT',
     headers: {
       'Content-Type': `application/json`
@@ -34,7 +33,6 @@ async function sendRecord(mapId: string, record: UltimaniaRecord) {
   if (!res.ok) {
     return new Error() // TODO
   }
-  const data = await res.text()
   return true
 }
 
@@ -43,7 +41,7 @@ async function updatePlayer(player: { login: string, nickname: string }) {
     login: player.login,
     nick: player.nickname
   })
-  const res = await fetch(`${url}/players`, {
+  const res = await fetch(`${config.host}/players`, {
     method: 'PUT',
     headers: {
       'Content-Type': `application/json`
@@ -53,7 +51,6 @@ async function updatePlayer(player: { login: string, nickname: string }) {
   if (!res.ok) {
     return new Error() // TODO
   }
-  const data = await res.text()
   return true
 }
 

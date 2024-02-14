@@ -38,7 +38,7 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
   score: number, date: Date): UltiRecord | false => {
   const pb: number | undefined = currentUltis.find(a => a.login === player.login)?.score
   const position: number = currentUltis.filter(a => a.score >= score).length + 1
-  if (position > config.recordCount || score < (pb ?? -1)) { return false }
+  if (score < (pb ?? -1)) { return false }
   if (pb === undefined) {
     const ultiRecordInfo: NewUltiRecord = constructRecordObject(player, score, undefined, position, undefined, date)
     currentUltis.splice(position - 1, 0,
@@ -270,11 +270,6 @@ export const ultimania = {
    * Plugin status
    */
   isEnabled: config.isEnabled,
-
-  /**
-   * Maximum amount of ultimania records
-   */
-  recordCountLimit: config.recordCount
 
 }
 

@@ -12,8 +12,6 @@ export default class UltiRanking extends StaticComponent {
 
   private readonly header: StaticHeader
   private recordList!: RecordList
-  private readonly maxUltis: number = ultimania.recordCountLimit
-
   constructor() {
     super(componentIds.ultiRanking)
     this.header = new StaticHeader('race')
@@ -99,7 +97,7 @@ export default class UltiRanking extends StaticComponent {
   private getRecordList(): void {
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      this.getEntries(), this.side, this.getTopCount(), this.maxUltis, config.displayNoRecordEntry)
+      this.getEntries(), this.side, this.getTopCount(), config.maxRecordCount, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
