@@ -245,9 +245,9 @@ export class RecordService {
       records.splice(position - 1, 0, recordInfo)
       Logger.info(...this.getLogString(undefined, position, undefined, time, player, recType))
       if (MapService.current.isInLapsMode && !isLap) {
-        void this.repo.add(MapService.current.lapsAmount, recordInfo)
+        void this.repo.add([recordInfo], false, MapService.current.lapsAmount)
       } else {
-        void this.repo.add(null, recordInfo)
+        void this.repo.add([recordInfo], isStunts)
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
@@ -265,10 +265,10 @@ export class RecordService {
       Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, recType))
       if (MapService.current.isInLapsMode && !isLap) {
         void this.repo.update(recordInfo.map, recordInfo.login,
-          recordInfo.time, recordInfo.checkpoints, recordInfo.date, MapService.current.lapsAmount)
+          recordInfo.time, recordInfo.checkpoints, recordInfo.date, false, MapService.current.lapsAmount)
       } else {
         void this.repo.update(recordInfo.map, recordInfo.login,
-          recordInfo.time, recordInfo.checkpoints, recordInfo.date)
+          recordInfo.time, recordInfo.checkpoints, recordInfo.date, isStunts)
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
