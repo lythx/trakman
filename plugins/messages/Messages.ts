@@ -1,4 +1,5 @@
 import { dedimania } from '../dedimania/Dedimania.js'
+import { ultimania } from '../ultimania/Ultimania.js'
 import c from './Config.js'
 
 /**
@@ -176,3 +177,20 @@ dedimania.onRecord((record) => {
     }) : ''
   }))
 })
+
+ultimania.onRecord((record) => {
+  const prev = record.previous === undefined ? undefined :
+    { time: record.previous.score, position: record.previous.position }
+  const rs = tm.utils.getRankingString({ position: record.position, time: record.score }, prev)
+  tm.sendMessage(tm.utils.strVar(c.ultiRecord, {
+    nickname: tm.utils.strip(record.nickname, true),
+    status: rs.status,
+    position: tm.utils.getOrdinalSuffix(record.position),
+    score: record.score,
+    difference: rs.difference !== undefined ? tm.utils.strVar(c.ultiDifference, {
+      position: record.previous?.position,
+      score: rs.difference
+    }) : ''
+  }))
+})
+

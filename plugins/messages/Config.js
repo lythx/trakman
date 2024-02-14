@@ -35,10 +35,10 @@ export default {
   dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
     + `#{status} the ${p.rank}#{position}${p.dedirecord} `
     + `dedimania record. Time${p.highlight}: #{time}#{difference}`,
-  ultiDifference: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}#{time}${p.dedirecord})`,
+  ultiDifference: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}+#{score}${p.dedirecord})`,
   ultiRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
-  + `#{status} the ${p.rank}#{position}${p.dedirecord} `
-  + `ultimania record. Score${p.highlight}: #{time}#{difference}`,
+    + `#{status} the ${p.rank}#{position}${p.dedirecord} `
+    + `ultimania record. Score${p.highlight}: #{score}#{difference}`,
   nextJuke: `${p.vote}The next map will be ${p.highlight}#{map}${p.vote}, as requested `
     + `by ${p.highlight}#{nickname}${p.vote}.`,
   jukeSkipped: `${p.vote}Map ${p.highlight}#{map} ${p.vote}will be dropped from the queue, as `
