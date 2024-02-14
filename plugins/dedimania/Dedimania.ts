@@ -210,12 +210,12 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
     tm.log.info(getLogString(undefined, position, undefined, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time === pb) {
-    const previousPosition: number = currentDedis.findIndex(a => a.login === currentDedis.find(a => a.login === player.login)?.login) + 1
+    const previousPosition: number = currentDedis.findIndex(a => a.login === player.login) + 1
     const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, time, previousPosition, previousPosition)
     tm.log.info(getLogString(previousPosition, previousPosition, time, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time < pb) {
-    const previousIndex: number = currentDedis.findIndex(a => a.login === currentDedis.find(a => a.login === player.login)?.login)
+    const previousIndex: number = currentDedis.findIndex(a => a.login === player.login)
     const previousTime: number = currentDedis[previousIndex].time
     if (previousTime === undefined) { // not sure if this is needed
       tm.log.error(`Can't find player ${player.login} in memory`)
