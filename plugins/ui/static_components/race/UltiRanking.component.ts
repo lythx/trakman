@@ -97,7 +97,8 @@ export default class UltiRanking extends StaticComponent {
   private getRecordList(): void {
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      this.getEntries(), this.side, this.getTopCount(), config.maxRecordCount, config.displayNoRecordEntry)
+      this.getEntries(), this.side, this.getTopCount(), config.maxRecordCount, config.displayNoRecordEntry,
+      { noRecordEntryText: config.noRecordEntryText })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)

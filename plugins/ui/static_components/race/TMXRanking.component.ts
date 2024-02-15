@@ -69,12 +69,11 @@ export default class TMXRanking extends StaticComponent {
     if (tmxInfo !== null) {
       replays = tmxInfo.validReplays.map(a => ({ name: a.name, time: a.time, date: a.recordDate, url: a.url }))
     }
-    const title = tm.getGameMode() === 'Stunts' ? config.stuntsTitle : config.title
     return {
       xml: `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
       <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(title, config.icon, this.side, { actionId: componentIds.TMXDetailsWindow })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.TMXDetailsWindow })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, replays)}
         </frame>

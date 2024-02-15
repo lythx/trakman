@@ -39,6 +39,8 @@ export default class LiveRanking extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsEntries
     }
     return config.entries
   }
@@ -50,6 +52,8 @@ export default class LiveRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsTopCount
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsTopCount
     }
     return config.topCount
   }
@@ -99,9 +103,6 @@ export default class LiveRanking extends StaticComponent {
       content = this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.live
         .map(a => ({ name: a.nickname, time: a.time, checkpoints: a.checkpoints, login: a.login })))
     }
-    if (tm.getGameMode() === 'Stunts') {
-      this.title = config.stuntsTitle
-    }
     return {
       xml: `<manialink id="${this.id}">
     <frame posn="${this.positionX} ${this.positionY} 1">
@@ -124,6 +125,8 @@ export default class LiveRanking extends StaticComponent {
     if (tm.getGameMode() === 'Laps') {
       dontParseTime = true
       noRecordEntryText = config.lapsNoRecordEntry
+    } else if (tm.getGameMode() === 'Stunts') {
+      noRecordEntryText = config.stuntsNoRecordEntry
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),

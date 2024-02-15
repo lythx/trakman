@@ -41,6 +41,8 @@ export default class LocalRanking extends StaticComponent {
       return config.cupEntries
     } if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsEntries
     }
     return config.entries
   }
@@ -53,6 +55,8 @@ export default class LocalRanking extends StaticComponent {
     } if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
     } if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    } if (tm.getGameMode() === 'Stunts') {
       return config.lapsTopCount
     }
     return config.topCount
@@ -77,7 +81,8 @@ export default class LocalRanking extends StaticComponent {
     const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      { noRecordEntryText: tm.getGameMode() === 'Stunts' ? config.stuntsNoRecordEntry : undefined })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
@@ -97,12 +102,11 @@ export default class LocalRanking extends StaticComponent {
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    const title = tm.getGameMode() === 'Stunts' ? config.stuntsTitle : config.title
     return {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(title, config.icon, this.side, { actionId: componentIds.localCps })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.local
         .map(a => ({ name: a.nickname, time: a.time, date: a.date, checkpoints: a.checkpoints, login: a.login }))

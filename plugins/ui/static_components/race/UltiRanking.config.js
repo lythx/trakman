@@ -2,7 +2,7 @@ import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  entries: 15,
+  entries: 12,
   teamsEntries: 15,
   roundsEntries: 7,
   cupEntries: 7,
@@ -19,5 +19,6 @@ export default {
   lapsTopCount: 3,
   displayNoRecordEntry: true,
   hidePanel: true,
-  maxRecordCount: 5000
+  maxRecordCount: 5000,
+  noRecordEntryText: '--'
 }
