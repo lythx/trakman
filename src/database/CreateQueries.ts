@@ -149,5 +149,14 @@ export const createQueries = [
     CONSTRAINT fk_caller_id
       FOREIGN KEY(caller_id)
 	      REFERENCES players(id)
-  );`
+  );`,
+
+  `CREATE TABLE IF NOT EXISTS author_scores(
+    map_id INT4 NOT NULL,
+    author_score INT4 NOT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_map_id
+      FOREIGN KEY(id) 
+        REFERENCES map_ids(id)
+    );`
 ]
