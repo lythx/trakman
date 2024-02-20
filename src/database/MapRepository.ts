@@ -69,10 +69,9 @@ export class MapRepository extends Repository {
   async getAll(): Promise<tm.Map[]> {
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    author_score, count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
     JOIN map_ids ON maps.id=map_ids.id
     LEFT JOIN votes ON votes.map_id=maps.id
-    LEFT JOIN author_scores ON author_scores.map_id=maps.id
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
@@ -90,10 +89,9 @@ export class MapRepository extends Repository {
     if (ids.length === 0) { return isArr ? [] : undefined }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    author_score, count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     LEFT JOIN votes ON votes.map_id=maps.id
-    LEFT JOIN author_scores ON author_scores.map_id=maps.id
     WHERE ${ids.map((_, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
@@ -114,10 +112,9 @@ export class MapRepository extends Repository {
     } else if (fileNames.length === 0) { return [] }
     const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
     author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    author_score, count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
+    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
     JOIN map_ids ON maps.id=map_ids.id
     LEFT JOIN votes ON votes.map_id=maps.id
-    LEFT JOIN author_scores ON author_scores.map_id=maps.id
     WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)}
     GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)`
@@ -150,8 +147,8 @@ export class MapRepository extends Repository {
     return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
-  async remove(...mapIds: string[]): Promise<void> { 
-    if(mapIds.length === 0) { return }
+  async remove(...mapIds: string[]): Promise<void> {
+    if (mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     if (ids.length !== mapIds.length) {
@@ -189,16 +186,6 @@ export class MapRepository extends Repository {
     }
     const query = `UPDATE maps SET filename=$1 WHERE id=$2`
     await this.query(query, fileName, id)
-  }
-
-  async setAuthorScore(uid: string, score: number) {
-    const id = await mapIdsRepo.get(uid)
-    if (id === undefined) {
-      Logger.error(`Failed to get id for map ${uid} while setting author score`)
-      return
-    }
-    const query = `SELECT author_scores SET author_score=$1 WHERE id=$2`
-    await this.query(query, score, id)
   }
 
   private constructMapObject(entry: TableEntry): tm.Map {

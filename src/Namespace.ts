@@ -46,8 +46,6 @@ declare global {
       leaderboardRating?: number
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
       awards?: number
-      /** TODO */
-      authorScore?: number
     }
     /** Controller online player object */
     export interface Player {

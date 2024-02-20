@@ -189,16 +189,6 @@ export class MapService {
     mapInfo.lapsAmount = obj.laps
     mapInfo.isInLapsMode = obj.isInLapsMode
     mapInfo.isLapsAmountModified = obj.isLapsAmountModified
-    // Set authorScore in runtime memory and database (need to parse the gbx file for that THANKS NADEO!!!)
-    if (GameService.gameMode === 'Stunts' && mapInfo.authorScore === undefined) {
-      const authorScore = this.parseAuthorScore(mapInfo.fileName as string)
-      if (authorScore instanceof Error) {
-        // TODO
-      } else {
-        mapInfo.authorScore = authorScore
-        void this.repo.setAuthorScore(mapInfo.id as string, authorScore)
-      }
-    }
     this._current = mapInfo as tm.CurrentMap
     if (this._history[0] === undefined) {
       Logger.info(`Current map set to ${Utils.strip(this._current.name)} by ${this._current.author}`)
@@ -568,10 +558,6 @@ export class MapService {
       isNadeo: false,
       isClassic: false
     }
-  }
-
-  private static parseAuthorScore(filename: string): number | Error {
-    return 0 // TODO
   }
 
   /**
