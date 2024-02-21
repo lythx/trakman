@@ -46,6 +46,10 @@ const updateRecordMode = () => {
 }
 
 const initialize = async (): Promise<void> => {
+  updateRecordMode()
+  if (leaderboard === 'Disabled') {
+    return
+  }
   const status = await client.connect(config.host, config.port)
   if (status !== true) {
     if (status.isAuthenticationError) {
@@ -57,7 +61,6 @@ const initialize = async (): Promise<void> => {
     }
     return
   }
-  updateRecordMode()
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
@@ -74,6 +77,10 @@ const reinitialize = async (): Promise<void> => {
   }
   do {
     await new Promise((resolve) => setTimeout(resolve, 60000))
+    updateRecordMode()
+    if (leaderboard === 'Disabled') {
+      return
+    }
     status = await client.connect(config.host, config.port)
     if (status !== true && status.isAuthenticationError) {
       tm.log.error('Failed to connect to dedimania', status.error.message)
@@ -81,7 +88,6 @@ const reinitialize = async (): Promise<void> => {
     }
   } while (status !== true)
   tm.log.info('Initialized dedimania after an error')
-  updateRecordMode()
   updateServerPlayers()
   const current: Readonly<tm.CurrentMap> = tm.maps.current
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
@@ -358,7 +364,18 @@ if (config.isEnabled) {
   }, true)
 
   tm.addListener('BeginMap', (info): void => {
+    const prevLb = leaderboard
     updateRecordMode()
+    if (prevLb === 'Disabled' && leaderboard !== 'Disabled') {
+      void initialize()
+      return
+    } 
+    if (prevLb !== 'Disabled' && leaderboard === 'Disabled') {
+      currentDedis.length = 0
+      newDedis.length = 0
+      client.disconnect()
+      return
+    }
     if (uploadLaps && tm.getGameMode() !== 'Laps') {
       tm.sendMessage(config.modifiedLapsMessage)
     }

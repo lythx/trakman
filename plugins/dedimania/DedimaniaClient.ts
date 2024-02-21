@@ -20,11 +20,7 @@ export class DedimaniaClient {
       }
     }
     this.password = process.env.DEDIMANIA_PASSWORD
-    this.receivingResponse = false
-    this._connected = false
-    this.response = new DedimaniaResponse()
-    this.socket?.destroy()
-    this.socket = new Socket()
+    this.disconnect()
     this.socket.connect(port, host)
     this.socket.setKeepAlive(true)
     this.setupListeners()
@@ -130,6 +126,14 @@ export class DedimaniaClient {
       }
       setImmediate(poll)
     })
+  }
+
+  async disconnect() {
+    this.receivingResponse = false
+    this._connected = false
+    this.response = new DedimaniaResponse()
+    this.socket?.destroy()
+    this.socket = new Socket()
   }
 
   get connected(): boolean {
