@@ -359,8 +359,10 @@ const getLogString = (previousPosition: number | undefined, position: number,
 if (config.isEnabled) {
 
   tm.addListener('Startup', (): void => {
-    tm.log.trace('Connecting to Dedimania...')
-    void initialize()
+    if(tm.getGameMode() !== 'Stunts') {
+      tm.log.trace('Connecting to Dedimania...')
+      void initialize()
+    }
   }, true)
 
   tm.addListener('BeginMap', (info): void => {

@@ -28,7 +28,7 @@ const initialize = async (): Promise<void> => {
   }
   for (const e of tm.players.list) {
     const status = await updatePlayer(e)
-    if(status instanceof Error) { break }
+    if (status instanceof Error) { break }
   }
   tm.log.trace('Connected to Ultimania')
   emitFetchEvent(currentUltis)
@@ -121,6 +121,9 @@ const getLogString = (previousPosition: number | undefined, position: number,
 if (config.isEnabled) {
 
   tm.addListener('Startup', (): void => {
+    if (tm.getGameMode() !== 'Stunts') {
+      return
+    }
     tm.log.trace('Connecting to Ultimania...')
     void initialize()
   })
@@ -128,6 +131,9 @@ if (config.isEnabled) {
   tm.addListener('BeginMap', async (info) => {
     newUltis = []
     currentUltis = []
+    if (tm.getGameMode() !== 'Stunts') {
+      return
+    }
     const records = await fetchRecords(info.id)
     if (!(records instanceof Error)) {
       currentUltis = records
@@ -139,6 +145,9 @@ if (config.isEnabled) {
   })
 
   tm.addListener('LiveRecord', (info) => {
+    if (tm.getGameMode() !== 'Stunts') {
+      return
+    }
     const record = addRecord(info, info.time, new Date())
     if (record !== false) {
       sendRecord(tm.maps.current.id, record)
