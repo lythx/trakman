@@ -97,7 +97,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
-  if (isFailedAuthentication) { return }
+  if (isFailedAuthentication || tm.getGameMode() === 'Stunts') { return }
   currentDedis.length = 0
   newDedis.length = 0
   if (!client.connected) {

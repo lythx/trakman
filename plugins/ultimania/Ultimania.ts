@@ -115,7 +115,7 @@ const getLogString = (previousPosition: number | undefined, position: number,
   previousTime: number | undefined, time: number, player: { login: string, nickname: string }): string[] => {
   const rs = tm.utils.getRankingString({ position, time }, (previousPosition && previousTime) ?
     { time: previousTime, position: previousPosition } : undefined)
-  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(position)} ultimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
+  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(position)} ultimania record. Score: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (+${rs.difference})` : ``}`]
 }
 
 if (config.isEnabled) {
