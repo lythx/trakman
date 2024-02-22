@@ -29,7 +29,9 @@ export default class BestCps extends StaticComponent {
       new Array(config.entries).fill(1), { margin: config.margin })
     this.paginator = new Paginator(this.id, 0, 0, 0)
     this.renderOnEvent('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
-      if (this.bestCps[info.index] === undefined || this.bestCps[info.index].time > info.time) {
+      if (this.bestCps[info.index] === undefined ||
+        (this.bestCps[info.index].time > info.time && tm.getGameMode() !== 'Stunts') ||
+        (this.bestCps[info.index].time < info.time && tm.getGameMode() === 'Stunts')) {
         this.bestCps[info.index] = { login: info.player.login, time: info.time, nickname: info.player.nickname }
         this.paginator.setPageCount(Math.ceil(this.bestCps.length / config.entries))
         this.newestCp = info.index
@@ -56,9 +58,9 @@ export default class BestCps extends StaticComponent {
       return this.display()
     })
     this.paginator.onPageChange = (login: string): void => {
-      if(this.reduxModeEnabled) { return }
+      if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(login)
-      if(obj!== undefined) {
+      if (obj !== undefined) {
         tm.sendManialink(obj.xml, login)
       }
     }
