@@ -66,17 +66,19 @@ if (config.isEnabled) {
   tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
     const date = new Date()
     const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)
+    const isStunts = tm.getGameMode() === 'Stunts'
     if (playerCheckpoints === undefined) {
       currentPlayerCps.push({ login: info.player.login, nickname: info.player.nickname, checkpoints: [info.time] })
       void allCpsDB.add(currentMapDBId, info.player.login, [info.time])
       emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
-    } else if ((playerCheckpoints.checkpoints[info.index] ?? Infinity) > info.time) {
+    } else if (((playerCheckpoints.checkpoints[info.index] ?? Infinity) > info.time && !isStunts) ||
+      ((playerCheckpoints.checkpoints[info.index] ?? -1) < info.time && isStunts)) {
       playerCheckpoints.checkpoints[info.index] = info.time
       void allCpsDB.update(currentMapDBId, info.player.login, playerCheckpoints.checkpoints.map(a => a === undefined ? -1 : a))
       emitEvent('PlayerCheckpoint', { login: info.player.login, nickname: info.player.nickname, index: info.index })
     }
     const cp = currentBestCps[info.index]?.checkpoint
-    if (cp === undefined || cp > info.time) {
+    if (cp === undefined || (cp > info.time && !isStunts) || (cp < info.time && isStunts)) {
       currentBestCps[info.index] = {
         login: info.player.login,
         nickname: info.player.nickname,
