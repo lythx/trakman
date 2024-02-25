@@ -29,5 +29,7 @@ export default {
     aliases: ['cpr', 'cprecs'],
     help: `Displays the checkpoint records on the current map.`,
     privilege: 0
-  }
+  },
+  noTimeText: '--:--.-',
+  stuntsNoTimeText: '--'
 }
