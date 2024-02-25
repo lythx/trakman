@@ -8,12 +8,12 @@
 
 <h3>Trackmania Forever server controller written in TypeScript</h3>
 
-![Trakman UI](https://cdn.discordapp.com/attachments/599381118633902080/1080276712417415208/TrakmanUI-Logo.png)
+![Trakman UI](https://trakman.ptrk.eu/TRAKMAN-UI.png)
 
 </div>
 
 ## Installation
-The recommended and fastest way to install Trakman is by using Docker, you can find the instructions [here](https://github.com/lythx/trakman/wiki/Docker-Installation)
+The recommended and fastest way to install Trakman is by using [Docker](https://docs.docker.com/get-docker), you can find the instructions [here](https://github.com/lythx/trakman/wiki/Docker-Installation)
 
 If you prefer not to use containers and/or want to install manually, [see this page instead](https://github.com/lythx/trakman/wiki/Manual-Installation)
 
@@ -37,5 +37,4 @@ Most controller configuration options are available on [this wiki page](https://
 
 ## Limitations
 1. Only the TimeAttack gamemode was thoroughly tested
-2. Stunts mode is currently not supported
-3. Bugs, while rare, can still happen, [reports are welcome](https://github.com/lythx/trakman/issues)
+2. Bugs, while rare, can still happen, [reports are welcome](https://github.com/lythx/trakman/issues)
