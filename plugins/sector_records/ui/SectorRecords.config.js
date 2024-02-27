@@ -34,5 +34,7 @@ export default {
     aliases: ['sr', 'secrecs'],
     help: `Displays the sector records on the current map.`,
     privilege: 0
-  }
+  },
+  noTimeText: '--:--.-',
+  stuntsNoTimeText: '--'
 }
