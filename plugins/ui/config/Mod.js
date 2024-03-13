@@ -4,7 +4,7 @@ export default
   [
     {
       environment: 'Stadium',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
