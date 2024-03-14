@@ -11,6 +11,8 @@ services:
       - ./trakman:/app/server/trakman
       - ./logs:/app/server/.pm2/logs
     environment:
+      # Timezone of the server, if you're unsure, check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      TZ: "Europe/Amsterdam"
       # Dedicated server config
       SERVER_IP: 127.0.0.1
       SERVER_PORT: 5000
@@ -57,11 +59,11 @@ services:
       - "2350:2350/udp"
       - "3450:3450/tcp"
       - "3450:3450/udp"
+    # Remove everything below if you already have a database
     depends_on:
       trakman-db:
         condition: service_started
 
-# Remove everything below if you already have a database
   trakman-db:
     image: postgres:16-alpine
     restart: unless-stopped
