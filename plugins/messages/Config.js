@@ -26,15 +26,19 @@ export default {
     + `has quit after ${p.highlight}#{time}${p.servermsg}.`,
   record: `${p.highlight}#{nickname}${p.record} has `
     + `#{status} the ${p.rank}#{position}${p.record} `
-    + `local record. Time${p.highlight}: #{time}#{difference}`,
+    + `local record. #{type}${p.highlight}: #{time}#{difference}`,
   lapRecord: `${p.highlight}#{nickname}${p.message} has `
     + `#{status} the ${p.rank}#{position}${p.message} `
     + `lap record. Time${p.highlight}: #{time}#{difference}`,
-  recordDifference: ` $n${p.record}(${p.rank}#{position} ${p.highlight}-#{time}${p.record})`,
+  recordDifference: ` $n${p.record}(${p.rank}#{position} ${p.highlight}#{time}${p.record})`,
   dediDifference: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}-#{time}${p.dedirecord})`,
   dediRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
     + `#{status} the ${p.rank}#{position}${p.dedirecord} `
     + `dedimania record. Time${p.highlight}: #{time}#{difference}`,
+  ultiDifference: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}+#{score}${p.dedirecord})`,
+  ultiRecord: `${p.highlight}#{nickname}${p.dedirecord} has `
+    + `#{status} the ${p.rank}#{position}${p.dedirecord} `
+    + `ultimania record. Score${p.highlight}: #{score}#{difference}`,
   nextJuke: `${p.vote}The next map will be ${p.highlight}#{map}${p.vote}, as requested `
     + `by ${p.highlight}#{nickname}${p.vote}.`,
   jukeSkipped: `${p.vote}Map ${p.highlight}#{map} ${p.vote}will be dropped from the queue, as `

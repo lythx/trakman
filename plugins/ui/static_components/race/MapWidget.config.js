@@ -30,7 +30,8 @@ export default {
     },
     author: icons.personBuilder,
     authorTime: icons.clockAuthor,
-    buildDate: icons.tools
+    buildDate: icons.tools,
+    goldScore: icons.placeholder // TODO
   },
   textScale: 1,
   noDateText: "N/A",

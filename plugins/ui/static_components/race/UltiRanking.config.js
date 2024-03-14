@@ -2,24 +2,23 @@ import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 export default {
-  entries: 15,
-  teamsEntries: 7,
+  entries: 12,
+  teamsEntries: 15,
   roundsEntries: 7,
   cupEntries: 7,
   lapsEntries: 7,
-  stuntsEntries: 7,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Local Records",
-  icon: icons.chartLocal,
+  title: "Ultimania Records",
+  icon: icons.chartDedi,
   margin: cfg.margin,
   topCount: 5,
-  teamsTopCount: 3,
+  teamsTopCount: 5,
   roundsTopCount: 3,
   cupTopCount: 3,
   lapsTopCount: 3,
-  stuntsTopCount: 5,
   displayNoRecordEntry: true,
   hidePanel: true,
-  stuntsNoRecordEntry: '--'
+  maxRecordCount: 5000,
+  noRecordEntryText: '--'
 }

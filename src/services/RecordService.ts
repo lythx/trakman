@@ -229,40 +229,46 @@ export class RecordService {
   private static async handleLocalRecord(mapId: string, time: number, date: Date,
     checkpoints: number[], player: tm.Player, isLap?: true): Promise<tm.RecordInfo | undefined> {
     const records = isLap ? this._lapRecords : this._localRecords
+    const isStunts = GameService.gameMode === 'Stunts'
     const recType = isLap ? 'lap' : 'local'
     const previousIndex = records.findIndex(a => a.login === player.login)
-    let position: number = records.findIndex(a => a.time > time) + 1
+    let position: number
+    if (isStunts) {
+      position = records.findIndex(a => a.time < time) + 1
+    } else {
+      position = records.findIndex(a => a.time > time) + 1
+    }
     // If player gets the worst record on the server set position to array length + 1
     if (position === 0) { position = records.length + 1 }
     if (previousIndex === -1) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
       records.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(undefined, position, undefined, time, player, recType))
+      Logger.info(...this.getLogString(undefined, position, undefined, time, player, recType, isStunts))
       if (MapService.current.isInLapsMode && !isLap) {
-        void this.repo.add(MapService.current.lapsAmount, recordInfo)
+        void this.repo.add([recordInfo], false, MapService.current.lapsAmount)
       } else {
-        void this.repo.add(null, recordInfo)
+        void this.repo.add([recordInfo], isStunts)
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
     const pb: number | undefined = records[previousIndex].time
     if (time === pb) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousIndex + 1, previousIndex + 1)
-      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, recType))
+      Logger.info(...this.getLogString(previousIndex + 1, previousIndex + 1, time, time, player, recType, isStunts))
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
-    if (time < pb) {
+    if ((time < pb && !isStunts) || (time > pb && isStunts)) {
       const previousTime: number | undefined = records[previousIndex].time
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       records.splice(previousIndex, 1)
       records.splice(position - 1, 0, recordInfo)
-      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, recType))
+      Logger.info(...this.getLogString(previousIndex + 1, position, previousTime, time, player, recType, isStunts))
       if (MapService.current.isInLapsMode && !isLap) {
         void this.repo.update(recordInfo.map, recordInfo.login,
-          recordInfo.time, recordInfo.checkpoints, recordInfo.date, MapService.current.lapsAmount)
+          recordInfo.time, recordInfo.checkpoints, recordInfo.date, false, MapService.current.lapsAmount)
       } else {
         void this.repo.update(recordInfo.map, recordInfo.login,
-          recordInfo.time, recordInfo.checkpoints, recordInfo.date)
+          recordInfo.time, recordInfo.checkpoints, recordInfo.date, isStunts)
       }
       return position > this.maxLocalsAmount ? undefined : recordInfo
     }
@@ -279,20 +285,26 @@ export class RecordService {
    */
   private static handleLiveRecord(mapId: string, time: number, date: Date, checkpoints: number[], player: tm.Player): tm.RecordInfo | undefined {
     const pb: number | undefined = this._liveRecords.find(a => a.login === player.login)?.time
-    const position: number = this._liveRecords.filter(a => a.time <= time).length + 1
+    const isStunts = GameService.gameMode === 'Stunts'
+    let position: number
+    if (isStunts) {
+      position = this._liveRecords.filter(a => a.time >= time).length + 1
+    } else {
+      position = this._liveRecords.filter(a => a.time <= time).length + 1
+    }
     if (pb === undefined) {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, undefined, position, undefined)
       this._liveRecords.splice(position - 1, 0, recordInfo)
-      Logger.trace(...this.getLogString(undefined, position, undefined, time, player, 'live'))
+      Logger.trace(...this.getLogString(undefined, position, undefined, time, player, 'live', isStunts))
       return recordInfo
     }
     if (time === pb) {
       const previousPosition: number = this._liveRecords.findIndex(a => a.login === this._liveRecords.find(a => a.login === player.login)?.login) + 1
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, time, previousPosition, previousPosition)
-      Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live'))
+      Logger.trace(...this.getLogString(previousPosition, previousPosition, time, time, player, 'live', isStunts))
       return recordInfo
     }
-    if (time < pb) {
+    if ((time < pb && !isStunts) || (time > pb && isStunts)) {
       const previousIndex: number = this._liveRecords.findIndex(a => a.login === player.login)
       if (previousIndex === -1) {
         Logger.error(`Can't find player ${player.nickname} (${player.login}) in memory`)
@@ -302,7 +314,7 @@ export class RecordService {
       const recordInfo: tm.RecordInfo = this.constructRecordObject(player, mapId, date, checkpoints, time, previousTime, position, previousIndex + 1)
       this._liveRecords.splice(previousIndex, 1)
       this._liveRecords.splice(position - 1, 0, recordInfo)
-      Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'live'))
+      Logger.trace(...this.getLogString(previousIndex + 1, position, previousTime, time, player, 'live', isStunts))
       return recordInfo
     }
   }
@@ -430,11 +442,13 @@ export class RecordService {
    */
   private static getLogString(previousPosition: number | undefined, position: number,
     previousTime: number | undefined, time: number, player: { login: string, nickname: string },
-    recordType: 'live' | 'local' | 'lap'): string[] {
+    recordType: 'live' | 'local' | 'lap', isStunts: boolean): string[] {
+    const t = isStunts ? 'Score' : 'Time'
+    const sign = isStunts ? '+' : '-'
     const rs = Utils.getRankingString({ time, position }, (previousPosition && previousTime) ? { position: previousPosition, time: previousTime } : undefined)
     return [`${Utils.strip(player.nickname)} (${player.login}) has ${rs.status} the` +
-      ` ${Utils.getOrdinalSuffix(position)} ${recordType} record. Time: ` + `
-    ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
+      ` ${Utils.getOrdinalSuffix(position)} ${recordType} record. ${t}: ` + `
+    ${Utils.getTimeString(time)}${rs.difference !== undefined ? ` (${sign}${rs.difference})` : ``}`]
   }
 
   /**
