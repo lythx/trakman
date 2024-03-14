@@ -1,11 +1,11 @@
 <div align="center">
 <h1>TRAKMAN</h1>
 
-[![License](https://img.shields.io/github/license/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/blob/main/LICENSE/)
-[![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers/)
-[![Discord](https://img.shields.io/discord/1130534915218354327?style=flat-square&logo=discord&label=discord&logoColor=white)](https://discord.gg/JXmg2cJVVx/)
-[![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman/dev?style=flat-square)](https://github.com/lythx/trakman/commits/dev/)
-[![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues/)
+[![License](https://img.shields.io/github/license/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/blob/main/LICENSE)
+[![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers)
+[![Discord](https://img.shields.io/discord/1130534915218354327?style=flat-square&logo=discord&label=discord&logoColor=white)](https://discord.gg/vC8vyMthWX)
+[![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman/dev?style=flat-square)](https://github.com/lythx/trakman/commits/dev)
+[![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues)
 <h3>Trackmania Forever server controller written in TypeScript</h3>
 
 ![Trakman UI](https://trakman.ptrk.eu/TRAKMAN-UI.png)
@@ -19,8 +19,8 @@ If you prefer not to use containers and/or want to install manually, [see this p
 
 ## Manual Installation Requirements
 - Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
-- NodeJS [v14.21.3+](https://nodejs.org/en/download/) (we recommend using the latest LTS version)
-- PostgreSQL [v12+](https://www.postgresql.org/download/)
+- NodeJS [v14.21.3+](https://nodejs.org/en/download) (we recommend using the latest LTS version)
+- PostgreSQL [v12+](https://www.postgresql.org/download)
 
 On Linux, relevant versions of NodeJS & PostgreSQL should be available in your distro's repositories by default (see [here](https://repology.org/project/nodejs/versions) for NodeJS and [here](https://repology.org/project/postgresql/versions) for PostgreSQL)
 
