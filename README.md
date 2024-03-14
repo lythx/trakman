@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/github/license/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/blob/main/LICENSE/)
 [![Stars](https://img.shields.io/github/stars/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/stargazers/)
-[![Discord](https://img.shields.io/discord/1130534915218354327?style=flat&logo=discord&label=discord)](https://discord.gg/JXmg2cJVVx/)
+[![Discord](https://img.shields.io/discord/1130534915218354327?style=flat-square&logo=discord&label=discord&logoColor=white)](https://discord.gg/JXmg2cJVVx/)
 [![Activity](https://img.shields.io/github/commit-activity/m/lythx/trakman/dev?style=flat-square)](https://github.com/lythx/trakman/commits/dev/)
 [![Issues](https://img.shields.io/github/issues-raw/lythx/trakman?style=flat-square)](https://github.com/lythx/trakman/issues/)
 <h3>Trackmania Forever server controller written in TypeScript</h3>
