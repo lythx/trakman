@@ -9,7 +9,7 @@ if (config.isEnabled) {
           ? fixedText.push(`$L${tm.utils.fixProtocol(t)}$L`)
           : fixedText.push(t)
       }
-      return fixedText.join(` `)
+      return fixedText.join(` `).slice(1)
     }
   }, config.importance)
 }
