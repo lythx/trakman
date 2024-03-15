@@ -1,6 +1,7 @@
 import { ChatRepository } from '../database/ChatRepository.js'
 import { Events } from '../Events.js'
 import { PlayerService } from './PlayerService.js'
+import { AdministrationService } from './AdministrationService.js'
 import { Client } from '../client/Client.js'
 import { Logger } from '../Logger.js'
 import { Utils } from '../Utils.js'
@@ -73,6 +74,10 @@ export abstract class ChatService {
     input: string, params: string[], alias: string): Promise<void> {
     if (info.privilege < command.privilege) {
       this.sendErrorMessage(messages.noPermission, info.login)
+      return
+    }
+    if (command.disableForMuted === true && AdministrationService.getMute(info.login) !== undefined) {
+      this.sendErrorMessage(messages.playerMuted, info.login)
       return
     }
     Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
