@@ -6,7 +6,7 @@ const commands: tm.Command[] = [
     help: config.hi.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.hi.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.hi.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.hi.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.hi.public ? undefined : info.login, false)
     },
     privilege: config.hi.privilege
   },
@@ -15,7 +15,7 @@ const commands: tm.Command[] = [
     help: config.bye.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.bye.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.bye.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.bye.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.bye.public ? undefined : info.login, false)
     },
     privilege: config.bye.privilege
   },
@@ -24,7 +24,7 @@ const commands: tm.Command[] = [
     help: config.thx.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.thx.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.thx.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.thx.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.thx.public ? undefined : info.login, false)
     },
     privilege: config.thx.privilege
   },
@@ -33,7 +33,7 @@ const commands: tm.Command[] = [
     help: config.gg.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.gg.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.gg.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.gg.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.gg.public ? undefined : info.login, false)
     },
     privilege: config.gg.privilege
   },
@@ -42,7 +42,7 @@ const commands: tm.Command[] = [
     help: config.bg.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.bg.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.bg.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.bg.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.bg.public ? undefined : info.login, false)
     },
     privilege: config.bg.privilege
   },
@@ -60,7 +60,7 @@ const commands: tm.Command[] = [
     help: config.gr.help,
     params: [{ name: 'name', type: 'multiword', optional: true }],
     callback: (info: tm.MessageInfo, name?: string): void => {
-      tm.sendMessage(tm.utils.strVar(config.gr.text, { nickname: info.nickname, name: name ?? 'everyone' }), config.gr.public ? undefined : info.login, false)
+      tm.sendMessage(tm.utils.strVar(config.gr.text, { nickname: info.nickname, name: name ?? config.defaultValue }), config.gr.public ? undefined : info.login, false)
     },
     privilege: config.gr.privilege
   },
@@ -175,7 +175,12 @@ const commands: tm.Command[] = [
         tm.sendMessage(config.pm.error, info.login)
         return
       }
-      tm.sendMessage(tm.utils.strVar(config.pm.text, { sender: tm.utils.strip(info.nickname, false), recipient: tm.utils.strip(playerInfo.nickname, false), message: text }), [info.login, playerInfo.login].join())
+      tm.sendMessage(tm.utils.strVar(config.pm.text,
+        {
+          sender: tm.utils.strip(info.nickname, false),
+          recipient: tm.utils.strip(playerInfo.nickname, false),
+          message: text
+        }), [info.login, playerInfo.login].join())
     },
     privilege: config.pm.privilege
   },
