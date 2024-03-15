@@ -100,7 +100,7 @@ export default class TimerWidget extends StaticComponent {
   }
 
   getHeight(): number {
-    return config.height
+    return config.height + (tm.getGameMode() === 'Stunts' ? config.stuntsMarginTop : 0)
   }
 
   private startDynamicTimerInterval() {
@@ -115,6 +115,9 @@ export default class TimerWidget extends StaticComponent {
   display() {
     if (!this.isDisplayed) { return }
     if (this.isPaused && tm.timer.isPaused) { return }
+    if(tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
+      return [this.hide()]
+    }
     const arr = []
     for (const e of tm.players.list) {
       arr.push(this.displayToPlayer(e.login, e.privilege))
@@ -166,9 +169,10 @@ export default class TimerWidget extends StaticComponent {
           { specialFont: true, yOffset: config.textYOffset })
       }
     }
+    let stuntsMargin = tm.getGameMode() === 'Stunts' ? config.stuntsMarginTop : 0
     return `
     <manialink id="${this.id}">
-      <frame posn="${this.positionX} ${this.positionY} -38">
+      <frame posn="${this.positionX} ${this.positionY - stuntsMargin} -38">
         <format textsize="1" textcolor="FFFF"/> 
         ${headerXml}
         <frame posn="0 ${-headerHeight - config.margin} -40">

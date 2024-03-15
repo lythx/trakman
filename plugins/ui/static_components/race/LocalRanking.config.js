@@ -7,7 +7,7 @@ export default {
   roundsEntries: 7,
   cupEntries: 7,
   lapsEntries: 7,
-  stuntsEntries: 7,
+  stuntsEntries: 12,
   entryHeight: 2.15,
   width: cfg.width,
   title: "Local Records",

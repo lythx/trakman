@@ -4,7 +4,7 @@ import icons from '../../config/Icons.js'
 export default {
   entries: 6,
   lapsEntries: 12,
-  stuntsEntries: 6,
+  stuntsEntries: 8,
   entryHeight: 2.15,
   width: cfg.width,
   title: "Live Records",

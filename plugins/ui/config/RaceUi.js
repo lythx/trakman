@@ -101,7 +101,21 @@ export default {
     "AdminPanel"
   ],
   lapsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter'],
-  stuntsRightSideOrder: [],
-  stuntsLeftSideOrder: [],
-  stuntsOtherComponents: []
+  stuntsRightSideOrder: [
+    "MapWidget",
+    "PreviousAndBest",
+    "DonationPanel",
+    "TimerWidget",
+    "LocalRanking",
+    "LiveRanking",
+  ],
+  stuntsLeftSideOrder: [
+    "ButtonsWidget",
+    "RankWidget",
+    "KarmaWidget",
+    "TMXRanking",
+    "UltiRanking",
+    "AdminPanel"
+  ],
+  stuntsOtherComponents: ['BestCps', 'BestFinishes', 'CpCounter']
 }
