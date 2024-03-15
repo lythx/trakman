@@ -115,7 +115,7 @@ export default class TimerWidget extends StaticComponent {
   display() {
     if (!this.isDisplayed) { return }
     if (this.isPaused && tm.timer.isPaused) { return }
-    if(tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
+    if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
       return [this.hide()]
     }
     const arr = []
@@ -128,11 +128,14 @@ export default class TimerWidget extends StaticComponent {
 
   displayToPlayer(login: string, privilege?: number) {
     if (!this.isDisplayed) { return }
+    if (tm.getGameMode() === 'Stunts' && !tm.timer.isDynamic) {
+      return { xml: this.hide() ?? '', login }
+    }
     privilege ??= tm.players.get(login)?.privilege ?? 0
     if (this.isOnRestart || !tm.timer.isDynamic || privilege < config.timerActionsPrivilege) {
       return { xml: this.noButtonXml, login }
     } else {
-      return  { xml: this.xmlWithButtons, login }
+      return { xml: this.xmlWithButtons, login }
     }
   }
 
