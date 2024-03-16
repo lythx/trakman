@@ -2,6 +2,7 @@ const p = tm.utils.palette
 const prefix = `$i` // Prefix all "fake" player messages with this (eg. $i, $t, etc)
 
 export default {
+  defaultValue: `everyone`, // This value will be used for the name if you don't specify anything in e.g. /hi
   hi: {
     text: `$g[#{nickname}$z$s$g] ${prefix}Hello, #{name}!`,
     public: true,

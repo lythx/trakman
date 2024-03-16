@@ -108,7 +108,7 @@ class CheckpointRecords extends PopupWindow {
       const bestSec = cps?.[i + cpIndex - 1]?.checkpoint
       let betterSign = '-'
       let worseSign = '+'
-      if(tm.getGameMode() === 'Stunts') {
+      if (tm.getGameMode() === 'Stunts') {
         betterSign = '+'
         worseSign = '-'
       }
@@ -117,11 +117,11 @@ class CheckpointRecords extends PopupWindow {
         if (cps?.[i + cpIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `($${this.diffColours.better}${betterSign}$${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${this.diffColours.better}${betterSign}${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
           differenceString = `($${this.diffColours.equal + tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `($${this.diffColours.worse}${worseSign}$${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${this.diffColours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)

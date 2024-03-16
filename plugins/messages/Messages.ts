@@ -38,7 +38,7 @@ const events: tm.Listener[] = [
         } else {
           if (c.rank.public) {
             tm.sendMessage(tm.utils.strVar(c.rank.message, {
-              rank: tm.utils.getOrdinalSuffix(playerRank!),
+              rank: tm.utils.getOrdinalSuffix(playerRank ?? 0),
               total: tm.players.totalCount
             }), player.login)
           }
@@ -74,7 +74,7 @@ const events: tm.Listener[] = [
       } else {
         if (c.rank.public) {
           tm.sendMessage(tm.utils.strVar(c.rank.message, {
-            rank: tm.utils.getOrdinalSuffix(playerRank!),
+            rank: tm.utils.getOrdinalSuffix(playerRank ?? 0),
             total: tm.players.totalCount
           }), player.login)
         }

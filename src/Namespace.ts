@@ -180,7 +180,9 @@ declare global {
       /** Callback function to execute on command call */
       readonly callback: (info: MessageInfo & { aliasUsed: string }, ...params: any[]) => void
       /** Player privilege required to call the command */
-      readonly privilege: number
+      readonly privilege: number,
+      /** Whether the command is usable by players currently in the mutelist */
+      readonly disableForMuted?: boolean
     }
     /** Controller ban object */
     export interface BanlistEntry {
