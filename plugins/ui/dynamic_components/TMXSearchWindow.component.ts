@@ -121,9 +121,6 @@ export default class TMXSearchWindow extends PopupWindow<{
     this.hideToPlayer(info.login)
   }
 
-  private isMultiByte = (str: string) =>
-    [...str].some(c => (c.codePointAt(0) ?? 0) > 255)
-
   protected async constructContent(login: string, params?: { page: number, privilege: number, list?: tm.TMXSearchResult[] }): Promise<string> {
     const maps = params?.list ?? []
     const startIndex = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
@@ -133,10 +130,10 @@ export default class TMXSearchWindow extends PopupWindow<{
       const index = startIndex + gridIndex
       let name = tm.utils.safeString(tm.utils.strip(maps[index].name, false))
       let author = tm.utils.safeString(tm.utils.strip(maps[index].author))
-      if (this.isMultiByte(name)) {
+      if (tm.utils.isMultibyte(name)) {
         name = ''
       }
-      if (this.isMultiByte(author)) {
+      if (tm.utils.isMultibyte(author)) {
         author = ''
       }
       const actionId = this.getActionId(maps[index].id, name)
