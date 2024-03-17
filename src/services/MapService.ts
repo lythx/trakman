@@ -90,7 +90,12 @@ export class MapService {
     }
     // Shuffle maps array
     this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
-    void this.repo.add(...mapsNotInDBObjects)
+    // Add maps, not more than 2000 at a time to not crash
+    const splitby = 2000
+    const len = Math.ceil(mapsNotInDBObjects.length / splitby)
+    for (let i= 0; i < len; i++) {
+      void this.repo.add(...mapsNotInDBObjects.slice(i*splitby, (i+1)*splitby))
+    }
   }
 
   /**
