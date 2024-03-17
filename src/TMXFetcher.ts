@@ -135,9 +135,11 @@ export abstract class TMXFetcher {
         Logger.warn(error.message)
         continue
       }
+      prefix = p
+      break
     }
     if (prefix === undefined) { return new Error('Cannot fetch map data from TMX') }
-    return { id: data[0].TrackId, prefix }
+    return { id: data.Results[0].TrackId, prefix }
   }
 
   /**
