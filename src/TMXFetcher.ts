@@ -225,9 +225,8 @@ export abstract class TMXFetcher {
    * @returns Array of replay objects or error in case fetch fails
    */
   static async getReplays(tmxId: number, prefix: TMXPrefix): Promise<tm.TMXReplay[] | Error> {
-    /* TODO: debug and implement when new TMX replay api gets fixed
     const url = `https://${prefix}.tm-exchange.com/api/replays?${new URLSearchParams([
-      ['fields', 'ReplayTime,ReplayId,ReplayScore,Score,TrackAt,ReplayAt,User'], 
+      ['fields', 'ReplayTime,ReplayId,ReplayScore,Score,TrackAt,ReplayAt,User.UserId,User.Name'], 
       ['trackId', tmxId.toString()]
     ])}`
     const res = await fetch(url).catch((err: Error) => err)
@@ -237,7 +236,6 @@ export abstract class TMXFetcher {
       Logger.warn(error.message, res.message)
       return error
     } else if (!res.ok) {
-      console.log('res is NOT ok')
       const error = new Error(`Error while fetching replays info from TMX (url: ${url}).` +
         `\nCode: ${res.status} Text: ${res.statusText}`)
       Logger.warn(error.message)
@@ -253,12 +251,11 @@ export abstract class TMXFetcher {
       data = rawData.Results
     }
     const replays: tm.TMXReplay[] = []
-    console.log(data)
     for (const r of data) {
       replays.push({
         id: r.ReplayId,
-        userId: 0,
-        name: '',
+        userId: r.User.UserId,
+        name: r.User.Name,
         time: r.ReplayTime,
         score: r.ReplayScore ?? undefined,
         recordDate: new Date(r.ReplayAt),
@@ -266,37 +263,7 @@ export abstract class TMXFetcher {
         leaderboardScore: r.Score,
         url: `https://${prefix}.tm-exchange.com/recordgbx/${r.ReplayId}`
       })
-      console.log(replays.at(-1))
     } 
-    return replays
-    */
-    const url: string = `https://${prefix}.tm-exchange.com/apiget.aspx?action=apitrackrecords&id=${tmxId}`
-    const replaysRes = await fetch(url).catch((err: Error) => err)
-    let replaysData: string[] = []
-    if (replaysRes instanceof Error) {
-      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).`, replaysRes.message)
-    } else if (!replaysRes.ok) {
-      Logger.warn(`Error while fetching replays info from TMX (url: ${url}).` +
-        `\nCode: ${replaysRes.status} Text: ${replaysRes.statusText}`)
-    } else {
-      replaysData = (await replaysRes.text()).split('\r\n')
-      replaysData.pop()
-    }
-    const replays: tm.TMXReplay[] = []
-    for (const r of replaysData) {
-      const rs: string[] = r.split('\t')
-      console.log(rs)
-      replays.push({
-        id: Number(rs[0]),
-        userId: Number(rs[1]),
-        name: rs[2],
-        time: Number(rs[3]),
-        recordDate: new Date(rs[4]),
-        mapDate: new Date(rs[5]),
-        leaderboardScore: Number(rs[7]),
-        url: `https://${prefix}.tm-exchange.com/recordgbx/${rs[0]}`
-      })
-    }
     return replays
   }
 
