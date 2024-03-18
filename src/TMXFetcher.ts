@@ -135,9 +135,11 @@ export abstract class TMXFetcher {
         Logger.warn(error.message)
         continue
       }
+      prefix = p
+      break
     }
     if (prefix === undefined) { return new Error('Cannot fetch map data from TMX') }
-    return { id: data[0].TrackId, prefix }
+    return { id: data.Results[0].TrackId, prefix }
   }
 
   /**
@@ -215,7 +217,7 @@ export abstract class TMXFetcher {
     if (mapId !== undefined) {
       void MapService.setAwardsAndLbRating(mapId, parsedData.awards, parsedData.leaderboardRating)
     }
-    return  parsedData
+    return parsedData
   }
 
   /**
@@ -226,8 +228,9 @@ export abstract class TMXFetcher {
    */
   static async getReplays(tmxId: number, prefix: TMXPrefix): Promise<tm.TMXReplay[] | Error> {
     const url = `https://${prefix}.tm-exchange.com/api/replays?${new URLSearchParams([
-      ['fields', 'ReplayTime,ReplayId,ReplayScore,Score,TrackAt,ReplayAt,User.UserId,User.Name'], 
-      ['trackId', tmxId.toString()]
+      ['fields', 'ReplayTime,ReplayId,ReplayScore,Score,TrackAt,ReplayAt,User.UserId,User.Name'],
+      ['trackId', tmxId.toString()],
+      ['best', '1'] // only get the best replay from each player
     ])}`
     const res = await fetch(url).catch((err: Error) => err)
     let data: any
@@ -263,7 +266,7 @@ export abstract class TMXFetcher {
         leaderboardScore: r.Score,
         url: `https://${prefix}.tm-exchange.com/recordgbx/${r.ReplayId}`
       })
-    } 
+    }
     return replays
   }
 

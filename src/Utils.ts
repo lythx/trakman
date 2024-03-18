@@ -38,7 +38,7 @@ export const Utils = {
    * @returns Formatted time string (eg. 25:12.63, 0:56.92)
    */
   getTimeString(time: number, ignoreGamemode?: true): string {
-    if(!ignoreGamemode && tm.getGameMode() === 'Stunts') {
+    if (!ignoreGamemode && tm.getGameMode() === 'Stunts') {
       return time.toString()
     }
     const d = new Date(time)
@@ -99,7 +99,6 @@ export const Utils = {
     let gradient: string = ''
     let [startRGB, endRGB] = [this.getRGB(startColour), this.getRGB(endColour)]
     let colours: string[] = []
-    // https://stackoverflow.com/a/32257791
     let alpha: number = 0.0
     for (let i = 0; i !== length; i++) {
       let cc: Array<number> = []
@@ -126,7 +125,6 @@ export const Utils = {
     if (hex.length === 3) {
       hex = hex.split('').map((a): string => { return a + a }).join('')
     }
-    // https://stackoverflow.com/a/5624139
     const sh: RegExpExecArray | null = (/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i).exec(hex)
     return sh ? [parseInt(sh[1], 16), parseInt(sh[2], 16), parseInt(sh[3], 16)] : []
   },
@@ -140,6 +138,15 @@ export const Utils = {
   getHex(rgb: Array<number>, getFull: boolean = true): string {
     let hex: string = (1 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]).toString(16).slice(1)
     return getFull ? hex : hex[0] + hex[2] + hex[4] // idk maybe this can be done better
+  },
+
+  /**
+   * Checks whether a string contains any UTF-8 characters with 4 bytes (breaks manialinks)
+   * @param str String to check
+   * @returns Whether the string contains 4-byte UTF-8 characters
+   */
+  isMultibyte(str: string): boolean {
+    return /[\u{10000}-\u{10FFFF}]/u.test(str)
   },
 
   /**
@@ -222,7 +229,7 @@ export const Utils = {
    * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
    * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number },  ignoreGamemode?: true): {
+  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }, ignoreGamemode?: true): {
     status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
     difference?: string
   } {
@@ -245,7 +252,7 @@ export const Utils = {
       calc = true
     }
     if (calc && previous !== undefined) {
-      if(tm.getGameMode() === 'Stunts' && !ignoreGamemode) {
+      if (tm.getGameMode() === 'Stunts' && !ignoreGamemode) {
         obj.difference = (current.time - previous.time).toString()
       } else {
         obj.difference = this.getTimeString(previous.time - current.time)

@@ -160,7 +160,4 @@ export default class TMXDetailsWindow extends PopupWindow {
   protected constructFooter(): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight)
   }
-
-  private isMultiByte = (str: string) =>
-    [...str].some(c => (c.codePointAt(0) ?? 0) > 255)
 }
