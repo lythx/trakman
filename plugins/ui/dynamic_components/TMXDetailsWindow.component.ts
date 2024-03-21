@@ -48,11 +48,11 @@ export default class TMXDetailsWindow extends PopupWindow {
       { margin: config.margin, background: config.gridBackground, headerBackground: config.iconBackground })
     const options = { textScale: config.recordTextScale }
     const arr: (GridCellFunction | GridCellObject)[] = [
-      (i, j, w, h) => centeredText('Lp.', w, h, options),
-      (i, j, w, h) => centeredText('Time', w, h, options),
-      (i, j, w, h) => centeredText('Name', w, h, options),
-      (i, j, w, h) => centeredText('Date', w, h, options),
-      (i, j, w, h) => centeredText('Dl.', w, h, options),
+      (i, j, w, h) => centeredText(' Lp. ', w, h, options),
+      (i, j, w, h) => centeredText(' Time ', w, h, options),
+      (i, j, w, h) => centeredText(' Name ', w, h, options),
+      (i, j, w, h) => centeredText(' Date ', w, h, options),
+      (i, j, w, h) => centeredText(' Dl. ', w, h, options),
     ]
     const indexCell: GridCellObject = {
       callback: (i, j, w, h) => centeredText(i.toString(), w, h, options),
@@ -61,7 +61,9 @@ export default class TMXDetailsWindow extends PopupWindow {
     const timeCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
     const nameCell: GridCellFunction = (i, j, w, h) =>
-      leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
+      tm.utils.isMultibyte(replays[i - 1]?.name)
+        ? leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
+        : leftAlignedText(tm.utils.safeString(config.defaultTime), w, h, options)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultTime, w, h, options)
     const downloadCell: GridCellObject = {
@@ -128,6 +130,7 @@ export default class TMXDetailsWindow extends PopupWindow {
     const w = width - p * 4
     const h = height - p * 4
     let description = tm.utils.safeString(map.comment.trim().replace(/\[(.*?)\]|\[\/(.*?)\]/gi, ''))
+    if (tm.utils.isMultibyte(description)) { description = '' }
     let length = 0
     for (let i = 0; i < description.length; i++) {
       length += description[i] === '\n' ? config.description.lineLength : 1
