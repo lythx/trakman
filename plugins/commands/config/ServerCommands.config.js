@@ -160,6 +160,13 @@ export default {
     aliases: ['kc', 'killcontroller'],
     help: `Kill the server controller.`
   },
+  setbuddynotif: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}{#status} ${p.admin}the friend list notifications.`,
+    public: true,
+    privilege: 3,
+    aliases: [`sbn`, `sfln`, `setbuddynotif`, `setbuddynotification`],
+    help: `Set whether friend list notifications are displayed for all players.`
+  },
   shutdown: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}annihilated ${p.admin}the dedicated server.`,
     public: true,

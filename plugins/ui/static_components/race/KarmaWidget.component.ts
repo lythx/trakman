@@ -27,6 +27,9 @@ export default class KarmaWidget extends StaticComponent {
     maniakarma.onVote(() => this.sendMultipleManialinks(this.display()))
     addManialinkListener(this.id + 1, 6, (info, offset): void => actions.addVote(info, this.options[offset]))
     this.renderOnEvent('VotesPrefetch', () => this.display())
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -45,6 +48,9 @@ export default class KarmaWidget extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return { xml: this.constructXml(login), login }
   }
 

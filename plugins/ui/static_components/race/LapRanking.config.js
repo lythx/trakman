@@ -9,5 +9,6 @@ export default {
   icon: icons.chartLocal,
   margin: cfg.margin,
   topCount: 3,
-  displayNoRecordEntry: true
+  displayNoRecordEntry: true,
+  hidePanel: true
 }

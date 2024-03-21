@@ -22,6 +22,9 @@ export default class TeamScore extends StaticComponent {
     this.renderOnEvent('EndRound', () => this.display())
     this.renderOnEvent('BeginRound', () => this.display())
     this.renderOnEvent('PlayerFinish', () => this.display())
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -36,6 +39,9 @@ export default class TeamScore extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return { xml: this.xml, login }
   }
 

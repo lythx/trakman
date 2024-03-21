@@ -136,6 +136,12 @@ tm.addListener('LocalRecord', info => {
   }
 })
 
+tm.addListener(['MapAdded', 'MapRemoved'], () => {
+  topList = []
+  onlineList = []
+  initialize()
+})
+
 /**
  * Creates and provides utilities for accessing players record count ranking
  * @author lythx
@@ -149,7 +155,7 @@ export const topRecords = {
   get list(): readonly Readonly<{ login: string, nickname: string, amount: number }>[] {
     return topList
   },
-  
+
   /**
    * List of currently online players sorted by their record count
    */

@@ -61,7 +61,15 @@ export default {
   },
   rmguest: {
     privilege: priv.addGuest,
-    aliases: ['rg', 'rmguest', 'removeguest',],
+    aliases: ['rg', 'rmguest', 'removeguest'],
     help: `Remove a player from the guestlist.`
+  },
+  loadmatchsettings: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has loaded the MatchSettings file ${p.highlight}{#file}${p.admin}.`,
+    error: `${p.error}Could not load the specified MatchSettings file.`,
+    public: true,
+    privilege: 3,
+    aliases: [`lms`, `loadmatchsettings`],
+    help: `Load the MatchSettings file.`
   }
 }

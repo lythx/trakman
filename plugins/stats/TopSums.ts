@@ -128,6 +128,10 @@ tm.addListener('LocalRecord', (info) => {
   for (const e of updateListeners) { e(updated) }
 })
 
+tm.addListener(['MapAdded', 'MapRemoved'], () => {
+  refreshNeeded = true
+})
+
 /**
  * Creates and provides utilities for accessing players podium sums ranking
  * @author lythx

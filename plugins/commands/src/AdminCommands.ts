@@ -88,6 +88,26 @@ const commands: tm.Command[] = [
     params: [{ name: 'login' }],
     callback: actions.removeGuest,
     privilege: config.rmguest.privilege
+  },
+  {
+    aliases: config.loadmatchsettings.aliases,
+    help: config.loadmatchsettings.help,
+    params: [{ name: 'file' }],
+    callback: async (info: tm.MessageInfo, file: string) => {
+      const res = await tm.client.call(`LoadMatchSettings`, [{ string: file }])
+      if (res instanceof Error) {
+        tm.sendMessage(config.loadmatchsettings.error, info.login)
+        return
+      }
+      tm.sendMessage(tm.utils.strVar(config.loadmatchsettings.text,
+        {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+          file: tm.utils.strip(file)
+        }
+      ), config.loadmatchsettings.public ? undefined : info.login)
+    },
+    privilege: config.loadmatchsettings.privilege
   }
 ]
 

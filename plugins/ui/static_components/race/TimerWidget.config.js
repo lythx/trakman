@@ -4,6 +4,8 @@ const p = tm.utils.palette
 
 export default {
   height: 6.45,
+  stuntsDynamicMarginTop: 5.5,
+  stuntsHeight: 6.45 + 5.5,
   width: cfg.width,
   title: "Timer",
   icon: icons.clock,

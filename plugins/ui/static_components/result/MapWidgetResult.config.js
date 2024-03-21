@@ -36,7 +36,9 @@ export default {
       nadeo: icons.trophyNadeo,
       classic: icons.trophyClassic
     },
-    tmxWr: icons.bestClock
+    tmxWr: icons.bestClock,
+    authorScore: icons.clockAuthor,
+    goldScore: icons.clockAuthor
   },
   textScale: 1,
   noDateText: "N/A",

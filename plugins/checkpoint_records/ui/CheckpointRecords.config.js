@@ -19,6 +19,12 @@ export default {
     { name: 'Local Checkpoints', actionId: ids.localCps },
     { name: 'Local Sectors', actionId: ids.localSectors },
   ],
+  stuntsNavbar: [
+    { name: 'Sector Records', actionId: ids.sectorRecords },
+    { name: 'Ulti Records', actionId: ids.ultiRecords },
+    { name: 'Local Checkpoints', actionId: ids.localCps },
+    { name: 'Local Sectors', actionId: ids.localSectors },
+  ],
   grid: {
     background: "9996",
     margin: 0.15,
@@ -29,5 +35,7 @@ export default {
     aliases: ['cpr', 'cprecs'],
     help: `Displays the checkpoint records on the current map.`,
     privilege: 0
-  }
+  },
+  noTimeText: '--:--.-',
+  stuntsNoTimeText: '--'
 }

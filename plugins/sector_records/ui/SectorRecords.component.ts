@@ -13,7 +13,7 @@ class SectorRecords extends PopupWindow {
   private readonly paginator: Paginator
 
   constructor() {
-    super(componentIds.sectorRecords, config.icon, config.title, config.navbar)
+    super(componentIds.sectorRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries + 2).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -93,24 +93,33 @@ class SectorRecords extends PopupWindow {
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
       const sector = sectors?.[i + sectorIndex - 1]
-      return centeredText(sector === null ? '--:--.-' : tm.utils.getTimeString(sector.sector), w, h)
+      const noTimeText = tm.getGameMode() === 'Stunts' ? config.stuntsNoTimeText : config.noTimeText
+      return centeredText(sector === null ? noTimeText : tm.utils.getTimeString(sector.sector), w, h)
     }
 
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
       const sector = personalSectors.find(a => a.login === login)?.sectors[i + sectorIndex - 1]
-      if (sector === undefined || sector === null) { return centeredText('--:--.-', w, h) }
+      const isStunts = tm.getGameMode() === 'Stunts'
+      const noTimeText = isStunts ? config.stuntsNoTimeText : config.noTimeText
+      if (sector === undefined || sector === null) { return centeredText(noTimeText, w, h) }
       let differenceString = ''
       const bestSec = sectors?.[i + sectorIndex - 1]?.sector
+      let betterSign = '-'
+      let worseSign = '+'
+      if(isStunts) {
+        betterSign = '+'
+        worseSign = '-'
+      }
       if (bestSec !== undefined) {
         const difference = bestSec - sector
         if (sectors?.[i + sectorIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `($${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.better}${betterSign}${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
           differenceString = `($${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `($${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${config.colours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sector), w, h)
@@ -123,13 +132,14 @@ class SectorRecords extends PopupWindow {
     }
 
     const totalTimeHeaderCell: GridCellObject = {
-      callback: (i, j, w, h) => centeredText(' Total Time ', w, h),
+      callback: (i, j, w, h) => centeredText(` Total ${tm.getGameMode() === 'Stunts' ? 'Score' : 'Time'} `, w, h),
       background: config.grid.headerBackground
     }
 
     const totalTime: GridCellFunction = (i, j, w, h) => {
       if (sectors.some(a => a === null)) {
-        return centeredText('--:--.-', w, h)
+        const noTimeText = tm.getGameMode() === 'Stunts' ? config.stuntsNoTimeText : config.noTimeText
+        return centeredText(noTimeText, w, h)
       }
       const sum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
       return centeredText(tm.utils.getTimeString(sum), w, h)
@@ -137,8 +147,16 @@ class SectorRecords extends PopupWindow {
 
     const pesonalTotalTime: GridCellFunction = (i, j, w, h) => {
       const secs = personalSectors.find(a => a.login === login)?.sectors
+      const isStunts = tm.getGameMode() === 'Stunts'
+      const noTimeText = isStunts ? config.stuntsNoTimeText : config.noTimeText
       if (secs === undefined || secs.some(a => a === null)) {
-        return centeredText('--:--.-', w, h)
+        return centeredText(noTimeText, w, h)
+      }
+      let betterSign = '-'
+      let worseSign = '+'
+      if(isStunts) {
+        betterSign = '+'
+        worseSign = '-'
       }
       let differenceString = ''
       const sum = secs.map(a => a === null ? 0 : a).reduce((acc, cur) => acc += cur)
@@ -146,11 +164,11 @@ class SectorRecords extends PopupWindow {
         const bestSum = sectors.map(a => a?.sector ?? 0).reduce((acc, cur) => acc += cur)
         const difference = bestSum - sum
         if (difference > 0) {
-          differenceString = `($${config.colours.better}-${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${config.colours.better}${betterSign}${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
           differenceString = `($${config.colours.equal}${tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `($${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${config.colours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(sum), w, h)

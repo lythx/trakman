@@ -31,11 +31,16 @@ export default class LiveRanking extends StaticComponent {
         return this.display()
       }
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getEntries(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsEntries
     }
     return config.entries
   }
@@ -47,6 +52,8 @@ export default class LiveRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Laps') {
       return config.lapsTopCount
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsTopCount
     }
     return config.topCount
   }
@@ -63,6 +70,9 @@ export default class LiveRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     let content: string
     this.title = config.title
     if (tm.getGameMode() === 'Laps') {
@@ -115,6 +125,8 @@ export default class LiveRanking extends StaticComponent {
     if (tm.getGameMode() === 'Laps') {
       dontParseTime = true
       noRecordEntryText = config.lapsNoRecordEntry
+    } else if (tm.getGameMode() === 'Stunts') {
+      noRecordEntryText = config.stuntsNoRecordEntry
     }
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),

@@ -443,7 +443,6 @@ export const actions = {
         title: title,
         nickname: tm.utils.strip(nickname, true),
         map: tm.utils.strip(tm.maps.current.name, true)
-        
       }), config.removeMap.public ? undefined : login)
       return
     }

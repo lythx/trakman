@@ -35,6 +35,9 @@ export class PlayerService {
         this.newLocalsAmount++
       }
     })
+    Events.addListener(['MapAdded', 'MapRemoved'], () => {
+      void this.calculateAveragesAndRanks()
+    })
     Events.addListener('BeginMap', (): void => {
       this.newLocalsAmount = 0
     })

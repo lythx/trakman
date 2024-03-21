@@ -25,7 +25,13 @@ export default class BestFinishes extends StaticComponent {
     this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
       new Array(config.entries).fill(1), { margin: config.margin })
     this.renderOnEvent('PlayerFinish', (info: tm.FinishInfo) => {
-      let index: number = this.bestFinishes.findIndex(a => a.time > info.time)
+      const isStunts = tm.getGameMode() === 'Stunts'
+      let index: number
+      if (isStunts) {
+        index = this.bestFinishes.findIndex(a => a.time < info.time)
+      } else {
+        index = this.bestFinishes.findIndex(a => a.time > info.time)
+      }
       if (index === -1) { index = this.bestFinishes.length }
       if (index < config.entries) {
         this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickname })

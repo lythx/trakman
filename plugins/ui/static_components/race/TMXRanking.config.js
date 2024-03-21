@@ -15,5 +15,6 @@ export default {
     4
   ],
   topCount: 3,
-  displayNoRecordEntry: false
+  displayNoRecordEntry: false,
+  hidePanel: true
 }

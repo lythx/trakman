@@ -180,7 +180,9 @@ declare global {
       /** Callback function to execute on command call */
       readonly callback: (info: MessageInfo & { aliasUsed: string }, ...params: any[]) => void
       /** Player privilege required to call the command */
-      readonly privilege: number
+      readonly privilege: number,
+      /** Whether the command is usable by players currently in the mutelist */
+      readonly disableForMuted?: boolean
     }
     /** Controller ban object */
     export interface BanlistEntry {
@@ -336,8 +338,6 @@ declare global {
       readonly style: string
       /** Map TMX routes (Single, Multi, Symmetrical) */
       readonly routes: string
-      /** Map TMX length, determined by the map author time eg. 1m30s etc. */
-      readonly length: string
       /** Map TMX difficulty ('Beginner', 'Expert', etc.) */
       readonly difficulty: TMXDifficulty
       /** Map TMX leaderboard rating */
@@ -366,6 +366,10 @@ declare global {
       readonly replays: TMXReplay[]
       /** Map TMX valid replays (only ones driven on current version of the map) */
       readonly validReplays: TMXReplay[]
+      /** Author medal time */
+      readonly authorTime: number
+      /** Author score (Stunts Mode) */
+      readonly authorScore?: number
     }
     /** TMX replay object */
     export interface TMXReplay {
@@ -377,18 +381,14 @@ declare global {
       readonly name: string
       /** Finish time */
       readonly time: number
+      /** Replay score (Stunts Mode) */
+      readonly score?: number
       /** Record date */
       readonly recordDate: Date
       /** Date on which the map version the replay was driven on was uploaded to TMX */
       readonly mapDate: Date
-      /** Somehow related to puzzle replays */
-      readonly approved: any
       /** Replay TMX leaderobard score */
       readonly leaderboardScore: number
-      /** Somehow related to puzzle replays */
-      readonly expires: any
-      /** Replay lock period after upload (puzzle maps only) */
-      readonly lockspan: any
       /** Replay file download url */
       readonly url: string
     }
@@ -444,6 +444,8 @@ declare global {
       readonly goldTime: number
       /** Author medal time */
       readonly authorTime: number
+      /** Author score (Stunts Mode) */
+      readonly authorScore?: number
       /** Map vehicle */
       readonly car: string
     }
@@ -711,7 +713,7 @@ declare global {
       readonly BestTime: number;
       /** Player checkpoints in the best run */
       readonly BestCheckpoints: number[];
-      /** Probably stunts mode related */ // TODO STUNTS
+      /** Player best Stunts Mode score */
       readonly Score: number;
       /** Amount of finished laps */
       readonly NbrLapsFinished: number;

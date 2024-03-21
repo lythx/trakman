@@ -7,6 +7,7 @@ export default {
   title: "Karma",
   icon: icons.karmaStats,
   margin: cfg.margin,
+  hidePanel: true,
   icons: [
     icons.karmaLocal,
     icons.karmaGlobal,
@@ -24,10 +25,10 @@ export default {
   textPadding: 0.1,
   plus: {
     scale: 0.6,
-    offset:0
+    offset: 0
   },
   minus: {
     scale: 1,
-    offset:-0.3
+    offset: -0.3
   }
 }

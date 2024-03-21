@@ -4,37 +4,37 @@ export default
   [
     {
       environment: 'Stadium',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Desert',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Snow',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Bay',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Coast',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Island',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
     {
       environment: 'Rally',
-      modLinks: [],
+      modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
       randomOrder: true,
     },
   ]

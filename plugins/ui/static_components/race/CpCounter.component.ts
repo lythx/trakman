@@ -121,6 +121,7 @@ export default class CpCounter extends StaticComponent {
 
   private constructTimeXml(login: string, isLap: boolean, icon: string,
     isFinish?: boolean, currentTime?: number, bestTime?: number): string {
+    const isStunts = tm.getGameMode() === 'Stunts'
     const arr = isLap ? this.prevLapTimes : this.prevTimes
     const prev = arr.find(a => a.login === login)
     if (currentTime === undefined) {
@@ -137,13 +138,20 @@ export default class CpCounter extends StaticComponent {
     }
     let differenceString: string = config.defaultDifference
     if (bestTime !== undefined) {
-      const difference: number = bestTime - currentTime
+      let difference: number = bestTime - currentTime
+      let betterSign = '-'
+      let worseSign = '+'
+      if(isStunts) {
+        difference = -difference
+        betterSign = '+'
+        worseSign = '-'
+      }
       if (difference > 0) {
-        differenceString = `$${config.colours.better}-${tm.utils.getTimeString(difference)}`
+        differenceString = `$${config.colours.better}${betterSign}${tm.utils.getTimeString(difference)}`
       } else if (difference === 0) {
         differenceString = `$${config.colours.equal}${tm.utils.getTimeString(difference)}`
       } else {
-        differenceString = `$${config.colours.worse}+${tm.utils.getTimeString(Math.abs(difference))}`
+        differenceString = `$${config.colours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}`
       }
     }
     const h: StaticHeaderOptions = this.header.options

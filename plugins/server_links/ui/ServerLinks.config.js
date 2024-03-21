@@ -29,5 +29,6 @@ export default {
   textBackground: cfg.background,
   textScale: 0.9,
   textPadding: 0.15,
-  iconWidth: 1.7
+  iconWidth: 1.7,
+  hidePanel: true
 }

@@ -27,6 +27,9 @@ export default class LapRanking extends StaticComponent {
       if (tm.records.lap.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
     this.renderOnEvent('LocalRecordsRemoved', () => this.display())
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -65,6 +68,9 @@ export default class LapRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">

@@ -1,6 +1,6 @@
 import RaceUi from "../config/RaceUi.js"
 import ResultUi from "../config/ResultUi.js"
-import { components } from '../UI.js'
+import { components, addKeyListener } from '../UI.js'
 
 interface PlayerML { login: string | string[], xml: string }
 type PlayerMLList = (string | PlayerML | void)[]
@@ -71,6 +71,8 @@ export default abstract class StaticComponent {
   }[] = []
   private static listenersAdded = false
   private static reduxModeEnabled = false
+  private static panelHideList: string[] = []
+  private static panelHideListeners: ((player: tm.Player) => any)[] = []
 
   /**
    * Abstract class for static manialink components
@@ -136,7 +138,27 @@ export default abstract class StaticComponent {
       StaticComponent.updateDisplayedComponents()
     }, true)
     tm.addListener('PlayerJoin', () => this.updateReduxModeStatus())
-    tm.addListener('PlayerLeave', () => this.updateReduxModeStatus())
+    tm.addListener('PlayerLeave', (info) => {
+      const index = this.panelHideList.indexOf(info.login)
+      if (index !== -1) {
+        this.panelHideList.splice(index)
+        for (const e of this.panelHideListeners) {
+          e(info)
+        }
+      }
+      this.updateReduxModeStatus()
+    })
+    addKeyListener('F7', (info) => {
+      const index = this.panelHideList.indexOf(info.login)
+      if (index !== -1) {
+        this.panelHideList.splice(index)
+      } else {
+        this.panelHideList.push(info.login)
+      }
+      for (const e of this.panelHideListeners) {
+        e(info)
+      }
+    }, 1)
   }
 
   private static initialize() {
@@ -212,12 +234,16 @@ export default abstract class StaticComponent {
       StaticComponent.displayedComponents.other.some(a => a.name === this.constructor.name))
   }
 
-  private static mapComponentHeight(names: string[]): { name: string, getHeight: () => number }[] {
+  private static mapComponentHeight(names: (string | number)[]): { name: string, getHeight: () => number }[] {
     const ret: { name: string, getHeight: () => number }[] = []
     for (const e of names) {
-      const comp = components.findStatic(e)
-      if (comp === undefined) { continue }
-      ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+      if (typeof e === 'number') {
+        ret.push({ name: '__margin__', getHeight: () => e })
+      } else {
+        const comp = components.findStatic(e)
+        if (comp === undefined) { continue }
+        ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+      }
     }
     return ret
   }
@@ -320,6 +346,10 @@ export default abstract class StaticComponent {
     return `<manialink id="${this.id}"></manialink>`
   }
 
+  hideToPlayer(login: string): PlayerML {
+    return { xml: `<manialink id="${this.id}"></manialink>`, login }
+  }
+
   /**
    * Add a callback function to execute when new component object gets created 
    * @param callback Function to execute on event
@@ -391,6 +421,18 @@ export default abstract class StaticComponent {
 
   protected get reduxModeEnabled() {
     return StaticComponent.reduxModeEnabled
+  }
+
+  protected onPanelHide(callback: (player: tm.Player) => any) {
+    StaticComponent.panelHideListeners.push(callback)
+  }
+
+  protected hasPanelsHidden(login: string) {
+    return StaticComponent.panelHideList.includes(login)
+  }
+
+  protected get panelHideList() {
+    return [...StaticComponent.panelHideList]
   }
 
 }

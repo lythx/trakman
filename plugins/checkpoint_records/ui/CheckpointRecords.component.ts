@@ -18,7 +18,7 @@ class CheckpointRecords extends PopupWindow {
   }
 
   constructor() {
-    super(componentIds.checkpointRecords, config.icon, config.title, config.navbar)
+    super(componentIds.checkpointRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
@@ -96,24 +96,32 @@ class CheckpointRecords extends PopupWindow {
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
       const cp = cps?.[i + cpIndex - 1]
-      return centeredText(cp === null ? '--:--.-' : tm.utils.getTimeString(cp.checkpoint), w, h)
+      const noTimeText = tm.getGameMode() === 'Stunts' ? config.stuntsNoTimeText : config.noTimeText
+      return centeredText(cp === null ? noTimeText : tm.utils.getTimeString(cp.checkpoint), w, h)
     }
 
     const personalSectorCell: GridCellFunction = (i, j, w, h) => {
       const cp = personalCps.find(a => a.login === login)?.checkpoints[i + cpIndex - 1]
-      if (cp === undefined || cp === null) { return centeredText('--:--.-', w, h) }
+      const noTimeText = tm.getGameMode() === 'Stunts' ? config.stuntsNoTimeText : config.noTimeText
+      if (cp === undefined || cp === null) { return centeredText(noTimeText, w, h) }
       let differenceString = ''
       const bestSec = cps?.[i + cpIndex - 1]?.checkpoint
+      let betterSign = '-'
+      let worseSign = '+'
+      if (tm.getGameMode() === 'Stunts') {
+        betterSign = '+'
+        worseSign = '-'
+      }
       if (bestSec !== undefined) {
         const difference = bestSec - cp
         if (cps?.[i + cpIndex - 1]?.login === login) {
           differenceString = ''
         } else if (difference > 0) {
-          differenceString = `($${this.diffColours.better}-$${tm.utils.getTimeString(difference)}$FFF)`
+          differenceString = `($${this.diffColours.better}${betterSign}${tm.utils.getTimeString(difference)}$FFF)`
         } else if (difference === 0) {
           differenceString = `($${this.diffColours.equal + tm.utils.getTimeString(difference)}$FFF)`
         } else {
-          differenceString = `($${this.diffColours.worse}+$${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
+          differenceString = `($${this.diffColours.worse}${worseSign}${tm.utils.getTimeString(Math.abs(difference))}$FFF)`
         }
       }
       return centeredText(differenceString + ' ' + tm.utils.getTimeString(cp), w, h)

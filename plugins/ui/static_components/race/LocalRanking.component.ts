@@ -27,6 +27,9 @@ export default class LocalRanking extends StaticComponent {
       if (tm.records.local.some(a => info.some(b => b.login === a.login))) { return this.display() }
     })
     this.renderOnEvent('LocalRecordsRemoved', () => this.display())
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getEntries(): number {
@@ -38,6 +41,8 @@ export default class LocalRanking extends StaticComponent {
       return config.cupEntries
     } if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
+    } if (tm.getGameMode() === 'Stunts') {
+      return config.stuntsEntries
     }
     return config.entries
   }
@@ -50,6 +55,8 @@ export default class LocalRanking extends StaticComponent {
     } if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
     } if (tm.getGameMode() === 'Laps') {
+      return config.lapsTopCount
+    } if (tm.getGameMode() === 'Stunts') {
       return config.lapsTopCount
     }
     return config.topCount
@@ -74,7 +81,8 @@ export default class LocalRanking extends StaticComponent {
     const entries = this.getEntries()
     this.recordList?.destroy?.()
     this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry)
+      entries, this.side, this.getTopCount(), tm.records.maxLocalsAmount, config.displayNoRecordEntry,
+      { noRecordEntryText: tm.getGameMode() === 'Stunts' ? config.stuntsNoRecordEntry : undefined })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
@@ -91,6 +99,9 @@ export default class LocalRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">

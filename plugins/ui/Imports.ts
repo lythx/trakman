@@ -40,6 +40,7 @@ import TeamScore from './static_components/race/TeamScore.component.js'
 import RoundsPointsRanking from './static_components/race/RoundsPointsRanking.component.js'
 import LapRanking from './static_components/race/LapRanking.component.js'
 import BannerWidget from './static_components/result/BannerWidget.component.js'
+import UltiRanking from './static_components/race/UltiRanking.component.js'
 
 /*
 ------------------
@@ -127,4 +128,5 @@ tm.addListener(`Startup`, (): void => {
   new Operatorlist()
   new Adminlist()
   new Masteradminlist()
+  new UltiRanking()
 }, true)

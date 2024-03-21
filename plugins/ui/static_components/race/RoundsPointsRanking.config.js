@@ -18,5 +18,6 @@ export default {
   otherCupPositionsImage: icons.trophy,
   cupFinalistImage: icons.flagFinish,
   cupImageVerticalPadding: 0.1,
-  cupImageHorizontalPadding: 0.3
+  cupImageHorizontalPadding: 0.3,
+  hidePanel: true
 }

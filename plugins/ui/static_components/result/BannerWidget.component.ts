@@ -42,14 +42,11 @@ export default class BannerWidget extends StaticComponent {
   }
 
   getWidth(): number {
-    const comps = components.staticHeights.Rounds
-    return (config.rightBorder - config.leftBorder) -
-      (comps.left[0].getHeight() * 5 + config.marginBig * 8)
+    return (config.rightBorder - config.leftBorder) - (config.width * 5 + config.marginBig * 5 + config.margin)
   }
 
   getPosX(): number {
-    const comps = components.staticHeights.Rounds
-    return config.leftBorder + (comps.left[0].getHeight() * 3 + config.marginBig * 4)
+    return config.leftBorder + (config.width * 3 + config.marginBig * 2 + config.margin)
   }
 
   display() {

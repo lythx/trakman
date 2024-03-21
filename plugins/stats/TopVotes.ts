@@ -104,6 +104,12 @@ tm.addListener('PlayerLeave', (info): void => {
   onlineList = onlineList.filter(a => a.login !== info.login)
 })
 
+tm.addListener(['MapAdded', 'MapRemoved'], () => {
+  topList = []
+  onlineList = []
+  initialize()
+})
+
 /**
  * Creates and provides utilities for accessing players vote count ranking
  * @author lythx

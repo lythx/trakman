@@ -22,5 +22,6 @@ export default {
   },
   topCount: 3,
   displayNoRecordEntry: false,
-  noMaxScore: '-'
+  noMaxScore: '-',
+  hidePanel: true
 }

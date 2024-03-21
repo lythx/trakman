@@ -17,5 +17,6 @@ export default {
   roundsTopCount: 3,
   cupTopCount: 3,
   lapsTopCount: 3,
-  displayNoRecordEntry: true
+  displayNoRecordEntry: true,
+  hidePanel: true
 }

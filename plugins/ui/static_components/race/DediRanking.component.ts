@@ -27,6 +27,9 @@ export default class DediRanking extends StaticComponent {
     this.renderOnEvent('PlayerLeave', (info: tm.LeaveInfo) => {
       if (dedimania.getRecord(info.login) !== undefined) { return this.display() }
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   display() {
@@ -41,6 +44,9 @@ export default class DediRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     return {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">

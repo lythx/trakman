@@ -358,7 +358,7 @@ export class AdministrationService {
       entry.reason = reason
       entry.expireDate = expireDate
       entry.date = date
-      void this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
+      await this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
       Events.emit('Ban', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
       return true
@@ -374,7 +374,7 @@ export class AdministrationService {
     } else {
       this.serverBanlist.push(obj)
     }
-    void this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
+    await this.banlistRepo.add(ip, login, date, caller.login, reason, expireDate)
     Events.emit('Ban', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
@@ -409,7 +409,7 @@ export class AdministrationService {
       obj = this.banOnJoin[banOnJoinIndex]
       this.banOnJoin.splice(banOnJoinIndex, 1)
     }
-    void this.banlistRepo.remove(login)
+    await this.banlistRepo.remove(login)
     Events.emit('Unban', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unbanned ${login}`)
@@ -444,7 +444,7 @@ export class AdministrationService {
       entry.reason = reason
       entry.expireDate = expireDate
       entry.date = date
-      void this.blacklistRepo.update(login, date, caller.login, reason, expireDate)
+      await this.blacklistRepo.update(login, date, caller.login, reason, expireDate)
       Events.emit('Blacklist', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
       return true
@@ -458,7 +458,7 @@ export class AdministrationService {
       callerLogin: caller.login, reason, expireDate
     }
     this._blacklist.push(obj)
-    void this.blacklistRepo.add(login, date, caller.login, reason, expireDate)
+    await this.blacklistRepo.add(login, date, caller.login, reason, expireDate)
     Events.emit('Blacklist', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has blacklisted ${login}`, durationString, reasonString)
     Client.callNoRes('Kick', [{ string: login }])
@@ -484,7 +484,7 @@ export class AdministrationService {
     }
     const obj = this._blacklist[blIndex]
     this._blacklist.splice(blIndex, 1)
-    void this.blacklistRepo.remove(login)
+    await this.blacklistRepo.remove(login)
     Events.emit('Unblacklist', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unblacklisted ${login}`)
@@ -520,7 +520,7 @@ export class AdministrationService {
       entry.reason = reason
       entry.expireDate = expireDate
       entry.date = date
-      void this.mutelistRepo.update(login, date, caller.login, reason, expireDate)
+      await this.mutelistRepo.update(login, date, caller.login, reason, expireDate)
       Events.emit('Mute', entry)
       Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
       return true
@@ -535,7 +535,7 @@ export class AdministrationService {
     } else {
       this.serverMutelist.push(obj)
     }
-    void this.mutelistRepo.add(login, date, caller.login, reason, expireDate)
+    await this.mutelistRepo.add(login, date, caller.login, reason, expireDate)
     Events.emit('Mute', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has muted ${login}`, durationString, reasonString)
     return true
@@ -564,7 +564,7 @@ export class AdministrationService {
       obj = this.muteOnJoin[muteOnJoinIndex]
       this.muteOnJoin.splice(muteOnJoinIndex, 1)
     }
-    void this.mutelistRepo.remove(login)
+    await this.mutelistRepo.remove(login)
     Events.emit('Unmute', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has unmuted ${login}`)
@@ -595,7 +595,7 @@ export class AdministrationService {
       callerLogin: caller.login
     }
     this._guestlist.push(obj)
-    void this.guestlistRepo.add(login, date, caller.login)
+    await this.guestlistRepo.add(login, date, caller.login)
     Events.emit('AddGuest', obj)
     Logger.info(`${caller.nickname} (${caller.login}) has added ${login} to guestlist`)
     Client.callNoRes('SaveGuestList', [{ string: this.guestlistFile }])
@@ -618,7 +618,7 @@ export class AdministrationService {
     if (res instanceof Error) { return res }
     const obj = this._guestlist[guestIndex]
     this._guestlist.splice(guestIndex, 1)
-    void this.guestlistRepo.remove(login)
+    await this.guestlistRepo.remove(login)
     Events.emit('RemoveGuest', obj)
     if (caller !== undefined) {
       Logger.info(`${caller.nickname} (${caller.login}) has removed ${login} from guestlist`)

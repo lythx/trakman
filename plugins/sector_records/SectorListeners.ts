@@ -67,17 +67,21 @@ if (config.isEnabled) {
     const date = new Date()
     const playerSectors = currentPlayerSecs.find(a => a.login === info.player.login)
     const time = info.time - (info.player.currentCheckpoints[info.index - 1]?.time ?? 0)
+    const isStunts = tm.getGameMode() === 'Stunts'
     if (playerSectors === undefined) {
       currentPlayerSecs.push({ login: info.player.login, sectors: [time], nickname: info.player.nickname })
       void allSecsDB.add(currentMapDBId, info.player.login, [time])
       emitEvent('PlayerSector', { login: info.player.login, nickname: info.player.nickname, index: info.index })
-    } else if ((playerSectors.sectors[info.index] ?? Infinity) > time) {
+    } else if (((playerSectors.sectors[info.index] ?? Infinity) > time && !isStunts) ||
+      ((playerSectors.sectors[info.index] ?? -1) < time && isStunts)) {
       playerSectors.sectors[info.index] = time
       void allSecsDB.update(currentMapDBId, info.player.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
       emitEvent('PlayerSector', { login: info.player.login, nickname: info.player.nickname, index: info.index })
     }
     const sector = currentBestSecs[info.index]?.sector
-    if (sector === undefined || sector > time) {
+    if (sector === undefined ||
+      (sector > time && !isStunts) ||
+      (sector < time && isStunts)) {
       currentBestSecs[info.index] = {
         login: info.player.login,
         nickname: info.player.nickname,
@@ -95,17 +99,21 @@ if (config.isEnabled) {
     const index = info.checkpoints.length
     const playerSectors = currentPlayerSecs.find(a => a.login === info.login)
     const time = info.time - (info.checkpoints[index - 1] ?? 0)
+    const isStunts = tm.getGameMode() === 'Stunts'
     if (playerSectors === undefined) {
       currentPlayerSecs.push({ login: info.login, sectors: [time], nickname: info.nickname })
       void allSecsDB.add(currentMapDBId, info.login, [time])
       emitEvent('PlayerSector', { login: info.login, nickname: info.nickname, index: index })
-    } else if ((playerSectors.sectors[index] ?? Infinity) > time) {
+    } else if (((playerSectors.sectors[index] ?? Infinity) > time && !isStunts) ||
+      ((playerSectors.sectors[index] ?? -1) < time && isStunts)) {
       playerSectors.sectors[index] = time
       void allSecsDB.update(currentMapDBId, info.login, playerSectors.sectors.map(a => a === undefined ? -1 : a))
       emitEvent('PlayerSector', { login: info.login, nickname: info.nickname, index: index })
     }
     const sector = currentBestSecs[index]?.sector
-    if (sector === undefined || sector > time) {
+    if (sector === undefined ||
+      (sector > time && !isStunts) ||
+      (sector < time && isStunts)) {
       currentBestSecs[index] = {
         login: info.login,
         nickname: info.nickname,

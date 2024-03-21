@@ -12,6 +12,7 @@ export default {
   icon: icons.gears,
   disabledColour: '333C',
   public: true,
+  hidePanel: true,
   icons: {
     players: icons.playerList,
     restart: icons.restart,

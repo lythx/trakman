@@ -52,11 +52,24 @@ export default class MapWidget extends StaticComponent {
     if (webservices.currentAuthor !== undefined) {
       authorIcon = (flags as any)[webservices.currentAuthor.countryCode] // cope typescript
     }
+    let timeOrScore: string, timeOrScoreIcon: string
+    if (tm.getGameMode() !== 'Stunts') {
+      timeOrScore = tm.utils.getTimeString(map.authorTime)
+      timeOrScoreIcon = ic.authorTime
+    } else {
+      if (TMXMap?.authorScore !== undefined) {
+        timeOrScore = tm.utils.getTimeString(TMXMap.authorScore) // Cant get author score (goldTime = gold score)
+        timeOrScoreIcon = ic.authorScore
+      } else {
+        timeOrScore = tm.utils.getTimeString(map.goldTime) // Cant get author score (goldTime = gold score)
+        timeOrScoreIcon = ic.goldScore
+      }
+    }
     const infos: [string, string][] = [
       [config.title, ic.header],
       [tm.utils.safeString(map.name), this.getTag(map, TMXMap ?? undefined)],
       [tm.utils.safeString(author), authorIcon],
-      [tm.utils.getTimeString(map.authorTime), ic.authorTime],
+      [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]
     ]
     const headerCfg: StaticHeaderOptions = this.header.options

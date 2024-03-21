@@ -47,9 +47,6 @@ class TMXWindow extends PopupWindow<number> {
     }
   }
 
-  private isMultiByte = (str: string) =>
-    [...str].some(c => (c.codePointAt(0) ?? 0) > 255)
-
   protected onOpen(info: tm.ManialinkClickInfo): void {
     const page = this.historyCount + 1
     this.displayToPlayer(info.login, page, `${page}/${this.paginator.pageCount}`)
@@ -78,15 +75,15 @@ class TMXWindow extends PopupWindow<number> {
     }
     const m = maps.filter(a => a !== undefined).map(a => (a as any).id)
     const allRecords: Readonly<tm.Record[]> = [...tm.records.getFromHistory(...m), ...tm.records.local, ...tm.records.getFromQueue(...m)]
-        .sort((a, b) => a.time - b.time)
-        .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
+      .sort((a, b) => a.time - b.time)
+      .filter((a, i, arr) => arr.findIndex(b => b.login === a.login && a.map === b.map) === i)
     const cell: GridCellFunction = (i, j, w, h) => {
       const map = maps[j]
       if (map === undefined) { return '' }
       const grid = new Grid(w, h, [1], config.gridRows,
         { background: config.info.background, margin: config.margin })
       let mapName = map.name
-      if (this.isMultiByte(mapName)) {
+      if (tm.utils.isMultibyte(mapName)) {
         mapName = ''
       }
       const TMXMap = TMXMaps[j] ?? undefined
@@ -190,7 +187,7 @@ image="${image}" url="${url}" /> `
 
   protected constructAuthor(width: number, height: number, map: tm.Map): string {
     let author = map.author
-    if (this.isMultiByte(author)) {
+    if (tm.utils.isMultibyte(author)) {
       author = ''
     }
     return `${this.constructEntry(tm.utils.safeString(author), config.icons.author, width - config.authorTimeWidth, height, config.iconWidth)}
@@ -226,7 +223,7 @@ image="${image}" url="${url}" /> `
       [map.voteCount.toString(), ic.voteCount],
       [(TMXMap?.awards?.toString() ?? map?.awards?.toString()) ?? config.defaultText, awardsIcon],
       [TMXMap?.author === undefined ? config.defaultText :
-        (this.isMultiByte(TMXMap.author) ? '' : tm.utils.safeString(TMXMap.author)), ic.tmxAuthor],
+        (tm.utils.isMultibyte(TMXMap.author) ? '' : tm.utils.safeString(TMXMap.author)), ic.tmxAuthor],
       [TMXMap !== undefined ? tm.utils.formatDate(TMXMap.lastUpdateDate, true) : config.defaultText, ic.buildDate],
       [TMXMap?.style ?? config.defaultText, ic.style],
       [lbRating, lbIcon],
