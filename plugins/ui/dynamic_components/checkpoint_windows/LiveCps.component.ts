@@ -21,7 +21,7 @@ export default class LiveCps extends PopupWindow {
   private readonly cpColours = config.cpColours
 
   constructor() {
-    super(componentIds.liveCps, config.icon, config.title, config.navbar)
+    super(componentIds.liveCps, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     const records = tm.records.live
     this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
     this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)

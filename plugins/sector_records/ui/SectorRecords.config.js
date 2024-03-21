@@ -19,6 +19,12 @@ export default {
     { name: 'Local Checkpoints', actionId: ids.localCps },
     { name: 'Local Sectors', actionId: ids.localSectors },
   ],
+  stuntsNavbar: [
+    { name: 'Checkpoint Records', actionId: ids.checkpointRecords },
+    { name: 'Ulti Records', actionId: ids.ultiRecords },
+    { name: 'Local Checkpoints', actionId: ids.localCps },
+    { name: 'Local Sectors', actionId: ids.localSectors },
+  ],
   colours: {
     worse: tm.utils.palette.red,
     better: tm.utils.palette.purple,

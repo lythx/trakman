@@ -19,6 +19,12 @@ export default {
     { name: 'Local Checkpoints', actionId: ids.localCps },
     { name: 'Local Sectors', actionId: ids.localSectors },
   ],
+  stuntsNavbar: [
+    { name: 'Sector Records', actionId: ids.sectorRecords },
+    { name: 'Ulti Records', actionId: ids.ultiRecords },
+    { name: 'Local Checkpoints', actionId: ids.localCps },
+    { name: 'Local Sectors', actionId: ids.localSectors },
+  ],
   grid: {
     background: "9996",
     margin: 0.15,

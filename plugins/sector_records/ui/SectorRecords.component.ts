@@ -13,7 +13,7 @@ class SectorRecords extends PopupWindow {
   private readonly paginator: Paginator
 
   constructor() {
-    super(componentIds.sectorRecords, config.icon, config.title, config.navbar)
+    super(componentIds.sectorRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries + 2).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,

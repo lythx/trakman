@@ -21,6 +21,12 @@ export default {
     { name: 'Live Checkpoints', actionId: ids.liveCps },
     { name: 'Live Sectors', actionId: ids.liveSectors }
   ],
+  stuntsNavbar: [
+    { name: 'Local Sectors', actionId: ids.localSectors },
+    { name: 'Ulti Records', actionId: ids.ultiRecords },
+    { name: 'Live Checkpoints', actionId: ids.liveCps },
+    { name: 'Live Sectors', actionId: ids.liveSectors }
+  ],
   cpPaginatorMargin: 0.25,
   startCellWidth: 2,
   indexCellWidth: 1,

@@ -18,7 +18,7 @@ class CheckpointRecords extends PopupWindow {
   }
 
   constructor() {
-    super(componentIds.checkpointRecords, config.icon, config.title, config.navbar)
+    super(componentIds.checkpointRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries + 1).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
     this.paginator.onPageChange = (login: string, page: number) => {
