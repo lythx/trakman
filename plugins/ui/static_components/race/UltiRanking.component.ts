@@ -1,6 +1,6 @@
 /**
  * @author lythx
- * @since 0.1
+ * @since 1.5.0
  */
 
 import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
@@ -49,7 +49,7 @@ export default class UltiRanking extends StaticComponent {
       xml: `<manialink id="${this.id}">
       <frame posn="${this.positionX} ${this.positionY} 1">
         <format textsize="1" textcolor="FFFF"/> 
-        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.dediCps /* TODO */ })}
+        ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.ultiRecords })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, ultimania.records.map(a => ({ ...a, name: a.nickname, time: a.score })))}
         </frame>
