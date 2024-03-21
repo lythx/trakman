@@ -62,8 +62,8 @@ export default class TMXDetailsWindow extends PopupWindow {
       tm.utils.getTimeString(replays[i - 1]?.time) : config.defaultTime, w, h, options)
     const nameCell: GridCellFunction = (i, j, w, h) =>
       tm.utils.isMultibyte(replays[i - 1]?.name)
-        ? leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
-        : leftAlignedText(tm.utils.safeString(config.defaultTime), w, h, options)
+        ? leftAlignedText(tm.utils.safeString(config.defaultTime), w, h, options)
+        : leftAlignedText(tm.utils.safeString(replays[i - 1]?.name ?? config.defaultTime), w, h, options)
     const dateCell: GridCellFunction = (i, j, w, h) => centeredText(replays[i - 1] !== undefined ?
       tm.utils.formatDate(replays[i - 1]?.recordDate, true) : config.defaultTime, w, h, options)
     const downloadCell: GridCellObject = {
