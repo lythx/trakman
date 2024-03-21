@@ -6,7 +6,7 @@ if (config.isEnabled) {
       let [text, fixedText]: string[][] = [info.text.split(` `), [``]]
       for (const t of text) {
         t.match(config.matchRegex)
-          ? fixedText.push(`$L${tm.utils.fixProtocol(t)}$L`)
+          ? fixedText.push(`$L${tm.utils.fixProtocol(tm.utils.strip(t))}$L`)
           : fixedText.push(t)
       }
       return fixedText.join(` `).slice(1)
