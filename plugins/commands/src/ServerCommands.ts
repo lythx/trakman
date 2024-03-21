@@ -344,6 +344,16 @@ const commands: tm.Command[] = [
     privilege: config.killcontroller.privilege
   },
   {
+    aliases: config.setbuddynotif.aliases,
+    help: config.setbuddynotif.help,
+    params: [{ name: 'status', type: 'boolean' }],
+    callback: (info: tm.MessageInfo, status: boolean): void => {
+      tm.sendMessage(tm.utils.strVar(config.setbuddynotif.text, { title: info.title, adminName: tm.utils.strip(info.nickname), status: status ? 'enabled' : 'disabled' }), config.setbuddynotif.public ? undefined : info.login)
+      tm.client.callNoRes(`SetBuddyNotification`, [{ string: '' }, { boolean: status }])
+    },
+    privilege: config.setbuddynotif.privilege
+  },
+  {
     aliases: config.shutdown.aliases,
     help: config.shutdown.help,
     callback: (info: tm.MessageInfo): void => {
