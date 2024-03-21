@@ -6,7 +6,7 @@ import { resultConfig as cfg, icons, StaticHeader } from '../../UI.js'
 export default {
   entries: 5,
   entryHeight: 2.15,
-  image: 'https://cdn.discordapp.com/attachments/793464821030322196/1094588922794889350/CrazyTrakmanBanner.png',
+  image: 'https://trakman.ptrk.eu/icons/CrazyTrakman.png',
   imageLink: tm.config.controller.repo,
   width: cfg.width,
   background: StaticHeader.resultPreset.iconBackground,
