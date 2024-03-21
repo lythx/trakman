@@ -12,9 +12,12 @@ export default {
   topBorder: 47.85,
   rightPosition: 49.13,
   leftPosition: -63.75,
+  // Put component class names here, if you want a margin between
+  // components then put a number
   rightSideOrder: [
     "MapWidget",
     "PreviousAndBest",
+    // 3.5, <- example margin
     "TMXRanking",
     "TimerWidget",
     "LocalRanking",

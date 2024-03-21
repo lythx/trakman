@@ -234,12 +234,16 @@ export default abstract class StaticComponent {
       StaticComponent.displayedComponents.other.some(a => a.name === this.constructor.name))
   }
 
-  private static mapComponentHeight(names: string[]): { name: string, getHeight: () => number }[] {
+  private static mapComponentHeight(names: (string | number)[]): { name: string, getHeight: () => number }[] {
     const ret: { name: string, getHeight: () => number }[] = []
     for (const e of names) {
-      const comp = components.findStatic(e)
-      if (comp === undefined) { continue }
-      ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+      if (typeof e === 'number') {
+        ret.push({ name: '__margin__', getHeight: () => e })
+      } else {
+        const comp = components.findStatic(e)
+        if (comp === undefined) { continue }
+        ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+      }
     }
     return ret
   }
