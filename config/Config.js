@@ -63,7 +63,7 @@ export default {
    * Used in nickname to login translation in commands. 0.15 is default value */
   nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.4.3",
+  version: "1.5.0",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }

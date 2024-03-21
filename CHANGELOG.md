@@ -1,7 +1,45 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
 
-## 1.4
+## 1.5.0
+**21/03/2024**
+* Removed DiscordJS dependency
++ Added Stunts mode support
++ Added Ultimania support for Stunts records
++ Added new TMX API support for records and map info
++ Added the ability to hide UI elements with the F7 key
++ Added Trakman mod to hide overlapping TMF UI elements
++ Added alias search to Commandlist #233
++ Added author search to TMXSearchWindow #238
++ Added map removal to Maplist for admins #237
++ Added switchable separators for author search
++ Added own Discord embeds to Logger
++ Added Dockerfile and Docker installation support
++ Added URL fixer to chat routing utilities
++ Added the ability to disable chat commands for muted players
++ Added text offset properties to static buttons
++ Added the ability to disable default messages individually
++ Added configurable defaults to chat commands
++ Added ability to configure margins in UI layouts
+- Fixed TMXSearchWindow crash on invalid TMX response
+- Fixed empty names in TMX UI windows due to multibyte characters
+- Fixed ServerInfo querying the database every second
+- Fixed records being visually duplicated in various UI components
+- Fixed the controller not being able to add 5000+ maps in one go to the database
+- Fixed cup scores erasing on skip/res in cup mode #234
+- Fixed misleading //shuffle description #235
+- Fixed Docker running as root #232
+- Fixed BannerWidget position and width when modifying othrr UI elements
+- Fixed wrong colouring in NextMapRecords widget due to not storing the player's time on the next map
+- Fixed crash on empty string when invoking strip util #240
+- Fixed wrong colouring in CheckpointRecords window
+- Fixed Logger crash on empty Discord webhook URL #241
+- Fixed controller allowing to remove the last map in the playlist #242
+- Fixed custom buttons not rendering on PlayerJoin event
+- Fixed all icon URLs
+- Fixed icons preload
+
+## 1.4.0
 **16/09/2023**
 + Added optimisations for UI display and hide
 + Added lighter UI for when there are too many players
@@ -31,7 +69,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed pagination in TMX search
 - Fixed various sent messages
 
-## 1.3 
+## 1.3.0
 **07/04/2023**
 * Removed mysterious checkpoint
 + Added manual chat routing features
@@ -57,7 +95,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed addrandom adding maps in a loop bug fix
 - Fixed chat repository crashing in case two messages were sent at the same exact time
 
-## 1.2
+## 1.2.0
 **02/03/2023**
 + Added UI for Rounds/Teams/Laps/Cup gamemodes
 + Added rerendering capabilitied to Server Info Window
@@ -77,7 +115,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed Dedimania not working on TMUF due to environment mismatch
 - Fixed various commands for Rounds/Teams/Laps/Cup gamemodes
 
-## 1.1
+## 1.1.0
 **01/01/2023**
 + Added the dynamic timer feature
 + Added the Server Info window
@@ -96,7 +134,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed the window pagination in specific cases
 - Fixed order of the maps added to the queue via //add
 
-## 1.0
+## 1.0.0
 **07/11/2022**
 * Removed the redundant welcome window
 * Removed UI utils (merged into UI)
@@ -115,7 +153,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed database crash on too long chat string
 - Fixed multibyte characters breaking manialinks
 
-## 0.6
+## 0.6.0
 **29/09/2022**
 * Removed JSON files and configs
 + Added player stats windows and related commands
@@ -142,7 +180,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed controller crash on stats update due to hardcoded limit
 - Fixed controller crash on double vote (perhaps)
 
-## 0.5
+## 0.5.0
 **04/09/2022**
 * Removed unnecessary things from source
 + Added actual plugin system
@@ -158,7 +196,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed chat commands being categorised in a silly way
 - Fixed recordlist crash on new map
 
-## 0.4
+## 0.4.0
 **10/08/2022**
 * Removed unused dependencies
 * Removed the sole broken test
@@ -183,7 +221,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed wins being incremented without player finish
 - Fixed various messages display
 
-## 0.3
+## 0.3.0
 **31/07/2022**
 + Added vote class
 + Added vote window
@@ -208,7 +246,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed record position string function being a scattered mess
 - Fixed Dedimania reconnection not working
 
-## 0.2
+## 0.2.0
 **28/07/2022**
 + Added PB messages
 + Added plain "X" to the welcome window, as the image might not load instantly
@@ -221,7 +259,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed local records crashing the server in certain circumstances
 - Fixed local records display when the record index is above the configured threshold
 
-## 0.1
+## 0.1.0
 **27/07/2022**
 - First "public" testing release
 - Working record storage & other databases
