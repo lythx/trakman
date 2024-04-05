@@ -5,6 +5,7 @@ import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import config from "../../config/Config.js"
 import { GameService } from './GameService.js'
+import { ManualMapLoading } from "../../plugins/manual_maps/ManualMapLoading.js";
 
 interface JukeboxMap {
   readonly map: tm.Map
@@ -22,7 +23,7 @@ export class MapService {
   private static readonly repo = new MapRepository()
   private static readonly _queue: JukeboxMap[] = []
   private static readonly _history: tm.Map[] = []
-  /** Amout of maps in the queue. */
+  /** Amount of maps in the queue. */
   static readonly queueSize: number = config.jukeboxQueueSize
   /** Max amount of maps in the history. */
   static readonly historySize: number = config.jukeboxHistorySize
@@ -31,17 +32,21 @@ export class MapService {
    * Creates maplist, sets current map and adds a proxy for Match Settings update
    */
   static async initialize(): Promise<void> {
+    await this.repo.enableClient()
     await this.createList()
     await this.setCurrent()
     this.fillQueue()
-    void this.updateNextMap()
-    // Recreate list when Match Settings get changed
-    Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
-      this._maps.length = 0
-      await this.createList()
-      this.clearJukebox()
-      Events.emit('MatchSettingsUpdated', this._maps)
-    })
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    //await this.updateNextMap()
+    // Recreate list when Match Settings get changed only with non-dynamic map loading
+    if (!config.manualMapLoadingEnabled) {
+      Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
+        this._maps.length = 0
+        await this.createList()
+        this.clearJukebox()
+        Events.emit('MatchSettingsUpdated', this._maps)
+      })
+    }
   }
 
   /**
@@ -53,7 +58,16 @@ export class MapService {
       Logger.fatal('Error while getting the current map', current.message)
       return
     }
-    const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+    if (config.manualMapLoadingEnabled) {
+      const list = await this.repo.getAll()
+      if (list.findIndex(a => a.id === current.UId) === -1) {
+        const v = await this.repo.getVoteCountAndRatio(current.UId)
+        this._maps.push({ ...this.constructNewMapObject(current), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 })
+      }
+      this._maps.push(...list)
+    }
+    const mapList: any[] | Error = config.manualMapLoadingEnabled ? await ManualMapLoading.parseMaps() : await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+    //const mapList: any[] | Error = []
     if (mapList instanceof Error) {
       Logger.fatal('Error while getting the map list', mapList.message)
       return
@@ -62,7 +76,8 @@ export class MapService {
     if (!mapList.some(a => a.UId === current.UId)) {
       mapList.unshift(current)
       const insert: any | Error = await Client.call('InsertChallenge', [{ string: current.FileName }])
-      if (insert instanceof Error) { await Logger.fatal('Failed to insert current challenge') }
+      if (insert instanceof Error && !insert.message.includes("already added."))
+        await Logger.fatal('Failed to insert current challenge', insert)
     }
     const DBMapList: tm.Map[] = (await this.repo.getAll())
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
@@ -71,15 +86,17 @@ export class MapService {
     }
     const mapsNotInDBObjects: tm.Map[] = []
     // Fetch info and add all maps which were not present in the database
-    const voteRatios = await this.repo.getVoteCountAndRatio(mapsNotInDB.map(a => a.UId))
+    //const voteRatios = await this.repo.getVoteCountAndRatio(mapsNotInDB.map(a => a.UId))
+    //const voteRatios: {uid: string, ratio: number, count: number}[] = mapsNotInDB.map(a => ({uid: a.UId, ratio: 0, count: 0}))
     for (const c of mapsNotInDB) {
-      const res: any | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
-      if (res instanceof Error) {
-        Logger.fatal(`Unable to retrieve map info for map id: ${c.UId}, filename: ${c.FileName}`, res.message)
-        return
-      }
-      const v = voteRatios.find(a => a.uid === c.UId)
-      mapsNotInDBObjects.push(({ ...this.constructNewMapObject(res), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
+      //const res: any | Error = await Client.call('GetChallengeInfo', [{ string: c.FileName }])
+      //if (res instanceof Error) {
+        //Logger.error(`Unable to retrieve map info for map id: ${c.UId}, filename: ${c.FileName}`, res.message)
+        //return
+      //}
+      //const v = voteRatios.find(a => a.uid === c.UId)
+      //mapsNotInDBObjects.push(({ ...this.constructNewMapObject(c), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
+      mapsNotInDBObjects.push(({ ...this.constructNewMapObject(c), voteCount: 0, voteRatio: 0 }))
     }
     const mapsInMapList: tm.Map[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
@@ -94,7 +111,7 @@ export class MapService {
     const splitby = 2000
     const len = Math.ceil(mapsNotInDBObjects.length / splitby)
     for (let i= 0; i < len; i++) {
-      void this.repo.add(...mapsNotInDBObjects.slice(i*splitby, (i+1)*splitby))
+      await this.repo.add(...mapsNotInDBObjects.slice(i*splitby, (i+1)*splitby))
     }
   }
 
@@ -102,10 +119,16 @@ export class MapService {
    * Updates map list based on the current Match Settings
    */
   static async updateList(): Promise<void> {
-    const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
-    if (mapList instanceof Error) {
-      Logger.error('Error while getting the map list', mapList.message)
-      return
+    let mapList: any[]
+    if (config.manualMapLoadingEnabled) {
+      mapList = await ManualMapLoading.parseMaps()
+    } else {
+      const maps: any[] | Error = await Client.call('GetChallengeList', [{int: 5000}, {int: 0}])
+      if (maps instanceof Error) {
+        Logger.error('Error while getting the map list', maps.message)
+        return
+      }
+      mapList = maps
     }
     const addedMaps = []
     for (let i = 0; i < mapList.length; i++) {
@@ -136,13 +159,18 @@ export class MapService {
       if (dbEntry !== undefined) { // If map is present in the database use the database info
         obj = { ...dbEntry }
       } else { // Otherwise fetch the info from server and save it in the database
-        const res: any | Error = await Client.call('GetChallengeInfo', [{ string: e.FileName }])
-        if (res instanceof Error) {
-          Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
-          continue
+        let map
+        if (config.manualMapLoadingEnabled) map = e
+        else {
+          const res: any | Error = await Client.call('GetChallengeInfo', [{string: e.FileName}])
+          if (res instanceof Error) {
+            Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
+            continue
+          }
+          map = res
         }
-        const voteRatios = await this.repo.getVoteCountAndRatio(res.UId)
-        const serverData = this.constructNewMapObject(res)
+        const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
+        const serverData = this.constructNewMapObject(map)
         obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
         void this.repo.add(obj)
       }
@@ -151,8 +179,9 @@ export class MapService {
     }
     void this.repo.remove(...removedMaps.map(a => a.id))
     for (const e of removedMaps) {
-      this.removeFromQueue(e.id)
+      await this.removeFromQueue(e.id)
     }
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     for (const e of addedMapObjects) {
       Events.emit('MapAdded', e)
     }
@@ -174,13 +203,13 @@ export class MapService {
     const mapInfo: Partial<{ -readonly [K in keyof tm.CurrentMap]: tm.CurrentMap[K] }> | undefined =
       this._maps.find(a => a.id === res.UId)
     if (mapInfo === undefined) {
-      Logger.error('Failed to get map info from memory')
+      Logger.error('Failed to get map info from memory, trying again... ', _try, '/3')
       await this.add(res.FileName, undefined, true)
       if (_try > 3) {
         await Logger.fatal('Failed to get map info from memory')
         return
       }
-      await this.setCurrent(_try++)
+      await this.setCurrent(_try+1)
       return
     }
     // Set checkpointAmount and lapsAmount in runtime memory and database 
@@ -239,16 +268,28 @@ export class MapService {
    * @returns Added map object or error if unsuccessful
    */
   static async add(filename: string, caller?: { login: string, nickname: string }, dontJuke: boolean = false): Promise<tm.Map | Error> {
-    const insert: any | Error = await Client.call('InsertChallenge', [{ string: filename }])
-    if (insert instanceof Error) { return insert }
-    if (insert === false) { return new Error(`Failed to insert map ${filename}`) }
+    if (!config.manualMapLoadingEnabled) {
+      const insert: any | Error = await Client.call('InsertChallenge', [{string: filename}])
+      if (insert instanceof Error) return insert
+      if (insert === false) return new Error(`Failed to insert map ${filename}`)
+    }
     const dbEntry: tm.Map | undefined = await this.repo.getByFilename(filename)
     let obj: tm.Map
     if (dbEntry !== undefined) { // If map is present in the database use the database info
       obj = { ...dbEntry }
     } else { // Otherwise fetch the info from server and save it in the database
-      const res: any | Error = await Client.call('GetChallengeInfo', [{ string: filename }])
-      if (res instanceof Error) { return res }
+      let res
+      if (config.manualMapLoadingEnabled) {
+        const map = await ManualMapLoading.parseMap(filename)
+        if (map.UId == undefined) return Error('Could not parse map with filename ' + filename)
+        res = map
+      } else {
+        const map: any | Error = await Client.call('GetChallengeInfo', [{string: filename}])
+        if (map instanceof Error) {
+          return map
+        }
+        res = map
+      }
       const voteRatios = await this.repo.getVoteCountAndRatio(res.UId)
       const serverData = this.constructNewMapObject(res)
       obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
@@ -303,7 +344,8 @@ export class MapService {
         let i: number = 0
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
-            const id: string = content.substring(i + 12, i + 12 + 27)
+            const id = content.match(/<ident uid=".*?"/gm)?.[0].slice(12, -1)
+            if (id === undefined) return new Error(`Map ${fileName} has no uid`)
             const map: tm.Map | undefined = this._maps.find(a => a.id === id)
             if (map === undefined) {
               return new Error(`Failed to queue map ${fileName}`)
@@ -331,9 +373,15 @@ export class MapService {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
     await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }]) // I HAVE NO CLUE HOW IT WORKS WITH THIS
     if (map === undefined) { return false }
-    const remove: any | Error = await Client.call('RemoveChallenge', [{ string: map.fileName }])
-    if (remove instanceof Error) { return remove }
-    if (remove === false) { return new Error(`Failed to remove map ${map.name} by ${map.author}`) }
+    if (!config.manualMapLoadingEnabled) {
+      const remove: any | Error = await Client.call('RemoveChallenge', [{string: map.fileName}])
+      if (remove instanceof Error) {
+        return remove
+      }
+      if (remove === false) {
+        return new Error(`Failed to remove map ${map.name} by ${map.author}`)
+      }
+    }
     this._maps = this._maps.filter(a => a.id !== id)
     void this.repo.remove(id)
     if (caller !== undefined) {
@@ -342,7 +390,7 @@ export class MapService {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
-    this.removeFromQueue(id, caller, false)
+    await this.removeFromQueue(id, caller, false)
     return true
   }
 
@@ -350,6 +398,7 @@ export class MapService {
    * Puts current map into history array, changes current map and updates the queue
    */
   static async update(): Promise<void> {
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.nextMap(this._current, this._queue.map(a => a.map))
     this._history.unshift(this._current)
     this._history.length = Math.min(this.historySize, this._history.length)
     await this.setCurrent()
@@ -416,6 +465,7 @@ export class MapService {
     const qi = this._queue.findIndex(a => !a.isForced)
     const index: number = setAsNextMap === true ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
@@ -505,6 +555,7 @@ export class MapService {
         this._history.some(a => a.id === current.id) || current.id === this._current.id) && i < lgt)
       this._queue.push({ map: current, isForced: false })
     }
+   // if (config.manualMapLoadingEnabled) ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
   }
 
   private static getLapsAndCheckpointsAmount(checkpointsPerLap: number, defaultLapAmount: number,
@@ -556,7 +607,7 @@ export class MapService {
       goldTime: info.GoldTime,
       authorTime: info.AuthorTime,
       copperPrice: info.CopperPrice,
-      isLapRace: info.LapRace,
+      isLapRace: info.LapRace === undefined ? info.NbLaps > 0 : info.LapRace,
       defaultLapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
       checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date(),

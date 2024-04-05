@@ -1,6 +1,9 @@
 import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
 import { Logger } from '../Logger.js'
+import { Readable } from 'stream'
+import { CopyStreamQuery } from "pg-copy-streams"
+import { pipeline } from "stream/promises"
 
 interface TableEntry {
   readonly uid: string
@@ -45,6 +48,10 @@ const mapIdsRepo = new MapIdsRepository()
 
 export class MapRepository extends Repository {
 
+  async enableClient(): Promise<void> {
+    await this.db.enableClient()
+  }
+
   async add(...maps: tm.Map[]): Promise<void> {
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     const arr = maps.filter(a => ids.some(b => b.uid === a.id))
@@ -53,17 +60,29 @@ export class MapRepository extends Repository {
         .filter(a => !ids.some(b => b.uid === a.id)).join(', ')} while inserting into maps table`)
     }
     if (arr.length === 0) { return }
-    const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
-      bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)} ON CONFLICT DO NOTHING`
-    const values: any[] = []
+
+    const values: string[] = []
     for (const [i, map] of arr.entries()) {
-      values.push(ids[i].id, map.name,
+      if (map.author === "k1ng0d") {
+        console.log("burh")
+      }
+      values.push(([ids[i].id, map.name,
         map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
-        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate,
-        map.leaderboardRating, map.awards)
+        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
+        map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().replaceAll("\t", " ").replaceAll('\\', '')).join('\t'))
     }
-    await this.query(query, ...values)
+    const bulk = values.join('\n')
+    const stream: CopyStreamQuery = await this.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
+    const src = new Readable()
+    src.readable = true
+
+    src.push(bulk)
+    src.push(null)
+
+    Logger.info("pushing to db")
+    //console.log(bulk)
+    await pipeline(src, stream)
+    Logger.info("pushed")
   }
 
   async getAll(): Promise<tm.Map[]> {

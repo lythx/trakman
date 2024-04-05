@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
+import {CopyStreamQuery, from} from 'pg-copy-streams'
 import { createQueries } from './CreateQueries.js'
 import { Logger } from '../Logger.js'
 
@@ -45,6 +46,11 @@ export class Database {
     return await this.client.query(q, params).catch((err: Error) => {
       throw Error(`Database error on query ${q}: ${err.message}`)
     })
+  }
+
+  async stream(q: string) {
+    //await this.enableClient() // it doesn't work without this
+    return this.client.query(from(`COPY ${q} FROM STDIN;`))
   }
 
 }

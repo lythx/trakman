@@ -17,6 +17,7 @@ import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 import { RoundsService } from './services/RoundsService.js'
+import {CopyStreamQuery} from "pg-copy-streams";
 
 const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
