@@ -83,7 +83,7 @@ export default class MapWidgetResult extends StaticComponent {
       [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
       [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
-      [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
+      config.displayEnvironment ? [map.environment, ic.environment] : [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
     ]
     const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {

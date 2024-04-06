@@ -35,8 +35,10 @@ export default {
     icons.chartLocal, // PB position icon
     icons.karmaPulse, // Local karma icon
     icons.trashcanDelete, // Remove map icon
-    icons.trashcanDeleteHover // Remove map icon
+    icons.trashcanDeleteHover, // Remove map icon
+    icons.carExplode // Environment
   ],
+  displayEnvironment: false, // Display environment instead of karma
   iconWidth: 2,
   queueWidth: 5.2,
   queueNumberWidth: 2.9,

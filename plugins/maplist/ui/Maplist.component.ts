@@ -269,10 +269,10 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <frame posn="${config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}"
-             image="${config.icons[5]}"/>
+             image="${config.icons[config.displayEnvironment ? 8 : 5]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
+              ${centeredText(config.displayEnvironment ? (maps[index].environment === 'Stadium' ? 'Stad' : maps[index].environment) : maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
             rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
