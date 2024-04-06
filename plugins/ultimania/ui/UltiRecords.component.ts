@@ -4,7 +4,7 @@
  */
 
 import { ultimania } from "../Ultimania.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, GridCellFunction, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, type GridCellFunction, PopupWindow } from '../../ui/UI.js'
 import config from './UltiRecords.config.js'
 
 export default class UltiRecords extends PopupWindow {

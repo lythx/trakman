@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent, type RLImage } from '../../UI.js'
 import config from './RoundsPointsRanking.config.js'
 
 export default class RoundsPointsRanking extends StaticComponent {

@@ -1,6 +1,6 @@
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
 import pluginConfig from '../Config.js'
-import { Song } from '../Types.js'
+import type { Song } from '../Types.js'
 import config from './SongList.config.js'
 
 type SearchTarget = 'name' | 'author'

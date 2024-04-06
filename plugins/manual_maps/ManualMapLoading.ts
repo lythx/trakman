@@ -10,12 +10,12 @@ export class ManualMapLoading {
 
   static async parseMaps(dirname: string = config.mapsDirectory) {
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
-    if (filesOrDirs.length > 5000) Logger.warn('Trying to parse a large amount of maps (', filesOrDirs.length,
-      '), reading their info might take a while.')
+    if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
     let maps: tm.ServerMap[] = []
     let i = 0
     for (const f of filesOrDirs) {
-      if (++i > 20000) break
+      if (++i > 130000) break
+      if (i <= 119996) continue
       if (f.isDirectory()) {
         maps.push(...(await this.parseMaps(dirname + f.name)))
         continue
@@ -23,6 +23,7 @@ export class ManualMapLoading {
       const map = await this.parseMap(dirname + '/' + f.name)
       if (map.UId != undefined && !maps.map(a => a.UId).includes(map.UId)) maps.push(map)
     }
+    Logger.trace("Parsed maps")
     return maps
   }
 
@@ -91,7 +92,7 @@ export class ManualMapLoading {
       Logger.error('Could not load new match settings')
       return
     }
-    Logger.info("Updated MatchSettings, starting at ", startAt)
+    Logger.info("Updated MatchSettings, starting at " + startAt)
     this.mapIndex = startAt
   }
 

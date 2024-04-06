@@ -1,4 +1,4 @@
-import { ButtonData } from "./ButtonData.js"
+import { type ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import { componentIds } from '../../../UI.js'

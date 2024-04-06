@@ -3,7 +3,7 @@
  * @since 1.3.3
  */
 
-import { componentIds, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Grid, type GridCellFunction, centeredText, closeButton, leftAlignedText, type GridCellObject, PopupWindow } from '../../ui/UI.js'
 import config from './TMXDetailsWindow.config.js'
 import { tmx } from '../../tmx/Tmx.js'
 

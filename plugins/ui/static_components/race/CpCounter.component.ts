@@ -3,9 +3,9 @@
  * @since 0.4
  */
 
-import { componentIds, StaticHeader, centeredText, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import config from './CpCounter.config.js'
-import { dedimania, DediRecord } from '../../../dedimania/Dedimania.js'
+import { dedimania, type DediRecord } from '../../../dedimania/Dedimania.js'
 
 interface CheckpointData {
   index: number,

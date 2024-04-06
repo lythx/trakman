@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
+import type { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 import countries from './Countries.js'
 
@@ -441,4 +441,4 @@ export const maniakarma = {
 
 }
 
-export { MKMapVotes, MKVote }
+export type { MKMapVotes, MKVote }

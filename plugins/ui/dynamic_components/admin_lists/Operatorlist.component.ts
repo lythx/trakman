@@ -3,7 +3,7 @@
  * @since 1.3.5
  */
 
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Operatorlist.config.js'
 import { actions } from '../../../actions/Actions.js'
 

@@ -1,6 +1,6 @@
 import config from './ServerLinks.config.js'
-import { StaticComponent, StaticHeader, StaticHeaderOptions, componentIds, Grid, GridCellFunction, centeredText, leftAlignedText, Paginator } from '../../ui/UI.js'
-import { ServerInfo } from '../ServerLinks.js'
+import { StaticComponent, StaticHeader, type StaticHeaderOptions, componentIds, Grid, type GridCellFunction, centeredText, leftAlignedText, Paginator } from '../../ui/UI.js'
+import type { ServerInfo } from '../ServerLinks.js'
 
 export default class ServerLinks extends StaticComponent {
 

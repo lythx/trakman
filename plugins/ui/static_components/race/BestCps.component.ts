@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import config from './BestCps.config.js'
 
 export default class BestCps extends StaticComponent {

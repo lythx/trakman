@@ -457,5 +457,8 @@ export const actions = {
       map: tm.utils.strip(map.name, true)
     }), config.removeMap.public ? undefined : login)
     void tm.maps.remove(map.id, { login, nickname })
+  },
+  updateMaps: async (): Promise<void> => {
+    await tm.maps.updateMaps()
   }
 }

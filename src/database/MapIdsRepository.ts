@@ -25,6 +25,20 @@ export class MapIdsRepository extends Repository {
     return isArr ? res : res[0]?.id
   }
 
+  async splitGet(mapUids: string[] | string) {
+    if (typeof mapUids === 'string') {
+      mapUids = [mapUids]
+    } else if (mapUids.length === 0) { return [] }
+    // Add maps, not more than 2000 at a time to not crash
+    const splitby = 2000
+    const len = Math.ceil(mapUids.length / splitby)
+    const ret = []
+    for (let i= 0; i < len; i++) {
+      ret.push(...await this.get(mapUids.slice(i*splitby, (i+1)*splitby)))
+    }
+    return ret
+  }
+
   async addAndGet(mapUid: string): Promise<number>
   async addAndGet(mapUids: string[]): Promise<{ uid: string, id: number }[]>
   async addAndGet(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number> {

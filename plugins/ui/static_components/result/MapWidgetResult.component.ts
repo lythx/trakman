@@ -3,10 +3,10 @@
  * @since 0.4
  */
 
-import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import { webservices, WebservicesInfo } from '../../../webservices/Webservices.js'
+import { webservices, type WebservicesInfo } from '../../../webservices/Webservices.js'
 import config from './MapWidgetResult.config.js'
 
 export default class MapWidgetResult extends StaticComponent {

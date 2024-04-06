@@ -3,7 +3,7 @@
  * @since 1.3.3
  */
 
-import { Grid, componentIds, GridCellFunction, GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
+import { Grid, componentIds, type GridCellFunction, type GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
 import { titles } from '../../../config/Titles.js'
 import { stats } from '../../stats/Stats.js'
 import config from './PlayerStats.config.js'

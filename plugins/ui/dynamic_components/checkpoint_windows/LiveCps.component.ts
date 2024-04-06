@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../../UI.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, type GridCellFunction, PopupWindow } from '../../UI.js'
 import config from './LiveCps.config.js'
 
 export default class LiveCps extends PopupWindow {

@@ -8,7 +8,7 @@ export default {
    * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
    * Enabling it makes the chat a bit slower, as all input has to go through the controller first.
    */
-  manualChatRoutingEnabled: true,
+  manualChatRoutingEnabled: false,
   /** Local records limit for rank calculation and plugins */
   localRecordsLimit: 30,
   /** Amount of chat messages stored in runtime memory */
@@ -37,6 +37,7 @@ export default {
     forceSpectator: 1,
     addMap: 1,
     removeMap: 1,
+    updateMaps: 2
   },
   /** Whether the maplist gets reloaded on Match Settings updates.
    *  Enable this if you use external tools to modify the Match Settings */

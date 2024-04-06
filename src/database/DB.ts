@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
-import {CopyStreamQuery, from} from 'pg-copy-streams'
+import { type CopyStreamQuery, from} from 'pg-copy-streams'
 import { createQueries } from './CreateQueries.js'
 import { Logger } from '../Logger.js'
 

@@ -3,8 +3,8 @@
  * @since 0.1
  */
 
-import { dedimania, DediRecord } from '../../dedimania/Dedimania.js'
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../../ui/UI.js'
+import { dedimania, type DediRecord } from '../../dedimania/Dedimania.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, type GridCellFunction, PopupWindow } from '../../ui/UI.js'
 import config from './DediSectors.config.js'
 
 export default class DediSectors extends PopupWindow {

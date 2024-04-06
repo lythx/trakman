@@ -3,7 +3,7 @@
  * @since 1.1
  */
 
-import { Grid, componentIds, GridCellFunction, GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
+import { Grid, componentIds, type GridCellFunction, type GridCellObject, centeredText, closeButton, PopupWindow } from '../UI.js'
 import config from './ServerInfo.config.js'
 import { arch, cpus, loadavg, totalmem, freemem, platform } from 'node:os'
 import { uptime, version, memoryUsage } from 'node:process'

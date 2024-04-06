@@ -2,7 +2,7 @@ import { Repository } from './Repository.js'
 import { MapIdsRepository } from './MapIdsRepository.js'
 import { Logger } from '../Logger.js'
 import { Readable } from 'stream'
-import { CopyStreamQuery } from "pg-copy-streams"
+import { type CopyStreamQuery } from "pg-copy-streams"
 import { pipeline } from "stream/promises"
 
 interface TableEntry {
@@ -50,6 +50,15 @@ export class MapRepository extends Repository {
 
   async enableClient(): Promise<void> {
     await this.db.enableClient()
+  }
+
+  async splitAdd(...maps: tm.Map[]): Promise<void> {
+    // Add maps, not more than 2000 at a time to not crash
+    const splitby = 2000
+    const len = Math.ceil(maps.length / splitby)
+    for (let i= 0; i < len; i++) {
+      await this.add(...maps.slice(i*splitby, (i+1)*splitby))
+    }
   }
 
   async add(...maps: tm.Map[]): Promise<void> {

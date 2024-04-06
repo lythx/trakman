@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'

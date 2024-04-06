@@ -2,6 +2,11 @@ const p = tm.utils.palette
 const priv = tm.admin.privileges
 
 export default {
+  updatemaps: {
+    privilege: 0,
+    aliases: ['updatemaps'],
+    help: `Nah bruh`
+  },
   kick: {
     privilege: priv.kick,
     aliases: ['k', 'kick'],

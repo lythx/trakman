@@ -4,7 +4,7 @@
  */
 
 import { actions } from '../../../actions/Actions.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Banlist.config.js'
 
 export default class Banlist extends PopupWindow<number> {

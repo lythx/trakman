@@ -3,7 +3,7 @@
  * @since 0.3
  */
 
-import { Grid, componentIds, GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
+import { Grid, componentIds, type GridCellFunction, centeredText, closeButton, PopupWindow, Paginator } from '../UI.js'
 import config from './Changelog.config.js'
 import fs from 'fs/promises'
 

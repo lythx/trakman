@@ -23,9 +23,10 @@ tm.addListener('Startup', (): void => {
   nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
   const maps: Readonly<tm.Map>[] = tm.maps.list
   karmaSort.push(...[...authorSort].sort((a, b): number => {
-    const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
-    const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
-    return bKarma - aKarma
+    return a.voteRatio ?? 0 - b.voteRatio ?? 0
+//    const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
+  //  const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
+    //return bKarma - aKarma
   }))
   worstKarmaSort.push(...[...karmaSort].reverse())
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))

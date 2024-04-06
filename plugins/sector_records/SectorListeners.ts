@@ -1,4 +1,4 @@
-import { BestSectors, PlayerSectors } from './SectorTypes.js'
+import type { BestSectors, PlayerSectors } from './SectorTypes.js'
 import { bestSecsDB, allSecsDB } from './SectorDB.js'
 import { emitEvent } from './SectorEvents.js'
 import config from './Config.js'
@@ -13,12 +13,13 @@ const onMapStart = async (): Promise<void> => {
     await tm.log.fatal(`Failed to fetch current map (${tm.maps.current.id}) id from database`)
     return
   }
-  currentMapDBId = DBId
+  currentMapDBId = DBId?.[0].id
   const res = await bestSecsDB.get(currentMapDBId)
   if (res instanceof Error) {
     await tm.log.fatal(`Failed to fetch best sectors for map ${tm.maps.current.id}`, res.message)
     return
   }
+  if (res === undefined) return
   currentBestSecs = res
   const playerSecs = await allSecsDB.get(currentMapDBId, ...tm.players.list.map(a => a.login))
   if (playerSecs instanceof Error) {
@@ -61,7 +62,7 @@ if (config.isEnabled) {
     if (changedObjects.length !== 0) {
       emitEvent('NicknameUpdated', changedObjects)
     }
-  }, true)
+  })
 
   tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
     const date = new Date()

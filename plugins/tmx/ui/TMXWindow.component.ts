@@ -3,7 +3,7 @@
  * @since 0.5
  */
 
-import { componentIds, Paginator, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Paginator, Grid, type GridCellFunction, centeredText, closeButton, leftAlignedText, type GridCellObject, PopupWindow } from '../../ui/UI.js'
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
 

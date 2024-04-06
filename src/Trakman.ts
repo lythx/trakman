@@ -17,7 +17,6 @@ import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 import { RoundsService } from './services/RoundsService.js'
-import {CopyStreamQuery} from "pg-copy-streams";
 
 const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
@@ -30,7 +29,7 @@ namespace trakman {
 
   export const db = {
 
-    getMapId: mapIdsRepo.get.bind(mapIdsRepo),
+    getMapId: mapIdsRepo.splitGet.bind(mapIdsRepo),
 
     getPlayerId: playersRepo.getId.bind(playersRepo),
 
@@ -307,6 +306,8 @@ namespace trakman {
     remove: MapService.remove.bind(MapService),
 
     writeFileAndAdd: MapService.writeFileAndAdd.bind(MapService),
+
+    updateMaps: MapService.updateList.bind(MapService),
 
     /**
      * All maps from current playlist.

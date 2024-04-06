@@ -1,4 +1,4 @@
-import { Grid, GridCellFunction, GridCellObject } from './Grid.js'
+import { Grid, type GridCellFunction, type GridCellObject } from './Grid.js'
 import { centeredText, leftAlignedText } from './TextUtils.js'
 import config from './List.config.js'
 

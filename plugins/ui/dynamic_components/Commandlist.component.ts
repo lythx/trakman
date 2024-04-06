@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, GridCellFunction, addManialinkListener, PopupWindow } from "../UI.js"
+import { Paginator, Grid, centeredText, componentIds, closeButton, Navbar, type GridCellFunction, addManialinkListener, PopupWindow } from "../UI.js"
 import config from './Commandlist.config.js'
 
 interface DisplayParams {

@@ -3,8 +3,8 @@
  * @since 0.1
  */
 
-import { centeredText, Grid, GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
-import { maniakarma, MKMapVotes } from '../../../maniakarma/Maniakarma.js'
+import { centeredText, Grid, type GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
+import { maniakarma, type MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidget.config.js'
 import { actions } from '../../../actions/Actions.js'
 

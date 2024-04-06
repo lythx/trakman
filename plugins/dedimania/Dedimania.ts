@@ -1,6 +1,6 @@
 import { DedimaniaClient } from './DedimaniaClient.js'
 import config from './Config.js'
-import { DediLeaderboard, DediRecord, NewDediRecord } from './DedimaniaTypes.js'
+import type { DediLeaderboard, DediRecord, NewDediRecord } from './DedimaniaTypes.js'
 import './ui/DediCps.component.js'
 import './ui/DediSectors.component.js'
 
@@ -160,7 +160,7 @@ const getRecords = async (id: string, name: string, environment: string, author:
     checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
     isLapRecord: uploadLaps
   }))
-  if (config.syncName) {
+  if (config.syncName && currentDedis.length > 0) {
     void tm.updatePlayerInfo(...currentDedis)
   }
   emitFetchEvent(currentDedis)
@@ -567,4 +567,4 @@ export const dedimania = {
 
 }
 
-export { NewDediRecord, DediRecord }
+export type { NewDediRecord, DediRecord }

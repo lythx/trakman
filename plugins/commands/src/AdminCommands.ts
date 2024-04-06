@@ -3,6 +3,13 @@ import { actions } from '../../actions/Actions.js'
 
 const commands: tm.Command[] = [
   {
+    aliases: config.updatemaps.aliases,
+    help: config.updatemaps.help,
+    params: [],
+    callback: actions.updateMaps,
+    privilege: config.updatemaps.privilege
+  },
+  {
     aliases: config.kick.aliases,
     help: config.kick.help,
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
