@@ -30,8 +30,7 @@ export class Database {
   }
 
   async enableClient(): Promise<void> {
-    const client: postgres.PoolClient = await Database.pool.connect()
-    this.client = client
+    this.client = await Database.pool.connect()
   }
 
   /**
@@ -48,8 +47,7 @@ export class Database {
     })
   }
 
-  async stream(q: string) {
-    //await this.enableClient() // it doesn't work without this
+  stream(q: string): CopyStreamQuery {
     return this.client.query(from(`COPY ${q} FROM STDIN;`))
   }
 

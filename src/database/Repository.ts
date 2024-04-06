@@ -8,10 +8,6 @@ export abstract class Repository {
     return (await (this.db.query(q, ...params))).rows
   }
 
-  async stream(q: string) {
-    return await this.db.stream(q)
-  }
-
   protected getInsertValuesString(columns: number, rows: number = 1): `VALUES ${string}` {
     let ret: `VALUES ${string}` = `VALUES `
     let index: number = 1

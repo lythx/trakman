@@ -52,13 +52,15 @@ export class MapRepository extends Repository {
     await this.db.enableClient()
   }
 
-  async splitAdd(...maps: tm.Map[]): Promise<void> {
+  async splitAdd(maps: tm.Map[]): Promise<void> {
     // Add maps, not more than 2000 at a time to not crash
     const splitby = 2000
     const len = Math.ceil(maps.length / splitby)
+    Logger.info("pushing to db")
     for (let i= 0; i < len; i++) {
       await this.add(...maps.slice(i*splitby, (i+1)*splitby))
     }
+    Logger.info("pushed")
   }
 
   async add(...maps: tm.Map[]): Promise<void> {
@@ -72,26 +74,20 @@ export class MapRepository extends Repository {
 
     const values: string[] = []
     for (const [i, map] of arr.entries()) {
-      if (map.author === "k1ng0d") {
-        console.log("burh")
-      }
       values.push(([ids[i].id, map.name,
         map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
         map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
         map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().replaceAll("\t", " ").replaceAll('\\', '')).join('\t'))
     }
     const bulk = values.join('\n')
-    const stream: CopyStreamQuery = await this.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
+    const stream: CopyStreamQuery = this.db.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
     const src = new Readable()
     src.readable = true
 
     src.push(bulk)
     src.push(null)
 
-    Logger.info("pushing to db")
-    //console.log(bulk)
     await pipeline(src, stream)
-    Logger.info("pushed")
   }
 
   async getAll(): Promise<tm.Map[]> {

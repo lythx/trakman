@@ -17,13 +17,12 @@ export class ManualMapLoading {
       if (++i > 130000) break
       if (i <= 119996) continue
       if (f.isDirectory()) {
-        maps.push(...(await this.parseMaps(dirname + f.name)))
+        (await this.parseMaps(dirname + f.name)).forEach(a => maps.push(a))
         continue
       }
       const map = await this.parseMap(dirname + '/' + f.name)
       if (map.UId != undefined && !maps.map(a => a.UId).includes(map.UId)) maps.push(map)
     }
-    Logger.trace("Parsed maps")
     return maps
   }
 

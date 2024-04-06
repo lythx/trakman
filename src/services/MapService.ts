@@ -106,7 +106,7 @@ export class MapService {
     }
     // Shuffle maps array
     this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
-    await this.repo.splitAdd(...mapsNotInDBObjects)
+    await this.repo.splitAdd(mapsNotInDBObjects)
   }
 
   /**
@@ -116,6 +116,7 @@ export class MapService {
     let mapList: any[]
     if (config.manualMapLoadingEnabled) {
       mapList = await ManualMapLoading.parseMaps()
+      Logger.trace("Parsed maps")
     } else {
       const maps: any[] | Error = await Client.call('GetChallengeList', [{int: 5000}, {int: 0}])
       if (maps instanceof Error) {
@@ -181,7 +182,7 @@ export class MapService {
       this._maps.push(obj)
       addedMapObjects.push(obj)
     }
-    await this.repo.splitAdd(...addedMapObjects)
+    await this.repo.splitAdd(addedMapObjects)
     //void this.repo.remove(...removedMaps.map(a => a.id))
     //for (const e of removedMaps) {
     //  await this.remove(e.id)
@@ -561,7 +562,6 @@ export class MapService {
         this._history.some(a => a.id === current.id) || current.id === this._current.id) && i < lgt)
       this._queue.push({ map: current, isForced: false })
     }
-   // if (config.manualMapLoadingEnabled) ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
   }
 
   private static getLapsAndCheckpointsAmount(checkpointsPerLap: number, defaultLapAmount: number,

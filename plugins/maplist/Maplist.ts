@@ -1,14 +1,14 @@
 import config from './Config.js'
 import './ui/Maplist.component.js'
 
-const authorSort: tm.Map[] = []
-const nameSort: tm.Map[] = []
-const karmaSort: tm.Map[] = []
-const worstKarmaSort: tm.Map[] = []
-const atSort: tm.Map[] = []
-const worstAtSort: tm.Map[] = []
-const newestSort: tm.Map[] = []
-const oldestSort: tm.Map[] = []
+let authorSort: tm.Map[] = []
+let nameSort: tm.Map[] = []
+let karmaSort: tm.Map[] = []
+let worstKarmaSort: tm.Map[] = []
+let atSort: tm.Map[] = []
+let worstAtSort: tm.Map[] = []
+let newestSort: tm.Map[] = []
+let oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
 let cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
@@ -19,20 +19,25 @@ const jukeboxUpdateListeners: ((jukebox: readonly Readonly<tm.Map>[]) => void)[]
 
 tm.addListener('Startup', (): void => {
   const arr: tm.Map[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
-  authorSort.push(...arr.sort((a, b): number => a.author.localeCompare(b.author)))
-  nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
+  //authorSort.push(...arr.sort((a, b): number => a.author.localeCompare(b.author)))
+  authorSort = arr.sort((a, b): number => a.author.localeCompare(b.author))
+  //nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
+  nameSort = [...authorSort].sort((a, b): number => a.name.localeCompare(b.name))
   const maps: Readonly<tm.Map>[] = tm.maps.list
-  karmaSort.push(...[...authorSort].sort((a, b): number => {
+  //karmaSort.push(...[...authorSort].sort((a, b): number => {
+  karmaSort = [...authorSort].sort((a, b): number => {
     return a.voteRatio ?? 0 - b.voteRatio ?? 0
-//    const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
-  //  const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
-    //return bKarma - aKarma
-  }))
-  worstKarmaSort.push(...[...karmaSort].reverse())
+  })
+  /*worstKarmaSort.push(...[...karmaSort].reverse())
   atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
   worstAtSort.push(...[...atSort].reverse())
   oldestSort.push(...[...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime()))
-  newestSort.push(...[...oldestSort].reverse())
+  newestSort.push(...[...oldestSort].reverse())*/
+  worstKarmaSort = [...karmaSort].reverse()
+  atSort = [...authorSort].sort((a, b): number => a.authorTime - b.authorTime)
+  worstAtSort = [...atSort].reverse()
+  oldestSort = [...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime())
+  newestSort = [...oldestSort].reverse()
 })
 
 tm.addListener('JukeboxChanged', (list): void => {
