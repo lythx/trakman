@@ -7,15 +7,14 @@ import config from '../../config/Config.js'
 export class ManualMapLoading {
   static readonly prefix: string = config.mapsDirectoryPrefix
   static mapIndex: number = 0
+  static oldQueue: tm.Map[]
+  static oldCurr: tm.CurrentMap
 
   static async parseMaps(dirname: string = config.mapsDirectory) {
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
     if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
     let maps: tm.ServerMap[] = []
-    let i = 0
     for (const f of filesOrDirs) {
-      if (++i > 130000) break
-      if (i <= 119996) continue
       if (f.isDirectory()) {
         (await this.parseMaps(dirname + f.name)).forEach(a => maps.push(a))
         continue
@@ -27,7 +26,15 @@ export class ManualMapLoading {
   }
 
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt: number = 0) {
-    let maps = queue.slice(0, config.preloadMaps).map(a => `  <challenge>
+    const newQueue = (queue.slice(0, config.preloadMaps))
+    if (this.oldQueue !== undefined && this.oldCurr !== undefined
+      && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName &&
+      this.oldQueue.every(((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
+      Logger.trace("Did not write new MatchSettings")
+      return
+    }
+
+    let maps = newQueue.map(a => `  <challenge>
     <file>${a.fileName.replaceAll('/', '\\')}</file>
     <ident>${a.id}</ident>
   </challenge>
@@ -81,7 +88,7 @@ export class ManualMapLoading {
   </filter>
   <startindex>${startAt}</startindex>
 `
-
+    // NOTE: btoa() is deprecated but idk another easy way to do this
     if (!await Client.call('WriteFile', [{string: 'MatchSettings.trakman.txt'}, {base64: btoa(header + maps.join('') + '</playlist>')}])) {
       Logger.error('Could not write new MatchSettings file')
       return
@@ -93,6 +100,8 @@ export class ManualMapLoading {
     }
     Logger.info("Updated MatchSettings, starting at " + startAt)
     this.mapIndex = startAt
+    this.oldCurr = curr
+    this.oldQueue = newQueue
   }
 
   static async nextMap(curr: tm.CurrentMap, queue: tm.Map[]) {
@@ -109,12 +118,16 @@ export class ManualMapLoading {
       return {}
     }
     const uid = rawUid.match(/".*?"/gm)?.[0].slice(1, -1)
+    const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
+    if (!((tm.getGameMode() === "Stunts" && mapType === "Stunts") || mapType === "Race")) {
+      return {}
+    }
     const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
     if (config.stadiumOnly && envir !== "Stadium") {
       Logger.warn('Non-stadium environment in file ', filename)
       return {}
     }
-    const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1)
+    const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
     const name = file.match(/" name=".*?"/gm)?.[0].slice(8, -1).slice(0, 60)
     const price = file.match(/price=".*?"/gm)?.[0].slice(7, -1)
     const goldTime = file.match(/gold=".*?"/gm)?.[0].slice(6, -1)

@@ -2,11 +2,6 @@ const p = tm.utils.palette
 const priv = tm.admin.privileges
 
 export default {
-  updatemaps: {
-    privilege: 0,
-    aliases: ['updatemaps'],
-    help: `Nah bruh`
-  },
   kick: {
     privilege: priv.kick,
     aliases: ['k', 'kick'],
@@ -76,5 +71,10 @@ export default {
     privilege: 3,
     aliases: [`lms`, `loadmatchsettings`],
     help: `Load the MatchSettings file.`
+  },
+  updatemaps: {
+    privilege: 3,
+    aliases: ['updatemaps'],
+    help: `Update the map list (parses maps, might take a long time and halt the server)`
   }
 }

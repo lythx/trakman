@@ -36,6 +36,7 @@ namespace trakman {
     /**
     * Executes a query on the database
     * @param query Query to execute
+    * @param params Query parameters
     * @returns Database response or error on invalid query
     */
     async query(query: string, ...params: any[]): Promise<any[] | Error> {
@@ -361,7 +362,7 @@ namespace trakman {
     clearHistory: MapService.clearHistory.bind(MapService),
 
     /**
-     * Amout of maps in the queue (maps juked by the players and the server). 
+     * Amount of maps in the queue (maps juked by the players and the server).
      * This is always equal to maxQueueCount.
      */
     get queueCount(): number { return MapService.queueSize },
@@ -452,28 +453,28 @@ namespace trakman {
     pause: GameService.pauseTimer.bind(GameService),
 
     /**
-     * Remaining race time in miliseconds. 
+     * Remaining race time in milliseconds.
      */
     get remainingRaceTime(): number {
       return GameService.remainingRaceTime
     },
 
     /**
-     * Remaining result screen time in miliseconds.
+     * Remaining result screen time in milliseconds.
      */
     get remainingResultTime(): number {
       return GameService.remainingResultTime
     },
 
     /**
-     * Race time limit in the current round in miliseconds.
+     * Race time limit in the current round in milliseconds.
      */
     get raceTimeLimit(): number {
       return GameService.raceTimeLimit
     },
 
     /**
-     * Result time limit in the current round in miliseconds.
+     * Result time limit in the current round in milliseconds.
      */
     get resultTimeLimit(): number {
       return GameService.resultTimeLimit
@@ -628,7 +629,9 @@ namespace trakman {
   * Sends a server message
   * @param message Message to be sent
   * @param login Optional player login or array of logins
-  */  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
+  * @param prefix
+  */
+  export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
 
       Client.callNoRes('ChatSendServerMessageToLogin',
@@ -688,7 +691,7 @@ namespace trakman {
    * Adds a listener to an event to execute callbacks.
    * @param event Event or array of events to register the callback on
    * @param callback Callback to register on given event
-   * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
+   * @param prepend If set to true puts the listener on the beginning of the array (it will get executed before other listeners)
    */
   export const addListener = Events.addListener
 

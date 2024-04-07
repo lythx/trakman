@@ -4,6 +4,7 @@ import { Logger } from '../Logger.js'
 import { Readable } from 'stream'
 import { type CopyStreamQuery } from "pg-copy-streams"
 import { pipeline } from "stream/promises"
+import config from "../../config/Config.js"
 
 interface TableEntry {
   readonly uid: string
@@ -54,7 +55,7 @@ export class MapRepository extends Repository {
 
   async splitAdd(maps: tm.Map[]): Promise<void> {
     // Add maps, not more than 2000 at a time to not crash
-    const splitby = 2000
+    const splitby = config.splitBy
     const len = Math.ceil(maps.length / splitby)
     Logger.info("pushing to db")
     for (let i= 0; i < len; i++) {

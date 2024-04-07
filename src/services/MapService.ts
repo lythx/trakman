@@ -62,9 +62,10 @@ export class MapService {
       const list = await this.repo.getAll()
       if (list.findIndex(a => a.id === current.UId) === -1) {
         const v = await this.repo.getVoteCountAndRatio(current.UId)
-        this._maps.push({ ...this.constructNewMapObject(current), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 })
+        const currObj: tm.Map = { ...this.constructNewMapObject(current), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }
+        this._maps.push(currObj)
+        await this.repo.add(currObj)
       }
-      //this._maps.push(...list)
       list.forEach(a => this._maps.push(a))
     }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
@@ -72,7 +73,7 @@ export class MapService {
       Logger.fatal('Error while getting the map list', mapList.message)
       return
     }
-    // Add current map to maplist if its not present there
+    // Add current map to maplist if it isn't present there
     if (!mapList.some(a => a.UId === current.UId)) {
       mapList.unshift(current)
       const insert: any | Error = await Client.call('InsertChallenge', [{ string: current.FileName }])
@@ -177,23 +178,18 @@ export class MapService {
         const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
         const serverData = this.constructNewMapObject(map)
         obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
-        //void this.repo.add(obj)
       }
       this._maps.push(obj)
       addedMapObjects.push(obj)
     }
     await this.repo.splitAdd(addedMapObjects)
-    //void this.repo.remove(...removedMaps.map(a => a.id))
-    //for (const e of removedMaps) {
-    //  await this.remove(e.id)
-    //}
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
-    for (const e of addedMapObjects) {
-      Events.emit('MapAdded', e)
-    }
+    void this.repo.remove(...removedMaps.map(a => a.id))
     for (const e of removedMaps) {
-      Events.emit('MapRemoved', e)
+      await this.remove(e.id)
     }
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    Events.emit('MapAdded', addedMapObjects)
+    Events.emit('MapRemoved', removedMaps)
   }
 
   /**
@@ -436,6 +432,7 @@ export class MapService {
    * @returns True if map gets set, Error if it fails
    */
   private static async updateNextMap(): Promise<void> {
+    //if (config.manualMapLoadingEnabled) return
     const id: string = this._queue[0].map.id
     const map: tm.Map | undefined = this._maps.find(a => a.id === id)
     if (map === undefined) { throw new Error(`Cant find map with id ${id} in memory`) }
@@ -446,6 +443,8 @@ export class MapService {
         Logger.error(`Server call to queue map ${map.name} failed. Try ${i - 1}.`, res.message)
       }
       if (i === 4) {
+        //await this.shuffle()
+        //return
         await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
       }
       i++
@@ -472,8 +471,8 @@ export class MapService {
     const qi = this._queue.findIndex(a => !a.isForced)
     const index: number = setAsNextMap === true ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -501,6 +500,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     return true
@@ -520,6 +520,7 @@ export class MapService {
     }
     this.fillQueue()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -536,6 +537,7 @@ export class MapService {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {

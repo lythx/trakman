@@ -1,4 +1,5 @@
 import { Repository } from "./Repository.js"
+import config from "../../config/Config.js"
 
 export class MapIdsRepository extends Repository {
 
@@ -30,7 +31,7 @@ export class MapIdsRepository extends Repository {
       mapUids = [mapUids]
     } else if (mapUids.length === 0) { return [] }
     // Add maps, not more than 2000 at a time to not crash
-    const splitby = 2000
+    const splitby = config.splitBy
     const len = Math.ceil(mapUids.length / splitby)
     const ret = []
     for (let i= 0; i < len; i++) {

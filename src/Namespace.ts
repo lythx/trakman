@@ -781,8 +781,8 @@ declare global {
       "KarmaVote": readonly KarmaVoteInfo[]
       "RecordsPrefetch": readonly Readonly<Record>[]
       "VotesPrefetch": readonly Readonly<Vote>[]
-      "MapAdded": MapAddedInfo
-      "MapRemoved": MapRemovedInfo
+      "MapAdded": MapAddedInfo | MapAddedInfo[]
+      "MapRemoved": MapRemovedInfo | MapRemovedInfo []
       "BillUpdated": BillUpdatedInfo
       "MatchSettingsUpdated": readonly Readonly<Map>[]
       "PrivilegeChanged": PrivilegeChangedInfo

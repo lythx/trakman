@@ -17,36 +17,21 @@ let cache: {
 const updateListeners: ((action: 'add' | 'remove', addedOrRemovedMap: Readonly<tm.Map>) => void)[] = []
 const jukeboxUpdateListeners: ((jukebox: readonly Readonly<tm.Map>[]) => void)[] = []
 
-tm.addListener('Startup', (): void => {
+function initialize(): void {
   const arr: tm.Map[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
-  //authorSort.push(...arr.sort((a, b): number => a.author.localeCompare(b.author)))
   authorSort = arr.sort((a, b): number => a.author.localeCompare(b.author))
-  //nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
   nameSort = [...authorSort].sort((a, b): number => a.name.localeCompare(b.name))
-  const maps: Readonly<tm.Map>[] = tm.maps.list
-  //karmaSort.push(...[...authorSort].sort((a, b): number => {
   karmaSort = [...authorSort].sort((a, b): number => {
     return a.voteRatio ?? 0 - b.voteRatio ?? 0
   })
-  /*worstKarmaSort.push(...[...karmaSort].reverse())
-  atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
-  worstAtSort.push(...[...atSort].reverse())
-  oldestSort.push(...[...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime()))
-  newestSort.push(...[...oldestSort].reverse())*/
   worstKarmaSort = [...karmaSort].reverse()
   atSort = [...authorSort].sort((a, b): number => a.authorTime - b.authorTime)
   worstAtSort = [...atSort].reverse()
   oldestSort = [...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime())
   newestSort = [...oldestSort].reverse()
-})
+}
 
-tm.addListener('JukeboxChanged', (list): void => {
-  jukebox.length = 0
-  jukebox.push(...list)
-  for (const e of jukeboxUpdateListeners) { e(list) }
-})
-
-tm.addListener('MapAdded', (map): void => {
+function insertMap(map: tm.MapAddedInfo): void {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author)
     && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author)
@@ -72,9 +57,9 @@ tm.addListener('MapAdded', (map): void => {
     && map.addDate.getTime() >= a.addDate.getTime()), 0, map)
   cache.length = 0
   for (const e of updateListeners) { e('add', map) }
-})
+}
 
-tm.addListener('MapRemoved', (map): void => {
+function removeMap(map: tm.MapRemovedInfo): void {
   authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
   nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
   karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)
@@ -85,6 +70,35 @@ tm.addListener('MapRemoved', (map): void => {
   oldestSort.splice(oldestSort.findIndex(a => a.id === map.id), 1)
   cache.length = 0
   for (const e of updateListeners) { e('remove', map) }
+}
+
+function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function):void {
+  if (!Array.isArray(map)) {
+    insertMap(map)
+    return
+  }
+  if (map.length < tm.config.controller.splitBy) {
+    map.forEach(a => fun(a))
+  } else {
+    initialize()
+  }
+}
+
+tm.addListener('JukeboxChanged', (list): void => {
+  jukebox.length = 0
+  jukebox.push(...list)
+  for (const e of jukeboxUpdateListeners) { e(list) }
+})
+
+
+tm.addListener('Startup', initialize)
+
+tm.addListener('MapAdded', (map: tm.MapAddedInfo | tm.MapAddedInfo[]):void => {
+  addOrRemove(map, insertMap)
+})
+
+tm.addListener('MapRemoved', (map: tm.MapRemovedInfo | tm.MapRemovedInfo[]):void => {
+  addOrRemove(map, removeMap)
 })
 
 tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {

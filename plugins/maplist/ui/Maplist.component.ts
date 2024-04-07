@@ -234,7 +234,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
              sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[1]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${leftAlignedText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width,
+              ${leftAlignedText(tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(maps[index].name), false)), width,
         rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>

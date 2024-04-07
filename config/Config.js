@@ -4,6 +4,7 @@ export default {
   mapsDirectory: "bapius/",
   stadiumOnly: false,
   preloadMaps: 5,
+  splitBy: 2000,
   /** 
    * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
    * Enabling it makes the chat a bit slower, as all input has to go through the controller first.

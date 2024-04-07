@@ -67,7 +67,7 @@ export default class MapWidget extends StaticComponent {
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
-      [tm.utils.safeString(map.name), this.getTag(map, TMXMap ?? undefined)],
+      [tm.utils.safeString(tm.utils.decodeURI(map.name)), this.getTag(map, TMXMap ?? undefined)],
       [tm.utils.safeString(author), authorIcon],
       [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]

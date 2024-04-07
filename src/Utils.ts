@@ -372,6 +372,19 @@ export const Utils = {
   },
 
   /**
+   * Safe way to decode url-escaped characters
+   * @param str original string
+   * @returns decoded string if successful
+   */
+  decodeURI(str: string): string {
+    try {
+      return decodeURIComponent(str)
+    } catch (e) {
+      return str
+    }
+  },
+
+  /**
    * In Trackmania, https links won't work
    * @param url Original URL
    * @returns URL that will likely function properly
