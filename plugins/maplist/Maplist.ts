@@ -36,7 +36,7 @@ tm.addListener('Startup', (): void => {
 
 tm.addListener('JukeboxChanged', (list): void => {
   jukebox.length = 0
-  jukebox.push(...list)
+  jukebox.push(...list.filter((a, i, arr) => arr.findIndex(b => b.id === a.id) === i))
   for (const e of jukeboxUpdateListeners) { e(list) }
 })
 
