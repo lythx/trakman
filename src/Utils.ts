@@ -378,7 +378,16 @@ export const Utils = {
    */
   decodeURI(str: string): string {
     try {
-      return decodeURIComponent(str)
+      const res = decodeURIComponent(str)
+      const map = {
+        '&amp;': '\&',
+        '&quot;': '\"',
+        '&apos;': '\'',
+        '&gt;': '\>',
+        '&lt;': '\<',
+        '+': ' '
+      }
+      return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => {return map[m as keyof typeof map]})
     } catch (e) {
       return str
     }
@@ -429,12 +438,12 @@ export const Utils = {
   },
 
   /**
-   * Converts date string to time in miliseconds. 
+   * Converts date string to time in milliseconds.
    * This method is used to parse time in chat commands.
    * @param dateStr Date string, number followed by optional modifier 
    * [s - seconds, m - minutes, h - hours, d - days]). 
    * If no modifier is specified the number will be treated as minutes.
-   * @returns Time in miliseconds, RangeError if time is bigger than max js Date,
+   * @returns Time in milliseconds, RangeError if time is bigger than max js Date,
    * TypeError if the dateStr is not a valid date string
    */
   parseTimeString(dateStr: string): number | RangeError | TypeError {

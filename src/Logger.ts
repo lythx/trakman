@@ -77,7 +77,7 @@ export abstract class Logger {
       this.logLevel = envLogLevel
     }
     await fs.mkdir(this.logDir).catch((err: Error): void => {
-      if (!err.message.startsWith('EEXIST')) { // ignore dir exists error
+      if (!err.message.startsWith('EEXIST') && err.name !== "EEXIST") { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })

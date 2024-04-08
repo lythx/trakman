@@ -91,7 +91,7 @@ class TMXWindow extends PopupWindow<number> {
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, TMXMap)
       const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, TMXMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
-        this.constructEntry(tm.utils.safeString(tm.utils.strip(mapName, false)), config.icons.name, ww, hh, config.iconWidth)
+        this.constructEntry(tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(mapName), false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructInfoXml(ww, hh, map, TMXMap)

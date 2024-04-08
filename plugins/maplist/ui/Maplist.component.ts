@@ -304,7 +304,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       }
       tm.jukebox.add(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.add,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(tm.utils.decodeURI(map.name), true) }), config.public ? undefined : login)
     }
     return true
   }
