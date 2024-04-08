@@ -93,8 +93,8 @@ export class MapService {
     // Add maps, not more than 2000 at a time to not crash
     const splitby = 2000
     const len = Math.ceil(mapsNotInDBObjects.length / splitby)
-    for (let i= 0; i < len; i++) {
-      void this.repo.add(...mapsNotInDBObjects.slice(i*splitby, (i+1)*splitby))
+    for (let i = 0; i < len; i++) {
+      void this.repo.add(...mapsNotInDBObjects.slice(i * splitby, (i + 1) * splitby))
     }
   }
 
@@ -410,11 +410,11 @@ export class MapService {
    * @param setAsNextMap If true map is going to be placed in front of the queue
    * @returns True if successful, Error if map is not in the memory
    */
-  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap?: true): Promise<true | Error> {
+  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap: boolean = false): Promise<true | Error> {
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const qi = this._queue.findIndex(a => !a.isForced)
-    const index: number = setAsNextMap === true ? 0 : (qi === -1 ? this._queue.length : qi)
+    const index: number = setAsNextMap ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
