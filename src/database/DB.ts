@@ -47,6 +47,11 @@ export class Database {
     })
   }
 
+  /**
+   * Fast insertion query using COPY, requires client to be enabled!
+   * @param q table name and column names in parentheses, ex. "maps(id, name, etc.)"
+   * @returns a stream that can be piped into
+   */
   stream(q: string): CopyStreamQuery {
     return this.client.query(from(`COPY ${q} FROM STDIN;`))
   }

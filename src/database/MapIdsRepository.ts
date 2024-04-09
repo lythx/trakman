@@ -26,11 +26,14 @@ export class MapIdsRepository extends Repository {
     return isArr ? res : res[0]?.id
   }
 
+  /**
+   * Get map id's one chunk at a time to prevent overly long queries that cause crashes.
+   * @param mapUids one or more map uid's.
+   */
   async splitGet(mapUids: string[] | string) {
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
     } else if (mapUids.length === 0) { return [] }
-    // Add maps, not more than 2000 at a time to not crash
     const splitby = config.splitBy
     const len = Math.ceil(mapUids.length / splitby)
     const ret = []

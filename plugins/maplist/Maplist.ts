@@ -77,6 +77,8 @@ function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function):vo
     insertMap(map)
     return
   }
+  // If the list of added or removed maps is small enough, use insertion/deletion;
+  // otherwise re-initialise everything from the beginning.
   if (map.length < tm.config.controller.splitBy) {
     map.forEach(a => fun(a))
   } else {

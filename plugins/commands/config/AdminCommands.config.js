@@ -74,7 +74,7 @@ export default {
   },
   updatemaps: {
     privilege: 3,
-    aliases: ['updatemaps'],
-    help: `Update the map list (parses maps, might take a long time and halt the server)`
+    aliases: ['udm', 'updatemaps'],
+    help: `Update the map list (parses maps, might take a very long time and lag the server for a while)`
   }
 }

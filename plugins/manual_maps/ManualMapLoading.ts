@@ -10,7 +10,13 @@ export class ManualMapLoading {
   static oldQueue: tm.Map[]
   static oldCurr: tm.CurrentMap
 
+  /**
+   * Parse every map in the `config.mapsDirectoryPrefix/config.mapsDirectory
+   * @param dirname the directory name
+   * @returns list of maps in the same format that the server returns them
+   */
   static async parseMaps(dirname: string = config.mapsDirectory) {
+    // TODO: Don't fully parse already existing maps, just check if they're still there!
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
     if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
     let maps: tm.ServerMap[] = []
@@ -25,6 +31,14 @@ export class ManualMapLoading {
     return maps
   }
 
+  /**
+   * Create a MatchSettings file from the queue and load it into the server.
+   * Does not write the file if it would have not changed.
+   * WARNING: If the queue contains invalid maps (e.g. puzzles) the server keeps the old MatchSettings.
+   * @param curr the current map
+   * @param queue the queue
+   * @param startAt
+   */
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt: number = 0) {
     const newQueue = (queue.slice(0, config.preloadMaps))
     if (this.oldQueue !== undefined && this.oldCurr !== undefined
@@ -98,16 +112,28 @@ export class ManualMapLoading {
       Logger.error('Could not load new match settings')
       return
     }
+    //TODO: save match settings and compare with the uploaded ones to prevent errors.
     Logger.info("Updated MatchSettings, starting at " + startAt)
     this.mapIndex = startAt
     this.oldCurr = curr
     this.oldQueue = newQueue
   }
 
+  /**
+   * Update current map and write a new MatchSettings if the next map hasn't been loaded yet.
+   * @param curr the current map
+   * @param queue the queue
+   */
   static async nextMap(curr: tm.CurrentMap, queue: tm.Map[]) {
     if (++this.mapIndex >= config.preloadMaps) await this.writeMS(curr, queue, 1)
   }
 
+  /**
+   * Parse a Challenge.Gbx file into a map object
+   * @param filename path to the file
+   * @returns map object (same format as returned from the server) if parsing successful
+   *          empty object if parsing unsuccessful
+   */
   public static async parseMap(filename: string) {
     if (filename.slice(-14) !== ".Challenge.Gbx") return {}
     const file = (await fs.readFile(this.prefix + '/' + filename)).toString()
@@ -128,6 +154,8 @@ export class ManualMapLoading {
       return {}
     }
     const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
+    // Yes, author logins can sometimes be longer than 40 characters and map names can be longer than 60
+    // ...for some reason (thanks Nadeo). Cut them here to prevent errors later.
     const name = file.match(/" name=".*?"/gm)?.[0].slice(8, -1).slice(0, 60)
     const price = file.match(/price=".*?"/gm)?.[0].slice(7, -1)
     const goldTime = file.match(/gold=".*?"/gm)?.[0].slice(6, -1)

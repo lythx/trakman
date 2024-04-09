@@ -50,7 +50,9 @@ export class MapService {
   }
 
   /**
-   * Downloads all the maps from the server and store them in the list
+   * Downloads all the maps from the server and store them in the list.
+   * If Manual map loading is enabled, just gets the maps from the database:
+   * to import new maps, use `updateList()` or `//updatemaps` in-game.
    */
   private static async createList(): Promise<void> {
     const current = await Client.call('GetCurrentChallengeInfo')
@@ -111,7 +113,8 @@ export class MapService {
   }
 
   /**
-   * Updates map list based on the current Match Settings
+   * Updates map list based on the current Match Settings.
+   * If Manual map loading is enabled, parses every map in the given directories and adds them to the server.
    */
   static async updateList(): Promise<void> {
     let mapList: any[]
@@ -592,7 +595,7 @@ export class MapService {
    * @param info GetChallengeInfo dedicated server call response
    */
   private static constructNewMapObject(info: any): Omit<tm.Map, 'voteCount' | 'voteRatio'> {
-    // Translate mood to controller type (some maps have non standard mood or space in front of it)
+    // Translate mood to controller type (some maps have non-standard mood or space in front of it)
     info.Mood = info.Mood.trim()
     if (!["Sunrise", "Day", "Sunset", "Night"].includes(info.Mood)) { // If map has non-standard mood set it to day
       info.Mood = 'Day'

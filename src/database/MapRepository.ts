@@ -53,18 +53,22 @@ export class MapRepository extends Repository {
     await this.db.enableClient()
   }
 
+  /**
+   * Insert maps into the database in chunks to prevent overly long queries and crashes.
+   * @param maps map objects to add
+   */
   async splitAdd(maps: tm.Map[]): Promise<void> {
-    // Add maps, not more than 2000 at a time to not crash
     const splitby = config.splitBy
     const len = Math.ceil(maps.length / splitby)
-    Logger.info("pushing to db")
+    Logger.info("Pushing new maps to db")
     for (let i= 0; i < len; i++) {
       await this.add(...maps.slice(i*splitby, (i+1)*splitby))
     }
-    Logger.info("pushed")
+    Logger.info("Pushed " + maps.length + " maps to the database.")
   }
 
   async add(...maps: tm.Map[]): Promise<void> {
+    // TODO: use copy also for map id's, since this becomes the bottleneck?
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     const arr = maps.filter(a => ids.some(b => b.uid === a.id))
     if (arr.length !== maps.length) {
@@ -78,10 +82,12 @@ export class MapRepository extends Repository {
       values.push(([ids[i].id, map.name,
         map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
         map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
-        map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().replaceAll("\t", " ").replaceAll('\\', '')).join('\t'))
+        map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().
+      replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
     }
     const bulk = values.join('\n')
-    const stream: CopyStreamQuery = this.db.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
+    const stream: CopyStreamQuery = this.db.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, " +
+      "gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
     const src = new Readable()
     src.readable = true
 

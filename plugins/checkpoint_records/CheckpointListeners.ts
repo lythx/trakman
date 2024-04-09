@@ -1,4 +1,4 @@
-import { type BestCheckpoints, type PlayerCheckpoints } from './CheckpointTypes.js'
+import type { BestCheckpoints, PlayerCheckpoints } from './CheckpointTypes.js'
 import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
 import config from './Config.js'

@@ -1,15 +1,9 @@
 export default {
-  manualMapLoadingEnabled: true,
-  mapsDirectoryPrefix: "tracks/",
-  mapsDirectory: "bapius/",
-  stadiumOnly: false,
-  preloadMaps: 5,
-  splitBy: 2000,
-  /** 
+  /**
    * Manual chat routing is needed for chat utilities such as custom brackets or finish counter.
    * Enabling it makes the chat a bit slower, as all input has to go through the controller first.
    */
-  manualChatRoutingEnabled: false,
+  manualChatRoutingEnabled: true,
   /** Local records limit for rank calculation and plugins */
   localRecordsLimit: 30,
   /** Amount of chat messages stored in runtime memory */
@@ -38,16 +32,35 @@ export default {
     forceSpectator: 1,
     addMap: 1,
     removeMap: 1,
-    updateMaps: 2
   },
+  /**
+   * Enable this for Trakman to take over handling maps. The controller will read maps from a folder
+   * defined below and give the upcoming ones to the server, allowing for much more map capacity than
+   * the server can handle (it becomes basically unresponsive at 5000 maps).
+   */
+  manualMapLoadingEnabled: true,
+  /** Path to the `GameData/Tracks/` directory of the server */
+  mapsDirectoryPrefix: "../GameData/Tracks/",
+  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`. Default value: "./" */
+  mapsDirectory: "./",
+  /** Ignore non-stadium maps */
+  stadiumOnly: true,
+  /** Amount of maps to load into the server. Default value: 5 */
+  preloadMaps: 5,
+  /**
+   * When adding a large amount of maps, it is better to add them in smaller chunks. This is the size
+   * of each chunk. Set to a higher amount to increase speed of pushing to the database, decrease
+   * if you are having problems with memory. Default value: 2000
+   */
+  splitBy: 2000,
   /** Whether the maplist gets reloaded on Match Settings updates.
    *  Enable this if you use external tools to modify the Match Settings */
   updateMatchSettingsOnChange: false,
   /** Point system for rounds and cup gamemodes */
   roundsModePointSystem: [33, 29, 27, 25, 23, 21, 19, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-  /** Default time limit in TimeAttack mode (in miliseconds) */
+  /** Default time limit in TimeAttack mode (in milliseconds) */
   defaultTimeAttackTimeLimit: 300000,
-  /** Minimal time value to which the dynamic timer can be set (in miliseconds) */
+  /** Minimal time value to which the dynamic timer can be set (in milliseconds) */
   dynamicTimerSubtractionLimit: 30000,
   /** Relative path (/GameData/Config/) to the blacklist file */
   blacklistFile: "blacklist.txt",
