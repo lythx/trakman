@@ -117,74 +117,76 @@ export class MapService {
    * If Manual map loading is enabled, parses every map in the given directories and adds them to the server.
    */
   static async updateList(): Promise<void> {
-    let mapList: any[]
+    let addedMapObjects: tm.Map[] = []
+    let removedMaps: tm.Map[] = []
     if (config.manualMapLoadingEnabled) {
-      mapList = await ManualMapLoading.parseMaps()
+      const lists = await ManualMapLoading.parseMaps(this._maps)
+      addedMapObjects = lists[1]
+      removedMaps = lists[2]
       Logger.trace("Parsed maps")
+      if (addedMapObjects.length === 0 && removedMaps.length === 0) return
+      addedMapObjects.forEach(a => this._maps.push(a))
     } else {
-      const maps: any[] | Error = await Client.call('GetChallengeList', [{int: 5000}, {int: 0}])
-      if (maps instanceof Error) {
-        Logger.error('Error while getting the map list', maps.message)
+      const serverMaps: any[] | Error = await Client.call('GetChallengeList', [{int: 5000}, {int: 0}])
+      if (serverMaps instanceof Error) {
+        Logger.error('Error while getting the map list', serverMaps.message)
         return
       }
-      mapList = maps
-    }
-
-    const maps = [...this._maps]
-    maps.sort((a, b) => a.id.localeCompare(b.id))
-    mapList.sort((a, b) => a.UId.localeCompare(b.UId))
-    let i = 0
-    let j = 0
-    const addedMaps: any[] = []
-    const removedMaps: tm.Map[] = []
-    while (i < maps.length && j < mapList.length) {
-      if (maps[i].id.localeCompare(mapList[j].UId) < 0) {
+      const maps = [...this._maps]
+      maps.sort((a, b) => a.id.localeCompare(b.id))
+      serverMaps.sort((a, b) => a.UId.localeCompare(b.UId))
+      const addedMaps: any[] = []
+      // faster algorithm for finding added and removed maps
+      let i = 0
+      let j = 0
+      while (i < maps.length && j < serverMaps.length) {
+        if (maps[i].id.localeCompare(serverMaps[j].UId) < 0) {
+          removedMaps.push(maps[i])
+          i++
+        } else if (maps[i].id === serverMaps[j].UId) {
+          i++
+          j++
+        } else {
+          addedMaps.push(serverMaps[j])
+          j++
+        }
+      }
+      while (j < serverMaps.length) {
+        addedMaps.push(serverMaps[j])
+        j++
+      }
+      while (i < maps.length) {
         removedMaps.push(maps[i])
         i++
-      } else if (maps[i].id === mapList[j].UId) {
-        i++
-        j++
-      } else {
-        addedMaps.push(mapList[j])
-        j++
       }
-    }
-    while (j < mapList.length) {
-      addedMaps.push(mapList[j])
-      j++
-    }
-    while (i < maps.length) {
-      removedMaps.push(maps[i])
-      i++
+      if (addedMaps.length === 0 && removedMaps.length === 0) {
+        return
+      }
+      for (const e of addedMaps) {
+        const dbEntry: tm.Map | undefined = await this.repo.getByFilename(e.FileName)
+        let obj: tm.Map
+        if (dbEntry !== undefined) { // If map is present in the database use the database info
+          obj = { ...dbEntry }
+        } else { // Otherwise fetch the info from server and save it in the database
+          let map
+          if (config.manualMapLoadingEnabled) map = e
+          else {
+            const res: any | Error = await Client.call('GetChallengeInfo', [{string: e.FileName}])
+            if (res instanceof Error) {
+              Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
+              continue
+            }
+            map = res
+          }
+          const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
+          const serverData = this.constructNewMapObject(map)
+          obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
+        }
+        this._maps.push(obj)
+        addedMapObjects.push(obj)
+      }
     }
 
-    if (addedMaps.length === 0 && removedMaps.length === 0) {
-      return
-    }
-    const addedMapObjects = []
-    for (const e of addedMaps) {
-      const dbEntry: tm.Map | undefined = await this.repo.getByFilename(e.FileName)
-      let obj: tm.Map
-      if (dbEntry !== undefined) { // If map is present in the database use the database info
-        obj = { ...dbEntry }
-      } else { // Otherwise fetch the info from server and save it in the database
-        let map
-        if (config.manualMapLoadingEnabled) map = e
-        else {
-          const res: any | Error = await Client.call('GetChallengeInfo', [{string: e.FileName}])
-          if (res instanceof Error) {
-            Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
-            continue
-          }
-          map = res
-        }
-        const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
-        const serverData = this.constructNewMapObject(map)
-        obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
-      }
-      this._maps.push(obj)
-      addedMapObjects.push(obj)
-    }
     await this.repo.splitAdd(addedMapObjects)
     void this.repo.remove(...removedMaps.map(a => a.id))
     for (const e of removedMaps) {
@@ -286,7 +288,7 @@ export class MapService {
       let res
       if (config.manualMapLoadingEnabled) {
         const map = await ManualMapLoading.parseMap(filename)
-        if (map.UId == undefined) return Error('Could not parse map with filename ' + filename)
+        if ((<tm.ServerMap>map).UId == undefined) return Error('Could not parse map with filename ' + filename)
         res = map
       } else {
         const map: any | Error = await Client.call('GetChallengeInfo', [{string: filename}])
@@ -594,7 +596,7 @@ export class MapService {
    * Contstructs tm.Map object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
    */
-  private static constructNewMapObject(info: any): Omit<tm.Map, 'voteCount' | 'voteRatio'> {
+  public static constructNewMapObject(info: any): Omit<tm.Map, 'voteCount' | 'voteRatio'> {
     // Translate mood to controller type (some maps have non-standard mood or space in front of it)
     info.Mood = info.Mood.trim()
     if (!["Sunrise", "Day", "Sunset", "Night"].includes(info.Mood)) { // If map has non-standard mood set it to day

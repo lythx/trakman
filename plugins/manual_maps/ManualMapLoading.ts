@@ -3,6 +3,11 @@ import fs from 'fs/promises'
 import { Logger } from '../../src/Logger.js'
 import { Client } from '../../src/client/Client.js'
 import config from '../../config/Config.js'
+import { MapService } from "../../src/services/MapService.js"
+
+type ReturnCode = {
+  code: number
+}
 
 export class ManualMapLoading {
   static readonly prefix: string = config.mapsDirectoryPrefix
@@ -12,23 +17,102 @@ export class ManualMapLoading {
 
   /**
    * Parse every map in the `config.mapsDirectoryPrefix/config.mapsDirectory
+   * @param presentMaps list of already existing maps to compare with
    * @param dirname the directory name
    * @returns list of maps in the same format that the server returns them
    */
-  static async parseMaps(dirname: string = config.mapsDirectory) {
-    // TODO: Don't fully parse already existing maps, just check if they're still there!
+  static async parseMaps(presentMaps: tm.Map[] = [], dirname: string = config.mapsDirectory) {
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
     if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
-    let maps: tm.ServerMap[] = []
+    const maps: tm.Map[] = []
+    const addedMaps: tm.Map[] = []
+    const removedMaps: tm.Map[] = []
     for (const f of filesOrDirs) {
       if (f.isDirectory()) {
-        (await this.parseMaps(dirname + f.name)).forEach(a => maps.push(a))
+        (await this.parseMaps(presentMaps, dirname + f.name)).forEach(a => {
+          maps.push(a[0])
+          addedMaps.push(a[1])
+          removedMaps.push(a[2])
+        })
         continue
       }
-      const map = await this.parseMap(dirname + '/' + f.name)
-      if (map.UId != undefined && !maps.map(a => a.UId).includes(map.UId)) maps.push(map)
+      const map = await this.parseMap(dirname + '/' + f.name, presentMaps, maps)
+      if ((<ReturnCode>map).code === 2) continue // duplicate file
+      else if ((<tm.Map>map).id !== undefined) maps.push(<tm.Map>map)
+      else if ((<tm.ServerMap>map).UId !== undefined) {
+        const mapObject: tm.Map = {...MapService.constructNewMapObject(map), voteRatio: 0, voteCount: 0}
+        maps.push(mapObject)
+        addedMaps.push(mapObject)
+      } else {
+        const removed = presentMaps.find(a => a.fileName === dirname + '/' + f.name)
+        if (removed !== undefined) removedMaps.push(removed)
+      }
     }
-    return maps
+    return [maps, addedMaps, removedMaps]
+  }
+
+  /**
+   * Parse a Challenge.Gbx file into a map object
+   * @param filename path to the file
+   * @param presentMaps list of maps to check against, whether such a map already exists to skip parsing
+   * @param parsed already parsed maps to check against
+   * @returns trakman map object if the uid matches one from the present maps
+   *          map object (same format as returned from the server) if parsing successful
+   *          code 1 if parsing unsuccessful
+   *          code 2 if the map has already been parsed
+   *          code 3 if map type or environment is wrong
+   */
+  public static async parseMap(filename: string, presentMaps: tm.Map[] = [], parsed: tm.Map[] = []) {
+    if (filename.slice(-14) !== ".Challenge.Gbx") return {code: 1}
+    const file = (await fs.readFile(this.prefix + '/' + filename)).toString()
+    let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
+    if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
+    if (rawUid == undefined) {
+      Logger.warn('Could not get uid of file ', filename)
+      return {code: 1}
+    }
+    const uid = rawUid.match(/".*?"/gm)?.[0].slice(1, -1)
+    if (parsed.find(a => a.id === uid)) return {code: 2}
+    const exists = presentMaps.find(a => a.id === uid)
+    if (exists !== undefined) return exists
+    const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
+    if (!((tm.getGameMode() === "Stunts" && mapType === "Stunts") || mapType === "Race")) {
+      return {code: 3}
+    }
+    const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
+    if (config.stadiumOnly && envir !== "Stadium") {
+      Logger.warn('Non-stadium environment in file ', filename)
+      return {code: 3}
+    }
+    const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
+    // Yes, author logins can sometimes be longer than 40 characters and map names can be longer than 60
+    // ...for some reason (thanks Nadeo). Cut them here to prevent errors later.
+    const name = file.match(/" name=".*?"/gm)?.[0].slice(8, -1).slice(0, 60)
+    const price = file.match(/price=".*?"/gm)?.[0].slice(7, -1)
+    const goldTime = file.match(/gold=".*?"/gm)?.[0].slice(6, -1)
+    const mood = file.match(/["\x00](Day|Night|Sunrise|Sunset)/gm)?.[0].slice(1)
+    const bronzeTime = file.match(/bronze=".*?"/gm)?.[0].slice(8, -1)
+    const silverTime = file.match(/silver=".*?"/gm)?.[0].slice(8, -1)
+    const authorTime = file.match(/authortime=".*?"/gm)?.[0].slice(12, -1)
+    const nbLaps = file.match(/nblaps=".*?"/gm)?.[0].slice(8, -1)
+    if (uid == undefined || author == undefined || name == undefined || envir == undefined) {
+      Logger.warn('Could not get map info of file ', filename)
+      return {code: 1}
+    }
+    return {
+      Name: name,
+      UId: uid,
+      FileName: filename,
+      Environnement: envir,
+      Author: author,
+      GoldTime: goldTime == undefined? 0 : parseInt(goldTime),
+      CopperPrice: price == undefined? 0 : parseInt(price),
+      Mood: mood == undefined? "Day" : mood,
+      BronzeTime: bronzeTime == undefined? 0 : parseInt(bronzeTime),
+      SilverTime: silverTime == undefined? 0 : parseInt(silverTime),
+      AuthorTime: authorTime == undefined? 0 : parseInt(authorTime),
+      NbLaps: nbLaps == undefined? 0 : parseInt(nbLaps)
+    }
   }
 
   /**
@@ -127,61 +211,4 @@ export class ManualMapLoading {
   static async nextMap(curr: tm.CurrentMap, queue: tm.Map[]) {
     if (++this.mapIndex >= config.preloadMaps) await this.writeMS(curr, queue, 1)
   }
-
-  /**
-   * Parse a Challenge.Gbx file into a map object
-   * @param filename path to the file
-   * @returns map object (same format as returned from the server) if parsing successful
-   *          empty object if parsing unsuccessful
-   */
-  public static async parseMap(filename: string) {
-    if (filename.slice(-14) !== ".Challenge.Gbx") return {}
-    const file = (await fs.readFile(this.prefix + '/' + filename)).toString()
-    let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
-    if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
-    if (rawUid == undefined) {
-      Logger.warn('Could not get uid of file ', filename)
-      return {}
-    }
-    const uid = rawUid.match(/".*?"/gm)?.[0].slice(1, -1)
-    const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
-    if (!((tm.getGameMode() === "Stunts" && mapType === "Stunts") || mapType === "Race")) {
-      return {}
-    }
-    const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
-    if (config.stadiumOnly && envir !== "Stadium") {
-      Logger.warn('Non-stadium environment in file ', filename)
-      return {}
-    }
-    const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
-    // Yes, author logins can sometimes be longer than 40 characters and map names can be longer than 60
-    // ...for some reason (thanks Nadeo). Cut them here to prevent errors later.
-    const name = file.match(/" name=".*?"/gm)?.[0].slice(8, -1).slice(0, 60)
-    const price = file.match(/price=".*?"/gm)?.[0].slice(7, -1)
-    const goldTime = file.match(/gold=".*?"/gm)?.[0].slice(6, -1)
-    const mood = file.match(/["\x00](Day|Night|Sunrise|Sunset)/gm)?.[0].slice(1)
-    const bronzeTime = file.match(/bronze=".*?"/gm)?.[0].slice(8, -1)
-    const silverTime = file.match(/silver=".*?"/gm)?.[0].slice(8, -1)
-    const authorTime = file.match(/authortime=".*?"/gm)?.[0].slice(12, -1)
-    const nbLaps = file.match(/nblaps=".*?"/gm)?.[0].slice(8, -1)
-    if (uid == undefined || author == undefined || name == undefined || envir == undefined) {
-      Logger.warn('Could not get map info of file ', filename)
-      return {}
-    }
-    return {
-      Name: name,
-      UId: uid,
-      FileName: filename,
-      Environnement: envir,
-      Author: author,
-      GoldTime: goldTime == undefined? 0 : parseInt(goldTime),
-      CopperPrice: price == undefined? 0 : parseInt(price),
-      Mood: mood == undefined? "Day" : mood,
-      BronzeTime: bronzeTime == undefined? 0 : parseInt(bronzeTime),
-      SilverTime: silverTime == undefined? 0 : parseInt(silverTime),
-      AuthorTime: authorTime == undefined? 0 : parseInt(authorTime),
-      NbLaps: nbLaps == undefined? 0 : parseInt(nbLaps)
-    }
-  }
-
 }
