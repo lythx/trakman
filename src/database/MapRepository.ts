@@ -178,6 +178,20 @@ export class MapRepository extends Repository {
     return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
+  /**
+   * Remove large amount of maps from the database.
+   * @param mapIds map id's
+   */
+  async splitRemove(mapIds: string[]): Promise<void> {
+    const splitby = config.splitBy
+    const len = Math.ceil(mapIds.length / splitby)
+    Logger.info("Removing from db")
+    for (let i= 0; i < len; i++) {
+      await this.remove(...mapIds.slice(i*splitby, (i+1)*splitby))
+    }
+    Logger.info("Removed " + mapIds.length + " maps from the database.")
+  }
+
   async remove(...mapIds: string[]): Promise<void> {
     if (mapIds.length === 0) { return }
     const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`

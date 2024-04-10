@@ -3,13 +3,6 @@ import { actions } from '../../actions/Actions.js'
 
 const commands: tm.Command[] = [
   {
-    aliases: config.updatemaps.aliases,
-    help: config.updatemaps.help,
-    params: [],
-    callback: actions.updateMaps,
-    privilege: config.updatemaps.privilege
-  },
-  {
     aliases: config.kick.aliases,
     help: config.kick.help,
     params: [{ name: 'login' }, { name: 'reason', type: 'multiword', optional: true }],
@@ -115,6 +108,20 @@ const commands: tm.Command[] = [
       ), config.loadmatchsettings.public ? undefined : info.login)
     },
     privilege: config.loadmatchsettings.privilege
+  },
+  {
+    aliases: config.updatemaps.aliases,
+    help: config.updatemaps.help,
+    params: [],
+    callback: async (info: tm.MessageInfo) => {
+      await actions.updateMaps()
+      tm.sendMessage(tm.utils.strVar(config.updatemaps.text,
+        {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname)
+        }), config.updatemaps.public ? undefined : info.login)
+    },
+    privilege: config.updatemaps.privilege
   }
 ]
 

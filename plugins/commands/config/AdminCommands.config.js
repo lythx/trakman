@@ -73,6 +73,8 @@ export default {
     help: `Load the MatchSettings file.`
   },
   updatemaps: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has updated the map list.`,
+    public: true,
     privilege: 3,
     aliases: ['udm', 'updatemaps'],
     help: `Update the map list (parses maps, might take a very long time and lag the server for a while)`

@@ -118,12 +118,21 @@ export class MapService {
    */
   static async updateList(): Promise<void> {
     let addedMapObjects: tm.Map[] = []
-    let removedMaps: tm.Map[] = []
+    const removedMaps: tm.Map[] = []
     if (config.manualMapLoadingEnabled) {
       const lists = await ManualMapLoading.parseMaps(this._maps)
+      const remainingMaps = lists[0]
       addedMapObjects = lists[1]
-      removedMaps = lists[2]
       Logger.trace("Parsed maps")
+      // fast difference of maps and remaining
+      const mapSet = new Set(this._maps)
+      const remainingSet = new Set(remainingMaps)
+      for (const v of remainingSet.values()) {
+        if (!mapSet.delete(v)) {
+          removedMaps.push(v)
+        }
+      }
+      for (const v of mapSet.values()) removedMaps.push(v)
       if (addedMapObjects.length === 0 && removedMaps.length === 0) return
       addedMapObjects.forEach(a => this._maps.push(a))
     } else {
@@ -168,18 +177,13 @@ export class MapService {
         if (dbEntry !== undefined) { // If map is present in the database use the database info
           obj = { ...dbEntry }
         } else { // Otherwise fetch the info from server and save it in the database
-          let map
-          if (config.manualMapLoadingEnabled) map = e
-          else {
-            const res: any | Error = await Client.call('GetChallengeInfo', [{string: e.FileName}])
-            if (res instanceof Error) {
-              Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
-              continue
-            }
-            map = res
+          const res: any | Error = await Client.call('GetChallengeInfo', [{string: e.FileName}])
+          if (res instanceof Error) {
+            Logger.error(`Failed to retrieve map info. Filename: ${e.FileName}`)
+            continue
           }
           const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
-          const serverData = this.constructNewMapObject(map)
+          const serverData = this.constructNewMapObject(res)
           obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
         }
         this._maps.push(obj)
@@ -188,9 +192,9 @@ export class MapService {
     }
 
     await this.repo.splitAdd(addedMapObjects)
-    void this.repo.remove(...removedMaps.map(a => a.id))
+    await this.repo.splitRemove(removedMaps.map(a => a.id))
     for (const e of removedMaps) {
-      await this.remove(e.id)
+      void this.remove(e.id)
     }
     if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('MapAdded', addedMapObjects)
@@ -437,7 +441,6 @@ export class MapService {
    * @returns True if map gets set, Error if it fails
    */
   private static async updateNextMap(): Promise<void> {
-    //if (config.manualMapLoadingEnabled) return
     const id: string = this._queue[0].map.id
     const map: tm.Map | undefined = this._maps.find(a => a.id === id)
     if (map === undefined) { throw new Error(`Cant find map with id ${id} in memory`) }
@@ -448,9 +451,10 @@ export class MapService {
         Logger.error(`Server call to queue map ${map.name} failed. Try ${i - 1}.`, res.message)
       }
       if (i === 4) {
-        //await this.shuffle()
-        //return
-        await Logger.fatal(`Failed to queue map ${map.name}.`, res.message)
+        Logger.error(`Failed to queue map ${map.name}. Removing and shuffling queue.`, res.message)
+        await this.remove(map.id)
+        await this.shuffle()
+        return
       }
       i++
       const list = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])

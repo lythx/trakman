@@ -4,11 +4,7 @@ import { Logger } from '../../src/Logger.js'
 import { Client } from '../../src/client/Client.js'
 import config from '../../config/Config.js'
 import { MapService } from "../../src/services/MapService.js"
-
-type ReturnCode = {
-  code: number
-}
-
+// TODO: Convert to real service
 export class ManualMapLoading {
   static readonly prefix: string = config.mapsDirectoryPrefix
   static mapIndex: number = 0
@@ -24,31 +20,30 @@ export class ManualMapLoading {
   static async parseMaps(presentMaps: tm.Map[] = [], dirname: string = config.mapsDirectory) {
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
     if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
-    const maps: tm.Map[] = []
+    const remainingMaps: tm.Map[] = []
     const addedMaps: tm.Map[] = []
-    const removedMaps: tm.Map[] = []
     for (const f of filesOrDirs) {
       if (f.isDirectory()) {
         (await this.parseMaps(presentMaps, dirname + f.name)).forEach(a => {
-          maps.push(a[0])
+          remainingMaps.push(a[0])
           addedMaps.push(a[1])
-          removedMaps.push(a[2])
         })
         continue
       }
-      const map = await this.parseMap(dirname + '/' + f.name, presentMaps, maps)
-      if ((<ReturnCode>map).code === 2) continue // duplicate file
-      else if ((<tm.Map>map).id !== undefined) maps.push(<tm.Map>map)
-      else if ((<tm.ServerMap>map).UId !== undefined) {
+      const map = await this.parseMap(dirname + '/' + f.name, presentMaps, remainingMaps.concat(addedMaps))
+      if (map instanceof Error) {
+        if (map.message.startsWith("PARSEERROR")) Logger.warn(map.message)
+        continue
+      }
+      if ((map as tm.Map).id !== undefined) remainingMaps.push(map as tm.Map)
+      else if ((map as tm.ServerMap).UId !== undefined) {
         const mapObject: tm.Map = {...MapService.constructNewMapObject(map), voteRatio: 0, voteCount: 0}
-        maps.push(mapObject)
         addedMaps.push(mapObject)
       } else {
-        const removed = presentMaps.find(a => a.fileName === dirname + '/' + f.name)
-        if (removed !== undefined) removedMaps.push(removed)
+        Logger.error("Function parseMap did not return error, but the resulting object does not contain a uid. File " + dirname + '/' + f.name)
       }
     }
-    return [maps, addedMaps, removedMaps]
+    return [remainingMaps, addedMaps]
   }
 
   /**
@@ -62,27 +57,23 @@ export class ManualMapLoading {
    *          code 2 if the map has already been parsed
    *          code 3 if map type or environment is wrong
    */
-  public static async parseMap(filename: string, presentMaps: tm.Map[] = [], parsed: tm.Map[] = []) {
-    if (filename.slice(-14) !== ".Challenge.Gbx") return {code: 1}
+  public static async parseMap(filename: string, presentMaps: tm.Map[] = [], parsed: tm.Map[] = []): Promise<tm.Map | tm.ServerMap | Error> {
+    if (filename.slice(-14) !== ".Challenge.Gbx") return new Error("PARSEERROR: " + filename + " is not a challenge file")
     const file = (await fs.readFile(this.prefix + '/' + filename)).toString()
     let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
     if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
-    if (rawUid == undefined) {
-      Logger.warn('Could not get uid of file ', filename)
-      return {code: 1}
-    }
+    if (rawUid == undefined) return new Error('PARSEERROR: Could not get uid of file ' + filename)
     const uid = rawUid.match(/".*?"/gm)?.[0].slice(1, -1)
-    if (parsed.find(a => a.id === uid)) return {code: 2}
+    if (parsed.find(a => a.id === uid)) return new Error("EXISTS: Map with uid " + uid + " already exists")
     const exists = presentMaps.find(a => a.id === uid)
     if (exists !== undefined) return exists
     const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
     if (!((tm.getGameMode() === "Stunts" && mapType === "Stunts") || mapType === "Race")) {
-      return {code: 3}
+      return new Error("MISMATCH: Map " + uid + " is of type " + mapType + ", which will not work with the current game mode")
     }
     const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
     if (config.stadiumOnly && envir !== "Stadium") {
-      Logger.warn('Non-stadium environment in file ', filename)
-      return {code: 3}
+      return new Error("MISMATCH: Map " + uid + " has environment " + envir + ", not Stadium")
     }
     const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
     // Yes, author logins can sometimes be longer than 40 characters and map names can be longer than 60
@@ -96,8 +87,7 @@ export class ManualMapLoading {
     const authorTime = file.match(/authortime=".*?"/gm)?.[0].slice(12, -1)
     const nbLaps = file.match(/nblaps=".*?"/gm)?.[0].slice(8, -1)
     if (uid == undefined || author == undefined || name == undefined || envir == undefined) {
-      Logger.warn('Could not get map info of file ', filename)
-      return {code: 1}
+      return new Error("PARSEERROR: Could not get map info of file " + filename)
     }
     return {
       Name: name,
@@ -186,8 +176,7 @@ export class ManualMapLoading {
   </filter>
   <startindex>${startAt}</startindex>
 `
-    // NOTE: btoa() is deprecated but idk another easy way to do this
-    if (!await Client.call('WriteFile', [{string: 'MatchSettings.trakman.txt'}, {base64: btoa(header + maps.join('') + '</playlist>')}])) {
+    if (!await Client.call('WriteFile', [{string: 'MatchSettings.trakman.txt'}, {base64: Buffer.from(header + maps.join('') + '</playlist>').toString('base64')}])) {
       Logger.error('Could not write new MatchSettings file')
       return
     }
@@ -196,7 +185,6 @@ export class ManualMapLoading {
       Logger.error('Could not load new match settings')
       return
     }
-    //TODO: save match settings and compare with the uploaded ones to prevent errors.
     Logger.info("Updated MatchSettings, starting at " + startAt)
     this.mapIndex = startAt
     this.oldCurr = curr
