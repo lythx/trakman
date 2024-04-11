@@ -74,7 +74,7 @@ function removeMap(map: tm.MapRemovedInfo): void {
 
 function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function):void {
   if (!Array.isArray(map)) {
-    insertMap(map)
+    fun(map)
     return
   }
   // If the list of added or removed maps is small enough, use insertion/deletion;

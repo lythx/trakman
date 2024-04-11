@@ -1,15 +1,20 @@
 import fs from 'fs/promises'
 
-import { Logger } from '../../src/Logger.js'
-import { Client } from '../../src/client/Client.js'
+import { Logger } from '../Logger.js'
+import { Client } from '../client/Client.js'
 import config from '../../config/Config.js'
-import { MapService } from "../../src/services/MapService.js"
-// TODO: Convert to real service
+import { MapService } from "./MapService.js"
+
 export class ManualMapLoading {
   static readonly prefix: string = config.mapsDirectoryPrefix
   static mapIndex: number = 0
   static oldQueue: tm.Map[]
   static oldCurr: tm.CurrentMap
+
+  static async getFileNames(): Promise<string[]> {
+    const files: string[] = await fs.readdir(this.prefix + config.mapsDirectory, { recursive: true })
+    return files.map(a => config.mapsDirectory + a)
+  }
 
   /**
    * Parse every map in the `config.mapsDirectoryPrefix/config.mapsDirectory
@@ -24,13 +29,12 @@ export class ManualMapLoading {
     const addedMaps: tm.Map[] = []
     for (const f of filesOrDirs) {
       if (f.isDirectory()) {
-        (await this.parseMaps(presentMaps, dirname + f.name)).forEach(a => {
-          remainingMaps.push(a[0])
-          addedMaps.push(a[1])
-        })
+        const res = await this.parseMaps(presentMaps, dirname + f.name + '/')
+        res[0].forEach(a => remainingMaps.push(a))
+        res[1].forEach(a => addedMaps.push(a))
         continue
       }
-      const map = await this.parseMap(dirname + '/' + f.name, presentMaps, remainingMaps.concat(addedMaps))
+      const map = await this.parseMap(dirname + f.name, presentMaps, remainingMaps.concat(addedMaps))
       if (map instanceof Error) {
         if (map.message.startsWith("PARSEERROR")) Logger.warn(map.message)
         continue
@@ -40,7 +44,7 @@ export class ManualMapLoading {
         const mapObject: tm.Map = {...MapService.constructNewMapObject(map), voteRatio: 0, voteCount: 0}
         addedMaps.push(mapObject)
       } else {
-        Logger.error("Function parseMap did not return error, but the resulting object does not contain a uid. File " + dirname + '/' + f.name)
+        Logger.error("Function parseMap did not return error, but the resulting object does not contain a uid. File " + dirname + f.name)
       }
     }
     return [remainingMaps, addedMaps]
@@ -53,13 +57,13 @@ export class ManualMapLoading {
    * @param parsed already parsed maps to check against
    * @returns trakman map object if the uid matches one from the present maps
    *          map object (same format as returned from the server) if parsing successful
-   *          code 1 if parsing unsuccessful
-   *          code 2 if the map has already been parsed
-   *          code 3 if map type or environment is wrong
+   * @throws PARSEERROR if parsing failed
+   *         EXISTS if map was already passed
+   *         MISMATCH if map is incompatible with current game mode or environment setting
    */
   public static async parseMap(filename: string, presentMaps: tm.Map[] = [], parsed: tm.Map[] = []): Promise<tm.Map | tm.ServerMap | Error> {
     if (filename.slice(-14) !== ".Challenge.Gbx") return new Error("PARSEERROR: " + filename + " is not a challenge file")
-    const file = (await fs.readFile(this.prefix + '/' + filename)).toString()
+    const file = (await fs.readFile(this.prefix + filename)).toString()
     let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
     if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
     if (rawUid == undefined) return new Error('PARSEERROR: Could not get uid of file ' + filename)

@@ -10,7 +10,7 @@
     "xml2js": "^0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.33",
+    "@types/node": "^18.11.9",
     "@types/pg": "^8.6.5",
     "@types/pg-copy-streams": "^1.2.5",
     "@types/xml2js": "^0.4.11",

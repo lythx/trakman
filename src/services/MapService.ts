@@ -5,7 +5,7 @@ import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import config from "../../config/Config.js"
 import { GameService } from './GameService.js'
-import { ManualMapLoading } from "../../plugins/manual_maps/ManualMapLoading.js";
+import { ManualMapLoading } from "./ManualMapLoading.js"
 
 interface JukeboxMap {
   readonly map: tm.Map
@@ -65,10 +65,13 @@ export class MapService {
       if (list.findIndex(a => a.id === current.UId) === -1) {
         const v = await this.repo.getVoteCountAndRatio(current.UId)
         const currObj: tm.Map = { ...this.constructNewMapObject(current), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }
-        this._maps.push(currObj)
+        list.push(currObj)
         await this.repo.add(currObj)
       }
-      list.forEach(a => this._maps.push(a))
+      const fileNames = new Set(await ManualMapLoading.getFileNames())
+      this._maps = list.filter(a => fileNames.has(a.fileName)).map(a => ({ map: a, rand: Math.random() }))
+      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+      return
     }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
     if (mapList instanceof Error) {
@@ -82,7 +85,6 @@ export class MapService {
       if (insert instanceof Error && !insert.message.includes("already added."))
         await Logger.fatal('Failed to insert current challenge', insert)
     }
-    if (config.manualMapLoadingEnabled) return
     const DBMapList: tm.Map[] = (await this.repo.getAll())
     const mapsNotInDB: any[] = mapList.filter(a => !DBMapList.some(b => a.UId === b.id))
     if (mapsNotInDB.length > 100) {
@@ -108,7 +110,8 @@ export class MapService {
       }
     }
     // Shuffle maps array
-    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
+    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() }))
+    .sort((a, b): number => a.rand - b.rand).map(a => a.map)
     await this.repo.splitAdd(mapsNotInDBObjects)
   }
 
@@ -395,7 +398,6 @@ export class MapService {
     }
     this._maps = this._maps.filter(a => a.id !== id)
     void this.repo.remove(id)
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) removed map ${Utils.strip(map.name)} by ${map.author}`)
     } else {
@@ -403,6 +405,7 @@ export class MapService {
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
     await this.removeFromQueue(id, caller, false)
+    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     return true
   }
 

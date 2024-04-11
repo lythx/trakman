@@ -377,20 +377,26 @@ export const Utils = {
    * @returns decoded string if successful
    */
   decodeURI(str: string): string {
-    try {
-      const res = decodeURIComponent(str)
-      const map = {
-        '&amp;': '\&',
-        '&quot;': '\"',
-        '&apos;': '\'',
-        '&gt;': '\>',
-        '&lt;': '\<',
-        '+': ' '
-      }
-      return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => {return map[m as keyof typeof map]})
-    } catch (e) {
-      return str
+    const map = {
+      '&amp;': '\&',
+      '&quot;': '\"',
+      '&apos;': '\'',
+      '&gt;': '\>',
+      '&lt;': '\<',
+      '+': ' '
     }
+    let res: string
+    try {
+      res = decodeURIComponent(str)
+    } catch (e) {
+      // try to cut off the last percent sign and try again
+      // this failure happens so little I do not care about speed that much
+      // it looks much better usually
+      const i = str.indexOf('%', str.length - 3)
+      if (i === -1) res = str
+      else res = this.decodeURI(str.slice(0, i)) + "..."
+    }
+    return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => {return map[m as keyof typeof map]})
   },
 
   /**
