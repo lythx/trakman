@@ -343,11 +343,12 @@ export class MapService {
     Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) :
       ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
-    const write: any | Error = await Client.call('WriteFile', [{ string: fileName }, { base64: base64String }])
+    const path = (config.manualMapLoadingEnabled ? config.mapsDirectory : "") + fileName
+    const write: any | Error = await Client.call('WriteFile', [{ string: path }, { base64: base64String }])
     if (write instanceof Error) {
-      return new Error(`Failed to write map file ${fileName}.`)
+      return new Error(`Failed to write map file ${path}.`)
     }
-    const map: tm.Map | Error = await this.add(fileName, caller, options?.dontJuke)
+    const map: tm.Map | Error = await this.add(path, caller, options?.dontJuke)
     if ((options as any)?.cancelIfAlreadyAdded === true && map instanceof Error) {
       return { wasAlreadyAdded: true } as any
     }
@@ -359,10 +360,10 @@ export class MapService {
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
             const id = content.match(/<ident uid=".*?"/gm)?.[0].slice(12, -1)
-            if (id === undefined) return new Error(`Map ${fileName} has no uid`)
+            if (id === undefined) return new Error(`Map ${path} has no uid`)
             const map: tm.Map | undefined = this._maps.find(a => a.id === id)
             if (map === undefined) {
-              return new Error(`Failed to queue map ${fileName}`)
+              return new Error(`Failed to queue map ${path}`)
             }
             if (options?.dontJuke !== true) {
               this.addToJukebox(id, caller)
@@ -372,7 +373,7 @@ export class MapService {
           i++
         }
       }
-      return new Error(`Failed to queue map ${fileName}`)
+      return new Error(`Failed to queue map ${path}`)
     }
     return { wasAlreadyAdded: false, map }
   }
