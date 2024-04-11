@@ -3,7 +3,7 @@ import config from './TestWidget.config.js'
 
 export default class TestWindow {
 
-  private intervals: { login: string, interval: NodeJS.Timer }[] = []
+  private intervals: { login: string, interval: NodeJS.Timeout }[] = []
 
   constructor() {
     tm.commands.add(

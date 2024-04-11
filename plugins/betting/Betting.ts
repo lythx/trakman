@@ -4,7 +4,7 @@ import config from './Config.js'
 
 const betLogins: string[] = []
 let prize: number | undefined
-let betPlaceInterval: NodeJS.Timer
+let betPlaceInterval: NodeJS.Timeout
 let isActive = config.isActive && config.isEnabled
 let isOpen = false
 

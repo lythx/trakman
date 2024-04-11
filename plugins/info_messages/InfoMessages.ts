@@ -6,7 +6,7 @@ import config from './Config.js'
  * @since 1.3
  */
 
-let currentInterval: NodeJS.Timer
+let currentInterval: NodeJS.Timeout
 
 const getRandomMessage = (): string => {
     return config.messages[~~(Math.random() * config.messages.length)]

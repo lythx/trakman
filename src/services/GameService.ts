@@ -35,7 +35,7 @@ export class GameService {
   private static _dynamicTimerOnNextRound = false
   private static timeAttackLimit = config.defaultTimeAttackTimeLimit
   private static remainingDynamicTime: number = config.defaultTimeAttackTimeLimit
-  private static dynamicTimerInterval: NodeJS.Timer
+  private static dynamicTimerInterval: NodeJS.Timeout
   private static lastDynamicTimerUpdate = 0
   private static dynamicTimerPaused = false
   private static _mapStartTimestamp: number
