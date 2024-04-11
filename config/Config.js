@@ -43,10 +43,11 @@ export default {
    * Default value: "../GameData/Tracks/" assuming the trakman directory is on the same level as the server.
    */
   mapsDirectoryPrefix: "../GameData/Tracks/",
-  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`. MUST end with a slash '/'!
-   * Default value: "Campaigns/Nations/Blue/"
+  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`.
+   *  MUST end with a slash '/' when a directory is specified (i.e. if not left empty)!
+   *  Default value: ""
    */
-  mapsDirectory: "Campaigns/Nations/Blue/",
+  mapsDirectory: "",
   /** Ignore non-stadium maps */
   stadiumOnly: undefined,
   /** Amount of maps to load into the server. Default value: 5 */

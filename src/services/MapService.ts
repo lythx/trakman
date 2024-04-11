@@ -294,9 +294,11 @@ export class MapService {
     } else { // Otherwise fetch the info from server and save it in the database
       let res
       if (config.manualMapLoadingEnabled) {
-        const map = await ManualMapLoading.parseMap(filename)
-        if ((<tm.ServerMap>map).UId == undefined) return Error('Could not parse map with filename ' + filename)
-        res = map
+        const map = await ManualMapLoading.parseMap(filename, this._maps)
+        if (map instanceof Error) return map
+        if ((map as tm.Map).id !== undefined) return Error('Challenge already added. Code: -1000')
+        if ((map as tm.ServerMap).UId === undefined) return Error('Could not parse map with filename ' + filename)
+        res = map as tm.ServerMap
       } else {
         const map: any | Error = await Client.call('GetChallengeInfo', [{string: filename}])
         if (map instanceof Error) {
@@ -343,7 +345,8 @@ export class MapService {
     Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) :
       ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
-    const path = (config.manualMapLoadingEnabled ? config.mapsDirectory : "") + fileName
+    // add map directory to filename and sanitise
+    const path = (config.manualMapLoadingEnabled ? config.mapsDirectory : "") + fileName.replace(/[^a-z0-9.]/gi, '_')
     const write: any | Error = await Client.call('WriteFile', [{ string: path }, { base64: base64String }])
     if (write instanceof Error) {
       return new Error(`Failed to write map file ${path}.`)

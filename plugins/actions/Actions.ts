@@ -416,13 +416,13 @@ export const actions = {
       return
     } else if (obj.wasAlreadyAdded) {
       tm.sendMessage(tm.utils.strVar(config.addMap.alreadyAdded, {
-        map: tm.utils.strip(obj.map.name, true),
+        map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
         nickname: tm.utils.strip(nickname, true)
       }), config.addMap.public ? undefined : login)
     } else {
       tm.sendMessage(tm.utils.strVar(config.addMap.added, {
         title: title,
-        map: tm.utils.strip(obj.map.name, true),
+        map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
         nickname: tm.utils.strip(nickname, true)
       }), config.addMap.public ? undefined : login)
     }
