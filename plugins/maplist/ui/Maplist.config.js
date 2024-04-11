@@ -38,7 +38,7 @@ export default {
     icons.trashcanDeleteHover, // Remove map icon
     icons.carExplode // Environment
   ],
-  displayEnvironment: false, // Display environment instead of karma
+  displayEnvironment: undefined, // Display environment instead of karma
   iconWidth: 2,
   queueWidth: 5.2,
   queueNumberWidth: 2.9,

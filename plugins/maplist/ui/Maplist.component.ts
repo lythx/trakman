@@ -17,6 +17,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
   private readonly paginatorIdOffset: number = 7000
   private readonly mapDeleteId: number = 11000
+  private readonly displayEnvironment: boolean = config.displayEnvironment !== undefined ? config.displayEnvironment : process.env.SERVER_PACKMASK !== "nations"
   private nextPaginatorId: number = 0
 
   constructor() {
@@ -269,10 +270,10 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <frame posn="${config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}"
-             image="${config.icons[config.displayEnvironment ? 8 : 5]}"/>
+             image="${config.icons[this.displayEnvironment ? 8 : 5]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(config.displayEnvironment ? (maps[index].environment === 'Stadium' ? 'Stad' : maps[index].environment) : maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
+              ${centeredText(this.displayEnvironment ? (maps[index].environment === 'Stadium' ? 'Stad' : maps[index].environment) : maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
             rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>

@@ -42,7 +42,7 @@ export default {
     goldScore: icons.clockAuthor
   },
   textScale: 1,
-  displayEnvironment: false, // Display environment instead of TMX time
+  displayEnvironment: undefined, // Display environment instead of TMX time
   noDateText: "N/A",
   noAwardsText: "N/A",
   noWrText: "-:--.--",

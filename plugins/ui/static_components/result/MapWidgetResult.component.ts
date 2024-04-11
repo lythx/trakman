@@ -14,6 +14,7 @@ export default class MapWidgetResult extends StaticComponent {
   private readonly rows: number = 5
   private readonly header: StaticHeader
   private readonly grid: Grid
+  private readonly displayEnvironment: boolean = config.displayEnvironment !== undefined ? config.displayEnvironment : process.env.SERVER_PACKMASK !== "nations"
   private isRestart: boolean = false
   private xml: string = ''
 
@@ -83,7 +84,7 @@ export default class MapWidgetResult extends StaticComponent {
       [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
       [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
-      config.displayEnvironment ? [map.environment, ic.environment] : [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
+      this.displayEnvironment ? [map.environment, ic.environment] : [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
     ]
     const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {

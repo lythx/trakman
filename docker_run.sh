@@ -21,6 +21,7 @@ else
   xml ed -L -u "/dedicated/system_config/server_port" -v "$SERVER_NET_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/server_p2p_port" -v "$SERVER_P2P_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/xmlrpc_port" -v "$SERVER_PORT" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/packmask" -v "$SERVER_PACKMASK" dedicated_cfg.txt.bk
   mv /app/server/dedicated_cfg.txt.bk /app/server/GameData/Config/dedicated_cfg.txt
 fi
 # copy over default tracks

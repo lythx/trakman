@@ -39,12 +39,16 @@ export default {
    * the server can handle (it becomes basically unresponsive at 5000 maps).
    */
   manualMapLoadingEnabled: true,
-  /** Path to the `GameData/Tracks/` directory of the server */
+  /** Path to the `GameData/Tracks/` directory of the server. MUST end with a slash '/'!
+   * Default value: "../GameData/Tracks/" assuming the trakman directory is on the same level as the server.
+   */
   mapsDirectoryPrefix: "../GameData/Tracks/",
-  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`. Default value: "./" */
-  mapsDirectory: "./",
+  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`. MUST end with a slash '/'!
+   * Default value: "Campaigns/Nations/Blue/"
+   */
+  mapsDirectory: "Campaigns/Nations/Blue/",
   /** Ignore non-stadium maps */
-  stadiumOnly: true,
+  stadiumOnly: undefined,
   /** Amount of maps to load into the server. Default value: 5 */
   preloadMaps: 5,
   /**

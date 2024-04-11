@@ -6,10 +6,11 @@ import config from '../../config/Config.js'
 import { MapService } from "./MapService.js"
 
 export class ManualMapLoading {
-  static readonly prefix: string = config.mapsDirectoryPrefix
-  static mapIndex: number = 0
-  static oldQueue: tm.Map[]
-  static oldCurr: tm.CurrentMap
+  private static readonly prefix: string = config.mapsDirectoryPrefix
+  private static readonly stadium: boolean = config.stadiumOnly !== undefined ? config.stadiumOnly : process.env.SERVER_PACKMASK === "nations"
+  private static mapIndex: number = 0
+  private static oldQueue: tm.Map[]
+  private static oldCurr: tm.CurrentMap
 
   static async getFileNames(): Promise<string[]> {
     const files: string[] = await fs.readdir(this.prefix + config.mapsDirectory, { recursive: true })
@@ -76,7 +77,7 @@ export class ManualMapLoading {
       return new Error("MISMATCH: Map " + uid + " is of type " + mapType + ", which will not work with the current game mode")
     }
     const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
-    if (config.stadiumOnly && envir !== "Stadium") {
+    if (this.stadium && envir !== "Stadium") {
       return new Error("MISMATCH: Map " + uid + " has environment " + envir + ", not Stadium")
     }
     const author = file.match(/" author=".*?"/gm)?.[0].slice(10, -1).slice(0, 40)
