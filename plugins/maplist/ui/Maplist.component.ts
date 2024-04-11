@@ -188,7 +188,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     const page: number = this.paginator.getPageByLogin(info.login)
     let pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
-    if (page === undefined) {
+    if (page === undefined || page > pageCount) {
       this.displayToPlayer(info.login, { page: 1, paginator: this.paginator }, `1/${pageCount}`)
       return
     }
@@ -339,13 +339,14 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
   private getHeader(login: string, mapIndex: number, mapId: string, actionId: number, deleteId: number, w: number, h: number): string {
     const height: number = h - this.margin
-    const index: number = tm.jukebox.juked.findIndex(a => a.map.id === mapId)
+    const uniqueJuked = tm.jukebox.juked.filter((a, i, arr) => arr.findIndex(b => a.map.id === b.map.id) === i)
+    const index: number = uniqueJuked.findIndex(a => a.map.id === mapId)
     const prevIndex: number = [tm.maps.current, ...tm.jukebox.history].findIndex(a => a.id === mapId)
     const player = tm.players.get(login)
     if (player === undefined) { return '' }
     let overlay: string | undefined
-    if (player?.privilege <= 0 && (prevIndex !== -1 || (tm.jukebox.juked[index]?.callerLogin !== undefined &&
-      tm.jukebox.juked[index].callerLogin !== login))) {
+    if (player?.privilege <= 0 && (prevIndex !== -1 || (uniqueJuked[index]?.callerLogin !== undefined &&
+      uniqueJuked[index].callerLogin !== login))) {
       overlay = `<quad posn="0 0 8" sizen="${w} ${h}" bgcolor="${config.overlayBackground}"/>
         <quad posn="0 0 3" sizen="${config.iconWidth} ${height / 4 - this.margin}" bgcolor="${config.iconBackground}"/>`
     }

@@ -51,7 +51,7 @@ const commands: tm.Command[] = [
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.replay.public ? undefined : info.login)
-      tm.jukebox.add(tm.maps.current.id, info)
+      tm.jukebox.add(tm.maps.current.id, info, true)
     },
     privilege: config.replay.privilege
   },
