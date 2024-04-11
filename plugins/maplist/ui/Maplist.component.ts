@@ -187,7 +187,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     const page: number = this.paginator.getPageByLogin(info.login)
     let pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
-    if (page === undefined) {
+    if (page === undefined || page > pageCount) {
       this.displayToPlayer(info.login, { page: 1, paginator: this.paginator }, `1/${pageCount}`)
       return
     }
