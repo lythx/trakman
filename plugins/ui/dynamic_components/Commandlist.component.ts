@@ -40,7 +40,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     // gets executed therefore need to check again after 10 seconds
     setTimeout(() => this.initializeListsAndPaginators(), 10000)
     addManialinkListener(this.openId, 501, (info, offset) => {
-      const arr: { [id: number]: [Paginator, tm.Command[], string] } = {
+      const arr: Record<number, [Paginator, tm.Command[], string]> = {
         100: [this.userPaginator, this.userCommands, 'User Commands'],
         200: [this.opPaginator, this.opCommands, 'Operator Commands'],
         300: [this.adminPaginator, this.adminCommands, 'Admin Commands'],
@@ -121,7 +121,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
       }
     }
     this.commandLists.length = 0
-    for (let i: number = 0; i <= 4; i++) {
+    for (let i = 0; i <= 4; i++) {
       const arr = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, i + 1)
       const commands: tm.Command[] = arr.flat(1)
       this.commandLists.push(commands)
@@ -137,7 +137,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
 
   openWithQuery(login: string, privilege: number, query: string) {
     const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands,
-    this.ownerCommands].slice(0, privilege + 1).flat(1)
+      this.ownerCommands].slice(0, privilege + 1).flat(1)
     const aliases = commands.map(a => a.aliases).flat(1)
     const matchedAliases = tm.utils.matchString(query, aliases)
     const aliasValues: ({ obj: tm.Command, value: number })[] = []
@@ -230,7 +230,7 @@ export default class CommandList extends PopupWindow<DisplayParams> {
     }
     const arr: GridCellFunction[] = []
     arr.push(...headers)
-    for (let i: number = 0; i < config.entries, params.commands[i + n + 1] !== undefined; i++) {
+    for (let i = 0; i < config.entries, params.commands[i + n + 1] !== undefined; i++) {
       arr.push(privCell, nameCell, paramsCell, commentCell)
     }
     return this.table.constructXml(arr)
