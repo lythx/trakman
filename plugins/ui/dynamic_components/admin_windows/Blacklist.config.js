@@ -1,6 +1,5 @@
 import ids from '../../config/ComponentIds.js'
 import icons from '../../config/Icons.js'
-const p = tm.utils.palette
 
 export default {
   privilege: tm.config.controller.privileges.blacklist,
