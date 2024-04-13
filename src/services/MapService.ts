@@ -36,10 +36,10 @@ export class MapService {
     await this.createList()
     await this.setCurrent()
     this.fillQueue()
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     // Recreate list when Match Settings get changed only with non-dynamic map loading
-    if (!config.manualMapLoadingEnabled) {
+    if (!config.manualMapLoading.enabled) {
       Client.addProxy(['LoadMatchSettings'], async (): Promise<void> => {
         this._maps.length = 0
         await this.createList()
@@ -60,7 +60,7 @@ export class MapService {
       Logger.fatal('Error while getting the current map', current.message)
       return
     }
-    if (config.manualMapLoadingEnabled) {
+    if (config.manualMapLoading.enabled) {
       const list = await this.repo.getAll()
       if (list.findIndex(a => a.id === current.UId) === -1) {
         const v = await this.repo.getVoteCountAndRatio(current.UId)
@@ -122,7 +122,7 @@ export class MapService {
   static async updateList(): Promise<void> {
     let addedMapObjects: tm.Map[] = []
     const removedMaps: tm.Map[] = []
-    if (config.manualMapLoadingEnabled) {
+    if (config.manualMapLoading.enabled) {
       const lists = await ManualMapLoading.parseMaps(this._maps)
       const remainingMaps = lists[0]
       addedMapObjects = lists[1]
@@ -199,7 +199,7 @@ export class MapService {
     for (const e of removedMaps) {
       void this.remove(e.id)
     }
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('MapAdded', addedMapObjects)
     Events.emit('MapRemoved', removedMaps)
   }
@@ -282,7 +282,7 @@ export class MapService {
    * @returns Added map object or error if unsuccessful
    */
   static async add(filename: string, caller?: { login: string, nickname: string }, dontJuke: boolean = false): Promise<tm.Map | Error> {
-    if (!config.manualMapLoadingEnabled) {
+    if (!config.manualMapLoading.enabled) {
       const insert: any | Error = await Client.call('InsertChallenge', [{string: filename}])
       if (insert instanceof Error) return insert
       if (insert === false) return new Error(`Failed to insert map ${filename}`)
@@ -293,7 +293,7 @@ export class MapService {
       obj = { ...dbEntry }
     } else { // Otherwise fetch the info from server and save it in the database
       let res
-      if (config.manualMapLoadingEnabled) {
+      if (config.manualMapLoading.enabled) {
         const map = await ManualMapLoading.parseMap(filename, this._maps)
         if (map instanceof Error) return map
         if ((map as tm.Map).id !== undefined) return Error('Challenge already added. Code: -1000')
@@ -346,7 +346,7 @@ export class MapService {
       ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
     // add map directory to filename and sanitise
-    const path = (config.manualMapLoadingEnabled ? config.mapsDirectory : "") + fileName.replace(/[^a-z0-9.]/gi, '_')
+    const path = (config.manualMapLoading.enabled ? config.manualMapLoading.mapsDirectory : "") + fileName.replace(/[^a-z0-9.]/gi, '_')
     const write: any | Error = await Client.call('WriteFile', [{ string: path }, { base64: base64String }])
     if (write instanceof Error) {
       return new Error(`Failed to write map file ${path}.`)
@@ -391,7 +391,7 @@ export class MapService {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
     await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }]) // I HAVE NO CLUE HOW IT WORKS WITH THIS
     if (map === undefined) { return false }
-    if (!config.manualMapLoadingEnabled) {
+    if (!config.manualMapLoading.enabled) {
       const remove: any | Error = await Client.call('RemoveChallenge', [{string: map.fileName}])
       if (remove instanceof Error) {
         return remove
@@ -409,7 +409,7 @@ export class MapService {
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
     await this.removeFromQueue(id, caller, false)
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     return true
   }
 
@@ -417,7 +417,7 @@ export class MapService {
    * Puts current map into history array, changes current map and updates the queue
    */
   static async update(): Promise<void> {
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.nextMap(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.nextMap(this._current, this._queue.map(a => a.map))
     this._history.unshift(this._current)
     this._history.length = Math.min(this.historySize, this._history.length)
     await this.setCurrent()
@@ -488,7 +488,7 @@ export class MapService {
     const index: number = setAsNextMap ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(map.name)} by ${map.author} to the jukebox`)
@@ -516,7 +516,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     return true
@@ -536,7 +536,7 @@ export class MapService {
     }
     this.fillQueue()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
@@ -553,7 +553,7 @@ export class MapService {
     this._maps = this._maps.map(a => ({ map: a, rand: Math.random() })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
-    if (config.manualMapLoadingEnabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
+    if (config.manualMapLoading.enabled) await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.updateNextMap()
     if (caller !== undefined) {

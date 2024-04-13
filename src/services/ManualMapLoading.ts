@@ -1,20 +1,21 @@
 import fs from 'fs/promises'
 
-import { Logger } from '../Logger.js'
-import { Client } from '../client/Client.js'
+import {Logger} from '../Logger.js'
+import {Client} from '../client/Client.js'
 import config from '../../config/Config.js'
-import { MapService } from "./MapService.js"
+import {MapService} from './MapService.js'
+import {GameService} from './GameService.js'
 
 export class ManualMapLoading {
-  private static readonly prefix: string = config.mapsDirectoryPrefix
-  private static readonly stadium: boolean = config.stadiumOnly !== undefined ? config.stadiumOnly : process.env.SERVER_PACKMASK === "nations"
+  private static readonly prefix: string = config.manualMapLoading.mapsDirectoryPrefix
+  private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ? config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === "nations"
   private static mapIndex: number = 0
   private static oldQueue: tm.Map[]
   private static oldCurr: tm.CurrentMap
 
   static async getFileNames(): Promise<string[]> {
-    const files: string[] = await fs.readdir(this.prefix + config.mapsDirectory, { recursive: true })
-    return files.map(a => config.mapsDirectory + a)
+    const files: string[] = await fs.readdir(this.prefix + config.manualMapLoading.mapsDirectory, {recursive: true})
+    return files.map(a => config.manualMapLoading.mapsDirectory + a)
   }
 
   /**
@@ -23,7 +24,7 @@ export class ManualMapLoading {
    * @param dirname the directory name
    * @returns list of maps in the same format that the server returns them
    */
-  static async parseMaps(presentMaps: tm.Map[] = [], dirname: string = config.mapsDirectory) {
+  static async parseMaps(presentMaps: tm.Map[] = [], dirname: string = config.manualMapLoading.mapsDirectory) {
     const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
     if (filesOrDirs.length > 5000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
     const remainingMaps: tm.Map[] = []
@@ -40,8 +41,9 @@ export class ManualMapLoading {
         if (map.message.startsWith("PARSEERROR")) Logger.warn(map.message)
         continue
       }
-      if ((map as tm.Map).id !== undefined) remainingMaps.push(map as tm.Map)
-      else if ((map as tm.ServerMap).UId !== undefined) {
+      if ((map as tm.Map).id !== undefined) {
+        remainingMaps.push(map as tm.Map)
+      } else if ((map as tm.ServerMap).UId !== undefined) {
         const mapObject: tm.Map = {...MapService.constructNewMapObject(map), voteRatio: 0, voteCount: 0}
         addedMaps.push(mapObject)
       } else {
@@ -73,7 +75,7 @@ export class ManualMapLoading {
     const exists = presentMaps.find(a => a.id === uid)
     if (exists !== undefined) return exists
     const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
-    if (!((tm.getGameMode() === "Stunts" && mapType === "Stunts") || mapType === "Race")) {
+    if (!((GameService.config.gameMode === 4 && mapType === "Stunts") || mapType === "Race")) {
       return new Error("MISMATCH: Map " + uid + " is of type " + mapType + ", which will not work with the current game mode")
     }
     const envir = file.match(/desc envir=".*?"/gm)?.[0].slice(12, -1)
@@ -100,13 +102,13 @@ export class ManualMapLoading {
       FileName: filename,
       Environnement: envir,
       Author: author,
-      GoldTime: goldTime == undefined? 0 : parseInt(goldTime),
-      CopperPrice: price == undefined? 0 : parseInt(price),
-      Mood: mood == undefined? "Day" : mood,
-      BronzeTime: bronzeTime == undefined? 0 : parseInt(bronzeTime),
-      SilverTime: silverTime == undefined? 0 : parseInt(silverTime),
-      AuthorTime: authorTime == undefined? 0 : parseInt(authorTime),
-      NbLaps: nbLaps == undefined? 0 : parseInt(nbLaps)
+      GoldTime: goldTime == undefined ? 0 : parseInt(goldTime),
+      CopperPrice: price == undefined ? 0 : parseInt(price),
+      Mood: mood == undefined ? "Day" : mood,
+      BronzeTime: bronzeTime == undefined ? 0 : parseInt(bronzeTime),
+      SilverTime: silverTime == undefined ? 0 : parseInt(silverTime),
+      AuthorTime: authorTime == undefined ? 0 : parseInt(authorTime),
+      NbLaps: nbLaps == undefined ? 0 : parseInt(nbLaps)
     }
   }
 
@@ -119,7 +121,7 @@ export class ManualMapLoading {
    * @param startAt
    */
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt: number = 0) {
-    const newQueue = (queue.slice(0, config.preloadMaps))
+    const newQueue = (queue.slice(0, config.manualMapLoading.preloadMaps))
     if (this.oldQueue !== undefined && this.oldCurr !== undefined
       && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName &&
       this.oldQueue.every(((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
@@ -138,7 +140,7 @@ export class ManualMapLoading {
   </challenge>
 `)
 
-    const game = tm.config.game
+    const game = GameService.config
     const header: string = `<?xml version="1.0" encoding="utf-8" ?>
 <playlist>
   <gameinfos>
@@ -202,6 +204,6 @@ export class ManualMapLoading {
    * @param queue the queue
    */
   static async nextMap(curr: tm.CurrentMap, queue: tm.Map[]) {
-    if (++this.mapIndex >= config.preloadMaps) await this.writeMS(curr, queue, 1)
+    if (++this.mapIndex >= config.manualMapLoading.preloadMaps) await this.writeMS(curr, queue, 1)
   }
 }

@@ -112,7 +112,6 @@ const commands: tm.Command[] = [
   {
     aliases: config.updatemaps.aliases,
     help: config.updatemaps.help,
-    params: [],
     callback: async (info: tm.MessageInfo) => {
       await actions.updateMaps()
       tm.sendMessage(tm.utils.strVar(config.updatemaps.text,

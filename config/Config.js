@@ -37,21 +37,27 @@ export default {
    * Enable this for Trakman to take over handling maps. The controller will read maps from a folder
    * defined below and give the upcoming ones to the server, allowing for much more map capacity than
    * the server can handle (it becomes basically unresponsive at 5000 maps).
+   * Enabling is recommended for new servers since writing a MatchSettings file manually is laborious,
+   * while old servers with some deleted maps will probably not gain a large advantage.
+   *
+   * Only works when the Trackmania server is on the same computer as Trakman!
    */
-  manualMapLoadingEnabled: true,
-  /** Path to the `GameData/Tracks/` directory of the server. MUST end with a slash '/'!
-   * Default value: "../GameData/Tracks/" assuming the trakman directory is on the same level as the server.
-   */
-  mapsDirectoryPrefix: "../GameData/Tracks/",
-  /** Relative path to all the maps. Read recursively from `GameData/Tracks/`.
-   *  MUST end with a slash '/' when a directory is specified (i.e. if not left empty)!
-   *  Default value: ""
-   */
-  mapsDirectory: "",
-  /** Ignore non-stadium maps */
-  stadiumOnly: undefined,
-  /** Amount of maps to load into the server. Default value: 5 */
-  preloadMaps: 5,
+  manualMapLoading: {
+    enabled: false,
+    /** Path to the `GameData/Tracks/` directory of the server. MUST end with a slash '/'!
+     * Default value: "../GameData/Tracks/" assuming the Trakman directory is on the same level as the server.
+     */
+    mapsDirectoryPrefix: "../GameData/Tracks/",
+    /** Relative path to all the maps. Read recursively from `GameData/Tracks/`.
+     *  MUST end with a slash '/' when a directory is specified (i.e. if not left empty)!
+     *  Default value: ""
+     */
+    mapsDirectory: "",
+    /** Ignore non-stadium maps */
+    stadiumOnly: undefined,
+    /** Amount of maps to load into the server. Default value: 5 */
+    preloadMaps: 5,
+  },
   /**
    * When adding a large amount of maps, it is better to add them in smaller chunks. This is the size
    * of each chunk. Set to a higher amount to increase speed of pushing to the database, decrease
