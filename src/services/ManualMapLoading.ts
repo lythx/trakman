@@ -46,7 +46,7 @@ export class ManualMapLoading {
       const map = await this.parseMap(dirname + f.name, presentSet, parsed)
       if (map instanceof Error) {
         if (map.message.startsWith("PARSEERROR")) {
-          Logger.warn(map.message)
+          Logger.trace(map.message)
         }
         continue
       }
@@ -169,21 +169,21 @@ export class ManualMapLoading {
 <playlist>
   <gameinfos>
     <game_mode>${game.gameMode}</game_mode>
-    <chat_time>10000</chat_time>
+    <chat_time>${game.resultTime}</chat_time>
     <finishtimeout>${game.finishTimeout}</finishtimeout>
     <allwarmupduration>${game.warmUpDuration}</allwarmupduration>
     <disablerespawn>${game.disableRespawn ? 1 : 0}</disablerespawn>
     <forceshowallopponents>${game.forceShowOpponents}</forceshowallopponents>
     <rounds_pointslimit>${game.roundsPointLimitOld}</rounds_pointslimit>
-    <rounds_usenewrules>1</rounds_usenewrules>
+    <rounds_usenewrules>${game.roundsPointSystemType === "new" ? 1 : 0}</rounds_usenewrules>
     <rounds_forcedlaps>${game.roundsModeLapsAmount}</rounds_forcedlaps>
     <rounds_pointslimitnewrules>${game.roundsPointLimitNew}</rounds_pointslimitnewrules>
     <team_pointslimit>${game.teamPointLimitOld}</team_pointslimit>
     <team_maxpoints>${game.teamMaxPoints}</team_maxpoints>
-    <team_usenewrules>1</team_usenewrules>
+    <team_usenewrules>${game.teamPointSystemType === "old" ? 1 : 0}</team_usenewrules>
     <team_pointslimitnewrules>${game.teamPointLimitNew}</team_pointslimitnewrules>
     <timeattack_limit>${game.timeAttackLimit}</timeattack_limit>
-    <timeattack_synchstartperiod>0</timeattack_synchstartperiod>
+    <timeattack_synchstartperiod>${game.countdownAdditionalTime}</timeattack_synchstartperiod>
     <laps_nblaps>${game.lapsModeLapsAmount}</laps_nblaps>
     <laps_timelimit>${game.lapsModeTimeLimit}</laps_timelimit>
     <cup_pointslimit>${game.cupPointsLimit}</cup_pointslimit>
