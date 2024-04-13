@@ -1,10 +1,10 @@
 import fs from 'fs/promises'
 
-import {Logger} from '../Logger.js'
-import {Client} from '../client/Client.js'
+import { Logger } from '../Logger.js'
+import { Client } from '../client/Client.js'
 import config from '../../config/Config.js'
-import {MapService} from './MapService.js'
-import {GameService} from './GameService.js'
+import { MapService } from './MapService.js'
+import { GameService } from './GameService.js'
 
 export class ManualMapLoading {
   private static readonly prefix: string = config.manualMapLoading.mapsDirectoryPrefix
@@ -25,14 +25,18 @@ export class ManualMapLoading {
    * @returns list of maps in the same format that the server returns them
    */
   static async parseMaps(presentMaps: tm.Map[] = [], dirname: string = config.manualMapLoading.mapsDirectory): Promise<[Set<string>, Set<tm.Map>]> {
-    const filesOrDirs = await fs.readdir(this.prefix + dirname, {withFileTypes: true})
-    if (filesOrDirs.length > 10000) Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
+    const filesOrDirs = await fs.readdir(this.prefix + dirname, { withFileTypes: true })
+    if (filesOrDirs.length > 10000) {
+      Logger.warn(`Trying to parse a large amount of maps (${filesOrDirs.length}), reading their info might take a while.`)
+    }
     const parsed: Set<string> = new Set()
     const addedMaps: Set<tm.Map> = new Set()
     const presentSet: Set<string> = new Set(presentMaps.map(a => a.id))
     let done = 0
     for (const f of filesOrDirs) {
-      if ((++done) % 10000 === 0) Logger.info(`Parsed ${done}/${filesOrDirs.length} maps`)
+      if ((++done) % 10000 === 0) { 
+        Logger.info(`Parsed ${done}/${filesOrDirs.length} maps`)
+      }
       if (f.isDirectory()) {
         const res: [Set<string>, Set<tm.Map>] = await this.parseMaps(presentMaps, dirname + f.name + '/')
         res[0].forEach(a => parsed.add(a))
@@ -41,7 +45,9 @@ export class ManualMapLoading {
       }
       const map = await this.parseMap(dirname + f.name, presentSet, parsed)
       if (map instanceof Error) {
-        if (map.message.startsWith("PARSEERROR")) Logger.warn(map.message)
+        if (map.message.startsWith("PARSEERROR")) { 
+          Logger.warn(map.message) 
+        }
         continue
       }
       if (typeof map === 'string') {
@@ -71,15 +77,30 @@ export class ManualMapLoading {
    *         MISMATCH if map is incompatible with current game mode or environment setting
    */
   public static async parseMap(filename: string, presentMaps: Set<string>, parsed: Set<string> = new Set()): Promise<tm.ServerMap | string | Error> {
-    if (filename.slice(-14).toLowerCase() !== ".challenge.gbx") return new Error("PARSEERROR: " + filename + " is not a challenge file")
+    // todo:
+    // this check is unreliable since you could rename anything to anything.
+    // checking for 'type="challenge"' in the gbx header would work better -w
+    if (filename.slice(-14).toLowerCase() !== ".challenge.gbx") {
+      return new Error("PARSEERROR: " + filename + " is not a challenge file")
+    }
     const file = (await fs.readFile(this.prefix + filename)).toString()
     let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
-    if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
-    if (rawUid === undefined) return new Error('PARSEERROR: Could not get uid of file ' + filename)
+    if (rawUid == null) { 
+      rawUid = file.match(/challenge uid=".*?"/gm)?.[0] 
+    }
+    if (rawUid === undefined) { 
+      return new Error('PARSEERROR: Could not get uid of file ' + filename)
+    }
     const uid = rawUid.match(/".*?"/gm)?.[0].slice(1, -1)
-    if (uid === undefined) return new Error('PARSEERROR: Uid exists in file ' + filename + ' but is not accessible!')
-    if (parsed.has(uid)) return new Error("EXISTS: Map with uid " + uid + " has already been parsed")
-    if (presentMaps.has(uid)) return uid
+    if (uid === undefined) {
+      return new Error('PARSEERROR: Uid exists in file ' + filename + ' but is not accessible!')
+    }
+    if (parsed.has(uid)) { 
+      return new Error("EXISTS: Map with uid " + uid + " has already been parsed")
+    }
+    if (presentMaps.has(uid)) { 
+      return uid
+    }
     const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
     if (!((GameService.config.gameMode === 4 && mapType === "Stunts") || mapType === "Race")) {
       return new Error("MISMATCH: Map " + uid + " is of type " + mapType + ", which will not work with the current game mode")
@@ -129,8 +150,8 @@ export class ManualMapLoading {
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt = 0) {
     const newQueue = (queue.slice(0, config.manualMapLoading.preloadMaps))
     if (this.oldQueue !== undefined && this.oldCurr !== undefined
-      && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName &&
-      this.oldQueue.every(((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
+      && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName
+      && this.oldQueue.every(((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
       Logger.trace("Did not write new MatchSettings")
       return
     }
@@ -189,11 +210,11 @@ export class ManualMapLoading {
   </filter>
   <startindex>${startAt}</startindex>
 `
-    if (!await Client.call('WriteFile', [{string: 'MatchSettings.trakman.txt'}, {base64: Buffer.from(header + maps.join('') + '</playlist>').toString('base64')}])) {
+    if (!await Client.call('WriteFile', [{ string: 'MatchSettings.trakman.txt' }, { base64: Buffer.from(header + maps.join('') + '</playlist>').toString('base64') }])) {
       Logger.error('Could not write new MatchSettings file')
       return
     }
-    const res = await Client.call(`LoadMatchSettings`, [{string: 'MatchSettings.trakman.txt'}])
+    const res = await Client.call(`LoadMatchSettings`, [{ string: 'MatchSettings.trakman.txt' }])
     if (res instanceof Error) {
       Logger.error('Could not load new match settings')
       return
@@ -210,6 +231,8 @@ export class ManualMapLoading {
    * @param queue the queue
    */
   static async nextMap(curr: tm.CurrentMap, queue: tm.Map[]) {
-    if (++this.mapIndex >= config.manualMapLoading.preloadMaps) await this.writeMS(curr, queue, 1)
+    if (++this.mapIndex >= config.manualMapLoading.preloadMaps) {
+      await this.writeMS(curr, queue, 1)
+    }
   }
 }
