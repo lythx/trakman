@@ -78,6 +78,9 @@ export class ManualMapLoading {
    */
   public static async parseMap(filename: string, presentMaps: Set<string>, parsed: Set<string> = new Set()): Promise<tm.ServerMap | string | Error> {
     const file = (await fs.readFile(this.prefix + filename)).toString()
+    if (file.match(/<header +type="challenge"/gm)?.[0] === undefined) {
+      return new Error("PARSEERROR: " + filename + " is not a challenge file")
+    }
     let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
     if (rawUid == null) {
       rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
@@ -94,9 +97,6 @@ export class ManualMapLoading {
     }
     if (presentMaps.has(uid)) {
       return uid
-    }
-    if (file.match(/<header +type="challenge"/gm)?.[0] === undefined) {
-      return new Error("PARSEERROR: " + filename + " is not a challenge file")
     }
     const mapType = file.match(/(?<!header +)type=".*?"/gm)?.[0].slice(6, -1)
     if (!((GameService.config.gameMode === 4 && mapType === "Stunts") || mapType === "Race")) {
