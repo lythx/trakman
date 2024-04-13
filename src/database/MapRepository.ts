@@ -68,24 +68,16 @@ export class MapRepository extends Repository {
   }
 
   async add(...maps: tm.Map[]): Promise<void> {
-    // TODO: use copy also for map id's, since this becomes the bottleneck?
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
-    /*const arr = maps.filter(a => ids.some(b => b.uid === a.id))
-    if (arr.length !== maps.length) {
-      Logger.error(`Failed to get ids for maps ${maps.filter(a => !ids.some(b => b.uid === a.id)).map(a => '(' + a.id + ': ' + a.name + ')').join(', ')} while inserting into maps table`)
-    }
-    if (arr.length === 0) {
-      return
-    }*/
     const uids = new Map(ids.map(a => [a.id, maps.find(b => b.id === a.uid)]))
     const values: string[] = []
-    //for (const [i, map] of arr.entries()) {
     uids.forEach((map, i) => {
       if (map !== undefined) {
         values.push(([i, map.name,
           map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
           map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
-          map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
+          map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString()
+          .replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
       }
     })
     const bulk = values.join('\n')
