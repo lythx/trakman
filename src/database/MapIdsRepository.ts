@@ -1,4 +1,4 @@
-import { Repository } from "./Repository.js"
+import {Repository} from "./Repository.js"
 import config from "../../config/Config.js"
 
 export class MapIdsRepository extends Repository {
@@ -20,8 +20,12 @@ export class MapIdsRepository extends Repository {
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
       isArr = false
-    } else if (mapUids.length === 0) { return [] }
-    const query = `SELECT uid, id FROM map_ids WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR `).join('').slice(0, -3)}`
+    } else if (mapUids.length === 0) {
+      return []
+    }
+    const query = `SELECT uid, id
+                   FROM map_ids
+                   WHERE ${mapUids.map((a, i) => `uid=$${i + 1} OR `).join('').slice(0, -3)}`
     const res = await this.query(query, ...mapUids)
     return isArr ? res : res[0]?.id
   }
@@ -33,12 +37,14 @@ export class MapIdsRepository extends Repository {
   async splitGet(mapUids: string[] | string) {
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
-    } else if (mapUids.length === 0) { return [] }
+    } else if (mapUids.length === 0) {
+      return []
+    }
     const splitby = config.splitBy
     const len = Math.ceil(mapUids.length / splitby)
     const ret = []
-    for (let i= 0; i < len; i++) {
-      ret.push(...await this.get(mapUids.slice(i*splitby, (i+1)*splitby)))
+    for (let i = 0; i < len; i++) {
+      ret.push(...await this.get(mapUids.slice(i * splitby, (i + 1) * splitby)))
     }
     return ret
   }
@@ -50,11 +56,14 @@ export class MapIdsRepository extends Repository {
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
       isArr = false
-    } else if (mapUids.length === 0) { return [] }
-    const query = `INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, mapUids.length)} 
-    ON CONFLICT (uid) DO UPDATE SET uid=EXCLUDED.uid
-    RETURNING id, uid`
-    const res = (await this.query(query, ...mapUids))
+    } else if (mapUids.length === 0) {
+      return []
+    }
+    const uidSet = new Set(mapUids)
+    const query = `INSERT INTO map_ids(uid) ${this.getInsertValuesString(1, uidSet.size)} ON CONFLICT (uid) DO
+    UPDATE SET uid=EXCLUDED.uid
+        RETURNING id, uid`
+    const res = (await this.query(query, ...uidSet))
     return isArr ? res : res[0]?.id
   }
 
