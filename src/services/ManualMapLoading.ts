@@ -65,7 +65,7 @@ export class ManualMapLoading {
    *         MISMATCH if map is incompatible with current game mode or environment setting
    */
   public static async parseMap(filename: string, presentMaps: tm.Map[] = [], parsed: tm.Map[] = []): Promise<tm.Map | tm.ServerMap | Error> {
-    if (filename.slice(-14) !== ".Challenge.Gbx") return new Error("PARSEERROR: " + filename + " is not a challenge file")
+    if (filename.slice(-14).toLowerCase() !== ".challenge.gbx") return new Error("PARSEERROR: " + filename + " is not a challenge file")
     const file = (await fs.readFile(this.prefix + filename)).toString()
     let rawUid = file.match(/ident uid=".*?"/gm)?.[0]
     if (rawUid == null) rawUid = file.match(/challenge uid=".*?"/gm)?.[0]
