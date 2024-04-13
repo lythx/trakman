@@ -114,7 +114,7 @@ export class ManualMapLoading {
       BronzeTime: bronzeTime == undefined ? 0 : parseInt(bronzeTime),
       SilverTime: silverTime == undefined ? 0 : parseInt(silverTime),
       AuthorTime: authorTime == undefined ? 0 : parseInt(authorTime),
-      NbLaps: nbLaps == undefined ? 0 : parseInt(nbLaps)
+      NbLaps: nbLaps == undefined ? 0 : Math.min(Math.max(parseInt(nbLaps), 32767), -32768)
     }
   }
 

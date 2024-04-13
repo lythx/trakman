@@ -77,7 +77,7 @@ export class MapRepository extends Repository {
           map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
           map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
           map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString()
-          .replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
+        .replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
       }
     })
     const bulk = values.join('\n')
