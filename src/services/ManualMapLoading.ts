@@ -9,7 +9,7 @@ import {GameService} from './GameService.js'
 export class ManualMapLoading {
   private static readonly prefix: string = config.manualMapLoading.mapsDirectoryPrefix
   private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ? config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === "nations"
-  private static mapIndex: number = 0
+  private static mapIndex = 0
   private static oldQueue: tm.Map[]
   private static oldCurr: tm.CurrentMap
 
@@ -120,7 +120,7 @@ export class ManualMapLoading {
    * @param queue the queue
    * @param startAt
    */
-  static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt: number = 0) {
+  static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt = 0) {
     const newQueue = (queue.slice(0, config.manualMapLoading.preloadMaps))
     if (this.oldQueue !== undefined && this.oldCurr !== undefined
       && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName &&
@@ -129,7 +129,7 @@ export class ManualMapLoading {
       return
     }
 
-    let maps = newQueue.map(a => `  <challenge>
+    const maps = newQueue.map(a => `  <challenge>
     <file>${a.fileName.replaceAll('/', '\\')}</file>
     <ident>${a.id}</ident>
   </challenge>
@@ -141,7 +141,7 @@ export class ManualMapLoading {
 `)
 
     const game = GameService.config
-    const header: string = `<?xml version="1.0" encoding="utf-8" ?>
+    const header = `<?xml version="1.0" encoding="utf-8" ?>
 <playlist>
   <gameinfos>
     <game_mode>${game.gameMode}</game_mode>

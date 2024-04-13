@@ -14,7 +14,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_sector_records(
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
 );`,
-  `CREATE TABLE IF NOT EXISTS sector_records(
+`CREATE TABLE IF NOT EXISTS sector_records(
   map_id INT4 NOT NULL,
   player_id INT4 NOT NULL,
   sectors INT4[] NOT NULL,

@@ -35,10 +35,10 @@ import Buttons from './Buttons.js'
 
 let customUi: CustomUi
 
-let currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
+const currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
 
 const loadMod = (): void => {
-  let mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
+  const mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
   for (const obj of modConfig) {
     if (obj.modLinks.length === 0) { continue }
     mods.push({

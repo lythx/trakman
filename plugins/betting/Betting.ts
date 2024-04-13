@@ -22,7 +22,7 @@ const returnCoppers = (login: string) => {
     }))
 }
 
-const onTimeRunOut = (wasInterrupted: boolean = false) => {
+const onTimeRunOut = (wasInterrupted = false) => {
   clearInterval(betPlaceInterval)
   isOpen = false
   const unitedPlayers = tm.players.list.filter(a => a.isUnited)
@@ -99,7 +99,7 @@ if (config.isEnabled) {
       })
     }
     const betStartTimestamp = Date.now()
-    let lastRemainingSeconds = -1
+    const lastRemainingSeconds = -1
     betPlaceInterval = setInterval(() => {
       const remainingSeconds = config.betTimeSeconds - ~~((Date.now() - betStartTimestamp) / 1000)
       if (remainingSeconds < 0) {

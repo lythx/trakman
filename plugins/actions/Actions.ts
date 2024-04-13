@@ -89,7 +89,7 @@ export const actions = {
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.unmute(login, info)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while unmuting player ${logStr}`, result.message)
       tm.sendMessage(tm.utils.strVar(config.unmute.error, { login: login }), info.login)
@@ -207,7 +207,7 @@ export const actions = {
     }
     const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
     const result = await tm.admin.unban(login, info)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while unmuting player ${logStr}`, result.message)
       tm.sendMessage(tm.utils.strVar(config.unban.error, { login: login }), info.login)
@@ -234,7 +234,7 @@ export const actions = {
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     const result = await tm.admin.addToBlacklist(login, info, targetInfo?.nickname, reason, expireDate)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while blacklisting player ${logStr}`, result.message)
       tm.sendMessage(tm.utils.strVar(config.blacklist.error, { login: login }), info.login)
@@ -256,7 +256,7 @@ export const actions = {
     }
     const targetInfo: tm.OfflinePlayer | undefined = await tm.players.fetch(login)
     const result = await tm.admin.unblacklist(login, info)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while removing player ${logStr} from the blacklist`, result.message)
       tm.sendMessage(tm.utils.strVar(config.unblacklist.error, { login: login }), info.login)
@@ -280,7 +280,7 @@ export const actions = {
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.addGuest(login, info, targetInfo?.nickname)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while adding player ${logStr} to the guestlist`, result.message)
       tm.sendMessage(tm.utils.strVar(config.addguest.error, { login: login }), info.login)
@@ -304,7 +304,7 @@ export const actions = {
     }
     const targetInfo: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
     const result = await tm.admin.removeGuest(login, info)
-    let logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
+    const logStr: string = targetInfo === undefined ? `(${login})` : `${tm.utils.strip(targetInfo.nickname)} (${targetInfo.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while removing player ${logStr} from the guestlist`, result.message)
       tm.sendMessage(tm.utils.strVar(config.rmguest.error, { login: login }), info.login)
@@ -394,7 +394,7 @@ export const actions = {
       await tm.admin.setPrivilege(target.login, privilege, caller)
     }
   },
-  addMap: async (login: string, nickname: string, title: string, id: number | string, tmxSite?: string, fromUrl: boolean = false) => {
+  addMap: async (login: string, nickname: string, title: string, id: number | string, tmxSite?: string, fromUrl = false) => {
     const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
     const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
     let file: { name: string, content: Buffer } | Error = await tm.tmx.fetchMapFile(id as any, site).catch((err: Error) => err)

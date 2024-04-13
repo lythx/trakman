@@ -9,7 +9,7 @@ export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
-  private static readonly environments: { [key: number]: tm.Environment } = {
+  private static readonly environments: Record<number, tm.Environment> = {
     1: 'Snow',
     2: 'Desert',
     3: 'Rally',
@@ -18,24 +18,24 @@ export abstract class TMXFetcher {
     6: 'Bay',
     7: 'Stadium'
   }
-  private static readonly difficulties: { [key: number]: tm.TMXDifficulty } = {
+  private static readonly difficulties: Record<number, tm.TMXDifficulty> = {
     0: 'Beginner',
     1: 'Intermediate',
     2: 'Expert',
     3: 'Lunatic'
   }
-  private static readonly moods: { [key: number]: tm.Mood } = {
+  private static readonly moods: Record<number, tm.Mood> = {
     0: 'Sunrise',
     1: 'Day',
     2: 'Sunset',
     3: 'Night'
   }
-  private static readonly routes: { [key: number]: tm.TMXRoutes } = {
+  private static readonly routes: Record<number, tm.TMXRoutes> = {
     0: 'Single',
     1: 'Multiple',
     2: 'Symmetrical'
   }
-  private static readonly mapTypes: { [key: number]: tm.TMXMapType } = {
+  private static readonly mapTypes: Record<number, tm.TMXMapType> = {
     0: 'Race',
     1: 'Puzzle',
     2: 'Platform',
@@ -43,7 +43,7 @@ export abstract class TMXFetcher {
     4: 'Shortcut',
     5: 'Laps'
   }
-  private static readonly cars: { [key: number]: tm.TMXCar } = {
+  private static readonly cars: Record<number, tm.TMXCar> = {
     1: 'SnowCar',
     2: 'DesertCar',
     3: 'RallyCar',
@@ -52,7 +52,7 @@ export abstract class TMXFetcher {
     6: 'BayCar',
     7: 'StadiumCar'
   }
-  private static readonly styles: { [key: number]: tm.TMXStyle } = {
+  private static readonly styles: Record<number, tm.TMXStyle> = {
     0: 'Normal',
     1: 'Stunt',
     2: 'Maze',
@@ -91,7 +91,7 @@ export abstract class TMXFetcher {
       id = res.id
       prefix = res.prefix
     }
-    const url: string = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
+    const url = `https://${prefix}.tm-exchange.com/trackgbx/${id}`
     const res = await fetch(url).catch((err: Error) => err)
     if (res instanceof Error) {
       Logger.warn(`Error while fetching map file from TMX (url: ${url}).`, res.message)
@@ -165,7 +165,7 @@ export abstract class TMXFetcher {
           `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
         ['id', tmxId.toString()]
       ])
-        }`
+      }`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.warn(`Error while fetching map info from TMX (url: ${url}).`, res.message)

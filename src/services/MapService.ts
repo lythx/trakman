@@ -70,7 +70,7 @@ export class MapService {
       }
       const fileNames = new Set(await ManualMapLoading.getFileNames())
       this._maps = list.filter(a => fileNames.has(a.fileName)).map(a => ({ map: a, rand: Math.random() }))
-      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+        .sort((a, b): number => a.rand - b.rand).map(a => a.map)
       return
     }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
@@ -111,7 +111,7 @@ export class MapService {
     }
     // Shuffle maps array
     this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() }))
-    .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
     await this.repo.splitAdd(mapsNotInDBObjects)
   }
 
@@ -281,7 +281,7 @@ export class MapService {
    * @param dontJuke If true the map doesn't get enqueued, false by default
    * @returns Added map object or error if unsuccessful
    */
-  static async add(filename: string, caller?: { login: string, nickname: string }, dontJuke: boolean = false): Promise<tm.Map | Error> {
+  static async add(filename: string, caller?: { login: string, nickname: string }, dontJuke = false): Promise<tm.Map | Error> {
     if (!config.manualMapLoading.enabled) {
       const insert: any | Error = await Client.call('InsertChallenge', [{string: filename}])
       if (insert instanceof Error) return insert
@@ -359,7 +359,7 @@ export class MapService {
       // Yes we actually need to do this in order to juke a map if it was on the server already
       if (map.message.trim() === 'Challenge already added. Code: -1000') {
         const content: string = file.toString()
-        let i: number = 0
+        let i = 0
         while (i < content.length) {
           if (content.substring(i, i + 12) === `<ident uid="`) {
             const id = content.match(/<ident uid=".*?"/gm)?.[0].slice(12, -1)
@@ -481,7 +481,7 @@ export class MapService {
    * @param setAsNextMap If true map is going to be placed in front of the queue
    * @returns True if successful, Error if map is not in the memory
    */
-  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap: boolean = false): Promise<true | Error> {
+  static async addToJukebox(mapId: string, caller?: { login: string, nickname: string }, setAsNextMap = false): Promise<true | Error> {
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) { return new Error(`Can't find map with id ${mapId} in memory`) }
     const qi = this._queue.findIndex(a => !a.isForced)
@@ -505,7 +505,7 @@ export class MapService {
    * @param jukebox If true, only removes the map if it is in the jukebox
    * @returns The boolean representing whether the map was removed
    */
-  static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox: boolean = true): Promise<boolean> {
+  static async removeFromQueue(mapId: string, caller?: { login: string, nickname: string }, jukebox = true): Promise<boolean> {
     if (jukebox && !this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) { return false }
     const index: number = this._queue.findIndex(a => a.map.id === mapId)
     if (index === -1) return false
@@ -528,7 +528,7 @@ export class MapService {
    */
   static async clearJukebox(caller?: { login: string, nickname: string }): Promise<void> {
     let n: number = this._queue.length
-    for (let i: number = 0; i < n; i++) {
+    for (let i = 0; i < n; i++) {
       if (this._queue[i].isForced) {
         this._queue.splice(i--, 1)
         n--
@@ -571,7 +571,7 @@ export class MapService {
     while (this._queue.length < Math.min(this.queueSize + this._history.length + 1, this._maps.length)) {
       const lgt: number = this._maps.length
       let current: tm.Map
-      let i: number = 0
+      let i = 0
       do {
         i++
         current = this._maps[(i + currentIndex) % lgt]

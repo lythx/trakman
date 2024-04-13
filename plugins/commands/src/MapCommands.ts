@@ -40,7 +40,7 @@ const commands: tm.Command[] = [
       do {
         const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
         const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
-        let file: { name: string, content: Buffer } | Error =
+        const file: { name: string, content: Buffer } | Error =
           await tm.tmx.fetchRandomMapFile(site).catch((err: Error) => err)
         if (file instanceof Error) {
           tm.sendMessage(config.addrandom.fetchError, info.login)

@@ -1,6 +1,6 @@
 import config from './Config.js'
 
-let topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
+const topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
 const updateListeners: ((changes: readonly Readonly<{
   login: string, nickname: string,
   sums: [number, number, number, number]

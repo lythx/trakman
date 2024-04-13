@@ -6,7 +6,7 @@ import './ui/DediSectors.component.js'
 
 let currentDedis: DediRecord[] = []
 let newDedis: DediRecord[] = []
-let isFailedAuthentication: boolean = false
+let isFailedAuthentication = false
 let uploadLaps = false
 let leaderboard: DediLeaderboard
 const client: DedimaniaClient = new DedimaniaClient()
@@ -155,11 +155,11 @@ const getRecords = async (id: string, name: string, environment: string, author:
     return
   }
   currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>
-  ({
-    login: a.Login, nickname: a.NickName, time: a.Best,
-    checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
-    isLapRecord: uploadLaps
-  }))
+    ({
+      login: a.Login, nickname: a.NickName, time: a.Best,
+      checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
+      isLapRecord: uploadLaps
+    }))
   if (config.syncName && currentDedis.length > 0) {
     void tm.updatePlayerInfo(...currentDedis)
   }
@@ -315,7 +315,7 @@ const playerLeave = async (player: { login: string, nickname: string }): Promise
 
 const getPlayersArray = (): any[] => {
   const players: tm.Player[] = tm.players.list
-  let arr: any[] = []
+  const arr: any[] = []
   for (const player of players) {
     arr.push(
       [
@@ -385,7 +385,7 @@ if (config.isEnabled) {
   }, true)
 
   tm.addListener('EndMap', (info): void => {
-    let cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
+    const cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
     void sendRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author, cpAmount)
   })
 

@@ -53,15 +53,15 @@ export default class ServerInfoWindow extends PopupWindow {
     const osUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
     const osArch: string = arch()
     const osCPU: string = cpus()[0].model
-    const osCPULoad: string = String(loadavg()[0] + `%`)
-    const osRAM: string = String(~~((totalmem() - freemem()) / (1024 ** 2)) + ` MB`) // Bytes
+    const osCPULoad = String(loadavg()[0] + `%`)
+    const osRAM = String(~~((totalmem() - freemem()) / (1024 ** 2)) + ` MB`) // Bytes
     const osKernel: string = platform().toUpperCase()
     // Trakman information
     const trakmanVersion: string = tm.config.controller.version
     const trakmanUptime: string = tm.utils.getVerboseTime(~~uptime() * 1000) // Seconds
     // Node information
     const nodeVersion: string = version
-    const nodeRAMUsage: string = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
+    const nodeRAMUsage = String(~~(memoryUsage().heapTotal / (1024 ** 2)) + ` MB`)
     return [osUptime, osArch, osCPU, osCPULoad, osRAM, osKernel,
       trakmanVersion, trakmanUptime, nodeVersion, nodeRAMUsage,
       tm.db.dbVersion, tm.db.dbSize]
@@ -115,7 +115,7 @@ export default class ServerInfoWindow extends PopupWindow {
     }
     const rows: number = config.serverCells.length + config.hostCells.length
     const arr: (GridCellObject | GridCellFunction)[] = headers
-    for (let i: number = 0; i < rows; i++) {
+    for (let i = 0; i < rows; i++) {
       arr.push(nameCell, infoCell)
     }
     return this.grid.constructXml(arr)
