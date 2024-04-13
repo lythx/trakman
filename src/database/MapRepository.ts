@@ -72,8 +72,7 @@ export class MapRepository extends Repository {
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     /*const arr = maps.filter(a => ids.some(b => b.uid === a.id))
     if (arr.length !== maps.length) {
-      Logger.error(`Failed to get ids for maps ${maps
-        .filter(a => !ids.some(b => b.uid === a.id)).join(', ')} while inserting into maps table`)
+      Logger.error(`Failed to get ids for maps ${maps.filter(a => !ids.some(b => b.uid === a.id)).map(a => '(' + a.id + ': ' + a.name + ')').join(', ')} while inserting into maps table`)
     }
     if (arr.length === 0) {
       return
