@@ -1,9 +1,9 @@
-import { Repository } from './Repository.js'
-import { MapIdsRepository } from './MapIdsRepository.js'
-import { Logger } from '../Logger.js'
-import { Readable } from 'stream'
-import { type CopyStreamQuery } from "pg-copy-streams"
-import { pipeline } from "stream/promises"
+import {Repository} from './Repository.js'
+import {MapIdsRepository} from './MapIdsRepository.js'
+import {Logger} from '../Logger.js'
+import {Readable} from 'stream'
+import {type CopyStreamQuery} from "pg-copy-streams"
+import {pipeline} from "stream/promises"
 import config from "../../config/Config.js"
 
 interface TableEntry {
@@ -61,8 +61,8 @@ export class MapRepository extends Repository {
     const splitby = config.splitBy
     const len = Math.ceil(maps.length / splitby)
     Logger.info("Pushing new maps to db")
-    for (let i= 0; i < len; i++) {
-      await this.add(...maps.slice(i*splitby, (i+1)*splitby))
+    for (let i = 0; i < len; i++) {
+      await this.add(...maps.slice(i * splitby, (i + 1) * splitby))
     }
     Logger.info("Pushed " + maps.length + " maps to the database.")
   }
@@ -70,21 +70,25 @@ export class MapRepository extends Repository {
   async add(...maps: tm.Map[]): Promise<void> {
     // TODO: use copy also for map id's, since this becomes the bottleneck?
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
-    const arr = maps.filter(a => ids.some(b => b.uid === a.id))
+    /*const arr = maps.filter(a => ids.some(b => b.uid === a.id))
     if (arr.length !== maps.length) {
       Logger.error(`Failed to get ids for maps ${maps
         .filter(a => !ids.some(b => b.uid === a.id)).join(', ')} while inserting into maps table`)
     }
-    if (arr.length === 0) { return }
-
+    if (arr.length === 0) {
+      return
+    }*/
+    const uids = new Map(ids.map(a => [a.id, maps.find(b => b.id === a.uid)]))
     const values: string[] = []
-    for (const [i, map] of arr.entries()) {
-      values.push(([ids[i].id, map.name,
-        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
-        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
-        map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().
-      replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
-    }
+    //for (const [i, map] of arr.entries()) {
+    uids.forEach((map, i) => {
+      if (map !== undefined) {
+        values.push(([i, map.name,
+          map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
+          map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
+          map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString().replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
+      }
+    })
     const bulk = values.join('\n')
     const stream: CopyStreamQuery = this.db.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, " +
       "gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
@@ -98,13 +102,30 @@ export class MapRepository extends Repository {
   }
 
   async getAll(): Promise<tm.Map[]> {
-    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps 
-    JOIN map_ids ON maps.id=map_ids.id
-    LEFT JOIN votes ON votes.map_id=maps.id
-    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
+    const query = `SELECT uid,
+                          name,
+                          filename,
+                          author,
+                          environment,
+                          mood,
+                          bronze_time,
+                          silver_time,
+                          gold_time,
+                          author_time,
+                          copper_price,
+                          is_lap_race,
+                          laps_amount,
+                          checkpoints_amount,
+                          add_date,
+                          leaderboard_rating,
+                          awards,
+                          count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum
+                   FROM maps
+                            JOIN map_ids ON maps.id = map_ids.id
+                            LEFT JOIN votes ON votes.map_id = maps.id
+                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                             leaderboard_rating, awards);`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
@@ -117,15 +138,34 @@ export class MapRepository extends Repository {
       mapIds = [mapIds]
     }
     const ids = await mapIdsRepo.get(mapIds)
-    if (ids.length === 0) { return isArr ? [] : undefined }
-    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
-    JOIN map_ids ON maps.id=map_ids.id
-    LEFT JOIN votes ON votes.map_id=maps.id
-    WHERE ${ids.map((_, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
-    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards);`
+    if (ids.length === 0) {
+      return isArr ? [] : undefined
+    }
+    const query = `SELECT uid,
+                          name,
+                          filename,
+                          author,
+                          environment,
+                          mood,
+                          bronze_time,
+                          silver_time,
+                          gold_time,
+                          author_time,
+                          copper_price,
+                          is_lap_race,
+                          laps_amount,
+                          checkpoints_amount,
+                          add_date,
+                          leaderboard_rating,
+                          awards,
+                          count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum
+                   FROM maps
+                            JOIN map_ids ON maps.id = map_ids.id
+                            LEFT JOIN votes ON votes.map_id = maps.id
+                   WHERE ${ids.map((_, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                             leaderboard_rating, awards);`
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (!isArr) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
@@ -140,20 +180,39 @@ export class MapRepository extends Repository {
     if (typeof fileNames === 'string') {
       isArr = false
       fileNames = [fileNames]
-    } else if (fileNames.length === 0) { return [] }
-    const query = `SELECT uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-    author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards,
-    count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum FROM maps
-    JOIN map_ids ON maps.id=map_ids.id
-    LEFT JOIN votes ON votes.map_id=maps.id
-    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)}
-    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-      author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)`
+    } else if (fileNames.length === 0) {
+      return []
+    }
+    const query = `SELECT uid,
+                          name,
+                          filename,
+                          author,
+                          environment,
+                          mood,
+                          bronze_time,
+                          silver_time,
+                          gold_time,
+                          author_time,
+                          copper_price,
+                          is_lap_race,
+                          laps_amount,
+                          checkpoints_amount,
+                          add_date,
+                          leaderboard_rating,
+                          awards,
+                          count(votes.map_id)::int AS vote_count, sum(votes.vote) AS vote_sum
+                   FROM maps
+                            JOIN map_ids ON maps.id = map_ids.id
+                            LEFT JOIN votes ON votes.map_id = maps.id
+                   WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)}
+                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                             leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
     if (!isArr) {
-      return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
+      return res[0] === undefined ? undefined : this.constructMapObject({...res[0], filename: fileNames[0]})
     }
-    return res.map((a, i) => this.constructMapObject({ ...a, filename: fileNames[i] }))
+    return res.map((a, i) => this.constructMapObject({...a, filename: fileNames[i]}))
   }
 
   async getVoteCountAndRatio(mapId: string): Promise<{ ratio: number, count: number } | undefined>
@@ -166,16 +225,22 @@ export class MapRepository extends Repository {
       mapIds = [mapIds]
     }
     const ids = await mapIdsRepo.get(mapIds)
-    if (ids.length === 0) { return isArr ? [] : undefined }
-    const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote) FROM map_ids
-    LEFT JOIN votes ON votes.map_id=map_ids.id
-    WHERE ${ids.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
-    GROUP BY uid;`
+    if (ids.length === 0) {
+      return isArr ? [] : undefined
+    }
+    const query = `SELECT uid, count(votes.map_id)::int, sum(votes.vote)
+                   FROM map_ids
+                            LEFT JOIN votes ON votes.map_id = map_ids.id
+                   WHERE ${ids.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
+                   GROUP BY uid;`
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (!isArr) {
-      return res[0] === undefined ? undefined : { ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count }
+      return res[0] === undefined ? undefined : {
+        ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100,
+        count: res[0].count
+      }
     }
-    return res.map(a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
+    return res.map(a => ({uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count}))
   }
 
   /**
@@ -186,15 +251,19 @@ export class MapRepository extends Repository {
     const splitby = config.splitBy
     const len = Math.ceil(mapIds.length / splitby)
     Logger.info("Removing from db")
-    for (let i= 0; i < len; i++) {
-      await this.remove(...mapIds.slice(i*splitby, (i+1)*splitby))
+    for (let i = 0; i < len; i++) {
+      await this.remove(...mapIds.slice(i * splitby, (i + 1) * splitby))
     }
     Logger.info("Removed " + mapIds.length + " maps from the database.")
   }
 
   async remove(...mapIds: string[]): Promise<void> {
-    if (mapIds.length === 0) { return }
-    const query = `DELETE FROM maps WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
+    if (mapIds.length === 0) {
+      return
+    }
+    const query = `DELETE
+                   FROM maps
+                   WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     if (ids.length !== mapIds.length) {
       Logger.error(`Failed to get id for maps ${mapIds.map(a => !ids.some(b => b.uid === a))} while removing from maps table`)
@@ -209,7 +278,10 @@ export class MapRepository extends Repository {
       Logger.error(`Failed to get id for map ${uid} while setting cps and laps amount in maps table`)
       return
     }
-    const query = `UPDATE maps SET laps_amount=$1, checkpoints_amount=$2 WHERE id=$3`
+    const query = `UPDATE maps
+                   SET laps_amount=$1,
+                       checkpoints_amount=$2
+                   WHERE id = $3`
     await this.query(query, lapsAmount, cpsAmount, id)
   }
 
@@ -219,7 +291,10 @@ export class MapRepository extends Repository {
       Logger.error(`Failed to get id for map ${uid} while setting awards and lb rating in maps table`)
       return
     }
-    const query = `UPDATE maps SET awards=$1, leaderboard_rating=$2 WHERE id=$3`
+    const query = `UPDATE maps
+                   SET awards=$1,
+                       leaderboard_rating=$2
+                   WHERE id = $3`
     await this.query(query, awards, lbRating, id)
   }
 
@@ -229,7 +304,9 @@ export class MapRepository extends Repository {
       Logger.error(`Failed to get id for map ${uid} while setting filename in maps table`)
       return
     }
-    const query = `UPDATE maps SET filename=$1 WHERE id=$2`
+    const query = `UPDATE maps
+                   SET filename=$1
+                   WHERE id = $2`
     await this.query(query, fileName, id)
   }
 
