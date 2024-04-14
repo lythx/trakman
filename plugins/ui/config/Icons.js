@@ -120,7 +120,15 @@ export default {
   requeue: "https://trakman.ptrk.eu/icons/Requeue.png",
   mapListHover: "https://trakman.ptrk.eu/icons/MapListHover.png",
   tagKacky: "https://trakman.ptrk.eu/icons/TagKacky.png",
-  noScreenshot: "https://trakman.ptrk.eu/icons/NoScreenshot.png",
+  noScreenshot: {
+    Bay: "https://trakman.ptrk.eu/icons/ScreenshotBay.png",
+    Coast: "https://trakman.ptrk.eu/icons/ScreenshotCoast.png",
+    Desert: "https://trakman.ptrk.eu/icons/ScreenshotDesert.png",
+    Island: "https://trakman.ptrk.eu/icons/ScreenshotIsland.png",
+    Rally: "https://trakman.ptrk.eu/icons/ScreenshotRally.png",
+    Snow: "https://trakman.ptrk.eu/icons/ScreenshotSnow.png",
+    Stadium: "https://trakman.ptrk.eu/icons/ScreenshotStadium.png"
+  },
   waypoint: "https://trakman.ptrk.eu/icons/Waypoint.png",
   bgGreyOpaque50: "https://trakman.ptrk.eu/icons/GreyOpaque50.png",
   shuffleHover: "https://trakman.ptrk.eu/icons/ShuffleHover.png",
