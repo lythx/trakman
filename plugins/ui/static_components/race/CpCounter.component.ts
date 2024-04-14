@@ -196,10 +196,14 @@ export default class CpCounter extends StaticComponent {
       text = config.noCpsText
       counterXml = ''
     }
+    let [posX, posY] = [config.posX, config.posY]
+    if (config.useRelative) {
+      [posX, posY] = [this.positionX, this.positionY]
+    }
     return {
       xml: `
         <manialink id="${this.id}">
-            <frame posn="${config.posX} ${config.posY} 4">
+            <frame posn="${posX} ${posY} 4">
               ${this.getLapsXml(login, params?.lap)}
               <format textsize="1"/>
               ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}

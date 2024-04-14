@@ -5,6 +5,8 @@ const p = tm.utils.palette
 export default {
   height: 2.17,
   width: 14.4,
+  // Change this ONLY if you want the widget to be on the side
+  useRelative: false,
   posX: 12,
   posY: -37,
   margin: cfg.margin,
