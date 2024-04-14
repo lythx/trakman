@@ -159,7 +159,7 @@ export default class CpCounter extends StaticComponent {
     const timeColour: string = '$' + (isFinish === true ? config.colours.finish : config.colours.default)
     return `${this.header.constructXml(timeColour + tm.utils.getTimeString(currentTime),
       icon, config.side, { rectangleWidth: w, centerText: true })}
-    <frame posn="${w + config.margin * 2 + h.squareWidth} 0 3">
+    <frame posn="${w + config.margin + h.squareWidth} 0 3">
       <quad posn="0 0 3" sizen="${w} ${h.height}" bgcolor="${h.textBackground}"/>
       ${centeredText('$' + config.colours.default + differenceString, w, h.height, h)}
     </frame>`
@@ -196,6 +196,7 @@ export default class CpCounter extends StaticComponent {
       text = config.noCpsText
       counterXml = ''
     }
+    const centerText = config.useRelative ? false : true
     let [posX, posY] = [config.posX, config.posY]
     if (config.useRelative) {
       [posX, posY] = [this.positionX, this.positionY]
@@ -206,7 +207,8 @@ export default class CpCounter extends StaticComponent {
             <frame posn="${posX} ${posY} 4">
               ${this.getLapsXml(login, params?.lap)}
               <format textsize="1"/>
-              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}
+              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, 
+                { rectangleWidth, centerText })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
                 ${cpAmount === 0 ? '' : this.constructTimeXml(login, false, config.iconBottom,
