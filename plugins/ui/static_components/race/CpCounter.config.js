@@ -16,12 +16,12 @@ export default {
   iconBottom: icons.clock,
   text: 'Checkpoint',
   noCpsText: 'No Checkpoints',
-  // this value seems to work lol
-  noCpsWidth: cfg.width - cfg.marginBig * 7,
+  // 1.7 is the squarewidth
+  noCpsWidth: cfg.width - cfg.margin - 1.7,
   defaultDifference: '$CCC-:--.--',
   finishText: `$${p.green}Finish`,
   colours: {
-    default: 'FFF',
+    default: 'CCC',
     cpsCollected: p.green,
     worse: p.red,
     better: p.purple,
