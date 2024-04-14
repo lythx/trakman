@@ -1,10 +1,10 @@
-import {Repository} from './Repository.js'
-import {MapIdsRepository} from './MapIdsRepository.js'
-import {Logger} from '../Logger.js'
-import {Readable} from 'stream'
-import {type CopyStreamQuery} from "pg-copy-streams"
-import {pipeline} from "stream/promises"
-import config from "../../config/Config.js"
+import { Repository } from './Repository.js'
+import { MapIdsRepository } from './MapIdsRepository.js'
+import { Logger } from '../Logger.js'
+import { Readable } from 'stream'
+import { type CopyStreamQuery } from 'pg-copy-streams'
+import { pipeline } from 'stream/promises'
+import config from '../../config/Config.js'
 
 interface TableEntry {
   readonly uid: string
@@ -29,20 +29,11 @@ interface TableEntry {
 }
 
 const moods = {
-  Sunrise: 1,
-  Day: 2,
-  Sunset: 3,
-  Night: 4
+  Sunrise: 1, Day: 2, Sunset: 3, Night: 4
 }
 
 const environments = {
-  Stadium: 1,
-  Island: 2,
-  Desert: 3,
-  Rally: 4,
-  Bay: 5,
-  Coast: 6,
-  Snow: 7
+  Stadium: 1, Island: 2, Desert: 3, Rally: 4, Bay: 5, Coast: 6, Snow: 7
 }
 
 const mapIdsRepo = new MapIdsRepository()
@@ -60,11 +51,11 @@ export class MapRepository extends Repository {
   async splitAdd(maps: tm.Map[]): Promise<void> {
     const splitby = config.splitBy
     const len = Math.ceil(maps.length / splitby)
-    Logger.info("Pushing new maps to db")
+    Logger.info('Pushing new maps to db')
     for (let i = 0; i < len; i++) {
       await this.add(...maps.slice(i * splitby, (i + 1) * splitby))
     }
-    Logger.info("Pushed " + maps.length + " maps to the database.")
+    Logger.info('Pushed ' + maps.length + ' maps to the database.')
   }
 
   async add(...maps: tm.Map[]): Promise<void> {
@@ -73,16 +64,17 @@ export class MapRepository extends Repository {
     const values: string[] = []
     uids.forEach((map, i) => {
       if (map !== undefined) {
-        values.push(([i, map.name,
-          map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
-          map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(),
-          map.leaderboardRating, map.awards]).map(a => a === undefined ? "\\N" : a.toString()
-        .replaceAll("\t", " ").replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
+        values.push(
+          ([i, map.name, map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime,
+            map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount,
+            map.checkpointsPerLap, map.addDate.toISOString(), map.leaderboardRating, map.awards]).map(
+            a => a === undefined ? '\\N' : a.toString()
+            .replaceAll('\t', ' ').replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
       }
     })
     const bulk = values.join('\n')
-    const stream: CopyStreamQuery = this.db.stream("maps(id, name, filename, author, environment, mood, bronze_time, silver_time, " +
-      "gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)")
+    const stream: CopyStreamQuery = this.db.stream(
+      'maps(id, name, filename, author, environment, mood, bronze_time, silver_time, ' + 'gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)')
     const src = new Readable()
     src.readable = true
 
@@ -92,7 +84,7 @@ export class MapRepository extends Repository {
     await pipeline(src, stream)
   }
 
-  async getAll(): Promise<tm.Map[]> {
+  async getAll(stadiumOnly: boolean = false): Promise<tm.Map[]> {
     const query = `SELECT uid,
                           name,
                           filename,
@@ -114,9 +106,10 @@ export class MapRepository extends Repository {
                    FROM maps
                             JOIN map_ids ON maps.id = map_ids.id
                             LEFT JOIN votes ON votes.map_id = maps.id
+                       ${stadiumOnly ? 'WHERE environment = 1' : ''}
                    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
-                             leaderboard_rating, awards);`
+                       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                       leaderboard_rating, awards);`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
@@ -201,15 +194,14 @@ export class MapRepository extends Repository {
                              leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
     if (!isArr) {
-      return res[0] === undefined ? undefined : this.constructMapObject({...res[0], filename: fileNames[0]})
+      return res[0] === undefined ? undefined : this.constructMapObject({ ...res[0], filename: fileNames[0] })
     }
-    return res.map((a, i) => this.constructMapObject({...a, filename: fileNames[i]}))
+    return res.map((a, i) => this.constructMapObject({ ...a, filename: fileNames[i] }))
   }
 
   async getVoteCountAndRatio(mapId: string): Promise<{ ratio: number, count: number } | undefined>
   async getVoteCountAndRatio(mapIds: string[]): Promise<{ uid: string, ratio: number, count: number }[]>
-  async getVoteCountAndRatio(mapIds: string | string[]): Promise<{ ratio: number, count: number } |
-    { uid: string, ratio: number, count: number }[] | undefined> {
+  async getVoteCountAndRatio(mapIds: string | string[]): Promise<{ ratio: number, count: number } | { uid: string, ratio: number, count: number }[] | undefined> {
     let isArr: boolean = true
     if (typeof mapIds === 'string') {
       isArr = false
@@ -227,11 +219,11 @@ export class MapRepository extends Repository {
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (!isArr) {
       return res[0] === undefined ? undefined : {
-        ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100,
-        count: res[0].count
+        ratio: res[0].count === 0 ? 0 : (((res[0].sum / res[0].count) - 1) / 6) * 100, count: res[0].count
       }
     }
-    return res.map(a => ({uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count}))
+    return res.map(
+      a => ({ uid: a.uid, ratio: a.count === 0 ? 0 : (((a.sum / a.count) - 1) / 6) * 100, count: a.count }))
   }
 
   /**
@@ -241,11 +233,11 @@ export class MapRepository extends Repository {
   async splitRemove(mapIds: string[]): Promise<void> {
     const splitby = config.splitBy
     const len = Math.ceil(mapIds.length / splitby)
-    Logger.info("Removing from db")
+    Logger.info('Removing from db')
     for (let i = 0; i < len; i++) {
       await this.remove(...mapIds.slice(i * splitby, (i + 1) * splitby))
     }
-    Logger.info("Removed " + mapIds.length + " maps from the database.")
+    Logger.info('Removed ' + mapIds.length + ' maps from the database.')
   }
 
   async remove(...mapIds: string[]): Promise<void> {
@@ -257,7 +249,8 @@ export class MapRepository extends Repository {
                    WHERE ${mapIds.map((a, i) => `id=$${i + 1} OR `).join('').slice(0, -3)};`
     const ids = await mapIdsRepo.get(mapIds)
     if (ids.length !== mapIds.length) {
-      Logger.error(`Failed to get id for maps ${mapIds.map(a => !ids.some(b => b.uid === a))} while removing from maps table`)
+      Logger.error(
+        `Failed to get id for maps ${mapIds.map(a => !ids.some(b => b.uid === a))} while removing from maps table`)
       return
     }
     await this.query(query, ...ids.map(a => a.id))
@@ -303,27 +296,15 @@ export class MapRepository extends Repository {
 
   private constructMapObject(entry: TableEntry): tm.Map {
     return {
-      id: entry.uid,
-      name: entry.name,
-      fileName: entry.filename,
-      author: entry.author,
+      id: entry.uid, name: entry.name, fileName: entry.filename, author: entry.author,
       environment: Object.entries(environments).find(a => a[1] === entry.environment)?.[0] as any,
-      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] as any,
-      bronzeTime: entry.bronze_time,
-      silverTime: entry.silver_time,
-      goldTime: entry.gold_time,
-      authorTime: entry.author_time,
-      copperPrice: entry.copper_price,
-      isLapRace: entry.is_lap_race,
-      addDate: entry.add_date,
-      defaultLapsAmount: entry.laps_amount ?? undefined,
-      checkpointsPerLap: entry.checkpoints_amount ?? undefined,
-      awards: entry.awards ?? undefined,
-      leaderboardRating: entry.leaderboard_rating ?? undefined,
-      voteCount: entry.vote_count,
-      voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
-      isClassic: entry.leaderboard_rating === 0,
-      isNadeo: entry.leaderboard_rating === 50000
+      mood: Object.entries(moods).find(a => a[1] === entry.mood)?.[0] as any, bronzeTime: entry.bronze_time,
+      silverTime: entry.silver_time, goldTime: entry.gold_time, authorTime: entry.author_time,
+      copperPrice: entry.copper_price, isLapRace: entry.is_lap_race, addDate: entry.add_date,
+      defaultLapsAmount: entry.laps_amount ?? undefined, checkpointsPerLap: entry.checkpoints_amount ?? undefined,
+      awards: entry.awards ?? undefined, leaderboardRating: entry.leaderboard_rating ?? undefined,
+      voteCount: entry.vote_count, voteRatio: entry.vote_count === 0 ? -1 : entry.vote_sum / entry.vote_count,
+      isClassic: entry.leaderboard_rating === 0, isNadeo: entry.leaderboard_rating === 50000
     }
   }
 
