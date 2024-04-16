@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
+import { type CopyStreamQuery, from} from 'pg-copy-streams'
 import { createQueries } from './CreateQueries.js'
 import { Logger } from '../Logger.js'
 
@@ -29,8 +30,7 @@ export class Database {
   }
 
   async enableClient(): Promise<void> {
-    const client: postgres.PoolClient = await Database.pool.connect()
-    this.client = client
+    this.client = await Database.pool.connect()
   }
 
   /**
@@ -45,6 +45,15 @@ export class Database {
     return await this.client.query(q, params).catch((err: Error) => {
       throw Error(`Database error on query ${q}: ${err.message}`)
     })
+  }
+
+  /**
+   * Fast insertion query using COPY, requires client to be enabled!
+   * @param q table name and column names in parentheses, ex. "maps(id, name, etc.)"
+   * @returns a stream that can be piped into
+   */
+  stream(q: string): CopyStreamQuery {
+    return this.client.query(from(`COPY ${q} FROM STDIN;`))
   }
 
 }

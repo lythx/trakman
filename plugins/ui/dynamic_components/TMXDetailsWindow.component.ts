@@ -3,7 +3,7 @@
  * @since 1.3.3
  */
 
-import { componentIds, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Grid, type GridCellFunction, centeredText, closeButton, leftAlignedText, type GridCellObject, PopupWindow } from '../../ui/UI.js'
 import config from './TMXDetailsWindow.config.js'
 import { tmx } from '../../tmx/Tmx.js'
 
@@ -37,7 +37,7 @@ export default class TMXDetailsWindow extends PopupWindow {
 
   private constructScreenshot(width: number, height: number, map: tm.TMXMap): string {
     const image: string = map === undefined
-      ? config.noScreenshot
+      ? config.noScreenshot["Stadium"] // this shouldn't ever be used anyway cause the window isn't constructed if the map is undefined
       : tm.utils.safeString(map.thumbnailUrl + `&.jpeg`)
     return `<quad posn="${config.margin + config.screenshotPadding} ${-config.margin - config.screenshotPadding} 8" sizen="${width - config.screenshotPadding * 2} ${height - config.margin * 2 - config.screenshotPadding * 2}" image="${image}"/>
       ${centeredText(config.notLoaded, width, height, { textScale: config.notLoadedTextscale, yOffset: -1 })}`

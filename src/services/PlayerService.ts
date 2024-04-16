@@ -210,7 +210,7 @@ export class PlayerService {
     const date: Date = new Date()
     const playerIndex: number = this._players.findIndex(a => a.login === login)
     if (playerIndex === -1) {
-      const errStr: string = `Error removing player ${login} from memory, player is not in the memory`
+      const errStr = `Error removing player ${login} from memory, player is not in the memory`
       Logger.error(errStr)
       return new Error(errStr)
     }
@@ -335,7 +335,7 @@ export class PlayerService {
       // If player doesnt have rank set it to locals amount
       if (previousRank === 0) { previousRank = RecordService.maxLocalsAmount }
       // Get rank from the end of the race
-      let newRank: number = localRecords.findIndex(a => a.login === avg.login) + 1
+      const newRank: number = localRecords.findIndex(a => a.login === avg.login) + 1
       // Calculate average
       const average: number = (amount * avg.average + newRank - previousRank) / amount
       const onlinePlayer: tm.Player | undefined = this.get(avg.login)

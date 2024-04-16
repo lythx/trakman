@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
+import { componentIds, StaticHeader, Grid, type GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
 import config from './AdminPanel.config.js'
 
 export default class AdminPanel extends StaticComponent {

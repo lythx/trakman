@@ -4,7 +4,7 @@
  */
 
 import { actions } from '../../../actions/Actions.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Blacklist.config.js'
 
 export default class Blacklist extends PopupWindow<number> {

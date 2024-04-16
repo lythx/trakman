@@ -1,4 +1,4 @@
-import { resultConfig as cfg, icons, StaticHeader } from '../../UI.js'
+import { resultConfig as cfg, StaticHeader } from '../../UI.js'
 
 /**
  * Banner image ratio is around 4:1

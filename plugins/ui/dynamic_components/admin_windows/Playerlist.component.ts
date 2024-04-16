@@ -4,7 +4,7 @@
  */
 
 import { actions } from '../../../actions/Actions.js'
-import { componentIds, Grid, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow, addManialinkListener } from '../../UI.js'
+import { componentIds, Grid, centeredText, closeButton, Paginator, type GridCellFunction, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Playerlist.config.js'
 
 export default class PlayerList extends PopupWindow<{ page: number, privilege: number }> {
@@ -133,7 +133,7 @@ export default class PlayerList extends PopupWindow<{ page: number, privilege: n
       return centeredText(colour + players[i + index].login, w, h)
     }
     const privilegeCell: GridCellFunction = (i, j, w, h) => {
-      let privilege = players[i + index].privilege
+      const privilege = players[i + index].privilege
       return centeredText('$' + config.privilegeColours[privilege as keyof typeof config.privilegeColours]
         + players[i + index].privilege.toString(), w, h)
     }

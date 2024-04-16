@@ -1,4 +1,4 @@
-import { CheckpointEventFunctions } from './CheckpointTypes.js'
+import type { CheckpointEventFunctions } from './CheckpointTypes.js'
 
 const fetchListeners: Function[] = []
 const bestDeleteListeners: Function[] = []

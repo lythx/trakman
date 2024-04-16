@@ -102,7 +102,7 @@ export class RecordService {
     this._playerRanks = this._playerRanks.filter(a => !logins.includes(a.login))
     const presentMaps = MapService.maps.map(a => a.id)
     if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
-    let records: tm.Record[] = await this.repo.getAll()
+    const records: tm.Record[] = await this.repo.getAll()
     if (records.length === 0) { return }
     let rank = 1
     let prevMap = records[0].map

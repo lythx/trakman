@@ -4,13 +4,15 @@
     "dotenv": "^16.0.0",
     "node-fetch": "^3.2.4",
     "pg": "^8.7.3",
+    "pg-copy-streams": "^6.0.6",
     "pm2": "^5.3.0",
     "typescript": "^5.3.3",
     "xml2js": "^0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.33",
+    "@types/node": "^18.11.9",
     "@types/pg": "^8.6.5",
+    "@types/pg-copy-streams": "^1.2.5",
     "@types/xml2js": "^0.4.11",
     "ts-node": "^10.7.0"
   },
