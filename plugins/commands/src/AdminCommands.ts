@@ -108,9 +108,9 @@ const commands: tm.Command[] = [
   {
     aliases: config.loadmatchsettings.aliases,
     help: config.loadmatchsettings.help,
-    params: [{name: 'file'}],
-    callback: async (info: tm.MessageInfo, file: string) => {
-      const res = await tm.client.call(`LoadMatchSettings`, [{string: file}])
+    params: [{name: 'fileName', type: 'multiword',}],
+    callback: async (info: tm.MessageInfo, fileName: string) => {
+      const res = await tm.client.call(`LoadMatchSettings`, [{string: fileName}])
       if (res instanceof Error) {
         tm.sendMessage(config.loadmatchsettings.error, info.login)
         return
@@ -119,11 +119,32 @@ const commands: tm.Command[] = [
         {
           title: info.title,
           adminName: tm.utils.strip(info.nickname),
-          file: tm.utils.strip(file)
+          file: tm.utils.strip(fileName)
         }
       ), config.loadmatchsettings.public ? undefined : info.login)
     },
     privilege: config.loadmatchsettings.privilege
+  },
+  {
+    aliases: config.savematchsettings.aliases,
+    help: config.savematchsettings.help,
+    params: [{name: 'fileName', type: 'multiword', optional: true}],
+    callback: async (info: tm.MessageInfo, fileName?: string) => {
+      fileName = fileName || tm.config.controller.matchSettingsFile
+      const res = await tm.client.call(`SaveMatchSettings`, [{string: fileName}])
+      if (res instanceof Error) {
+        tm.sendMessage(config.savematchsettings.error, info.login)
+        return
+      }
+      tm.sendMessage(tm.utils.strVar(config.savematchsettings.text,
+        {
+          title: info.title,
+          adminName: tm.utils.strip(info.nickname),
+          file: tm.utils.strip(fileName)
+        }
+      ), config.savematchsettings.public ? undefined : info.login)
+    },
+    privilege: config.savematchsettings.privilege
   },
   {
     aliases: config.updatemaps.aliases,
