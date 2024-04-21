@@ -782,7 +782,7 @@ declare global {
       "RecordsPrefetch": readonly Readonly<Record>[]
       "VotesPrefetch": readonly Readonly<Vote>[]
       "MapAdded": MapAddedInfo | MapAddedInfo[]
-      "MapRemoved": MapRemovedInfo | MapRemovedInfo []
+      "MapRemoved": MapRemovedInfo | MapRemovedInfo[]
       "BillUpdated": BillUpdatedInfo
       "MatchSettingsUpdated": readonly Readonly<Map>[]
       "PrivilegeChanged": PrivilegeChangedInfo
