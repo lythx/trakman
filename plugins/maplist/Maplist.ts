@@ -72,7 +72,7 @@ function removeMap(map: tm.MapRemovedInfo): void {
   for (const e of updateListeners) { e('remove', map) }
 }
 
-function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function):void {
+function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function): void {
   if (!Array.isArray(map)) {
     fun(map)
     return
@@ -95,11 +95,11 @@ tm.addListener('JukeboxChanged', (list): void => {
 
 tm.addListener('Startup', initialize)
 
-tm.addListener('MapAdded', (map: tm.MapAddedInfo | tm.MapAddedInfo[]):void => {
+tm.addListener('MapAdded', (map: tm.MapAddedInfo | tm.MapAddedInfo[]): void => {
   addOrRemove(map, insertMap)
 })
 
-tm.addListener('MapRemoved', (map: tm.MapRemovedInfo | tm.MapRemovedInfo[]):void => {
+tm.addListener('MapRemoved', (map: tm.MapRemovedInfo | tm.MapRemovedInfo[]): void => {
   addOrRemove(map, removeMap)
 })
 
@@ -214,9 +214,10 @@ export const maplist = {
    */
   searchByName: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'name')?.list
+    let indices: number[]
     if (list === undefined) {
-      list = (tm.utils.matchString(query, authorSort, 'name', true))
-        .filter(a => a.value > config.searchMinSimilarityValue).map(a => a.obj)
+      indices = tm.utils.matchString(query, authorSort.map(a => a.name))
+      list = indices.map(a => authorSort[a])
       cache.unshift({ query, list, type: 'name' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
@@ -230,9 +231,10 @@ export const maplist = {
    */
   searchByAuthor: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'author')?.list
+    let indices: number[]
     if (list === undefined) {
-      list = (tm.utils.matchString(query, nameSort, 'author', true))
-        .filter(a => a.value > config.searchMinSimilarityValue).map(a => a.obj)
+      indices = tm.utils.matchString(query, authorSort.map(a => a.author))
+      list = indices.map(a => authorSort[a])
       cache.unshift({ query, list, type: 'author' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }

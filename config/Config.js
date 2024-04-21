@@ -85,6 +85,11 @@ export default {
   truthyParams: ['true', 'yes', 'y', '1'],
   /** Things that will be interpreted as false for the boolean command parameter */
   falsyParams: ['false', 'no', 'n', '0'],
+  /** Object with options for ufuzzy, see https://github.com/leeoniya/uFuzzy#options */
+  searchOptions: {
+    intraMode: 1,
+    alpha: "a-zа-яё"
+  },
   /** Represents default minimal similarity value at which nickname to
    * login translation will be successful. Used in nickname to login
    * translation in commands. 0.4 is the default value */
