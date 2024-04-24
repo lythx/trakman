@@ -551,51 +551,6 @@ export const Utils = {
 
 }
 
-// /**
-//  * Checks similarity of given strings, returns best matches sorted based on similarity.
-//  * @param searchString String to compare possible matches to
-//  * @param possibleMatches Array of strings to sort by similarity
-//  * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
-//  * @returns Array of objects containing string and its similarity value
-//  */
-// function matchString(searchString: string, possibleMatches: string[], stripSpecialChars?: true): { str: string, value: number }[]
-// /**
-//  * Checks similarity of given strings in an array of objects, returns best matches sorted based on similarity.
-//  * @param searchString String to compare possible matches to
-//  * @param possibleMatches Array of objects to sort by similarity
-//  * @param key Key in objects containing the string to compare
-//  * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
-//  * @returns Array of objects containing object and its similarity value
-//  */
-// function matchString<T extends { [key: string]: any }>
-//   (searchString: string, possibleMatches: T[], key: keyof T, stripSpecialChars?: true): { obj: T, value: number }[]
-// function matchString<T extends { [key: string]: any }>
-//   (searchString: string, possibleMatches: string[] | T[], arg?: keyof T | true, stripSpecialChars?: true)
-//   : { str: string, value: number }[] | { obj: T, value: number }[] {
-//   if (possibleMatches.length === 0) { return [] }
-//   if (arg === undefined || typeof arg === 'boolean') {
-//     const stripSpecialChars = arg
-//     const arr: { str: string, value: number }[] = []
-//     for (const e of possibleMatches) {
-//       arr.push({
-//         str: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
-//           Utils.stripSpecialChars(Utils.strip(e as string)) : e)
-//       })
-//     }
-//     return arr.sort((a, b): number => b.value - a.value)
-//   } else {
-//     const key = arg
-//     const arr: { obj: T, value: number }[] = []
-//     for (const e of possibleMatches) {
-//       arr.push({
-//         obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
-//           Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key])
-//       })
-//     }
-//     return arr.sort((a, b): number => b.value - a.value)
-//   }
-// }
-
 /** 
  * Replaces #{variableName} in string with given variables.
  * @param str String to replace #{variableName} in
@@ -634,9 +589,6 @@ function strVar(str: string, vars: { [name: string]: any }): string {
   }
   return str
 }
-
-
-// TODO @lythx ensure compatibility in all instances PLEASE
 
 /**
  * Searches for a given string in a given array of values
