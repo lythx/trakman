@@ -534,8 +534,7 @@ export class MapService {
     const index: number = setAsNextMap ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    this.writeMS()
-    await this.updateNextMap()
+    this.writeMS().then(() => this.updateNextMap())
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(
         map.name)} by ${map.author} to the jukebox`)
@@ -571,8 +570,7 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    this.writeMS()
-    await this.updateNextMap()
+    this.writeMS().then(() => this.updateNextMap())
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     return true
   }

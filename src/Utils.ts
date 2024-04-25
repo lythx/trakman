@@ -6,6 +6,7 @@ import { PlayerService } from "./services/PlayerService.js"
 import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
+import { Logger } from './Logger.js'
 import ufuzzy from "@leeoniya/ufuzzy"
 
 const uf = new ufuzzy(config.searchOptions)
@@ -323,9 +324,11 @@ export const Utils = {
             resolve(true)
             break
           case 'refused':
+            Logger.error('Transaction refused')
             resolve(new Error(`Transaction refused`))
             break
           case 'error':
+            Logger.error('Error: ' + errorString)
             resolve(new Error(errorString ?? 'error'))
         }
       }
