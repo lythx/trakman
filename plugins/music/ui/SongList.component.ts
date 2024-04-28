@@ -115,9 +115,9 @@ export default class SongList extends PopupWindow<DisplayParams> {
     }
   }
 
-  private getSearchResult(query: string, target: SearchTarget): (Song & { index: number })[] {
-    return (tm.utils.matchString(query, this.songs, target, true))
-      .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj)
+  private getSearchResult(query: string, target: SearchTarget) {
+    let indices: number[] = tm.utils.matchString(query, this.songs.map(a => a[target]))
+    return indices.map(a => this.songs[a])
   }
 
   protected async constructContent(login: string, params?: DisplayParams, privilege = 0): Promise<string> {

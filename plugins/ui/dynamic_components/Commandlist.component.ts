@@ -136,22 +136,21 @@ export default class CommandList extends PopupWindow<DisplayParams> {
   }
 
   openWithQuery(login: string, privilege: number, query: string) {
-    const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands,
-      this.ownerCommands].slice(0, privilege + 1).flat(1)
+    const commands = [this.userCommands, this.opCommands, this.adminCommands, this.masteradminCommands, this.ownerCommands].slice(0, privilege + 1).flat(1)
     const aliases = commands.map(a => a.aliases).flat(1)
-    const matchedAliases = tm.utils.matchString(query, aliases)
-    const aliasValues: ({ obj: tm.Command, value: number })[] = []
-    if(config.aliasSearch) {
+    const matchedAliases = []
+    let aliasIndices: number[]
+    if (config.aliasSearch) {
+      aliasIndices = tm.utils.matchString(query, aliases)
       for (const e of commands) {
-        const value = matchedAliases.find((a) => e.aliases.includes(a.str))?.value
-        if (value !== undefined) {
-          aliasValues.push({ obj: e, value })
+        if (aliasIndices.map(a => aliases[a]).find(a => e.aliases.includes(a))) {
+          matchedAliases.push(e)
         }
       }
     }
-    const list: tm.Command[] = [...tm.utils.matchString(query, commands, "help"), ...aliasValues]
-      .sort((a, b) => b.value - a.value).filter(a => a.value > config.minimumMatchSimilarity).map(a => a.obj)
-      .filter((a, i, arr) => arr.indexOf(a) === i)
+    let indices: number[]
+    indices = tm.utils.matchString(query, commands.map(a => a.help ?? ''))
+    const list: tm.Command[] = [...indices.map(a => commands[a]), ...matchedAliases].filter((a, i, arr) => arr.indexOf(a) === i)
     if (list.length === 0) {
       tm.sendMessage(tm.utils.strVar(config.noMatchesMessage, { query }), login)
       return

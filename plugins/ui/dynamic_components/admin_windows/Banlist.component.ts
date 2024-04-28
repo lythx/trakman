@@ -21,10 +21,10 @@ export default class Banlist extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
-    addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
-      const target = tm.admin.banlist[offset]
+    addManialinkListener(this.openId + 1000, 1000, async (info, offset) => {
+      const target = await tm.players.fetch(tm.admin.banlist[offset].login)
       if (target === undefined) { return }
-      actions.unban(info, target.login)
+      actions.unban(info, target)
     })
     tm.addListener(['Ban', 'Unban'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.banCount / (config.entries - 1)))

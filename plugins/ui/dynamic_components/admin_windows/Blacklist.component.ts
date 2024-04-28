@@ -21,10 +21,10 @@ export default class Blacklist extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
-    addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
-      const target = tm.admin.blacklist[offset]
+    addManialinkListener(this.openId + 1000, 1000, async (info, offset) => {
+      const target = await tm.players.fetch(tm.admin.blacklist[offset].login)
       if (target === undefined) { return }
-      actions.unblacklist(info, target.login)
+      actions.unblacklist(info, target)
     })
     tm.addListener(['Blacklist', 'Unblacklist'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.blacklistCount / (config.entries - 1)))

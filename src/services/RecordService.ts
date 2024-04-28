@@ -37,10 +37,13 @@ export class RecordService {
     await this.updateQueue()
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
-    Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'], async (): Promise<void> => {
-      this._playerRanks.length = 0
-      await this.fetchAndStoreRanks()
-    })
+    if (!config.manualMapLoading) {
+      Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'],
+        async (): Promise<void> => {
+          this._playerRanks.length = 0
+          await this.fetchAndStoreRanks()
+        })
+    }
     Events.addListener('JukeboxChanged', () => this.updateQueue())
     Events.addListener('LocalRecord', (info) => {
       const ranks = this._playerRanks.filter(a => a.mapId === MapService.current.id)

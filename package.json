@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "dice-similarity-coeff": "^1.1.1",
+    "@leeoniya/ufuzzy": "^1.0.14",
     "dotenv": "^16.0.0",
     "node-fetch": "^3.2.4",
     "pg": "^8.7.3",

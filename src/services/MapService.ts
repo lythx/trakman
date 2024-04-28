@@ -37,7 +37,7 @@ export class MapService {
     await this.createList()
     await this.setCurrent()
     this.fillQueue()
-    await this.writeMS()
+    await this.writeMatchSettings()
     await this.updateNextMap()
     // Recreate list when Match Settings get changed only with non-dynamic map loading
     if (!config.manualMapLoading.enabled) {
@@ -53,7 +53,7 @@ export class MapService {
   /**
    * Write MatchSettings file if dynamic map loading is enabled
    */
-  private static async writeMS() {
+  private static async writeMatchSettings() {
     if (config.manualMapLoading.enabled) {
       await ManualMapLoading.writeMS(this._current, this._queue.map(a => a.map))
     }
@@ -82,7 +82,7 @@ export class MapService {
       }
       const fileNames = new Set(await ManualMapLoading.getFileNames())
       this._maps = list.filter(a => fileNames.has(a.fileName)).map(a => ({ map: a, rand: Math.random() }))
-      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+        .sort((a, b): number => a.rand - b.rand).map(a => a.map)
       return
     }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
@@ -126,7 +126,7 @@ export class MapService {
     }
     // Shuffle maps array
     this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() }))
-    .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
     await this.repo.splitAdd(mapsNotInDBObjects)
   }
 
@@ -214,7 +214,7 @@ export class MapService {
     await this.repo.splitAdd(addedMapObjects)
     await this.repo.splitRemove(removedMaps)
     removedMaps.forEach(a => void this.remove(a))
-    await this.writeMS()
+    await this.writeMatchSettings()
     Events.emit('MapAdded', addedMapObjects)
   }
 
@@ -446,7 +446,7 @@ export class MapService {
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
     await this.removeFromQueue(id, caller, false)
-    await this.writeMS()
+    await this.writeMatchSettings()
     return true
   }
 
@@ -534,8 +534,8 @@ export class MapService {
     const index: number = setAsNextMap ? 0 : (qi === -1 ? this._queue.length : qi)
     this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    this.writeMS()
-    await this.updateNextMap()
+    await this.writeMatchSettings()
+    void this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) added map ${Utils.strip(
         map.name)} by ${map.author} to the jukebox`)
@@ -571,8 +571,8 @@ export class MapService {
     }
     this._queue.splice(index, 1)
     this.fillQueue()
-    this.writeMS()
-    await this.updateNextMap()
+    await this.writeMatchSettings()
+    void this.updateNextMap()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     return true
   }
@@ -591,7 +591,7 @@ export class MapService {
     }
     this.fillQueue()
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
-    this.writeMS()
+    this.writeMatchSettings()
     await this.updateNextMap()
     if (caller !== undefined) {
       Logger.trace(`${Utils.strip(caller.nickname)} (${caller.login}) cleared the jukebox`)
