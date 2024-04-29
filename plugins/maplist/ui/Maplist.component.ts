@@ -12,11 +12,12 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
   private readonly paginator: Paginator
   private readonly mapAddId: number = 1000
+  private readonly maxMapCount = 1_000_000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
-  private readonly paginatorIdOffset: number = 7000
-  private readonly mapDeleteId: number = 11000
+  private readonly paginatorIdOffset: number = this.mapAddId + this.maxMapCount
+  private readonly mapDeleteId: number = this.mapAddId + this.maxMapCount * 2
   private readonly displayEnvironment: boolean = config.displayEnvironment !== undefined ? config.displayEnvironment : process.env.SERVER_PACKMASK !== "nations"
   private nextPaginatorId = 0
 
@@ -32,7 +33,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
-    addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex): void => {
+    addManialinkListener(this.openId + this.mapAddId, this.maxMapCount, (info, mapIndex): void => {
       const mapId: string = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
@@ -43,7 +44,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       if (!gotQueued) { return }
       this.reRender()
     })
-    addManialinkListener(this.openId + this.mapDeleteId, 5000, async (info, mapIndex): Promise<void> => {
+    addManialinkListener(this.openId + this.mapDeleteId, this.maxMapCount, async (info, mapIndex): Promise<void> => {
       const mapId: string = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)

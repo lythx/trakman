@@ -34,7 +34,6 @@ export default {
   liveCps: 8000,
   dediSectors: 9000,
   locals: 10000,
-  mapList: 20000,
   liveSectors: 40000,
   liveCheckpoint: 70000,
   currentCps: 80000,
@@ -83,4 +82,6 @@ export default {
   localSectors: 520000,
   ultiRanking: 530000,
   ultiRecords: 540000,
+  // needs 3.1 mil ids
+  mapList: 10000000
 }
