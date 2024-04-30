@@ -213,7 +213,13 @@ export abstract class TMXFetcher {
     if (replays instanceof Error) {
       replays = []
     }
-    const parsedData = this.parseMapInfoApiResponse(data, replays, this.prefixToSite(prefix), prefix)
+    let parsedData
+    try {
+      parsedData = this.parseMapInfoApiResponse(data, replays, this.prefixToSite(prefix), prefix)
+    } catch(ex) {
+      Logger.debug(`Tmx map info api parse error ${ex}`, `Map data: ${data}`, `Arg: ${arg}`, `Prefix: ${prefix}`)
+      return new Error()
+    }
     if (mapId !== undefined) {
       void MapService.setAwardsAndLbRating(mapId, parsedData.awards, parsedData.leaderboardRating)
     }
