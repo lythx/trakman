@@ -351,7 +351,7 @@ export class MapService {
       Logger.info(`Map ${Utils.strip(obj.name)} by ${obj.author} added`)
     }
     if (!dontJuke) {
-      const status: true | Error = await this.addToJukebox(obj.id, caller)
+      const status = await this.addToJukebox(obj.id, caller)
       if (status instanceof Error) {
         Logger.error(
           `Failed to insert newly added map ${obj.name} into the jukebox, clearing the jukebox to prevent further errors...`)
@@ -521,11 +521,14 @@ export class MapService {
    * @param mapId Map UID
    * @param caller Object containing login and nickname of player adding the map
    * @param setAsNextMap If true map is going to be placed in front of the queue
-   * @returns True if successful, Error if map is not in the memory
+   * @returns True if successful, False if the map is already juked, Error if map is not in the memory
    */
   static async addToJukebox(mapId: string, caller?: {
     login: string, nickname: string
-  }, setAsNextMap = false): Promise<true | Error> {
+  }, setAsNextMap = false): Promise<boolean | Error> {
+    if(this.jukebox.some(a => a.map.id === mapId)) {
+      return false
+    }
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
     if (map === undefined) {
       return new Error(`Can't find map with id ${mapId} in memory`)
