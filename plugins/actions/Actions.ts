@@ -488,5 +488,15 @@ export const actions = {
       map: tm.utils.strip(map.name, true)
     }), config.removeMap.public ? undefined : login)
     void tm.maps.remove(map.id, { login, nickname })
+  },
+  requeueMap: async (login: string, nickname: string, title: string): Promise<void> => {
+    const status = await tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
+    if (!status || status instanceof Error) {
+      tm.sendMessage(config.requeueMap.error, login)
+    }
+    tm.sendMessage(tm.utils.strVar(config.requeueMap.text, {
+      title: title,
+      adminName: nickname,
+    }))
   }
 }
