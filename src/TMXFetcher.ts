@@ -313,9 +313,6 @@ export abstract class TMXFetcher {
       Logger.warn(error.message)
       return error
     }
-    if (data.UId == null) { // tmx bug
-      return new Error(`TMX data error: uid is null for ${data.TrackName}`)
-    }
     return this.parseSearchApiResponse(data, site, prefix)
   }
 
@@ -358,6 +355,9 @@ export abstract class TMXFetcher {
   static parseSearchApiResponse(data: any, site: tm.TMXSite, prefix: TMXPrefix): tm.TMXSearchResult[] {
     const ret: tm.TMXSearchResult[] = []
     for (const e of data.Results) {
+      if (e.UId == null) { // TMX BUG NUMBER 56023765123. I LOVE THOSE PEOPLE!!!
+        continue
+      }
       ret.push({
         id: e.UId,
         TMXId: e.TrackId,
