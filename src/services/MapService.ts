@@ -115,7 +115,7 @@ export class MapService {
       }
       const v = voteRatios.find(a => a.uid === c.UId)
       mapsNotInDBObjects.push(
-        ({ ...this.constructNewMapObject(c), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
+        ({ ...this.constructNewMapObject(res), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
     }
     const mapsInMapList: tm.Map[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
