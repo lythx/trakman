@@ -165,7 +165,7 @@ export abstract class TMXFetcher {
           `UpdatedAt,PrimaryType,AuthorComments,Style,Routes,Difficulty,Environment,Car,Mood,Awards,Comments,Images`],
         ['id', tmxId.toString()]
       ])
-      }`
+        }`
       const res = await fetch(url).catch((err: Error) => err)
       if (res instanceof Error) {
         Logger.warn(`Error while fetching map info from TMX (url: ${url}).`, res.message)
@@ -216,7 +216,7 @@ export abstract class TMXFetcher {
     let parsedData
     try {
       parsedData = this.parseMapInfoApiResponse(data, replays, this.prefixToSite(prefix), prefix)
-    } catch(ex) {
+    } catch (ex) {
       Logger.debug(`Tmx map info api parse error ${ex}`, `Map data: ${data}`, `Arg: ${arg}`, `Prefix: ${prefix}`)
       return new Error()
     }
@@ -313,7 +313,7 @@ export abstract class TMXFetcher {
       Logger.warn(error.message)
       return error
     }
-    if(data.UId === null) { // tmx bug
+    if (data.UId == null) { // tmx bug
       return new Error(`TMX data error: uid is null for ${data.TrackName}`)
     }
     return this.parseSearchApiResponse(data, site, prefix)
