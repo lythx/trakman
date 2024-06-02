@@ -88,7 +88,7 @@ function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function): v
 
 tm.addListener('JukeboxChanged', (list): void => {
   jukebox.length = 0
-  jukebox.push(...list.filter((a, i, arr) => arr.findIndex(b => b.id === a.id) === i))
+  jukebox.push(...list)
   for (const e of jukeboxUpdateListeners) { e(list) }
 })
 
