@@ -493,10 +493,11 @@ export const actions = {
     const status = await tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
     if (!status || status instanceof Error) {
       tm.sendMessage(config.requeueMap.error, login)
+      return
     }
     tm.sendMessage(tm.utils.strVar(config.requeueMap.text, {
       title: title,
-      adminName: nickname,
+      adminName: tm.utils.strip(nickname, true),
     }))
   }
 }
