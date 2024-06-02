@@ -267,17 +267,17 @@ export const actions = {
     const logStr: string = `${tm.utils.strip(player.nickname)} (${player.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while removing player ${logStr} from the blacklist`, result.message)
-      tm.sendMessage(tm.utils.strVar(config.unblacklist.error, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.unblacklist.error, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     if (result === 'Player not blacklisted') {
-      tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.unblacklist.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
-      name: tm.utils.strip(player.login)
+      name: tm.utils.strip(player.nickname)
     }), config.unblacklist.public ? undefined : info.login)
   },
   /**
@@ -294,17 +294,17 @@ export const actions = {
     const logStr: string = `${tm.utils.strip(player.nickname)} (${player.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while adding player ${logStr} to the guestlist`, result.message)
-      tm.sendMessage(tm.utils.strVar(config.addguest.error, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.addguest.error, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     if (result === 'Already guest') {
-      tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.addguest.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
-      name: tm.utils.strip(player.login)
+      name: tm.utils.strip(player.nickname)
     }), config.addguest.public ? undefined : info.login)
   },
   /**
@@ -321,17 +321,17 @@ export const actions = {
     const logStr: string = `${tm.utils.strip(player.nickname)} (${player.login})`
     if (result instanceof Error) {
       tm.log.error(`Error while removing player ${logStr} from the guestlist`, result.message)
-      tm.sendMessage(tm.utils.strVar(config.rmguest.error, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.rmguest.error, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     if (result === 'Player not in guestlist') {
-      tm.sendMessage(tm.utils.strVar(config.rmguest.notGuest, { login: player.login }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.rmguest.notGuest, { login: tm.utils.strip(player.nickname) }), info.login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.rmguest.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
-      name: tm.utils.strip(player.login)
+      name: tm.utils.strip(player.nickname)
     }), config.rmguest.public ? undefined : info.login)
   },
   publicAdd: async (login: string, nickname: string, title: string, mapName: string): Promise<boolean> => {
@@ -488,5 +488,16 @@ export const actions = {
       map: tm.utils.strip(map.name, true)
     }), config.removeMap.public ? undefined : login)
     void tm.maps.remove(map.id, { login, nickname })
+  },
+  requeueMap: async (login: string, nickname: string, title: string): Promise<void> => {
+    const status = await tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
+    if (!status || status instanceof Error) {
+      tm.sendMessage(config.requeueMap.error, login)
+      return
+    }
+    tm.sendMessage(tm.utils.strVar(config.requeueMap.text, {
+      title: title,
+      adminName: tm.utils.strip(nickname, true),
+    }))
   }
 }
