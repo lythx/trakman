@@ -306,12 +306,15 @@ export abstract class TMXFetcher {
       Logger.warn(error.message)
       return error
     }
-    const data = await res.json().catch((data: Error) => data)
+    const data = await res.json().catch((data: Error) => data) as any
     if (data instanceof Error) { // FOR WHATEVER REASON THE NEW API ALSO RETURNS A WEBPAGE INSTEAD OF AN ERROR (REAL HTTP 200 RESPONSE BY THE WAY!!!)
       const error = new Error(`Error while processing TMX response (url: ${url}).`
         + `\nCode: ${res.status} Text: ${res.statusText} `)
       Logger.warn(error.message)
       return error
+    }
+    if(data.UId === null) { // tmx bug
+      return new Error(`TMX data error: uid is null for ${data.TrackName}`)
     }
     return this.parseSearchApiResponse(data, site, prefix)
   }
