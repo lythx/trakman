@@ -86,5 +86,12 @@ export default {
     privilege: 3,
     aliases: ['udm', 'updatemaps'],
     help: `Update the map list (parses maps, might take a very long time and lag the server for a while)`
+  },
+  recalculateranks: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}force re-calculated server ranks.`,
+    public: true,
+    privilege: 3,
+    aliases: ['recalculateranks', 'updateranks', 'recrank'],
+    help: `Force re-calculate every rank on the server.`
   }
 }

@@ -12,19 +12,28 @@ export const fixRankCoherence = async (): Promise<void> => {
     Logger.trace(`Rank coherence fix unneeded (same max locals value)`)
     return
   }
+  await forceFixRankCoherence()
+}
+
+export const forceFixRankCoherence = async (): Promise<void> => {
   Logger.info(`Recalculating ranks...`)
-  const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
-  if (mapList instanceof Error) {
-    Logger.fatal('Error while getting the map list', mapList.message)
-    return
-  }
   const allMaps: { uid: string, id: number }[] = (await db.query(`SELECT id, uid FROM map_ids`)).rows
+  let maps: { uid: string, id: number }[]
+  if (!config.manualMapLoading.enabled) {
+    const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+    if (mapList instanceof Error) {
+      Logger.fatal('Error while getting the map list', mapList.message)
+      return
+    }
+    maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
+  } else {
+    maps = allMaps
+  }
   const playerIds: number[] = (await db.query(`SELECT id FROM players`)).rows.map(a => a.id)
   const allRecords: { player_id: number, map_id: number }[] = (await db.query(`SELECT player_id, map_id FROM records
   ORDER BY map_id ASC,
   time ASC,
   date ASC;`)).rows
-  const maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
   const records = allRecords.filter(a => maps.some(b => b.id === a.map_id))
   const limit = config.localRecordsLimit
   const sums: { id: number, average: number }[] = []

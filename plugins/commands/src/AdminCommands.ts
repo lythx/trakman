@@ -158,6 +158,17 @@ const commands: tm.Command[] = [
         }), config.updatemaps.public ? undefined : info.login)
     },
     privilege: config.updatemaps.privilege
+  },
+  {
+    aliases: config.recalculateranks.aliases,
+    help: config.recalculateranks.help,
+    callback: async (info: tm.MessageInfo) => {
+      await tm.records.recalculateRanks()
+      tm.sendMessage(tm.utils.strVar(config.recalculateranks.text, {
+        title: info.title, adminName: tm.utils.strip(info.nickname)
+      }), config.recalculateranks.public ? undefined : info.login)
+    },
+    privilege: config.recalculateranks.privilege
   }
 ]
 

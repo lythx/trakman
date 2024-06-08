@@ -226,11 +226,18 @@ export abstract class Logger {
   }
 
   private static async sendDiscordMessage(message: string) {
-    return fetch(process.env.DISCORD_WEBHOOK_URL!, {
+    const response: Response | Error = await fetch(process.env.DISCORD_WEBHOOK_URL!, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: message
-    })
+    }).catch(e => e)
+    if (response instanceof Error) {
+      Logger.error('Could not send message to Discord.', response)
+      return
+    }
+    if (!response.ok) {
+      Logger.error('Discord log response not ok, status: ' + response.status)
+    }
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {

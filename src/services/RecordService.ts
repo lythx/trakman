@@ -103,7 +103,7 @@ export class RecordService {
   static async fetchAndStoreRanks(...logins: string[]): Promise<void> {
     // If logins length is 0 get online players
     this._playerRanks = this._playerRanks.filter(a => !logins.includes(a.login))
-    const presentMaps = MapService.maps.map(a => a.id)
+    const presentMaps = new Set(MapService.maps.map(a => a.id))
     if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
     const records: tm.Record[] = await this.repo.getAll()
     if (records.length === 0) { return }
@@ -115,7 +115,7 @@ export class RecordService {
       if (curMap !== prevMap) {
         rank = 1
         mapPresent = true
-        if (!presentMaps.includes(records[i].map)) {
+        if (!presentMaps.has(records[i].map)) {
           mapPresent = false
           continue
         }
