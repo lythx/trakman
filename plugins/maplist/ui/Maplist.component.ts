@@ -107,26 +107,27 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     {
       aliases: config.commands.best.aliases,
       help: config.commands.best.help,
-      params: [{ name: 'page', type: 'int' }],
-      callback: (info: tm.MessageInfo, page: number): void => {
-        this.openWithOption(info.login, 'best', page)
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'best', page ?? 1)
       },
       privilege: config.commands.best.privilege
     },
     {
       aliases: config.commands.worst.aliases,
       help: config.commands.worst.help,
-      params: [{ name: 'page', type: 'int' }],
-      callback: (info: tm.MessageInfo, page: number): void => {
-        this.openWithOption(info.login, 'worst', page)
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'worst', page ?? 1)
       },
       privilege: config.commands.worst.privilege
     },
     {
       aliases: config.commands.jukebox.aliases,
       help: config.commands.jukebox.help,
-      callback: (info: tm.MessageInfo, page: number): void => {
-        this.openWithOption(info.login, 'jukebox', page)
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'jukebox', page ?? 1)
       },
       privilege: config.commands.jukebox.privilege
     }
