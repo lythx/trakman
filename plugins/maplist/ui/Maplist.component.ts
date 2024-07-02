@@ -107,24 +107,26 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     {
       aliases: config.commands.best.aliases,
       help: config.commands.best.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'best', 1) // TODO MAKE PARAMETER
+      params: [{ name: 'page', type: 'int' }],
+      callback: (info: tm.MessageInfo, page: number): void => {
+        this.openWithOption(info.login, 'best', page)
       },
       privilege: config.commands.best.privilege
     },
     {
       aliases: config.commands.worst.aliases,
       help: config.commands.worst.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'worst', 1) // TODO MAKE PARAMETER
+      params: [{ name: 'page', type: 'int' }],
+      callback: (info: tm.MessageInfo, page: number): void => {
+        this.openWithOption(info.login, 'worst', page)
       },
       privilege: config.commands.worst.privilege
     },
     {
       aliases: config.commands.jukebox.aliases,
       help: config.commands.jukebox.help,
-      callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'jukebox', 1) // TODO MAKE PARAMETER
+      callback: (info: tm.MessageInfo, page: number): void => {
+        this.openWithOption(info.login, 'jukebox', page)
       },
       privilege: config.commands.jukebox.privilege
     }
