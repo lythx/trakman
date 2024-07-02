@@ -22,6 +22,8 @@ export default {
   defaultTMXSearchLimit: 50,
   /** Whether to reset Cup mode scores after a map is skipped or restarted */
   resetCupScoreOnSkipAndRestart: true,
+  /** Timeout after clicking manialink in miliseconds */
+  manialinkInteractionTimeout: 20,
   /** Privilege levels for each of the administrative actions */
   privileges: {
     ban: 2,
