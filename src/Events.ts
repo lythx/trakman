@@ -30,7 +30,7 @@ const initialize = async (): Promise<void> => {
  * Add callback function to execute on given event.
  * @param event Dedicated server callback event
  * @param callback Function to execute on event
- * @param prepend If set to true puts the listener on the beggining of the array (it will get executed before other listeners)
+ * @param prepend If set to true puts the listener on the beginning of the array (it will get executed before other listeners)
  */
 const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
   callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any)

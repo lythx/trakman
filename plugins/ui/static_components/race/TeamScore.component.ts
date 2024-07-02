@@ -2,7 +2,7 @@
  * @author lythx
  * @since 1.2
  */
-import { componentIds, StaticHeader, centeredText, StaticComponent, GridCellFunction, Grid } from '../../UI.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent, type GridCellFunction, Grid } from '../../UI.js'
 import config from './TeamScore.config.js'
 
 export default class TeamScore extends StaticComponent {

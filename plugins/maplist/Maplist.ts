@@ -1,14 +1,14 @@
 import config from './Config.js'
 import './ui/Maplist.component.js'
 
-const authorSort: tm.Map[] = []
-const nameSort: tm.Map[] = []
-const karmaSort: tm.Map[] = []
-const worstKarmaSort: tm.Map[] = []
-const atSort: tm.Map[] = []
-const worstAtSort: tm.Map[] = []
-const newestSort: tm.Map[] = []
-const oldestSort: tm.Map[] = []
+let authorSort: tm.Map[] = []
+let nameSort: tm.Map[] = []
+let karmaSort: tm.Map[] = []
+let worstKarmaSort: tm.Map[] = []
+let atSort: tm.Map[] = []
+let worstAtSort: tm.Map[] = []
+let newestSort: tm.Map[] = []
+let oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
 let cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
@@ -17,30 +17,21 @@ let cache: {
 const updateListeners: ((action: 'add' | 'remove', addedOrRemovedMap: Readonly<tm.Map>) => void)[] = []
 const jukeboxUpdateListeners: ((jukebox: readonly Readonly<tm.Map>[]) => void)[] = []
 
-tm.addListener('Startup', (): void => {
+function initialize(): void {
   const arr: tm.Map[] = tm.maps.list.sort((a, b): number => a.name.localeCompare(b.name))
-  authorSort.push(...arr.sort((a, b): number => a.author.localeCompare(b.author)))
-  nameSort.push(...[...authorSort].sort((a, b): number => a.name.localeCompare(b.name)))
-  const maps: Readonly<tm.Map>[] = tm.maps.list
-  karmaSort.push(...[...authorSort].sort((a, b): number => {
-    const aKarma: number = maps.find(c => c.id === a.id)?.voteRatio ?? 0
-    const bKarma: number = maps.find(c => c.id === b.id)?.voteRatio ?? 0
-    return bKarma - aKarma
-  }))
-  worstKarmaSort.push(...[...karmaSort].reverse())
-  atSort.push(...[...authorSort].sort((a, b): number => a.authorTime - b.authorTime))
-  worstAtSort.push(...[...atSort].reverse())
-  oldestSort.push(...[...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime()))
-  newestSort.push(...[...oldestSort].reverse())
-})
+  authorSort = arr.sort((a, b): number => a.author.localeCompare(b.author))
+  nameSort = [...authorSort].sort((a, b): number => a.name.localeCompare(b.name))
+  karmaSort = [...authorSort].sort((a, b): number => {
+    return a.voteRatio ?? 0 - b.voteRatio ?? 0
+  })
+  worstKarmaSort = [...karmaSort].reverse()
+  atSort = [...authorSort].sort((a, b): number => a.authorTime - b.authorTime)
+  worstAtSort = [...atSort].reverse()
+  oldestSort = [...authorSort].sort((a, b): number => a.addDate.getTime() - b.addDate.getTime())
+  newestSort = [...oldestSort].reverse()
+}
 
-tm.addListener('JukeboxChanged', (list): void => {
-  jukebox.length = 0
-  jukebox.push(...list)
-  for (const e of jukeboxUpdateListeners) { e(list) }
-})
-
-tm.addListener('MapAdded', (map): void => {
+function insertMap(map: tm.MapAddedInfo): void {
   authorSort.splice(authorSort.findIndex(a => map.author.localeCompare(a.author)
     && map.name.localeCompare(a.name)), 0, map)
   nameSort.splice(nameSort.findIndex(a => map.author.localeCompare(a.author)
@@ -66,9 +57,9 @@ tm.addListener('MapAdded', (map): void => {
     && map.addDate.getTime() >= a.addDate.getTime()), 0, map)
   cache.length = 0
   for (const e of updateListeners) { e('add', map) }
-})
+}
 
-tm.addListener('MapRemoved', (map): void => {
+function removeMap(map: tm.MapRemovedInfo): void {
   authorSort.splice(authorSort.findIndex(a => a.id === map.id), 1)
   nameSort.splice(nameSort.findIndex(a => a.id === map.id), 1)
   karmaSort.splice(karmaSort.findIndex(a => a.id === map.id), 1)
@@ -79,6 +70,37 @@ tm.addListener('MapRemoved', (map): void => {
   oldestSort.splice(oldestSort.findIndex(a => a.id === map.id), 1)
   cache.length = 0
   for (const e of updateListeners) { e('remove', map) }
+}
+
+function addOrRemove(map: tm.MapAddedInfo | tm.MapAddedInfo[], fun: Function): void {
+  if (!Array.isArray(map)) {
+    fun(map)
+    return
+  }
+  // If the list of added or removed maps is small enough, use insertion/deletion;
+  // otherwise re-initialise everything from the beginning.
+  if (map.length < tm.config.controller.splitBy) {
+    map.forEach(a => fun(a))
+  } else {
+    initialize()
+  }
+}
+
+tm.addListener('JukeboxChanged', (list): void => {
+  jukebox.length = 0
+  jukebox.push(...list)
+  for (const e of jukeboxUpdateListeners) { e(list) }
+})
+
+
+tm.addListener('Startup', initialize)
+
+tm.addListener('MapAdded', (map: tm.MapAddedInfo | tm.MapAddedInfo[]): void => {
+  addOrRemove(map, insertMap)
+})
+
+tm.addListener('MapRemoved', (map: tm.MapRemovedInfo | tm.MapRemovedInfo[]): void => {
+  addOrRemove(map, removeMap)
 })
 
 tm.addListener('LiveRecord', (info: tm.FinishInfo): void => {
@@ -192,9 +214,10 @@ export const maplist = {
    */
   searchByName: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'name')?.list
+    let indices: number[]
     if (list === undefined) {
-      list = (tm.utils.matchString(query, authorSort, 'name', true))
-        .filter(a => a.value > config.searchMinSimilarityValue).map(a => a.obj)
+      indices = tm.utils.matchString(query, authorSort.map(a => a.name))
+      list = indices.map(a => authorSort[a])
       cache.unshift({ query, list, type: 'name' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
@@ -208,9 +231,10 @@ export const maplist = {
    */
   searchByAuthor: (query: string): Readonly<tm.Map>[] => {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'author')?.list
+    let indices: number[]
     if (list === undefined) {
-      list = (tm.utils.matchString(query, nameSort, 'author', true))
-        .filter(a => a.value > config.searchMinSimilarityValue).map(a => a.obj)
+      indices = tm.utils.matchString(query, authorSort.map(a => a.author))
+      list = indices.map(a => authorSort[a])
       cache.unshift({ query, list, type: 'author' })
       cache.length = Math.min(config.cacheSize, cache.length)
     }

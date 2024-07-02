@@ -1,5 +1,5 @@
 import config from './Config.js'
-import { TMXMapChangedInfo } from './TmxTypes.js'
+import type { TMXMapChangedInfo } from './TmxTypes.js'
 import './ui/TMXWindow.component.js'
 
 // fill with empty strings at start to avoid undefined error on startup
@@ -203,4 +203,4 @@ export const tmx = {
 
 }
 
-export { TMXMapChangedInfo }
+export type { TMXMapChangedInfo }

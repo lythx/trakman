@@ -14,7 +14,7 @@ const initialize = async () => {
     await tm.log.fatal('Failed to fetch top playtimes', res.message, res.stack)
     return
   }
-  for (const e of res) { e.playtime = e.playtime * 1000 } // Change playtime to miliseconds
+  for (const e of res) { e.playtime = e.playtime * 1000 } // Change playtime to milliseconds
   topList = res
   for (const e of updateListeners) { e(topList) }
   for (const e of nicknameChangeListeners) { e(topList) }

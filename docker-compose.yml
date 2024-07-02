@@ -1,5 +1,3 @@
-version: "3.0"
-
 services:
   trakman:
     image: borecek/trakman:main
@@ -25,6 +23,7 @@ services:
       SERVER_PASSWORD: ""
       SERVER_NET_PORT: 2350
       SERVER_P2P_PORT: 3450
+      SERVER_PACKMASK: "nations"
       # Database config - preconfigured for included database
       DB_USER: "trakman"
       DB_PASSWORD: "trakman"

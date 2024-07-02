@@ -14,7 +14,7 @@ export class ClientSocket extends net.Socket {
   /**
   * Setup socket listeners for client - server communication
   */
-  setupListeners(): void {
+  setupListeners = (): void => {
     this.on('data', (buffer: Buffer): void => {
       // handshake has no id so it has to be treated differently from normal data
       if (this.handshakeStatus === null) {
@@ -30,7 +30,7 @@ export class ClientSocket extends net.Socket {
   /**
   * Poll handshake status
   */
-  async awaitHandshake(): Promise<true | Error> {
+  awaitHandshake = async (): Promise<true | Error> => {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
       const poll = (): void => {
@@ -48,7 +48,7 @@ export class ClientSocket extends net.Socket {
     })
   }
 
-  destroy(): this {
+  destroy = (): this => {
     this.responses.length = 0
     return super.destroy()
   }
@@ -57,7 +57,7 @@ export class ClientSocket extends net.Socket {
   * Poll dedicated server response
   * @returns array of values returned by server or error
   */
-  async awaitResponse(id: number, method: string): Promise<any | Error> {
+  awaitResponse = async (id: number, method: string): Promise<any | Error> => {
     const startTimestamp: number = Date.now()
     return await new Promise((resolve): void => {
       const poll = (): void => {
@@ -81,7 +81,7 @@ export class ClientSocket extends net.Socket {
     })
   }
 
-  private handleHandshake(buffer: Buffer): void {
+  private handleHandshake = (buffer: Buffer): void => {
     this.handshakeHeader += buffer.toString()
     if (this.handshakeHeader.slice(-11) === 'GBXRemote 2') {
       this.handshakeStatus = true
@@ -93,7 +93,7 @@ export class ClientSocket extends net.Socket {
   /** 
    * Initiates a Response object with targetSize and id
    */
-  private handleResponseStart(buffer: Buffer): void {
+  private handleResponseStart = (buffer: Buffer): void => {
     this.responses.length = Math.min(this.responses.length, 20) // trim responses array so it doesn't grow inifinitely
     if (buffer.length < 8) { // rarely buffer header will get split between two data chunks
       this.response = null
@@ -113,7 +113,7 @@ export class ClientSocket extends net.Socket {
   /**
    * Adds data to response object and handles response end
    */
-  private handleResponseChunk(buffer: Buffer): void {
+  private handleResponseChunk = (buffer: Buffer): void => {
     if (this.response === null) { return }
     this.response.addData(buffer)
     if (this.response.status === 'overloaded') {

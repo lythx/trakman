@@ -1,7 +1,7 @@
 import IDS from '../config/UtilIds.js'
 import { centeredText, rightAlignedText } from './TextUtils.js'
 import { Vote } from '../../vote/Vote.js'
-import { addManialinkListener, removeManialinkListener, StaticHeader, StaticHeaderOptions } from '../UI.js'
+import { addManialinkListener, removeManialinkListener, StaticHeader, type StaticHeaderOptions } from '../UI.js'
 import config from './VoteWindow.config.js'
 
 /**

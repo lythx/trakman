@@ -3,7 +3,7 @@
  * @since 0.5
  */
 
-import { componentIds, Paginator, Grid, GridCellFunction, centeredText, closeButton, leftAlignedText, GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Paginator, Grid, type GridCellFunction, centeredText, closeButton, leftAlignedText, type GridCellObject, PopupWindow } from '../../ui/UI.js'
 import config from './TMXWindow.config.js'
 import { tmx } from "../../tmx/Tmx.js"
 
@@ -89,9 +89,9 @@ class TMXWindow extends PopupWindow<number> {
       const TMXMap = TMXMaps[j] ?? undefined
       const mapRecords = allRecords.filter(a => a.map === map.id)
       const header: GridCellFunction = (ii, jj, ww, hh) => this.constructHeader(ww, hh, titles[j], map, TMXMap)
-      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, TMXMap)
+      const screenshot: GridCellFunction = (ii, jj, ww, hh) => this.constructScreenshot(login, ww, hh, mapRecords, map.environment, TMXMap)
       const name: GridCellFunction = (ii, jj, ww, hh) =>
-        this.constructEntry(tm.utils.safeString(tm.utils.strip(mapName, false)), config.icons.name, ww, hh, config.iconWidth)
+        this.constructEntry(tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(mapName), false)), config.icons.name, ww, hh, config.iconWidth)
       const author: GridCellFunction = (ii, jj, ww, hh) => this.constructAuthor(ww, hh, map)
       const infos: GridCellFunction = (ii, jj, ww, hh) =>
         this.constructInfoXml(ww, hh, map, TMXMap)
@@ -137,7 +137,7 @@ image="${image}" url="${url}" /> `
       </frame>`
   }
 
-  protected constructScreenshot(login: string, width: number, height: number, records: tm.Record[], TMXMap?: tm.TMXMap) {
+  protected constructScreenshot(login: string, width: number, height: number, records: tm.Record[], environment: tm.Environment, TMXMap?: tm.TMXMap) {
     const rightW = width - (config.screenshotWidth + config.margin)
     const count = config.localsCount
     const grid = new Grid(rightW, height, [1, 2, 3], new Array(count + 1).fill(1),
@@ -176,7 +176,7 @@ image="${image}" url="${url}" /> `
       arr.push(indexCell, timeCell, nameCell)
     }
     const image = TMXMap === undefined
-      ? config.noScreenshot
+      ? config.noScreenshot[environment]
       : tm.utils.safeString(TMXMap.thumbnailUrl + `&.jpeg`)
     return `<quad posn="${config.margin} ${-config.margin} 8" sizen="${config.screenshotWidth} ${height - config.margin * 2}" image="${image}"/>
       ${centeredText(config.notLoaded, config.screenshotWidth, height, { textScale: config.notLoadedTextscale, yOffset: -1 })}

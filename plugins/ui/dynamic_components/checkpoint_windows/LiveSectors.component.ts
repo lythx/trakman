@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, GridCellFunction, PopupWindow } from '../../UI.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, type GridCellFunction, PopupWindow } from '../../UI.js'
 import config from './LiveSectors.config.js'
 
 export default class LiveSectors extends PopupWindow {
@@ -70,7 +70,7 @@ export default class LiveSectors extends PopupWindow {
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      let ret: string = centeredText(records[i + playerIndex].login, w, h)
+      const ret: string = centeredText(records[i + playerIndex].login, w, h)
       if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -105,8 +105,8 @@ export default class LiveSectors extends PopupWindow {
         ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
-      ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)],
-        new Array(this.entries + 1).fill(1), config.grid)
+        ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth), ...new Array(this.cpsOnFirstPage + 1).fill(1)],
+      new Array(this.entries + 1).fill(1), config.grid)
     } else {
       headers = [
         (i, j, w, h) => centeredText(' Lp. ', w, h),
@@ -116,11 +116,11 @@ export default class LiveSectors extends PopupWindow {
         ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
       ]
       grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
-      ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
-      ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+        ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+        ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
-    for (let i: number = 0; i < entriesToDisplay; i++) {
+    for (let i = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
         arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
@@ -142,10 +142,10 @@ export default class LiveSectors extends PopupWindow {
   private getCpIndexAndAmount(cpPage: number): [number, number] {
     const cpAmount = tm.maps.current.checkpointsAmount
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
-    let cpIndex: number = 0
+    let cpIndex = 0
     if (cpPage > 1) {
       cpIndex = this.cpsOnFirstPage
-      for (let i: number = 2; i < cpPage; i++) {
+      for (let i = 2; i < cpPage; i++) {
         cpIndex += this.cpsOnNextPages
       }
       cpsToDisplay = Math.min(cpAmount - cpIndex, this.cpsOnNextPages)
@@ -168,9 +168,9 @@ export default class LiveSectors extends PopupWindow {
   }
 
   private calculateCpPages(): number {
-    let cpPages: number = 1
+    let cpPages = 1
     const cpAmount = tm.maps.current.checkpointsAmount
-    for (let i: number = 1; i < cpAmount; i++) {
+    for (let i = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++
       } else if (i >= this.cpsOnFirstPage + this.cpsOnNextPages * (cpPages - 1)) {

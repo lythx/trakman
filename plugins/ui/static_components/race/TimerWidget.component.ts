@@ -9,7 +9,7 @@ import config from './TimerWidget.config.js'
 export default class TimerWidget extends StaticComponent {
 
   private readonly header: StaticHeader
-  private dynamicTimerInterval: NodeJS.Timer | undefined
+  private dynamicTimerInterval: NodeJS.Timeout | undefined
   private noButtonXml: string = ''
   private xmlWithButtons: string = ''
   private readonly pauseButtonId = this.id + 1

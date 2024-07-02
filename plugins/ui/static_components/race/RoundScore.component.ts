@@ -3,7 +3,7 @@
  * @since 1.2
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, RLImage } from '../../UI.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent, type RLImage } from '../../UI.js'
 
 import config from './RoundScore.config.js'
 

@@ -40,7 +40,7 @@ const commands: tm.Command[] = [
       do {
         const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
         const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
-        let file: { name: string, content: Buffer } | Error =
+        const file: { name: string, content: Buffer } | Error =
           await tm.tmx.fetchRandomMapFile(site).catch((err: Error) => err)
         if (file instanceof Error) {
           tm.sendMessage(config.addrandom.fetchError, info.login)
@@ -93,13 +93,13 @@ const commands: tm.Command[] = [
         return
       } else if (obj.wasAlreadyAdded) {
         tm.sendMessage(tm.utils.strVar(config.addfromurl.alreadyAdded, {
-          map: tm.utils.strip(obj.map.name, true),
+          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
           nickname: tm.utils.strip(info.nickname, true)
         }), config.addfromurl.public ? undefined : info.login)
       } else {
         tm.sendMessage(tm.utils.strVar(config.addfromurl.added, {
           title: info.title,
-          map: tm.utils.strip(obj.map.name, true),
+          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
           nickname: tm.utils.strip(info.nickname, true)
         }), config.addfromurl.public ? undefined : info.login)
       }
@@ -158,13 +158,13 @@ const commands: tm.Command[] = [
         return
       } else if (obj.wasAlreadyAdded) {
         tm.sendMessage(tm.utils.strVar(config.publicadd.alreadyAdded, {
-          map: tm.utils.strip(obj.map.name, true),
+          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
           nickname: tm.utils.strip(info.nickname, true)
         }), config.publicadd.public ? undefined : info.login)
       } else {
         tm.sendMessage(tm.utils.strVar(config.publicadd.added, {
           title: info.title,
-          map: tm.utils.strip(obj.map.name, true),
+          map: tm.utils.strip(tm.utils.decodeURI(obj.map.name), true),
           nickname: tm.utils.strip(info.nickname, true)
         }), config.publicadd.public ? undefined : info.login)
       }

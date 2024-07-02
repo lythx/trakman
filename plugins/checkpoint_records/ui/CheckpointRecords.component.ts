@@ -3,7 +3,7 @@
  * @since 0.3
  */
 
-import { closeButton, componentIds, Grid, centeredText, Paginator, GridCellFunction, GridCellObject, PopupWindow } from '../../ui/UI.js'
+import { closeButton, componentIds, Grid, centeredText, Paginator, type GridCellFunction, type GridCellObject, PopupWindow } from '../../ui/UI.js'
 import { checkpointRecords } from '../../checkpoint_records/CheckpointRecords.js'
 import config from './CheckpointRecords.config.js'
 

@@ -3,8 +3,9 @@
  * @since 0.4
  */
 
-import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
+import { componentIds, StaticHeader, Grid, type GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
 import config from './AdminPanelResult.config.js'
+import { actions } from '../../../actions/Actions.js'
 
 export default class AdminPanelResult extends StaticComponent {
 
@@ -27,12 +28,8 @@ export default class AdminPanelResult extends StaticComponent {
     this.renderOnEvent('PrivilegeChanged', (info) => {
       return this.displayToPlayer(info.login)
     })
-    addManialinkListener(this.id + this.actions.requeue, info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.requeue, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
-      tm.jukebox.add(tm.maps.current.id, info)
+    addManialinkListener(this.id + this.actions.requeue, async info => {
+      await actions.requeueMap(info.login, info.nickname, info.title)
     })
     addManialinkListener(this.id + this.actions.previous, async info => {
       tm.sendMessage(tm.utils.strVar(config.messages.previous, {

@@ -5,7 +5,7 @@
 
 import { stats } from "../Stats.js"
 import { componentIds, centeredText } from '../../ui/UI.js'
-import { Paginator, Grid, GridCellFunction, closeButton, GridCellObject, PopupWindow } from "../../ui/UI.js"
+import { Paginator, Grid, type GridCellFunction, closeButton, type GridCellObject, PopupWindow } from "../../ui/UI.js"
 import config from './TopDonations.config.js'
 
 export default class TopDonations extends PopupWindow<number> {

@@ -1,5 +1,5 @@
 import fetch from "node-fetch"
-import { UltimaniaRecord } from "./UltimaniaTypes"
+import type { UltimaniaRecord } from "./UltimaniaTypes"
 import config from './Config.js'
 
 
