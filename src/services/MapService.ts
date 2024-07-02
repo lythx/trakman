@@ -376,6 +376,8 @@ export class MapService {
   static async writeFileAndAdd<T>(fileName: string, file: Buffer, caller?: { nickname: string, login: string },
     options?: { dontJuke?: boolean, cancelIfAlreadyAdded?: T }): Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) : ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
     const base64String: string = file.toString('base64')
+    const extension = '.Challenge.Gbx'
+    fileName = fileName.slice(0, -extension.length) + '_' + String(Date.now()) + extension
     // add map directory to filename and sanitise
     const path = (config.manualMapLoading.enabled ? config.manualMapLoading.mapsDirectory : '') + fileName.replace(
       /[^a-z0-9.]/gi, '_')

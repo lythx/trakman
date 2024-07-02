@@ -41,8 +41,7 @@ export default class TMXSearchWindow extends PopupWindow<{
         tm.log.error('Error while adding map to queue TMX search window', `Map index out of range`)
         return
       }
-      const gotQueued: boolean = await this.handleMapClick(mapId, mapName, info.login, info.nickname, info.privilege, info.title)
-      if (!gotQueued) { return }
+      await this.handleMapClick(mapId, mapName, info.login, info.nickname, info.privilege, info.title)
     })
     tm.commands.add({
       aliases: config.command.aliases,
