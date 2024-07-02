@@ -51,6 +51,7 @@ export default {
   blankImage: icons.blank,
   public: true,
   authorSearchSeparator: '$a',
+  pageSearchSeparator: '$p',
   messages: {
     error: `${p.error}Error while adding the map to queue.`,
     noPermission: `${p.error}You can't add more than one map to the queue.`,
@@ -60,7 +61,7 @@ export default {
   commands: {
     list: {
       aliases: ['l', 'ml', 'list'],
-      help: `Display list of maps. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
+      help: `Display list of maps. Options: $$a[author], $$p[page], jb, name, karma, short, long, best, worst.`,
       privilege: 0
     },
     best: {

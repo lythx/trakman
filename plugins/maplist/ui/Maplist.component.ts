@@ -54,7 +54,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       await actions.removeMap(info.login, info.nickname, info.title, mapId)
       this.reRender()
     })
-    addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
+    addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox', 1))
     tm.commands.add({
       aliases: config.commands.list.aliases,
       help: config.commands.list.help,
@@ -64,24 +64,42 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           tm.openManialink(this.openId, info.login)
           return
         }
+        const split = query.split(' ').filter(a => a != '')
+        const [q1, q2] = [split[0], split[1]]
+        let page = 1
+        if (q1 !== undefined && q1.startsWith(config.pageSearchSeparator)) {
+          page = Number(q1.slice(2))
+          if (!Number.isInteger(page) || page < 1) {
+            page = 1
+          }
+          void this.openOnPage(info.login, page)
+          return
+        } 
+        if (q2 !== undefined && q2.startsWith(config.pageSearchSeparator)) {
+          page = Number(q2.slice(2))
+          if (!Number.isInteger(page) || page < 1) {
+            page = 1
+          }
+          query = q1
+        }
         if (query === 'jb') { query = 'jukebox' }
         const option: string = query.split(' ').filter(a => a !== '')[0]
         const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'oldest', 'newest'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
-          void this.openWithOption(info.login, o)
+          void this.openWithOption(info.login, o, page)
           return
         }
         if (['nofin', 'nofinish'].includes(option)) {
-          void this.openWithOption(info.login, 'nofinish')
+          void this.openWithOption(info.login, 'nofinish', page)
         } else if (option === 'noauthor') {
-          void this.openWithOption(info.login, 'noauthor')
+          void this.openWithOption(info.login, 'noauthor', page)
         } else if (option === 'norank') {
-          void this.openWithOption(info.login, 'norank')
+          void this.openWithOption(info.login, 'norank', page)
         } else if (query.startsWith(config.authorSearchSeparator)) {
-          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), true)
+          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), page, true)
         } else {
-          void this.openWithQuery(info.login, query)
+          void this.openWithQuery(info.login, query, page)
         }
       },
       privilege: config.commands.list.privilege
@@ -90,7 +108,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       aliases: config.commands.best.aliases,
       help: config.commands.best.help,
       callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'best')
+        this.openWithOption(info.login, 'best', 1) // TODO MAKE PARAMETER
       },
       privilege: config.commands.best.privilege
     },
@@ -98,7 +116,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       aliases: config.commands.worst.aliases,
       help: config.commands.worst.help,
       callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'worst')
+        this.openWithOption(info.login, 'worst', 1) // TODO MAKE PARAMETER
       },
       privilege: config.commands.worst.privilege
     },
@@ -106,7 +124,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       aliases: config.commands.jukebox.aliases,
       help: config.commands.jukebox.help,
       callback: (info: tm.MessageInfo): void => {
-        this.openWithOption(info.login, 'jukebox')
+        this.openWithOption(info.login, 'jukebox', 1) // TODO MAKE PARAMETER
       },
       privilege: config.commands.jukebox.privilege
     }
@@ -117,7 +135,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
   async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
     | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish'
-    | 'norank' | 'noauthor' | 'oldest' | 'newest'): Promise<void> {
+    | 'norank' | 'noauthor' | 'oldest' | 'newest', page: number): Promise<void> {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = maplist.getByPosition(login, option)
@@ -127,14 +145,26 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       list = maplist.get(option)
     }
     const paginator = this.getPaginator(login, list, option)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`,
+    page = Math.max(1, Math.min(Math.ceil(list.length / (config.rows * config.columns)), page))
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`,
       undefined, config.optionTitles[option as keyof typeof config.optionTitles])
   }
 
-  openWithQuery(login: string, query: string, searchByAuthor?: true): void {
+  openWithQuery(login: string, query: string, page: number, searchByAuthor?: true): void {
     const list: Readonly<tm.Map>[] = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list, query)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
+    page = Math.max(1, Math.min(Math.ceil(list.length / (config.rows * config.columns)), page))
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`)
+  }
+
+  openOnPage(login: string, page: number): void {
+    const list: Readonly<tm.Map>[] = tm.maps.list
+    const paginator = this.paginator
+    page = Math.min(Math.ceil(list.length / (config.rows * config.columns)), page)
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`)
   }
 
   private getPaginator(login: string, list: readonly tm.Map[], option: string): Paginator {
