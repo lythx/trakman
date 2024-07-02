@@ -232,11 +232,11 @@ export abstract class Logger {
       body: message
     }).catch(e => e)
     if (response instanceof Error) {
-      Logger.error('Could not send message to Discord.', response)
+      this.error('Could not send message to Discord.', response)
       return
     }
     if (!response.ok) {
-      Logger.error('Discord log response not ok, status: ' + response.status)
+      this.error('Discord log response not ok, status: ' + response.status)
     }
   }
 
