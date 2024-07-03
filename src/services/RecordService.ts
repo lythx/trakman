@@ -37,7 +37,7 @@ export class RecordService {
     await this.updateQueue()
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
-    if (!config.manualMapLoading) {
+    if (!config.manualMapLoading.enabled) {
       Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'],
         async (): Promise<void> => {
           this._playerRanks.length = 0
