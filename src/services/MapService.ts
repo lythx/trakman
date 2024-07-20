@@ -375,6 +375,9 @@ export class MapService {
    */
   static async writeFileAndAdd<T>(fileName: string, file: Buffer, caller?: { nickname: string, login: string },
     options?: { dontJuke?: boolean, cancelIfAlreadyAdded?: T }): Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) : ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
+    if (file.BYTES_PER_ELEMENT * file.length >= 1_048_576) { // Dedicated server hangs if the map file is greater than 1MB
+      return new Error(`Map file too big.`)
+    }
     const base64String: string = file.toString('base64')
     const extension = '.Challenge.Gbx'
     fileName = fileName.slice(0, -extension.length) + '_' + String(Date.now()) + extension
@@ -528,7 +531,7 @@ export class MapService {
   static async addToJukebox(mapId: string, caller?: {
     login: string, nickname: string
   }, setAsNextMap = false): Promise<boolean | Error> {
-    if(this.jukebox.some(a => a.map.id === mapId)) {
+    if (this.jukebox.some(a => a.map.id === mapId)) {
       return false
     }
     const map: tm.Map | undefined = this._maps.find(a => a.id === mapId)
