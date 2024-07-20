@@ -53,12 +53,12 @@ export class MapRepository extends Repository {
     const len = Math.ceil(maps.length / splitby)
     Logger.info('Pushing new maps to db')
     for (let i = 0; i < len; i++) {
-      await this.add(...maps.slice(i * splitby, (i + 1) * splitby))
+      await this.bulkAdd(...maps.slice(i * splitby, (i + 1) * splitby))
     }
     Logger.info('Pushed ' + maps.length + ' maps to the database.')
   }
 
-  async add(...maps: tm.Map[]): Promise<void> {
+  async bulkAdd(...maps: tm.Map[]): Promise<void> {
     const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
     const uids = new Map(ids.map(a => [a.id, maps.find(b => b.id === a.uid)]))
     const values: string[] = []
@@ -82,6 +82,27 @@ export class MapRepository extends Repository {
     src.push(null)
 
     await pipeline(src, stream)
+  }
+
+  async add(...maps: tm.Map[]): Promise<void> {
+    const ids = await mapIdsRepo.addAndGet(maps.map(a => a.id))
+    const arr = maps.filter(a => ids.some(b => b.uid === a.id))
+    if (arr.length !== maps.length) {
+      Logger.error(`Failed to get ids for maps ${maps
+        .filter(a => !ids.some(b => b.uid === a.id)).join(', ')} while inserting into maps table`)
+    }
+    if (arr.length === 0) { return }
+    const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
+      bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17, ids.length)} ON CONFLICT DO NOTHING`
+    const values: any[] = []
+    for (const [i, map] of arr.entries()) {
+      values.push(ids[i].id, map.name,
+        map.fileName, map.author, environments[map.environment], moods[map.mood], map.bronzeTime, map.silverTime,
+        map.goldTime, map.authorTime, map.copperPrice, map.isLapRace, map.defaultLapsAmount, map.checkpointsPerLap, map.addDate,
+        map.leaderboardRating, map.awards)
+    }
+    await this.query(query, ...values)
   }
 
   async getAll(stadiumOnly: boolean = false): Promise<tm.Map[]> {
