@@ -14,8 +14,8 @@ const getRandomMessage = (): string => {
 
 const sendInfoMessage = (): void => {
   tm.sendMessage(config.messagePrefix
-        + `${config.defaultFormatting}`
-        + getRandomMessage(), undefined, config.chatPrefixEnabled)
+    + `${config.defaultFormatting}`
+    + getRandomMessage(), undefined, config.chatPrefixEnabled)
 }
 
 if (config.isEnabled) {
@@ -46,10 +46,9 @@ if (config.isEnabled) {
       }, config.messageInterval * 1000)
     })
   }
-  config.events.forEach(e => {
-    // If fake event it just won't work
+  for (const e of config.events) {
     tm.addListener(e as keyof tm.Events, (): void => {
       sendInfoMessage()
     })
-  });
+  }
 }
