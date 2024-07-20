@@ -247,9 +247,9 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   protected async constructContent(login: string, params?: { page: number, list?: readonly tm.Map[] }): Promise<string> {
     const maps: readonly Readonly<tm.Map>[] = params?.list ?? maplist.get()
     const startIndex: number = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
-    const mapsToDisplay: number = Math.min(maps.length - startIndex, config.rows * config.columns)
     const recordIndexStrings: string[] = await this.getRecordIndexStrings(login, ...maps.slice(startIndex,
       (config.rows * config.columns) + startIndex).map(a => a.id))
+    const mapsToDisplay: number = Math.min(maps.length - startIndex, config.rows * config.columns)
     const cell = (i: number, j: number, w: number, h: number): string => {
       const gridIndex: number = (i * config.columns) + j
       const recordIndexString: string = recordIndexStrings[gridIndex]
