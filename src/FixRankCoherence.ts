@@ -37,10 +37,13 @@ export const forceFixRankCoherence = async (): Promise<void> => {
   const records = allRecords.filter(a => maps.some(b => b.id === a.map_id))
   const limit = config.localRecordsLimit
   const sums: { id: number, average: number }[] = []
+  const indexesMap = new Map<number, number[]>(playerIds.map(a => [a, []]))
+  for (let i = 0; i < records.length; i++) {
+    indexesMap.get(records[i].player_id as number)?.push(i)
+  }
   for (let i = 0; i < playerIds.length; i++) {
-    const indexes: number[] = []
+    const indexes = indexesMap.get(playerIds[i]) as number[]
     let sum = 0
-    for (let j = 0; j < records.length; j++) { if (records[j].player_id === playerIds[i]) { indexes.push(j) } }
     for (let j = 0; j < indexes.length; j++) {
       let position = 1
       for (let k = indexes[j] - 1; k >= 0; k--) {
