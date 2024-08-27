@@ -118,7 +118,7 @@ export default class BestFinishes extends StaticComponent {
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       return this.bestFinishes[i] === undefined ? '' : bg +
-        (leftAlignedText(tm.utils.strip(this.bestFinishes[i].nickname, false), w, h,
+        (leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[i].nickname, false)), w, h,
           { textScale: config.textScale, padding: config.textPadding }))
     }
 

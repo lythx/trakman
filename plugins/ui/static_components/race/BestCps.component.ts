@@ -163,7 +163,11 @@ export default class BestCps extends StaticComponent {
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestCps[i + cpIndex] === undefined ? '' : bg + (this.bestCps[i + cpIndex] === undefined ? '' : leftAlignedText(tm.utils.strip(this.bestCps[i + cpIndex].nickname, false), w, h, { textScale: config.textScale, padding: config.textPadding }))
+      return this.bestCps[i + cpIndex] === undefined ? '' : 
+      bg + (this.bestCps[i + cpIndex] === undefined ? '' : 
+        leftAlignedText(tm.utils.safeString(tm.utils.strip(
+          this.bestCps[i + cpIndex].nickname, false)), w, h, 
+          { textScale: config.textScale, padding: config.textPadding }))
     }
 
     const cpsToDisplay: number = this.cpAmount - cpIndex

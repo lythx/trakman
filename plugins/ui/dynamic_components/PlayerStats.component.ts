@@ -54,7 +54,7 @@ export default class PlayerStatsWindow extends PopupWindow {
     if (params === undefined) { return '' }
     const data: string[] = [
       params.player.login,
-      tm.utils.strip(params.player.nickname, false),
+      tm.utils.safeString(tm.utils.strip(params.player.nickname, false)),
       `${params.player.country} / ${params.player.countryCode}`,
       titles.privileges[params.player.privilege as keyof typeof titles.privileges],
       (stats.averages.list.findIndex(a => a.login === params.player.login) + 1).toString(),
