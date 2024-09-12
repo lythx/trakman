@@ -3,6 +3,7 @@ import config from './Config.js'
 let topList: { readonly login: string, nickname: string, playtime: number }[] = []
 const updateListeners: ((changes: readonly Readonly<{ login: string, nickname: string, playtime: number }>[]) => void)[] = []
 const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
+let interval: NodeJS.Timeout
 
 const initialize = async () => {
   const res: { login: string, nickname: string, playtime: number }[] | Error =
@@ -18,6 +19,31 @@ const initialize = async () => {
   topList = res
   for (const e of updateListeners) { e(topList) }
   for (const e of nicknameChangeListeners) { e(topList) }
+  clearInterval(interval)
+  interval = setInterval(update, config.playtimesUpdateInterval)
+}
+
+const update = async () => {
+  const players = tm.players.list
+  const updated: typeof topList = []
+  for (const e of players) {
+    const pt = e.timePlayed + Date.now() - e.joinTimestamp
+    if (topList.length !== 0 && topList.length >= config.playtimesCount &&
+      pt <= topList[topList.length - 1].playtime) { return }
+    const entry = topList.find(a => a.login === e.login)
+    if (entry !== undefined) {
+      entry.playtime = pt
+      updated.push(entry)
+      topList.sort((a, b) => b.playtime - a.playtime)
+    } else {
+      const obj = { login: e.login, nickname: e.nickname, playtime: pt }
+      updated.push(obj)
+      topList.push(obj)
+      topList.sort((a, b) => b.playtime - a.playtime)
+      topList.length = Math.min(config.playtimesCount, topList.length)
+    }
+  }
+  for (const e of updateListeners) { e(updated) }
 }
 
 tm.addListener('PlayerDataUpdated', (info) => {
@@ -39,27 +65,9 @@ tm.addListener('PlayerDataUpdated', (info) => {
 tm.addListener('Startup', (): void => void initialize())
 
 tm.addListener('EndMap', () => {
-  const players = tm.players.list
-  const updated: typeof topList = []
-  for (const e of players) {
-    const pt = e.timePlayed + Date.now() - e.joinTimestamp
-    if (topList.length !== 0 && topList.length >= config.playtimesCount &&
-      pt <= topList[topList.length - 1].playtime) { return }
-    const entry = topList.find(a => a.login === e.login)
-    if (entry !== undefined) {
-      entry.playtime = pt
-      updated.push(entry)
-      topList.sort((a, b) => b.playtime - a.playtime)
-    } else {
-      const obj = { login: e.login, nickname: e.nickname, playtime: pt }
-      updated.push(obj)
-      topList.push(obj)
-      topList.sort((a, b) => b.playtime - a.playtime)
-      topList.length = Math.min(config.playtimesCount, topList.length)
-    }
-  }
-  for (const e of updateListeners) { e(updated) }
+  update()
 })
+
 
 /**
  * Creates and provides utilities for accessing players playtime ranking
