@@ -124,7 +124,7 @@ export default class BestFinishes extends StaticComponent {
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
-      const index = config.horizontal ? (j - 2) / 3 : i
+      const index = config.horizontal ? (j - 1) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
       const fin = this.bestFinishes[index]
       if (fin === undefined) { return '' }
