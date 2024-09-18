@@ -11,7 +11,7 @@ const commands: tm.Command[] = [
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.skip.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
+      actions.skipMap()
     },
     privilege: config.skip.privilege
   },

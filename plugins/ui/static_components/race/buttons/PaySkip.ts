@@ -2,6 +2,7 @@ import type { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import messages from "./Messages.config.js"
+import { actions } from '../../../../actions/Actions.js'
 
 const msg = messages.paySkip
 const cfg = config.paySkip
@@ -43,7 +44,7 @@ export class PaySkip extends UiButton {
     const res: boolean | Error = await tm.utils.sendCoppers(login, cfg.cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail, login)
-    } else if (res === true) {
+    } else if (res) {
       let countDown: number = cfg.countdown
       const startTime: number = Date.now()
       tm.sendMessage(tm.utils.strVar(msg.success, {
@@ -67,7 +68,7 @@ export class PaySkip extends UiButton {
           this.buttonData.text2 = tm.utils.strVar(cfg.texts[1][1], { seconds: countDown.toString() })
           this.emitUpdate()
           if (countDown === 0) {
-            tm.client.callNoRes('NextChallenge')
+            actions.skipMap()
             this.handleSkipNoCountdown()
             clearInterval(interval)
           }

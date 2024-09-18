@@ -22,6 +22,15 @@ tm.addListener('BeginMap', (info): void => {
   }
 })
 
+let toSkip = false
+
+tm.addListener('ServerStateChanged', (state): void => {
+  if (toSkip) {
+    tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{boolean: true }] : undefined)
+    toSkip = false
+  }
+})
+
 /**
  * Provides utilities for various actions.
  * @author lythx & wiseraven
@@ -499,5 +508,17 @@ export const actions = {
       title: title,
       adminName: tm.utils.strip(nickname, true),
     }))
+  },
+  skipMap: (): void => {
+    switch(tm.getState()) {
+      case 'result':
+        break
+      case 'transition':
+        toSkip = true
+        break
+      case 'race':
+        tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{boolean: true }] : undefined)
+        break
+    }
   }
 }

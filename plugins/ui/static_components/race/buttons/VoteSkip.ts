@@ -3,6 +3,7 @@ import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import { VoteWindow } from "../../../UI.js"
 import messages from "./Messages.config.js"
+import { actions } from '../../../../actions/Actions.js'
 
 const cfg = config.voteSkip
 const msg = messages.voteSkip
@@ -153,7 +154,7 @@ export class VoteSkip extends UiButton {
         this.buttonData.text2 = tm.utils.strVar(cfg.texts[1][1], { seconds: countDown.toString() })
         this.emitUpdate()
         if (countDown === 0) {
-          tm.client.callNoRes('NextChallenge')
+          actions.skipMap()
           this.handleSkipNoCountdown()
           clearInterval(interval)
         }

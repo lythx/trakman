@@ -34,7 +34,7 @@ export default class AdminPanel extends StaticComponent {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`)
+      actions.skipMap()
     })
     addManialinkListener(this.id + this.actions.requeue, async info => {
       await actions.requeueMap(info.login, info.nickname, info.title)
