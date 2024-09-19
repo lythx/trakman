@@ -109,11 +109,14 @@ export class PaySkip extends UiButton {
 
   private handleReplay(): void {
     if (this.isReplay) { return }
-    this.isReplay = true
+    const plus = tm.timer.isDynamic ? 2 : 0
+    if (!tm.timer.isDynamic) {
+      this.isReplay = true
+    }
     if (this.isSkip || this.isLastMapReplay) { return }
-    this.buttonData.text1 = cfg.texts[2][0]
-    this.buttonData.text2 = cfg.texts[2][1]
-    this.buttonData.equalTexts = cfg.texts[2].equal
+    this.buttonData.text1 = cfg.texts[2+plus][0]
+    this.buttonData.text2 = cfg.texts[2+plus][1]
+    this.buttonData.equalTexts = cfg.texts[2+plus].equal
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }
