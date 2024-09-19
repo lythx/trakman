@@ -25,5 +25,5 @@ export default {
   newestColour: `${tm.utils.palette.yellow}F`,
   textScale: 0.87,
   textPadding: 0.2,
-  horizontal: true
+  horizontal: false
 }
