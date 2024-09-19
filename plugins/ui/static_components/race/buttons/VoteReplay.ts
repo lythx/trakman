@@ -225,7 +225,7 @@ export class VoteReplay extends UiButton {
 
   private handleTimeExtension(): void {
     this.lastExtensionTimestamp = Date.now()
-    if (this.replayCount === cfg.extensionsLimit) {
+    if (this.replayCount >= cfg.extensionsLimit) {
       this.buttonData.text1 = cfg.texts[5][0]
       this.buttonData.text2 = cfg.texts[5][1]
       this.buttonData.equalTexts = cfg.texts[5].equal

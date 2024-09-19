@@ -163,7 +163,7 @@ export default {
       { 0: "$AF4RES$z$s LIMIT", 1: "REACHED", equal: true },
       { 0: "MAP IS", 1: "$AF4REPLAYED", equal: true },
       { 0: "$E22DISABLED", 1: "DUE TO SKIP", equal: true },
-      { 0: "PAY $AF4#{cost}", 1: "TO $AF4EXT", equal: true },
+      { 0: "PAY $AF4#{cost}", 1: "TO $AF4EXT", equal: false },
       { 0: "$AF4EXT$z$s LIMIT", 1: "REACHED", equal: true }
     ],
     timeExtension: 1000 * 60 * 5, // 5 minutes
