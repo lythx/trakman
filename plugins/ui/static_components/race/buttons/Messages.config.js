@@ -13,8 +13,10 @@ export default {
     skipEvent: 'skipped',
     replayEvent: 'replayed',
     refund: `, coppers will be returned`,
-    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to replay the ongoing map.`,
-    refundMail: `Refund for failed map replay on ${tm.config.server.name}`
+    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to #{action} the ongoing map.`,
+    refundMail: `Refund for failed map replay on ${tm.config.server.name}`,
+    replayStr: `${p.highlight}replay${p.vote}`,
+    extendStr: `${p.highlight}extend${p.vote} the time on`
   },
   voteSkip: {
     start: `${p.highlight}#{nickname} ${p.vote}started a vote to ${p.highlight}skip ${p.vote}the ongoing map.`,
