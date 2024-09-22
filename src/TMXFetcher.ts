@@ -135,6 +135,9 @@ export abstract class TMXFetcher {
         Logger.warn(error.message)
         continue
       }
+      if (data.Results[0] === undefined) {
+        continue
+      }
       prefix = p
       break
     }
