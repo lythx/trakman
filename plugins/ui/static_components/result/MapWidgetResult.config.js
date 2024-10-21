@@ -16,10 +16,10 @@ export default {
      map name is tested both stripped and unstripped from special characters
      Tags are read from top to bottom
      */
-     { authors: ['Fwo Niro'], icon: icons.tagRed }, 
-     { authors: ['tony89300'], icon: icons.tagPinkCyan },
-     { names: [/{Kackiest Kacky}*/], icon: icons.tagKacky },
-     { names: [/\$w\$i\$f70ARC_*/], icon: icons.tagArcade }
+    { authors: ['Fwo Niro'], icon: icons.tagRed },
+    { authors: ['tony89300'], icon: icons.tagPinkCyan },
+    { names: [/{Kackiest Kacky}*/], icon: icons.tagKacky },
+    { names: [/\$w\$i\$f70ARC_*/], icon: icons.tagArcade }
   ],
   icons: {
     header: icons.ongoingMap,
@@ -37,10 +37,12 @@ export default {
       classic: icons.trophyClassic
     },
     tmxWr: icons.bestClock,
+    environment: icons.carExplode,
     authorScore: icons.clockAuthor,
     goldScore: icons.clockAuthor
   },
   textScale: 1,
+  displayEnvironment: undefined, // Display environment instead of TMX time
   noDateText: "N/A",
   noAwardsText: "N/A",
   noWrText: "-:--.--",

@@ -1,5 +1,3 @@
-const p = tm.utils.palette
-
 export default {
   masteradmin: {
     public: true,

@@ -1,5 +1,5 @@
 import { componentIds, StaticHeader, StaticComponent, leftAlignedText } from '../../ui/UI.js'
-import { Song } from '../Types.js'
+import type { Song } from '../Types.js'
 import config from './MusicWidget.config.js'
 
 export default class MusicWidget extends StaticComponent {

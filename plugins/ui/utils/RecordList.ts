@@ -322,7 +322,7 @@ export default class RecordList {
       if (c !== undefined) {
         for (const [i, e] of cps.map(a => a[index]).entries()) {
           if (e === undefined || c[i] !== undefined) { continue }
-          if (e > (c[i] as number)) {
+          if (e > (c[i] as unknown as number)) {
             cpTypes[index][i] = 'worst'
           } else if (e === c[i]) {
             cpTypes[index][i] = 'equal'
@@ -394,7 +394,7 @@ export default class RecordList {
 
   private getTimeColours(login: string | undefined, playerIndex: number, records: RLRecord[], personalBest?: number): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
-    if(login === undefined) {
+    if (login === undefined) {
       for (let i: number = 0; i < records.length; i++) {
         ret.push('slower')
       }

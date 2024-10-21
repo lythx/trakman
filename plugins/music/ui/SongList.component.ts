@@ -1,6 +1,6 @@
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../ui/UI.js'
 import pluginConfig from '../Config.js'
-import { Song } from '../Types.js'
+import type { Song } from '../Types.js'
 import config from './SongList.config.js'
 
 type SearchTarget = 'name' | 'author'
@@ -115,15 +115,15 @@ export default class SongList extends PopupWindow<DisplayParams> {
     }
   }
 
-  private getSearchResult(query: string, target: SearchTarget): (Song & { index: number })[] {
-    return (tm.utils.matchString(query, this.songs, target, true))
-      .filter(a => a.value > config.searchMinSimilatiryValue).map(a => a.obj)
+  private getSearchResult(query: string, target: SearchTarget) {
+    let indices: number[] = tm.utils.matchString(query, this.songs.map(a => a[target]))
+    return indices.map(a => this.songs[a])
   }
 
-  protected async constructContent(login: string, params?: DisplayParams, privilege: number = 0): Promise<string> {
-    let page = params?.page ?? 1
-    let list = params?.list ?? this.songs
-    let index = (page - 1) * (config.entries - 1) - 1
+  protected async constructContent(login: string, params?: DisplayParams, privilege = 0): Promise<string> {
+    const page = params?.page ?? 1
+    const list = params?.list ?? this.songs
+    const index = (page - 1) * (config.entries - 1) - 1
     const headers: GridCellFunction[] = [
       (i, j, w, h) => centeredText(' Index ', w, h),
       (i, j, w, h) => centeredText(' Name ', w, h),
@@ -133,7 +133,7 @@ export default class SongList extends PopupWindow<DisplayParams> {
       (i, j, w, h) => centeredText(' Queue ', w, h),
     ]
     const indexCell: GridCellFunction = (i, j, w, h) => {
-      let cover = ''
+      const cover = ''
       return centeredText((i + index + 1).toString(), w, h) + cover
     }
 

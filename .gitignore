@@ -4,6 +4,9 @@
 # VSCode
 /.vscode/
 
+# IntelliJ
+/.idea/
+
 # Config files
 **/[Cc]onfig/*
 **[Cc]onfig.js
@@ -23,3 +26,11 @@
 
 # Environment
 .env
+
+# Docker
+/trakman/
+/tmf-config/
+/tracks/
+
+# Bun
+bun.lockb

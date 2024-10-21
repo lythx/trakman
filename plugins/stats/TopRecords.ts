@@ -10,8 +10,8 @@ const initialize = async () => {
   const res: { readonly login: string, nickname: string, amount: number }[] | Error =
     await tm.db.query(`WITH r(player_id, map_id) AS
     (SELECT player_id, map_id FROM records WHERE map_id IN(${
-      // Use only map ids in the current maplist
-      mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
+  // Use only map ids in the current maplist
+  mapIds.map(a => `${a.id},`).join('').slice(0, -1)}))
   SELECT count(*)::int as amount, nickname, login FROM r
   JOIN players ON players.id=r.player_id
   GROUP BY (nickname, login, last_online)

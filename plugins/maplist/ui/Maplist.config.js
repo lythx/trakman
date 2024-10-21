@@ -35,8 +35,10 @@ export default {
     icons.chartLocal, // PB position icon
     icons.karmaPulse, // Local karma icon
     icons.trashcanDelete, // Remove map icon
-    icons.trashcanDeleteHover // Remove map icon
+    icons.trashcanDeleteHover, // Remove map icon
+    icons.carExplode // Environment
   ],
+  displayEnvironment: undefined, // Display environment instead of karma
   iconWidth: 2,
   queueWidth: 5.2,
   queueNumberWidth: 2.9,
@@ -49,6 +51,7 @@ export default {
   blankImage: icons.blank,
   public: true,
   authorSearchSeparator: '$a',
+  pageSearchSeparator: '$p',
   messages: {
     error: `${p.error}Error while adding the map to queue.`,
     noPermission: `${p.error}You can't add more than one map to the queue.`,
@@ -58,7 +61,7 @@ export default {
   commands: {
     list: {
       aliases: ['l', 'ml', 'list'],
-      help: `Display list of maps. Options: jukebox, jb, name, karma, short, long, best, worst, worstkarma.`,
+      help: `Display list of maps. Options: $$a[author], $$p[page], jb, name, karma, short, long, best, worst.`,
       privilege: 0
     },
     best: {

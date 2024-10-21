@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
@@ -67,7 +67,7 @@ export default class MapWidget extends StaticComponent {
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
-      [tm.utils.safeString(map.name), this.getTag(map, TMXMap ?? undefined)],
+      [tm.utils.safeString(tm.utils.decodeURI(map.name)), this.getTag(map, TMXMap ?? undefined)],
       [tm.utils.safeString(author), authorIcon],
       [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]

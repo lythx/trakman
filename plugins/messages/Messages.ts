@@ -116,7 +116,7 @@ const events: tm.Listener[] = [
       if (tm.jukebox.juked[0]?.callerLogin !== undefined && c.nextJuke.public) {
         const player: tm.OfflinePlayer | undefined = tm.players.get(tm.jukebox.juked[0].callerLogin) ?? await tm.players.fetch(tm.jukebox.juked[0].callerLogin)
         tm.sendMessage(tm.utils.strVar(c.nextJuke.message, {
-          map: tm.utils.strip(tm.jukebox.juked[0].map.name, true),
+          map: tm.utils.strip(tm.utils.decodeURI(tm.jukebox.juked[0].map.name), true),
           nickname: tm.utils.strip(player?.nickname ?? '', true)
         }))
       }

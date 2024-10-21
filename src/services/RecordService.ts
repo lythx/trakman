@@ -37,10 +37,13 @@ export class RecordService {
     await this.updateQueue()
     await this.fetchAndStoreRanks()
     // Recreate list when Match Settings get changed
-    Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'], async (): Promise<void> => {
-      this._playerRanks.length = 0
-      await this.fetchAndStoreRanks()
-    })
+    if (!config.manualMapLoading.enabled) {
+      Client.addProxy(['LoadMatchSettings', 'AppendPlaylistFromMatchSettings', 'InsertPlaylistFromMatchSettings'],
+        async (): Promise<void> => {
+          this._playerRanks.length = 0
+          await this.fetchAndStoreRanks()
+        })
+    }
     Events.addListener('JukeboxChanged', () => this.updateQueue())
     Events.addListener('LocalRecord', (info) => {
       const ranks = this._playerRanks.filter(a => a.mapId === MapService.current.id)
@@ -100,9 +103,9 @@ export class RecordService {
   static async fetchAndStoreRanks(...logins: string[]): Promise<void> {
     // If logins length is 0 get online players
     this._playerRanks = this._playerRanks.filter(a => !logins.includes(a.login))
-    const presentMaps = MapService.maps.map(a => a.id)
+    const presentMaps = new Set(MapService.maps.map(a => a.id))
     if (logins.length === 0) { logins = PlayerService.players.map(a => a.login) }
-    let records: tm.Record[] = await this.repo.getAll()
+    const records: tm.Record[] = await this.repo.getAll()
     if (records.length === 0) { return }
     let rank = 1
     let prevMap = records[0].map
@@ -112,7 +115,7 @@ export class RecordService {
       if (curMap !== prevMap) {
         rank = 1
         mapPresent = true
-        if (!presentMaps.includes(records[i].map)) {
+        if (!presentMaps.has(records[i].map)) {
           mapPresent = false
           continue
         }

@@ -1,8 +1,9 @@
-import { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import { VoteWindow } from "../../../UI.js"
 import messages from "./Messages.config.js"
+import { actions } from '../../../../actions/Actions.js'
 
 const cfg = config.voteSkip
 const msg = messages.voteSkip
@@ -51,20 +52,20 @@ export class VoteSkip extends UiButton {
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isLastMapReplay || this.isReplay
       || this.isSkip || tm.getState() === 'result') { return }
-    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
+    const autopass = tm.players.count === 1
+    if (!autopass && tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
       return
     }
-    if (Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
+    if (!autopass && Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
-    if (this.triesCount >= cfg.triesLimit) {
+    if (!autopass && this.triesCount >= cfg.triesLimit) {
       tm.sendMessage(msg.tooManyFailed, login)
       return
     }
     const startMsg: string = tm.utils.strVar(msg.start, { nickname: tm.utils.strip(nickname, true) })
-    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) { return }
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, cfg.header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list)
     if (result === undefined) {
@@ -153,7 +154,7 @@ export class VoteSkip extends UiButton {
         this.buttonData.text2 = tm.utils.strVar(cfg.texts[1][1], { seconds: countDown.toString() })
         this.emitUpdate()
         if (countDown === 0) {
-          tm.client.callNoRes('NextChallenge')
+          actions.skipMap()
           this.handleSkipNoCountdown()
           clearInterval(interval)
         }
@@ -163,11 +164,14 @@ export class VoteSkip extends UiButton {
 
   private handleReplay(): void {
     if (this.isReplay) { return }
-    this.isReplay = true
+    const plus = tm.timer.isDynamic ? 2 : 0
+    if (!tm.timer.isDynamic) {
+      this.isReplay = true
+    }
     if (this.isSkip || this.isLastMapReplay) { return }
-    this.buttonData.text1 = cfg.texts[2][0]
-    this.buttonData.text2 = cfg.texts[2][1]
-    this.buttonData.equalTexts = cfg.texts[2].equal
+    this.buttonData.text1 = cfg.texts[2+plus][0]
+    this.buttonData.text2 = cfg.texts[2+plus][1]
+    this.buttonData.equalTexts = cfg.texts[2+plus].equal
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }

@@ -1,4 +1,4 @@
-import { SectorEventFunctions } from './SectorTypes.js'
+import type { SectorEventFunctions } from './SectorTypes.js'
 
 const fetchListeners: Function[] = []
 const bestDeleteListeners: Function[] = []

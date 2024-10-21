@@ -15,49 +15,49 @@ export default abstract class StaticComponent {
     [mode in tm.GameMode | 'Result']: { [sideOrList in 'left' | 'right' | 'other']:
       { name: string, getHeight: () => number }[] }
   } =
-    {
-      TimeAttack: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Rounds: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Cup: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Laps: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Teams: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Stunts: {
-        left: [],
-        right: [],
-        other: []
-      },
-      Result: {
-        left: [],
-        right: [],
-        other: []
+      {
+        TimeAttack: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Rounds: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Cup: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Laps: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Teams: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Stunts: {
+          left: [],
+          right: [],
+          other: []
+        },
+        Result: {
+          left: [],
+          right: [],
+          other: []
+        }
       }
-    }
   static displayedComponents: {
     left: { name: string, getHeight: () => number }[],
     right: { name: string, getHeight: () => number }[],
     other: { name: string, getHeight: () => number }[]
   } = { left: [], right: [], other: [] }
-  private _isDisplayed: boolean = true
+  private _isDisplayed = true
   /** Component manialink ID */
   readonly id: number
   private static readonly componentCreateListeners: ((component: StaticComponent) => void)[] = []
@@ -170,7 +170,7 @@ export default abstract class StaticComponent {
   }
 
   private static updateReduxModeStatus() {
-    let prev = this.reduxModeEnabled
+    const prev = this.reduxModeEnabled
     if (this.reduxModeEnabled) {
       this.reduxModeEnabled = tm.players.count > RaceUi.reduxModeDisablePlayerAmount
     } else {
@@ -308,10 +308,10 @@ export default abstract class StaticComponent {
     }
     const left = StaticComponent.displayedComponents.left
     const right = StaticComponent.displayedComponents.right
-    let side: boolean = false
+    let side = false
     if (right.some(a => a.name === widgetName)) { side = true }
     const order: { name: string; getHeight: () => number; }[] = side ? right : left
-    let positionSum: number = 0
+    let positionSum = 0
     for (const e of order) {
       if (e.name === widgetName) { break }
       positionSum += e.getHeight() + cfg.marginBig
@@ -385,7 +385,7 @@ export default abstract class StaticComponent {
     if (Array.isArray(manialinks)) {
       manialinks = manialinks.filter(a => a !== undefined)
     }
-    let xmls: { [login: string]: string } = {}
+    const xmls: Record<string, string> = {}
     for (let i = 0; i < manialinks.length; i++) {
       const ml: string | PlayerML | void = manialinks[i]
       let login: string | string[] = (ml as any).login ?? '*'

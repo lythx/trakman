@@ -3,8 +3,9 @@
  * @since 0.1
  */
 
-import { componentIds, StaticHeader, Grid, GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
+import { componentIds, StaticHeader, Grid, type GridCellFunction, addManialinkListener, StaticComponent } from '../../UI.js'
 import config from './AdminPanel.config.js'
+import { actions } from '../../../actions/Actions.js'
 
 export default class AdminPanel extends StaticComponent {
 
@@ -33,14 +34,10 @@ export default class AdminPanel extends StaticComponent {
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`)
+      actions.skipMap()
     })
-    addManialinkListener(this.id + this.actions.requeue, info => {
-      tm.sendMessage(tm.utils.strVar(config.messages.requeue, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.public ? undefined : info.login)
-      tm.jukebox.add(tm.maps.current.id, info)
+    addManialinkListener(this.id + this.actions.requeue, async info => {
+      await actions.requeueMap(info.login, info.nickname, info.title)
     })
     addManialinkListener(this.id + this.actions.previous, async info => {
       tm.sendMessage(tm.utils.strVar(config.messages.previous, {

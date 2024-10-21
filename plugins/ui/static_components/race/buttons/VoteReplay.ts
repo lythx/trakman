@@ -1,4 +1,4 @@
-import { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import { VoteWindow } from "../../../UI.js"
@@ -59,11 +59,12 @@ export class VoteReplay extends UiButton {
   private async handleClick(login: string, nickname: string): Promise<void> {
     if (this.isReplay || this.isSkip) { return }
     const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
-    if (tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
+    const autopass = tm.players.count === 1
+    if (!autopass && tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(tm.utils.strVar(msg.tooLate, { action }), login)
       return
     }
-    if (Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
+    if (!autopass && Date.now() - this.failedVoteTimestamp < cfg.timeout * 1000) {
       tm.sendMessage(msg.failedRecently, login)
       return
     }
@@ -71,7 +72,7 @@ export class VoteReplay extends UiButton {
       tm.sendMessage(msg.extendedRecently, login)
       return
     }
-    if (this.triesCount >= cfg.triesLimit) {
+    if (!autopass && this.triesCount >= cfg.triesLimit) {
       tm.sendMessage(msg.tooManyFailed, login)
       return
     }
@@ -141,9 +142,9 @@ export class VoteReplay extends UiButton {
       tm.timer.addTime(cfg.timeExtension)
     } else {
       this.handleMapReplay()
-      this.emitReplay()
       tm.jukebox.add(tm.maps.current.id, undefined, true)
     }
+    this.emitReplay()
   }
 
   private handleMapStart(): void {
@@ -202,6 +203,9 @@ export class VoteReplay extends UiButton {
   }
 
   private handleMapReplay(): void {
+    if (tm.timer.isDynamic) {
+      return
+    }
     this.isReplay = true
     this.buttonData.text1 = cfg.texts[2][0]
     this.buttonData.text2 = cfg.texts[2][1]
@@ -221,7 +225,7 @@ export class VoteReplay extends UiButton {
 
   private handleTimeExtension(): void {
     this.lastExtensionTimestamp = Date.now()
-    if (this.replayCount === cfg.extensionsLimit) {
+    if (this.replayCount >= cfg.extensionsLimit) {
       this.buttonData.text1 = cfg.texts[5][0]
       this.buttonData.text2 = cfg.texts[5][1]
       this.buttonData.equalTexts = cfg.texts[5].equal

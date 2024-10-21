@@ -5,7 +5,8 @@ interface UITextOptions {
   padding?: number,
   xOffset?: number,
   yOffset?: number,
-  specialFont?: boolean
+ specialFont?: boolean,
+  autoNewLine?: boolean
 }
 
 /**
@@ -24,7 +25,7 @@ const centeredText = (text: string, parentWidth: number, parentHeight: number,
   const posY: number = parentHeight / 2 + (options?.yOffset ?? config.yOffset)
   const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}"
-   scale="${textScale}" text="${config.format}${text}" ${styleStr} valign="center" halign="center"/>`
+   scale="${textScale}" text="${config.format}${text}" ${styleStr} valign="center" halign="center" ${options?.autoNewLine ? 'autonewline="1"' : ''}/>`
 }
 
 /**
@@ -43,7 +44,7 @@ const leftAlignedText = (text: string, parentWidth: number, parentHeight: number
   const posY: number = parentHeight / 2 + (options?.yOffset ?? config.yOffset)
   const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${padding + posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" 
-  scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center"/>`
+  scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center" ${options?.autoNewLine ? 'autonewline="1"' : ''}/>`
 }
 
 /**
@@ -62,7 +63,7 @@ const horizontallyCenteredText = (text: string, parentWidth: number, parentHeigh
   const posY: number = options?.yOffset ?? 0
   const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${posX} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}" 
-  scale="${textScale}" ${styleStr} text="${config.format}${text}" halign="center"/>`
+  scale="${textScale}" ${styleStr} text="${config.format}${text}" halign="center" ${options?.autoNewLine ? 'autonewline="1"' : ''}/>`
 }
 
 /**
@@ -81,7 +82,7 @@ const rightAlignedText = (text: string, parentWidth: number, parentHeight: numbe
   const posY: number = parentHeight / 2 + (options?.yOffset ?? config.yOffset)
   const styleStr = options?.specialFont ? `style="TextRaceChrono"` : ''
   return `<label posn="${posX - padding} -${posY} 3" sizen="${(parentWidth * (1 / textScale)) - (padding * 2)} ${parentHeight}"
-   scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center" halign="right"/>`
+   scale="${textScale}" ${styleStr} text="${config.format}${text}" valign="center" halign="right" ${options?.autoNewLine ? 'autonewline="1"' : ''}/>`
 }
 
 export { centeredText, leftAlignedText, horizontallyCenteredText, rightAlignedText }

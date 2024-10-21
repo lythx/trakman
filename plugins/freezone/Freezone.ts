@@ -12,19 +12,20 @@ const sendLive = async (): Promise<true | Error> => {
   // Data object in any because TS coping language
   const data = {
     serverLogin: cfg.login,
-    // Remove the if below for shorthand here?
-    serverName: cfg.name,
+    // Remove colours here so that we won't have to later
+    serverName: tm.utils.strip(cfg.name, true),
     serverVersion: [cfg.game, cfg.version, cfg.build].join(),
     manialiveVersion: config.manialiveVersion,
     // Check if > 40 and set to 40 in that case
-    maxPlayers: cfg.currentMaxPlayers,
-    visibility: cfg.password.length === 0 ? 1 : 0, // Maybe reversed statement
+    maxPlayers: cfg.currentMaxPlayers > 40 ? 40 : cfg.currentMaxPlayers,
+    // Public is 1, private is 0
+    visibility: cfg.password.length === 0 ? 1 : 0,
     classHash: config.manialiveHash
   }
   // Append freezone to the server name if it isn't there already
-  if (!cfg.name.toLowerCase().includes('freezone')) {
+  if (!data.serverName.toLowerCase().includes('freezone')) {
     // If the resulting name is too long, trim it to (presumably) max value
-    data.serverName = ('Freezone|' + data.serverName).substring(0, 80)
+    data.serverName = ('Freezone|' + data.serverName).substring(0, 75)
   }
   // Get authentication string
   const auth: string = 'Basic ' + Buffer.from(`${data.serverLogin}:${password}`).toString('base64')
@@ -61,11 +62,11 @@ const sendLive = async (): Promise<true | Error> => {
 
 const initialize = async (): Promise<true | Error> => {
   if (password === undefined) {
-    return new Error('FREEZONE_PASSWORD is undefined. Check your .env file to use the plugin.')
+    return new Error('FREEZONE_PASSWORD is undefined. Update your .env file to use the Freezone plugin.')
   }
   const status: true | Error = await sendLive()
   if (status instanceof Error) {
-    return new Error('Failed to authenticate on ManiaLive')
+    return new Error('Failed to authenticate on ManiaLive.')
   }
   setInterval(async (): Promise<void> => {
     await sendLive()

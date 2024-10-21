@@ -3,7 +3,7 @@
  * @since 1.0
  */
 
-import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, GridCellFunction, PopupWindow } from '../UI.js'
+import { componentIds, Grid, leftAlignedText, centeredText, closeButton, Paginator, type GridCellFunction, PopupWindow } from '../UI.js'
 import config from './Chatlog.config.js'
 
 export default class ChatLog extends PopupWindow<{ page: number }> {
@@ -60,7 +60,7 @@ export default class ChatLog extends PopupWindow<{ page: number }> {
       return centeredText(tm.utils.formatDate(messages[index + i].date, true), w, h)
     }
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.safeString(tm.utils.strip(messages[index + i].nickname, false))), w, h)
     }
     const loginCell: GridCellFunction = (i, j, w, h) => {
       const playerLogin = messages[index + i].login

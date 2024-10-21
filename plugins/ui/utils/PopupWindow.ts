@@ -76,7 +76,7 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
     [this.headerLeft, this.headerRight, this.frameMidTop,
-    this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
+      this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId === this.openId) {
         tm.log.trace(`Player ${tm.utils.strip(info.nickname)} (${info.login}) opened ${this.constructor.name} manialink.`)

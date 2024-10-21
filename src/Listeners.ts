@@ -14,6 +14,7 @@ import { Utils } from './Utils.js'
 import { RoundsService } from './services/RoundsService.js'
 
 let isRestart: boolean = false
+let timeouts = new Array(260).fill(0) // playerId's range from 0 to ~250
 
 export class Listeners {
   private static readonly listeners: tm.Listener[] = [
@@ -290,6 +291,10 @@ export class Listeners {
       event: 'TrackMania.PlayerManialinkPageAnswer',
       callback: ([playerId, login, answer]: tm.Events['TrackMania.PlayerManialinkPageAnswer']): void => {
         // [0] = PlayerUid, [1] = Login, [2] = Answer
+        if (timeouts[playerId] > Date.now()) {
+          return
+        }
+        timeouts[playerId] = Date.now() + config.manialinkInteractionTimeout
         if (PlayerService.get(login)?.privilege === -1) { return }
         const temp: any = PlayerService.get(login)
         if (temp === undefined) {
@@ -312,9 +317,12 @@ export class Listeners {
     {
       event: 'TrackMania.ChallengeListModified',
       callback: async ([currentIndex, nextIndex, isListModified]: [number, number, boolean]): Promise<void> => {
+        if (config.manualMapLoading.enabled) {
+          return
+        }
         // [0] = CurChallengeIndex, [1] = NextChallengeIndex, [2] = IsListModified
         Client.callNoRes('SaveMatchSettings', [{ string: config.matchSettingsFile }])
-        if(config.updateMatchSettingsOnChange && isListModified) {
+        if (config.updateMatchSettingsOnChange && isListModified) {
           void MapService.updateList()
         }
       }

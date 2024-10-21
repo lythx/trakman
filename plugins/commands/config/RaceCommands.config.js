@@ -24,8 +24,6 @@ export default {
     help: `Requeue the previously played map.`
   },
   replay: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the ongoing map.`,
-    public: true,
     privilege: 1,
     aliases: ['rq', 'requeue', 'replay'],
     help: `Requeue the ongoing map.`

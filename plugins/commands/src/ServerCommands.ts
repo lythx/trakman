@@ -177,9 +177,9 @@ const commands: tm.Command[] = [
           const player: tm.OfflinePlayer | undefined = tm.players.get(login) ?? await tm.players.fetch(login)
           tm.sendMessage(tm.utils.strVar(config.pay.text, {
             title: info.title,
-            adminName: info.nickname,
+            adminName: tm.utils.strip(info.nickname, true),
             coppers: amount,
-            target: player?.nickname ?? login
+            target: tm.utils.strip(player?.nickname ?? login, true)
           }), config.pay.public ? undefined : info.login)
         }
       }

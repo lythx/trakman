@@ -65,11 +65,33 @@ export default {
     help: `Remove a player from the guestlist.`
   },
   loadmatchsettings: {
-    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has loaded the MatchSettings file ${p.highlight}{#file}${p.admin}.`,
-    error: `${p.error}Could not load the specified MatchSettings file.`,
-    public: true,
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has loaded the MatchSettings file ${p.highlight}#{file}${p.admin}.`,
+    error: `${p.error}Could not load the MatchSettings file.`,
+    public: false,
     privilege: 3,
     aliases: [`lms`, `loadmatchsettings`],
-    help: `Load the MatchSettings file.`
+    help: `Load the MatchSettings file from the specified location.`
+  },
+  savematchsettings: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has saved the MatchSettings file ${p.highlight}#{file}${p.admin}.`,
+    error: `${p.error}Could not save the MatchSettings file.`,
+    public: false,
+    privilege: 3,
+    aliases: [`svms`, `savematchsettings`],
+    help: `Save the MatchSettings file to the specified location.`
+  },
+  updatemaps: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has updated the map list.`,
+    public: true,
+    privilege: 3,
+    aliases: ['udm', 'updatemaps'],
+    help: `Update the map list (parses maps, might take a very long time and lag the server for a while)`
+  },
+  recalculateranks: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}force re-calculated server ranks.`,
+    public: true,
+    privilege: 3,
+    aliases: ['recalculateranks', 'updateranks', 'recrank'],
+    help: `Force re-calculate every rank on the server.`
   }
 }

@@ -1,5 +1,5 @@
 import config from './Config.js'
-import { NewUltimaniaRecord as NewUltiRecord, UltimaniaRecord as UltiRecord } from './UltimaniaTypes.js'
+import type { NewUltimaniaRecord as NewUltiRecord, UltimaniaRecord as UltiRecord } from './UltimaniaTypes.js'
 import { sendRecord, updatePlayer, fetchRecords } from './UltimaniaClient.js'
 import './ui/UltiRecords.component.js'
 
@@ -289,4 +289,4 @@ export const ultimania = {
 
 }
 
-export { NewUltiRecord, UltiRecord }
+export type { NewUltiRecord, UltiRecord }

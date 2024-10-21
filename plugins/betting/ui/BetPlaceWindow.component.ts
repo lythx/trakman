@@ -1,5 +1,5 @@
 import {
-  DynamicComponent, StaticHeader, Grid, GridCellFunction,
+  DynamicComponent, StaticHeader, Grid, type GridCellFunction,
   centeredText, icons, addManialinkListener, componentIds, components
 } from '../../ui/UI.js'
 import config from './BetPlaceWindow.config.js'
