@@ -43,8 +43,12 @@ fi
 # ugly creating of files to be able to chmod and remove them later
 mkdir -p trakman/logs
 touch trakman/logs/combined.log
+touch trakman/logs/fatal.log
 touch trakman/logs/error.log
+touch trakman/logs/warn.log
 touch trakman/logs/info.log
+touch trakman/logs/debug.log
+touch trakman/logs/trace.log
 mkdir -p .pm2/logs
 touch .pm2/logs/Trakman-error.log
 touch .pm2/logs/Trakman-out.log
@@ -55,11 +59,18 @@ touch trakman/plugins/server_links/temp/data.txt
 chown -R server:server /app/server
 # build and actually run everything
 echo "#!/bin/sh
-/app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt
+(while true; do
+  /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt /nodaemon
+  echo 'Server exited with code ' $?
+  echo 'Restarting...'
+done) &
 npm i --prefix /app/server/trakman
 npm run build --prefix /app/server/trakman
 chmod -R a+w /app/server
-npm run daemon --prefix /app/server/trakman" > run.sh
+cd trakman
+trap 'echo Terminating; npx pm2 stop 0; npx pm2 kill; exit' SIGTERM SIGINT
+npx pm2 start ./built/src/Main.js --name Trakman
+wait $!" > run.sh
 chown server:server run.sh
 chmod 766 run.sh
 exec su-exec server ./run.sh

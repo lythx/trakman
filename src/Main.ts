@@ -74,3 +74,19 @@ Logger.trace('Callbacks enabled')
 await Events.initialize()
 Logger.trace('Controller events enabled')
 Logger.info('Controller started successfully')
+
+process.on('SIGINT', async () => {
+  Logger.info('Controller terminated, exiting')
+  await Client.call('NextChallenge') // easiest way of uploading all records to dbs and dedimania
+  setTimeout(() => process.exit(0), 200) // yes I know this is stupid
+})
+
+setInterval(async () => {
+  Logger.trace('Checking if server alive')
+  const status: {Code: number, Name: string} | Error = await Client.call('GetStatus')
+  if (status instanceof Error) {
+    // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
+    await Logger.fatal('Healthcheck failed - no connection to server. Game state was:', GameService.state)
+  }
+  Logger.trace('Connection to server exists')
+}, 10000)

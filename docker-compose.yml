@@ -6,8 +6,9 @@ services:
     volumes:
       - ./tmf-config:/app/server/GameData/Config
       - ./tracks:/app/server/GameData/Tracks
+      - ./logs/server:/app/server/Logs
       - ./trakman:/app/server/trakman
-      - ./logs:/app/server/.pm2/logs
+      - ./logs/trakman:/app/server/.pm2/logs
     environment:
       # Timezone of the server, if you're unsure, check https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
       TZ: "Europe/Amsterdam"

@@ -145,7 +145,9 @@ export class ManualMapLoading {
    */
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt = 0) {
     const newQueue = (queue.slice(0, config.manualMapLoading.preloadMaps))
-    if (this.oldQueue !== undefined && this.oldCurr !== undefined && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName && this.oldQueue.every(
+    // don't write unless something has changed
+    if (this.oldQueue !== undefined && this.oldCurr !== undefined && curr.id === this.oldCurr.id &&
+      curr.fileName === this.oldCurr.fileName && this.oldQueue.length === newQueue.length && this.oldQueue.every(
       ((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
       Logger.trace('Did not write new MatchSettings')
       return

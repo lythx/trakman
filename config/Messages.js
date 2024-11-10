@@ -3,7 +3,7 @@ import prefixes from './PrefixesAndPalette.js'
 const p = prefixes.palette
 
 export default {
-  /** Message sent to the player attempting to use a command they does not have the permission for */
+  /** Message sent to the player attempting to use a command they do not have the permission for */
   noPermission: `${p.error} You have no permission to use this command.`,
   /** Message sent to the muted player attempting to use a command that is disabled for muted players */
   playerMuted: `${p.error} You are muted and cannot use this command.`,

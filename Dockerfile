@@ -30,8 +30,9 @@ RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
 # expose volumes
 VOLUME /app/server/GameData/Config
 VOLUME /app/server/GameData/Tracks
+VOLUME /app/server/Logs
 VOLUME /app/server/trakman
 VOLUME /app/server/.pm2/logs
 # set user back to root to be able to chown volumes in the run script
 USER root
-CMD /app/server/docker_run.sh
+CMD ["/app/server/docker_run.sh"]
