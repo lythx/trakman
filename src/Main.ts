@@ -77,8 +77,7 @@ Logger.info('Controller started successfully')
 
 process.on('SIGINT', async () => {
   Logger.info('Controller terminated, exiting')
-  await Client.call('NextChallenge') // easiest way of uploading all records to dbs and dedimania
-  setTimeout(() => process.exit(0), 200) // yes I know this is stupid
+  process.exit(0)
 })
 
 setInterval(async () => {
