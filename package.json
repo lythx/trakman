@@ -6,11 +6,11 @@
     "pg": "^8.7.3",
     "pg-copy-streams": "^6.0.6",
     "pm2": "^5.3.0",
-    "typescript": "^5.3.3",
+    "typescript": "^5.6.3",
     "xml2js": "^0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
+    "@types/node": "^22.9.0",
     "@types/pg": "^8.6.5",
     "@types/pg-copy-streams": "^1.2.5",
     "@types/xml2js": "^0.4.11",
