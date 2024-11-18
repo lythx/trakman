@@ -173,7 +173,7 @@ const commands: tm.Command[] = [
     aliases: config.rq.aliases,
     help: config.rq.help,
     callback: (info: tm.MessageInfo): void => {
-      tm.sendMessage(tm.utils.strVar(config.bootme.text, { nickname: tm.utils.strip(info.nickname, true) }), config.rq.public ? undefined : info.login)
+      tm.sendMessage(tm.utils.strVar(config.rq.text, { nickname: tm.utils.strip(info.nickname, true) }), config.rq.public ? undefined : info.login)
       tm.client.callNoRes('Kick', [{ string: info.login }, { string: config.rq.leaveText }])
     },
     privilege: config.rq.privilege
