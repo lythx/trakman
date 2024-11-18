@@ -62,6 +62,9 @@ export default class BestCps extends StaticComponent {
         tm.sendManialink(obj.xml, login)
       }
     }
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getGrid(): Grid {
@@ -90,6 +93,9 @@ export default class BestCps extends StaticComponent {
 
   displayToPlayer(login: string, params?: { page?: number }) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     if (this.reduxModeEnabled) { params = { page: 1 } }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount

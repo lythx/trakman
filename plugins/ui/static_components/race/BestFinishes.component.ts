@@ -56,6 +56,9 @@ export default class BestFinishes extends StaticComponent {
       this.bestFinishes.length = 0
       return this.display()
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -77,6 +80,9 @@ export default class BestFinishes extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     if (config.horizontal) {
       return {
         xml: `

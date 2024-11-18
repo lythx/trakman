@@ -95,7 +95,7 @@ export default class CpCounter extends StaticComponent {
         index: 0, current: time === 0 ? undefined : time,
         best, isFinish: time !== 0, lap
       })
-      if(obj !== undefined) {
+      if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
       }
     }, true)
@@ -103,6 +103,9 @@ export default class CpCounter extends StaticComponent {
       this.prevTimes.length = 0
       this.prevLapTimes.length = 0
       return this.display()
+    })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
     })
   }
 
@@ -141,7 +144,7 @@ export default class CpCounter extends StaticComponent {
       let difference: number = bestTime - currentTime
       let betterSign = '-'
       let worseSign = '+'
-      if(isStunts) {
+      if (isStunts) {
         difference = -difference
         betterSign = '+'
         worseSign = '-'
@@ -167,6 +170,9 @@ export default class CpCounter extends StaticComponent {
 
   displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
     if (cpAmount === params?.index) {
@@ -207,12 +213,12 @@ export default class CpCounter extends StaticComponent {
             <frame posn="${posX} ${posY} 4">
               ${this.getLapsXml(login, params?.lap)}
               <format textsize="1"/>
-              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, 
-                { rectangleWidth, centerText })}
+              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side,
+        { rectangleWidth, centerText })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
                 ${cpAmount === 0 ? '' : this.constructTimeXml(login, false, config.iconBottom,
-        params?.isFinish, params?.current, params?.best)}
+          params?.isFinish, params?.current, params?.best)}
               </frame>
             </frame>
         </manialink>`, login
