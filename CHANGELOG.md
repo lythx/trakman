@@ -29,6 +29,7 @@ Changelog can also be found in the controller (/changes)
 - Fixed skipping during transition state not doing anything
 - Fixed UI breaking on non-escaped characters in player name #258
 - Fixed admin windows not refreshing when interacting with an offline player
+- Fixed RoundService not recognising changes made in the config file
 - Fixed several non-optimised algorithms
 
 ## 1.5.0
