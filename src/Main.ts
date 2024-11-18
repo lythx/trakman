@@ -76,16 +76,16 @@ Logger.trace('Controller events enabled')
 Logger.info('Controller started successfully')
 
 process.on('SIGINT', async () => {
-  Logger.info('Controller terminated, exiting')
+  Logger.warn('Controller terminated, exiting...')
   process.exit(0)
 })
 
 setInterval(async () => {
-  Logger.trace('Checking if server alive')
-  const status: {Code: number, Name: string} | Error = await Client.call('GetStatus')
+  Logger.debug('Checking if the dedicated server is alive...')
+  const status: { Code: number, Name: string } | Error = await Client.call('GetStatus')
   if (status instanceof Error) {
     // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
-    await Logger.fatal('Healthcheck failed - no connection to server. Game state was:', GameService.state)
+    await Logger.fatal('Healthcheck failed - no connection to the server. Game state was: ', GameService.state)
   }
-  Logger.trace('Connection to server exists')
-}, 10000)
+  Logger.debug('Connection to the dedicated server exists.')
+}, 10000) // make this configurable?
