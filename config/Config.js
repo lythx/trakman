@@ -92,16 +92,8 @@ export default {
     intraMode: 1,
     alpha: "a-zа-яё"
   },
-  /** Represents default minimal similarity value at which nickname to
-   * login translation will be successful. Used in nickname to login
-   * translation in commands. 0.4 is the default value */
-  nicknameToLoginSimilarityGoal: 0.4,
-  /** Represents minimal similarity difference between best
-   * and second-best match at which translation will be successful.
-   * Used in nickname to login translation in commands. 0.15 is default value */
-  nicknameToLoginMinimumDifferenceBetweenMatches: 0.15,
   /** Current controller version */
-  version: "1.5.0",
+  version: "1.6.0",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }

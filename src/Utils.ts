@@ -416,16 +416,9 @@ export const Utils = {
   /**
    * Attempts to convert the player nickname to their login via charmap.
    * @param nickname Player nickname
-   * @param options Options to modify search similarity goals
    * @returns Possibly matching login or undefined if unsuccessful
    */
-  nicknameToPlayer(nickname: string, options: {
-    similarityGoal: number,
-    minDifferenceBetweenMatches: number
-  } = {
-      similarityGoal: config.nicknameToLoginSimilarityGoal,
-      minDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
-    }): tm.Player | undefined {
+  nicknameToPlayer(nickname: string): tm.Player | undefined {
     const players = PlayerService.players
     const strippedNicknames = []
     for (const e of players) {
