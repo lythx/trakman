@@ -81,10 +81,17 @@ process.on('SIGINT', () => {
   process.exit(0)
 })
 
+let failedHealthChecks = 0
+
 setInterval(async () => {
   Logger.debug('Checking if the dedicated server is alive...')
-  const status = await Client.call('GetStatus')
+  let status = await Client.call('GetStatus')
   if (status instanceof Error) {
+    failedHealthChecks++
+    Logger.warn('Server did not respond to healthcheck')
+  }
+  // Surely checking two times is enough
+  if (failedHealthChecks > 1) {
     // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
     await Logger.fatal(`Healthcheck failed - no connection to the server. Game state was: ${GameService.state}`)
   }
