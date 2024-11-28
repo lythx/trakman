@@ -7,9 +7,11 @@ import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
 import { Logger } from './Logger.js'
-import ufuzzy from "@leeoniya/ufuzzy"
+//import uFuzzy from '@leeoniya/ufuzzy'
+// @ts-ignore
+import uFuzzy from '@leeoniya/ufuzzy/dist/uFuzzy.esm.js' // TODO: don't do this
 
-const uf = new ufuzzy(config.searchOptions)
+const uf = new uFuzzy(config.searchOptions)
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
@@ -594,7 +596,7 @@ function strVar(str: string, vars: { [name: string]: any }): string {
  */
 function matchString(needle: string, haystack: string[]): number[] {
   if (haystack.length === 0) { return [] }
-  haystack = ufuzzy.latinize(haystack)
+  haystack = uFuzzy.latinize(haystack)
   const arr = []
   const idxs = uf.filter(haystack, needle)
   if (idxs != null && idxs.length > 0) {

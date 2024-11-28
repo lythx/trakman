@@ -25,7 +25,7 @@ export default {
   /** Timeout after clicking manialink in milliseconds */
   manialinkInteractionTimeout: 50,
   /** Interval between pings to the server to check its online status in milliseconds */
-  healthcheckInterval: 60000,
+  healthcheckInterval: 10000,
   /** Privilege levels for each of the administrative actions */
   privileges: {
     ban: 2,
