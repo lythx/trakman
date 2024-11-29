@@ -12,12 +12,14 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
   private readonly paginator: Paginator
   private readonly mapAddId: number = 1000
+  private readonly maxMapCount = 1_000_000
   private readonly grid: Grid
   private readonly mapActionIds: string[] = []
   private readonly playerQueries: { paginator: Paginator, list: readonly tm.Map[], login: string, query?: string }[] = []
-  private readonly paginatorIdOffset: number = 7000
-  private readonly mapDeleteId: number = 11000
-  private nextPaginatorId: number = 0
+  private readonly paginatorIdOffset: number = this.mapAddId + this.maxMapCount
+  private readonly mapDeleteId: number = this.mapAddId + this.maxMapCount * 2
+  private readonly displayEnvironment: boolean = config.displayEnvironment !== undefined ? config.displayEnvironment : process.env.SERVER_PACKMASK !== "nations"
+  private nextPaginatorId = 0
 
   constructor() {
     super(componentIds.mapList, config.icon, config.title, config.navbar)
@@ -31,7 +33,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     }
     this.grid = new Grid(this.contentWidth, this.contentHeight, new Array(config.columns).fill(1),
       new Array(config.rows).fill(1), config.grid)
-    addManialinkListener(this.openId + this.mapAddId, 5000, (info, mapIndex): void => {
+    addManialinkListener(this.openId + this.mapAddId, this.maxMapCount, (info, mapIndex): void => {
       const mapId: string = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
@@ -42,7 +44,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       if (!gotQueued) { return }
       this.reRender()
     })
-    addManialinkListener(this.openId + this.mapDeleteId, 5000, async (info, mapIndex): Promise<void> => {
+    addManialinkListener(this.openId + this.mapDeleteId, this.maxMapCount, async (info, mapIndex): Promise<void> => {
       const mapId: string = this.mapActionIds[mapIndex]
       if (mapId === undefined) {
         tm.sendMessage(config.messages.error, info.login)
@@ -52,7 +54,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       await actions.removeMap(info.login, info.nickname, info.title, mapId)
       this.reRender()
     })
-    addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox'))
+    addManialinkListener(componentIds.jukebox, (info): Promise<void> => this.openWithOption(info.login, 'jukebox', 1))
     tm.commands.add({
       aliases: config.commands.list.aliases,
       help: config.commands.list.help,
@@ -62,52 +64,73 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           tm.openManialink(this.openId, info.login)
           return
         }
+        const split = query.split(' ').filter(a => a != '')
+        const [q1, q2] = [split[0], split[1]]
+        let page = 1
+        if (q1 !== undefined && q1.startsWith(config.pageSearchSeparator)) {
+          page = Number(q1.slice(2))
+          if (!Number.isInteger(page) || page < 1) {
+            page = 1
+          }
+          void this.openOnPage(info.login, page)
+          return
+        } 
+        if (q2 !== undefined && q2.startsWith(config.pageSearchSeparator)) {
+          page = Number(q2.slice(2))
+          if (!Number.isInteger(page) || page < 1) {
+            page = 1
+          }
+          query = q1
+        }
         if (query === 'jb') { query = 'jukebox' }
         const option: string = query.split(' ').filter(a => a !== '')[0]
         const arr = ['jukebox', 'name', 'karma', 'short', 'long', 'best', 'worst', 'worstkarma', 'oldest', 'newest'] as const
         const o = arr.find(a => a === option)
         if (o !== undefined) {
-          void this.openWithOption(info.login, o)
+          void this.openWithOption(info.login, o, page)
           return
         }
         if (['nofin', 'nofinish'].includes(option)) {
-          void this.openWithOption(info.login, 'nofinish')
+          void this.openWithOption(info.login, 'nofinish', page)
         } else if (option === 'noauthor') {
-          void this.openWithOption(info.login, 'noauthor')
+          void this.openWithOption(info.login, 'noauthor', page)
         } else if (option === 'norank') {
-          void this.openWithOption(info.login, 'norank')
+          void this.openWithOption(info.login, 'norank', page)
         } else if (query.startsWith(config.authorSearchSeparator)) {
-          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), true)
+          void this.openWithQuery(info.login, query.slice(config.authorSearchSeparator.length), page, true)
         } else {
-          void this.openWithQuery(info.login, query)
+          void this.openWithQuery(info.login, query, page)
         }
       },
       privilege: config.commands.list.privilege
     },
-      {
-        aliases: config.commands.best.aliases,
-        help: config.commands.best.help,
-        callback: (info: tm.MessageInfo): void => {
-          this.openWithOption(info.login, 'best')
-        },
-        privilege: config.commands.best.privilege
+    {
+      aliases: config.commands.best.aliases,
+      help: config.commands.best.help,
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'best', page ?? 1)
       },
-      {
-        aliases: config.commands.worst.aliases,
-        help: config.commands.worst.help,
-        callback: (info: tm.MessageInfo): void => {
-          this.openWithOption(info.login, 'worst')
-        },
-        privilege: config.commands.worst.privilege
+      privilege: config.commands.best.privilege
+    },
+    {
+      aliases: config.commands.worst.aliases,
+      help: config.commands.worst.help,
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'worst', page ?? 1)
       },
-      {
-        aliases: config.commands.jukebox.aliases,
-        help: config.commands.jukebox.help,
-        callback: (info: tm.MessageInfo): void => {
-          this.openWithOption(info.login, 'jukebox')
-        },
-        privilege: config.commands.jukebox.privilege
-      }
+      privilege: config.commands.worst.privilege
+    },
+    {
+      aliases: config.commands.jukebox.aliases,
+      help: config.commands.jukebox.help,
+      params: [{ name: 'page', type: 'int', optional: true }],
+      callback: (info: tm.MessageInfo, page?: number): void => {
+        this.openWithOption(info.login, 'jukebox', page ?? 1)
+      },
+      privilege: config.commands.jukebox.privilege
+    }
     )
     maplist.onListUpdate((): void => this.reRender())
     maplist.onJukeboxUpdate((): void => this.reRender())
@@ -115,7 +138,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
 
   async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
     | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish'
-    | 'norank' | 'noauthor' | 'oldest' | 'newest'): Promise<void> {
+    | 'norank' | 'noauthor' | 'oldest' | 'newest', page: number): Promise<void> {
     let list: readonly Readonly<tm.Map>[] = []
     if (option === 'best' || option === 'worst') {
       list = maplist.getByPosition(login, option)
@@ -125,14 +148,26 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       list = maplist.get(option)
     }
     const paginator = this.getPaginator(login, list, option)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`,
+    page = Math.max(1, Math.min(Math.ceil(list.length / (config.rows * config.columns)), page))
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`,
       undefined, config.optionTitles[option as keyof typeof config.optionTitles])
   }
 
-  openWithQuery(login: string, query: string, searchByAuthor?: true): void {
+  openWithQuery(login: string, query: string, page: number, searchByAuthor?: true): void {
     const list: Readonly<tm.Map>[] = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
     const paginator = this.getPaginator(login, list, query)
-    this.displayToPlayer(login, { page: 1, paginator, list }, `1/${paginator.pageCount}`)
+    page = Math.max(1, Math.min(Math.ceil(list.length / (config.rows * config.columns)), page))
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`)
+  }
+
+  openOnPage(login: string, page: number): void {
+    const list: Readonly<tm.Map>[] = tm.maps.list
+    const paginator = this.paginator
+    page = Math.min(Math.ceil(list.length / (config.rows * config.columns)), page)
+    paginator.setPageForLogin(login, page)
+    this.displayToPlayer(login, { page, paginator, list }, `${page}/${paginator.pageCount}`)
   }
 
   private getPaginator(login: string, list: readonly tm.Map[], option: string): Paginator {
@@ -187,7 +222,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     const page: number = this.paginator.getPageByLogin(info.login)
     let pageCount: number = Math.ceil(tm.maps.count / (config.rows * config.columns))
     if (pageCount === 0) { pageCount++ }
-    if (page === undefined) {
+    if (page === undefined || page > pageCount) {
       this.displayToPlayer(info.login, { page: 1, paginator: this.paginator }, `1/${pageCount}`)
       return
     }
@@ -212,9 +247,9 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   protected async constructContent(login: string, params?: { page: number, list?: readonly tm.Map[] }): Promise<string> {
     const maps: readonly Readonly<tm.Map>[] = params?.list ?? maplist.get()
     const startIndex: number = (config.rows * config.columns) * ((params?.page ?? 1) - 1)
-    const mapsToDisplay: number = Math.min(maps.length - startIndex, config.rows * config.columns)
     const recordIndexStrings: string[] = await this.getRecordIndexStrings(login, ...maps.slice(startIndex,
       (config.rows * config.columns) + startIndex).map(a => a.id))
+    const mapsToDisplay: number = Math.min(maps.length - startIndex, config.rows * config.columns)
     const cell = (i: number, j: number, w: number, h: number): string => {
       const gridIndex: number = (i * config.columns) + j
       const recordIndexString: string = recordIndexStrings[gridIndex]
@@ -234,8 +269,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
              sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}" image="${config.icons[1]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${width} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${leftAlignedText(tm.utils.safeString(tm.utils.strip(maps[index].name, false)), width,
-        rowH - this.margin, { textScale: config.textScale })}
+              ${leftAlignedText(tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(maps[index].name), false)), width,
+    rowH - this.margin, { textScale: config.textScale })}
             </frame>
           </frame>
           <frame posn="0 ${-rowH * 2} 2">
@@ -254,7 +289,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${config.timeWidth} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
               ${centeredText(tm.utils.getTimeString(maps[index].authorTime), config.timeWidth, rowH - this.margin,
-          { textScale: config.textScale, padding: config.padding })}
+    { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
           <frame posn="${config.timeWidth + config.iconWidth + this.margin * 2} ${-rowH * 3} 2">
@@ -269,11 +304,11 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
           <frame posn="${config.timeWidth + config.positionWidth + this.margin * 4 + config.iconWidth * 2} ${-rowH * 3} 2">
             <quad posn="0 0 3" sizen="${config.iconWidth} ${rowH - this.margin}" bgcolor="${config.iconBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${config.iconWidth - this.margin * 2} ${rowH - this.margin * 3}"
-             image="${config.icons[5]}"/>
+             image="${config.icons[this.displayEnvironment ? 8 : 5]}"/>
             <frame posn="${config.iconWidth + this.margin} 0 2">
               <quad posn="0 0 2" sizen="${karmaW} ${rowH - this.margin}" bgcolor="${config.contentBackground}"/>
-              ${centeredText(maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
-            rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
+              ${centeredText(this.displayEnvironment ? (maps[index].environment === 'Stadium' ? 'Stad' : maps[index].environment) : maps[index].voteRatio === -1 ? config.defaultText : maps[index].voteRatio.toFixed(0), karmaW,
+    rowH - this.margin, { textScale: config.textScale, padding: config.padding })}
             </frame>
           </frame>
         </frame>`
@@ -304,7 +339,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       }
       tm.jukebox.add(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.add,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(tm.utils.decodeURI(map.name), true) }), config.public ? undefined : login)
     }
     return true
   }
@@ -312,7 +347,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
     const ranks = tm.records.getRank(login, mapIds)
     const ret: string[] = []
-    for (let i: number = 0; i < mapIds.length; i++) {
+    for (let i = 0; i < mapIds.length; i++) {
       const r = ranks.find(a => a.mapId === mapIds[i])
       if (r === undefined) { ret.push(config.texts.noRank) }
       else { ret.push(tm.utils.getOrdinalSuffix(r.rank)) }

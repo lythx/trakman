@@ -1,11 +1,15 @@
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
+let entries = 7
+
 export default {
   entryHeight: 2.16,
-  entries: 6,
+  entries,
   width: cfg.width,
-  posX:  cfg.rightPosition - (cfg.marginBig + cfg.width),
+  horizontalModeWidth: cfg.rightPosition - cfg.leftPosition - cfg.width * 2 - cfg.margin * 3,
+  posX: cfg.rightPosition - (cfg.marginBig + cfg.width),
+  horizontalModePosX: cfg.leftPosition + cfg.width * 2 + cfg.margin * 2,
   posY: cfg.topBorder,
   side: true,
   title: "Best Finishes",
@@ -21,4 +25,6 @@ export default {
   newestColour: `${tm.utils.palette.yellow}F`,
   textScale: 0.87,
   textPadding: 0.2,
+  horizontal: false,
+  hidePanel: true,
 }

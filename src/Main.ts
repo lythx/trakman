@@ -14,6 +14,7 @@ import { VoteService } from './services/VoteService.js'
 import { RoundsService } from './services/RoundsService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
+import config from '../config/Config.js'
 import './Trakman.js'
 
 await Logger.initialize()
@@ -74,3 +75,25 @@ Logger.trace('Callbacks enabled')
 await Events.initialize()
 Logger.trace('Controller events enabled')
 Logger.info('Controller started successfully')
+
+process.on('SIGINT', () => {
+  Logger.warn('Controller terminated, exiting...')
+  process.exit(0)
+})
+
+let failedHealthChecks = 0
+
+setInterval(async () => {
+  Logger.debug('Checking if the dedicated server is alive...')
+  let status = await Client.call('GetStatus')
+  if (status instanceof Error) {
+    failedHealthChecks++
+    Logger.warn('Server did not respond to healthcheck')
+  }
+  // Surely checking two times is enough
+  if (failedHealthChecks > 1) {
+    // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
+    await Logger.fatal(`Healthcheck failed - no connection to the server. Game state was: ${GameService.state}`)
+  }
+  Logger.debug('Connection to the dedicated server exists.')
+}, config.healthcheckInterval)

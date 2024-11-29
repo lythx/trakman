@@ -1,4 +1,4 @@
-import { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from "./ButtonData.js"
 
 export abstract class UiButton {
 

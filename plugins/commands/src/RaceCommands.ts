@@ -1,4 +1,5 @@
 import config from '../config/RaceCommands.config.js'
+import { actions } from '../../actions/Actions.js'
 
 const commands: tm.Command[] = [
   {
@@ -10,7 +11,7 @@ const commands: tm.Command[] = [
         title: info.title,
         adminName: tm.utils.strip(info.nickname)
       }), config.skip.public ? undefined : info.login)
-      tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
+      actions.skipMap()
     },
     privilege: config.skip.privilege
   },
@@ -47,11 +48,7 @@ const commands: tm.Command[] = [
     aliases: config.replay.aliases,
     help: config.replay.help,
     callback: (info: tm.MessageInfo): void => {
-      tm.sendMessage(tm.utils.strVar(config.replay.text, {
-        title: info.title,
-        adminName: tm.utils.strip(info.nickname)
-      }), config.replay.public ? undefined : info.login)
-      tm.jukebox.add(tm.maps.current.id, info)
+      actions.requeueMap(info.login, info.nickname, info.title)
     },
     privilege: config.replay.privilege
   },

@@ -5,7 +5,9 @@ export default {
   entryHeight: 2.16,
   entries: 6,
   width: cfg.width,
+  horizontalModeWidth: cfg.rightPosition - cfg.leftPosition - cfg.width * 2 - cfg.margin * 4,
   posX: cfg.leftPosition + cfg.marginBig + cfg.width,
+  horizontalModePosX: cfg.leftPosition + cfg.width + cfg.margin,
   posY: cfg.topBorder,
   side: false,
   title: "Best Cps",
@@ -25,4 +27,7 @@ export default {
   downIcon: icons.pageRight,
   upIconHover: icons.pageLeftHover,
   downIconHover: icons.pageRightHover,
+  horizontal: false,
+  horizontalMaxRows: 5,
+  hidePanel: true,
 }

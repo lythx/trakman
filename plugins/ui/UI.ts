@@ -12,9 +12,9 @@ import StaticComponent from './utils/StaticComponent.js'
 import DynamicComponent from './utils/DynamicComponent.js'
 import CustomUi from './CustomUi.js'
 import Paginator from './utils/Paginator.js'
-import { Grid, GridCellFunction, GridCellObject } from './utils/Grid.js'
+import { Grid, type GridCellFunction, type GridCellObject } from './utils/Grid.js'
 import Navbar from './utils/Navbar.js'
-import RecordList, { RLImage, RLRecord } from './utils/RecordList.js'
+import RecordList, { type RLImage, type RLRecord } from './utils/RecordList.js'
 import VoteWindow from './utils/VoteWindow.js'
 import componentIds from './config/ComponentIds.js'
 import { centeredText, horizontallyCenteredText, leftAlignedText, rightAlignedText } from './utils/TextUtils.js'
@@ -22,7 +22,7 @@ import { getCpTypes } from './utils/GetCpTypes.js'
 import { closeButton } from './utils/CloseButton.js'
 import { addKeyListener, removeKeyListener } from './utils/KeyListener.js'
 import { List } from './utils/List.js'
-import StaticHeader, { StaticHeaderOptions } from './utils/StaticHeader.js'
+import StaticHeader, { type StaticHeaderOptions } from './utils/StaticHeader.js'
 import staticButton from './utils/StaticButton.js'
 import { addManialinkListener, removeManialinkListener } from './utils/ManialinkListener.js'
 import PopupWindow from './utils/PopupWindow.js'
@@ -35,10 +35,10 @@ import Buttons from './Buttons.js'
 
 let customUi: CustomUi
 
-let currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
+const currentModIndex = { 'Stadium': 0, 'Desert': 0, 'Snow': 0, 'Bay': 0, 'Coast': 0, 'Island': 0, 'Rally': 0 }
 
 const loadMod = (): void => {
-  let mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
+  const mods: { struct: { Env: { string: string }, Url: { string: string } } }[] = []
   for (const obj of modConfig) {
     if (obj.modLinks.length === 0) { continue }
     mods.push({
@@ -188,8 +188,8 @@ const addLoadListener = (callback: Function): void => {
 }
 
 export {
-  Paginator, Grid, Navbar, VoteWindow, RecordList, GridCellFunction, GridCellObject, List, StaticHeader,
-  PopupWindow, StaticComponent, DynamicComponent, StaticHeaderOptions, RLImage, RLRecord,
+  Paginator, Grid, Navbar, VoteWindow, RecordList, type GridCellFunction, type GridCellObject, List, StaticHeader,
+  PopupWindow, StaticComponent, DynamicComponent, type StaticHeaderOptions, type RLImage, type RLRecord,
   components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds,
   addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText,
   staticButton, fullScreenListener, centeredText, addLoadListener,

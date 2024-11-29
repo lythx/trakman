@@ -12,26 +12,38 @@ export const fixRankCoherence = async (): Promise<void> => {
     Logger.trace(`Rank coherence fix unneeded (same max locals value)`)
     return
   }
+  await forceFixRankCoherence()
+}
+
+export const forceFixRankCoherence = async (): Promise<void> => {
   Logger.info(`Recalculating ranks...`)
-  const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
-  if (mapList instanceof Error) {
-    Logger.fatal('Error while getting the map list', mapList.message)
-    return
-  }
   const allMaps: { uid: string, id: number }[] = (await db.query(`SELECT id, uid FROM map_ids`)).rows
+  let maps: { uid: string, id: number }[]
+  if (!config.manualMapLoading.enabled) {
+    const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
+    if (mapList instanceof Error) {
+      Logger.fatal('Error while getting the map list', mapList.message)
+      return
+    }
+    maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
+  } else {
+    maps = allMaps
+  }
   const playerIds: number[] = (await db.query(`SELECT id FROM players`)).rows.map(a => a.id)
   const allRecords: { player_id: number, map_id: number }[] = (await db.query(`SELECT player_id, map_id FROM records
   ORDER BY map_id ASC,
   time ASC,
   date ASC;`)).rows
-  const maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
   const records = allRecords.filter(a => maps.some(b => b.id === a.map_id))
   const limit = config.localRecordsLimit
   const sums: { id: number, average: number }[] = []
+  const indexesMap = new Map<number, number[]>(playerIds.map(a => [a, []]))
+  for (let i = 0; i < records.length; i++) {
+    indexesMap.get(records[i].player_id as number)?.push(i)
+  }
   for (let i = 0; i < playerIds.length; i++) {
-    const indexes: number[] = []
+    const indexes = indexesMap.get(playerIds[i]) as number[]
     let sum = 0
-    for (let j = 0; j < records.length; j++) { if (records[j].player_id === playerIds[i]) { indexes.push(j) } }
     for (let j = 0; j < indexes.length; j++) {
       let position = 1
       for (let k = indexes[j] - 1; k >= 0; k--) {

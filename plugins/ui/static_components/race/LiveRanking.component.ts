@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, RLRecord } from '../../UI.js'
+import { RecordList, componentIds, StaticHeader, StaticComponent, type RLRecord } from '../../UI.js'
 import config from './LiveRanking.config.js'
 
 export default class LiveRanking extends StaticComponent {

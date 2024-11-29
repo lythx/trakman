@@ -29,5 +29,4 @@ export default {
     margin: 0.15,
     headerBackground: "333C"
   },
-  searchMinSimilatiryValue: 0.1
 }

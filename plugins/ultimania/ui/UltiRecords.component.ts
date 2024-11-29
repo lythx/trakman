@@ -4,7 +4,7 @@
  */
 
 import { ultimania } from "../Ultimania.js"
-import { componentIds, Paginator, Grid, centeredText, closeButton, GridCellFunction, PopupWindow } from '../../ui/UI.js'
+import { componentIds, Paginator, Grid, centeredText, closeButton, type GridCellFunction, PopupWindow } from '../../ui/UI.js'
 import config from './UltiRecords.config.js'
 
 export default class UltiRecords extends PopupWindow {
@@ -53,7 +53,7 @@ export default class UltiRecords extends PopupWindow {
     }
 
     const loginCell = (i: number, j: number, w: number, h: number): string => {
-      let ret: string = centeredText(records[i + playerIndex].login, w, h)
+      const ret: string = centeredText(records[i + playerIndex].login, w, h)
       if (login === records[i + playerIndex].login) { // Add colour for yourself
         return `<format textcolor="${this.selfColour}"/>` + ret
       }
@@ -81,7 +81,7 @@ export default class UltiRecords extends PopupWindow {
     grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(this.entries + 1).fill(1), config.grid)
     const arr = [...headers]
-    for (let i: number = 0; i < entriesToDisplay; i++) {
+    for (let i = 0; i < entriesToDisplay; i++) {
       arr.push(indexCell, nickNameCell, loginCell, dateCell, finishCell)
     }
     return grid.constructXml(arr)

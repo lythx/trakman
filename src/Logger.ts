@@ -77,7 +77,7 @@ export abstract class Logger {
       this.logLevel = envLogLevel
     }
     await fs.mkdir(this.logDir).catch((err: Error): void => {
-      if (!err.message.startsWith('EEXIST')) { // ignore dir exists error
+      if (!err.message.startsWith('EEXIST') && err.name !== "EEXIST") { // ignore dir exists error
         throw new Error(`Error while creating log directory\n${err.message}\n\n${err.stack}`)
       }
     })
@@ -226,11 +226,18 @@ export abstract class Logger {
   }
 
   private static async sendDiscordMessage(message: string) {
-    return fetch(process.env.DISCORD_WEBHOOK_URL!, {
+    const response: Response | Error = await fetch(process.env.DISCORD_WEBHOOK_URL!, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: message
-    })
+    }).catch(e => e)
+    if (response instanceof Error) {
+      this.error('Could not send message to Discord.', response)
+      return
+    }
+    if (!response.ok) {
+      this.error('Discord log response not ok, status: ' + response.status)
+    }
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {

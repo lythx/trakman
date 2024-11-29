@@ -1,16 +1,16 @@
 import fetch from 'node-fetch'
 import xml2js from 'xml2js'
-import { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
+import type { MKMapVotes, MKVote } from './ManiakarmaTypes.js'
 import config from './Config.js'
 import countries from './Countries.js'
 
 let authCode: string
-let isConnected: boolean = false
+let isConnected = false
 let apiUrl: string
-let mapKarmaValue: number = 0
+let mapKarmaValue = 0
 let mapKarma: MKMapVotes = { fantastic: 0, beautiful: 0, good: 0, bad: 0, poor: 0, waste: 0 }
-let playerVotes: MKVote[] = []
-let newVotes: MKVote[] = []
+const playerVotes: MKVote[] = []
+const newVotes: MKVote[] = []
 let lastMap: Readonly<tm.CurrentMap>
 
 const mapFetchListeners: ((info: { votes: MKVote[], ratio: number, karma: MKMapVotes }) => void)[] = []
@@ -68,7 +68,7 @@ const reinitialize = async (): Promise<void> => {
 }
 
 const authenticate = async (): Promise<true | Error> => {
-  const url: string = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({
+  const url = `http://worldwide.mania-karma.com/api/tmforever-trackmania-v4.php?Action=Auth&${new URLSearchParams({
     login: tm.config.server.login,
     name: Buffer.from(tm.config.server.name).toString('base64'),
     game: tm.config.server.game,
@@ -95,7 +95,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   newVotes.length = 0
   playerVotes.length = 0
   if (logins.length === 0) { return [] }
-  const url: string = `${apiUrl}?Action=Get&${new URLSearchParams({
+  const url = `${apiUrl}?Action=Get&${new URLSearchParams({
     login: tm.config.server.login,
     authcode: authCode,
     uid: tm.maps.current.id,
@@ -127,7 +127,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
   }
   const ret: MKVote[] = []
   for (const e of json?.result?.players[0]?.player) {
-    const vote: number = Number(e?.$?.vote)
+    const vote = Number(e?.$?.vote)
     const login = e?.$?.login
     const arr: [-3, -2, -1, 1, 2, 3] = [-3, -2, -1, 1, 2, 3]
     const v = arr.find(a => a === vote)
@@ -142,7 +142,7 @@ const fetchVotes = async (...logins: string[]): Promise<MKVote[] | Error> => {
 
 const sendVotes = async (newVotes: MKVote[]): Promise<void> => {
   if (newVotes.length === 0) { return }
-  const url: string = `${apiUrl}?Action=Vote&${new URLSearchParams({
+  const url = `${apiUrl}?Action=Vote&${new URLSearchParams({
     login: tm.config.server.login,
     authcode: authCode,
     uid: lastMap.id,
@@ -182,7 +182,7 @@ const storePlayerVotes = (login: string, vote: -3 | -2 | -1 | 1 | 2 | 3): void =
 }
 
 const getVoteString = (newVotes: MKVote[]): string => {
-  let voteString: string[] = []
+  const voteString: string[] = []
   const count: any = {}
   for (const player of newVotes) {
     count[player.login] = (count[player.login] ?? 0) + 1
@@ -441,4 +441,4 @@ export const maniakarma = {
 
 }
 
-export { MKMapVotes, MKVote }
+export type { MKMapVotes, MKVote }

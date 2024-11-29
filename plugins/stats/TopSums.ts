@@ -1,6 +1,6 @@
 import config from './Config.js'
 
-let topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
+const topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
 const updateListeners: ((changes: readonly Readonly<{
   login: string, nickname: string,
   sums: [number, number, number, number]
@@ -22,45 +22,47 @@ const initialize = async () => {
     await tm.log.fatal(`Failed to fetch topsums`, res.message)
     return
   }
-  const presentMaps = tm.maps.list.map(a => a.id)
   if (res.length === 0) { return }
-  let rank = 1
-  let prevMap = res[0].uid
-  let curMap = res[0].uid
-  let mapPresent = true
-  for (let i = 0; i < res.length; i++) {
-    if (curMap !== prevMap) {
-      rank = 1
-      mapPresent = true
-      if (!presentMaps.includes(res[i].uid)) {
-        mapPresent = false
-        continue
-      }
+  const presentMaps = tm.maps.list.map(a => a.id).sort((a, b) => a.localeCompare(b))
+  let i = 0
+  let j = 0
+  while (i < res.length && j < presentMaps.length) {
+    const cmp = res[i].uid.localeCompare(presentMaps[j])
+    if (cmp > 0) {
+      j++
+      continue
     }
-    if (!mapPresent) { continue }
-    const find = topList.find(a => a.login === res[i].login)
-    if (find !== undefined) {
-      if (rank <= 3) {
-        find.sums[rank - 1]++
-      } else {
-        find.sums[3]++
-      }
-    } else {
-      const arr: [number, number, number, number] = [0, 0, 0, 0]
-      if (rank <= 3) {
-        arr[rank - 1]++
-      } else {
-        arr[3]++
-      }
-      topList.push({
-        login: res[i].login,
-        nickname: res[i].nickname,
-        sums: arr
-      })
+    if (cmp < 0) {
+      i++
+      continue
     }
-    rank++
-    prevMap = res[i].uid
-    curMap = res[i + 1]?.uid
+    const uid = res[i].uid
+    let rank = 1
+    while (i < res.length && res[i].uid === uid) {
+      const login = res[i].login
+      const find = topList.find(a => a.login === login)
+      if (find !== undefined) {
+        if (rank <= 3) {
+          find.sums[rank - 1]++
+        } else {
+          find.sums[3]++
+        }
+      } else {
+        const arr: [number, number, number, number] = [0, 0, 0, 0]
+        if (rank <= 3) {
+          arr[rank - 1]++
+        } else {
+          arr[3]++
+        }
+        topList.push({
+          login: res[i].login,
+          nickname: res[i].nickname,
+          sums: arr
+        })
+      }
+      rank += 1
+      i += 1
+    }
   }
   sortToplist()
   topList.length = Math.min(config.sumsCount, topList.length)
@@ -99,7 +101,7 @@ tm.addListener('LocalRecord', (info) => {
   let oldArrPos = prevRecordIndex === -1 ? undefined : prevRecordIndex
   if (oldArrPos !== undefined && oldArrPos > 2) {
     oldArrPos = 3
-  }
+  } // [1,2,3,4] 7000 
   let newArrPos = info.position - 1
   if (info.position > 2) {
     newArrPos = 3
@@ -126,6 +128,7 @@ tm.addListener('LocalRecord', (info) => {
   sortToplist()
   topList.length = Math.min(config.sumsCount, topList.length)
   for (const e of updateListeners) { e(updated) }
+  initialLocals = tm.records.local
 })
 
 tm.addListener(['MapAdded', 'MapRemoved'], () => {

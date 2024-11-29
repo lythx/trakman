@@ -47,6 +47,21 @@ declare global {
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
       awards?: number
     }
+    /** TM Server Challenge return type */
+    export interface ServerMap {
+      Name: string,
+      UId: string,
+      FileName: string,
+      Environnement: string,
+      Author: string,
+      GoldTime: number,
+      CopperPrice: number,
+      Mood?: string,
+      BronzeTime?: number,
+      SilverTime?: number,
+      AuthorTime?: number,
+      NbLaps?: number
+    }
     /** Controller online player object */
     export interface Player {
       /** 
@@ -766,8 +781,8 @@ declare global {
       "KarmaVote": readonly KarmaVoteInfo[]
       "RecordsPrefetch": readonly Readonly<Record>[]
       "VotesPrefetch": readonly Readonly<Vote>[]
-      "MapAdded": MapAddedInfo
-      "MapRemoved": MapRemovedInfo
+      "MapAdded": MapAddedInfo | MapAddedInfo[]
+      "MapRemoved": MapRemovedInfo | MapRemovedInfo[]
       "BillUpdated": BillUpdatedInfo
       "MatchSettingsUpdated": readonly Readonly<Map>[]
       "PrivilegeChanged": PrivilegeChangedInfo

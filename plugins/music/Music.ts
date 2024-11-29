@@ -1,6 +1,6 @@
 import config from './Config.js'
 import songList from './SongList.js'
-import { Song, SongAddedCallback, SongRemovedCallback, QueueChangedCallback, Caller } from './Types.js'
+import type { Song, SongAddedCallback, SongRemovedCallback, QueueChangedCallback, Caller } from './Types.js'
 import SongList from './ui/SongList.component.js'
 import MusicWidget from './ui/MusicWidget.component.js'
 import fs from 'fs/promises'

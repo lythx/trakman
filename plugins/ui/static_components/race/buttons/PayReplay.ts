@@ -1,4 +1,4 @@
-import { ButtonData } from "./ButtonData.js"
+import type { ButtonData } from "./ButtonData.js"
 import { UiButton } from "./UiButton.js"
 import config from "./ButtonsWidget.config.js"
 import messages from './Messages.config.js'
@@ -17,17 +17,18 @@ export class PayReplay extends UiButton {
   constructor(parentId: number) {
     super()
     this.parentId = parentId
+    const plus = tm.timer.isDynamic ? 4 : 0
     this.buttonData = {
       icon: cfg.icon,
-      text1: tm.utils.strVar(cfg.texts[0][0], {
+      text1: tm.utils.strVar(cfg.texts[0+plus][0], {
         cost: cfg.costs[0]
       }),
-      text2: cfg.texts[0][1],
+      text2: cfg.texts[0+plus][1],
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0].equal
+      equalTexts: cfg.texts[0+plus].equal
     }
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -41,13 +42,14 @@ export class PayReplay extends UiButton {
 
   private handleClick = async (login: string, nickname: string): Promise<void> => {
     if (this.isReplay || this.isSkip) { return }
+    const action = tm.timer.isDynamic ? msg.extendStr : msg.replayStr
     const cost: number = cfg.costs[this.costIndex]
     if (cost === undefined) { return }
     const res: boolean | Error = await tm.utils.sendCoppers(login, cost, cfg.billMessage)
     if (res instanceof Error) {
       tm.sendMessage(msg.paymentFail, login)
-    } else if (res === true) {
-      if ((this.isReplay as boolean) === true || (this.isSkip as boolean) === true) {
+    } else if (res) {
+      if ((this.isReplay as boolean) || (this.isSkip as boolean)) {
         let refundMessage = ''
         if (cost >= 100) { // Its not worth to return under 100 due to nadeo tax growing exponentially
           refundMessage = msg.refund
@@ -61,35 +63,49 @@ export class PayReplay extends UiButton {
       }
       tm.sendMessage(tm.utils.strVar(msg.success, {
         name: tm.utils.strip(nickname),
-        amount: cost
+        amount: cost,
+        action
       }))
       tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
       this.costIndex++
-      this.handleMapReplay()
+      this.replayOrExtendTime()
       this.emitReplay()
     }
   }
 
+  private replayOrExtendTime(): void {
+    if (tm.timer.isDynamic) {
+      this.isReplay = true
+      this.handleMapStart()
+      tm.timer.addTime(cfg.timeExtension)
+    } else {
+      this.handleMapReplay()
+      this.emitReplay()
+      tm.jukebox.add(tm.maps.current.id, undefined, true)
+    }
+  }
+
   private handleMapStart(): void {
+    const plus = tm.timer.isDynamic ? 4 : 0
     if (!this.isReplay) { this.costIndex = 0 }
     if (cfg.costs[this.costIndex] !== undefined) {
       this.buttonData = {
         icon: cfg.icon,
-        text1: tm.utils.strVar(cfg.texts[0][0], {
+        text1: tm.utils.strVar(cfg.texts[0+plus][0], {
           cost: cfg.costs[this.costIndex]
         }),
-        text2: cfg.texts[0][1],
+        text2: cfg.texts[0+plus][1],
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        equalTexts: cfg.texts[0].equal,
+        equalTexts: cfg.texts[0+plus].equal,
         actionId: cfg.actionId + this.parentId
       }
     } else {
       this.buttonData = {
         icon: cfg.icon,
-        text1: cfg.texts[1][0],
-        text2: cfg.texts[1][1],
+        text1: cfg.texts[1+plus][0],
+        text2: cfg.texts[1+plus][1],
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
@@ -102,6 +118,9 @@ export class PayReplay extends UiButton {
   }
 
   private handleMapReplay(): void {
+    if (tm.timer.isDynamic) {
+      return
+    }
     this.isReplay = true
     this.buttonData.text1 = cfg.texts[2][0]
     this.buttonData.text2 = cfg.texts[2][1]

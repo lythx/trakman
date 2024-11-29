@@ -4,17 +4,20 @@ const p = tm.utils.palette
 
 export default {
   height: 2.17,
-  width: 14.4,
+  width: cfg.width,
+  // Change this ONLY if you want the widget to be on the side
+  useRelative: false,
   posX: 12,
   posY: -37,
-  margin: cfg.margin,
+  margin: cfg.marginBig,
   side: true,
   rectangleWidth: 7.7,
   icon: icons.waypoint,
   iconBottom: icons.clock,
   text: 'Checkpoint',
   noCpsText: 'No Checkpoints',
-  noCpsWidth: 10.2,
+  // 1.7 is the squarewidth
+  noCpsWidth: cfg.width - cfg.margin - 1.7,
   defaultDifference: '$CCC-:--.--',
   finishText: `$${p.green}Finish`,
   colours: {
@@ -35,5 +38,6 @@ export default {
     checkpointTextWidth: 2.8,
   },
   background: cfg.background,
-  finishTextDuration: 3000
+  finishTextDuration: 3000,
+  hidePanel: false,
 }

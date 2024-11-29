@@ -12,7 +12,6 @@ export default class BestFinishes extends StaticComponent {
   private readonly header: StaticHeader
   private readonly headerBg: string
   private readonly headerHeight: number
-  private readonly contentHeight: number
   private readonly grid: Grid
   private newestFinish: number = -1
 
@@ -21,9 +20,14 @@ export default class BestFinishes extends StaticComponent {
     this.header = new StaticHeader('race')
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
-    this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
-      new Array(config.entries).fill(1), { margin: config.margin })
+    if (config.horizontal) {
+      this.grid = new Grid(config.horizontalModeWidth, config.entryHeight, new Array(config.entries).fill(config.columnProportions).flat(),
+        [1], { margin: config.margin })
+    } else {
+      const contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
+      this.grid = new Grid(config.width + config.margin * 2, contentHeight, config.columnProportions,
+        new Array(config.entries).fill(1), { margin: config.margin })
+    }
     this.renderOnEvent('PlayerFinish', (info: tm.FinishInfo) => {
       const isStunts = tm.getGameMode() === 'Stunts'
       let index: number
@@ -52,9 +56,15 @@ export default class BestFinishes extends StaticComponent {
       this.bestFinishes.length = 0
       return this.display()
     })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
+    if (config.horizontal) {
+      return config.entryHeight
+    }
     return (config.entryHeight + config.margin * 2) * config.entries + StaticHeader.raceHeight + config.margin
   }
 
@@ -70,6 +80,21 @@ export default class BestFinishes extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
+    if (config.horizontal) {
+      return {
+        xml: `
+    <manialink id="${this.id}">
+    <frame posn="${config.horizontalModePosX} ${config.posY + config.margin} 1">
+      <format textsize="1"/>
+      ${this.constructGrid(login)}
+    </frame>
+    </manialink>`,
+        login
+      }
+    }
     return {
       xml: `
     <manialink id="${this.id}">
@@ -79,7 +104,7 @@ export default class BestFinishes extends StaticComponent {
     </frame>
     <frame posn="${config.posX - config.margin} ${config.posY - (this.headerHeight)} 1">
       <format textsize="1"/>
-      ${this.constructText(login)}
+      ${this.constructGrid(login)}
     </frame>
     </manialink>`, login
     }
@@ -88,37 +113,37 @@ export default class BestFinishes extends StaticComponent {
   private constructHeader(): string {
     if (this.bestFinishes.length === 0) { return '' }
     return this.header.constructXml(config.title, config.icon, config.side)
-    //  `
-    // <quad posn="0 0 1" sizen="${this.squareW} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
-    // <quad posn="${this.iconHPadding} ${-this.iconVPadding} 4" sizen="${this.iconW} ${this.iconH}" image="${config.icon}"/> 
-    // <frame posn="${this.squareW + config.margin} 0 1">
-    //   <quad posn="0 0 1" sizen="${config.width - (this.squareW + config.margin)} ${this.headerHeight}" bgcolor="${this.headerBg}"/>
-    //    ${verticallyCenteredText(config.title, config.width - (this.squareW + config.margin), 
-    //     this.headerHeight, { textScale: config.textScale })}
-    // </frame>`
   }
 
-  private constructText(login: string): string {
+  private constructGrid(login: string): string {
     if (this.reduxModeEnabled) { login = '' }
     const indexCell = (i: number, j: number, w: number, h: number): string => {
+      let index
+      if (config.horizontal) {
+        index = j / 3 + 1
+      } else {
+        index = i + 1
+      }
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((i + 1).toString(), w, h,
+      return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((index).toString(), w, h,
         { textScale: config.textScale, padding: config.textPadding }))
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
+      const index = config.horizontal ? (j - 1) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      const fin = this.bestFinishes[i]
+      const fin = this.bestFinishes[index]
       if (fin === undefined) { return '' }
       let format: string = fin.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
-      if (i === this.newestFinish) { format = `<format textcolor="${config.newestColour}"/>` }
+      if (index === this.newestFinish) { format = `<format textcolor="${config.newestColour}"/>` }
       return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, { textScale: config.textScale, padding: config.textPadding })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
+      const index = config.horizontal ? (j - 2) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg +
-        (leftAlignedText(tm.utils.strip(this.bestFinishes[i].nickname, false), w, h,
+      return this.bestFinishes[index] === undefined ? '' : bg +
+        (leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[index].nickname, false)), w, h,
           { textScale: config.textScale, padding: config.textPadding }))
     }
 

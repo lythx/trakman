@@ -2,7 +2,7 @@ import { Database } from './DB.js'
 
 export abstract class Repository {
 
-  private db: Database = new Database()
+  protected db: Database = new Database()
 
   async query(q: string, ...params: any[]): Promise<any[]> {
     return (await (this.db.query(q, ...params))).rows

@@ -3,9 +3,9 @@
  * @since 0.4
  */
 
-import { componentIds, StaticHeader, centeredText, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, StaticHeader, centeredText, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import config from './CpCounter.config.js'
-import { dedimania, DediRecord } from '../../../dedimania/Dedimania.js'
+import { dedimania, type DediRecord } from '../../../dedimania/Dedimania.js'
 
 interface CheckpointData {
   index: number,
@@ -95,7 +95,7 @@ export default class CpCounter extends StaticComponent {
         index: 0, current: time === 0 ? undefined : time,
         best, isFinish: time !== 0, lap
       })
-      if(obj !== undefined) {
+      if (obj !== undefined) {
         tm.sendManialink(obj.xml, obj.login)
       }
     }, true)
@@ -103,6 +103,9 @@ export default class CpCounter extends StaticComponent {
       this.prevTimes.length = 0
       this.prevLapTimes.length = 0
       return this.display()
+    })
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
     })
   }
 
@@ -141,7 +144,7 @@ export default class CpCounter extends StaticComponent {
       let difference: number = bestTime - currentTime
       let betterSign = '-'
       let worseSign = '+'
-      if(isStunts) {
+      if (isStunts) {
         difference = -difference
         betterSign = '+'
         worseSign = '-'
@@ -159,7 +162,7 @@ export default class CpCounter extends StaticComponent {
     const timeColour: string = '$' + (isFinish === true ? config.colours.finish : config.colours.default)
     return `${this.header.constructXml(timeColour + tm.utils.getTimeString(currentTime),
       icon, config.side, { rectangleWidth: w, centerText: true })}
-    <frame posn="${w + config.margin * 2 + h.squareWidth} 0 3">
+    <frame posn="${w + config.margin + h.squareWidth} 0 3">
       <quad posn="0 0 3" sizen="${w} ${h.height}" bgcolor="${h.textBackground}"/>
       ${centeredText('$' + config.colours.default + differenceString, w, h.height, h)}
     </frame>`
@@ -167,6 +170,9 @@ export default class CpCounter extends StaticComponent {
 
   displayToPlayer(login: string, params?: CheckpointData & { lap?: CheckpointData & { cpIndex: number } }) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     const cpAmount: number = tm.maps.current.checkpointsAmount - 1
     let colour: string = config.colours.default
     if (cpAmount === params?.index) {
@@ -196,17 +202,23 @@ export default class CpCounter extends StaticComponent {
       text = config.noCpsText
       counterXml = ''
     }
+    const centerText = config.useRelative ? false : true
+    let [posX, posY] = [config.posX, config.posY]
+    if (config.useRelative) {
+      [posX, posY] = [this.positionX, this.positionY]
+    }
     return {
       xml: `
         <manialink id="${this.id}">
-            <frame posn="${config.posX} ${config.posY} 4">
+            <frame posn="${posX} ${posY} 4">
               ${this.getLapsXml(login, params?.lap)}
               <format textsize="1"/>
-              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side, { rectangleWidth })}
+              ${this.header.constructXml('$' + config.colours.default + text, config.icon, config.side,
+        { rectangleWidth, centerText })}
               ${counterXml}
               <frame posn="0 ${-(config.height + config.margin)} 2">
                 ${cpAmount === 0 ? '' : this.constructTimeXml(login, false, config.iconBottom,
-        params?.isFinish, params?.current, params?.best)}
+          params?.isFinish, params?.current, params?.best)}
               </frame>
             </frame>
         </manialink>`, login

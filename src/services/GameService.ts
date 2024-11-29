@@ -35,11 +35,11 @@ export class GameService {
   private static _dynamicTimerOnNextRound = false
   private static timeAttackLimit = config.defaultTimeAttackTimeLimit
   private static remainingDynamicTime: number = config.defaultTimeAttackTimeLimit
-  private static dynamicTimerInterval: NodeJS.Timer
+  private static dynamicTimerInterval: NodeJS.Timeout
   private static lastDynamicTimerUpdate = 0
   private static dynamicTimerPaused = false
   private static _mapStartTimestamp: number
-  private static readonly gameModeMap: { [value: number]: tm.GameMode } = {
+  private static readonly gameModeMap: Record<number, tm.GameMode> = {
     0: 'Rounds',
     1: 'TimeAttack',
     2: 'Teams',

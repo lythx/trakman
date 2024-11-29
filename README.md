@@ -19,7 +19,7 @@ If you prefer not to use containers and/or want to install manually, [see this p
 
 ## Manual Installation Requirements
 - Trackmania Forever dedicated server [v2011-02-21 / Latest](http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip)
-- NodeJS [v14.21.3+](https://nodejs.org/en/download) (we recommend using the latest LTS version)
+- Node.js [v18.20.2+](https://nodejs.org/en/download) (we recommend using the latest LTS version) or Bun [v1.1+](https://bun.sh/docs/installation) (Bun is still experimental and several things may break)
 - PostgreSQL [v12+](https://www.postgresql.org/download) (any currently supported version is fine)
 
 On Linux, relevant versions of NodeJS & PostgreSQL should be available in your distro's repositories by default (see [here](https://repology.org/project/nodejs/versions) for NodeJS and [here](https://repology.org/project/postgresql/versions) for PostgreSQL)

@@ -4,7 +4,7 @@
  */
 
 import { actions } from '../../../actions/Actions.js'
-import { closeButton, componentIds, Grid, centeredText, GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
+import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
 import config from './Guestlist.config.js'
 
 export default class Guestlist extends PopupWindow<number> {
@@ -21,10 +21,10 @@ export default class Guestlist extends PopupWindow<number> {
     this.paginator.onPageChange = (login, page, info) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
-    addManialinkListener(this.openId + 1000, 1000, (info, offset) => {
-      const target = tm.admin.guestlist[offset]
+    addManialinkListener(this.openId + 1000, 1000, async (info, offset) => {
+      const target = await tm.players.fetch(tm.admin.guestlist[offset].login)
       if (target === undefined) { return }
-      actions.removeGuest(info, target.login)
+      actions.removeGuest(info, target)
     })
     tm.addListener(['AddGuest', 'RemoveGuest'], () => {
       this.paginator.setPageCount(Math.ceil(tm.admin.guestCount / (config.entries - 1)))

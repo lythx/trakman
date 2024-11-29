@@ -3,10 +3,10 @@
  * @since 0.4
  */
 
-import { componentIds, Grid, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
-import { webservices, WebservicesInfo } from '../../../webservices/Webservices.js'
+import { webservices, type WebservicesInfo } from '../../../webservices/Webservices.js'
 import config from './MapWidgetResult.config.js'
 
 export default class MapWidgetResult extends StaticComponent {
@@ -14,6 +14,7 @@ export default class MapWidgetResult extends StaticComponent {
   private readonly rows: number = 5
   private readonly header: StaticHeader
   private readonly grid: Grid
+  private readonly displayEnvironment: boolean = config.displayEnvironment !== undefined ? config.displayEnvironment : process.env.SERVER_PACKMASK !== "nations"
   private isRestart: boolean = false
   private xml: string = ''
 
@@ -78,12 +79,12 @@ export default class MapWidgetResult extends StaticComponent {
     }
     const infos: [string, string][] = [
       [config.title, ic.header],
-      [tm.utils.safeString(map.name), obj.tag],
+      [tm.utils.safeString(tm.utils.decodeURI(map.name)), obj.tag],
       [tm.utils.safeString(author), authorIcon],
       [timeOrScore, timeOrScoreIcon],
       [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate],
       [TMXMap?.awards === undefined ? config.noAwardsText : TMXMap.awards.toString(), obj.award],
-      [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
+      this.displayEnvironment ? [map.environment, ic.environment] : [TMXMap?.validReplays?.[0]?.time === undefined ? config.noWrText : tm.utils.getTimeString(TMXMap.validReplays[0].time), ic.tmxWr]
     ]
     const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {

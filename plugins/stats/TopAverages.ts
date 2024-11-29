@@ -59,6 +59,11 @@ tm.addListener('RanksAndAveragesUpdated', async (info) => {
   for (const e of updateListeners) { e(updated) }
 })
 
+tm.addListener(['MapAdded', 'MapRemoved'], () => {
+  topList = []
+  initialize()
+})
+
 /**
  * Creates and provides utilities for accessing players average rank ranking
  * @author lythx

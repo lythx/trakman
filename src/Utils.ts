@@ -1,5 +1,4 @@
 import { Client } from "./client/Client.js"
-import dsc from 'dice-similarity-coeff'
 import specialCharmap from './data/SpecialCharmap.js'
 import countries from './data/Countries.js'
 import { Events } from './Events.js'
@@ -7,6 +6,12 @@ import { PlayerService } from "./services/PlayerService.js"
 import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
+import { Logger } from './Logger.js'
+//import uFuzzy from '@leeoniya/ufuzzy'
+// @ts-ignore
+import uFuzzy from '@leeoniya/ufuzzy/dist/uFuzzy.esm.js' // TODO: don't do this
+
+const uf = new uFuzzy(config.searchOptions)
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
@@ -321,9 +326,11 @@ export const Utils = {
             resolve(true)
             break
           case 'refused':
+            Logger.error('Transaction refused')
             resolve(new Error(`Transaction refused`))
             break
           case 'error':
+            Logger.error('Error: ' + errorString)
             resolve(new Error(errorString ?? 'error'))
         }
       }
@@ -372,6 +379,34 @@ export const Utils = {
   },
 
   /**
+   * Safe way to decode url-escaped characters
+   * @param str original string
+   * @returns decoded string if successful
+   */
+  decodeURI(str: string): string {
+    const map = {
+      '&amp;': '\&',
+      '&quot;': '\"',
+      '&apos;': '\'',
+      '&gt;': '\>',
+      '&lt;': '\<',
+      '+': ' '
+    }
+    let res: string
+    try {
+      res = decodeURIComponent(str)
+    } catch (e) {
+      // try to cut off the last percent sign and try again
+      // this failure happens so little I do not care about speed that much
+      // it looks much better usually
+      const i = str.indexOf('%', str.length - 3)
+      if (i === -1) res = str
+      else res = this.decodeURI(str.slice(0, i)) + "..."
+    }
+    return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => { return map[m as keyof typeof map] })
+  },
+
+  /**
    * In Trackmania, https links won't work
    * @param url Original URL
    * @returns URL that will likely function properly
@@ -383,45 +418,30 @@ export const Utils = {
   /**
    * Attempts to convert the player nickname to their login via charmap.
    * @param nickname Player nickname
-   * @param options Options to modify search similarity goals
    * @returns Possibly matching login or undefined if unsuccessful
    */
-  nicknameToPlayer(nickname: string, options: {
-    similarityGoal: number,
-    minDifferenceBetweenMatches: number
-  } = {
-      similarityGoal: config.nicknameToLoginSimilarityGoal,
-      minDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
-    }): tm.Player | undefined {
+  nicknameToPlayer(nickname: string): tm.Player | undefined {
     const players = PlayerService.players
-    const strippedNicknames: { strippedNickname: string, player: tm.Player }[] = []
+    const strippedNicknames = []
     for (const e of players) {
-      strippedNicknames.push({ strippedNickname: this.stripSpecialChars(Utils.strip(e.nickname).toLowerCase()), player: e })
+      strippedNicknames.push(this.stripSpecialChars(Utils.strip(e.nickname)))
     }
-    const matches: { player: tm.Player, value: number }[] = []
-    for (const e of strippedNicknames) {
-      const value = dsc.twoStrings(e.strippedNickname, nickname.toLowerCase())
-      if (value > options.similarityGoal) {
-        matches.push({ player: e.player, value })
-      }
-    }
+    const matches = []
+    const indices = this.matchString(nickname, strippedNicknames)
+    matches.push(indices.map(a => players[a]))
     if (matches.length === 0) {
       return undefined
     }
-    const s = matches.sort((a, b): number => b.value - a.value)
-    if (s[0].value - s?.[1]?.value ?? 0 < options.minDifferenceBetweenMatches) {
-      return undefined
-    }
-    return s[0].player
+    return matches[0][0]
   },
 
   /**
-   * Converts date string to time in miliseconds. 
+   * Converts date string to time in milliseconds.
    * This method is used to parse time in chat commands.
    * @param dateStr Date string, number followed by optional modifier 
    * [s - seconds, m - minutes, h - hours, d - days]). 
    * If no modifier is specified the number will be treated as minutes.
-   * @returns Time in miliseconds, RangeError if time is bigger than max js Date,
+   * @returns Time in milliseconds, RangeError if time is bigger than max js Date,
    * TypeError if the dateStr is not a valid date string
    */
   parseTimeString(dateStr: string): number | RangeError | TypeError {
@@ -529,51 +549,6 @@ export const Utils = {
 
 }
 
-/**
- * Checks similarity of given strings, returns best matches sorted based on similarity.
- * @param searchString String to compare possible matches to
- * @param possibleMatches Array of strings to sort by similarity
- * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
- * @returns Array of objects containing string and its similarity value
- */
-function matchString(searchString: string, possibleMatches: string[], stripSpecialChars?: true): { str: string, value: number }[]
-/**
- * Checks similarity of given strings in an array of objects, returns best matches sorted based on similarity.
- * @param searchString String to compare possible matches to
- * @param possibleMatches Array of objects to sort by similarity
- * @param key Key in objects containing the string to compare
- * @param stripSpecialChars If true special characters get in strings get replaced with latin if possible
- * @returns Array of objects containing object and its similarity value
- */
-function matchString<T extends { [key: string]: any }>
-  (searchString: string, possibleMatches: T[], key: keyof T, stripSpecialChars?: true): { obj: T, value: number }[]
-function matchString<T extends { [key: string]: any }>
-  (searchString: string, possibleMatches: string[] | T[], arg?: keyof T | true, stripSpecialChars?: true)
-  : { str: string, value: number }[] | { obj: T, value: number }[] {
-  if (possibleMatches.length === 0) { return [] }
-  if (arg === undefined || typeof arg === 'boolean') {
-    const stripSpecialChars = arg
-    const arr: { str: string, value: number }[] = []
-    for (const e of possibleMatches) {
-      arr.push({
-        str: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
-          Utils.stripSpecialChars(Utils.strip(e as string)) : e)
-      })
-    }
-    return arr.sort((a, b): number => b.value - a.value)
-  } else {
-    const key = arg
-    const arr: { obj: T, value: number }[] = []
-    for (const e of possibleMatches) {
-      arr.push({
-        obj: e as any, value: dsc.twoStrings(searchString, stripSpecialChars === true ?
-          Utils.stripSpecialChars(Utils.strip((e as any)[key])) : (e as any)[key])
-      })
-    }
-    return arr.sort((a, b): number => b.value - a.value)
-  }
-}
-
 /** 
  * Replaces #{variableName} in string with given variables.
  * @param str String to replace #{variableName} in
@@ -611,4 +586,28 @@ function strVar(str: string, vars: { [name: string]: any }): string {
     }
   }
   return str
+}
+
+/**
+ * Searches for a given string in a given array of values
+ * @param needle What string to search for
+ * @param haystack Array where to search
+ * @returns Indices that match the search
+ */
+function matchString(needle: string, haystack: string[]): number[] {
+  if (haystack.length === 0) { return [] }
+  haystack = uFuzzy.latinize(haystack)
+  const arr = []
+  const idxs = uf.filter(haystack, needle)
+  if (idxs != null && idxs.length > 0) {
+    const infoThresh = 1e4
+    if (idxs.length <= infoThresh) {
+      const info = uf.info(idxs, haystack, needle)
+      const order = uf.sort(info, haystack, needle)
+      for (let i = 0; i < order.length; i++) {
+        arr.push(info.idx[order[i]])
+      }
+    }
+  }
+  return arr
 }

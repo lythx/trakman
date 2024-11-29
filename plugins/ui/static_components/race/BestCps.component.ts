@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent, StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, centeredText, rightAlignedText, leftAlignedText, Paginator, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
 import config from './BestCps.config.js'
 
 export default class BestCps extends StaticComponent {
@@ -25,8 +25,7 @@ export default class BestCps extends StaticComponent {
     this.headerHeight = this.header.options.height
     this.contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
     this.cpAmount = tm.maps.current.checkpointsAmount - 1
-    this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
-      new Array(config.entries).fill(1), { margin: config.margin })
+    this.grid = this.getGrid()
     this.paginator = new Paginator(this.id, 0, 0, 0)
     this.renderOnEvent('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
       if (this.bestCps[info.index] === undefined ||
@@ -45,8 +44,7 @@ export default class BestCps extends StaticComponent {
       this.cpAmount = tm.maps.current.checkpointsAmount - 1
       this.paginator.setPageCount(1)
       this.paginator.resetPlayerPages()
-      this.grid = new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
-        new Array(config.entries).fill(1), { margin: config.margin })
+      this.grid = this.getGrid()
       this.bestCps.length = 0
       return this.display()
     })
@@ -64,6 +62,19 @@ export default class BestCps extends StaticComponent {
         tm.sendManialink(obj.xml, login)
       }
     }
+    this.onPanelHide((player) => {
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
+  }
+
+  getGrid(): Grid {
+    if (config.horizontal) {
+      const rows = Math.min(config.horizontalMaxRows, Math.ceil(tm.maps.current.checkpointsAmount / config.entries))
+      return new Grid(config.horizontalModeWidth, config.entryHeight * rows, new Array(config.entries).fill(config.columnProportions).flat(),
+        new Array(rows).fill(1), { margin: config.margin })
+    }
+    return new Grid(config.width + config.margin * 2, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), { margin: config.margin })
   }
 
   getHeight(): number {
@@ -82,9 +93,23 @@ export default class BestCps extends StaticComponent {
 
   displayToPlayer(login: string, params?: { page?: number }) {
     if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
+    }
     if (this.reduxModeEnabled) { params = { page: 1 } }
     const page: number = params?.page === undefined ? this.paginator.getPageByLogin(login) : params.page
     const pageCount: number = this.paginator.pageCount
+    if (config.horizontal) {
+      return {
+        xml: `
+      <manialink id="${this.id}">
+      <frame posn="${config.posX} ${config.posY + config.margin} 1">
+        <format textsize="1"/>
+        ${this.constructText(login, 1)}
+      </frame>
+      </manialink>`, login
+      }
+    }
     return {
       xml: `
     <manialink id="${this.id}">
@@ -148,22 +173,29 @@ export default class BestCps extends StaticComponent {
     const cpIndex: number = config.entries * (page - 1)
 
     const indexCell = (i: number, j: number, w: number, h: number): string => {
+      const index = config.horizontal ? i * config.entries + j / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-      return this.bestCps[i + cpIndex] === undefined ? '' : bg + (centeredText((i + 1 + cpIndex).toString(), w, h, { textScale: config.textScale, padding: config.textPadding }))
+      return this.bestCps[index] === undefined ? '' : bg + (centeredText((index + 1).toString(), w, h, { textScale: config.textScale, padding: config.textPadding }))
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
+      const index = config.horizontal ? i * config.entries + (j - 1) / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      const cp = this.bestCps[i + cpIndex]
+      const cp = this.bestCps[index]
       if (cp === undefined) { return '' }
       let format: string = cp.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
-      if (i + cpIndex === this.newestCp) { format = `<format textcolor="${config.newestColour}"/>` }
+      if (index === this.newestCp) { format = `<format textcolor="${config.newestColour}"/>` }
       return bg + format + centeredText(tm.utils.getTimeString(cp.time), w, h, { textScale: config.textScale, padding: config.textPadding })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
+      const index = config.horizontal ? i * config.entries + (j - 2) / 3 : i + cpIndex
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestCps[i + cpIndex] === undefined ? '' : bg + (this.bestCps[i + cpIndex] === undefined ? '' : leftAlignedText(tm.utils.strip(this.bestCps[i + cpIndex].nickname, false), w, h, { textScale: config.textScale, padding: config.textPadding }))
+      return this.bestCps[index] === undefined ? '' :
+        bg + (this.bestCps[index] === undefined ? '' :
+          leftAlignedText(tm.utils.safeString(tm.utils.strip(
+            this.bestCps[index].nickname, false)), w, h,
+            { textScale: config.textScale, padding: config.textPadding }))
     }
 
     const cpsToDisplay: number = this.cpAmount - cpIndex

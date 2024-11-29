@@ -14,7 +14,7 @@ const createQueries = [`CREATE TABLE IF NOT EXISTS best_checkpoint_records(
     FOREIGN KEY(map_id)
       REFERENCES map_ids(id)
 );`,
-  `CREATE TABLE IF NOT EXISTS checkpoint_records(
+`CREATE TABLE IF NOT EXISTS checkpoint_records(
   map_id INT4 NOT NULL,
   player_id INT4 NOT NULL,
   checkpoints INT4[] NOT NULL,

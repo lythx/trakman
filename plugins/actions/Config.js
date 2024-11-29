@@ -130,10 +130,15 @@ export default {
   },
   removeMap: {
     text: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed map ${p.highlight}#{map} ${p.admin}from the server.`,
-    removeThis:`${p.admin}#{title} ${p.highlight}#{nickname}${p    .admin} has removed the ongoing map ${p.highlight}#{map} ${p.admin}from the server.`,
+    removeThis: `${p.admin}#{title} ${p.highlight}#{nickname}${p.admin} has removed the ongoing map ${p.highlight}#{map} ${p.admin}from the server.`,
     alreadyRemoved: `${p.error}This map is already getting removed.`,
     error: `${p.error}Error while removing the map.`,
     onlyMap: `${p.error}There are no more maps in the server playlist.`,
+    public: true,
+  },
+  requeueMap: {
+    text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has requeued the ongoing map.`,
+    error: `${p.error}This map has already been requeued.`,
     public: true,
   }
 }
