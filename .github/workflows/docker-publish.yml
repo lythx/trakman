@@ -9,11 +9,9 @@ on:
   schedule:
     - cron: '19 22 1 * *'
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main-bun" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main", "dev" ]
 
 env:
   # github.repository as <account>/<repo>

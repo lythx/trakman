@@ -1,9 +1,8 @@
 # Creates a runnable environment with a dedicated server and trakman
-FROM node:lts-alpine
+FROM oven/bun:alpine
 # create directory, install xml editing tool and setup non-root user
 RUN adduser -h /app/server -s /bin/sh -D -u 1001 server && \
-    apk add xmlstarlet su-exec && \
-    npm i -g npm@10.9.1
+    apk add xmlstarlet su-exec
 USER server
 WORKDIR /app/server
 # copy useful trakman files and entrypoint command
@@ -20,8 +19,7 @@ RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-0
     Readme_Dedicated.html RemoteControlExamples TrackmaniaServer.exe manialink_dedicatedserver.txt
 # get trakman dependencies and build
 WORKDIR /app/server/trakmanbk
-RUN npm i && \
-    npm run build
+RUN bun i
 WORKDIR /app/server
 # backup important files to prevent them being deleted by mounting the volume
 RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
