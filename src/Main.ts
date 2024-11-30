@@ -89,11 +89,14 @@ setInterval(async () => {
   if (status instanceof Error) {
     failedHealthChecks++
     Logger.warn('Server did not respond to healthcheck')
+  } else {
+    Logger.debug('Connection to the dedicated server exists')
+    failedHealthChecks = 0
+    return
   }
   // Surely checking two times is enough
   if (failedHealthChecks > 1) {
     // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
     await Logger.fatal(`Healthcheck failed - no connection to the server. Game state was: ${GameService.state}`)
   }
-  Logger.debug('Connection to the dedicated server exists.')
 }, config.healthcheckInterval)
