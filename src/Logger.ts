@@ -46,14 +46,14 @@ export abstract class Logger {
       level: 3, colour: this.consoleColours.green,
       files: [`${this.logDir}/info.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.green
     },
+    trace: {
+      level: 4, colour: this.consoleColours.magenta,
+      files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.magenta
+    },
     debug: {
-      level: 4, colour: this.consoleColours.cyan,
+      level: 5, colour: this.consoleColours.cyan,
       files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.cyan
     },
-    trace: {
-      level: 5, colour: this.consoleColours.magenta,
-      files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.magenta
-    }
   }
   private static readonly users: string[] = process.env.DISCORD_TAGGED_USERS?.split(',') ?? []
   private static readonly thumbs: string[] = process.env.DISCORD_EMBED_IMAGES?.split(',') ?? []
