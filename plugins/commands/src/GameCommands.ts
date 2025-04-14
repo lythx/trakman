@@ -43,7 +43,8 @@ const commands: tm.Command[] = [
           time: tm.utils.getVerboseTime(time)
         }),
         config.settimelimit.public ? undefined : info.login)
-      tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
+      tm.timer.setTimeLimit(time)
+      //tm.client.callNoRes(`SetTimeAttackLimit`, [{ int: time }])
     },
     privilege: config.settimelimit.privilege
   },
