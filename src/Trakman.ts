@@ -447,6 +447,8 @@ namespace trakman {
 
     setTime: GameService.setTime.bind(GameService),
 
+    setTimeLimit: GameService.setTimeLimit.bind(GameService),
+
     addTime: GameService.addTime.bind(GameService),
 
     subtractTime: GameService.subtractTime.bind(GameService),
