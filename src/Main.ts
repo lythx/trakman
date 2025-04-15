@@ -14,6 +14,8 @@ import { VoteService } from './services/VoteService.js'
 import { RoundsService } from './services/RoundsService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
+import * as readline from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
 import config from '../config/Config.js'
 import './Trakman.js'
 
@@ -76,7 +78,9 @@ await Events.initialize()
 Logger.trace('Controller events enabled')
 Logger.info('Controller started successfully')
 
+let running = true
 process.on('SIGINT', () => {
+  running = false
   Logger.warn('Controller terminated, exiting...')
   process.exit(0)
 })
@@ -100,3 +104,13 @@ setInterval(async () => {
     await Logger.fatal(`Healthcheck failed - no connection to the server. Game state was: ${GameService.state}`)
   }
 }, config.healthcheckInterval)
+
+Logger.info('Press Enter to execute a command as the server (include slashes)')
+const rl = readline.createInterface({ input, output })
+while (running) {
+  await rl.question("")
+  Logger.disableConsole()
+  const command = await rl.question("Run command as server: ")
+  Logger.enableConsole()
+  ChatService.serverCommand(command)
+}
