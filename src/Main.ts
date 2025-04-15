@@ -109,7 +109,7 @@ Logger.info('Press Enter to execute a command as the server (include slashes)')
 const rl = readline.createInterface({ input, output })
 while (running) {
   await rl.question("")
-  Logger.consoleOn = false
+  Logger.disableConsole()
   const command = await rl.question("Run command as server: ")
   Logger.enableConsole()
   void ChatService.serverCommand(command)

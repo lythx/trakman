@@ -72,10 +72,14 @@ export abstract class ChatService {
   }
 
   public static async serverCommand(text: string) {
+    let command = text.trim()
+    if (command[0] !== '/') {
+      command = '//sm ' + text
+    }
     const mi: tm.MessageInfo = {
       login: ServerConfig.config.login,
       nickname: ServerConfig.config.name,
-      text: text,
+      text: command,
       date: new Date(),
       id: 0,
       country: "",

@@ -66,8 +66,7 @@ export abstract class Logger {
   private static isFirstLog: boolean = true
   private static consoleQueue: string[] = []
   private static consoleDisabled: boolean = process.env.CONSOLE_LOG_DISABLED === 'YES'
-
-  public static consoleOn: boolean = !this.consoleDisabled
+  private static consoleOn: boolean = !this.consoleDisabled
 
   static async initialize(): Promise<void> {
     const envLogLevel = Number(process.env.LOG_LEVEL)
@@ -180,6 +179,32 @@ export abstract class Logger {
     void this.writeLog('trace', location, date, lines)
   }
 
+  static consoleLog(message: string, force: boolean) {
+    if (message !== '') {
+      this.consoleQueue.push(message)
+    }
+    if (this.consoleQueue.length > 1000) {
+      this.warn("Command input mode has been on for too long, re-enabling console logging")
+    }
+    if (force || this.consoleOn || this.consoleQueue.length > 1000) {
+      this.consoleOn = true
+      for (const m of this.consoleQueue) {
+        console.log(m)
+      }
+      this.consoleQueue = []
+    }
+  }
+
+  static disableConsole() {
+    this.consoleOn = false
+  }
+
+  static enableConsole() {
+    if (!this.consoleDisabled) {
+      this.consoleLog('', true)
+    }
+  }
+
   private static async writeLog(tag: Tag, location: string, date: string, lines: any[], force = false): Promise<void> {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr: string = this.getLogfileString(tag, lines, location, date)
@@ -222,28 +247,6 @@ export abstract class Logger {
       })
       await this.sendDiscordMessage(message)
       this.isFirstLog = false
-    }
-  }
-
-  private static consoleLog(message: string, force: boolean) {
-    if (message !== '') {
-      this.consoleQueue.push(message)
-    }
-    if (this.consoleQueue.length > 1000) {
-      this.warn("Command input mode has been on for too long, re-enabling console logging")
-    }
-    if (force || this.consoleOn || this.consoleQueue.length > 1000) {
-      this.consoleOn = true
-      for (const m of this.consoleQueue) {
-        console.log(m)
-      }
-      this.consoleQueue = []
-    }
-  }
-
-  public static enableConsole() {
-    if (!this.consoleDisabled) {
-      this.consoleLog('', true)
     }
   }
 

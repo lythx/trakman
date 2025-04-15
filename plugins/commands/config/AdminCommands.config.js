@@ -93,5 +93,12 @@ export default {
     privilege: 3,
     aliases: ['recalculateranks', 'updateranks', 'recrank'],
     help: `Force re-calculate every rank on the server.`
+  },
+  servermessage: {
+    aliases: ['sm', 'servermessage', 'servermsg'],
+    message: `$g[#{server}$z$s$g] #{message}`,
+    help: `Send a message from the server.`,
+    privilege: 2,
+    public: true
   }
 }
