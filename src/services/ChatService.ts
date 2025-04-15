@@ -8,7 +8,7 @@ import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
-import { ServerConfig } from '../ServerConfig'
+import { ServerConfig } from '../ServerConfig.js'
 
 type MessageFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
 type ModifyTextFunction = (info: tm.MessageInfo) => Promise<string | Error | undefined> | (string | Error | undefined)
