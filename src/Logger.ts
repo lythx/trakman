@@ -110,7 +110,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs a fatal error message into the console and exits the process
+   * Adds a fatal error message into the log and exits the process
    * @param lines Message lines
    */
   static async fatal(...lines: any[]): Promise<void> {
@@ -125,7 +125,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs an error message into the console
+   * Adds an error message into the log
    * @param lines Message lines
    */
   static error(...lines: any[]): void {
@@ -136,7 +136,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs a warn message into the console
+   * Adds a warn message into the log
    * @param lines Message lines
    */
   static warn(...lines: any[]): void {
@@ -147,7 +147,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs an info message into the console
+   * Adds an info message into the log
    * @param lines Message lines
    */
   static info(...lines: any[]): void {
@@ -158,7 +158,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs a debug message into the console
+   * Adds a debug message into the log
    * @param lines Message lines
    */
   static debug(...lines: any[]): void {
@@ -169,7 +169,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs a trace message into the console
+   * Adds a trace message into the log
    * @param lines Message lines
    */
   static trace(...lines: any[]): void {
@@ -179,6 +179,11 @@ export abstract class Logger {
     void this.writeLog('trace', location, date, lines)
   }
 
+  /**
+   * Try to print a message to the console
+   * @param message
+   * @param force
+   */
   static consoleLog(message: string, force: boolean) {
     if (message !== '') {
       this.consoleQueue.push(message)

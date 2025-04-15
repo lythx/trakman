@@ -71,7 +71,11 @@ export abstract class ChatService {
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
   }
 
-  public static async serverCommand(text: string) {
+  /**
+   * Runs a command from the console as server
+   * @param text command string
+   */
+  public static serverCommand(text: string) {
     let command = text.trim()
     if (command[0] !== '/') {
       command = '//sm ' + text

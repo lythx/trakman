@@ -112,5 +112,5 @@ while (running) {
   Logger.disableConsole()
   const command = await rl.question("Run command as server: ")
   Logger.enableConsole()
-  void ChatService.serverCommand(command)
+  ChatService.serverCommand(command)
 }
