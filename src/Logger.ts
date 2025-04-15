@@ -64,6 +64,10 @@ export abstract class Logger {
   private static readonly useDiscord: boolean = process.env.DISCORD_LOG_ENABLED === 'YES'
   private static discordLogLevel: number = 2
   private static isFirstLog: boolean = true
+  private static consoleQueue: string[] = []
+  private static consoleDisabled: boolean = process.env.CONSOLE_LOG_DISABLED === 'YES'
+
+  public static consoleOn: boolean = !this.consoleDisabled
 
   static async initialize(): Promise<void> {
     const envLogLevel = Number(process.env.LOG_LEVEL)
@@ -107,7 +111,7 @@ export abstract class Logger {
   }
 
   /**
-   * Outputs an fatal error message into the console and exits the process
+   * Outputs a fatal error message into the console and exits the process
    * @param lines Message lines
    */
   static async fatal(...lines: any[]): Promise<void> {
@@ -115,10 +119,9 @@ export abstract class Logger {
     this.crashed = true
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'fatal'
     // In case discord message hangs the process it exits after 10 seconds anyway
     setTimeout(() => process.exit(1), 10000)
-    await this.writeLog(tag, location, date, lines)
+    await this.writeLog('fatal', location, date, lines, true)
     process.exit(1)
   }
 
@@ -130,8 +133,7 @@ export abstract class Logger {
     if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'error'
-    void this.writeLog(tag, location, date, lines)
+    void this.writeLog('error', location, date, lines)
   }
 
   /**
@@ -142,8 +144,7 @@ export abstract class Logger {
     if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'warn'
-    void this.writeLog(tag, location, date, lines)
+    void this.writeLog('warn', location, date, lines)
   }
 
   /**
@@ -154,8 +155,7 @@ export abstract class Logger {
     if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'info'
-    void this.writeLog(tag, location, date, lines)
+    void this.writeLog('info', location, date, lines)
   }
 
   /**
@@ -166,8 +166,7 @@ export abstract class Logger {
     if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'debug'
-    void this.writeLog(tag, location, date, lines)
+    void this.writeLog('debug', location, date, lines)
   }
 
   /**
@@ -178,14 +177,15 @@ export abstract class Logger {
     if (this.crashed) { return }
     const date: string = new Date().toUTCString()
     const location: string = this.getLocation()
-    const tag: Tag = 'trace'
-    void this.writeLog(tag, location, date, lines)
+    void this.writeLog('trace', location, date, lines)
   }
 
-  private static async writeLog(tag: Tag, location: string, date: string, lines: any[]): Promise<void> {
+  private static async writeLog(tag: Tag, location: string, date: string, lines: any[], force = false): Promise<void> {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
     const logStr: string = this.getLogfileString(tag, lines, location, date)
-    console.log(this.getConsoleString(tag, lines, location, date))
+    if (!this.consoleDisabled) {
+      this.consoleLog(this.getConsoleString(tag, lines, location, date), force)
+    }
     for (const file of this.logTypes[tag].files) {
       await fs.appendFile(file, logStr)
     }
@@ -222,6 +222,28 @@ export abstract class Logger {
       })
       await this.sendDiscordMessage(message)
       this.isFirstLog = false
+    }
+  }
+
+  private static consoleLog(message: string, force: boolean) {
+    if (message !== '') {
+      this.consoleQueue.push(message)
+    }
+    if (this.consoleQueue.length > 1000) {
+      this.warn("Command input mode has been on for too long, re-enabling console logging")
+    }
+    if (force || this.consoleOn || this.consoleQueue.length > 1000) {
+      this.consoleOn = true
+      for (const m of this.consoleQueue) {
+        console.log(m)
+      }
+      this.consoleQueue = []
+    }
+  }
+
+  public static enableConsole() {
+    if (!this.consoleDisabled) {
+      this.consoleLog('', true)
     }
   }
 
