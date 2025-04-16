@@ -330,7 +330,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
     if (tm.jukebox.juked.some(a => a.map.id === mapId)) {
       tm.jukebox.remove(mapId, { login, nickname })
       tm.sendMessage(tm.utils.strVar(config.messages.remove,
-        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(map.name, true) }), config.public ? undefined : login)
+        { player: tm.utils.strip(nickname, true), map: tm.utils.strip(tm.utils.decodeURI(map.name), true) }), config.public ? undefined : login)
     }
     else {
       if ((privilege < config.multijukePrivilege && tm.jukebox.juked.some(a => a.callerLogin === login))
