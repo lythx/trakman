@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@leeoniya/ufuzzy": "^1.0.17",
+    "@leeoniya/ufuzzy": "^1.0.18",
     "dotenv": "^16.0.0",
     "node-fetch": "^3.2.4",
     "pg": "^8.7.3",
