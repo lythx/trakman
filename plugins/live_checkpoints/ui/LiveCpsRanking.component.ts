@@ -22,12 +22,12 @@ export default class LiveCpsRanking extends StaticComponent {
     this.header = new StaticHeader('race')
     this.getRecordList()
     for (const player of tm.players.list) {
-      if (player.isSpectator) { return }
+      if (player.isSpectator) { continue }
       this.initPlayer(player)
     }
     tm.addListener('BeginMap', () => {
       for (const player of tm.players.list) {
-        if (player.isSpectator) { return }
+        if (player.isSpectator) { continue }
         this.initPlayer(player)
       }
     })
@@ -35,15 +35,17 @@ export default class LiveCpsRanking extends StaticComponent {
       this.playerData.clear()
     })
     this.renderOnEvent('PlayerInfoChanged', (info: tm.InfoChangedInfo) => {
-      if (info.isSpectator && this.playerData.get(info.login) !== undefined) {
-        this.playerData.delete(info.login)
+      const player = tm.players.get(info.login)
+      if (player?.isSpectator && this.playerData.get(player.login) !== undefined) {
+        this.playerData.delete(player.login)
       } else {
         this.initPlayer(info)
       }
       return this.display()
     })
     this.renderOnEvent('PlayerJoin', (info: tm.JoinInfo) => {
-      if (info.isSpectator) { return }
+      const player = tm.players.get(info.login)
+      if (player?.isSpectator) { return }
       this.initPlayer(info)
       return this.display()
     })
