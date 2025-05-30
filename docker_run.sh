@@ -1,6 +1,6 @@
 #!/bin/sh
 # Do **NOT** run this script locally,
-# it is meant to only be used in the provided docker environment.
+# it is meant to only be used in the provided Docker environment.
 
 # create and copy dedicated config
 if find /app/server/GameData/Config -mindepth 1 -maxdepth 1 | read; then
@@ -8,7 +8,7 @@ if find /app/server/GameData/Config -mindepth 1 -maxdepth 1 | read; then
   rm dedicated_cfg.txt.bk
 else
   echo 'Setting up server...'
-  # cool and ugly xml replacement
+  # ugly xml replacement
   xml ed -L -u "/dedicated/authorization_levels/level[name='SuperAdmin']/password" -v "$SUPER_ADMIN_PASSWORD" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/authorization_levels/level[name='SuperAdmin']/name" -v "$SUPER_ADMIN_NAME" dedicated_cfg.txt.bk
   ADMIN_PASS=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${1:-32}";echo;)
@@ -32,19 +32,22 @@ else
   echo 'Setting up tracks...'
   mv /app/server/Tracksbk/* /app/server/GameData/Tracks/
 fi
-# copy over trakman directory
+# update and copy over Trakman directory
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
   echo 'Trakman exists. Attempting update...'
   cd trakman || exit
   node Update.js /app/server/trakmanbk/.hashes.json
   if [ $? -gt 0 ]; then
+    echo 'Update not fully successful, please stop the container.'
+    sleep 1m # wait a minute for user to read the message, or to realise something's wrong
     exit
   fi
   cd ..
   rm -r trakmanbk
 else
-  echo 'Setting up trakman...'
+  echo 'Setting up Trakman...'
   mv /app/server/trakmanbk/* /app/server/trakman/
+  mv /app/server/trakmanbk/.hashes.json /app/server/trakman/
 fi
 # ugly creating of files to be able to chmod and remove them later
 mkdir -p trakman/logs

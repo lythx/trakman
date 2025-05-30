@@ -25,6 +25,10 @@ try {
   const fromPath = path.dirname(process.argv[2])
   try {
     const oldHashes = new Map(Object.entries(JSON.parse(await fs.readFile('.hashes.json', { encoding: 'utf-8' }))))
+    if (oldHashes.has('__generated__') && oldHashes.get('__generated__') > newHashes.get('__generated__')) {
+      console.log('Local version newer than update, skipping...')
+      process.exit()
+    }
     await doUpdate(fromPath, newHashes, oldHashes)
   } catch(e) {
     console.log('.hashes.json file does not exist.')
@@ -66,6 +70,7 @@ async function generateHashes() {
   for (const name of ['Plugins.ts', 'package.json', 'tsconfig.json', 'CHANGELOG.md', 'Update.js']) {
     res.set(name, await hashFile(name))
   }
+  res.set('__generated__', Date.now())
   console.log('Hashes generated.')
   return res
 }
@@ -76,6 +81,9 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
   let errorOccurred = false
   let updatePerformed = false
   for (const file of newHashes.keys()) {
+    if (file === '__generated__') {
+      continue
+    }
     const newHash = newHashes.get(file)
     const fullFromPath = path.join(fromPath, file)
     try {
@@ -126,8 +134,18 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     console.log('!!! Update conflicts, make sure to fix them by comparing your files to files ending in .new !!!')
     console.log('If you do not fix these conflicts, the controller might fail to start or crash.')
     console.log('Affected files: ')
-    conflicts.forEach(name => console.log(name))
+    let log = 'Update did not succeed because of conflicts. Please merge the following files manually:'
+    conflicts.forEach(name => {
+      console.log(name)
+      log += '\n' + name
+    })
     console.log('_____________________________________')
+    try {
+      await fs.writeFile('update.log', log, { encoding: 'utf-8' })
+    } catch(e) {
+      console.log('Failed to write update log.')
+      console.log(e)
+    }
     process.exit(2)
   }
   if (updatePerformed) {

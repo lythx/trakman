@@ -38,4 +38,4 @@ VOLUME /app/server/trakman
 VOLUME /app/server/.pm2/logs
 # set user back to root to be able to chown volumes in the run script
 USER root
-CMD ["/app/server/docker_run.sh"]
+ENTRYPOINT ["/app/server/docker_run.sh"]
