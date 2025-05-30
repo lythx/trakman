@@ -74,29 +74,32 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
   const currHashes = await generateHashes()
   const conflicts = []
   let errorOccurred = false
+  let updatePerformed = false
   for (const file of newHashes.keys()) {
     const newHash = newHashes.get(file)
     const fullFromPath = path.join(fromPath, file)
     try {
       // NICE NOT AT ALL CONFUSING IF STATEMENTS!!!
-      if (currHashes.has(file) && currHashes.get(file) !== newHash) {
+      if (currHashes.has(file) && currHashes.get(file) !== newHash && currHashes.get(file) !== '') {
         if (oldHashes !== null && oldHashes.has(file)) {
           if (oldHashes.get(file) === newHash) {
             // no update since only the user's file is different (X Y X)
             continue
           } else if (oldHashes.get(file) === currHashes.get(file)) {
             // normal update since user didn't alter the file (X X Y)
+            updatePerformed = true
             await fs.copyFile(fullFromPath, file)
             continue
           }
         }
         // copy the new file with the .new extension since the user modified the file, and it might have been updated (X Y Z)
         conflicts.push(file)
+        updatePerformed = true
         await fs.copyFile(fullFromPath, file + '.new')
-      } else if (!currHashes.has(file)) {
+      } else if (!currHashes.has(file) || currHashes.get(file) === '') {
         // the file exists in the new version and not in the old
         // make sure the directory exists
-        console.log(path.dirname(file))
+        updatePerformed = true
         await fs.mkdir(path.dirname(file), { recursive: true })
         await fs.copyFile(fullFromPath, file)
       }
@@ -110,7 +113,7 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
   // copy new hashes so you only have to update once
   try {
     await fs.copyFile(process.argv[2], '.hashes.json')
-  } catch (e) {
+  } catch(e) {
     console.log('Failed to copy new hashes.')
     console.log(e)
     process.exit(1)
@@ -127,6 +130,10 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     console.log('_____________________________________')
     process.exit(2)
   }
-  console.log('Update successful.')
+  if (updatePerformed) {
+    console.log('Update successful.')
+  } else {
+    console.log('Update not necessary.')
+  }
   process.exit()
 }
