@@ -66,12 +66,8 @@ export class PayReplay extends UiButton {
         amount: cost,
         action
       }))
-      if (!tm.timer.isDynamic) {
-        tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
-      }
       this.costIndex++
       this.replayOrExtendTime()
-      this.emitReplay()
     }
   }
 
