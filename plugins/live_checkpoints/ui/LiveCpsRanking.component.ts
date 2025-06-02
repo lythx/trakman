@@ -36,8 +36,10 @@ export default class LiveCpsRanking extends StaticComponent {
     })
     this.renderOnEvent('PlayerInfoChanged', (info: tm.InfoChangedInfo) => {
       const player = tm.players.get(info.login)
-      if (player?.isSpectator && this.playerData.get(player.login) !== undefined) {
-        this.playerData.delete(player.login)
+      if (player?.isSpectator) {
+        if (this.playerData.get(player.login) !== undefined) {
+          this.playerData.delete(player.login)
+        }
       } else {
         this.initPlayer(info)
       }
@@ -117,6 +119,7 @@ export default class LiveCpsRanking extends StaticComponent {
         }
         return a.time - b.time // otherwise just use the time
       })
+      .slice(0, this.getEntries())
     // infinity is used for finished runs, recordlist will display "F" as the index in this case
     // otherwise, the actual cp index is used instead of the default 1, 2, 3..
     const indices = sorted.map(a => a.finished ? Infinity : a.currentCp >= 0 ? a.currentCp : -1)
