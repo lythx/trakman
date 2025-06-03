@@ -343,6 +343,8 @@ export class Listeners {
           isTemporarySpectator: spec?.[spec.length - 2] === '1',
           isPureSpectator: spec?.[spec.length - 3] === '1',
           autoTarget: spec?.[spec.length - 4] === '1',
+          // this is 255 when the player is spectating nobody OR when the player was spectating nobody
+          // and just changed back into race mode because this callback gets fired twice when that happens :D
           currentTargetId: Number(spec?.substring(0, spec.length - 4)) || 0,
           forceSpectator: Number(flags?.[flags.length - 1]) || 0,
           isReferee: flags?.[flags.length - 2] === '1',

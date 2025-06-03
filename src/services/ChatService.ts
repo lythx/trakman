@@ -97,6 +97,7 @@ export abstract class ChatService {
       isUnited: ServerConfig.config.isUnited,
       ladderPoints: 0,
       ladderRank: 0,
+      spectators: new Set<string>(),
       title: "Server",
       wins: 0,
       privilege: 4,
