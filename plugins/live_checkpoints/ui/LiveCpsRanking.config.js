@@ -9,7 +9,7 @@ export default {
   icon: icons.bestClock,
   margin: cfg.margin,
   topCount: 1,
-  displayNoRecordEntry: true,
+  displayNoRecordEntry: false,
   cpsCollectedColour: tm.utils.palette.green,
   hidePanel: true,
   maxRecordsAmount: 3000 // If more records than this get driven in one round the click listener will break
