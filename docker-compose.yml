@@ -1,6 +1,6 @@
 services:
   trakman:
-    image: borecek/trakman:main
+    image: borecek/trakman:dev-bun
     container_name: trakman-server
     restart: unless-stopped
     volumes:

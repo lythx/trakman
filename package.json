@@ -5,7 +5,7 @@
   "license": "MIT",
   "homepage": "http://github.com/lythx/trakman",
   "dependencies": {
-    "@leeoniya/ufuzzy": "^1.0.18",
+    "@leeoniya/ufuzzy": "^1.0.19",
     "dotenv": "^16.5.0",
     "node-fetch": "^3.3.2",
     "pg": "^8.16.0",
@@ -29,10 +29,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node ./built/src/Main.js",
-    "daemon": "pm2 start ./built/src/Main.js --attach --name Trakman",
-    "restart": "pm2 restart ./built/src/Main.js",
-    "stop": "pm2 delete ./built/src/Main.js"
+    "start": "bun ./built/src/Main.js",
+    "daemon": "pm2 start --interpreter none 'bun run ./src/Main.ts' --attach --name Trakman",
+    "restart": "pm2 restart Trakman",
+    "stop": "pm2 delete Trakman"
   },
   "type": "module"
 }

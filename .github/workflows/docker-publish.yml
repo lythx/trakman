@@ -7,7 +7,7 @@ name: Docker
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["dev-bun"]
     tags: [ 'v*.*.*' ]
 
 env:
