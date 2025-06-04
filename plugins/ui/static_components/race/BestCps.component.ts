@@ -103,7 +103,7 @@ export default class BestCps extends StaticComponent {
       return {
         xml: `
       <manialink id="${this.id}">
-      <frame posn="${config.posX} ${config.posY + config.margin} 1">
+      <frame posn="${config.horizontalModePosX} ${config.posY + config.margin} 1">
         <format textsize="1"/>
         ${this.constructText(login, 1)}
       </frame>

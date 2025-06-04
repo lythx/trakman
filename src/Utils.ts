@@ -7,9 +7,7 @@ import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
 import { Logger } from './Logger.js'
-//import uFuzzy from '@leeoniya/ufuzzy'
-// @ts-ignore
-import uFuzzy from '@leeoniya/ufuzzy/dist/uFuzzy.esm.js' // TODO: don't do this
+import uFuzzy from '@leeoniya/ufuzzy'
 
 const uf = new uFuzzy(config.searchOptions)
 

@@ -86,7 +86,7 @@ export class ServerConfig {
       id: loginInfo.PlayerId, // Always 0
       zone: loginInfo.Path.substring(6), // Remove "World"
       ipAddress: loginInfo.IPAddress.split(':')[0], // Throw port away
-      isUnited: loginInfo.OnlineRights === 3 ? true : false,
+      isUnited: loginInfo.OnlineRights === 3,
       // Stuff from GetVersion
       game: version.Name,
       version: version.Version,

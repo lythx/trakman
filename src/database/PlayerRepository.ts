@@ -43,7 +43,8 @@ export class PlayerRepository extends Repository {
     ${this.getInsertValuesString(9, players.length)};`
     const values: any[] = []
     for (const player of players) {
-      values.push(player.login, player.nickname, player.region, player.wins, Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline, player.average)
+      // people have discovered how to increase the name character cap. shucks.
+      values.push(player.login, player.nickname.substring(0, 45), player.region, player.wins, Math.round(player.timePlayed / 1000), player.visits, player.isUnited, player.lastOnline, player.average)
     }
     await this.query(query, ...values)
   }
@@ -55,7 +56,7 @@ export class PlayerRepository extends Repository {
 
   async updateNickname(login: string, nickname: string): Promise<void> {
     const query: string = `UPDATE players SET nickname=$1 WHERE login=$2;`
-    await this.query(query, nickname, login)
+    await this.query(query, nickname.substring(0, 45), login)
   }
 
   async updateRegion(login: string, region: string): Promise<void> {
@@ -70,7 +71,7 @@ export class PlayerRepository extends Repository {
 
   async updateOnJoin(login: string, nickname: string, region: string, visits: number, isUnited: boolean): Promise<void> {
     const query: string = `UPDATE players SET nickname=$1, region=$2, visits=$3, is_united=$4 WHERE login=$5;`
-    await this.query(query, nickname, region, visits, isUnited, login)
+    await this.query(query, nickname.substring(0, 45), region, visits, isUnited, login)
   }
 
   async updateOnLeave(login: string, timePlayed: number, date: Date): Promise<void> {

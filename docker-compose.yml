@@ -44,6 +44,7 @@ services:
       WEBSERVICES_PASSWORD: ""
       # Logging
       LOG_LEVEL: 3
+      CONSOLE_LOG_DISABLED: "NO"
       DISCORD_LOG_ENABLED: "NO"
       DISCORD_LOG_LEVEL: 2
       DISCORD_WEBHOOK_URL: ""

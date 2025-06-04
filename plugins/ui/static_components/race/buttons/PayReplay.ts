@@ -20,15 +20,15 @@ export class PayReplay extends UiButton {
     const plus = tm.timer.isDynamic ? 4 : 0
     this.buttonData = {
       icon: cfg.icon,
-      text1: tm.utils.strVar(cfg.texts[0+plus][0], {
+      text1: tm.utils.strVar(cfg.texts[0 + plus][0], {
         cost: cfg.costs[0]
       }),
-      text2: cfg.texts[0+plus][1],
+      text2: cfg.texts[0 + plus][1],
       iconWidth: cfg.width,
       iconHeight: cfg.height,
       padding: cfg.padding,
       actionId: cfg.actionId + this.parentId,
-      equalTexts: cfg.texts[0+plus].equal
+      equalTexts: cfg.texts[0 + plus].equal
     }
     tm.addListener('ManialinkClick', (info) => {
       if (info.actionId === cfg.actionId + this.parentId) {
@@ -66,10 +66,8 @@ export class PayReplay extends UiButton {
         amount: cost,
         action
       }))
-      tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
       this.costIndex++
       this.replayOrExtendTime()
-      this.emitReplay()
     }
   }
 
@@ -91,21 +89,21 @@ export class PayReplay extends UiButton {
     if (cfg.costs[this.costIndex] !== undefined) {
       this.buttonData = {
         icon: cfg.icon,
-        text1: tm.utils.strVar(cfg.texts[0+plus][0], {
+        text1: tm.utils.strVar(cfg.texts[0 + plus][0], {
           cost: cfg.costs[this.costIndex]
         }),
-        text2: cfg.texts[0+plus][1],
+        text2: cfg.texts[0 + plus][1],
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
-        equalTexts: cfg.texts[0+plus].equal,
+        equalTexts: cfg.texts[0 + plus].equal,
         actionId: cfg.actionId + this.parentId
       }
     } else {
       this.buttonData = {
         icon: cfg.icon,
-        text1: cfg.texts[1+plus][0],
-        text2: cfg.texts[1+plus][1],
+        text1: cfg.texts[1 + plus][0],
+        text2: cfg.texts[1 + plus][1],
         iconWidth: cfg.width,
         iconHeight: cfg.height,
         padding: cfg.padding,
