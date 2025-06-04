@@ -95,7 +95,7 @@ export default {
     alpha: "a-zа-яё"
   },
   /** Current controller version */
-  version: "1.6.0",
+  version: "1.6.1",
   /** Controller repository link */
   repo: "github.com/lythx/trakman",
 }
