@@ -8,6 +8,7 @@ import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
 import messages from '../../config/Messages.js'
 import { prefixes } from '../../config/PrefixesAndPalette.js'
+import { ServerConfig } from '../ServerConfig.js'
 
 type MessageFunction = (info: tm.MessageInfo) => Promise<string | undefined> | (string | undefined)
 type ModifyTextFunction = (info: tm.MessageInfo) => Promise<string | Error | undefined> | (string | Error | undefined)
@@ -68,6 +69,48 @@ export abstract class ChatService {
   static addCommand(...commands: tm.Command[]): void {
     this._commandList.push(...commands)
     this._commandList.sort((a, b): number => a.aliases[0].localeCompare(b.aliases[0]))
+  }
+
+  /**
+   * Runs a command from the console as server
+   * @param text command string
+   */
+  public static serverCommand(text: string) {
+    let command = text.trim()
+    if (command[0] !== '/') {
+      command = '//sm ' + text
+    }
+    const mi: tm.MessageInfo = {
+      login: ServerConfig.config.login,
+      nickname: ServerConfig.config.name,
+      text: command,
+      date: new Date(),
+      id: 0,
+      country: "",
+      countryCode: "",
+      region: ServerConfig.config.zone,
+      timePlayed: 0,
+      joinTimestamp: 0,
+      currentCheckpoints: [],
+      visits: 0,
+      ip: ServerConfig.config.ipAddress,
+      isUnited: ServerConfig.config.isUnited,
+      ladderPoints: 0,
+      ladderRank: 0,
+      spectators: new Set<string>(),
+      title: "Server",
+      wins: 0,
+      privilege: 4,
+      isSpectator: true,
+      isPureSpectator: true,
+      isTemporarySpectator: false,
+      hasPlayerSlot: false,
+      average: 0,
+      roundsPoints: 0,
+      roundTimes: [],
+      isCupFinalist: false
+    }
+    Events.emit('PlayerChat', mi)
   }
 
   private static async commandCallback(command: tm.Command, info: tm.MessageInfo,

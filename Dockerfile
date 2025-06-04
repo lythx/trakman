@@ -10,7 +10,7 @@ WORKDIR /app/server
 COPY --chown=1001:1001 ./config ./trakmanbk/config
 COPY --chown=1001:1001 ./plugins ./trakmanbk/plugins
 COPY --chown=1001:1001 ./src ./trakmanbk/src
-COPY --chown=1001:1001 ./Plugins.ts ./package.json ./tsconfig.json ./CHANGELOG.md ./trakmanbk/
+COPY --chown=1001:1001 ./Plugins.ts ./package.json ./tsconfig.json ./CHANGELOG.md ./Update.js ./trakmanbk/
 COPY --chown=1001:1001 --chmod=0755 ./docker_run.sh ./docker_run.sh
 # download dedicated server and remove unnecessary files
 RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-02-21.zip && \
@@ -18,9 +18,10 @@ RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-0
     unzip serv.zip && \
     rm -r serv.zip CommandLine.html ListCallbacks.html ListMethods.html \
     Readme_Dedicated.html RemoteControlExamples TrackmaniaServer.exe manialink_dedicatedserver.txt
-# get trakman dependencies and build
+# generate file hashes, get trakman dependencies and build
 WORKDIR /app/server/trakmanbk
-RUN npm i && \
+RUN node Update.js && \
+    npm i && \
     npm run build
 WORKDIR /app/server
 # backup important files to prevent them being deleted by mounting the volume
@@ -37,4 +38,4 @@ VOLUME /app/server/trakman
 VOLUME /app/server/.pm2/logs
 # set user back to root to be able to chown volumes in the run script
 USER root
-CMD ["/app/server/docker_run.sh"]
+ENTRYPOINT ["/app/server/docker_run.sh"]

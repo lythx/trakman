@@ -2,7 +2,7 @@ const p = tm.utils.palette
 
 export default {
   // If false plugin cant be activated
-  isEnabled: true,
+  isEnabled: false,
   // This can be changed using an ingame command
   isActive: false,
   betTimeSeconds: 30,

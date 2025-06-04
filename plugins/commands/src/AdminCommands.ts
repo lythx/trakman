@@ -169,6 +169,18 @@ const commands: tm.Command[] = [
       }), config.recalculateranks.public ? undefined : info.login)
     },
     privilege: config.recalculateranks.privilege
+  },
+  {
+    aliases: config.servermessage.aliases,
+    help: config.servermessage.help,
+    params: [{ name: 'text', type: 'multiword', optional: true }],
+    callback: async (info: tm.MessageInfo, text: string = ''): Promise<void> => {
+      tm.sendMessage(tm.utils.strVar(config.servermessage.message, {
+        server: tm.config.server.name, // No strip
+        message: text
+      }), config.servermessage.public ? undefined : info.login, false)
+    },
+    privilege: config.servermessage.privilege
   }
 ]
 

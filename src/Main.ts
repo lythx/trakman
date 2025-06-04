@@ -14,6 +14,8 @@ import { VoteService } from './services/VoteService.js'
 import { RoundsService } from './services/RoundsService.js'
 import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
+import * as readline from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
 import config from '../config/Config.js'
 import './Trakman.js'
 
@@ -76,7 +78,9 @@ await Events.initialize()
 Logger.trace('Controller events enabled')
 Logger.info('Controller started successfully')
 
+let running = true
 process.on('SIGINT', () => {
+  running = false
   Logger.warn('Controller terminated, exiting...')
   process.exit(0)
 })
@@ -89,11 +93,24 @@ setInterval(async () => {
   if (status instanceof Error) {
     failedHealthChecks++
     Logger.warn('Server did not respond to healthcheck')
+  } else {
+    Logger.debug('Connection to the dedicated server exists')
+    failedHealthChecks = 0
+    return
   }
   // Surely checking two times is enough
   if (failedHealthChecks > 1) {
     // We don't need to wait to restart here since the timeout is 10s anyway - plenty of time for serv to start
     await Logger.fatal(`Healthcheck failed - no connection to the server. Game state was: ${GameService.state}`)
   }
-  Logger.debug('Connection to the dedicated server exists.')
 }, config.healthcheckInterval)
+
+Logger.info('Press Enter to execute a command as the server (include slashes)')
+const rl = readline.createInterface({ input, output })
+while (running) {
+  await rl.question("")
+  Logger.disableConsole()
+  const command = await rl.question("Run command as server: ")
+  Logger.enableConsole()
+  ChatService.serverCommand(command)
+}
