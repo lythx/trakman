@@ -62,7 +62,7 @@ if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
       # this runs if trakmanbk doesn't exist so we have nothing to update from
       echo "Update not available."
     else
-      if ! node Update.js /app/server/trakmanbk/.hashes.json
+      if ! bun Update.js /app/server/trakmanbk/.hashes.json
       then
         # this runs if trakmanbk exists and the update script fails
         chown server:server update.log
@@ -105,13 +105,13 @@ echo "#!/bin/sh
   echo 'Restarting...'
 done) &" > run.sh
 if [ "$INSTALL_ON_STARTUP" != "NO" ]; then
-  echo "npm i --prefix /app/server/trakman" >> run.sh
+  echo "bun i --cwd /app/server/trakman" >> run.sh
 fi
-echo "npm run build --prefix /app/server/trakman
+echo "bun check -p /app/server/trakman
 chmod -R a+w /app/server
 cd trakman
-trap 'echo Terminating; npx pm2 stop 0; npx pm2 kill; exit' SIGTERM SIGINT
-npm run daemon
+trap 'echo Terminating; bun pm2 stop 0; bun pm2 kill; exit' SIGTERM SIGINT
+bun run daemon
 wait \$!" >> run.sh
 chown server:server run.sh
 chmod 766 run.sh
