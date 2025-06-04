@@ -36,7 +36,7 @@ fi
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
   echo 'Trakman exists. Attempting update...'
   cd trakman || exit
-  node Update.js /app/server/trakmanbk/.hashes.json
+  bun Update.js /app/server/trakmanbk/.hashes.json
   if [ $? -gt 0 ]; then
     chown server:server update.log
     echo 'Update not fully successful, please stop the container.'
@@ -74,12 +74,13 @@ echo "#!/bin/sh
   echo 'Server exited with code ' $?
   echo 'Restarting...'
 done) &
-npm i --prefix /app/server/trakman
-npm run build --prefix /app/server/trakman
-chmod -R a+w /app/server
 cd trakman
-trap 'echo Terminating; npx pm2 stop 0; npx pm2 kill; exit' SIGTERM SIGINT
-npx pm2 start ./built/src/Main.js --name Trakman
+bun i
+chmod -R a+w /app/server
+sleep 1 # wait for dedicated server to finish loading
+trap 'echo Terminating; bun pm2 stop 0; bun pm2 kill; exit' SIGTERM SIGINT
+bun pm2 ls # idk why but the controller starts not without this
+bun pm2 start --interpreter bun src/Main.ts --name Trakman
 wait $!" > run.sh
 chown server:server run.sh
 chmod 766 run.sh
