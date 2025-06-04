@@ -144,7 +144,7 @@ export default class CpCounter extends StaticComponent {
       }
     }
     return this.displayToPlayer(info.player.login, {
-      index: info.index,
+      index: info.index + 1,
       best: pb, current: info.time, isFinish: false, lap
     })
   }

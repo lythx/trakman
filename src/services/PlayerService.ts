@@ -310,7 +310,6 @@ export class PlayerService {
     player.hasPlayerSlot = info.hasPlayerSlot
     // update spectators
     const spectated: tm.Player | undefined = info.currentTargetId % 255 === 0 ? undefined : this._players.find(a => a.id === info.currentTargetId)
-    Logger.debug(`Player ${player.login} is spectating id ${info.currentTargetId}, which is player ${spectated}`)
     let specChanged = true
     if (spectated === undefined) {
       if (!player.isSpectator && info.currentTargetId % 255 !== 0) {
@@ -320,6 +319,7 @@ export class PlayerService {
       specChanged = false
     } else {
       spectated.spectators.add(player.login)
+      Logger.debug(`Player ${player.login} is now spectating player ${spectated.login}.`)
     }
     if (specChanged) {
       this._players.forEach(a => {
