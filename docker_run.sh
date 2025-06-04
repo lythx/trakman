@@ -36,6 +36,7 @@ fi
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
   echo 'Trakman exists. Attempting update...'
   cd trakman || exit
+  cp ../trakmanbk/Update.js .
   bun Update.js /app/server/trakmanbk/.hashes.json
   if [ $? -gt 0 ]; then
     chown server:server update.log
