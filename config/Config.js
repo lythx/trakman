@@ -81,7 +81,7 @@ export default {
   blacklistFile: "blacklist.txt",
   /** Relative path (/GameData/Config/) to the guestlist file */
   guestlistFile: "guestlist.txt",
-  /** Relative path (/GameData/Tracks/) to the matchsettings file */
+  /** Relative path (/GameData/Tracks/) to the match settings file, ignored if manualMapLoading is enabled */
   matchSettingsFile: "MatchSettings/MatchSettings.txt",
   /** Default message sent as the reason for administrative actions if nothing was specified by the admin */
   defaultReasonMessage: 'No reason specified',
@@ -93,9 +93,5 @@ export default {
   searchOptions: {
     intraMode: 1,
     alpha: "a-zа-яё"
-  },
-  /** Current controller version */
-  version: "1.6.1",
-  /** Controller repository link */
-  repo: "github.com/lythx/trakman",
+  }
 }

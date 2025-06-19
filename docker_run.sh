@@ -5,7 +5,7 @@
 # create and copy dedicated config
 if find /app/server/GameData/Config -mindepth 1 -maxdepth 1 | read; then
   echo 'Server config exists, skipping initial setup.'
-  rm dedicated_cfg.txt.bk
+  rm dedicated_cfg.txt.bk 2>/dev/null
 else
   echo 'Setting up server...'
   # ugly xml replacement
@@ -17,17 +17,30 @@ else
   xml ed -L -u "/dedicated/masterserver_account/password" -v "$SERVER_ACC_PASSWORD" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/masterserver_account/validation_key" -v "$SERVER_ACC_KEY" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/server_options/name" -v "$SERVER_NAME" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/comment" -v "$SERVER_COMMENT" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/hide_server" -v "${SERVER_HIDE_SERVER=0}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/max_players" -v "${SERVER_MAX_PLAYERS=32}" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/server_options/password" -v "$SERVER_PASSWORD" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/max_spectators" -v "${SERVER_MAX_SPECTATORS=32}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/password_spectator" -v "$SERVER_PASSWORD_SPECTATOR" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/ladder_mode" -v "${SERVER_LADDER_MODE=1}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/ladder_serverlimit_min" -v "${SERVER_LADDER_SERVERLIMIT_MIN=0}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/ladder_serverlimit_max" -v "${SERVER_LADDER_SERVERLIMIT_MAX=50000}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/enable_p2p_upload" -v "${SERVER_ENABLE_P2P_UPLOAD=True}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/server_options/enable_p2p_download" -v "${SERVER_ENABLE_P2P_DOWNLOAD=True}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/connection_uploadrate" -v "${SERVER_CONNECTION_UPLOADRATE=512}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/connection_downloadrate" -v "${SERVER_CONNECTION_DOWNLOADRATE=8192}" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/server_port" -v "$SERVER_NET_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/server_p2p_port" -v "$SERVER_P2P_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/xmlrpc_port" -v "$SERVER_PORT" dedicated_cfg.txt.bk
-  xml ed -L -u "/dedicated/system_config/packmask" -v "$SERVER_PACKMASK" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/packmask" -v "${SERVER_PACKMASK=nations}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/disable_coherence_checks" -v "${SERVER_DISABLE_COHERENCE_CHECKS=laps}" dedicated_cfg.txt.bk
   mv /app/server/dedicated_cfg.txt.bk /app/server/GameData/Config/dedicated_cfg.txt
 fi
 # copy over default tracks
 if find /app/server/GameData/Tracks -mindepth 1 -maxdepth 1 | read; then
   echo 'Tracks exist, skipping initial setup.'
-  rm -r Tracksbk
+  rm -r Tracksbk 2>/dev/null
 else
   echo 'Setting up tracks...'
   mv /app/server/Tracksbk/* /app/server/GameData/Tracks/
@@ -35,16 +48,27 @@ fi
 # update and copy over Trakman directory
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
   echo 'Trakman exists. Attempting update...'
-  cd trakman || exit
-  cp ../trakmanbk/Update.js . && bun Update.js /app/server/trakmanbk/.hashes.json || echo "Update not available."
-  if [ $? -gt 0 ]; then
-    chown server:server update.log
-    echo 'Update not fully successful, please stop the container.'
-    sleep 1m # wait a minute for user to read the message, or to realise something's wrong
+  if ! cd trakman 2>/dev/null
+  then
+    echo 'Trakman actually does not exist. This makes no sense. Aborting and trying again.'
     exit
   fi
+  if ! cp ../trakmanbk/Update.js . 2>/dev/null
+  then
+    # this runs if trakmanbk doesn't exist so we have nothing to update from
+    echo "Update not available."
+  else
+    if ! bun Update.js /app/server/trakmanbk/.hashes.json
+    then
+      # this runs if trakmanbk exists and the update script fails
+      chown server:server update.log
+      echo 'Update not fully successful, please stop the container.'
+      sleep 1m # wait a minute for the user to read the message, or to realise something's wrong
+      exit 1
+    fi
+  fi
   cd ..
-  rm -r trakmanbk
+  rm -r trakmanbk 2>/dev/null
 else
   echo 'Setting up Trakman...'
   mv /app/server/trakmanbk/* /app/server/trakman/
@@ -62,6 +86,7 @@ touch trakman/logs/trace.log
 mkdir -p .pm2/logs
 touch .pm2/logs/Trakman-error.log
 touch .pm2/logs/Trakman-out.log
+touch .pm2/logs/docker.log
 mkdir -p trakman/temp
 touch trakman/temp/rank_coherence.txt
 mkdir -p trakman/plugins/server_links/temp
@@ -71,7 +96,7 @@ chown -R server:server /app/server
 echo "#!/bin/sh
 (while true; do
   /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt /nodaemon
-  echo 'Server exited with code ' $?
+  echo [\$(date +'%d %b %Y %T')] Server exited with code \$? | tee -a /app/server/.pm2/logs/docker.log
   echo 'Restarting...'
 done) &
 cd trakman
@@ -81,7 +106,7 @@ sleep 1 # wait for dedicated server to finish loading
 trap 'echo Terminating; bun pm2 stop 0; bun pm2 kill; exit' SIGTERM SIGINT
 bun pm2 ls # idk why but the controller starts not without this
 bun pm2 start --interpreter bun src/Main.ts --name Trakman
-wait $!" > run.sh
+wait \$!" > run.sh
 chown server:server run.sh
 chmod 766 run.sh
 exec su-exec server ./run.sh

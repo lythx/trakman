@@ -212,10 +212,10 @@ export abstract class Logger {
 
   private static async writeLog(tag: Tag, location: string, date: string, lines: any[], force = false): Promise<void> {
     if (lines.length === 0 || this.logTypes[tag].level > this.logLevel) { return }
-    const logStr: string = this.getLogfileString(tag, lines, location, date)
     if (!this.consoleDisabled) {
       this.consoleLog(this.getConsoleString(tag, lines, location, date), force)
     }
+    const logStr: string = this.getLogfileString(tag, lines, location, date)
     for (const file of this.logTypes[tag].files) {
       await fs.appendFile(file, logStr)
     }

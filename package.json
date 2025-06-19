@@ -1,4 +1,9 @@
 {
+  "name": "trakman",
+  "version": "1.6.1",
+  "private": "true",
+  "license": "MIT",
+  "homepage": "http://github.com/lythx/trakman",
   "dependencies": {
     "@leeoniya/ufuzzy": "^1.0.18",
     "dotenv": "^16.5.0",

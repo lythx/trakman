@@ -18,11 +18,16 @@ import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 import { RoundsService } from './services/RoundsService.js'
 import { forceFixRankCoherence } from './FixRankCoherence.js'
+import fs from 'node:fs/promises'
 
 const playersRepo: PlayerRepository = new PlayerRepository()
 const mapIdsRepo: MapIdsRepository = new MapIdsRepository()
 
 const DB: Database = new Database()
+
+// parsing this ourselves instead of using npm_package_version or _homepage because those don't work half the time
+// crashes the controller if package.json doesn't exist, Too Bad!
+const packageObject = JSON.parse(await fs.readFile('package.json', { encoding: 'utf-8' }))
 
 namespace trakman {
 
@@ -730,7 +735,11 @@ namespace trakman {
     /**
      * Controller config.
      */
-    controller: controllerConfig,
+    controller: {
+      ...controllerConfig,
+      version: packageObject.version,
+      repo: packageObject.homepage
+    },
 
     /**
      * Current dedicated server config.

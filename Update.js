@@ -118,6 +118,7 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
       errorOccurred = true
     }
   }
+
   // copy new hashes so you only have to update once
   try {
     await fs.copyFile(process.argv[2], '.hashes.json')
@@ -130,27 +131,32 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     console.log('Errors occurred during update, exiting...')
     process.exit(1)
   }
-  let log = 'Update successful!'
+
+  let log = `Update log to version ${JSON.parse(await fs.readFile(path.join(fromPath, 'package.json'), { encoding: 'utf-8' }))['version']}\n\n`
   if (conflicts.length > 0) {
     console.log('!!! Update conflicts, make sure to fix them by comparing your files to files ending in .new !!!')
     console.log('If you do not fix these conflicts, the controller might fail to start or crash.')
     console.log('Affected files: ')
-    log = 'Update did not succeed because of conflicts. Please merge the following files manually:\n'
+    log += 'Update did not succeed because of conflicts. Please merge the following files manually:\n'
     conflicts.forEach(name => {
       console.log(name)
       log += name + '\n'
     })
     console.log('_____________________________________')
+  } else {
+    log += 'Update successful!'
   }
+
   try {
     await fs.writeFile('update.log', log, { encoding: 'utf-8' })
   } catch(e) {
     console.log('Failed to write update log.')
     console.log(e)
   }
+
   if (conflicts.length > 0) { process.exit(2) }
   if (updatePerformed) {
-    console.log('Update successful.')
+    console.log('Update successful!')
   } else {
     console.log('Update not necessary.')
   }
