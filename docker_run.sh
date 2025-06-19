@@ -100,12 +100,12 @@ echo "#!/bin/sh
   echo 'Restarting...'
 done) &
 cd trakman
-bun i
+bun i --production
 chmod -R a+w /app/server
 sleep 1 # wait for dedicated server to finish loading
 trap 'echo Terminating; bun pm2 stop 0; bun pm2 kill; exit' SIGTERM SIGINT
 bun pm2 ls # idk why but the controller starts not without this
-bun pm2 start --interpreter bun src/Main.ts --name Trakman
+bun daemon
 wait \$!" > run.sh
 chown server:server run.sh
 chmod 766 run.sh

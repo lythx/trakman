@@ -20,7 +20,7 @@ RUN wget -O serv.zip http://files2.trackmaniaforever.com/TrackmaniaServer_2011-0
 # generate file hashes, get trakman dependencies and build
 WORKDIR /app/server/trakmanbk
 RUN bun Update.js && \
-    bun i
+    bun i --production
 WORKDIR /app/server
 # backup important files to prevent them being deleted by mounting the volume
 RUN mv GameData/Config/dedicated_cfg.txt dedicated_cfg.txt.bk && \
