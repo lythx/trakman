@@ -36,13 +36,13 @@ const authenticationStatus: any | Error = await Client.call('Authenticate', [
 if (authenticationStatus instanceof Error) { await Logger.fatal('Authentication failed. Server responded with an error:', authenticationStatus.message) }
 Logger.trace('Authentication success')
 Logger.trace('Initializing database...')
-Database.initialize()
+await Database.initialize()
 Logger.trace('Database initialized...')
 await fixRankCoherence()
 Logger.trace('Retrieving game info...')
 await GameService.initialize()
 Logger.trace('Game info fetched')
-// import plugins after initializing database to avoid process exiting with no error in case of query on inexistent table
+// import plugins after initializing database to avoid process exiting with no error in case of query on non-existent table
 await import('../Plugins.js')
 Logger.trace('Fetching player info...')
 await PlayerService.initialize()

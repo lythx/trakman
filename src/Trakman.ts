@@ -737,8 +737,8 @@ namespace trakman {
      */
     controller: {
       ...controllerConfig,
-      version: packageObject.version,
-      repo: packageObject.homepage
+      version: packageObject.version ??= "unknown",
+      repo: packageObject.homepage ??= "http://github.com/lythx/trakman"
     },
 
     /**

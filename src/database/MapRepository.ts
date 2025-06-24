@@ -73,8 +73,12 @@ export class MapRepository extends Repository {
       }
     })
     const bulk = values.join('\n')
-    const stream: CopyStreamQuery = this.db.stream(
+    const stream: CopyStreamQuery | Error = this.db.stream(
       'maps(id, name, filename, author, environment, mood, bronze_time, silver_time, ' + 'gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)')
+    if (stream instanceof Error) {
+      await Logger.fatal('Failed to mass-add maps to database', stream)
+      return
+    }
     const src = new Readable()
     src.readable = true
 

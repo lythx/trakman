@@ -47,27 +47,31 @@ else
 fi
 # update and copy over Trakman directory
 if find /app/server/trakman -mindepth 1 -maxdepth 1 | read; then
-  echo 'Trakman exists. Attempting update...'
-  if ! cd trakman 2>/dev/null
-  then
-    echo 'Trakman actually does not exist. This makes no sense. Aborting and trying again.'
-    exit
-  fi
-  if ! cp ../trakmanbk/Update.js . 2>/dev/null
-  then
-    # this runs if trakmanbk doesn't exist so we have nothing to update from
-    echo "Update not available."
+  if [ "$UPDATE_UTILITY_DISABLED" = "YES" ]; then
+    echo 'Trakman exists, skipping initial setup.'
   else
-    if ! bun Update.js /app/server/trakmanbk/.hashes.json
+    echo 'Trakman exists. Attempting update...'
+    if ! cd trakman 2>/dev/null
     then
-      # this runs if trakmanbk exists and the update script fails
-      chown server:server update.log
-      echo 'Update not fully successful, please stop the container.'
-      sleep 1m # wait a minute for the user to read the message, or to realise something's wrong
-      exit 1
+      echo 'Trakman actually does not exist. This makes no sense. Aborting and trying again.'
+      exit
     fi
+    if ! cp ../trakmanbk/Update.js . 2>/dev/null
+    then
+      # this runs if trakmanbk doesn't exist so we have nothing to update from
+      echo "Update not available."
+    else
+      if ! bun Update.js /app/server/trakmanbk/.hashes.json
+      then
+        # this runs if trakmanbk exists and the update script fails
+        chown server:server update.log
+        echo 'Update not fully successful, please stop the container.'
+        sleep 1m # wait a minute for the user to read the message, or to realise something's wrong
+        exit 1
+      fi
+    fi
+    cd ..
   fi
-  cd ..
   rm -r trakmanbk 2>/dev/null
 else
   echo 'Setting up Trakman...'
@@ -96,7 +100,7 @@ chown -R server:server /app/server
 echo "#!/bin/sh
 (while true; do
   /app/server/TrackmaniaServer /game_settings=MatchSettings/MatchSettings.txt /dedicated_cfg=dedicated_cfg.txt /nodaemon
-  echo [\$(date +'%d %b %Y %T')] Server exited with code \$? | tee -a /app/server/.pm2/logs/docker.log
+  echo [\$(date +'%d %b %Y %T.%3N')] Server exited with code \$? | tee -a /app/server/.pm2/logs/docker.log
   echo 'Restarting...'
 done) &
 cd trakman

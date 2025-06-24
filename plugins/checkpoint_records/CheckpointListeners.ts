@@ -3,7 +3,7 @@ import { bestCpsDB, allCpsDB } from './CheckpointDB.js'
 import { emitEvent } from './CheckpointEvents.js'
 import config from './Config.js'
 
-let currentBestCps: BestCheckpoints
+let currentBestCps: BestCheckpoints = []
 let currentMapDBId: number
 const currentPlayerCps: PlayerCheckpoints[] = []
 
@@ -65,6 +65,10 @@ if (config.isEnabled) {
   })
 
   tm.addListener('PlayerCheckpoint', (info: tm.CheckpointInfo) => {
+    if (currentMapDBId === undefined) {
+      tm.log.error(`Player ${info.player.login} got a checkpoint before the map started`)
+      return
+    }
     const date = new Date()
     const playerCheckpoints = currentPlayerCps.find(a => a.login === info.player.login)
     const isStunts = tm.getGameMode() === 'Stunts'

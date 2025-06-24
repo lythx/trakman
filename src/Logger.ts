@@ -85,10 +85,10 @@ export abstract class Logger {
       }
     })
     process.on('uncaughtException', (err: Error): void => {
-      void this.fatal('Uncaught exception occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
+      void this.fatal('Uncaught exception occurred: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
     process.on('unhandledRejection', (err: Error): void => {
-      void this.fatal('Unhandled rejection occured: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
+      void this.fatal('Unhandled rejection occurred: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
     if (this.useDiscord) {
       const envDcLog = Number(process.env.DISCORD_LOG_LEVEL)
@@ -116,11 +116,9 @@ export abstract class Logger {
   static async fatal(...lines: any[]): Promise<void> {
     if (this.crashed) { return }
     this.crashed = true
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
     // In case discord message hangs the process it exits after 10 seconds anyway
     setTimeout(() => process.exit(1), 10000)
-    await this.writeLog('fatal', location, date, lines, true)
+    void this.writeLog('fatal', this.getLocation(), this.getDateString(), lines, true)
     process.exit(1)
   }
 
@@ -130,9 +128,7 @@ export abstract class Logger {
    */
   static error(...lines: any[]): void {
     if (this.crashed) { return }
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
-    void this.writeLog('error', location, date, lines)
+    void this.writeLog('error', this.getLocation(), this.getDateString(), lines)
   }
 
   /**
@@ -141,9 +137,7 @@ export abstract class Logger {
    */
   static warn(...lines: any[]): void {
     if (this.crashed) { return }
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
-    void this.writeLog('warn', location, date, lines)
+    void this.writeLog('warn', this.getLocation(), this.getDateString(), lines)
   }
 
   /**
@@ -152,9 +146,7 @@ export abstract class Logger {
    */
   static info(...lines: any[]): void {
     if (this.crashed) { return }
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
-    void this.writeLog('info', location, date, lines)
+    void this.writeLog('info', this.getLocation(), this.getDateString(), lines)
   }
 
   /**
@@ -163,9 +155,7 @@ export abstract class Logger {
    */
   static debug(...lines: any[]): void {
     if (this.crashed) { return }
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
-    void this.writeLog('debug', location, date, lines)
+    void this.writeLog('debug', this.getLocation(), this.getDateString(), lines)
   }
 
   /**
@@ -174,9 +164,7 @@ export abstract class Logger {
    */
   static trace(...lines: any[]): void {
     if (this.crashed) { return }
-    const date: string = new Date().toUTCString()
-    const location: string = this.getLocation()
-    void this.writeLog('trace', location, date, lines)
+    void this.writeLog('trace', this.getLocation(), this.getDateString(), lines)
   }
 
   /**
@@ -208,6 +196,12 @@ export abstract class Logger {
     if (!this.consoleDisabled) {
       this.consoleLog('', true)
     }
+  }
+
+  private static getDateString(): string {
+    const d = new Date()
+    const ret = d.toUTCString()
+    return ret.substring(5, ret.length - 4) + `.${String(d.getMilliseconds()).padStart(3, "0")}`
   }
 
   private static async writeLog(tag: Tag, location: string, date: string, lines: any[], force = false): Promise<void> {
@@ -271,7 +265,7 @@ export abstract class Logger {
   }
 
   private static getLogfileString(tag: Tag, lines: string[], location: string, date: string): string {
-    let ret: string = `<${tag.toUpperCase()}> [${date.substring(5, date.length - 4)}] (${location}) ${lines[0]}\n`
+    let ret: string = `<${tag.toUpperCase()}> [${date}] (${location}) ${lines[0]}\n`
     for (let i: number = 1; i < lines.length; i++) {
       ret += `\t${lines[i]}\n`
     }
@@ -281,7 +275,7 @@ export abstract class Logger {
   private static getConsoleString(tag: Tag, lines: string[], location: string, date: string): string {
     const colour: string = this.logTypes[tag].colour
     const colourString: string = `\u001b${colour}`
-    let ret: string = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date.substring(5, date.length - 4)}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
+    let ret: string = `<${colourString}${tag.toUpperCase()}\x1b[0m> [\u001b[34m${date}\x1b[0m] (\u001b[36m${location}\x1b[0m) ${lines[0]}`
     for (let i: number = 1; i < lines.length; i++) {
       ret += `\n\t${lines[i]}`
     }
