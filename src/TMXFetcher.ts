@@ -9,6 +9,9 @@ export abstract class TMXFetcher {
 
   private static readonly prefixes: TMXPrefix[] = ['tmnforever', 'united', 'nations', 'original', 'sunrise']
   private static readonly sites: tm.TMXSite[] = ['TMNF', 'TMU', 'TMN', 'TMO', 'TMS']
+  private static readonly packmaskSite: tm.TMXSite = (config.manualMapLoading.stadiumOnly !== undefined
+    ? config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === 'nations')
+    ? 'TMNF' : 'TMU'
   private static readonly environments: Record<number, tm.Environment> = {
     1: 'Snow',
     2: 'Desert',
@@ -77,11 +80,11 @@ export abstract class TMXFetcher {
   /**
    * Fetches map file from TMX via its TMX ID.
    * @param tmxId Map TMX ID
-   * @param site Optional TMX site (TMNF by default)
+   * @param site Optional TMX site (default depends on packmask)
    * @returns Object containing map name and file content, or Error if unsuccessful
    */
   static async fetchMapFile(tmxId: number, site?: tm.TMXSite): Promise<{ name: string, content: Buffer } | Error>
-  static async fetchMapFile(id: number | string, site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+  static async fetchMapFile(id: number | string, site: tm.TMXSite = this.packmaskSite): Promise<{ name: string, content: Buffer } | Error> {
     let prefix: TMXPrefix = this.siteToPrefix(site)
     if (typeof id === 'string') {
       const res = await this.getTMXId(id)
@@ -154,6 +157,7 @@ export abstract class TMXFetcher {
   /**
    * Fetches TMX for map information.
    * @param tmxId Map TMX ID
+   * @param prefix Map TMX Prefix
    * @returns Map info from TMX or error if unsuccessful
    */
   static async fetchMapInfo(tmxId: number, prefix: TMXPrefix): Promise<Omit<tm.TMXMap, 'id'> | Error>
@@ -283,11 +287,11 @@ export abstract class TMXFetcher {
   * Searches for maps matching the specified name on TMX.
   * @param query Search query
   * @param author Map author to look for
-  * @param site TMX Site to fetch from
+  * @param site TMX Site to fetch from (default depends on packmask)
   * @param count Number of maps to fetch
   * @returns An array of searched map objects or Error if unsuccessful
   */
-  static async searchForMap(query?: string, author?: string, site: tm.TMXSite = 'TMNF',
+  static async searchForMap(query?: string, author?: string, site: tm.TMXSite = this.packmaskSite,
     count: number = config.defaultTMXSearchLimit): Promise<Error | tm.TMXSearchResult[]> {
     const params: [string, string][] = [['count', count.toString()], ['name', (query ?? '').trim()], ['author', (author ?? '').trim()]]
     if (author === undefined) { params.pop() }
@@ -321,10 +325,10 @@ export abstract class TMXFetcher {
 
   /**
    * Fetches a random map file from TMX.
-   * @param site Optional TMX site (TMNF by default)
+   * @param site Optional TMX site (default depends on packmask)
    * @returns Object containing map name and file content, or Error if unsuccessful
    */
-  static async fetchRandomMapFile(site: tm.TMXSite = 'TMNF'): Promise<{ name: string, content: Buffer } | Error> {
+  static async fetchRandomMapFile(site: tm.TMXSite = this.packmaskSite): Promise<{ name: string, content: Buffer } | Error> {
     const prefix = this.siteToPrefix(site)
     const res = await fetch(`https://${prefix}.tm-exchange.com/trackrandom`).catch((err: Error) => err)
     if (res instanceof Error) {
