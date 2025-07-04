@@ -139,9 +139,9 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   async openWithOption(login: string, option: 'jukebox' | 'name' | 'karma'
     | 'short' | 'long' | 'best' | 'worst' | 'worstkarma' | 'nofinish'
     | 'norank' | 'noauthor' | 'oldest' | 'newest', page: number): Promise<void> {
-    let list: readonly Readonly<tm.Map>[] = []
+    let list: readonly Readonly<tm.Map>[]
     if (option === 'best' || option === 'worst') {
-      list = maplist.getByPosition(login, option)
+      list = await maplist.getByPosition(login, option)
     } else if (option === 'nofinish' || option === 'norank' || option === 'noauthor') {
       list = await maplist.getFiltered(login, option)
     } else {
@@ -154,8 +154,8 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
       undefined, config.optionTitles[option as keyof typeof config.optionTitles])
   }
 
-  openWithQuery(login: string, query: string, page: number, searchByAuthor?: true): void {
-    const list: Readonly<tm.Map>[] = searchByAuthor === true ? maplist.searchByAuthor(query) : maplist.searchByName(query)
+  async openWithQuery(login: string, query: string, page: number, searchByAuthor?: true): Promise<void> {
+    const list: Readonly<tm.Map>[] = searchByAuthor === true ? await maplist.searchByAuthor(query) : await maplist.searchByName(query)
     const paginator = this.getPaginator(login, list, query)
     page = Math.max(1, Math.min(Math.ceil(list.length / (config.rows * config.columns)), page))
     paginator.setPageForLogin(login, page)
@@ -346,7 +346,7 @@ export default class MapList extends PopupWindow<{ page: number, paginator: Pagi
   }
 
   private async getRecordIndexStrings(login: string, ...mapIds: string[]): Promise<string[]> {
-    const ranks = tm.records.getRank(login, mapIds)
+    const ranks = await tm.records.getRank(login, mapIds)
     const ret: string[] = []
     for (let i = 0; i < mapIds.length; i++) {
       const r = ranks.find(a => a.mapId === mapIds[i])

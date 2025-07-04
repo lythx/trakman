@@ -442,6 +442,7 @@ export class RecordService {
    * @param time Record time
    * @param player Player object containing login and nickname
    * @param recordType Record type ('live' or 'local')
+   * @param isStunts The record is not a time but a stunts score
    * @returns Array of strings formatted for Logger output
    */
   private static getLogString(previousPosition: number | undefined, position: number,
@@ -461,29 +462,30 @@ export class RecordService {
    * @param mapId Map uid
    * @returns Rank or undefined if player doesn't have a record
    */
-  static getRank(login: string, mapId: string): number | undefined
+  static async getRank(login: string, mapId: string): Promise<number | undefined>
   /**
    * Gets given player local ranks on given maps
    * @param login Player login
    * @param mapIds Array of map uids
    * @returns Array of objects with player ranks and map uids
    */
-  static getRank(login: string, mapIds?: string[]): { mapId: string, rank: number }[]
+  static async getRank(login: string, mapIds?: string[]): Promise<{ mapId: string; rank: number }[]>
   /**
    * Gets given player local ranks on all maps
    * @param login Player login
    * @returns Array of objects with player ranks and map uids
    */
-  static getRank(login: string): { mapId: string, rank: number }[]
-  static getRank(login: string, mapIds?: string | string[]): number | undefined | { mapId: string, rank: number }[] {
+  static async getRank(login: string): Promise<{ mapId: string; rank: number }[]>
+  static async getRank(login: string, mapIds?: string | string[]): Promise<number | { mapId: string; rank: number }[] | undefined> {
     if (mapIds === undefined) {
       return this._playerRanks.filter(a => login === a.login && a.rank !== -1)
     }
     if (typeof mapIds === 'string') {
-      const find = this._playerRanks.find(a => mapIds === a.mapId && a.rank !== -1 && a.login === login)
+      const find = this._playerRanks.find(a => a.login === login && a.rank !== -1 && mapIds === a.mapId)
       return find?.rank
     }
-    return this._playerRanks.filter(a => mapIds.includes(a.mapId) && a.rank !== -1 && a.login === login)
+    const mapIdSet = new Set(mapIds)
+    return this._playerRanks.filter(a => a.login === login && a.rank !== -1 && mapIdSet.has(a.mapId))
   }
 
   /**

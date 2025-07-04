@@ -33,6 +33,8 @@ else
   xml ed -L -u "/dedicated/system_config/server_port" -v "$SERVER_NET_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/server_p2p_port" -v "$SERVER_P2P_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/xmlrpc_port" -v "$SERVER_PORT" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/xmlrpc_allowremote" -v "${REMOTE_XMLRPC=False}" dedicated_cfg.txt.bk
+  xml ed -L -u "/dedicated/system_config/force_ip_address" -v "$SERVER_IP" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/packmask" -v "${SERVER_PACKMASK=nations}" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/disable_coherence_checks" -v "${SERVER_DISABLE_COHERENCE_CHECKS=laps}" dedicated_cfg.txt.bk
   mv /app/server/dedicated_cfg.txt.bk /app/server/GameData/Config/dedicated_cfg.txt
@@ -103,14 +105,15 @@ echo "#!/bin/sh
   echo [\$(date +'%d %b %Y %T.%3N')] Server exited with code \$? | tee -a /app/server/.pm2/logs/docker.log
   echo 'Restarting...'
 done) &
-cd trakman
-bun i --production
-chmod -R a+w /app/server
+cd trakman" > run.sh
+if [ "$INSTALL_ON_STARTUP" != "NO" ]; then
+  echo "bun i --production" >> run.sh
+fi
+echo "chmod -R a+w /app/server
 sleep 1 # wait for dedicated server to finish loading
 trap 'echo Terminating; bun pm2 stop 0; bun pm2 kill; exit' SIGTERM SIGINT
-bun pm2 ls # idk why but the controller starts not without this
 bun daemon
-wait \$!" > run.sh
+wait \$!" >> run.sh
 chown server:server run.sh
 chmod 766 run.sh
 exec su-exec server ./run.sh
