@@ -1,12 +1,13 @@
 import { raceConfig as cfg, icons } from '../../ui/UI.js'
+import config from '../Config.js';
 
 export default {
-  height: 33,
+  height: (config.servers.length * 6) + 3,
   width: cfg.width,
   title: "Linked Servers",
   icon: icons.infoList,
   margin: cfg.margin,
-  entries: 5,
+  entries: config.servers.length,
   icons: {
     name: icons.tag,
     map: icons.ongoingMap,
