@@ -21,7 +21,8 @@ export interface ServerInfo {
   gameMode: tm.GameMode
   environment: tm.Environment
   minLadderLimit: number
-  maxLadderLimit: number
+  maxLadderLimit: number,
+  serverName: string | null
 }
 
 const servers: Server[] = config.servers
@@ -61,7 +62,8 @@ async function updateDataFile() {
     maxLadderLimit: res.LadderServerLimitMax,
     maxPlayerCount: tm.config.server.currentMaxPlayers,
     currentMap: tm.maps.current.name,
-    currentMapAuthor: tm.maps.current.author
+    currentMapAuthor: tm.maps.current.author,
+    serverName: tm.config.server.name
   }
   try {
     await fs.writeFile(config.dataFilePath, JSON.stringify(serverData))
@@ -117,7 +119,8 @@ function constructInfoObject(info: Partial<ServerInfo>, name: string): ServerInf
     maxLadderLimit: info.maxLadderLimit ?? 0,
     maxPlayerCount: info.maxPlayerCount ?? 0,
     currentMap: info.currentMap ?? config.noDataText,
-    currentMapAuthor: info.currentMapAuthor ?? config.noDataText
+    currentMapAuthor: info.currentMapAuthor ?? config.noDataText,
+    serverName: info.serverName ?? null
   }
 
 }

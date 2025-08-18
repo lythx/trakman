@@ -155,7 +155,7 @@ export default class ServerLinks extends StaticComponent {
         const arr: GridCellFunction[] = [
             (i, j, w, h): string => {
                 return `${this.icon(icons.name, iw, h)}
-        ${this.text(tm.utils.strip(data.name, false), w - iw - m, h, iw + m, config.iconBackground, true)}`
+        ${this.text(data.serverName ?? tm.utils.strip(data.name, false), w - iw - m, h, iw + m, config.iconBackground, true)}`
             },
             (i, j, w, h): string => {
                 const width = 7
