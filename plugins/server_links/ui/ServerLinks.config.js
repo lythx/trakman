@@ -10,6 +10,8 @@ export default {
   entries: config.servers.length,
   icons: {
     name: icons.tag,
+    blank: icons.blank,
+    join: icons.bgGreyOpaque50,
     map: icons.ongoingMap,
     author: icons.personBuilder,
     playerCount: icons.person,
