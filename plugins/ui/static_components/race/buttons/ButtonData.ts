@@ -7,5 +7,6 @@ export interface ButtonData {
   padding: number,
   equalTexts?: boolean,
   actionId?: number,
-  link?: string
+  link?: string,
+  perPlayer?: boolean
 }
