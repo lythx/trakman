@@ -22,11 +22,8 @@ export class MedalButton extends UiButton {
       equalTexts: false,
       perPlayer: true
     }
-    tm.addListener('LocalRecord', () => {
-        this.emitUpdate()
-      })
 
-      tm.addListener('BeginMap', () => {
+      tm.addListener(['BeginMap', 'PlayerDataUpdated', 'LocalRecord'], (): void => {
           this.emitUpdate()
       })
   }
