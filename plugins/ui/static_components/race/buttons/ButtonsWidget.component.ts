@@ -40,6 +40,7 @@ export default class ButtonsWidget extends StaticComponent {
             new PaySkip(this.id),
             new VoteReplay(this.id),
             new VoteSkip(this.id),
+            new MedalButton()
         ]
         for (const e of config.order) {
             const b = allButtons.find(a => a.constructor.name === e)

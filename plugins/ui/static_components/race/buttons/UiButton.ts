@@ -37,4 +37,8 @@ export abstract class UiButton {
     UiButton.skipListeners.push(callback)
   }
 
+  public renderForPlayer(login: string, i: number, j: number, w: number, h: number): string {
+      return ``
+  }
+
 }

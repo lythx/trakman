@@ -180,5 +180,16 @@ export default {
       500
     ],
     actionId: 4
-  }
+  },
+    medalButton: {
+        icon: icons.karmaGlobal,
+        width: 1.8,
+        height: 1.8,
+        padding: 0.3,
+        textNoMedal: "NO MEDAL",
+        textBronzeMedal: "$0f0BRONZE",
+        textSilverMedal: "$cccSILVER",
+        textGoldMedal: "$fd0GOLD",
+        textAuthorMedal: "$0f0AUTHOR"
+    },
 }
