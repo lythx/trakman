@@ -37,6 +37,10 @@ export abstract class UiButton {
     UiButton.skipListeners.push(callback)
   }
 
+  /**
+   * If `ButtonData.perPlayer` is set to true this function will be used for rendering, instead
+   * of static rendering based on `ButtonData` (see `MedalButton.ts`)
+   */
   public renderForPlayer(login: string, i: number, j: number, w: number, h: number): string {
       return ``
   }

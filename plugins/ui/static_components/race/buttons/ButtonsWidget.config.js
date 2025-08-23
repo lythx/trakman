@@ -1,6 +1,8 @@
 import cfg from '../../../config/RaceUi.js'
 import icons from '../../../config/Icons.js'
 
+const palette = tm.utils.palette
+
 export default {
   height: 14.5,
   width: cfg.width,
@@ -181,14 +183,15 @@ export default {
     ],
     actionId: 4
   },
-    medalButton: {
-        width: 1.8,
-        height: 1.8,
-        padding: 0.3,
-        textNoMedal: "NO MEDAL",
-        textBronzeMedal: "$0f0BRONZE",
-        textSilverMedal: "$cccSILVER",
-        textGoldMedal: "$fd0GOLD",
-        textAuthorMedal: "$0f0AUTHOR"
-    },
+  medalButton: {
+    width: 3,
+    height: 3,
+    padding: 0.3,
+    textYOffset: 3.6,
+    textNoMedal: "NO MEDAL",
+    textBronzeMedal: `$0f0BRONZE`,
+    textSilverMedal: "SILVER",
+    textGoldMedal: `$${palette.yellow}GOLD`,
+    textAuthorMedal: `$${palette.green}AUTHOR`
+  },
 }
