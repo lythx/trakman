@@ -189,7 +189,7 @@ export default {
     padding: 0.3,
     textYOffset: 3.6,
     textNoMedal: "NO MEDAL",
-    textBronzeMedal: `$0f0BRONZE`,
+    textBronzeMedal: `$da5BRONZE`,
     textSilverMedal: "SILVER",
     textGoldMedal: `$${palette.yellow}GOLD`,
     textAuthorMedal: `$${palette.green}AUTHOR`
