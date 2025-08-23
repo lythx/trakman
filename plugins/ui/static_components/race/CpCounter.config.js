@@ -38,5 +38,6 @@ export default {
     checkpointTextWidth: 2.8,
   },
   background: cfg.background,
-  finishTextDuration: 3000
+  finishTextDuration: 3000,
+  hidePanel: false,
 }

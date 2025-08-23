@@ -308,6 +308,8 @@ export class AdministrationService {
     }
     if (player === undefined) {
       const player = await PlayerService.fetch(login)
+      await this.privilegeRepo.set(login, privilege)
+      await this.updatePrivilegeArrays()
       Events.emit('PrivilegeChanged', {
         player: player === undefined ? undefined : { ...player, privilege },
         login,
@@ -315,7 +317,6 @@ export class AdministrationService {
         newPrivilege: privilege,
         caller
       })
-      void this.privilegeRepo.set(login, privilege)
       return
     }
     PlayerService.updateInfo({ login, title: PlayerService.getTitle(login, privilege, player.country, player.countryCode) })

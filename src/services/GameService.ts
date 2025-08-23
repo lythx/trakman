@@ -210,6 +210,21 @@ export class GameService {
   }
 
   /**
+   * Sets the new timelimit in runtime memory. Only works in 'race' game state.
+   * @param milliseconds Amount of time to set in milliseconds
+   * @returns Boolean indicating whether the time got set
+   */
+  static setTimeLimit(milliseconds: number): boolean {
+    if (milliseconds < config.dynamicTimerSubtractionLimit || tm.getState() !== 'race') {
+      return false
+    }
+    this.timeAttackLimit = milliseconds
+    this.remainingDynamicTime = milliseconds
+    this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit, this.remainingDynamicTime)
+    return true
+  }
+
+  /**
    * Adds time to the timer. This method works only if 
    * dynamic timer is enabled and server is in 'race' state.
    * @param milliseconds Amount of time to add in milliseconds

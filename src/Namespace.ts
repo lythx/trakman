@@ -97,6 +97,8 @@ declare global {
       readonly ladderRank: number
       /** Player last leave date (undefined if the player never visited the server before) */
       readonly lastOnline?: Date
+      /** Set of logins currently spectating the player */
+      readonly spectators: Set<string>
       /** Player title ('Player', 'Admin', etc.) */
       title: string
       /** Player wins count */

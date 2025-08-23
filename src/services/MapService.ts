@@ -451,7 +451,7 @@ export class MapService {
     }
     Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
     await this.removeFromQueue(id, caller, false)
-    await this.writeMatchSettings()
+    //await this.writeMatchSettings()
     return true
   }
 
@@ -671,7 +671,7 @@ export class MapService {
   }
 
   /**
-   * Contstructs tm.Map object from dedicated server response
+   * Constructs tm.Map object from dedicated server response
    * @param info GetChallengeInfo dedicated server call response
    */
   public static constructNewMapObject(info: any): Omit<tm.Map, 'voteCount' | 'voteRatio'> {

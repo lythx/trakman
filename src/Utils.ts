@@ -7,9 +7,9 @@ import colours from './data/Colours.js'
 import { palette } from '../config/PrefixesAndPalette.js'
 import config from '../config/Config.js'
 import { Logger } from './Logger.js'
-import ufuzzy from "@leeoniya/ufuzzy"
+import uFuzzy from '@leeoniya/ufuzzy'
 
-const uf = new ufuzzy(config.searchOptions)
+const uf = new uFuzzy(config.searchOptions)
 
 const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
@@ -416,16 +416,9 @@ export const Utils = {
   /**
    * Attempts to convert the player nickname to their login via charmap.
    * @param nickname Player nickname
-   * @param options Options to modify search similarity goals
    * @returns Possibly matching login or undefined if unsuccessful
    */
-  nicknameToPlayer(nickname: string, options: {
-    similarityGoal: number,
-    minDifferenceBetweenMatches: number
-  } = {
-      similarityGoal: config.nicknameToLoginSimilarityGoal,
-      minDifferenceBetweenMatches: config.nicknameToLoginMinimumDifferenceBetweenMatches
-    }): tm.Player | undefined {
+  nicknameToPlayer(nickname: string): tm.Player | undefined {
     const players = PlayerService.players
     const strippedNicknames = []
     for (const e of players) {
@@ -601,7 +594,7 @@ function strVar(str: string, vars: { [name: string]: any }): string {
  */
 function matchString(needle: string, haystack: string[]): number[] {
   if (haystack.length === 0) { return [] }
-  haystack = ufuzzy.latinize(haystack)
+  haystack = uFuzzy.latinize(haystack)
   const arr = []
   const idxs = uf.filter(haystack, needle)
   if (idxs != null && idxs.length > 0) {

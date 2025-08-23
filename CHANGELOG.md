@@ -1,6 +1,37 @@
 # Changelog
 Changelog can also be found in the controller (/changes)
 
+## 1.6.0
+**18/11/2024**
++ Added support for potentially infinite map handling
++ Added new search algorithm #253
++ Added support for Bun (experimental)
++ Added nickname to player (login) translation for admin actions
++ Added manialink interaction timeouts
++ Added page selection in MapList via $p (by default) #252
++ Added stats update on interval
++ Added dedicated server healthchecks
++ Added SIGINT handling #224
++ Added BestCps and BestFinishes horizontal layouts
++ Added rank recalculation via //recrank
++ Added CpCounter relative layout
++ Added environment display to MapList and MapWidgetResult
++ Added different default screenshots for all environments
++ Added //savematchsettings
++ Added new options for UI text
+- Fixed //requeue allowing continuous requeueing of the same map #254
+- Fixed crash in Paginator when landing on a non-existent page
+- Fixed Freezone plugin sending too long names
+- Fixed maps not being added due to having the same filename
+- Fixed the server hanging when attempting to add a map too big in size
+- Fixed TMXFetcher not going through other TMX websites on empty response
+- Fixed restart/extend related bugs
+- Fixed skipping during transition state not doing anything
+- Fixed UI breaking on non-escaped characters in player name #258
+- Fixed admin windows not refreshing when interacting with an offline player
+- Fixed RoundService not recognising changes made in the config file
+- Fixed several non-optimised algorithms
+
 ## 1.5.0
 **21/03/2024**
 * Removed DiscordJS dependency

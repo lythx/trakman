@@ -447,6 +447,8 @@ namespace trakman {
 
     setTime: GameService.setTime.bind(GameService),
 
+    setTimeLimit: GameService.setTimeLimit.bind(GameService),
+
     addTime: GameService.addTime.bind(GameService),
 
     subtractTime: GameService.subtractTime.bind(GameService),
@@ -636,9 +638,12 @@ namespace trakman {
   */
   export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
-
+      const m =  (prefix ? prefixes.prefixes.serverToPlayer : '') + message
+      if (login === ServerConfig.config.login || login?.includes(ServerConfig.config.login)) {
+        Logger.consoleLog(Utils.strip(m), false) // send message to console if one of the recipients is the server
+      }
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: (prefix ? prefixes.prefixes.serverToPlayer : '') + message },
+        [{ string: m },
         { string: typeof login === 'string' ? login : login.join(',') }])
       return
     }

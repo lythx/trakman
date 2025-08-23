@@ -44,7 +44,7 @@ export default class KarmaRanking extends StaticComponent {
       <frame posn="${this.positionX} ${this.positionY} 2">
       ${this.header.constructXml(config.title, config.icon, this.side)}
       <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(list.map(a => a.voteRatio === -1 ? config.defaultText : a.voteRatio.toFixed(0)), list.map(a => tm.utils.safeString(tm.utils.strip(a.name, false))))}
+        ${this.list.constructXml(list.map(a => a.voteRatio === -1 ? config.defaultText : a.voteRatio.toFixed(0)), list.map(a => tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(a.name), false))))}
       </frame>
       </frame>
     </manialink>`

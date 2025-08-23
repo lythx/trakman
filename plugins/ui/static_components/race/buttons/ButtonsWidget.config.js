@@ -194,4 +194,5 @@ export default {
     textGoldMedal: `$${palette.yellow}GOLD`,
     textAuthorMedal: `$${palette.green}AUTHOR`
   },
+  hidePanel: false,
 }

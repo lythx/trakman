@@ -57,7 +57,11 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
       let data: string = ''
       res.on('data', (chunk): void => { data += chunk })
       if (res.statusCode === 200) {
-        res.on('end', (): void => { resolve(JSON.parse(data)) })
+        try {
+          res.on('end', (): void => { resolve(JSON.parse(data)) })
+        } catch(error) {
+          reject(new Error(`Instead of a JSON, the request returned the following: ${data}. Error was: ${error}`))
+        }
       } else {
         reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
       }

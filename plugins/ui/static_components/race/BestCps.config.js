@@ -28,5 +28,6 @@ export default {
   upIconHover: icons.pageLeftHover,
   downIconHover: icons.pageRightHover,
   horizontal: false,
-  horizontalMaxRows: 5
+  horizontalMaxRows: 5,
+  hidePanel: true,
 }

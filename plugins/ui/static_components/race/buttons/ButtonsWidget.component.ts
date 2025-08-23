@@ -75,8 +75,9 @@ export default class ButtonsWidget extends StaticComponent {
         }
       })
     }
-
-
+    this.onPanelHide((player) => { // todo: this does not work properly due to button update
+      this.sendMultipleManialinks(this.displayToPlayer(player.login))
+    })
   }
 
   getHeight(): number {
@@ -90,8 +91,9 @@ export default class ButtonsWidget extends StaticComponent {
 
 
   displayToPlayer(login: string) {
-    if (!this.isDisplayed) {
-      return
+    if (!this.isDisplayed) { return }
+    if (config.hidePanel && this.hasPanelsHidden(login)) {
+      return this.hideToPlayer(login)
     }
     return { xml: this.xml, login }
   }

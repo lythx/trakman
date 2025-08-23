@@ -10,6 +10,9 @@ export default {
   overlayBackground: '7777',
   defaultText: '-',
   colour: p.green,
+  multijukePrivilege: 1, // privilege level for adding more than 1 map to the jukebox
+  multijukeMaxMaps: 5, // max amount of maps that can be added to the jukebox by one person
+  unlimitedJukePrivilege: 2, // privilege level for unlimited jukebox (see 2 entries above)
   optionTitles: {
     jukebox: 'Jukebox'
   },
@@ -54,7 +57,7 @@ export default {
   pageSearchSeparator: '$p',
   messages: {
     error: `${p.error}Error while adding the map to queue.`,
-    noPermission: `${p.error}You can't add more than one map to the queue.`,
+    noPermission: `${p.error}You can't add more maps to the queue.`,
     remove: `${p.highlight}#{player} ${p.vote}removed ${p.highlight}#{map}${p.vote} from the queue.`,
     add: `${p.highlight}#{player} ${p.vote}added ${p.highlight}#{map}${p.vote} to the queue.`
   },

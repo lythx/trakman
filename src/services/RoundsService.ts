@@ -103,7 +103,9 @@ export class RoundsService {
     this._teamsPointsLimit = teamPointsLimit.CurrentValue
     this._cupPointsLimit = cupPointsLimit.CurrentValue
     this._cupMaxWinnersCount = cupMaxWinnersCount.CurrentValue
-    if (this._roundsPointSystem.length === 0) {
+    if (this._roundsPointSystem.length === 0
+      || !(this._roundsPointSystem.length === config.roundsModePointSystem.length
+        && this._roundsPointSystem.every((v, i) => v === config.roundsModePointSystem[i]))) {
       this._roundsPointSystem = config.roundsModePointSystem
       Client.callNoRes(`SetRoundCustomPoints`,
         [{ array: this._roundsPointSystem.map(a => ({ int: a })) }, { boolean: true }])
@@ -184,10 +186,10 @@ export class RoundsService {
     this.teamsRoundPoints = undefined
     this._teamScores = { blue: 0, red: 0 }
     this.finishedRounds = 0
-    if(!config.resetCupScoreOnSkipAndRestart) {
+    if (!config.resetCupScoreOnSkipAndRestart) {
       this._ranking = []
       await this.fetchRanking()
-    } else { 
+    } else {
       // This method modifies the player objects so it needs to ignore the readonly constraint
       const playerList = PlayerService.players as tm.Player[]
       for (const e of playerList) {

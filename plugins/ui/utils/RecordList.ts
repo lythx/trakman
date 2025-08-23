@@ -188,7 +188,7 @@ export default class RecordList {
    * @param pb Personal best time (if omitted current map pb will be used)
    * @returns Record list XML string
    */
-  constructXml(login: string | undefined, allRecords: RLRecord[], pb?: number): string {
+  constructXml(login: string | undefined, allRecords: RLRecord[], pb?: number, indices?: number[]): string {
     const checkpointAmounts = allRecords.map(a =>
       a?.checkpoints?.length).filter(a => a !== undefined) as number[]
     const cpAmount: number = checkpointAmounts.length === 0 ? 0 : Math.max(...checkpointAmounts)
@@ -214,7 +214,8 @@ export default class RecordList {
       } else {
         ret += this.constructMarker(markers?.[i])
       }
-      ret += this.constructIndex(parsedRecs?.[i]?.index) +
+      const displayIndex = indices?.[i] ?? parsedRecs?.[i]?.index
+      ret += this.constructIndex(displayIndex) +
         this.constructTime(parsedRecs?.[i]?.record?.time, timeColours?.[i],
           parsedRecs?.[i]?.record?.text, parsedRecs?.[i]?.record?.image) +
         this.constructName(parsedRecs?.[i]?.record?.name) +
@@ -322,7 +323,7 @@ export default class RecordList {
       if (c !== undefined) {
         for (const [i, e] of cps.map(a => a[index]).entries()) {
           if (e === undefined || c[i] !== undefined) { continue }
-          if (e > (c[i] as number)) {
+          if (e > (c[i] as unknown as number)) {
             cpTypes[index][i] = 'worst'
           } else if (e === c[i]) {
             cpTypes[index][i] = 'equal'
@@ -394,7 +395,7 @@ export default class RecordList {
 
   private getTimeColours(login: string | undefined, playerIndex: number, records: RLRecord[], personalBest?: number): ('slower' | 'faster' | 'top' | 'you')[] {
     const ret: ('slower' | 'faster' | 'top' | 'you')[] = []
-    if(login === undefined) {
+    if (login === undefined) {
       for (let i: number = 0; i < records.length; i++) {
         ret.push('slower')
       }
@@ -553,8 +554,9 @@ export default class RecordList {
     const height: number = this.rowHeight - this.rowGap
     const width: number = this.columnWidths[0] - this.columnGap
     const n: string = index === undefined ? '' : `${(index + 1)}`
+    const di: string = index === -1 ? '-' : index === Infinity ? 'F' : n
     return `<quad posn="${posX} 0  1" sizen="${width} ${height}" bgcolor="${this.headerBackground}"/>
-      ${this.centeredText((index === -1 ? '-' : n), width, height, posX)}`
+      ${this.centeredText(di, width, height, posX)}`
   }
 
   private constructTime(time: number | undefined, timeColour: TimeColour | undefined,

@@ -31,6 +31,8 @@
 /trakman/
 /tmf-config/
 /tracks/
+/.hashes.json
+/update.log
 
 # Bun
 bun.lockb
