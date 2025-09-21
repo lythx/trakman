@@ -50,8 +50,7 @@ export class VoteSkip extends UiButton {
   }
 
   private async handleClick(login: string, nickname: string): Promise<void> {
-    if (this.isLastMapReplay || this.isReplay
-      || this.isSkip || tm.getState() === 'result') { return }
+    if (this.isLastMapReplay || this.isReplay || this.isSkip || tm.getState() === 'result') { return }
     const autopass = tm.players.count === 1
     if (!autopass && tm.timer.remainingRaceTime <= cfg.minimumRemainingTime) {
       tm.sendMessage(msg.tooLate, login)
@@ -169,9 +168,9 @@ export class VoteSkip extends UiButton {
       this.isReplay = true
     }
     if (this.isSkip || this.isLastMapReplay) { return }
-    this.buttonData.text1 = cfg.texts[2+plus][0]
-    this.buttonData.text2 = cfg.texts[2+plus][1]
-    this.buttonData.equalTexts = cfg.texts[2+plus].equal
+    this.buttonData.text1 = cfg.texts[2 + plus][0]
+    this.buttonData.text2 = cfg.texts[2 + plus][1]
+    this.buttonData.equalTexts = cfg.texts[2 + plus].equal
     this.buttonData.actionId = undefined
     this.emitUpdate()
   }

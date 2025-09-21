@@ -3,12 +3,16 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, centeredText, leftAlignedText, StaticHeader, StaticComponent } from '../../UI.js'
+import { centeredText, componentIds, Grid, leftAlignedText, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './BestFinishes.config.js'
 
 export default class BestFinishes extends StaticComponent {
 
-  private readonly bestFinishes: { login: string, time: number, nickname: string }[] = []
+  private readonly bestFinishes: {
+    login: string,
+    time: number,
+    nickname: string
+  }[] = []
   private readonly header: StaticHeader
   private readonly headerBg: string
   private readonly headerHeight: number
@@ -21,8 +25,8 @@ export default class BestFinishes extends StaticComponent {
     this.headerBg = this.header.options.textBackground
     this.headerHeight = this.header.options.height
     if (config.horizontal) {
-      this.grid = new Grid(config.horizontalModeWidth, config.entryHeight, new Array(config.entries).fill(config.columnProportions).flat(),
-        [1], { margin: config.margin })
+      this.grid = new Grid(config.horizontalModeWidth, config.entryHeight,
+        new Array(config.entries).fill(config.columnProportions).flat(), [1], { margin: config.margin })
     } else {
       const contentHeight = ((config.entryHeight + config.margin * 2) * config.entries) - (this.headerHeight + config.margin)
       this.grid = new Grid(config.width + config.margin * 2, contentHeight, config.columnProportions,
@@ -38,7 +42,11 @@ export default class BestFinishes extends StaticComponent {
       }
       if (index === -1) { index = this.bestFinishes.length }
       if (index < config.entries) {
-        this.bestFinishes.splice(index, 0, { login: info.login, time: info.time, nickname: info.nickname })
+        this.bestFinishes.splice(index, 0, {
+          login: info.login,
+          time: info.time,
+          nickname: info.nickname
+        })
         this.bestFinishes.length = Math.min(config.entries, this.bestFinishes.length)
         this.newestFinish = index
         return this.display()
@@ -106,7 +114,8 @@ export default class BestFinishes extends StaticComponent {
       <format textsize="1"/>
       ${this.constructGrid(login)}
     </frame>
-    </manialink>`, login
+    </manialink>`,
+      login
     }
   }
 
@@ -125,8 +134,10 @@ export default class BestFinishes extends StaticComponent {
         index = i + 1
       }
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${this.headerBg}"/>`
-      return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((index).toString(), w, h,
-        { textScale: config.textScale, padding: config.textPadding }))
+      return this.bestFinishes[i] === undefined ? '' : bg + (centeredText((index).toString(), w, h, {
+        textScale: config.textScale,
+        padding: config.textPadding
+      }))
     }
 
     const timeCell = (i: number, j: number, w: number, h: number): string => {
@@ -136,15 +147,20 @@ export default class BestFinishes extends StaticComponent {
       if (fin === undefined) { return '' }
       let format: string = fin.login === login ? `<format textcolor="${config.selfColour}"/>` : ''
       if (index === this.newestFinish) { format = `<format textcolor="${config.newestColour}"/>` }
-      return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, { textScale: config.textScale, padding: config.textPadding })
+      return bg + format + centeredText(tm.utils.getTimeString(fin.time), w, h, {
+        textScale: config.textScale,
+        padding: config.textPadding
+      })
     }
 
     const nicknameCell = (i: number, j: number, w: number, h: number): string => {
       const index = config.horizontal ? (j - 2) / 3 : i
       const bg = `<quad posn="0 0 1" sizen="${w} ${h}" bgcolor="${config.background}"/>`
-      return this.bestFinishes[index] === undefined ? '' : bg +
-        (leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[index].nickname, false)), w, h,
-          { textScale: config.textScale, padding: config.textPadding }))
+      return this.bestFinishes[index] === undefined ? '' :
+        bg + (leftAlignedText(tm.utils.safeString(tm.utils.strip(this.bestFinishes[index].nickname, false)), w, h, {
+          textScale: config.textScale,
+          padding: config.textPadding
+        }))
     }
 
     const arr: ((i: number, j: number, w: number, h: number) => string)[] = []

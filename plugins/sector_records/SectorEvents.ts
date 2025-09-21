@@ -13,7 +13,7 @@ const nicknameUpdateListeners: Function[] = []
  * @param callback Callback function to execute
  */
 const addListener = <T extends keyof SectorEventFunctions>(event: T, callback: SectorEventFunctions[T]): void => {
-  switch (event) {
+  switch(event) {
     case 'BestSector':
       bestSectorListeners.push(callback as any)
       return
@@ -34,9 +34,10 @@ const addListener = <T extends keyof SectorEventFunctions>(event: T, callback: S
   }
 }
 
-const emitEvent = async <T extends keyof SectorEventFunctions>(event: T, ...params: Parameters<SectorEventFunctions[T]>) => {
+const emitEvent = async <T extends keyof SectorEventFunctions>(event: T,
+  ...params: Parameters<SectorEventFunctions[T]>) => {
   let listeners: any
-  switch (event) {
+  switch(event) {
     case 'BestSector':
       listeners = bestSectorListeners
       break

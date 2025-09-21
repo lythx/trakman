@@ -1,5 +1,5 @@
 export default {
-  background: "000a",
+  background: '000a',
   yOffsetBig: 2.2,
   yOffset: 2.4,
   yOffsetBottom: 3.65,
@@ -8,5 +8,5 @@ export default {
   padding: 0.6,
   iconWidth: 1.8,
   iconHeight: 1.8,
-  topPadding: 0.2,
+  topPadding: 0.2
 }

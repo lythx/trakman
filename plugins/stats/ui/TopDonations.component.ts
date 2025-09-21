@@ -4,15 +4,18 @@
  */
 
 import { stats } from "../Stats.js"
-import { componentIds, centeredText } from '../../ui/UI.js'
-import { Paginator, Grid, type GridCellFunction, closeButton, type GridCellObject, PopupWindow } from "../../ui/UI.js"
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, Paginator, PopupWindow } from '../../ui/UI.js'
 import config from './TopDonations.config.js'
 
 export default class TopDonations extends PopupWindow<number> {
 
   private readonly paginator: Paginator
   private readonly grid: Grid
-  private ranks: readonly { login: string, nickname: string, amount: number }[]
+  private ranks: readonly {
+    login: string,
+    nickname: string,
+    amount: number
+  }[]
 
   constructor() {
     super(componentIds.topDonations, config.icon, config.title, config.navbar)
@@ -29,7 +32,8 @@ export default class TopDonations extends PopupWindow<number> {
       this.paginator.setPageCount(Math.ceil(this.ranks.length / config.entries))
       this.reRender()
     })
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(this.ranks.length / config.entries))
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight,
+      Math.ceil(this.ranks.length / config.entries))
     this.paginator.onPageChange = (login, page) => {
       this.displayToPlayer(login, page, `${page}/${this.paginator.pageCount}`)
     }
@@ -61,17 +65,17 @@ export default class TopDonations extends PopupWindow<number> {
     const leftColumns = 3
     const offset = (((page ?? 1) - 1) * config.entries) - 1
     const getIndex = (i: number, j: number) => i + offset + (j > leftColumns ? (config.entries / columns) : 0)
-    const arr: (GridCellFunction | GridCellObject)[] = config.headers.map((a) =>
-      (i: number, j: number, w: number, h: number) => centeredText(a, w, h))
+    const arr: (GridCellFunction | GridCellObject)[] = config.headers.map(
+      (a) => (i: number, j: number, w: number, h: number) => centeredText(a, w, h))
     const indexCell: GridCellFunction = (i, j, w, h) => centeredText((getIndex(i, j) + 1).toString(), w, h)
-    const nicknameCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(tm.utils.safeString(tm.utils.strip(this.ranks[getIndex(i, j)].nickname, false)), w, h)
+    const nicknameCell: GridCellFunction = (i, j, w, h) => centeredText(
+      tm.utils.safeString(tm.utils.strip(this.ranks[getIndex(i, j)].nickname, false)), w, h)
     const loginCell: GridCellFunction = (i, j, w, h) => {
       const colour = this.ranks[getIndex(i, j)].login === login ? `$${config.selfColour} ` : ''
       return centeredText(colour + this.ranks[getIndex(i, j)].login, w, h)
     }
-    const averageCell: GridCellFunction = (i, j, w, h) =>
-      centeredText(this.ranks[getIndex(i, j)].amount.toString(), w, h)
+    const averageCell: GridCellFunction = (i, j, w, h) => centeredText(this.ranks[getIndex(i, j)].amount.toString(), w,
+      h)
     const emptyCell: GridCellObject = {
       callback: (i, j, w, h) => '',
       background: undefined

@@ -3,9 +3,9 @@ export class ClientRequest {
   private readonly xml: string
 
   /**
-  * Prepares XML string for a dedicated server request.
-  * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
-  */
+   * Prepares XML string for a dedicated server request.
+   * List of dedicated server methods: https://methods.xaseco.org/methodstmf.php
+   */
   constructor(method: string, params: tm.CallParams[]) {
     this.xml = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
@@ -17,8 +17,8 @@ export class ClientRequest {
   }
 
   /**
-  * Prepares and returns buffer from XML string
-  */
+   * Prepares and returns buffer from XML string
+   */
   getPreparedBuffer(requestId: number): Buffer {
     const bufferLength: number = Buffer.byteLength(this.xml)
     const buffer: Buffer = Buffer.alloc(8 + bufferLength) // alloc 8 bonus bytes for target length and id
@@ -39,7 +39,7 @@ export class ClientRequest {
     if (value === undefined) {
       return new Error(`Received undefined while creating dedicated server XML request, expected ${type}.`)
     }
-    switch (type) {
+    switch(type) {
       case 'boolean':
         return `<boolean>${value === true ? '1' : '0'}</boolean>`
       case 'int':

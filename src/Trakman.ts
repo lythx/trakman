@@ -40,11 +40,11 @@ namespace trakman {
     getPlayerId: playersRepo.getId.bind(playersRepo),
 
     /**
-    * Executes a query on the database
-    * @param query Query to execute
-    * @param params Query parameters
-    * @returns Database response or error on invalid query
-    */
+     * Executes a query on the database
+     * @param query Query to execute
+     * @param params Query parameters
+     * @returns Database response or error on invalid query
+     */
     async query(query: string, ...params: any[]): Promise<any[] | Error> {
       const res = await DB.query(query, ...params).catch((err: Error) => err)
       if (res instanceof Error) {
@@ -75,7 +75,7 @@ namespace trakman {
 
     get dbSize() { return Database.dbSize },
 
-    get dbVersion() { return Database.dbVersion },
+    get dbVersion() { return Database.dbVersion }
 
   }
 
@@ -98,7 +98,7 @@ namespace trakman {
     fetch: PlayerService.fetch.bind(PlayerService),
 
     /**
-      All online players
+     All online players
      */
     get list() { return PlayerService.players },
 
@@ -169,7 +169,7 @@ namespace trakman {
     get liveCount(): number { return RecordService.liveRecordCount },
 
     /**
-     * Maximum amount of local records. 
+     * Maximum amount of local records.
      * All local records get fetched, but only ones below max amount count towards server rank.
      */
     get maxLocalsAmount(): number { return RecordService.maxLocalsAmount },
@@ -192,7 +192,7 @@ namespace trakman {
     /**
      * Number of current round records.
      */
-    get roundRecordCount(): number { return RoundsService.roundRecordCount },
+    get roundRecordCount(): number { return RoundsService.roundRecordCount }
 
   }
 
@@ -267,7 +267,7 @@ namespace trakman {
     addMessageTextModifier: ChatService.addMessageTextModifier.bind(ChatService),
 
     /**
-     * Recent chat messages. 
+     * Recent chat messages.
      */
     get messages(): tm.Message[] { return ChatService.messages },
 
@@ -300,7 +300,7 @@ namespace trakman {
 
     callNoRes: Client.callNoRes.bind(Client),
 
-    addProxy: Client.addProxy.bind(Client),
+    addProxy: Client.addProxy.bind(Client)
 
   }
 
@@ -437,7 +437,7 @@ namespace trakman {
     get currentCount(): number { return VoteService.currentCount },
 
     /**
-     * All votes in runtime memory. Only votes for maps in the history, 
+     * All votes in runtime memory. Only votes for maps in the history,
      * queue and the current map are stored.
      */
     get allVotes() { return VoteService.votes }
@@ -631,25 +631,24 @@ namespace trakman {
     /**
      * Number of server masteradmins.
      */
-    get masteradminCount(): number { return AdministrationService.masteradminCount },
+    get masteradminCount(): number { return AdministrationService.masteradminCount }
 
   }
 
-  /** 
-  * Sends a server message
-  * @param message Message to be sent
-  * @param login Optional player login or array of logins
-  * @param prefix
-  */
+  /**
+   * Sends a server message
+   * @param message Message to be sent
+   * @param login Optional player login or array of logins
+   * @param prefix
+   */
   export const sendMessage = (message: string, login?: string | string[], prefix: boolean = true): void => {
     if (login !== undefined) {
-      const m =  (prefix ? prefixes.prefixes.serverToPlayer : '') + message
+      const m = (prefix ? prefixes.prefixes.serverToPlayer : '') + message
       if (login === ServerConfig.config.login || login?.includes(ServerConfig.config.login)) {
         Logger.consoleLog(Utils.strip(m), false) // send message to console if one of the recipients is the server
       }
       Client.callNoRes('ChatSendServerMessageToLogin',
-        [{ string: m },
-        { string: typeof login === 'string' ? login : login.join(',') }])
+        [{ string: m }, { string: typeof login === 'string' ? login : login.join(',') }])
       return
     }
     Client.callNoRes('ChatSendServerMessage', [{ string: (prefix ? prefixes.prefixes.serverToAll : '') + message }])
@@ -662,24 +661,29 @@ namespace trakman {
    * @param deleteOnClick Whether to remove the manialink on player interaction
    * @param expireTime Amount of time (in seconds) for the manialink to disappear
    */
-  export const sendManialink = (manialink: string, login?: string | string[],
-    deleteOnClick: boolean = false, expireTime: number = 0): void => {
+  export const sendManialink = (manialink: string, login?: string | string[], deleteOnClick: boolean = false,
+    expireTime: number = 0): void => {
     if (tm.players.count === 0) { return }
     if (login !== undefined) {
-      Client.callNoRes('SendDisplayManialinkPageToLogin', [
-        { string: typeof login === 'string' ? login : login.join(',') },
-        { string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+      Client.callNoRes('SendDisplayManialinkPageToLogin',
+        [{ string: typeof login === 'string' ? login : login.join(',') }, { string: manialink }, { int: expireTime },
+          { boolean: deleteOnClick }])
       return
     }
-    Client.callNoRes('SendDisplayManialinkPage', [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
+    Client.callNoRes('SendDisplayManialinkPage',
+      [{ string: manialink }, { int: expireTime }, { boolean: deleteOnClick }])
   }
 
   /**
    * Updates player information in runtime memory and database
    * @param players Objects containing player login and infos to update
    */
-  export const updatePlayerInfo = async (...players:
-    { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> => {
+  export const updatePlayerInfo = async (...players: {
+    login: string,
+    nickname?: string,
+    region?: string,
+    title?: string
+  }[]): Promise<void> => {
     await PlayerService.updateInfo(...players)
     RecordService.updateInfo(...players)
     AdministrationService.updateNickname(...players.filter(a => a.nickname !== undefined) as any)
@@ -715,7 +719,7 @@ namespace trakman {
   export const removeListener = Events.removeListener
 
   /**
-   * Emits ManialinkClick for given player and actionId. 
+   * Emits ManialinkClick for given player and actionId.
    * Used for manialink interaction such as opening UI windows.
    * @param id Manialink ID
    * @param login Player login

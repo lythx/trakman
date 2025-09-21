@@ -18,11 +18,11 @@ export default class TimerWidgetResult extends StaticComponent {
   getHeight(): number {
     return config.height
   }
-  
+
   protected onPositionChange(): void {
     this.constructXml()
     const xml = this.display()
-    if(xml !== undefined) { tm.sendManialink(xml) }
+    if (xml !== undefined) { tm.sendManialink(xml) }
   }
 
   display() {
@@ -32,7 +32,10 @@ export default class TimerWidgetResult extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   private constructXml(): void {

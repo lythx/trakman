@@ -3,21 +3,29 @@
  * @since 1.3.5
  */
 
-import { closeButton, componentIds, Grid, centeredText, type GridCellFunction, Paginator, PopupWindow, addManialinkListener } from '../../UI.js'
+import { addManialinkListener, centeredText, closeButton, componentIds, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../UI.js'
 import config from './Masteradminlist.config.js'
 import { actions } from '../../../actions/Actions.js'
 
-export default class Masteradminlist extends PopupWindow<{ page: number, privilege: number }> {
+export default class Masteradminlist extends PopupWindow<{
+  page: number,
+  privilege: number
+}> {
 
   readonly grid: Grid
   readonly paginator: Paginator
 
   constructor() {
     super(componentIds.masteradminlist, config.icon, config.title, config.navbar, config.width)
-    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions, new Array(config.entries).fill(1), config.grid)
-    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight, Math.ceil(tm.admin.masteradminCount / (config.entries - 1)))
+    this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
+      new Array(config.entries).fill(1), config.grid)
+    this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
+      Math.ceil(tm.admin.masteradminCount / (config.entries - 1)))
     this.paginator.onPageChange = (login, page, info) => {
-      this.displayToPlayer(login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount}`, info.privilege)
+      this.displayToPlayer(login, {
+        page,
+        privilege: info.privilege
+      }, `${page}/${this.paginator.pageCount}`, info.privilege)
     }
     addManialinkListener(this.openId + 1000, 1000, async (info, offset) => {
       const target = tm.admin.masteradminlist[offset]
@@ -44,26 +52,31 @@ export default class Masteradminlist extends PopupWindow<{ page: number, privile
 
   protected onOpen(info: tm.ManialinkClickInfo) {
     const page = this.paginator.getPageByLogin(info.login)
-    this.displayToPlayer(info.login, { page, privilege: info.privilege }, `${page}/${this.paginator.pageCount} `, tm.players.get(info.login)?.privilege ?? 0)
+    this.displayToPlayer(info.login, {
+      page,
+      privilege: info.privilege
+    }, `${page}/${this.paginator.pageCount} `, tm.players.get(info.login)?.privilege ?? 0)
   }
 
   private reRender() {
     const players = this.getPlayersWithWindowOpen(true)
     for (const player of players) {
       const page = this.paginator.getPageByLogin(player.login)
-      this.displayToPlayer(player.login, { page, privilege: player.params.privilege }, `${page}/${this.paginator.pageCount} `, tm.players.get(player.login)?.privilege ?? 0)
+      this.displayToPlayer(player.login, {
+        page,
+        privilege: player.params.privilege
+      }, `${page}/${this.paginator.pageCount} `, tm.players.get(player.login)?.privilege ?? 0)
     }
   }
 
-  protected async constructContent(login: string, params: { page: number, privilege: number }) {
+  protected async constructContent(login: string, params: {
+    page: number,
+    privilege: number
+  }) {
     const index = (params.page - 1) * (config.entries - 1) - 1
-    const headers: GridCellFunction[] = [
-      (i, j, w, h) => centeredText(' Index ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Promote ', w, h),
-      (i, j, w, h) => centeredText(' Demote ', w, h),
-    ]
+    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Index ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h), (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Promote ', w, h), (i, j, w, h) => centeredText(' Demote ', w, h)]
     const masteradminlist = tm.admin.masteradminlist
     const fetchedPlayers = await tm.players.fetch(masteradminlist.map(a => a.login))
     const indexCell: GridCellFunction = (i, j, w, h) => {
@@ -74,7 +87,8 @@ export default class Masteradminlist extends PopupWindow<{ page: number, privile
       return centeredText(tm.utils.safeString(tm.utils.strip(nickname ?? config.defaultNickname, false)), w, h)
     }
     const loginCell: GridCellFunction = (i, j, w, h) => masteradminlist[i + index].login === login ?
-      centeredText('$' + config.selfColour + masteradminlist[i + index].login, w, h) : centeredText(masteradminlist[i + index].login, w, h)
+      centeredText('$' + config.selfColour + masteradminlist[i + index].login, w, h) :
+      centeredText(masteradminlist[i + index].login, w, h)
     const promoteButton: GridCellFunction = (i, j, w, h) => {
       let actionStr = ` action="${this.openId + i + 1000 + index}"`
       let cover = ''
@@ -102,8 +116,7 @@ export default class Masteradminlist extends PopupWindow<{ page: number, privile
   }
 
   protected constructFooter(login: string): string {
-    return closeButton(this.closeId, this.windowWidth, this.footerHeight) +
-			this.paginator.constructXml(login)
+    return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(login)
   }
 
 }

@@ -2,7 +2,10 @@ import { Client } from "./client/Client.js"
 import { Logger } from "./Logger.js"
 import { GameService } from './services/GameService.js'
 
-const eventListeners: { event: keyof tm.Events, callback: ((params: any) => void | Promise<void>) }[] = []
+const eventListeners: {
+  event: keyof tm.Events,
+  callback: ((params: any) => void | Promise<void>)
+}[] = []
 let controllerReady: boolean = false
 
 const initialize = async (): Promise<void> => {
@@ -33,13 +36,22 @@ const initialize = async (): Promise<void> => {
  * @param prepend If set to true puts the listener on the beginning of the array (it will get executed before other listeners)
  */
 const addListener = <T extends keyof tm.Events>(event: T | (keyof tm.Events)[],
-  callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any)
-    => void | Promise<void>), prepend?: true): void => {
-  const arr: { event: keyof tm.Events, callback: ((params: any) => void) }[] = []
+  callback: ((params: T extends keyof tm.Events ? tm.Events[T] : any) => void | Promise<void>),
+  prepend?: true): void => {
+  const arr: {
+    event: keyof tm.Events,
+    callback: ((params: any) => void)
+  }[] = []
   if (Array.isArray(event)) {
-    arr.push(...event.map(a => ({ event: a, callback })))
+    arr.push(...event.map(a => ({
+      event: a,
+      callback
+    })))
   } else {
-    arr.push({ event: event, callback: callback })
+    arr.push({
+      event: event,
+      callback: callback
+    })
   }
   prepend === true ? eventListeners.unshift(...arr) : eventListeners.push(...arr)
 }
@@ -61,17 +73,24 @@ const removeListener = (callback: Function): void => {
  * @param event callback event name
  * @param params callback params
  */
-const emit = <T extends keyof tm.Events>(event: T,
-  params: tm.Events[T]): void => {
+const emit = <T extends keyof tm.Events>(event: T, params: tm.Events[T]): void => {
   if (!controllerReady) { return }
   const matchingEvents = eventListeners.filter(a => a.event === event || a.event === '*')
   for (const listener of matchingEvents) {
     if (listener.event === '*') {
-      listener.callback({ event, params })
+      listener.callback({
+        event,
+        params
+      })
     } else {
       listener.callback(params)
     }
   }
 }
 
-export const Events = { initialize, addListener, removeListener, emit }
+export const Events = {
+  initialize,
+  addListener,
+  removeListener,
+  emit
+}

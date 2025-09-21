@@ -4,7 +4,7 @@
  */
 
 import { donations } from '../../../donations/Donations.js'
-import { componentIds, StaticHeader, centeredText, StaticComponent } from '../../UI.js'
+import { centeredText, componentIds, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './DonationPanel.config.js'
 
 export default class DonationPanel extends StaticComponent {
@@ -33,7 +33,10 @@ export default class DonationPanel extends StaticComponent {
 
   display() {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login: tm.players.list.filter(a => a.isUnited).map(a => a.login) }
+    return {
+      xml: this.xml,
+      login: tm.players.list.filter(a => a.isUnited).map(a => a.login)
+    }
   }
 
   displayToPlayer(login: string) {
@@ -42,7 +45,10 @@ export default class DonationPanel extends StaticComponent {
       return this.hideToPlayer(login)
     }
     if (tm.players.get(login)?.isUnited) {
-      return { xml: this.xml, login }
+      return {
+        xml: this.xml,
+        login
+      }
     }
   }
 

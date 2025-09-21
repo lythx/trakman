@@ -2,13 +2,14 @@ import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
 
 export default {
-  title: "Changelog",
+  title: 'Changelog',
   icon: icons.codeBranch,
-  navbar: [
-    { name: 'Command List', actionId: ids.commandList }
-  ],
+  navbar: [{
+    name: 'Command List',
+    actionId: ids.commandList
+  }],
   textScale: 1.4,
-  tileBackground: "9996",
+  tileBackground: '9996',
   marginBig: 1,
   entries: 2,
   versionWidth: 6,

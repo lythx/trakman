@@ -115,5 +115,5 @@ export default {
     privilege: 3,
     aliases: ['drp', 'disablerespawn'],
     help: `Set whether checkpoint respawning is enabled.`
-  },
+  }
 }

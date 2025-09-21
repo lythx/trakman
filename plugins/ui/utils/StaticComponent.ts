@@ -1,8 +1,12 @@
 import RaceUi from "../config/RaceUi.js"
 import ResultUi from "../config/ResultUi.js"
-import { components, addKeyListener } from '../UI.js'
+import { addKeyListener, components } from '../UI.js'
 
-interface PlayerML { login: string | string[], xml: string }
+interface PlayerML {
+  login: string | string[],
+  xml: string
+}
+
 type PlayerMLList = (string | PlayerML | void)[]
 type MLLike = string | PlayerML | PlayerMLList
 
@@ -12,51 +16,67 @@ type MLLike = string | PlayerML | PlayerMLList
 export default abstract class StaticComponent {
 
   static components: {
-    [mode in tm.GameMode | 'Result']: { [sideOrList in 'left' | 'right' | 'other']:
-      { name: string, getHeight: () => number }[] }
-  } =
-      {
-        TimeAttack: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Rounds: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Cup: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Laps: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Teams: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Stunts: {
-          left: [],
-          right: [],
-          other: []
-        },
-        Result: {
-          left: [],
-          right: [],
-          other: []
-        }
-      }
+    [mode in tm.GameMode | 'Result']: {
+      [sideOrList in 'left' | 'right' | 'other']: {
+        name: string,
+        getHeight: () => number
+      }[]
+    }
+  } = {
+    TimeAttack: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Rounds: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Cup: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Laps: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Teams: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Stunts: {
+      left: [],
+      right: [],
+      other: []
+    },
+    Result: {
+      left: [],
+      right: [],
+      other: []
+    }
+  }
   static displayedComponents: {
-    left: { name: string, getHeight: () => number }[],
-    right: { name: string, getHeight: () => number }[],
-    other: { name: string, getHeight: () => number }[]
-  } = { left: [], right: [], other: [] }
+    left: {
+      name: string,
+      getHeight: () => number
+    }[],
+    right: {
+      name: string,
+      getHeight: () => number
+    }[],
+    other: {
+      name: string,
+      getHeight: () => number
+    }[]
+  } = {
+    left: [],
+    right: [],
+    other: []
+  }
   private _isDisplayed = true
   /** Component manialink ID */
   readonly id: number
@@ -116,7 +136,10 @@ export default abstract class StaticComponent {
 
   private static addListeners() {
     this.listenersAdded = true
-    tm.addListener('*', ({ event, params }) => {
+    tm.addListener('*', ({
+      event,
+      params
+    }) => {
       const manialinks = []
       for (let i = 0; i < StaticComponent.listeners.length; i++) {
         if (StaticComponent.listeners[i].event === event) {
@@ -229,20 +252,33 @@ export default abstract class StaticComponent {
    * Updates _isDisplayed prop based on current static UI layout
    */
   updateIsDisplayed(): void {
-    this._isDisplayed = (StaticComponent.displayedComponents.left.some(a => a.name === this.constructor.name) ||
-      StaticComponent.displayedComponents.right.some(a => a.name === this.constructor.name) ||
-      StaticComponent.displayedComponents.other.some(a => a.name === this.constructor.name))
+    this._isDisplayed = (StaticComponent.displayedComponents.left.some(
+      a => a.name === this.constructor.name) || StaticComponent.displayedComponents.right.some(
+      a => a.name === this.constructor.name) || StaticComponent.displayedComponents.other.some(
+      a => a.name === this.constructor.name))
   }
 
-  private static mapComponentHeight(names: (string | number)[]): { name: string, getHeight: () => number }[] {
-    const ret: { name: string, getHeight: () => number }[] = []
+  private static mapComponentHeight(names: (string | number)[]): {
+    name: string,
+    getHeight: () => number
+  }[] {
+    const ret: {
+      name: string,
+      getHeight: () => number
+    }[] = []
     for (const e of names) {
       if (typeof e === 'number') {
-        ret.push({ name: '__margin__', getHeight: () => e })
+        ret.push({
+          name: '__margin__',
+          getHeight: () => e
+        })
       } else {
         const comp = components.findStatic(e)
         if (comp === undefined) { continue }
-        ret.push({ name: e, getHeight: comp.getHeight.bind(comp) })
+        ret.push({
+          name: e,
+          getHeight: comp.getHeight.bind(comp)
+        })
       }
     }
     return ret
@@ -298,7 +334,11 @@ export default abstract class StaticComponent {
    * Gets position relative to other static manialinks based on current static UI layout.
    * @returns Object containing coordinates and side of the component
    */
-  private getRelativePosition(): { x: number, y: number, side: boolean } {
+  private getRelativePosition(): {
+    x: number,
+    y: number,
+    side: boolean
+  } {
     const widgetName: string = this.constructor.name
     let cfg
     if (tm.getState() === 'result') {
@@ -310,13 +350,20 @@ export default abstract class StaticComponent {
     const right = StaticComponent.displayedComponents.right
     let side = false
     if (right.some(a => a.name === widgetName)) { side = true }
-    const order: { name: string; getHeight: () => number; }[] = side ? right : left
+    const order: {
+      name: string;
+      getHeight: () => number;
+    }[] = side ? right : left
     let positionSum = 0
     for (const e of order) {
       if (e.name === widgetName) { break }
       positionSum += e.getHeight() + cfg.marginBig
     }
-    return { y: cfg.topBorder - positionSum, x: side ? cfg.rightPosition : cfg.leftPosition, side }
+    return {
+      y: cfg.topBorder - positionSum,
+      x: side ? cfg.rightPosition : cfg.leftPosition,
+      side
+    }
   }
 
   /**
@@ -347,11 +394,14 @@ export default abstract class StaticComponent {
   }
 
   hideToPlayer(login: string): PlayerML {
-    return { xml: `<manialink id="${this.id}"></manialink>`, login }
+    return {
+      xml: `<manialink id="${this.id}"></manialink>`,
+      login
+    }
   }
 
   /**
-   * Add a callback function to execute when new component object gets created 
+   * Add a callback function to execute when new component object gets created
    * @param callback Function to execute on event
    */
   static onComponentCreated(callback: (component: StaticComponent) => void): void {
@@ -359,7 +409,10 @@ export default abstract class StaticComponent {
   }
 
   protected renderOnEvent<T extends keyof tm.Events>(event: T, callback: (params: tm.Events[T]) => MLLike | void) {
-    StaticComponent.listeners.push({ event, callback })
+    StaticComponent.listeners.push({
+      event,
+      callback
+    })
   }
 
   static reduxModeChangeListeners: (() => MLLike | void)[] = []

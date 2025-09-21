@@ -37,9 +37,8 @@ export class RecordRepository extends Repository {
     const arr = records.filter(a => mapIds.some(b => b.uid === a.map) && playerIds.some(b => b.login === a.login))
     if (arr.length !== records.length) {
       Logger.error(`Failed to get ids for maps or players ${records
-        .filter(a => !(mapIds.some(b => b.uid === a.map)
-          && playerIds.some(b => b.login === a.login)))
-        .map(a => `(${a.login}, ${a.map})`).join(', ')} while inserting into records table`)
+      .filter(a => !(mapIds.some(b => b.uid === a.map) && playerIds.some(b => b.login === a.login)))
+      .map(a => `(${a.login}, ${a.map})`).join(', ')} while inserting into records table`)
     }
     if (arr.length === 0) { return }
     if (laps !== undefined) {
@@ -136,7 +135,6 @@ export class RecordRepository extends Repository {
     return res.map(a => this.constructRecordObject(a))
   }
 
-
   async getOne(mapUid: string, login: string, laps: number = -1): Promise<tm.Record | undefined> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
@@ -151,7 +149,10 @@ export class RecordRepository extends Repository {
       WHERE map_id=$1 AND player_id=$2 AND laps=$3`
       res = (await this.query(query, mapId, playerId, laps))
     }
-    return this.constructRecordObject({ uid: mapUid, login, ...res[0] })
+    return this.constructRecordObject({
+      uid: mapUid,
+      login, ...res[0]
+    })
   }
 
   async remove(mapUid: string, login: string, laps: number = -1): Promise<void> {
@@ -185,7 +186,8 @@ export class RecordRepository extends Repository {
     }
   }
 
-  async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date, isStunts?: boolean, laps: number = -1): Promise<void> {
+  async update(mapUid: string, login: string, time: number, checkpoints: number[], date: Date, isStunts?: boolean,
+    laps: number = -1): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     if (mapId === undefined || playerId === undefined) {
@@ -193,7 +195,7 @@ export class RecordRepository extends Repository {
       return
     }
     if (laps === -1) {
-      if(isStunts) {
+      if (isStunts) {
         time = -time
       }
       const query = 'UPDATE records SET time=$1, checkpoints=$2, date=$3 WHERE map_id=$4 AND player_id=$5'

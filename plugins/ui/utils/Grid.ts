@@ -39,7 +39,11 @@ export class Grid {
    * @param rowProportions Grid row proportions
    * @param options Optional properties
    */
-  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: { background?: string, margin?: number, headerBackground?: string }) {
+  constructor(width: number, height: number, columnProportions: number[], rowProportions: number[], options?: {
+    background?: string,
+    margin?: number,
+    headerBackground?: string
+  }) {
     this.width = width
     this.height = height
     this.margin = options?.margin ?? 0
@@ -83,8 +87,10 @@ export class Grid {
         } else {
           callback = obj
         }
-        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i).reduce((acc, cur): number => acc += cur, 0) - this.margin
-        const posX: number = this.columnWidths.filter((val, index): boolean => index < j).reduce((acc, cur): number => acc += cur, 0) + this.margin
+        const posY: number = -this.rowHeights.filter((val, index): boolean => index < i)
+        .reduce((acc, cur): number => acc += cur, 0) - this.margin
+        const posX: number = this.columnWidths.filter((val, index): boolean => index < j)
+        .reduce((acc, cur): number => acc += cur, 0) + this.margin
         let h: number = -this.margin
         for (let k: number = i; k < i + rowspan; k++) {
           h += this.rowHeights[k]

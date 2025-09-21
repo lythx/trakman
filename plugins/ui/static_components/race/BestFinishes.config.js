@@ -12,19 +12,15 @@ export default {
   horizontalModePosX: cfg.leftPosition + cfg.width * 2 + cfg.margin * 2,
   posY: cfg.topBorder,
   side: true,
-  title: "Best Finishes",
+  title: 'Best Finishes',
   icon: icons.bestFinishes,
   margin: cfg.margin,
   background: cfg.background,
-  columnProportions: [
-    1,
-    2.8,
-    4
-  ],
+  columnProportions: [1, 2.8, 4],
   selfColour: `${tm.utils.palette.green}F`,
   newestColour: `${tm.utils.palette.yellow}F`,
   textScale: 0.87,
   textPadding: 0.2,
   horizontal: false,
-  hidePanel: true,
+  hidePanel: true
 }

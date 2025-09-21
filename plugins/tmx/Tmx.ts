@@ -30,7 +30,8 @@ const getUid = (map: tm.TMXMap | string): string => typeof map === 'string' ? ma
 
 const initialize = async (): Promise<void> => {
   if (queueSize > tm.jukebox.queueCount) {
-    await tm.log.fatal(`jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
+    await tm.log.fatal(
+      `jukeboxQueueSize (${tm.jukebox.queueCount}) can't be lower than tmx queueSize (${queueSize}). Change your tmx config`)
   }
   const res: tm.TMXMap | Error = await tm.tmx.fetchMapInfo(tm.maps.current.id)
   current = res instanceof Error ? tm.maps.current.id : res
@@ -56,8 +57,7 @@ const update = async (updateCurrent?: true): Promise<void> => {
   const curId = tm.maps.current.id
   if (updateCurrent) {
     const entry = fetchedMaps.find(a => getUid(a) === curId)
-    if (entry !== undefined) { current = entry }
-    else {
+    if (entry !== undefined) { current = entry } else {
       const res = await tm.tmx.fetchMapInfo(curId)
       current = res instanceof Error ? curId : res
     }
@@ -127,7 +127,7 @@ function getFromQueue(uids: string | string[]): Readonly<tm.TMXMap> | undefined 
 }
 
 /**
- * Fetches TMX data for current map and maps in the queue. 
+ * Fetches TMX data for current map and maps in the queue.
  * Provides utilities for accessing TMX related data.
  * @author lythx
  * @since 0.1
@@ -155,7 +155,7 @@ export const tmx = {
   getFromQueue,
 
   /**
-   * Current map TMX info or null if map is not on tmx 
+   * Current map TMX info or null if map is not on tmx
    */
   get current(): Readonly<tm.TMXMap> | null {
     return typeof current === 'string' ? null : current

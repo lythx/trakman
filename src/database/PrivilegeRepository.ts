@@ -4,17 +4,25 @@ interface TableEntry {
   readonly login: string
   readonly privilege: number
 }
+
 export class PrivilegeRepository extends Repository {
 
   async get(login: string): Promise<number>
-  async get(logins: string[]): Promise<{ login: string, privilege: number }[]>
-  async get(logins: string[] | string): Promise<{ login: string, privilege: number }[] | number> {
+  async get(logins: string[]): Promise<{
+    login: string,
+    privilege: number
+  }[]>
+  async get(logins: string[] | string): Promise<{
+    login: string,
+    privilege: number
+  }[] | number> {
     let isArr: boolean = true
     if (typeof logins === 'string') {
       logins = [logins]
       isArr = false
     } else if (logins.length === 0) { return [] }
-    const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('').slice(0, -3)}`
+    const query = `SELECT login, privilege FROM privileges WHERE ${logins.map((a, i) => `login=$${i + 1} OR `).join('')
+    .slice(0, -3)}`
     const res = await this.query(query, ...logins)
     return isArr ? res : res[0]?.privilege ?? 0
   }
@@ -62,7 +70,7 @@ export class PrivilegeRepository extends Repository {
   private constructPrivilegeObject(entry: TableEntry): tm.PrivilegeEntry {
     return {
       login: entry.login,
-      privilege: entry.privilege,
+      privilege: entry.privilege
     }
   }
 

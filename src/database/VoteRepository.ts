@@ -29,9 +29,8 @@ export class VoteRepository extends Repository {
     const arr = votes.filter(a => mapIds.some(b => b.uid === a.mapId) && playerIds.some(b => b.login === a.login))
     if (arr.length !== votes.length) {
       Logger.error(`Failed to get ids for maps or players ${votes
-        .filter(a => !(mapIds.some(b => b.uid === a.mapId)
-          && playerIds.some(b => b.login === a.login)))
-        .map(a => `(${a.login}, ${a.mapId})`).join(', ')} while inserting into votes table`)
+      .filter(a => !(mapIds.some(b => b.uid === a.mapId) && playerIds.some(b => b.login === a.login)))
+      .map(a => `(${a.login}, ${a.mapId})`).join(', ')} while inserting into votes table`)
     }
     if (arr.length === 0) { return }
     const query = `INSERT INTO votes(map_id, player_id, vote, date) 
@@ -48,10 +47,17 @@ export class VoteRepository extends Repository {
     }
   }
 
-  async update(mapUid: string, objects: { login: string, vote: number, date: Date }[]): Promise<void>
+  async update(mapUid: string, objects: {
+    login: string,
+    vote: number,
+    date: Date
+  }[]): Promise<void>
   async update(mapUid: string, login: string, vote: number, date: Date): Promise<void>
-  async update(mapUid: string,
-    arg: string | { login: string, vote: number, date: Date }[], vote?: number, date?: Date): Promise<void> {
+  async update(mapUid: string, arg: string | {
+    login: string,
+    vote: number,
+    date: Date
+  }[], vote?: number, date?: Date): Promise<void> {
     const mapId = await mapIdsRepo.get(mapUid)
     if (typeof arg === 'string') {
       const login = arg
@@ -69,7 +75,7 @@ export class VoteRepository extends Repository {
     const arr = arg.filter(a => playerIds.some(b => b.login === a.login))
     if (arr.length !== arg.length) {
       Logger.error(`Failed to get ids for players ${arg.filter(a => !playerIds.some(b => b.login === a.login))
-        .map(a => `${a.login}`).join(', ')} while inserting into votes table`)
+      .map(a => `${a.login}`).join(', ')} while inserting into votes table`)
     }
     const query: string = `UPDATE votes SET 
     vote=v.vote, date=v.date
@@ -87,7 +93,10 @@ export class VoteRepository extends Repository {
     const mapId = await mapIdsRepo.get(mapUid)
     const playerId = await playerRepo.getId(login)
     const res = await this.query(query, mapId, playerId)
-    return res[0] === undefined ? undefined : this.constructVoteObject({ ...res[0], uid: mapUid })
+    return res[0] === undefined ? undefined : this.constructVoteObject({
+      ...res[0],
+      uid: mapUid
+    })
   }
 
   async get(...mapUids: string[]): Promise<tm.Vote[]> {

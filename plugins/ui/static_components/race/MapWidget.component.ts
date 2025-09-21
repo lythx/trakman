@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { componentIds, Grid, StaticHeader, StaticComponent, type StaticHeaderOptions } from '../../UI.js'
+import { componentIds, Grid, StaticComponent, StaticHeader, type StaticHeaderOptions } from '../../UI.js'
 import flags from '../../config/FlagIcons.js'
 import { tmx } from '../../../tmx/Tmx.js'
 import { webservices } from '../../../webservices/Webservices.js'
@@ -39,7 +39,10 @@ export default class MapWidget extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   private updateXML(): void {
@@ -65,13 +68,10 @@ export default class MapWidget extends StaticComponent {
         timeOrScoreIcon = ic.goldScore
       }
     }
-    const infos: [string, string][] = [
-      [config.title, ic.header],
+    const infos: [string, string][] = [[config.title, ic.header],
       [tm.utils.safeString(tm.utils.decodeURI(map.name)), this.getTag(map, TMXMap ?? undefined)],
-      [tm.utils.safeString(author), authorIcon],
-      [timeOrScore, timeOrScoreIcon],
-      [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]
-    ]
+      [tm.utils.safeString(author), authorIcon], [timeOrScore, timeOrScoreIcon],
+      [date === undefined ? config.noDateText : tm.utils.formatDate(date), ic.buildDate]]
     const headerCfg: StaticHeaderOptions = this.header.options
     const cell = (i: number, j: number, w: number, h: number): string => {
       if (i === 3) {
@@ -84,24 +84,23 @@ export default class MapWidget extends StaticComponent {
           textBackground: config.background
         })}
         </frame>
-        <frame posn="${(headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)) +
-          headerCfg.squareWidth + (headerCfg.margin * 2)} 0 1">
+        <frame posn="${(headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)) + headerCfg.squareWidth + (headerCfg.margin * 2)} 0 1">
           ${this.header.constructXml(infos[i + 1][0], infos[i + 1][1], this.side, {
-            rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
-            textScale: config.textScale,
-            centerText: true,
-            textBackground: config.background
-          })}
+          rectangleWidth: (headerCfg.rectangleWidth / 2) - (headerCfg.margin + (headerCfg.squareWidth / 2)),
+          textScale: config.textScale,
+          centerText: true,
+          textBackground: config.background
+        })}
         </frame>`
       }
       return `
       <frame posn="0 0 1">
         ${i === 0 ? this.header.constructXml(infos[i][0], infos[i][1], this.side) :
-          this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
-            textScale: config.textScale,
-            textBackground: config.background,
-            horizontalPadding: config.mapPadding
-          })}
+        this.header.constructXml(tm.utils.strip(infos[i][0], false), infos[i][1], this.side, {
+          textScale: config.textScale,
+          textBackground: config.background,
+          horizontalPadding: config.mapPadding
+        })}
       </frame>`
     }
     const arr: any[] = new Array(this.rows).fill(cell)
@@ -116,9 +115,9 @@ export default class MapWidget extends StaticComponent {
 
   private getTag(map: tm.Map, TMXMap?: tm.TMXMap): string {
     for (const e of config.customTags) {
-      if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) ||
-        e?.names?.some(a => a.test(map.name) || a.test(tm.utils.strip(map.name)) ||
-          (TMXMap !== undefined ? (a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name))) : false))) {
+      if (e?.authors?.some(a => a === map.author || a === TMXMap?.author) || e?.names?.some(
+        a => a.test(map.name) || a.test(tm.utils.strip(map.name)) || (TMXMap !== undefined ?
+          (a.test(TMXMap.name) || a.test(tm.utils.strip(TMXMap.name))) : false))) {
         return e.icon
       }
     }

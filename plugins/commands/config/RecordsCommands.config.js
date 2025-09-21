@@ -16,5 +16,5 @@ export default {
     privilege: 3,
     aliases: ['pr', 'prunerecs', 'prunerecords'],
     help: `Remove all records on the ongoing map.`
-  },
+  }
 }

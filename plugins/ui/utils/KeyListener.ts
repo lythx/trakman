@@ -1,6 +1,10 @@
 import utilIds from '../config/UtilIds.js'
 
-let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5' | 'F6' | 'F7', importance: number }[] = []
+let keyListeners: {
+  callback: ((info: tm.ManialinkClickInfo) => void),
+  key: 'F5' | 'F6' | 'F7',
+  importance: number
+}[] = []
 
 /**
  * Registers a callback function to execute on given key press.
@@ -8,8 +12,13 @@ let keyListeners: { callback: ((info: tm.ManialinkClickInfo) => void), key: 'F5'
  * @param callback Function to execute on key press, it takes ManialinkClickInfo as a parameter
  * @param importance Importance index - only the function with highest importance index will get executed
  */
-export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void, importance: number) => {
-  keyListeners.unshift({ callback, key, importance })
+export const addKeyListener = (key: 'F5' | 'F6' | 'F7', callback: (info: tm.ManialinkClickInfo) => void,
+  importance: number) => {
+  keyListeners.unshift({
+    callback,
+    key,
+    importance
+  })
 }
 
 /**
@@ -49,7 +58,7 @@ tm.addListener('PlayerJoin', (info): void => {
 })
 
 tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
-  switch (info.actionId) {
+  switch(info.actionId) {
     case utilIds.F5:
       keyListeners.find(a => a.key === 'F5')?.callback(info)
       break

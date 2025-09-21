@@ -1,4 +1,4 @@
-import { utilIds, staticButton } from './UI.js'
+import { staticButton, utilIds } from './UI.js'
 import config from './config/Buttons.js'
 
 export default class Buttons {

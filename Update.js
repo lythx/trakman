@@ -57,9 +57,18 @@ async function hashFile(path) {
 
 async function generateHashes() {
   console.log('Generating hashes for current files...')
-  const entries = (await fs.readdir('./src', { recursive: true, withFileTypes: true }))
-  .concat(await fs.readdir('./plugins', { recursive: true, withFileTypes: true }))
-  .concat(await fs.readdir('./config', { recursive: true, withFileTypes: true }))
+  const entries = (await fs.readdir('./src', {
+    recursive: true,
+    withFileTypes: true
+  }))
+  .concat(await fs.readdir('./plugins', {
+    recursive: true,
+    withFileTypes: true
+  }))
+  .concat(await fs.readdir('./config', {
+    recursive: true,
+    withFileTypes: true
+  }))
 
   const res = new Map(
     await Promise.all(entries.filter(a => a.isFile() && (a.name.endsWith('.js') || a.name.endsWith('.ts')))
@@ -132,7 +141,8 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     process.exit(1)
   }
 
-  let log = `Update log to version ${JSON.parse(await fs.readFile(path.join(fromPath, 'package.json'), { encoding: 'utf-8' }))['version']}\n\n`
+  let log = `Update log to version ${JSON.parse(
+    await fs.readFile(path.join(fromPath, 'package.json'), { encoding: 'utf-8' }))['version']}\n\n`
   if (conflicts.length > 0) {
     console.log('!!! Update conflicts, make sure to fix them by comparing your files to files ending in .new !!!')
     console.log('If you do not fix these conflicts, the controller might fail to start or crash.')
@@ -154,7 +164,9 @@ async function doUpdate(fromPath, newHashes, oldHashes = null) {
     console.log(e)
   }
 
-  if (conflicts.length > 0) { process.exit(2) }
+  if (conflicts.length > 0) {
+    process.exit(2)
+  }
   if (updatePerformed) {
     console.log('Update successful!')
   } else {

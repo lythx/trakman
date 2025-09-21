@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { centeredText, Grid, type GridCellFunction, componentIds, StaticHeader, addManialinkListener, StaticComponent } from '../../UI.js'
+import { addManialinkListener, centeredText, componentIds, Grid, type GridCellFunction, StaticComponent, StaticHeader } from '../../UI.js'
 import { maniakarma, type MKMapVotes } from '../../../maniakarma/Maniakarma.js'
 import config from './KarmaWidget.config.js'
 import { actions } from '../../../actions/Actions.js'
@@ -20,8 +20,11 @@ export default class KarmaWidget extends StaticComponent {
     super(componentIds.karma)
     this.header = new StaticHeader('race')
     this.headerH = this.header.options.height
-    this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2, config.margin + config.height - this.headerH,
-      new Array(3).fill(1), new Array(3).fill(1), { background: config.background, margin: config.margin })
+    this.grid = new Grid((config.width + config.margin - config.buttonWidth) / 2,
+      config.margin + config.height - this.headerH, new Array(3).fill(1), new Array(3).fill(1), {
+        background: config.background,
+        margin: config.margin
+      })
     this.renderOnEvent('KarmaVote', () => this.display())
     maniakarma.onMapFetch(() => this.sendMultipleManialinks(this.display()))
     maniakarma.onVote(() => this.sendMultipleManialinks(this.display()))
@@ -51,7 +54,10 @@ export default class KarmaWidget extends StaticComponent {
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    return { xml: this.constructXml(login), login }
+    return {
+      xml: this.constructXml(login),
+      login
+    }
   }
 
   private constructXml(login: string): string {
@@ -106,9 +112,11 @@ export default class KarmaWidget extends StaticComponent {
     const karmaStr: string = karma !== -1 ? (~~karma).toString() : config.defaultText
     const mkKarmaStr: string = mkVoteCount !== 0 ? (~~mkKarma).toString() : config.defaultText
     const mkCountStr: string = maniakarma.isEnabled ? mkVoteCount.toString() : config.defaultText
-    const options = { padding: config.textPadding, textScale: config.textScale }
-    const arr: GridCellFunction[] = [
-      (i, j, w, h): string => ``,
+    const options = {
+      padding: config.textPadding,
+      textScale: config.textScale
+    }
+    const arr: GridCellFunction[] = [(i, j, w, h): string => ``,
       (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4" 
       sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[0]}"/>`,
       (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4"
@@ -119,10 +127,10 @@ export default class KarmaWidget extends StaticComponent {
       (i, j, w, h): string => centeredText(karmaStr, w, h, options),
       (i, j, w, h): string => centeredText(mkKarmaStr, w, h, options),
 
-      (i, j, w, h): string => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,
+      (i, j, w,
+        h): string => `<quad posn="${config.margin} ${-config.margin} 4" sizen="${w - config.margin * 2} ${h - config.margin * 2}" image="${config.icons[3]}"/>`,
       (i, j, w, h): string => centeredText(voteCount.toString(), w, h, options),
-      (i, j, w, h): string => centeredText(mkCountStr, w, h, options),
-    ]
+      (i, j, w, h): string => centeredText(mkCountStr, w, h, options)]
     return this.grid.constructXml(arr)
   }
 
@@ -135,8 +143,12 @@ export default class KarmaWidget extends StaticComponent {
       const colour: string = this.options[i] === personalVote ? config.selfColour : config.mkColours[i]
       ret += `<quad posn="${config.margin} -${config.margin + h * i} 2" 
       sizen="${config.buttonWidth - (config.margin * 2)} ${h - config.margin}" bgcolor="${colour}" action="${this.id + i + 1}"/>
-      ${centeredText(e, config.buttonWidth - (config.margin * 2), h - config.margin,
-        { xOffset: config.margin, yOffset: config.margin + h * i + offsetFix, padding: 0, textScale })}`
+      ${centeredText(e, config.buttonWidth - (config.margin * 2), h - config.margin, {
+        xOffset: config.margin,
+        yOffset: config.margin + h * i + offsetFix,
+        padding: 0,
+        textScale
+      })}`
     }
     return ret
   }

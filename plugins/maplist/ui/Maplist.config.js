@@ -1,8 +1,9 @@
-import { icons, componentIds as ids } from '../../ui/UI.js'
+import { componentIds as ids, icons } from '../../ui/UI.js'
+
 const p = tm.utils.palette
 
 export default {
-  title: "Map List",
+  title: 'Map List',
   icon: icons.mapList,
   textScale: 1,
   padding: 0.1,
@@ -19,7 +20,7 @@ export default {
   texts: {
     map: 'Map #',
     queued: 'Queued',
-    noRank: "--."
+    noRank: '--.'
   },
   rows: 5,
   columns: 5,
@@ -27,11 +28,11 @@ export default {
     background: 'FFFA',
     margin: 0.15
   },
-  navbar: [
-    { name: 'Map Info', actionId: ids.TMXWindow }
-  ],
-  icons: [
-    icons.ongoingMap, // Map header icon
+  navbar: [{
+    name: 'Map Info',
+    actionId: ids.TMXWindow
+  }],
+  icons: [icons.ongoingMap, // Map header icon
     icons.tag, // Map name icon
     icons.personBuilder, // Author name icon
     icons.clockAuthor, // Author time icon
@@ -47,8 +48,8 @@ export default {
   queueNumberWidth: 2.9,
   timeWidth: 5,
   positionWidth: 3.1,
-  iconBackground: "222C",
-  contentBackground: "555C",
+  iconBackground: '222C',
+  contentBackground: '555C',
   plusImage: icons.addMap,
   minusImage: icons.removeMap,
   blankImage: icons.blank,

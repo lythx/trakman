@@ -15,7 +15,7 @@ export abstract class Logger {
     blue: '\u001b[34m',
     magenta: '\u001b[35m',
     cyan: '\u001b[36m',
-    white: '\u001b[37m',
+    white: '\u001b[37m'
   } as const
   private static readonly discordColours = {
     black: 0x000000,
@@ -31,29 +31,41 @@ export abstract class Logger {
   private static readonly logDir: string = './logs'
   private static readonly logTypes = {
     fatal: {
-      level: 1, colour: this.consoleColours.red,
-      files: [`${this.logDir}/fatal.log`, `${this.logDir}/error.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.red
+      level: 1,
+      colour: this.consoleColours.red,
+      files: [`${this.logDir}/fatal.log`, `${this.logDir}/error.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.red
     },
     error: {
-      level: 1, colour: this.consoleColours.red,
-      files: [`${this.logDir}/error.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.red
+      level: 1,
+      colour: this.consoleColours.red,
+      files: [`${this.logDir}/error.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.red
     },
     warn: {
-      level: 2, colour: this.consoleColours.yellow,
-      files: [`${this.logDir}/warn.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.yellow
+      level: 2,
+      colour: this.consoleColours.yellow,
+      files: [`${this.logDir}/warn.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.yellow
     },
     info: {
-      level: 3, colour: this.consoleColours.green,
-      files: [`${this.logDir}/info.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.green
+      level: 3,
+      colour: this.consoleColours.green,
+      files: [`${this.logDir}/info.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.green
     },
     trace: {
-      level: 4, colour: this.consoleColours.magenta,
-      files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.magenta
+      level: 4,
+      colour: this.consoleColours.magenta,
+      files: [`${this.logDir}/trace.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.magenta
     },
     debug: {
-      level: 5, colour: this.consoleColours.cyan,
-      files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`], discordColour: this.discordColours.cyan
-    },
+      level: 5,
+      colour: this.consoleColours.cyan,
+      files: [`${this.logDir}/debug.log`, `${this.logDir}/combined.log`],
+      discordColour: this.discordColours.cyan
+    }
   }
   private static readonly users: string[] = process.env.DISCORD_TAGGED_USERS?.split(',') ?? []
   private static readonly thumbs: string[] = process.env.DISCORD_EMBED_IMAGES?.split(',') ?? []
@@ -71,11 +83,11 @@ export abstract class Logger {
   static async initialize(): Promise<void> {
     const envLogLevel = Number(process.env.LOG_LEVEL)
     if (isNaN(envLogLevel)) {
-      this.warn(`LOG_LEVEL is undefined or not a number, default value (${this.logLevel})` +
-        ` will be used. Check your .env file to change it`)
+      this.warn(
+        `LOG_LEVEL is undefined or not a number, default value (${this.logLevel})` + ` will be used. Check your .env file to change it`)
     } else if (envLogLevel < 0 || envLogLevel > 5) {
-      this.warn(`LOG_LEVEL needs to be >=0 and <=5, received ${envLogLevel}.` +
-        ` Default value (${this.logLevel}) will be used. Check your .env file to change it`)
+      this.warn(
+        `LOG_LEVEL needs to be >=0 and <=5, received ${envLogLevel}.` + ` Default value (${this.logLevel}) will be used. Check your .env file to change it`)
     } else {
       this.logLevel = envLogLevel
     }
@@ -85,20 +97,22 @@ export abstract class Logger {
       }
     })
     process.on('uncaughtException', (err: Error): void => {
-      void this.fatal('Uncaught exception occurred: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
+      void this.fatal('Uncaught exception occurred: ', err.message,
+        ...(err.stack === undefined ? '' : err.stack.split('\n'))) // indent fix
     })
     process.on('unhandledRejection', (err: Error): void => {
-      void this.fatal('Unhandled rejection occurred: ', err.message, ...(err.stack === undefined ? '' : err.stack.split('\n')))
+      void this.fatal('Unhandled rejection occurred: ', err.message,
+        ...(err.stack === undefined ? '' : err.stack.split('\n')))
     })
     if (this.useDiscord) {
       const envDcLog = Number(process.env.DISCORD_LOG_LEVEL)
       const envDcWebhook = process.env.DISCORD_WEBHOOK_URL
       if (isNaN(envDcLog)) {
-        this.warn(`DISCORD_LOG_LEVEL is undefined or not a number, ` +
-          `default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
+        this.warn(
+          `DISCORD_LOG_LEVEL is undefined or not a number, ` + `default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
       } else if (envDcLog < 0 || envDcLog > 5) {
-        this.warn(`DISCORD_LOG_LEVEL needs to be >=0 and <=5, received ${envDcLog}. ` +
-          `Default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
+        this.warn(
+          `DISCORD_LOG_LEVEL needs to be >=0 and <=5, received ${envDcLog}. ` + `Default value (${this.discordLogLevel}) will be used. Check your .env file to change it`)
       } else {
         this.discordLogLevel = envDcLog
       }
@@ -234,14 +248,12 @@ export abstract class Logger {
             url: this.thumbs.length === 0 ? undefined : this.thumbs[~~(Math.random() * this.thumbs.length)]
           },
           footer: {
-            text: `📅`,
+            text: `📅`
           },
-          fields: [
-            {
-              name: `➡️ ${location}`,
-              value: `⚠️ ${str}`,
-            },
-          ],
+          fields: [{
+            name: `➡️ ${location}`,
+            value: `⚠️ ${str}`
+          }]
         }]
       })
       await this.sendDiscordMessage(message)

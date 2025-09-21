@@ -23,7 +23,8 @@ export class MapService {
   private static readonly repo = new MapRepository()
   private static readonly _queue: JukeboxMap[] = []
   private static readonly _history: tm.Map[] = []
-  private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ? config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === 'nations'
+  private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ?
+    config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === 'nations'
   /** Amount of maps in the queue. */
   static readonly queueSize: number = config.jukeboxQueueSize
   /** Max amount of maps in the history. */
@@ -75,14 +76,19 @@ export class MapService {
       if (list.findIndex(a => a.id === current.UId) === -1) {
         const v = await this.repo.getVoteCountAndRatio(current.UId)
         const currObj: tm.Map = {
-          ...this.constructNewMapObject(current), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0
+          ...this.constructNewMapObject(current),
+          voteCount: v?.count ?? 0,
+          voteRatio: v?.ratio ?? 0
         }
         list.push(currObj)
         await this.repo.add(currObj)
       }
       const fileNames = new Set(await ManualMapLoading.getFileNames())
-      this._maps = list.filter(a => fileNames.has(a.fileName)).map(a => ({ map: a, rand: Math.random() }))
-        .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+      this._maps = list.filter(a => fileNames.has(a.fileName)).map(a => ({
+        map: a,
+        rand: Math.random()
+      }))
+      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
       return
     }
     const mapList: any[] | Error = await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }])
@@ -114,8 +120,11 @@ export class MapService {
         return
       }
       const v = voteRatios.find(a => a.uid === c.UId)
-      mapsNotInDBObjects.push(
-        ({ ...this.constructNewMapObject(res), voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }))
+      mapsNotInDBObjects.push(({
+        ...this.constructNewMapObject(res),
+        voteCount: v?.count ?? 0,
+        voteRatio: v?.ratio ?? 0
+      }))
     }
     const mapsInMapList: tm.Map[] = []
     // From maps that were present in the database add only ones that are in current Match Settings
@@ -125,8 +134,11 @@ export class MapService {
       }
     }
     // Shuffle maps array
-    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({ map: a, rand: Math.random() }))
-      .sort((a, b): number => a.rand - b.rand).map(a => a.map)
+    this._maps = [...mapsInMapList, ...mapsNotInDBObjects].map(a => ({
+      map: a,
+      rand: Math.random()
+    }))
+    .sort((a, b): number => a.rand - b.rand).map(a => a.map)
     await this.repo.splitAdd(mapsNotInDBObjects)
   }
 
@@ -204,7 +216,11 @@ export class MapService {
           }
           const voteRatios = await this.repo.getVoteCountAndRatio(e.UId)
           const serverData = this.constructNewMapObject(res)
-          obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
+          obj = {
+            ...serverData,
+            voteCount: voteRatios?.count ?? 0,
+            voteRatio: voteRatios?.ratio ?? 0
+          }
         }
         this._maps.push(obj)
         addedMapObjects.push(obj)
@@ -267,7 +283,11 @@ export class MapService {
    * Sets vote ratios and counts for given maps. This method is called from VoteService
    * @param data Vote data objects
    */
-  static setVoteData(...data: { uid: string, count: number, ratio: number }[]): void {
+  static setVoteData(...data: {
+    uid: string,
+    count: number,
+    ratio: number
+  }[]): void {
     for (const e of data) {
       const map = this._maps.find(a => a.id === e.uid)
       if (map === undefined) {
@@ -302,7 +322,8 @@ export class MapService {
    * @returns Added map object or error if unsuccessful
    */
   static async add(filename: string, caller?: {
-    login: string, nickname: string
+    login: string,
+    nickname: string
   }, dontJuke = false): Promise<tm.Map | Error> {
     if (!config.manualMapLoading.enabled) {
       const insert: any | Error = await Client.call('InsertChallenge', [{ string: filename }])
@@ -340,7 +361,11 @@ export class MapService {
       }
       const voteRatios = await this.repo.getVoteCountAndRatio(res.UId)
       const serverData = this.constructNewMapObject(res)
-      obj = { ...serverData, voteCount: voteRatios?.count ?? 0, voteRatio: voteRatios?.ratio ?? 0 }
+      obj = {
+        ...serverData,
+        voteCount: voteRatios?.count ?? 0,
+        voteRatio: voteRatios?.ratio ?? 0
+      }
       void this.repo.add(obj)
     }
     this._maps.push(obj)
@@ -358,7 +383,10 @@ export class MapService {
         this.clearJukebox()
       }
     }
-    Events.emit('MapAdded', { ...obj, callerLogin: caller?.login })
+    Events.emit('MapAdded', {
+      ...obj,
+      callerLogin: caller?.login
+    })
     return obj
   }
 
@@ -373,8 +401,19 @@ export class MapService {
    * If that happens the map in returned object will be undefined.
    * @returns Error if unsuccessful, object containing map object and boolean indicating whether the map was already on the server
    */
-  static async writeFileAndAdd<T>(fileName: string, file: Buffer, caller?: { nickname: string, login: string },
-    options?: { dontJuke?: boolean, cancelIfAlreadyAdded?: T }): Promise<T extends true ? ({ map?: tm.Map, wasAlreadyAdded: boolean } | Error) : ({ map: tm.Map, wasAlreadyAdded: boolean } | Error)> {
+  static async writeFileAndAdd<T>(fileName: string, file: Buffer, caller?: {
+    nickname: string,
+    login: string
+  }, options?: {
+    dontJuke?: boolean,
+    cancelIfAlreadyAdded?: T
+  }): Promise<T extends true ? ({
+    map?: tm.Map,
+    wasAlreadyAdded: boolean
+  } | Error) : ({
+    map: tm.Map,
+    wasAlreadyAdded: boolean
+  } | Error)> {
     if (file.BYTES_PER_ELEMENT * file.length >= 1_048_576) { // Dedicated server hangs if the map file is greater than 1MB
       return new Error(`Map file too big.`)
     }
@@ -410,14 +449,20 @@ export class MapService {
             if (options?.dontJuke !== true) {
               this.addToJukebox(id, caller)
             }
-            return { wasAlreadyAdded: true, map }
+            return {
+              wasAlreadyAdded: true,
+              map
+            }
           }
           i++
         }
       }
       return new Error(`Failed to queue map ${path}`)
     }
-    return { wasAlreadyAdded: false, map }
+    return {
+      wasAlreadyAdded: false,
+      map
+    }
   }
 
   /**
@@ -426,7 +471,10 @@ export class MapService {
    * @param caller Object containing login and nickname of the player who is removing the map
    * @returns True if map was successfully removed, false if map was not in the map list, Error if server fails to remove the map
    */
-  static async remove(id: string, caller?: { login: string, nickname: string }): Promise<boolean | Error> {
+  static async remove(id: string, caller?: {
+    login: string,
+    nickname: string
+  }): Promise<boolean | Error> {
     const map: tm.Map | undefined = this._maps.find(a => id === a.id)
     await Client.call('GetChallengeList', [{ int: 5000 }, { int: 0 }]) // I HAVE NO CLUE HOW IT WORKS WITH THIS
     if (map === undefined) {
@@ -449,7 +497,10 @@ export class MapService {
     } else {
       Logger.info(`Map ${Utils.strip(map.name)} by ${map.author} removed`)
     }
-    Events.emit('MapRemoved', { ...map, callerLogin: caller?.login })
+    Events.emit('MapRemoved', {
+      ...map,
+      callerLogin: caller?.login
+    })
     await this.removeFromQueue(id, caller, false)
     //await this.writeMatchSettings()
     return true
@@ -478,7 +529,10 @@ export class MapService {
       this._current.isLapRace)
     // Avoid reference errors
     this._current = {
-      ...this._current, checkpointsAmount: obj.checkpoints, lapsAmount: obj.laps, isInLapsMode: obj.isInLapsMode,
+      ...this._current,
+      checkpointsAmount: obj.checkpoints,
+      lapsAmount: obj.laps,
+      isInLapsMode: obj.isInLapsMode,
       isLapsAmountModified: obj.isLapsAmountModified
     }
     Logger.info(`Map ${Utils.strip(this._current.name)} by ${this._current.author} restarted.`)
@@ -529,7 +583,8 @@ export class MapService {
    * @returns True if successful, False if the map is already juked, Error if map is not in the memory
    */
   static async addToJukebox(mapId: string, caller?: {
-    login: string, nickname: string
+    login: string,
+    nickname: string
   }, setAsNextMap = false): Promise<boolean | Error> {
     if (this.jukebox.some(a => a.map.id === mapId)) {
       return false
@@ -540,7 +595,11 @@ export class MapService {
     }
     const qi = this._queue.findIndex(a => !a.isForced)
     const index: number = setAsNextMap ? 0 : (qi === -1 ? this._queue.length : qi)
-    this._queue.splice(index, 0, { map: map, isForced: true, callerLogin: caller?.login })
+    this._queue.splice(index, 0, {
+      map: map,
+      isForced: true,
+      callerLogin: caller?.login
+    })
     Events.emit('JukeboxChanged', this.jukebox.map(a => a.map))
     await this.writeMatchSettings()
     void this.updateNextMap()
@@ -561,7 +620,8 @@ export class MapService {
    * @returns The boolean representing whether the map was removed
    */
   static async removeFromQueue(mapId: string, caller?: {
-    login: string, nickname: string
+    login: string,
+    nickname: string
   }, jukebox = true): Promise<boolean> {
     if (jukebox && !this._queue.filter(a => a.isForced).some(a => a.map.id === mapId)) {
       return false
@@ -575,7 +635,8 @@ export class MapService {
         this._queue[index].map.name)} by ${this._queue[index].map.author} from the ${jukebox ? 'jukebox' : 'queue'}`)
     } else {
       Logger.trace(`Map ${Utils.strip(
-        this._queue[index].map.name)} by ${this._queue[index].map.author} has been removed from the ${jukebox ? 'jukebox' : 'queue'}`)
+        this._queue[index].map.name)} by ${this._queue[index].map.author} has been removed from the ${jukebox ?
+        'jukebox' : 'queue'}`)
     }
     this._queue.splice(index, 1)
     this.fillQueue()
@@ -589,7 +650,10 @@ export class MapService {
    * Removes all maps from jukebox
    * @param caller Object containing login and nickname of player clearing the jukebox
    */
-  static async clearJukebox(caller?: { login: string, nickname: string }): Promise<void> {
+  static async clearJukebox(caller?: {
+    login: string,
+    nickname: string
+  }): Promise<void> {
     let n: number = this._queue.length
     for (let i = 0; i < n; i++) {
       if (this._queue[i].isForced) {
@@ -612,9 +676,13 @@ export class MapService {
    * Randomly changes the order of maps in the maplist
    * @param caller Object containing login and nickname of the player who called the method
    */
-  static async shuffle(caller?: { login: string, nickname: string }): Promise<void> {
+  static async shuffle(caller?: {
+    login: string,
+    nickname: string
+  }): Promise<void> {
     this._maps = this._maps.map(a => ({
-      map: a, rand: Math.random()
+      map: a,
+      rand: Math.random()
     })).sort((a, b): number => a.rand - b.rand).map(a => a.map)
     this._queue.length = 0
     this.fillQueue()
@@ -645,16 +713,27 @@ export class MapService {
         // Prevents adding maps in current queue and history unless there is less maps than queue size
       } while ((this._queue.some(a => a.map.id === current.id) || this._history.some(
         a => a.id === current.id) || current.id === this._current.id) && i < lgt)
-      this._queue.push({ map: current, isForced: false })
+      this._queue.push({
+        map: current,
+        isForced: false
+      })
     }
   }
 
   private static getLapsAndCheckpointsAmount(checkpointsPerLap: number, defaultLapAmount: number, isLapRace: boolean): {
-    laps: number, checkpoints: number, isInLapsMode: boolean, isLapsAmountModified: boolean
+    laps: number,
+    checkpoints: number,
+    isInLapsMode: boolean,
+    isLapsAmountModified: boolean
   } {
     let isLapsAmountModified = false
     if (GameService.gameMode === 'TimeAttack' || GameService.gameMode === 'Stunts' || !isLapRace) {
-      return { checkpoints: checkpointsPerLap, laps: 1, isInLapsMode: false, isLapsAmountModified }
+      return {
+        checkpoints: checkpointsPerLap,
+        laps: 1,
+        isInLapsMode: false,
+        isLapsAmountModified
+      }
     }
     let laps = defaultLapAmount
     if ((GameService.gameMode === 'Rounds' || GameService.gameMode === 'Cup' || GameService.gameMode === 'Teams') && GameService.config.roundsModeLapsAmount !== 0) {
@@ -667,7 +746,12 @@ export class MapService {
       laps = GameService.config.lapsModeLapsAmount
       isLapsAmountModified = true
     }
-    return { checkpoints: laps * checkpointsPerLap, laps, isInLapsMode: true, isLapsAmountModified }
+    return {
+      checkpoints: laps * checkpointsPerLap,
+      laps,
+      isInLapsMode: true,
+      isLapsAmountModified
+    }
   }
 
   /**
@@ -687,13 +771,23 @@ export class MapService {
       info.Environnement = 'Snow'
     }
     return {
-      id: info.UId, name: info.Name, fileName: info.FileName, author: info.Author, environment: info.Environnement,
-      mood: info.Mood, bronzeTime: info.BronzeTime, silverTime: info.SilverTime, goldTime: info.GoldTime,
-      authorTime: info.AuthorTime, copperPrice: info.CopperPrice,
+      id: info.UId,
+      name: info.Name,
+      fileName: info.FileName,
+      author: info.Author,
+      environment: info.Environnement,
+      mood: info.Mood,
+      bronzeTime: info.BronzeTime,
+      silverTime: info.SilverTime,
+      goldTime: info.GoldTime,
+      authorTime: info.AuthorTime,
+      copperPrice: info.CopperPrice,
       isLapRace: info.LapRace === undefined ? info.NbLaps > 0 : info.LapRace,
       defaultLapsAmount: info.NbLaps === -1 ? undefined : info.NbLaps,
-      checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints, addDate: new Date(),
-      isNadeo: false, isClassic: false
+      checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
+      addDate: new Date(),
+      isNadeo: false,
+      isClassic: false
     }
   }
 
@@ -737,14 +831,22 @@ export class MapService {
         return undefined
       }
       const v = await this.repo.getVoteCountAndRatio(uids)
-      return { ...data, voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 }
+      return {
+        ...data,
+        voteCount: v?.count ?? 0,
+        voteRatio: v?.ratio ?? 0
+      }
     }
     const data = await this.repo.get(uids)
     const ret: tm.Map[] = []
     const voteRatios = await this.repo.getVoteCountAndRatio(uids)
     for (const e of data) {
       const v = voteRatios.find(a => a.uid === e.id)
-      ret.push({ ...e, voteCount: v?.count ?? 0, voteRatio: v?.ratio ?? 0 })
+      ret.push({
+        ...e,
+        voteCount: v?.count ?? 0,
+        voteRatio: v?.ratio ?? 0
+      })
     }
     return ret
   }
@@ -794,23 +896,37 @@ export class MapService {
    * @param uid Map uid
    * @returns jukebox object or undefined if map is not in the jukeboxed
    */
-  static getFromJukebox(uid: string): Readonly<{ map: tm.Map, callerLogin?: string }> | undefined
+  static getFromJukebox(uid: string): Readonly<{
+    map: tm.Map,
+    callerLogin?: string
+  }> | undefined
   /**
    * Gets multiple maps from jukebox. If some map is not present in jukebox it won't be returned.
    * Returned array is not in initial order.
    * @param uids Array of map uids
    * @returns Array of jukebox objects
    */
-  static getFromJukebox(uids: string[]): Readonly<{ map: tm.Map, callerLogin?: string }>[]
-  static getFromJukebox(uids: string | string[]): Readonly<{ map: tm.Map, callerLogin?: string }> | Readonly<{
-    map: tm.Map, callerLogin?: string
+  static getFromJukebox(uids: string[]): Readonly<{
+    map: tm.Map,
+    callerLogin?: string
+  }>[]
+  static getFromJukebox(uids: string | string[]): Readonly<{
+    map: tm.Map,
+    callerLogin?: string
+  }> | Readonly<{
+    map: tm.Map,
+    callerLogin?: string
   }>[] | undefined {
     if (typeof uids === 'string') {
       const obj = this._queue.find(a => a.map.id === uids && a.isForced)
-      return obj === undefined ? undefined : { map: obj.map, callerLogin: obj.callerLogin }
+      return obj === undefined ? undefined : {
+        map: obj.map,
+        callerLogin: obj.callerLogin
+      }
     }
     return this._queue.filter(a => uids.includes(a.map.id) && a.isForced).map(a => ({
-      map: a.map, callerLogin: a.callerLogin
+      map: a.map,
+      callerLogin: a.callerLogin
     }))
   }
 
@@ -818,7 +934,10 @@ export class MapService {
    * Clears the map history
    * @param caller Object containing login and nickname of the player who called the method
    */
-  static clearHistory(caller?: { login: string, nickname: string }): void {
+  static clearHistory(caller?: {
+    login: string,
+    nickname: string
+  }): void {
     this._history.length = 0
     if (caller !== undefined) {
       Logger.info(`${Utils.strip(caller.nickname)} (${caller.login}) shuffled the maplist`)
@@ -851,8 +970,14 @@ export class MapService {
   /**
    * Maps juked by the players.
    */
-  static get jukebox(): ({ map: tm.Map, callerLogin?: string })[] {
-    return this._queue.filter(a => a.isForced).map(a => ({ map: a.map, callerLogin: a.callerLogin }))
+  static get jukebox(): ({
+    map: tm.Map,
+    callerLogin?: string
+  })[] {
+    return this._queue.filter(a => a.isForced).map(a => ({
+      map: a.map,
+      callerLogin: a.callerLogin
+    }))
   }
 
   /**

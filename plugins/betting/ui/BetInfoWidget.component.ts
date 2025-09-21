@@ -1,6 +1,4 @@
-import {
-  DynamicComponent, StaticHeader, componentIds, centeredText, components
-} from '../../ui/UI.js'
+import { centeredText, componentIds, components, DynamicComponent, StaticHeader } from '../../ui/UI.js'
 import config from './BetInfoWidget.config.js'
 
 export default class BetInfoWidget extends DynamicComponent {
@@ -13,8 +11,7 @@ export default class BetInfoWidget extends DynamicComponent {
     super(componentIds.betInfoWidget)
     this.updatePosYAndHeight()
     this.header = new StaticHeader('race', {
-      rectangleWidth: StaticHeader.racePreset.rectangleWidth -
-        (config.prizeWidth + config.margin)
+      rectangleWidth: StaticHeader.racePreset.rectangleWidth - (config.prizeWidth + config.margin)
     })
     tm.addListener('EndMap', () => this.hide())
   }
@@ -30,8 +27,7 @@ export default class BetInfoWidget extends DynamicComponent {
     }
     const side = config.side === true ? 'right' : 'left'
     const data = components.staticHeights[tm.getGameMode()]
-    this.posY = config.topBorder - data[side].reduce((acc, cur) =>
-      acc += cur.getHeight() + config.marginBig, 0)
+    this.posY = config.topBorder - data[side].reduce((acc, cur) => acc += cur.getHeight() + config.marginBig, 0)
   }
 
   displayToPlayer(login: string): void {

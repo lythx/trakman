@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 import { dedimania } from '../../../dedimania/Dedimania.js'
 
 import config from './DediRanking.config.js'
@@ -53,7 +53,10 @@ export default class DediRanking extends StaticComponent {
         <format textsize="1" textcolor="FFFF"/> 
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.dediCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
-          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, dedimania.records.map(a => ({ ...a, name: a.nickname })))}
+          ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, dedimania.records.map(a => ({
+        ...a,
+        name: a.nickname
+      })))}
         </frame>
       </frame>
     </manialink>`,
@@ -64,11 +67,14 @@ export default class DediRanking extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsEntries
-    } if (tm.getGameMode() === 'Rounds') {
+    }
+    if (tm.getGameMode() === 'Rounds') {
       return config.roundsEntries
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupEntries
-    } if (tm.getGameMode() === 'Laps') {
+    }
+    if (tm.getGameMode() === 'Laps') {
       return config.lapsEntries
     }
     return config.entries
@@ -81,11 +87,14 @@ export default class DediRanking extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsTopCount
-    } if (tm.getGameMode() === 'Rounds') {
+    }
+    if (tm.getGameMode() === 'Rounds') {
       return config.roundsTopCount
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
-    } if (tm.getGameMode() === 'Laps') {
+    }
+    if (tm.getGameMode() === 'Laps') {
       return config.lapsTopCount
     }
     return config.topCount
@@ -98,8 +107,9 @@ export default class DediRanking extends StaticComponent {
 
   private getRecordList(): void {
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      this.getEntries(), this.side, this.getTopCount(), this.maxDedis, config.displayNoRecordEntry)
+    this.recordList = new RecordList('race', this.id, config.width,
+      this.getHeight() - (this.header.options.height + config.margin), this.getEntries(), this.side, this.getTopCount(),
+      this.maxDedis, config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)

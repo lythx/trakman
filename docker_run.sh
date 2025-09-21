@@ -34,7 +34,6 @@ else
   xml ed -L -u "/dedicated/system_config/server_p2p_port" -v "$SERVER_P2P_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/xmlrpc_port" -v "$SERVER_PORT" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/xmlrpc_allowremote" -v "${REMOTE_XMLRPC=False}" dedicated_cfg.txt.bk
-  xml ed -L -u "/dedicated/system_config/force_ip_address" -v "$SERVER_IP" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/packmask" -v "${SERVER_PACKMASK=nations}" dedicated_cfg.txt.bk
   xml ed -L -u "/dedicated/system_config/disable_coherence_checks" -v "${SERVER_DISABLE_COHERENCE_CHECKS=laps}" dedicated_cfg.txt.bk
   mv /app/server/dedicated_cfg.txt.bk /app/server/GameData/Config/dedicated_cfg.txt

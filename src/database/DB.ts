@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import postgres from 'pg'
-import { type CopyStreamQuery, from} from 'pg-copy-streams'
+import { type CopyStreamQuery, from } from 'pg-copy-streams'
 import { createQueries } from './CreateQueries.js'
 import { Logger } from '../Logger.js'
 
@@ -37,7 +37,8 @@ export class Database {
           return
         }
         this.reconnectingPool = true
-        Logger.error(`Lost connection to database, attempting to reconnect in ${this.reconnectTimeout/1000} second(s)`)
+        Logger.error(
+          `Lost connection to database, attempting to reconnect in ${this.reconnectTimeout / 1000} second(s)`)
         setTimeout(async () => {
           Logger.debug('Reconnecting to database...')
           await this.pool.query(`select version();`).catch(async (err: Error) => {
@@ -55,7 +56,8 @@ export class Database {
 
   private static async getDBInfo(): Promise<void> {
     this.dbVersion = String((await this.pool.query(`select version();`) as any)?.rows[0]?.version?.split(` `, 2)[1])
-    this.dbSize = String((await this.pool.query(`select pg_size_pretty(pg_database_size('${process.env.DB_NAME}'));`) as any)?.rows[0]?.pg_size_pretty)
+    this.dbSize = String((await this.pool.query(
+      `select pg_size_pretty(pg_database_size('${process.env.DB_NAME}'));`) as any)?.rows[0]?.pg_size_pretty)
   }
 
   async enableClient(): Promise<void> {

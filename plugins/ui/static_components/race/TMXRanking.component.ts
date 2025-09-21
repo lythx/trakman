@@ -3,7 +3,7 @@
  * @since 0.1
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, RecordList, StaticComponent, StaticHeader } from '../../UI.js'
 
 import { tmx } from '../../../tmx/Tmx.js'
 import config from './TMXRanking.config.js'
@@ -34,8 +34,9 @@ export default class TMXRanking extends StaticComponent {
 
   createRecordList(): void {
     this.recordList?.destroy()
-    this.recordList = new RecordList('race', this.id, config.width, this.getHeight() - (this.header.options.height + config.margin), config.entries,
-      this.side, config.topCount, config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
+    this.recordList = new RecordList('race', this.id, config.width,
+      this.getHeight() - (this.header.options.height + config.margin), config.entries, this.side, config.topCount,
+      config.entries, config.displayNoRecordEntry, { getColoursFromPb: true })
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)
@@ -64,13 +65,20 @@ export default class TMXRanking extends StaticComponent {
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    let replays: { name: string, time: number, date: Date, login?: string }[] = []
+    let replays: {
+      name: string,
+      time: number,
+      date: Date,
+      login?: string
+    }[] = []
     const tmxInfo: tm.TMXMap | null = tmx.current
     const isStunts = tm.getGameMode() === 'Stunts'
     if (tmxInfo !== null) {
       replays = tmxInfo.validReplays.map(a => ({
         name: a.name,
-        time: isStunts ? (a.score ?? 0) : a.time, date: a.recordDate, url: a.url
+        time: isStunts ? (a.score ?? 0) : a.time,
+        date: a.recordDate,
+        url: a.url
       }))
     }
     return {

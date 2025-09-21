@@ -8,7 +8,8 @@ import { GameService } from './GameService.js'
 
 export class ManualMapLoading {
   private static readonly prefix: string = config.manualMapLoading.mapsDirectoryPrefix
-  private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ? config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === 'nations'
+  private static readonly stadium: boolean = config.manualMapLoading.stadiumOnly !== undefined ?
+    config.manualMapLoading.stadiumOnly : process.env.SERVER_PACKMASK === 'nations'
   private static mapIndex = 0
   private static oldQueue: tm.Map[]
   private static oldCurr: tm.CurrentMap
@@ -57,7 +58,11 @@ export class ManualMapLoading {
         continue
       }
       if ((map as tm.ServerMap).UId !== undefined) {
-        const mapObject: tm.Map = { ...MapService.constructNewMapObject(map), voteRatio: 0, voteCount: 0 }
+        const mapObject: tm.Map = {
+          ...MapService.constructNewMapObject(map),
+          voteRatio: 0,
+          voteCount: 0
+        }
         parsed.add(mapObject.id)
         addedMaps.add(mapObject)
       } else {
@@ -126,9 +131,15 @@ export class ManualMapLoading {
     const authorTime = file.match(/authortime=".*?"/gm)?.[0].slice(12, -1)
     const nbLaps = file.match(/nblaps=".*?"/gm)?.[0].slice(8, -1)
     return {
-      Name: name, UId: uid, FileName: filename, Environnement: envir, Author: author,
-      GoldTime: goldTime == undefined ? 0 : parseInt(goldTime), CopperPrice: price == undefined ? 0 : parseInt(price),
-      Mood: mood == undefined ? 'Day' : mood, BronzeTime: bronzeTime == undefined ? 0 : parseInt(bronzeTime),
+      Name: name,
+      UId: uid,
+      FileName: filename,
+      Environnement: envir,
+      Author: author,
+      GoldTime: goldTime == undefined ? 0 : parseInt(goldTime),
+      CopperPrice: price == undefined ? 0 : parseInt(price),
+      Mood: mood == undefined ? 'Day' : mood,
+      BronzeTime: bronzeTime == undefined ? 0 : parseInt(bronzeTime),
       SilverTime: silverTime == undefined ? 0 : parseInt(silverTime),
       AuthorTime: authorTime == undefined ? 0 : parseInt(authorTime),
       NbLaps: nbLaps == undefined ? 0 : Math.min(Math.max(parseInt(nbLaps), 32767), -32768)
@@ -146,8 +157,7 @@ export class ManualMapLoading {
   static async writeMS(curr: tm.CurrentMap, queue: tm.Map[], startAt = 0) {
     const newQueue = (queue.slice(0, config.manualMapLoading.preloadMaps))
     // don't write unless something has changed
-    if (this.oldQueue !== undefined && this.oldCurr !== undefined && curr.id === this.oldCurr.id &&
-      curr.fileName === this.oldCurr.fileName && this.oldQueue.length === newQueue.length && this.oldQueue.every(
+    if (this.oldQueue !== undefined && this.oldCurr !== undefined && curr.id === this.oldCurr.id && curr.fileName === this.oldCurr.fileName && this.oldQueue.length === newQueue.length && this.oldQueue.every(
       ((a, i) => a.id === newQueue[i].id && a.fileName === newQueue[i].fileName))) {
       Logger.trace('Did not write new MatchSettings')
       return

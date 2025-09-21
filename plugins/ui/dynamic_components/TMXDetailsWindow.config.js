@@ -2,7 +2,7 @@ import icons from '../config/Icons.js'
 import ids from '../config/ComponentIds.js'
 
 export default {
-  title: "TMX Detailed Info",
+  title: 'TMX Detailed Info',
   icon: icons.maniaExchange,
   margin: 0.15,
   windowHeight: 40,
@@ -50,35 +50,21 @@ export default {
     tmxAuthor: icons.personBuilder,
     checkpointsAmount: icons.clockList
   },
-  columnProportions: [
-    1,
-    1,
-    1
-  ],
-  rowProportions: [
-    1,
-  ],
+  columnProportions: [1, 1, 1],
+  rowProportions: [1],
   grid: {
     background: '555A',
     margin: 0.15
   },
-  navbar: [
-    {
-      name: "Map Info",
-      actionId: ids.TMXWindow,
-    },
-  ],
-  tmxRecordsProportions: [
-    0.7,
-    2,
-    3,
-    3,
-    0.7
-  ],
+  navbar: [{
+    name: 'Map Info',
+    actionId: ids.TMXWindow
+  }],
+  tmxRecordsProportions: [0.7, 2, 3, 3, 0.7],
   tmxRecordsAmount: 10,
   recordTextScale: 0.6,
-  iconBackground: "222C",
-  contentBackground: "777C",
+  iconBackground: '222C',
+  contentBackground: '777C',
   gridBackground: '777A',
   defaultTime: `-:-.--`,
   defaultText: `--`,
@@ -87,7 +73,7 @@ export default {
   notLoaded: `Press DEL if the image\n      doesn't appear`,
   notLoadedTextscale: 0.5,
   info: {
-    background: "FFFA",
+    background: 'FFFA',
     columnsProportions: [1.3, 1.3, 1, 1],
     rows: 4,
     iconWidth: 2,

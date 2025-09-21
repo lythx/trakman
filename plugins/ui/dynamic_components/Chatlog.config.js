@@ -1,8 +1,9 @@
 import icons from '../config/Icons.js'
+
 const p = tm.utils.palette
 
 export default {
-  title: " Chat Log ",
+  title: ' Chat Log ',
   kickPrivilege: 1,
   forceSpecPrivilege: 1,
   privilege: 0, // Privilege required to open the window
@@ -11,19 +12,13 @@ export default {
   iconHeight: 2,
   public: true,
   entries: 16,
-  columnProportions: [
-    2,
-    3,
-    2.5,
-    7,
-  ],
-  navbar: [
-  ],
+  columnProportions: [2, 3, 2.5, 7],
+  navbar: [],
   selfColour: p.green,
   grid: {
-    background: "9996",
+    background: '9996',
     margin: 0.15,
-    headerBackground: "333C"
+    headerBackground: '333C'
   },
   command: {
     aliases: ['chatlog', 'cl'],

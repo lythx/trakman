@@ -7,8 +7,8 @@ export default {
   margin: cfg.margin,
   width: cfg.width,
   background: cfg.background,
-  noDataText: "--",
-  iconBackground: "000a",
+  noDataText: '--',
+  iconBackground: '000a',
   icons: {
     name: icons.disk,
     author: icons.personMusic

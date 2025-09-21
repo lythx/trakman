@@ -1,9 +1,8 @@
-import { componentIds } from '../UI.js'
+import { centeredText, componentIds } from '../UI.js'
 import DynamicComponent from './DynamicComponent.js'
 import utilIds from '../config/UtilIds.js'
 import Navbar from './Navbar.js'
 import config from '../config/PopupWindow.js'
-import { centeredText } from '../UI.js'
 
 /**
  * Abstract class for manialink popup windows.
@@ -50,7 +49,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
   protected readonly footerHeight: number = config.footerHeight
   /** Right header part width (usually used for page display) */
   protected readonly headerPageWidth: number = config.headerPageWidth
-  private static readonly playersWithWindowOpen: { login: string, id: number, params: any }[] = []
+  private static readonly playersWithWindowOpen: {
+    login: string,
+    id: number,
+    params: any
+  }[] = []
 
   /**
    * Abstract class for manialink popup windows
@@ -61,9 +64,11 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param windowWidth Window width
    * @param windowHeight Window height
    */
-  constructor(windowId: number, headerIcon: string, title: string,
-    navbar: { name: string, actionId: number, privilege?: number }[] = [],
-    windowWidth: number = config.windowWidth, windowHeight: number = config.windowHeight) {
+  constructor(windowId: number, headerIcon: string, title: string, navbar: {
+    name: string,
+    actionId: number,
+    privilege?: number
+  }[] = [], windowWidth: number = config.windowWidth, windowHeight: number = config.windowHeight) {
     super(componentIds.PopupWindow)
     this.headerIcon = headerIcon
     this.title = title
@@ -75,14 +80,14 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
     this.navbarHeight = this.navbar.height
     this.contentWidth = windowWidth
     this.contentHeight = windowHeight - (2 * this.headerHeight + this.navbarHeight + 2 * this.margin);
-    [this.headerLeft, this.headerRight, this.frameMidTop,
-      this.frameMidBottom, this.frameBottom, this.noNavbarMidTop, this.noNavbarBottom] = this.constructFrame()
+    [this.headerLeft, this.headerRight, this.frameMidTop, this.frameMidBottom, this.frameBottom, this.noNavbarMidTop,
+      this.noNavbarBottom] = this.constructFrame()
     tm.addListener('ManialinkClick', (info: tm.ManialinkClickInfo): void => {
       if (info.actionId === this.openId) {
-        tm.log.trace(`Player ${tm.utils.strip(info.nickname)} (${info.login}) opened ${this.constructor.name} manialink.`)
+        tm.log.trace(
+          `Player ${tm.utils.strip(info.nickname)} (${info.login}) opened ${this.constructor.name} manialink.`)
         this.onOpen(info)
-      }
-      else if (info.actionId === this.closeId) {
+      } else if (info.actionId === this.closeId) {
         const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
         if (index !== -1) {
           PopupWindow.playersWithWindowOpen.splice(index, 1)
@@ -94,7 +99,10 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       const index: number = PopupWindow.playersWithWindowOpen.findIndex(a => a.login === info.login)
       if (index !== -1) {
         PopupWindow.playersWithWindowOpen.splice(index, 1)
-        this.onClose({ ...info, actionId: this.closeId })
+        this.onClose({
+          ...info,
+          actionId: this.closeId
+        })
       }
     })
   }
@@ -122,41 +130,34 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
             <quad posn="0 0 2" sizen="${this.headerHeight} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
             <quad posn="${this.margin} ${-this.margin} 4" sizen="${this.headerHeight - this.margin * 2} ${this.headerHeight - this.margin * 2}" image="${icon ?? this.headerIcon}"/>
             <quad posn="${this.headerHeight + this.margin} 0 2" sizen="${this.windowWidth - (this.headerHeight + this.headerPageWidth + this.margin * 2)} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>
-            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(title ?? this.title)}" valign="center" halign="center"/>
+            <label posn="${this.windowWidth / 2} -${this.headerHeight / 2} 5" sizen="${this.windowWidth} ${this.headerHeight}" scale="${config.textScale}" text="${tm.utils.safeString(
+      title ?? this.title)}" valign="center" halign="center"/>
             <frame posn="${this.headerHeight + this.windowWidth - (this.headerHeight + this.headerPageWidth)} 0 4">
               <quad posn="0 0 2" sizen="${this.headerPageWidth} ${this.headerHeight}" bgcolor="${this.headerBackground}"/>`
   }
 
   private constructFrame(): string[] {
-    return [
-      this._constructHeader(),
-      `
+    return [this._constructHeader(), `
             </frame>
           </frame>
-          <frame posn="0 ${-(this.headerHeight + this.margin)} 5">`,
-      `</frame>
+          <frame posn="0 ${-(this.headerHeight + this.margin)} 5">`, `</frame>
           <frame posn="0 ${-(this.headerHeight + this.navbarHeight + this.margin * 2)} 5">
             <quad posn="0 0 2" sizen="${this.windowWidth} ${this.windowHeight - (this.headerHeight * 2 + this.margin * 2 + this.navbarHeight)}" bgcolor="${this.background}"/>
-            <frame posn="0 0 1">`,
-      `
+            <frame posn="0 0 1">`, `
           </frame>
         </frame>
           <frame posn="0 -${this.windowHeight - (this.footerHeight - this.margin)} 5">
-            <quad posn="0 0 2" sizen="${this.windowWidth} ${this.footerHeight}" bgcolor="${this.headerBackground}"/>`,
-      `
+            <quad posn="0 0 2" sizen="${this.windowWidth} ${this.footerHeight}" bgcolor="${this.headerBackground}"/>`, `
           </frame>
         </frame>
-      </manialink>`,
-      `</frame>
+      </manialink>`, `</frame>
       <frame posn="0 ${this.navbarHeight + this.margin} 1">
         <frame posn="0 ${-(this.headerHeight + this.navbarHeight + this.margin * 2)} 5">
           <quad posn="0 0 2" sizen="${this.windowWidth} ${this.windowHeight - (this.headerHeight * 2 + this.margin * 2 + this.navbarHeight)}" bgcolor="${this.background}"/>
-          <frame posn="0 0 1">`,
-      `     </frame>
+          <frame posn="0 0 1">`, `     </frame>
           </frame>
         </frame>
-      </manialink>`
-    ]
+      </manialink>`]
   }
 
   /**
@@ -177,7 +178,8 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param privilege Player privilege
    * @returns Content XML string
    */
-  protected abstract constructContent(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
+  protected abstract constructContent(login: string, params?: DisplayParams,
+    privilege?: number): string | Promise<string>
 
   /**
    * Method called on displayToPlayer. It returns manialink XML string to be displayed inside window footer.
@@ -186,7 +188,8 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param privilege Player privilege
    * @returns Footer XML string
    */
-  protected abstract constructFooter(login: string, params?: DisplayParams, privilege?: number): string | Promise<string>
+  protected abstract constructFooter(login: string, params?: DisplayParams,
+    privilege?: number): string | Promise<string>
 
   /**
    * Displays window to given player based on manialink XML strings returned by construct methods.
@@ -206,9 +209,15 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
       PopupWindow.playersWithWindowOpen.splice(index, 1)
     }
     const noNavbar: boolean = this.navbar.getButtonCount(privilege) === 0
-    PopupWindow.playersWithWindowOpen.push({ login, id: this.openId, params })
-    tm.sendManialink(`${(title !== undefined || icon !== undefined) ? this._constructHeader(title, icon) : this.headerLeft}
-    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin, { textScale: config.textScale })}
+    PopupWindow.playersWithWindowOpen.push({
+      login,
+      id: this.openId,
+      params
+    })
+    tm.sendManialink(
+      `${(title !== undefined || icon !== undefined) ? this._constructHeader(title, icon) : this.headerLeft}
+    ${centeredText(topRightText ?? '', this.headerPageWidth, this.headerHeight - this.margin,
+        { textScale: config.textScale })}
     ${this.headerRight}
     ${this.constructNavbar(login, params, privilege)}
     ${noNavbar ? this.noNavbarMidTop : this.frameMidTop}
@@ -228,11 +237,20 @@ export default abstract class PopupWindow<DisplayParams = any> extends DynamicCo
    * @param getParams If set gets objects instead of logins
    * @returns Array of objects containing player logins and display params
    */
-  protected getPlayersWithWindowOpen(getParams: true): { login: string, params: DisplayParams }[]
-  protected getPlayersWithWindowOpen(getParams?: true): string[] | { login: string, params: DisplayParams }[] {
+  protected getPlayersWithWindowOpen(getParams: true): {
+    login: string,
+    params: DisplayParams
+  }[]
+  protected getPlayersWithWindowOpen(getParams?: true): string[] | {
+    login: string,
+    params: DisplayParams
+  }[] {
     if (getParams === true) {
       return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId)
-        .map(a => ({ login: a.login, params: a.params }))
+      .map(a => ({
+        login: a.login,
+        params: a.params
+      }))
     }
     return PopupWindow.playersWithWindowOpen.filter(a => a.id === this.openId).map(a => a.login)
   }

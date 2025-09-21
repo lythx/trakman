@@ -1,8 +1,8 @@
 /*
------------------
-STATIC COMPONENTS
------------------
-*/
+ -----------------
+ STATIC COMPONENTS
+ -----------------
+ */
 
 import RankWidget from './static_components/race/RankWidget.component.js'
 import DediRanking from './static_components/race/DediRanking.component.js'
@@ -43,11 +43,10 @@ import BannerWidget from './static_components/result/BannerWidget.component.js'
 import UltiRanking from './static_components/race/UltiRanking.component.js'
 
 /*
-------------------
-DYNAMIC COMPONENTS
-------------------
-*/
-
+ ------------------
+ DYNAMIC COMPONENTS
+ ------------------
+ */
 import CommandList from './dynamic_components/Commandlist.component.js'
 import LocalCps from './dynamic_components/checkpoint_windows/LocalCps.component.js'
 import LiveSectors from './dynamic_components/checkpoint_windows/LiveSectors.component.js'

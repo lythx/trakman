@@ -3,7 +3,7 @@
  * @since 1.2
  */
 
-import { RecordList, componentIds, StaticHeader, StaticComponent, type RLImage } from '../../UI.js'
+import { componentIds, RecordList, type RLImage, StaticComponent, StaticHeader } from '../../UI.js'
 
 import config from './RoundScore.config.js'
 
@@ -29,7 +29,8 @@ export default class RoundScore extends StaticComponent {
   getEntries(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsEntries
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupEntries
     }
     return config.roundsEntries
@@ -42,7 +43,8 @@ export default class RoundScore extends StaticComponent {
   getTopCount(): number {
     if (tm.getGameMode() === 'Teams') {
       return config.teamsTopCount
-    } if (tm.getGameMode() === 'Cup') {
+    }
+    if (tm.getGameMode() === 'Cup') {
       return config.cupTopCount
     }
     return config.roundsTopCount
@@ -70,13 +72,16 @@ export default class RoundScore extends StaticComponent {
         ${this.header.constructXml(config.title, config.icon, this.side, { actionId: componentIds.localCps })}
         <frame posn="0 -${this.header.options.height + config.margin} 1">
           ${this.recordList.constructXml(this.reduxModeEnabled ? undefined : login, tm.records.roundRecords
-        .map(a => ({
-          name: a.nickname, time: a.time, checkpoints: a.checkpoints,
-          login: a.login, points: a.roundPoints,
-          colour: a.team !== undefined ? config.markerBackgrounds[a.team] : undefined,
-          markerImage: this.getCupImage(a)
-        }))
-        .slice(0, tm.records.maxLocalsAmount))}
+      .map(a => ({
+        name: a.nickname,
+        time: a.time,
+        checkpoints: a.checkpoints,
+        login: a.login,
+        points: a.roundPoints,
+        colour: a.team !== undefined ? config.markerBackgrounds[a.team] : undefined,
+        markerImage: this.getCupImage(a)
+      }))
+      .slice(0, tm.records.maxLocalsAmount))}
         </frame>
       </frame>
     </manialink>`,
@@ -93,8 +98,9 @@ export default class RoundScore extends StaticComponent {
     const height = this.getHeight()
     const entries = this.getEntries()
     this.recordList?.destroy?.()
-    this.recordList = new RecordList('race', this.id, config.width, height - (this.header.options.height + config.margin),
-      entries, this.side, this.getTopCount(), 250, config.displayNoRecordEntry)
+    this.recordList = new RecordList('race', this.id, config.width,
+      height - (this.header.options.height + config.margin), entries, this.side, this.getTopCount(), 250,
+      config.displayNoRecordEntry)
     this.recordList.onClick((info: tm.ManialinkClickInfo): void => {
       if (this.reduxModeEnabled) { return }
       const obj = this.displayToPlayer(info.login)

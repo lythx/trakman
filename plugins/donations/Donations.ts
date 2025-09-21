@@ -10,7 +10,9 @@ interface DonationInfo {
   }[]
 }
 
-const listeners: ((info: DonationInfo & { readonly amount: number }) => void)[] = []
+const listeners: ((info: DonationInfo & {
+  readonly amount: number
+}) => void)[] = []
 const nicknameChangeListeners: ((info: DonationInfo[]) => void)[] = []
 let onlineDonators: DonationInfo[] = []
 await tm.db.query(`CREATE TABLE IF NOT EXISTS donations(
@@ -75,9 +77,13 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
     }
     if (res[0] === undefined) { return undefined }
     return {
-      login: logins, nickname: res[0].nickname,
+      login: logins,
+      nickname: res[0].nickname,
       sum: res.reduce((acc, cur) => acc += cur.amount, 0),
-      history: res.map(a => ({ amount: a.amount, date: a.date }))
+      history: res.map(a => ({
+        amount: a.amount,
+        date: a.date
+      }))
     }
   }
   const ids = await tm.db.getPlayerId(logins)
@@ -95,9 +101,13 @@ async function getFromDB(logins: string | string[]): Promise<DonationInfo | unde
     const arr: any[] = res.filter(a => a.login === login)
     if (arr.length === 0) { continue }
     ret.push({
-      login, nickname: arr[0]?.nickname,
+      login,
+      nickname: arr[0]?.nickname,
       sum: arr.reduce((acc, cur) => acc += cur.amount, 0),
-      history: arr.map(a => ({ amount: a.amount, date: a.date }))
+      history: arr.map(a => ({
+        amount: a.amount,
+        date: a.date
+      }))
     })
   }
   return ret
@@ -115,7 +125,10 @@ const addToDB = async (login: string, amount: number, date: Date): Promise<void>
 tm.commands.add({
   aliases: ['donate'],
   help: 'Donate coppers to the server.',
-  params: [{ name: 'amount', type: 'int' }],
+  params: [{
+    name: 'amount',
+    type: 'int'
+  }],
   callback(info, amount: number) {
     donate(info.login, info.nickname, amount)
   },
@@ -124,7 +137,7 @@ tm.commands.add({
 
 /**
  * Donate coppers to server
- * @param payerLogin Login of the player 
+ * @param payerLogin Login of the player
  * @param payerNickname Nickname of the player
  * @param amount Amount of coppers to donate
  * @returns True if successful, false if player refuses payment, Error if dedicated server call fails
@@ -151,17 +164,26 @@ const donate = async (payerLogin: string, payerNickname: string, amount: number)
     if (info === undefined) {
       if (isOnline) {
         info = {
-          login: payerLogin, nickname: payerNickname, sum: 0, history: []
+          login: payerLogin,
+          nickname: payerNickname,
+          sum: 0,
+          history: []
         }
         onlineDonators.push(info)
       } else {
         return true
       }
     }
-    info.history.push({ amount, date })
+    info.history.push({
+      amount,
+      date
+    })
     info.sum += amount
     for (const e of listeners) {
-      e({ ...info, amount })
+      e({
+        ...info,
+        amount
+      })
     }
     return true
   }
@@ -205,7 +227,9 @@ export const donations = {
    * Add a callback function to execute on donation
    * @param callback Function to execute on event. It takes donation object as a parameter
    */
-  onDonation(callback: (info: DonationInfo & { readonly amount: number }) => void) {
+  onDonation(callback: (info: DonationInfo & {
+    readonly amount: number
+  }) => void) {
     listeners.push(callback)
   },
 

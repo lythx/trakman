@@ -93,8 +93,16 @@ export class AdministrationService {
    * Updates the player nickname in runtime memory
    * @param players Objects containing player logins and nicknames
    */
-  static updateNickname(...players: { login: string, nickname: string }[]): void {
-    const replaceNickname = (arr: { nickname?: string, login: string, callerLogin: string, callerNickname: string }[]) => {
+  static updateNickname(...players: {
+    login: string,
+    nickname: string
+  }[]): void {
+    const replaceNickname = (arr: {
+      nickname?: string,
+      login: string,
+      callerLogin: string,
+      callerNickname: string
+    }[]) => {
       for (const p of players) {
         const obj = arr.find(a => a.login === p.login)
         if (obj !== undefined) { obj.nickname = p.nickname }
@@ -139,7 +147,8 @@ export class AdministrationService {
       return
     }
     for (const e of this.banOnJoin) {
-      const params: tm.CallParams[] = e.reason === undefined ? [{ string: e.login }, { string: config.defaultReasonMessage }, { boolean: false }] :
+      const params: tm.CallParams[] = e.reason === undefined ?
+        [{ string: e.login }, { string: config.defaultReasonMessage }, { boolean: false }] :
         [{ string: e.login }, { string: e.reason }, { boolean: false }]
       if (!banlist.some((a: any): boolean => a.Login === e.login)) {
         const res = await Client.call('BanAndBlackList', params)
@@ -157,7 +166,8 @@ export class AdministrationService {
       if (!this.banlist.some((a: any): boolean => a.login === login)) {
         const res: any[] | Error = await Client.call('UnBan', [{ string: login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to remove login ${login} from banlist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to remove login ${login} from banlist`, `Server responded with error:`,
+            res.message)
         }
       }
     }
@@ -190,11 +200,12 @@ export class AdministrationService {
       }
     }
     for (const login of blacklist.map((a): string => a.Login)) {
-      if (!this._blacklist.some((a: any): boolean => a.login === login) &&
-        !this.serverBanlist.some((a: any): boolean => a.login === login)) {
+      if (!this._blacklist.some((a: any): boolean => a.login === login) && !this.serverBanlist.some(
+        (a: any): boolean => a.login === login)) {
         const res: any | Error = await Client.call('UnBlackList', [{ string: login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to remove login ${login} from blacklist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to remove login ${login} from blacklist`, `Server responded with error:`,
+            res.message)
         }
       }
     }
@@ -235,13 +246,14 @@ export class AdministrationService {
       if (!this.mutelist.some((a: any): boolean => a.login === login)) {
         const res: any | Error = await Client.call('UnIgnore', [{ string: login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to remove login ${login} from mutelist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to remove login ${login} from mutelist`, `Server responded with error:`,
+            res.message)
         }
       }
     }
   }
 
-  /**  
+  /**
    * Adds all the players present in guestlist table to server guestlist if they aren't guests,
    * removes all players who are on the server guestlist but not in guestlist table
    */
@@ -263,7 +275,8 @@ export class AdministrationService {
       if (!this._guestlist.some((a: any): boolean => a.login === login)) {
         const res: any | Error = await Client.call('RemoveGuest', [{ string: login }])
         if (res instanceof Error) {
-          await Logger.fatal(`Failed to remove login ${login} from guestlist`, `Server responded with error:`, res.message)
+          await Logger.fatal(`Failed to remove login ${login} from guestlist`, `Server responded with error:`,
+            res.message)
         }
       }
     }
@@ -297,7 +310,10 @@ export class AdministrationService {
    * @param privilege Privilege level to set
    * @param caller Optional caller player object
    */
-  static async setPrivilege(login: string, privilege: number, caller?: { login: string, nickname: string }): Promise<void> {
+  static async setPrivilege(login: string, privilege: number, caller?: {
+    login: string,
+    nickname: string
+  }): Promise<void> {
     if (login.length > 25) { return }
     const player: tm.Player | undefined = PlayerService.get(login)
     if (player !== undefined) { player.privilege = privilege }
@@ -311,7 +327,10 @@ export class AdministrationService {
       await this.privilegeRepo.set(login, privilege)
       await this.updatePrivilegeArrays()
       Events.emit('PrivilegeChanged', {
-        player: player === undefined ? undefined : { ...player, privilege },
+        player: player === undefined ? undefined : {
+          ...player,
+          privilege
+        },
         login,
         previousPrivilege: player?.privilege ?? 0,
         newPrivilege: privilege,
@@ -319,11 +338,17 @@ export class AdministrationService {
       })
       return
     }
-    PlayerService.updateInfo({ login, title: PlayerService.getTitle(login, privilege, player.country, player.countryCode) })
+    PlayerService.updateInfo({
+      login,
+      title: PlayerService.getTitle(login, privilege, player.country, player.countryCode)
+    })
     await this.privilegeRepo.set(login, privilege)
     await this.updatePrivilegeArrays()
     Events.emit('PrivilegeChanged', {
-      player: player === undefined ? undefined : { ...player, privilege },
+      player: player === undefined ? undefined : {
+        ...player,
+        privilege
+      },
       login,
       previousPrivilege: player.privilege ?? 0,
       newPrivilege: privilege,
@@ -341,8 +366,11 @@ export class AdministrationService {
    * @param expireDate Optional ban expire date
    * @returns True if successful, false if caller privilege is too low or if it's not higher than target privilege
    */
-  static async ban(ip: string, login: string, caller: { login: string, privilege: number, nickname: string },
-    nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
+  static async ban(ip: string, login: string, caller: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }, nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
     if (caller.privilege < this.privileges.ban || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
@@ -352,7 +380,8 @@ export class AdministrationService {
       entry = this.serverBanlist.find(a => a.login === login && a.ip === ip)
     }
     const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
-    const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
+    const durationString: string = expireDate === undefined ? 'No expire date specified' :
+      ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
       entry.callerNickname = caller.nickname
@@ -361,14 +390,21 @@ export class AdministrationService {
       entry.date = date
       await this.banlistRepo.update(ip, login, date, caller.login, reason, expireDate)
       Events.emit('Ban', entry)
-      Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString, reasonString)
+      Logger.info(`${caller.nickname} (${caller.login}) has banned ${login} with ip ${ip}`, durationString,
+        reasonString)
       return true
     }
     const res = await Client.call('BanAndBlackList',
       [{ string: login }, { string: reason ?? config.defaultReasonMessage }, { boolean: true }])
     const obj = {
-      ip, login, nickname, date, callerNickname: caller.nickname,
-      callerLogin: caller.login, reason, expireDate
+      ip,
+      login,
+      nickname,
+      date,
+      callerNickname: caller.nickname,
+      callerLogin: caller.login,
+      reason,
+      expireDate
     }
     if (res instanceof Error) {
       this.banOnJoin.push(obj)
@@ -387,11 +423,14 @@ export class AdministrationService {
    * from banlist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successful, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low
    * 'Player not banned' if player was not banned, Error if dedicated server call fails
    */
-  static async unban(login: string, caller?: { login: string, privilege: number, nickname: string }):
-    Promise<boolean | 'Player not banned' | Error> {
+  static async unban(login: string, caller?: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }): Promise<boolean | 'Player not banned' | Error> {
     if (caller !== undefined && caller.privilege < this.privileges.ban) { return false }
     const serverBanIndex = this.serverBanlist.findIndex(a => a.login === login)
     const banOnJoinIndex = this.banOnJoin.findIndex(a => a.login === login)
@@ -430,15 +469,19 @@ export class AdministrationService {
    * @returns True if successful, false if caller privilege is too low or if it's not higher than target privilege,
    * Error if dedicated server call fails
    */
-  static async addToBlacklist(login: string, caller: { login: string, privilege: number, nickname: string },
-    nickname?: string, reason?: string, expireDate?: Date): Promise<boolean | Error> {
+  static async addToBlacklist(login: string, caller: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }, nickname?: string, reason?: string, expireDate?: Date): Promise<boolean | Error> {
     if (caller.privilege < this.privileges.blacklist || login.length > 25) { return false }
     const targetPrivilege = (await PlayerService.fetch(login))?.privilege
     if (targetPrivilege !== undefined && targetPrivilege >= caller.privilege) { return false }
     const date: Date = new Date()
     const entry = this._blacklist.find(a => a.login === login)
     const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
-    const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
+    const durationString: string = expireDate === undefined ? 'No expire date specified' :
+      ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
       entry.callerNickname = caller.nickname
@@ -455,8 +498,13 @@ export class AdministrationService {
       if (res instanceof Error) { return res }
     }
     const obj = {
-      login, nickname, date, callerNickname: caller.nickname,
-      callerLogin: caller.login, reason, expireDate
+      login,
+      nickname,
+      date,
+      callerNickname: caller.nickname,
+      callerLogin: caller.login,
+      reason,
+      expireDate
     }
     this._blacklist.push(obj)
     await this.blacklistRepo.add(login, date, caller.login, reason, expireDate)
@@ -471,11 +519,14 @@ export class AdministrationService {
    * Unblacklists a player if he is not banned and deletes him from blacklist table. Saves the server blacklist
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successful, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low
    * 'Player not blacklisted' if player was not blacklisted, Error if dedicated server call fails
    */
-  static async unblacklist(login: string, caller?: { login: string, privilege: number, nickname: string }):
-    Promise<boolean | 'Player not blacklisted' | Error> {
+  static async unblacklist(login: string, caller?: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }): Promise<boolean | 'Player not blacklisted' | Error> {
     if (caller !== undefined && caller.privilege < this.privileges.blacklist) { return false }
     const blIndex = this._blacklist.findIndex(a => a.login === login)
     if (blIndex === -1) { return 'Player not blacklisted' }
@@ -505,8 +556,11 @@ export class AdministrationService {
    * @param expireDate Optional mute expire date
    * @returns True if successful, false if caller privilege is too low
    */
-  static async mute(login: string, caller: { login: string, privilege: number, nickname: string },
-    nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
+  static async mute(login: string, caller: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }, nickname?: string, reason?: string, expireDate?: Date): Promise<boolean> {
     if (caller.privilege < this.privileges.mute || login.length > 25) { return false }
     const date: Date = new Date()
     let entry = this.muteOnJoin.find(a => a.login === login)
@@ -514,7 +568,8 @@ export class AdministrationService {
       entry = this.serverMutelist.find(a => a.login === login)
     }
     const reasonString: string = reason === undefined ? config.defaultReasonMessage : ` Reason: ${reason}`
-    const durationString: string = expireDate === undefined ? 'No expire date specified' : ` Expire date: ${expireDate.toUTCString()}`
+    const durationString: string = expireDate === undefined ? 'No expire date specified' :
+      ` Expire date: ${expireDate.toUTCString()}`
     if (entry !== undefined) {
       entry.callerLogin = caller.login
       entry.callerNickname = caller.nickname
@@ -528,8 +583,13 @@ export class AdministrationService {
     }
     const res = await Client.call('Ignore', [{ string: login }])
     const obj = {
-      login, nickname, date, callerNickname: caller.nickname,
-      callerLogin: caller.login, reason, expireDate
+      login,
+      nickname,
+      date,
+      callerNickname: caller.nickname,
+      callerLogin: caller.login,
+      reason,
+      expireDate
     }
     if (res instanceof Error) {
       this.muteOnJoin.push(obj)
@@ -546,11 +606,14 @@ export class AdministrationService {
    * Unmutes a player and deletes him from mutelist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successful, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low
    * 'Player not muted' if player was not muted, Error if dedicated server call fails
    */
-  static async unmute(login: string, caller?: { login: string, privilege: number, nickname: string }):
-    Promise<boolean | 'Player not muted' | Error> {
+  static async unmute(login: string, caller?: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }): Promise<boolean | 'Player not muted' | Error> {
     if (caller !== undefined && caller.privilege < this.privileges.mute) { return false }
     const serverMuteIndex = this.serverMutelist.findIndex(a => a.login === login)
     const muteOnJoinIndex = this.muteOnJoin.findIndex(a => a.login === login)
@@ -583,8 +646,11 @@ export class AdministrationService {
    * @returns True if successful, false if caller privilege is too low,
    * 'Already guest' if player was already in the guestlist, Error if server call fails
    */
-  static async addGuest(login: string, caller: { login: string, privilege: number, nickname: string }, nickname?: string):
-    Promise<boolean | 'Already guest' | Error> {
+  static async addGuest(login: string, caller: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }, nickname?: string): Promise<boolean | 'Already guest' | Error> {
     if (caller.privilege < this.privileges.addGuest || login.length > 25) { return false }
     const date: Date = new Date()
     const entry = this._guestlist.find(a => a.login === login)
@@ -592,7 +658,10 @@ export class AdministrationService {
     const res = await Client.call('AddGuest', [{ string: login }])
     if (res instanceof Error) { return res }
     const obj = {
-      login, nickname, date, callerNickname: caller.nickname,
+      login,
+      nickname,
+      date,
+      callerNickname: caller.nickname,
       callerLogin: caller.login
     }
     this._guestlist.push(obj)
@@ -607,11 +676,14 @@ export class AdministrationService {
    * Removes a player from server guestlist, saves it and deletes him from guestlist table
    * @param login Player login
    * @param caller Caller player object
-   * @returns True if successful, false if caller privilege is too low 
+   * @returns True if successful, false if caller privilege is too low
    * 'Player not in guestlist' if player was not in the guestlist, Error if dedicated server call fails
    */
-  static async removeGuest(login: string, caller?: { login: string, privilege: number, nickname: string }):
-    Promise<boolean | 'Player not in guestlist' | Error> {
+  static async removeGuest(login: string, caller?: {
+    login: string,
+    privilege: number,
+    nickname: string
+  }): Promise<boolean | 'Player not in guestlist' | Error> {
     if (caller !== undefined && caller.privilege < this.privileges.addGuest) { return false }
     const guestIndex = this._guestlist.findIndex(a => a.login === login)
     if (guestIndex === -1) { return 'Player not in guestlist' }

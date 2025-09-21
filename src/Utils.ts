@@ -11,11 +11,14 @@ import uFuzzy from '@leeoniya/ufuzzy'
 
 const uf = new uFuzzy(config.searchOptions)
 
-const bills: { id: number, callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void) }[] = []
+const bills: {
+  id: number,
+  callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void)
+}[] = []
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
   const billIndex: number = bills.findIndex(a => a.id === info.id)
   if (billIndex !== -1) {
-    switch (info.state) {
+    switch(info.state) {
       case 4:
         bills[billIndex].callback('accepted')
         break
@@ -106,11 +109,8 @@ export const Utils = {
     for (let i = 0; i !== length; i++) {
       let cc: Array<number> = []
       alpha += (1.0 / length)
-      cc = [
-        startRGB[0] * alpha + (1 - alpha) * endRGB[0],
-        startRGB[1] * alpha + (1 - alpha) * endRGB[1],
-        startRGB[2] * alpha + (1 - alpha) * endRGB[2]
-      ]
+      cc = [startRGB[0] * alpha + (1 - alpha) * endRGB[0], startRGB[1] * alpha + (1 - alpha) * endRGB[1],
+        startRGB[2] * alpha + (1 - alpha) * endRGB[2]]
       colours.push(this.getHex(cc, false))
     }
     for (let i = 0; i !== length; i++) {
@@ -158,9 +158,8 @@ export const Utils = {
    * @returns Converted string
    */
   stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] =>
-      [a[0], [a[0], ...a[1]]]
-    ))
+    const charmap = Object.fromEntries(
+      Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => [a[0], [a[0], ...a[1]]]))
     let strippedStr: string = ''
     for (const letter of str) {
       let foundLetter: boolean = false
@@ -181,10 +180,17 @@ export const Utils = {
   /**
    * Gets country information from region in Nadeo format (eg. World|Poland|Pomorskie)
    * @param region Region in Nadeo format, can start with World but doesn't have to
-   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and 
-   * country code (eg. POL) if matching one was found 
+   * @returns Object containing parsed region (eg. Poland|Pomorskie), country and
+   * country code (eg. POL) if matching one was found
    */
-  getRegionInfo(region: string): { region: string, country: string, countryCode?: string } {
+  getRegionInfo(region: string): {
+    region: string,
+    country: string,
+    countryCode?: string
+  } | Error {
+    if (region === null) {
+      return new Error('Null region')
+    }
     let split = region.split('|')
     if (region.startsWith('World')) {
       split.shift()
@@ -192,7 +198,11 @@ export const Utils = {
     const r: string = split.join('|')
     const country: string = split[0]
     const countryCode: string | undefined = this.countryToCode(country)
-    return { region: r, country, countryCode }
+    return {
+      region: r,
+      country,
+      countryCode
+    }
   },
 
   /**
@@ -229,10 +239,16 @@ export const Utils = {
    * @param current Object containing current record time (treated as score in Stunts mode) and position
    * @param previous Optional object containing previous record time and position
    * @param ignoreGamemode If true won't treat times as scores in Stunts Mode
-   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and 
+   * @returns Object containing the verb to use (eg. 'acquired', 'improved') and
    * the time difference string if previous record was specified
    */
-  getRankingString(current: { time: number, position: number }, previous?: { time: number, position: number }, ignoreGamemode?: true): {
+  getRankingString(current: {
+    time: number,
+    position: number
+  }, previous?: {
+    time: number,
+    position: number
+  }, ignoreGamemode?: true): {
     status: '' | 'acquired' | 'obtained' | 'equaled' | 'improved',
     difference?: string
   } {
@@ -263,7 +279,8 @@ export const Utils = {
       let i: number = -1
       while (true) {
         i++
-        if (obj.difference[i] === undefined || (!isNaN(Number(obj.difference[i])) && Number(obj.difference[i]) !== 0) || obj.difference.length === 4) {
+        if (obj.difference[i] === undefined || (!isNaN(Number(obj.difference[i])) && Number(
+          obj.difference[i]) !== 0) || obj.difference.length === 4) {
           break
         }
         if (Number(obj.difference[i]) !== 0) {
@@ -287,12 +304,14 @@ export const Utils = {
    * @param targetLogin Login of the receiver
    * @returns Whether the payment went through or error
    */
-  async sendCoppers(payerLogin: string, amount: number, message: string, targetLogin: string = ''): Promise<boolean | Error> {
-    const billId: any | Error = await Client.call('SendBill', [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
+  async sendCoppers(payerLogin: string, amount: number, message: string,
+    targetLogin: string = ''): Promise<boolean | Error> {
+    const billId: any | Error = await Client.call('SendBill',
+      [{ string: payerLogin }, { int: amount }, { string: message }, { string: targetLogin }])
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
-        switch (status) {
+        switch(status) {
           case 'accepted':
             resolve(true)
             break
@@ -303,7 +322,10 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId, callback })
+      bills.push({
+        id: billId,
+        callback
+      })
     })
   },
 
@@ -315,11 +337,12 @@ export const Utils = {
    * @returns True on payment success or error
    */
   async payCoppers(targetLogin: string, amount: number, message: string): Promise<true | Error> {
-    const billId: any | Error = await Client.call('Pay', [{ string: targetLogin }, { int: amount }, { string: message }])
+    const billId: any | Error = await Client.call('Pay',
+      [{ string: targetLogin }, { int: amount }, { string: message }])
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
-        switch (status) {
+        switch(status) {
           case 'accepted':
             resolve(true)
             break
@@ -332,7 +355,10 @@ export const Utils = {
             resolve(new Error(errorString ?? 'error'))
         }
       }
-      bills.push({ id: billId, callback })
+      bills.push({
+        id: billId,
+        callback
+      })
     })
   },
 
@@ -371,7 +397,7 @@ export const Utils = {
   safeString(str: string): string {
     const map = {
       '&': '&amp;',
-      '"': '&quot;',
+      '"': '&quot;'
     }
     return str.replace(/[&"]/g, (m): string => { return map[m as keyof typeof map] })
   },
@@ -393,13 +419,16 @@ export const Utils = {
     let res: string
     try {
       res = decodeURIComponent(str)
-    } catch (e) {
+    } catch(e) {
       // try to cut off the last percent sign and try again
       // this failure happens so little I do not care about speed that much
       // it looks much better usually
       const i = str.indexOf('%', str.length - 3)
-      if (i === -1) res = str
-      else res = this.decodeURI(str.slice(0, i)) + "..."
+      if (i === -1) {
+        res = str
+      } else {
+        res = this.decodeURI(str.slice(0, i)) + "..."
+      }
     }
     return res.replace(/&amp;|&quot;|&apos;|&gt;|&lt;|\+/g, (m): string => { return map[m as keyof typeof map] })
   },
@@ -436,8 +465,8 @@ export const Utils = {
   /**
    * Converts date string to time in milliseconds.
    * This method is used to parse time in chat commands.
-   * @param dateStr Date string, number followed by optional modifier 
-   * [s - seconds, m - minutes, h - hours, d - days]). 
+   * @param dateStr Date string, number followed by optional modifier
+   * [s - seconds, m - minutes, h - hours, d - days]).
    * If no modifier is specified the number will be treated as minutes.
    * @returns Time in milliseconds, RangeError if time is bigger than max js Date,
    * TypeError if the dateStr is not a valid date string
@@ -455,7 +484,7 @@ export const Utils = {
       return new TypeError(`Invalid time string`)
     }
     let parsedTime: number
-    switch (unit) {
+    switch(unit) {
       case 's':
         parsedTime = time * 1000
         break
@@ -485,7 +514,8 @@ export const Utils = {
    */
   formatDate(date: Date, displayDay?: true): string {
     if (displayDay === true) {
-      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString()
+      .padStart(2, '0')}/${date.getFullYear()}`
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
@@ -504,8 +534,7 @@ export const Utils = {
           text += `[`
           hasOptionals = true
         }
-        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}>` }
-        else { text += `, ${e.name} <${e.type ?? 'string'}>` }
+        if (i === 0) { text += `${e.name} <${e.type ?? 'string'}>` } else { text += `, ${e.name} <${e.type ?? 'string'}>` }
       }
     }
     if (hasOptionals) {
@@ -547,21 +576,25 @@ export const Utils = {
 
 }
 
-/** 
+/**
  * Replaces #{variableName} in string with given variables.
  * @param str String to replace #{variableName} in
  * @param variables Object containing values for variable names (key is variableName)
  * @returns String with replaced variables
  */
-function strVar(str: string, variables: { [name: string]: any }): string
-/** 
+function strVar(str: string, variables: {
+  [name: string]: any
+}): string
+/**
  * Replaces #{variableName} in string with given variables
  * @param str String to replace #{variableName} in
  * @param variables Array containing values for variables in order
  * @returns String with replaced variables
  */
 function strVar(str: string, variables: any[]): string
-function strVar(str: string, vars: { [name: string]: any }): string {
+function strVar(str: string, vars: {
+  [name: string]: any
+}): string {
   if (Array.isArray(vars)) {
     for (const e of vars) {
       if (typeof e === 'string') {

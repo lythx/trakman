@@ -12,8 +12,9 @@ const nicknameUpdateListeners: Function[] = []
  * @param event Event name
  * @param callback Callback function to execute
  */
-const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callback: CheckpointEventFunctions[T]): void => {
-  switch (event) {
+const addListener = <T extends keyof CheckpointEventFunctions>(event: T,
+  callback: CheckpointEventFunctions[T]): void => {
+  switch(event) {
     case 'BestCheckpoint':
       bestCheckpointListeners.push(callback as any)
       return
@@ -34,9 +35,10 @@ const addListener = <T extends keyof CheckpointEventFunctions>(event: T, callbac
   }
 }
 
-const emitEvent = async <T extends keyof CheckpointEventFunctions>(event: T, ...params: Parameters<CheckpointEventFunctions[T]>) => {
+const emitEvent = async <T extends keyof CheckpointEventFunctions>(event: T,
+  ...params: Parameters<CheckpointEventFunctions[T]>) => {
   let listeners: any
-  switch (event) {
+  switch(event) {
     case 'BestCheckpoint':
       listeners = bestCheckpointListeners
       break

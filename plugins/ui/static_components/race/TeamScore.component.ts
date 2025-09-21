@@ -2,7 +2,7 @@
  * @author lythx
  * @since 1.2
  */
-import { componentIds, StaticHeader, centeredText, StaticComponent, type GridCellFunction, Grid } from '../../UI.js'
+import { centeredText, componentIds, Grid, type GridCellFunction, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './TeamScore.config.js'
 
 export default class TeamScore extends StaticComponent {
@@ -42,7 +42,10 @@ export default class TeamScore extends StaticComponent {
     if (config.hidePanel && this.hasPanelsHidden(login)) {
       return this.hideToPlayer(login)
     }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   private constructXml() {

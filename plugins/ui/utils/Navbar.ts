@@ -10,7 +10,11 @@ export default class Navbar {
   readonly width: number
   /** Navbar height */
   readonly height: number
-  private buttons: { name: string, actionId: number, privilege: number }[]
+  private buttons: {
+    name: string,
+    actionId: number,
+    privilege: number
+  }[]
   /** Background image displayed on button hover */
   readonly hoverImage: string
   /** Background colour */
@@ -25,13 +29,17 @@ export default class Navbar {
    * @param hoverImgUrl Background image to display on button hover
    */
   constructor(buttons: {
-    name: string, actionId: number,
-    privilege?: number
-  }[], width: number, height: number | null = config.height,
-    background: string = config.background, hoverImgUrl: string = config.hoverImage) {
+      name: string,
+      actionId: number,
+      privilege?: number
+    }[], width: number, height: number | null = config.height, background: string = config.background,
+    hoverImgUrl: string = config.hoverImage) {
     this.width = width
     this.height = height ?? config.height
-    this.buttons = buttons.map(a => ({ ...a, privilege: a.privilege ?? 0 }))
+    this.buttons = buttons.map(a => ({
+      ...a,
+      privilege: a.privilege ?? 0
+    }))
     this.hoverImage = hoverImgUrl
     this.background = background
   }

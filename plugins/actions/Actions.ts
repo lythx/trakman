@@ -11,7 +11,13 @@ interface CallerInfo {
 
 const sendNoPrivilegeMessage = (info: CallerInfo): void => tm.sendMessage(config.noPermission, info.login)
 
-let eraseObject: { id: string, admin: { login: string, nickname: string } } | undefined
+let eraseObject: {
+  id: string,
+  admin: {
+    login: string,
+    nickname: string
+  }
+} | undefined
 tm.addListener('BeginMap', (info): void => {
   if (info.isRestart) {
     return
@@ -26,7 +32,7 @@ let toSkip = false
 
 tm.addListener('ServerStateChanged', (state): void => {
   if (toSkip) {
-    tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{boolean: true }] : undefined)
+    tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
     toSkip = false
   }
 })
@@ -42,7 +48,10 @@ export const actions = {
    * @param info Player information
    * @param voteValue Vote value
    */
-  addVote: (info: { login: string, nickname: string }, voteValue: -3 | -2 | -1 | 1 | 2 | 3) => {
+  addVote: (info: {
+    login: string,
+    nickname: string
+  }, voteValue: -3 | -2 | -1 | 1 | 2 | 3) => {
     if (voteValue === undefined || voteValue === tm.karma.current.find(a => a.login === info.login)?.vote) {
       return
     }
@@ -63,13 +72,15 @@ export const actions = {
       sendNoPrivilegeMessage(info)
       return
     }
-    const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.kick.reason, { reason: reason })}.`
+    const reasonString: string = reason === undefined ? '' :
+      ` ${tm.utils.strVar(config.kick.reason, { reason: reason })}.`
     tm.sendMessage(tm.utils.strVar(config.kick.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
       name: tm.utils.strip(player.nickname)
     }) + `${reasonString}`, config.kick.public ? undefined : info.login)
-    tm.client.callNoRes(`Kick`, [{ string: player.login }, { string: reason === undefined ? 'No reason specified' : reason }])
+    tm.client.callNoRes(`Kick`,
+      [{ string: player.login }, { string: reason === undefined ? 'No reason specified' : reason }])
   },
   /**
    * Mutes a player and sends a chat message
@@ -85,8 +96,10 @@ export const actions = {
     }
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     await tm.admin.mute(player.login, info, player.nickname, reason, expireDate)
-    const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
+    const reasonString: string = reason === undefined ? '' :
+      ` ${tm.utils.strVar(config.mute.reason, { reason: reason })}`
+    const durationString: string = duration === undefined ? '' :
+      ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.mute.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
@@ -131,16 +144,13 @@ export const actions = {
       sendNoPrivilegeMessage(info)
       return
     }
-    const res = await tm.client.call('system.multicall',
-      [{
-        method: 'ForceSpectator',
-        params: [{ string: player.login }, { int: 1 }]
-      },
-      {
-        method: 'ForceSpectator',
-        params: [{ string: player.login }, { int: 0 }]
-      }]
-    )
+    const res = await tm.client.call('system.multicall', [{
+      method: 'ForceSpectator',
+      params: [{ string: player.login }, { int: 1 }]
+    }, {
+      method: 'ForceSpectator',
+      params: [{ string: player.login }, { int: 0 }]
+    }])
     const name = tm.utils.strip(player.nickname)
     if (res instanceof Error || res[0] instanceof Error) {
       tm.sendMessage(tm.utils.strVar(config.forcespec.tooManySpecs, { name }), info.login)
@@ -162,16 +172,13 @@ export const actions = {
       sendNoPrivilegeMessage(info)
       return
     }
-    const res = await tm.client.call('system.multicall',
-      [{
-        method: 'ForceSpectator',
-        params: [{ string: player.login }, { int: 2 }]
-      },
-      {
-        method: 'ForceSpectator',
-        params: [{ string: player.login }, { int: 0 }]
-      }]
-    )
+    const res = await tm.client.call('system.multicall', [{
+      method: 'ForceSpectator',
+      params: [{ string: player.login }, { int: 2 }]
+    }, {
+      method: 'ForceSpectator',
+      params: [{ string: player.login }, { int: 0 }]
+    }])
     const name = tm.utils.strip(player.nickname)
     if (res instanceof Error || res[0] instanceof Error) {
       tm.sendMessage(tm.utils.strVar(config.forceplay.tooManyPlayers, { name }), info.login)
@@ -197,8 +204,10 @@ export const actions = {
     }
     const expireDate: Date | undefined = duration === undefined ? undefined : new Date(Date.now() + duration)
     await tm.admin.ban(player.ip, player.login, info, player.nickname, reason, expireDate)
-    const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
+    const reasonString: string = reason === undefined ? '' :
+      ` ${tm.utils.strVar(config.ban.reason, { reason: reason })}`
+    const durationString: string = duration === undefined ? '' :
+      ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.ban.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
@@ -253,8 +262,10 @@ export const actions = {
       tm.sendMessage(tm.utils.strVar(config.blacklist.error, { login: player.login }), info.login)
       return
     }
-    const reasonString: string = reason === undefined ? '' : ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
-    const durationString: string = duration === undefined ? '' : ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
+    const reasonString: string = reason === undefined ? '' :
+      ` ${tm.utils.strVar(config.blacklist.reason, { reason: reason })}`
+    const durationString: string = duration === undefined ? '' :
+      ` for ${tm.utils.palette.highlight}${tm.utils.getVerboseTime(duration)}`
     tm.sendMessage(tm.utils.strVar(config.blacklist.text, {
       title: info.title,
       adminName: tm.utils.strip(info.nickname),
@@ -280,7 +291,8 @@ export const actions = {
       return
     }
     if (result === 'Player not blacklisted') {
-      tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: tm.utils.strip(player.nickname) }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.unblacklist.notBlacklisted, { login: tm.utils.strip(player.nickname) }),
+        info.login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.unblacklist.text, {
@@ -307,7 +319,8 @@ export const actions = {
       return
     }
     if (result === 'Already guest') {
-      tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: tm.utils.strip(player.nickname) }), info.login)
+      tm.sendMessage(tm.utils.strVar(config.addguest.alreadyGuest, { login: tm.utils.strip(player.nickname) }),
+        info.login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.addguest.text, {
@@ -344,14 +357,11 @@ export const actions = {
     }), config.rmguest.public ? undefined : info.login)
   },
   publicAdd: async (login: string, nickname: string, title: string, mapName: string): Promise<boolean> => {
-    const voteWindow: VoteWindow = new VoteWindow(
-      login,
-      config.publicAdd.voteGoal,
-      tm.utils.strVar(config.publicAdd.voteText, { mapName }),
-      tm.utils.strVar(config.publicAdd.voteStart, { nickname: tm.utils.strip(nickname, true), mapName }),
-      config.publicAdd.voteTime,
-      config.publicAdd.voteIcon
-    )
+    const voteWindow: VoteWindow = new VoteWindow(login, config.publicAdd.voteGoal,
+      tm.utils.strVar(config.publicAdd.voteText, { mapName }), tm.utils.strVar(config.publicAdd.voteStart, {
+        nickname: tm.utils.strip(nickname, true),
+        mapName
+      }), config.publicAdd.voteTime, config.publicAdd.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list)
     if (result === undefined) {
       tm.sendMessage(config.publicAdd.alreadyRunning)
@@ -429,7 +439,8 @@ export const actions = {
       await tm.admin.setPrivilege(target.login, privilege, caller)
     }
   },
-  addMap: async (login: string, nickname: string, title: string, id: number | string, tmxSite?: string, fromUrl = false) => {
+  addMap: async (login: string, nickname: string, title: string, id: number | string, tmxSite?: string,
+    fromUrl = false) => {
     const tmxSites: tm.TMXSite[] = ['TMNF', 'TMN', 'TMO', 'TMS', 'TMU']
     const site: tm.TMXSite | undefined = tmxSites.find(a => a === tmxSite?.toUpperCase())
     let file: {
@@ -449,7 +460,10 @@ export const actions = {
       tm.sendMessage(config.addMap.fetchError, login)
       return
     }
-    const obj = await tm.maps.writeFileAndAdd(file.name, file.content, { login, nickname })
+    const obj = await tm.maps.writeFileAndAdd(file.name, file.content, {
+      login,
+      nickname
+    })
     if (obj instanceof Error) {
       tm.log.warn(obj.message)
       tm.sendMessage(config.addMap.addError, login)
@@ -478,7 +492,13 @@ export const actions = {
         return
       }
       id = tm.maps.current.id
-      eraseObject = { id: id, admin: { login, nickname } }
+      eraseObject = {
+        id: id,
+        admin: {
+          login,
+          nickname
+        }
+      }
       tm.sendMessage(tm.utils.strVar(config.removeMap.removeThis, {
         title: title,
         nickname: tm.utils.strip(nickname, true),
@@ -496,17 +516,23 @@ export const actions = {
       nickname: tm.utils.strip(nickname, true),
       map: tm.utils.strip(map.name, true)
     }), config.removeMap.public ? undefined : login)
-    void tm.maps.remove(map.id, { login, nickname })
+    void tm.maps.remove(map.id, {
+      login,
+      nickname
+    })
   },
   requeueMap: async (login: string, nickname: string, title: string): Promise<void> => {
-    const status = await tm.jukebox.add(tm.maps.current.id, { login, nickname }, true)
+    const status = await tm.jukebox.add(tm.maps.current.id, {
+      login,
+      nickname
+    }, true)
     if (!status || status instanceof Error) {
       tm.sendMessage(config.requeueMap.error, login)
       return
     }
     tm.sendMessage(tm.utils.strVar(config.requeueMap.text, {
       title: title,
-      adminName: tm.utils.strip(nickname, true),
+      adminName: tm.utils.strip(nickname, true)
     }))
   },
   skipMap: (): void => {
@@ -517,7 +543,7 @@ export const actions = {
         toSkip = true
         break
       case 'race':
-        tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{boolean: true }] : undefined)
+        tm.client.callNoRes(`NextChallenge`, tm.getGameMode() === 'Cup' ? [{ boolean: true }] : undefined)
         break
     }
   }

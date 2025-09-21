@@ -98,7 +98,11 @@ export class PlayerService {
    */
   static async join(login: string, nickname: string, fullRegion: string, isSpectator: boolean, id: number, ip: string,
     isUnited: boolean, ladderPoints: number, ladderRank: number, serverStart?: true): Promise<tm.Player> {
-    let { region, country, countryCode } = Utils.getRegionInfo(fullRegion)
+    let {
+      region,
+      country,
+      countryCode
+    } = Utils.getRegionInfo(fullRegion)
     if (countryCode === undefined) { // This actually happens sometimes yes thanks nadeo
       Logger.warn(`Player ${Utils.strip(nickname)} (${login}) has undefined nation. Setting it to OTH.`)
       Logger.debug(`Login: "${login}", Region: "${fullRegion}".`)
@@ -187,13 +191,21 @@ export class PlayerService {
    * Updates the player information in runtime memory and the database
    * @param players Objects containing player login and infos to change
    */
-  static async updateInfo(...players: { login: string, nickname?: string, region?: string, title?: string }[]): Promise<void> {
+  static async updateInfo(...players: {
+    login: string,
+    nickname?: string,
+    region?: string,
+    title?: string
+  }[]): Promise<void> {
     for (const p of players) {
       const obj: tm.Player | tm.OfflinePlayer | undefined = this._players.find(
         a => a.login === p.login) ?? await this.repo.get(p.login)
       if (obj === undefined) { continue }
       if (p.title !== undefined && (obj as any).title !== undefined) { (obj as any).title = p.title }
-      const { region, countryCode } = Utils.getRegionInfo(p.region ?? obj.region)
+      const {
+        region,
+        countryCode
+      } = Utils.getRegionInfo(p.region ?? obj.region)
       if (p.nickname !== undefined && p.nickname !== obj.nickname) {
         Logger.trace(`Updated the nickname for ${p.login} from Dedimania.`)
         await this.repo.updateNickname(p.login, p.nickname ?? obj.nickname)
@@ -220,7 +232,9 @@ export class PlayerService {
     const sessionTime: number = Date.now() - player.joinTimestamp
     const totalTimePlayed: number = sessionTime + player.timePlayed
     const leaveInfo: tm.LeaveInfo = {
-      ...player, timePlayed: totalTimePlayed, sessionTime
+      ...player,
+      timePlayed: totalTimePlayed,
+      sessionTime
     }
     // remove spec
     if (player.isSpectator) {
@@ -256,7 +270,9 @@ export class PlayerService {
    * @param cp Checkpoint object
    */
   static addCP(player: tm.Player, cp: tm.Checkpoint): Error | boolean | {
-    lapTime: number, isFinish: boolean, lapCheckpoints: number[]
+    lapTime: number,
+    isFinish: boolean,
+    lapCheckpoints: number[]
   } {
     const laps = tm.maps.current.lapsAmount
     if (cp.index === 0) {
@@ -278,7 +294,8 @@ export class PlayerService {
         const startIndex = cp.index - MapService.current.checkpointsPerLap
         const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
         return {
-          lapTime: cp.time - startTime, isFinish: false,
+          lapTime: cp.time - startTime,
+          isFinish: false,
           lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1, -1).map(a => a.time - startTime)
         }
       }
@@ -288,7 +305,8 @@ export class PlayerService {
         const startIndex = cp.index - MapService.current.checkpointsPerLap
         const startTime = player.currentCheckpoints[startIndex]?.time ?? 0
         return {
-          lapTime: cp.time - startTime, isFinish: true,
+          lapTime: cp.time - startTime,
+          isFinish: true,
           lapCheckpoints: player.currentCheckpoints.slice(startIndex + 1).map(a => a.time - startTime)
         }
       }
@@ -309,7 +327,8 @@ export class PlayerService {
     player.isTemporarySpectator = info.isTemporarySpectator
     player.hasPlayerSlot = info.hasPlayerSlot
     // update spectators
-    const spectated: tm.Player | undefined = info.currentTargetId % 255 === 0 ? undefined : this._players.find(a => a.id === info.currentTargetId)
+    const spectated: tm.Player | undefined = info.currentTargetId % 255 === 0 ? undefined :
+      this._players.find(a => a.id === info.currentTargetId)
     let specChanged = true
     if (spectated === undefined) {
       if (!player.isSpectator && info.currentTargetId % 255 !== 0) {
@@ -357,7 +376,10 @@ export class PlayerService {
     const initialLocals = RecordService.initialLocals
     const amount: number = MapService.mapCount
     const averages = await this.repo.getAverage(logins)
-    const arr: { login: string, average: number }[] = []
+    const arr: {
+      login: string,
+      average: number
+    }[] = []
     for (const avg of averages) {
       // Get rank from the start of the race
       let previousRank: number = initialLocals.findIndex(a => a.login === avg.login) + 1
@@ -371,7 +393,10 @@ export class PlayerService {
       if (onlinePlayer !== undefined) { // Set average in runtime if player is online
         onlinePlayer.average = average
       }
-      arr.push({ login: avg.login, average })
+      arr.push({
+        login: avg.login,
+        average
+      })
       await this.repo.updateAverage(avg.login, average) // Set average in the database
     }
     // Get ranks for all players
@@ -405,15 +430,23 @@ export class PlayerService {
    * @param login Player login
    * @returns Player object or undefined if the player isn't online
    */
-  static get(login: string): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined
+  static get(login: string): Readonly<tm.Player & {
+    currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>
+  }> | undefined
   /**
    * Gets multiple players information from runtime memory. Only online players are stored
    * If some player is not online he won't be returned. Returned array is not in initial order
    * @param logins Array of player logins
    * @returns Array of player objects
    */
-  static get(logins: string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[]
-  static get(logins: string | string[]): Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }> | undefined | Readonly<tm.Player & { currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]> }>[] {
+  static get(logins: string[]): Readonly<tm.Player & {
+    currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>
+  }>[]
+  static get(logins: string | string[]): Readonly<tm.Player & {
+    currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>
+  }> | undefined | Readonly<tm.Player & {
+    currentCheckpoints: Readonly<Readonly<tm.Checkpoint>[]>
+  }>[] {
     if (typeof logins === 'string') {
       return this._players.find(a => a.login === logins)
     }
@@ -423,7 +456,9 @@ export class PlayerService {
   /**
    * All online players
    */
-  static get players(): Readonly<tm.Player & { currentCheckpoints: Readonly<tm.Checkpoint>[] }>[] {
+  static get players(): Readonly<tm.Player & {
+    currentCheckpoints: Readonly<tm.Checkpoint>[]
+  }>[] {
     return [...this._players]
   }
 

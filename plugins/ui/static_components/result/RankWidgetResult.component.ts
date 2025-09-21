@@ -26,7 +26,10 @@ export default class RankWidgetResult extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   protected onPositionChange(): void {

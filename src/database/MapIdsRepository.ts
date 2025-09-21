@@ -1,4 +1,4 @@
-import {Repository} from "./Repository.js"
+import { Repository } from "./Repository.js"
 import config from "../../config/Config.js"
 
 export class MapIdsRepository extends Repository {
@@ -14,8 +14,14 @@ export class MapIdsRepository extends Repository {
    * @param mapUids Array of map uids
    * @returns Array of objects containing map id and uid. If map is not in the database it won't be in the array
    */
-  async get(mapUids: string[]): Promise<{ uid: string, id: number }[]>
-  async get(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number | undefined> {
+  async get(mapUids: string[]): Promise<{
+    uid: string,
+    id: number
+  }[]>
+  async get(mapUids: string[] | string): Promise<{
+    uid: string,
+    id: number
+  }[] | number | undefined> {
     let isArr = true
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]
@@ -50,8 +56,14 @@ export class MapIdsRepository extends Repository {
   }
 
   async addAndGet(mapUid: string): Promise<number>
-  async addAndGet(mapUids: string[]): Promise<{ uid: string, id: number }[]>
-  async addAndGet(mapUids: string[] | string): Promise<{ uid: string, id: number }[] | number> {
+  async addAndGet(mapUids: string[]): Promise<{
+    uid: string,
+    id: number
+  }[]>
+  async addAndGet(mapUids: string[] | string): Promise<{
+    uid: string,
+    id: number
+  }[] | number> {
     let isArr = true
     if (typeof mapUids === 'string') {
       mapUids = [mapUids]

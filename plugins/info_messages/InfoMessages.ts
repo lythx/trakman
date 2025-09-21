@@ -13,9 +13,8 @@ const getRandomMessage = (): string => {
 }
 
 const sendInfoMessage = (): void => {
-  tm.sendMessage(config.messagePrefix
-    + `${config.defaultFormatting}`
-    + getRandomMessage(), undefined, config.chatPrefixEnabled)
+  tm.sendMessage(config.messagePrefix + `${config.defaultFormatting}` + getRandomMessage(), undefined,
+    config.chatPrefixEnabled)
 }
 
 if (config.isEnabled) {

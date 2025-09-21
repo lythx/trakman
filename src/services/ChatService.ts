@@ -22,9 +22,18 @@ export abstract class ChatService {
   private static readonly _messages: tm.Message[] = []
   private static readonly repo: ChatRepository = new ChatRepository()
   private static readonly _commandList: tm.Command[] = []
-  private static readonly customPrefixes: { callback: MessageFunction, position: number }[] = []
-  private static readonly messageStyleFunctions: { importance: number, callback: MessageFunction }[] = []
-  private static readonly messageTextModifiers: { importance: number, callback: ModifyTextFunction }[] = []
+  private static readonly customPrefixes: {
+    callback: MessageFunction,
+    position: number
+  }[] = []
+  private static readonly messageStyleFunctions: {
+    importance: number,
+    callback: MessageFunction
+  }[] = []
+  private static readonly messageTextModifiers: {
+    importance: number,
+    callback: ModifyTextFunction
+  }[] = []
   static readonly manualChatRoutingEnabled = config.manualChatRoutingEnabled
 
   /**
@@ -33,10 +42,7 @@ export abstract class ChatService {
   static async initialize(): Promise<void> {
     this._messages.push(...await this.repo.get({ limit: this.messagesArraySize }))
     tm.addListener('Startup', () => {
-      Client.callNoRes('ChatEnableManualRouting', [
-        { boolean: this.manualChatRoutingEnabled },
-        { boolean: true }
-      ])
+      Client.callNoRes('ChatEnableManualRouting', [{ boolean: this.manualChatRoutingEnabled }, { boolean: true }])
     })
     Events.addListener('PlayerChat', (info): void => {
       const input: string = info.text?.trim()
@@ -113,8 +119,8 @@ export abstract class ChatService {
     Events.emit('PlayerChat', mi)
   }
 
-  private static async commandCallback(command: tm.Command, info: tm.MessageInfo,
-    input: string, params: string[], alias: string): Promise<void> {
+  private static async commandCallback(command: tm.Command, info: tm.MessageInfo, input: string, params: string[],
+    alias: string): Promise<void> {
     if (info.privilege < command.privilege) {
       this.sendErrorMessage(messages.noPermission, info.login)
       return
@@ -123,7 +129,8 @@ export abstract class ChatService {
       this.sendErrorMessage(messages.playerMuted, info.login)
       return
     }
-    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' : ` with params ${params.join(', ')}`}`)
+    Logger.info(`${Utils.strip(info.nickname)} (${info.login}) used command ${alias}${params.length === 0 ? '' :
+      ` with params ${params.join(', ')}`}`)
     const parsedParams: (string | number | boolean | undefined | tm.Player | tm.OfflinePlayer)[] = []
     if (command.params !== undefined) {
       for (const [i, param] of command.params.entries()) {
@@ -139,14 +146,16 @@ export abstract class ChatService {
         if (param.validValues !== undefined) {
           const enumVal = param.validValues.find(a => a.toString().toLowerCase() === params[i].toLowerCase())
           if (enumVal === undefined) {
-            this.sendErrorMessage(Utils.strVar(messages.invalidValue,
-              { name: param.name, values: param.validValues.join(', ') }), info.login)
+            this.sendErrorMessage(Utils.strVar(messages.invalidValue, {
+              name: param.name,
+              values: param.validValues.join(', ')
+            }), info.login)
             return
           }
           parsedParams.push(enumVal)
           continue
         }
-        switch (param.type) {
+        switch(param.type) {
           case 'int':
             if (!Number.isInteger(Number(params[i]))) {
               this.sendErrorMessage(Utils.strVar(messages.notInt, { name: param.name }), info.login)
@@ -171,12 +180,10 @@ export abstract class ChatService {
           case 'time':
             const timeOrError = Utils.parseTimeString(params[i])
             if (timeOrError instanceof RangeError) {
-              this.sendErrorMessage(Utils.strVar(messages.timeTooBig,
-                { name: param.name }), info.login)
+              this.sendErrorMessage(Utils.strVar(messages.timeTooBig, { name: param.name }), info.login)
               return
             } else if (timeOrError instanceof TypeError) {
-              this.sendErrorMessage(Utils.strVar(messages.notTime,
-                { name: param.name }), info.login)
+              this.sendErrorMessage(Utils.strVar(messages.notTime, { name: param.name }), info.login)
               return
             }
             parsedParams.push(timeOrError)
@@ -224,7 +231,9 @@ export abstract class ChatService {
         }
       }
     }
-    const messageInfo: tm.MessageInfo & { aliasUsed: string } = {
+    const messageInfo: tm.MessageInfo & {
+      aliasUsed: string
+    } = {
       ...info,
       text: input.split(' ').splice(1).join(' '),
       aliasUsed: alias.slice(1)
@@ -257,8 +266,7 @@ export abstract class ChatService {
     }
     const messageInfo: tm.MessageInfo = {
       text,
-      date: message.date,
-      ...player
+      date: message.date, ...player
     }
     if (text[0] !== '/') { // I dont trim here cuz if u put space in front of slash the message gets displayed
       Logger.trace(`${Utils.strip(player.nickname)} (${player.login}) sent message: ${text}`)
@@ -306,11 +314,14 @@ export abstract class ChatService {
   /**
    * Registers a function to add a prefix or postfix to chat messages when using manual chat routing.
    * @param callback The function takes MessageInfo object and returns string (the prefix) or undefined (then its ignored)
-   * @param position Prefixes are positioned based on this, lowest one is first, 
+   * @param position Prefixes are positioned based on this, lowest one is first,
    * negative values are positioned before the nickname, positive after it
    */
   static addMessagePrefix(callback: MessageFunction, position: number): void {
-    this.customPrefixes.push({ callback, position })
+    this.customPrefixes.push({
+      callback,
+      position
+    })
     this.customPrefixes.sort((a, b) => b.position - a.position)
   }
 
@@ -321,19 +332,25 @@ export abstract class ChatService {
    * If it returns undefined the 2nd most important function will be executed and so on
    */
   static setMessageStyle(callback: MessageFunction, importance: number) {
-    this.messageStyleFunctions.push({ callback, importance })
+    this.messageStyleFunctions.push({
+      callback,
+      importance
+    })
     this.messageStyleFunctions.sort((a, b) => b.importance - a.importance)
   }
 
   /**
    * Registers a function to modify chat message text.
-   * @param callback The function takes MessageInfo object and returns string (the name), 
+   * @param callback The function takes MessageInfo object and returns string (the name),
    * error (prevents message from being sent) or undefined (then its ignored)
    * @param importance In case multiple functions are registered the most important one will be executed.
    * If it returns undefined the 2nd most important will be executed and so on
    */
   static addMessageTextModifier(callback: ModifyTextFunction, importance: number) {
-    this.messageTextModifiers.push({ callback, importance })
+    this.messageTextModifiers.push({
+      callback,
+      importance
+    })
     this.messageTextModifiers.sort((a, b) => b.importance - a.importance)
   }
 
@@ -343,7 +360,10 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetchByLogin(login: string, options: { limit?: number; date?: Date; }): Promise<tm.Message[]> {
+  static async fetchByLogin(login: string, options: {
+    limit?: number;
+    date?: Date;
+  }): Promise<tm.Message[]> {
     return await this.repo.getByLogin(login, options)
   }
 
@@ -352,13 +372,16 @@ export abstract class ChatService {
    * @param options Limit is maximum amount of fetched messages, date is timestamp after which messages will be fetched
    * @returns Array of message objects
    */
-  static async fetch(options: { limit?: number; date?: Date; }): Promise<tm.Message[]> {
+  static async fetch(options: {
+    limit?: number;
+    date?: Date;
+  }): Promise<tm.Message[]> {
     return await this.repo.get(options)
   }
 
   /**
    * Gets recent chat messages written by specified player
-   * @param login Player login 
+   * @param login Player login
    * @returns Array of message objects
    */
   static get(login: string): Readonly<tm.Message>[] {

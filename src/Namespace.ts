@@ -1,4 +1,4 @@
-export { }
+export {}
 declare global {
   /** Global Trakman object providing methods to interact with controller */
   namespace tm {
@@ -47,6 +47,7 @@ declare global {
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
       awards?: number
     }
+
     /** TM Server Challenge return type */
     export interface ServerMap {
       Name: string,
@@ -62,10 +63,11 @@ declare global {
       AuthorTime?: number,
       NbLaps?: number
     }
+
     /** Controller online player object */
     export interface Player {
-      /** 
-       * Player server ID (assigned by the dedicated server when the 
+      /**
+       * Player server ID (assigned by the dedicated server when the
        * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly id: number
@@ -111,7 +113,7 @@ declare global {
       isPureSpectator: boolean
       /** Whether the player is in spectator mode temporarily (eg. result screen, inbetween rounds) */
       isTemporarySpectator: boolean
-      /** Whether the player has a player slot 
+      /** Whether the player has a player slot
        * (player slot is needed to switch to player mode, it's automatically assigned if the server is not full) */
       hasPlayerSlot: boolean
       /** Player server rank (undefined if the player doesn't have any record) */
@@ -129,6 +131,7 @@ declare global {
       /** Whether the player is a cup finalist (Cup mode only) (Winners are not finalists) */
       isCupFinalist: boolean
     }
+
     /** Controller offline player object */
     export interface OfflinePlayer {
       /** Player login */
@@ -158,6 +161,7 @@ declare global {
       /** Player average server map rank */
       readonly average: number
     }
+
     /** Trackmania dedicated server call parameters */
     export interface CallParams {
       string?: string
@@ -170,6 +174,7 @@ declare global {
       base64?: string,
       array?: CallParams[]
     }
+
     /** Trackmania dedicated server call object */
     export interface Call {
       /** Dedicated server method name */
@@ -177,6 +182,7 @@ declare global {
       /** Call parameters */
       readonly params?: CallParams[]
     }
+
     /** Controller command object */
     export interface Command {
       /** Aliases that can be used to call the command in the chat */
@@ -195,12 +201,15 @@ declare global {
         readonly optional?: true
       }[]
       /** Callback function to execute on command call */
-      readonly callback: (info: MessageInfo & { aliasUsed: string }, ...params: any[]) => void
+      readonly callback: (info: MessageInfo & {
+        aliasUsed: string
+      }, ...params: any[]) => void
       /** Player privilege required to call the command */
       readonly privilege: number,
       /** Whether the command is usable by players currently in the mutelist */
       readonly disableForMuted?: boolean
     }
+
     /** Controller ban object */
     export interface BanlistEntry {
       /** Banned player ip */
@@ -220,6 +229,7 @@ declare global {
       /** Ban expire date (undefined if wasn't specified) */
       expireDate: Date | undefined
     }
+
     /** Controller blacklist object */
     export interface BlacklistEntry {
       /** Blacklisted player login */
@@ -237,6 +247,7 @@ declare global {
       /** Blacklist expire date (undefined if wasn't specified) */
       expireDate: Date | undefined
     }
+
     /** Controller mute object */
     export interface MutelistEntry {
       /** Muted player login */
@@ -254,6 +265,7 @@ declare global {
       /** Mute expire date (undefined if wasn't specified) */
       expireDate: Date | undefined
     }
+
     /** Controller guest object */
     export interface GuestlistEntry {
       /** Guest login */
@@ -288,10 +300,11 @@ declare global {
       readonly lapCheckpointTime: number
       /** Checkpoint index in the current lap (Multilap maps only) */
       readonly lapCheckpointIndex: number
-      /** Whether the checkpoint is a finish (Multilap maps only) 
+      /** Whether the checkpoint is a finish (Multilap maps only)
        * (Actual race finish is not counted as a checkpoint) */
       readonly isLapFinish: boolean
     }
+
     /** Controller chat message object */
     export interface Message {
       /** Player login */
@@ -303,6 +316,7 @@ declare global {
       /** Message date */
       readonly date: Date
     }
+
     /** Controller player record object */
     export interface Record {
       /** Map UID */
@@ -318,6 +332,7 @@ declare global {
       /** Player nickname */
       nickname: string
     }
+
     /** Controller karma map vote object */
     export interface Vote {
       /** Map UID */
@@ -329,6 +344,7 @@ declare global {
       /** Vote date */
       date: Date
     }
+
     /** TMX map object */
     export interface TMXMap {
       /** Map UID */
@@ -388,6 +404,7 @@ declare global {
       /** Author score (Stunts Mode) */
       readonly authorScore?: number
     }
+
     /** TMX replay object */
     export interface TMXReplay {
       /** TMX replay ID */
@@ -409,6 +426,7 @@ declare global {
       /** Replay file download url */
       readonly url: string
     }
+
     /** TMX map search result object */
     export interface TMXSearchResult {
       /** Map UID */
@@ -466,6 +484,7 @@ declare global {
       /** Map vehicle */
       readonly car: string
     }
+
     /** Server information object */
     export interface ServerInfo {
       /** The server name */
@@ -523,6 +542,7 @@ declare global {
       /** Dedicated server executable build (for TMF, the latest build is 2.11.26) */
       build: string
     }
+
     /** Object containing Trackmania coppers bill state information. Created and emitted on the BillUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface BillUpdatedInfo {
       /** Bill ID */
@@ -534,13 +554,14 @@ declare global {
       /** Transaction ID */
       readonly transactionId: number
     }
+
     /** Object containing player state information. Created and emitted on the PlayerInfoChanged event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface InfoChangedInfo {
       /** Player login */
       readonly login: string
       /** Player nickname */
       readonly nickname: string
-      /** Player server ID (assigned by the dedicated server when the 
+      /** Player server ID (assigned by the dedicated server when the
        * player connects). Ranges from 0 to 250, inclusive (0 is the server account). */
       readonly id: number
       /** Possibly leftover from earlier versions? Usually undefined or 0. */
@@ -572,6 +593,7 @@ declare global {
       /** Identifier of the player currently being watched by the spectator */
       readonly currentTargetId: number
     }
+
     /** Object containing player controller privilege information. Created and emitted on the PrivilegeChange event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PrivilegeChangedInfo {
       /** Player object (undefined if the player is not in the database) */
@@ -590,6 +612,7 @@ declare global {
         readonly nickname: string
       }
     }
+
     /** Object containing map karma vote information. Created and emitted on the KarmaVote event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface KarmaVoteInfo {
       /** Map UID */
@@ -601,6 +624,7 @@ declare global {
       /** Vote date */
       readonly date: Date
     }
+
     /** Controller event listener object */
     export interface Listener {
       /** Event name or an array of event names */
@@ -608,6 +632,7 @@ declare global {
       /** Callback function to execute on the event */
       readonly callback: ((params: any) => void)
     }
+
     /** Game information object */
     export interface GameInfo {
       /** Current server gamemode (Rounds (0), TimeAttack (1), Team (2), Laps (3), Stunts (4), Cup (5)) */
@@ -664,6 +689,7 @@ declare global {
       /** Warm-up rounds count in Cup mode */
       cupWarmUpRounds: number
     }
+
     /** Object containing player information. Created and emitted on the PlayerDataUpdated event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export interface PlayerDataUpdatedInfo {
       /** Player login */
@@ -682,6 +708,7 @@ declare global {
         readonly region: string
       }
     }
+
     /** Map object received from certain dedicated server callbacks and methods */
     export interface TrackmaniaMapInfo {
       /** Map UID */
@@ -713,14 +740,15 @@ declare global {
       /** Amount of checkpoints (certain methods (eg. GetChallengeInfo, GetNextChallengeInfo) return -1 here for some reason) */
       readonly NbCheckpoints: number;
     }
+
     /** Ranking object received from EndChallenge and EndRace dedicated server callbacks */
     export interface TrackmaniaRankingInfo {
       /** Player login */
       readonly Login: string;
       /** Player nickname */
       readonly NickName: string;
-      /** 
-       * Player server ID (assigned by the dedicated server when the 
+      /**
+       * Player server ID (assigned by the dedicated server when the
        * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly PlayerId: number;
@@ -737,22 +765,23 @@ declare global {
       /** Player ladderpoints amount */
       readonly LadderScore: number;
     }
+
     /** Player object received from certain dedicated server callbacks and methods */
     export interface TrackmaniaPlayerInfo {
       /** Player login */
       readonly Login: string;
       /** Player nickname */
       readonly NickName: string;
-      /** 
-       * Player server ID (assigned by the dedicated server when the 
+      /**
+       * Player server ID (assigned by the dedicated server when the
        * player connects). Ranges from 0 to 250, inclusive (0 is the server account).
        */
       readonly PlayerId: number;
       /** Possibly leftover from earlier versions? Usually undefined or 0. */
       readonly TeamId: number;
       /** Integer representing the player spectator status .
-       * (isSpectator + isTemporarySpectator * 10 + isPureSpectator * 100 + 
-       * autoTarget * 1000 + currentTargetId * 10000) 
+       * (isSpectator + isTemporarySpectator * 10 + isPureSpectator * 100 +
+       * autoTarget * 1000 + currentTargetId * 10000)
        */
       readonly SpectatorStatus: number;
       /** Player ladder ranking */
@@ -764,9 +793,13 @@ declare global {
        */
       readonly Flags: number;
     }
+
     /** Object containing event names and types that get passed as parameters */
     export interface Events {
-      "*": { event: keyof Events, params: any }
+      "*": {
+        event: keyof Events,
+        params: any
+      }
       "Startup": 'result' | 'race'
       "ServerStateChanged": ServerState
       "PlayerChat": MessageInfo
@@ -790,7 +823,10 @@ declare global {
       "PrivilegeChanged": PrivilegeChangedInfo
       "LocalRecordsRemoved": readonly Readonly<Record>[]
       "JukeboxChanged": readonly Readonly<Map>[]
-      "RanksAndAveragesUpdated": readonly Readonly<{ login: string, average: number }>[]
+      "RanksAndAveragesUpdated": readonly Readonly<{
+        login: string,
+        average: number
+      }>[]
       "Ban": Readonly<BanlistEntry>
       "Unban": Readonly<BanlistEntry>
       "Blacklist": Readonly<BlacklistEntry>
@@ -827,6 +863,7 @@ declare global {
       "TrackMania.Echo": readonly [string, string]
       "TrackMania.VoteUpdated": readonly [string, string, string, string]
     }
+
     /** Object containing player information. Created and emitted on the PlayerJoin event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type JoinInfo = Readonly<Omit<Player, 'currentCheckpoints'>>
     /** Object containing map information. Created and emitted on the EndMap event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
@@ -845,10 +882,10 @@ declare global {
       readonly winnerWins?: number,
       /** Whether the map was restarted using dedicated server call */
       readonly isRestart: boolean
-      /** Server side ranking objects. 
+      /** Server side ranking objects.
        * (Can differ from controller rankings only if it was restarted during the map) */
       readonly serverSideRankings: readonly TrackmaniaRankingInfo[]
-      /** If keep queue after leave is set to false, this is the object that stores the dropped map 
+      /** If keep queue after leave is set to false, this is the object that stores the dropped map
        * This is the exact copy of the JukeboxMap interface off of MapService */
       readonly droppedMap?: {
         /** The dropped map object */
@@ -888,8 +925,7 @@ declare global {
     export type FinishInfo = Omit<Player & LocalRecord & {
       /** Amount of round points acquired by the player in the current round (Rounds/Cup/Teams mode only) */
       readonly roundPoints?: number
-    },
-      'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
+    }, 'currentCheckpoints' | 'isSpectator' | 'date' | 'isTemporarySpectator' | 'isPureSpectator'>
     /** Object containing player information. Created and emitted on the PlayerLeave event https://github.com/lythx/trakman/wiki/Controller-Events#events-list */
     export type LeaveInfo = Omit<Player, 'lastOnline'> & {
       /** Amount of time the player spent on the server in the current session */
@@ -961,7 +997,7 @@ declare global {
     /** TMX map car ('SnowCar', 'DesertCar', etc.) */
     export type TMXCar = 'SnowCar' | 'DesertCar' | 'RallyCar' | 'IslandCar' | 'CoastCar' | 'BayCar' | 'StadiumCar'
     /** TMX map style ('Normal', 'Stunt', etc.) */
-    export type TMXStyle = 'Normal' | 'Stunt' | 'Maze' | 'Offroad' | 'Laps' | 'Fullspeed' | 'LOL' |
-      'Tech' | 'SpeedTech' | 'RPG' | 'PressForward' | 'Trial' | 'Grass'
+    export type TMXStyle = 'Normal' | 'Stunt' | 'Maze' | 'Offroad' | 'Laps' | 'Fullspeed' | 'LOL' | 'Tech' | 'SpeedTech'
+      | 'RPG' | 'PressForward' | 'Trial' | 'Grass'
   }
 }

@@ -5,21 +5,14 @@ export class DedimaniaRequest {
   private sessionKey?: string
   private xmlBuffer: Buffer
   private _buffer: Buffer = Buffer.from(
-    'POST /Dedimania HTTP/1.1\n' +
-    'Host: dedimania.net\n' +
-    'User-Agent: XMLaccess\n' +
-    'Cache-Control: no-cache\n' +
-    'Accept-Encoding: gzip\n' +
-    'Content-Encoding: gzip\n' +
-    'Content-type: text/xml; charset=UTF-8\n'
-  )
+    'POST /Dedimania HTTP/1.1\n' + 'Host: dedimania.net\n' + 'User-Agent: XMLaccess\n' + 'Cache-Control: no-cache\n' + 'Accept-Encoding: gzip\n' + 'Content-Encoding: gzip\n' + 'Content-type: text/xml; charset=UTF-8\n')
 
   /**
-  * Prepares XML string for a dedimania request.
-  * @param method dedimania method
-  * @param params parameters
-  * @param sessionKey dedimania session key
-  */
+   * Prepares XML string for a dedimania request.
+   * @param method dedimania method
+   * @param params parameters
+   * @param sessionKey dedimania session key
+   */
   constructor(method: string, params: tm.CallParams[], sessionKey?: string) {
     let xml: string = `<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>${method}</methodName><params>`
     for (const param of params) {
@@ -32,17 +25,12 @@ export class DedimaniaRequest {
     this.sessionKey = sessionKey
     const gzip: Buffer = zlib.gzipSync(this.xmlBuffer)
     if (this.sessionKey === undefined) {
-      this._buffer = Buffer.concat([
-        this._buffer,
-        Buffer.from(`Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`),
-        gzip
-      ])
+      this._buffer = Buffer.concat([this._buffer, Buffer.from(
+        `Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\n\r\n`), gzip])
     } else {
-      this._buffer = Buffer.concat([
-        this._buffer,
-        Buffer.from(`Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${this.sessionKey}\r\n\r\n`),
-        gzip
-      ])
+      this._buffer = Buffer.concat([this._buffer, Buffer.from(
+        `Content-length: ${gzip.length}\r\nKeep-Alive: timeout=600, max=2000\r\nConnection: Keep-Alive\r\nCookie: PHPSESSID=${this.sessionKey}\r\n\r\n`),
+        gzip])
     }
   }
 
@@ -53,7 +41,7 @@ export class DedimaniaRequest {
     if (value === undefined) {
       return new Error(`Received undefined while creating dedimania XML request, expected ${type}.`)
     }
-    switch (type) {
+    switch(type) {
       case 'boolean':
         return `<boolean>${value === true ? '1' : '0'}</boolean>`
       case 'int':

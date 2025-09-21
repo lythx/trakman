@@ -35,7 +35,7 @@ export default {
     kick: 1,
     forceSpectator: 1,
     addMap: 1,
-    removeMap: 1,
+    removeMap: 1
   },
   /**
    * Enable this for Trakman to take over handling maps. The controller will read maps from a folder
@@ -51,16 +51,16 @@ export default {
     /** Path to the `GameData/Tracks/` directory of the server. MUST end with a slash '/'!
      * Default value: "../GameData/Tracks/" assuming the Trakman directory is on the same level as the server.
      */
-    mapsDirectoryPrefix: "../GameData/Tracks/",
+    mapsDirectoryPrefix: '../GameData/Tracks/',
     /** Relative path to all the maps. Read recursively from `GameData/Tracks/`.
      *  MUST end with a slash '/' when a directory is specified (i.e. if not left empty)!
      *  Default value: ""
      */
-    mapsDirectory: "",
+    mapsDirectory: '',
     /** Ignore non-stadium maps */
     stadiumOnly: undefined,
     /** Amount of maps to load into the server. Default value: 5 */
-    preloadMaps: 5,
+    preloadMaps: 5
   },
   /**
    * When adding a large amount of maps, it is better to add them in smaller chunks. This is the size
@@ -77,12 +77,14 @@ export default {
   defaultTimeAttackTimeLimit: 300000,
   /** Minimal time value to which the dynamic timer can be set (in milliseconds) */
   dynamicTimerSubtractionLimit: 30000,
+  /** CallVotes are skip/restart votes that can be done through the ingame UI (ESC>Advanced Options), setting it to -1 disables CallVotes entirely */
+  callVoteRatio: -1,
   /** Relative path (/GameData/Config/) to the blacklist file */
-  blacklistFile: "blacklist.txt",
+  blacklistFile: 'blacklist.txt',
   /** Relative path (/GameData/Config/) to the guestlist file */
-  guestlistFile: "guestlist.txt",
+  guestlistFile: 'guestlist.txt',
   /** Relative path (/GameData/Tracks/) to the match settings file, ignored if manualMapLoading is enabled */
-  matchSettingsFile: "MatchSettings/MatchSettings.txt",
+  matchSettingsFile: 'MatchSettings/MatchSettings.txt',
   /** Default message sent as the reason for administrative actions if nothing was specified by the admin */
   defaultReasonMessage: 'No reason specified',
   /** Things that will be interpreted as true for the boolean command parameter */
@@ -92,6 +94,6 @@ export default {
   /** Object with options for ufuzzy, see https://github.com/leeoniya/uFuzzy#options */
   searchOptions: {
     intraMode: 1,
-    alpha: "a-zа-яё"
+    alpha: 'a-zа-яё'
   }
 }

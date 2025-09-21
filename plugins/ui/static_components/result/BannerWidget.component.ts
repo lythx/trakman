@@ -29,7 +29,8 @@ export default class BannerWidget extends StaticComponent {
     <frame posn="${this.getPosX()} ${config.topBorder} 1">
       <format textsize="1" textcolor="FFFF"/> 
       <quad posn="0 0 2" sizen="${w} ${h}" bgcolor="${config.background}"/>
-      <quad posn="${m} ${-m} 3" sizen="${w - m * 2} ${h - (bh + m * 3)}" image="${config.image}" url="${tm.utils.fixProtocol(config.imageLink)}"/>
+      <quad posn="${m} ${-m} 3" sizen="${w - m * 2} ${h - (bh + m * 3)}" image="${config.image}" url="${tm.utils.fixProtocol(
+      config.imageLink)}"/>
       <frame posn="0 ${-(h - (bh + m * 2))} 1">
         ${this.constructDonateButtons(w, m)}
       </frame>
@@ -56,7 +57,10 @@ export default class BannerWidget extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   constructDonateButtons(width: number, margin: number) {
@@ -69,8 +73,11 @@ export default class BannerWidget extends StaticComponent {
       const action = i === 0 ? '' : `action="${this.id + i}"`
       const bg = i === 0 ? config.mainTextBackground : config.donateBackground
       ret += `<quad posn="${x} ${-margin} 3" sizen="${w} ${config.buttonHeight}" bgcolor="${bg}" ${action}/>
-            ${centeredText(arr[i], w, config.buttonHeight,
-        { xOffset: x, yOffset: margin, textScale: config.textScale })}`
+            ${centeredText(arr[i], w, config.buttonHeight, {
+        xOffset: x,
+        yOffset: margin,
+        textScale: config.textScale
+      })}`
       x += w + margin
     }
     return ret

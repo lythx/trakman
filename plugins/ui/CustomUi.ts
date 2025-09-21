@@ -7,8 +7,7 @@ export default class CustomUi {
   }
 
   display(): void {
-    tm.sendManialink(
-      `<custom_ui>
+    tm.sendManialink(`<custom_ui>
           <notice visible="${config.notice}"/>
           <challenge_info visible="${config.challengeInfo}"/>
           <net_infos visible="${config.netInfo}"/>
@@ -17,13 +16,11 @@ export default class CustomUi {
           <round_scores visible="${config.roundScores}"/>
           <scoretable visible="${config.scoreTable}"/>
           <global visible="${config.global}"/>
-        </custom_ui>`
-    )
+        </custom_ui>`)
   }
 
   displayToPlayer(login: string): void {
-    tm.sendManialink(
-      `<custom_ui>
+    tm.sendManialink(`<custom_ui>
           <notice visible="${config.notice}"/>
           <challenge_info visible="${config.challengeInfo}"/>
           <net_infos visible="${config.netInfo}"/>
@@ -32,9 +29,7 @@ export default class CustomUi {
           <round_scores visible="${config.roundScores}"/>
           <scoretable visible="${config.scoreTable}"/>
           <global visible="${config.global}"/>
-        </custom_ui>`,
-      login
-    )
+        </custom_ui>`, login)
   }
 
 }

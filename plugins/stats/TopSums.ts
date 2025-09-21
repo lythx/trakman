@@ -1,18 +1,29 @@
 import config from './Config.js'
 
-const topList: { readonly login: string, nickname: string, sums: [number, number, number, number] }[] = []
+const topList: {
+  readonly login: string,
+  nickname: string,
+  sums: [number, number, number, number]
+}[] = []
 const updateListeners: ((changes: readonly Readonly<{
-  login: string, nickname: string,
+  login: string,
+  nickname: string,
   sums: [number, number, number, number]
 }>[]) => void)[] = []
-const nicknameChangeListeners: ((changes: readonly Readonly<{ login: string, nickname: string }>[]) => void)[] = []
+const nicknameChangeListeners: ((changes: readonly Readonly<{
+  login: string,
+  nickname: string
+}>[]) => void)[] = []
 let initialLocals: tm.LocalRecord[] = []
 let refreshNeeded = false
 
 const initialize = async () => {
   refreshNeeded = false
-  const res: { uid: string, login: string, nickname: string }[] | Error =
-    await tm.db.query(`SELECT uid, login, nickname FROM records
+  const res: {
+    uid: string,
+    login: string,
+    nickname: string
+  }[] | Error = await tm.db.query(`SELECT uid, login, nickname FROM records
   JOIN map_ids ON map_ids.id=records.map_id
   JOIN players ON players.id=records.player_id
   ORDER BY uid ASC,
@@ -81,7 +92,10 @@ tm.addListener('BeginMap', (): void => {
 })
 
 tm.addListener('PlayerDataUpdated', (info) => {
-  const changedObjects: { login: string, nickname: string }[] = []
+  const changedObjects: {
+    login: string,
+    nickname: string
+  }[] = []
   for (const e of topList) {
     const newNickname = info.find(a => a.login === e.login)?.nickname
     if (newNickname !== undefined) {
@@ -146,7 +160,8 @@ export const topSums = {
    * List of players sorted by their records amount
    */
   get list(): readonly Readonly<{
-    login: string, nickname: string,
+    login: string,
+    nickname: string,
     sums: Readonly<[number, number, number, number]>
   }>[] {
     return topList
@@ -157,7 +172,8 @@ export const topSums = {
    * @param callback Function to execute on event. It takes an array of updated objects as a parameter
    */
   onUpdate(callback: (changes: readonly Readonly<{
-    login: string, nickname: string,
+    login: string,
+    nickname: string,
     sums: Readonly<[number, number, number, number]>
   }>[]) => void) {
     updateListeners.push(callback)
@@ -167,7 +183,10 @@ export const topSums = {
    * Add a callback function to execute on player nickname change
    * @param callback Function to execute on event. It takes an array of objects containing login and nickname as a parameter
    */
-  onNicknameChange(callback: (changes: readonly Readonly<{ login: string, nickname: string }>[]) => void): void {
+  onNicknameChange(callback: (changes: readonly Readonly<{
+    login: string,
+    nickname: string
+  }>[]) => void): void {
     nicknameChangeListeners.push(callback)
   }
 
@@ -175,14 +194,30 @@ export const topSums = {
 
 function sortToplist() {
   topList.sort((a, b) => {
-    if (a.sums[0] < b.sums[0]) return 1
-    if (a.sums[0] > b.sums[0]) return -1
-    if (a.sums[1] < b.sums[1]) return 1
-    if (a.sums[1] > b.sums[1]) return -1
-    if (a.sums[2] < b.sums[2]) return 1
-    if (a.sums[2] > b.sums[2]) return -1
-    if (a.sums[3] < b.sums[3]) return 1
-    if (a.sums[3] > b.sums[3]) return -1
+    if (a.sums[0] < b.sums[0]) {
+      return 1
+    }
+    if (a.sums[0] > b.sums[0]) {
+      return -1
+    }
+    if (a.sums[1] < b.sums[1]) {
+      return 1
+    }
+    if (a.sums[1] > b.sums[1]) {
+      return -1
+    }
+    if (a.sums[2] < b.sums[2]) {
+      return 1
+    }
+    if (a.sums[2] > b.sums[2]) {
+      return -1
+    }
+    if (a.sums[3] < b.sums[3]) {
+      return 1
+    }
+    if (a.sums[3] > b.sums[3]) {
+      return -1
+    }
     return 0
   })
 }

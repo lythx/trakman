@@ -5,7 +5,7 @@ export default {
   entries: 5,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Dedi Records",
+  title: 'Dedi Records',
   icon: icons.chartDedi,
   margin: cfg.margin,
   topCount: 5,

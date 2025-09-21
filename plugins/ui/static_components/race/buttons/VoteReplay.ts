@@ -84,7 +84,10 @@ export class VoteReplay extends UiButton {
       }
       return
     }
-    const startMsg: string = tm.utils.strVar(msg.start, { action, nickname: tm.utils.strip(nickname, true) })
+    const startMsg: string = tm.utils.strVar(msg.start, {
+      action,
+      nickname: tm.utils.strip(nickname, true)
+    })
     const header = tm.timer.isDynamic ? cfg.extendHeader : cfg.resHeader
     const voteWindow: VoteWindow = new VoteWindow(login, cfg.goal, header, startMsg, cfg.time, cfg.voteIcon)
     const result = await voteWindow.startAndGetResult(tm.players.list)

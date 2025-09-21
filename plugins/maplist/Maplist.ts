@@ -12,7 +12,8 @@ let oldestSort: tm.Map[] = []
 const jukebox: tm.Map[] = []
 let cache: {
   type: 'best' | 'worst' | 'name' | 'author' | 'nofin' | 'norank' | 'noauthor' | 'newest' | 'oldest',
-  query: string, list: tm.Map[]
+  query: string,
+  list: tm.Map[]
 }[] = []
 const updateListeners: ((action: 'add' | 'remove', addedOrRemovedMap: Readonly<tm.Map>) => void)[] = []
 const jukeboxUpdateListeners: ((jukebox: readonly Readonly<tm.Map>[]) => void)[] = []
@@ -21,7 +22,7 @@ function initialize(): void {
   authorSort = tm.maps.list.sort((a, b): number => a.author.localeCompare(b.author))
   nameSort = [...authorSort].sort((a, b): number => a.name.localeCompare(b.name))
   karmaSort = [...authorSort].sort((a, b): number => {
-    return a.voteRatio ?? 0 - b.voteRatio ?? 0
+    return a.voteRatio ?? 0 - (b.voteRatio ?? 0)
   })
   worstKarmaSort = [...karmaSort].reverse()
   atSort = [...authorSort].sort((a, b): number => a.authorTime - b.authorTime)
@@ -169,7 +170,10 @@ export const maplist = {
     let list: tm.Map[] | undefined = cache.find(a => a.query === login && a.type === sort)?.list
     if (list === undefined) {
       const order = sort === 'best' ? 1 : -1
-      const ranks: { mapId: string, rank: number }[] = (await tm.records.getRank(login, tm.maps.list.map(a => a.id)))
+      const ranks: {
+        mapId: string,
+        rank: number
+      }[] = (await tm.records.getRank(login, tm.maps.list.map(a => a.id)))
       .sort((a, b): number => (a.rank - b.rank) * order)
       const rankMap = new Map(ranks.map((e, i) => [e.mapId, i]))
       list = Array(rankMap.size)
@@ -183,7 +187,11 @@ export const maplist = {
       }
       // in case it doesn't work just uncomment this, it's not much overhead but its overhead nonetheless
       // list.filter(a => a) // delete empty slots from the list
-      cache.unshift({ query: login, list, type: sort })
+      cache.unshift({
+        query: login,
+        list,
+        type: sort
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list
@@ -200,7 +208,11 @@ export const maplist = {
     if (list === undefined) {
       indices = tm.utils.matchString(query, authorSort.map(a => a.name))
       list = indices.map(a => authorSort[a])
-      cache.unshift({ query, list, type: 'name' })
+      cache.unshift({
+        query,
+        list,
+        type: 'name'
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list
@@ -217,7 +229,11 @@ export const maplist = {
     if (list === undefined) {
       indices = tm.utils.matchString(query, authorSort.map(a => a.author))
       list = indices.map(a => authorSort[a])
-      cache.unshift({ query, list, type: 'author' })
+      cache.unshift({
+        query,
+        list,
+        type: 'author'
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list
@@ -249,7 +265,11 @@ export const maplist = {
     if (list === undefined) {
       const mapsWithRec: string[] = (await tm.records.fetchByLogin(login)).map(a => a.map)
       list = authorSort.filter(a => !mapsWithRec.includes(a.id))
-      cache.unshift({ query: login, list, type: 'nofin' })
+      cache.unshift({
+        query: login,
+        list,
+        type: 'nofin'
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list
@@ -267,7 +287,11 @@ export const maplist = {
       .filter(a => authorSort.find(b => b.id === a.map)?.authorTime ?? Infinity < a.time)
       .map(a => a.map)
       list = authorSort.filter(a => !mapsWithAuthor.includes(a.id))
-      cache.unshift({ query: login, list, type: 'norank' })
+      cache.unshift({
+        query: login,
+        list,
+        type: 'norank'
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list
@@ -284,7 +308,11 @@ export const maplist = {
       const ranks = (await (tm.records.getRank(login, authorSort.map(a => a.id))))
       .filter(a => a.rank <= tm.records.maxLocalsAmount)
       list = authorSort.filter(a => !ranks.some(b => a.id === b.mapId))
-      cache.unshift({ query: login, list, type: 'noauthor' })
+      cache.unshift({
+        query: login,
+        list,
+        type: 'noauthor'
+      })
       cache.length = Math.min(config.cacheSize, cache.length)
     }
     return list

@@ -4,8 +4,7 @@ import buttonCfg from './ButtonsWidget.config.js'
 export default {
   paySkip: {
     paymentFail: `${p.error}Failed to process payment.`,
-    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to skip the ongoing map.` +
-      ` Skipping in ${p.highlight}#{seconds}s${p.donation}.`
+    success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to skip the ongoing map.` + ` Skipping in ${p.highlight}#{seconds}s${p.donation}.`
   },
   payReplay: {
     paymentFail: `${p.error}Failed to process payment.`,
@@ -37,10 +36,8 @@ export default {
     start: `${p.highlight}#{nickname} ${p.vote}started a vote to #{action} the ongoing map.`,
     tooLate: `${p.error}It's too late for replay vote.`,
     failedRecently: `${p.error}Vote failed recently, wait a bit.`,
-    cantReplay: `${p.error}Can't vote for replay when the dynamic timer is enabled.` +
-      ` Use ${p.highlight}/${buttonCfg.voteReplay.extendCommand.aliases[0]}${p.error} to vote for time extension instead.`,
-    cantExtend: `${p.error}Can't vote for time extension when the dynamic timer is disabled.` +
-      ` Use ${p.highlight}/${buttonCfg.voteReplay.command.aliases[0]}${p.error} to vote for replay instead.`,
+    cantReplay: `${p.error}Can't vote for replay when the dynamic timer is enabled.` + ` Use ${p.highlight}/${buttonCfg.voteReplay.extendCommand.aliases[0]}${p.error} to vote for time extension instead.`,
+    cantExtend: `${p.error}Can't vote for time extension when the dynamic timer is disabled.` + ` Use ${p.highlight}/${buttonCfg.voteReplay.command.aliases[0]}${p.error} to vote for replay instead.`,
     tooManyFailed: `${p.error}Too many votes failed.`,
     tooManyReplays: `${p.error}Too many replays.`,
     tooManyExtensions: `${p.error}Too many time extensions.`,

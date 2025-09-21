@@ -4,7 +4,7 @@
  */
 
 import { dedimania, type DediRecord } from '../../dedimania/Dedimania.js'
-import { componentIds, Paginator, Grid, centeredText, closeButton, getCpTypes, type GridCellFunction, PopupWindow } from '../../ui/UI.js'
+import { centeredText, closeButton, componentIds, getCpTypes, Grid, type GridCellFunction, Paginator, PopupWindow } from '../../ui/UI.js'
 import config from './DediSectors.config.js'
 
 export default class DediSectors extends PopupWindow {
@@ -24,8 +24,10 @@ export default class DediSectors extends PopupWindow {
   constructor() {
     super(componentIds.dediSectors, config.icon, config.title, config.navbar)
     const records = dedimania.records
-    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight, Math.ceil(records.length / this.entries))
-    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1, true)
+    this.paginator = new Paginator(this.openId, this.windowWidth, this.footerHeight,
+      Math.ceil(records.length / this.entries))
+    this.cpPaginator = new Paginator(this.openId + 10, this.windowWidth, this.footerHeight, this.calculateCpPages(), 1,
+      true)
     this.paginator.onPageChange = (login: string): void => {
       this.getPagesAndOpen(login)
     }
@@ -54,10 +56,16 @@ export default class DediSectors extends PopupWindow {
     this.getPagesAndOpen(info.login)
   }
 
-  protected constructContent(login: string, params: { page: number, cpPage: number }): string {
+  protected constructContent(login: string, params: {
+    page: number,
+    cpPage: number
+  }): string {
     const records: DediRecord[] = []
     for (const e of dedimania.records) {
-      records.push({ ...e, checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1]) })
+      records.push({
+        ...e,
+        checkpoints: [...e.checkpoints, e.time].map((a, i, arr) => i === 0 ? a : a - arr[i - 1])
+      })
     }
     const [cpIndex, cpsToDisplay] = this.getCpIndexAndAmount(params.cpPage)
     const playerIndex: number = (params.page - 1) * this.entries - 1
@@ -97,42 +105,44 @@ export default class DediSectors extends PopupWindow {
     let grid: Grid
     let headers: GridCellFunction[] = []
     if (params.cpPage === 1) {
-      headers = [
-        (i, j, w, h) => centeredText(' Lp. ', w, h),
-        (i, j, w, h) => centeredText(' Nickname ', w, h),
-        (i, j, w, h) => centeredText(' Login ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText((j - this.startCellsOnFirstPage).toString(), w, h)),
-        (i, j, w, h) => centeredText(' Finish ', w, h),
-        ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
-      ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
-        ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
-        ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
+      headers = [(i, j, w, h) => centeredText(' Lp. ', w, h), (i, j, w, h) => centeredText(' Nickname ', w, h),
+        (i, j, w, h) => centeredText(' Login ', w, h), ...new Array(cpsToDisplay).fill(
+          (i: number, j: number, w: number, h: number): string => centeredText(
+            (j - this.startCellsOnFirstPage).toString(), w, h)), (i, j, w, h) => centeredText(' Finish ', w, h),
+        ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(
+          (i: number, j: number, w: number, h: number): string => '')]
+      grid = new Grid(this.contentWidth, this.contentHeight,
+        [this.indexCellWidth, ...new Array(this.startCellsOnFirstPage).fill(this.startCellWidth),
+          ...new Array(this.cpsOnFirstPage + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     } else {
-      headers = [
-        (i, j, w, h) => centeredText(' Lp. ', w, h),
+      headers = [(i, j, w, h) => centeredText(' Lp. ', w, h),
         (i: number, j: number, w: number, h: number): string => centeredText(' Nickname ', w, h),
-        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string =>
-          centeredText((j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
+        ...new Array(cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => centeredText(
+          (j + cpIndex - (this.startCellsOnNextPages)).toString(), w, h)),
         (i: number, j: number, w: number, h: number): string => centeredText(' Finish ', w, h),
-        ...new Array(this.cpsOnNextPages - cpsToDisplay).fill((i: number, j: number, w: number, h: number): string => '')
-      ]
-      grid = new Grid(this.contentWidth, this.contentHeight, [this.indexCellWidth,
-        ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth), ...new Array(this.cpsOnNextPages + 1).fill(1)],
-      new Array(this.entries + 1).fill(1), config.grid)
+        ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(
+          (i: number, j: number, w: number, h: number): string => '')]
+      grid = new Grid(this.contentWidth, this.contentHeight,
+        [this.indexCellWidth, ...new Array(this.startCellsOnNextPages).fill(this.startCellWidth),
+          ...new Array(this.cpsOnNextPages + 1).fill(1)], new Array(this.entries + 1).fill(1), config.grid)
     }
     const arr = [...headers]
     for (let i = 0; i < entriesToDisplay; i++) {
       if (params.cpPage === 1) {
-        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, loginCell, ...new Array(cpsToDisplay).fill(cell), finishCell,
+          ...new Array(this.cpsOnFirstPage - cpsToDisplay).fill(emptyCell))
       } else {
-        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell, ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
+        arr.push(indexCell, nickNameCell, ...new Array(cpsToDisplay).fill(cell), finishCell,
+          ...new Array(this.cpsOnNextPages - cpsToDisplay).fill(emptyCell))
       }
     }
     return grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: { page: number, cpPage: number }): string {
+  protected constructFooter(login: string, params: {
+    page: number,
+    cpPage: number
+  }): string {
     const w = (this.cpPaginator.buttonW + this.cpPaginator.margin) * this.cpPaginator.buttonCount + config.cpPaginatorMargin
     return `${closeButton(this.closeId, this.windowWidth, this.headerHeight - this.margin)}
     ${this.paginator.constructXml(params.page)}
@@ -142,8 +152,7 @@ export default class DediSectors extends PopupWindow {
   }
 
   private getCpIndexAndAmount(cpPage: number): [number, number] {
-    const cpAmount = dedimania.isUploadingLaps ?
-      tm.maps.current.checkpointsPerLap : tm.maps.current.checkpointsAmount
+    const cpAmount = dedimania.isUploadingLaps ? tm.maps.current.checkpointsPerLap : tm.maps.current.checkpointsAmount
     let cpsToDisplay: number = Math.min(cpAmount, this.cpsOnFirstPage)
     let cpIndex = 0
     if (cpPage > 1) {
@@ -160,7 +169,10 @@ export default class DediSectors extends PopupWindow {
     const page = this.paginator.getPageByLogin(login)
     const cpPage = this.cpPaginator.getPageByLogin(login)
     const pageCount: number = this.paginator.pageCount
-    this.displayToPlayer(login, { page, cpPage }, `${page}/${Math.max(1, pageCount)}`)
+    this.displayToPlayer(login, {
+      page,
+      cpPage
+    }, `${page}/${Math.max(1, pageCount)}`)
   }
 
   private reRender(): void {
@@ -172,8 +184,7 @@ export default class DediSectors extends PopupWindow {
 
   private calculateCpPages(): number {
     let cpPages = 1
-    const cpAmount = dedimania.isUploadingLaps ?
-      tm.maps.current.checkpointsPerLap : tm.maps.current.checkpointsAmount
+    const cpAmount = dedimania.isUploadingLaps ? tm.maps.current.checkpointsPerLap : tm.maps.current.checkpointsAmount
     for (let i = 1; i < cpAmount; i++) {
       if (cpPages === 1 && i >= this.cpsOnFirstPage) {
         cpPages++

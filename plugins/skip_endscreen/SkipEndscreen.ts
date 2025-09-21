@@ -14,16 +14,13 @@ if (config.isEnabled) {
       if (specs.find(a => a.login === p.login)) {
         continue
       }
-      tm.client.callNoRes('system.multicall',
-        [{
-          method: 'ForceSpectator',
-          params: [{ string: p.login }, { int: 2 }]
-        },
-        {
-          method: 'ForceSpectator',
-          params: [{ string: p.login }, { int: 0 }]
-        }]
-      )
+      tm.client.callNoRes('system.multicall', [{
+        method: 'ForceSpectator',
+        params: [{ string: p.login }, { int: 2 }]
+      }, {
+        method: 'ForceSpectator',
+        params: [{ string: p.login }, { int: 0 }]
+      }])
     }
     specs.length = 0
   })
@@ -40,16 +37,13 @@ if (config.isEnabled) {
           specs.push(p)
           continue
         }
-        tm.client.callNoRes('system.multicall',
-          [{
-            method: 'ForceSpectator',
-            params: [{ string: p.login }, { int: 1 }]
-          },
-          {
-            method: 'ForceSpectator',
-            params: [{ string: p.login }, { int: 0 }]
-          }]
-        )
+        tm.client.callNoRes('system.multicall', [{
+          method: 'ForceSpectator',
+          params: [{ string: p.login }, { int: 1 }]
+        }, {
+          method: 'ForceSpectator',
+          params: [{ string: p.login }, { int: 0 }]
+        }])
       }
     }, config.waitTime * 1000)
   })

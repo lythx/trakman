@@ -66,7 +66,8 @@ const initialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string),
+    current.author)
   tm.log.trace('Connected to Dedimania')
 }
 
@@ -93,7 +94,8 @@ const reinitialize = async (): Promise<void> => {
   if (uploadLaps && tm.getGameMode() !== 'Laps') {
     tm.sendMessage(config.modifiedLapsMessage)
   }
-  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string), current.author)
+  await getRecords(current.id, current.name, (tm.utils.environmentToNadeoEnvironment(current.environment) as string),
+    current.author)
 }
 
 const getRecords = async (id: string, name: string, environment: string, author: string): Promise<void> => {
@@ -120,80 +122,65 @@ const getRecords = async (id: string, name: string, environment: string, author:
   const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
   const players = tm.players.list
   const rawDedis: any[] | Error = await client.call('dedimania.CurrentChallenge',
-    [
-      { string: id },
-      { string: name },
-      { string: environment },
-      { string: author },
-      { string: 'TMF' },
-      { int: recordModeEnum[leaderboard] },
-      {
-        struct: {
-          SrvName: { string: cfg.name },
-          Comment: { string: cfg.comment },
-          Private: { boolean: cfg.password !== '' },
-          SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
-          SrvPort: { string: '5000' },
-          XmlRpcPort: { string: '5000' },
-          NumPlayers: { int: players.filter(a => !a.isSpectator).length },
-          MaxPlayers: { int: cfg.currentMaxPlayers },
-          NumSpecs: { int: players.filter(a => a.isSpectator).length },
-          MaxSpecs: { int: cfg.currentMaxPlayers },
-          LadderMode: { int: cfg.currentLadderMode },
-          NextFiveUID: { string: nextIds.join('/') }
-        }
-      },
-      { int: config.dediCount },
-      { array: getPlayersArray() }
-    ])
+    [{ string: id }, { string: name }, { string: environment }, { string: author }, { string: 'TMF' },
+      { int: recordModeEnum[leaderboard] }, {
+      struct: {
+        SrvName: { string: cfg.name },
+        Comment: { string: cfg.comment },
+        Private: { boolean: cfg.password !== '' },
+        SrvIP: { string: '127.0.0.1' }, // Can actually get the real server IP via cfg.ipAddress
+        SrvPort: { string: '5000' },
+        XmlRpcPort: { string: '5000' },
+        NumPlayers: { int: players.filter(a => !a.isSpectator).length },
+        MaxPlayers: { int: cfg.currentMaxPlayers },
+        NumSpecs: { int: players.filter(a => a.isSpectator).length },
+        MaxSpecs: { int: cfg.currentMaxPlayers },
+        LadderMode: { int: cfg.currentLadderMode },
+        NextFiveUID: { string: nextIds.join('/') }
+      }
+    }, { int: config.dediCount }, { array: getPlayersArray() }])
   if (rawDedis instanceof Error) {
-    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`, rawDedis.message)
+    tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received error:`,
+      rawDedis.message)
     return
-  }
-  else if (rawDedis?.[0]?.Records === undefined) {
+  } else if (rawDedis?.[0]?.Records === undefined) {
     tm.log.error(`Failed to fetch dedimania records for map ${tm.utils.strip(name)} (${id}), received empty response`)
     return
   }
-  currentDedis = rawDedis[0].Records.map((a: any): DediRecord =>
-    ({
-      login: a.Login, nickname: a.NickName, time: a.Best,
-      checkpoints: a.Checks.slice(0, a.Checks.length - 1), leaderboard,
-      isLapRecord: uploadLaps
-    }))
+  currentDedis = rawDedis[0].Records.map((a: any): DediRecord => ({
+    login: a.Login,
+    nickname: a.NickName,
+    time: a.Best,
+    checkpoints: a.Checks.slice(0, a.Checks.length - 1),
+    leaderboard,
+    isLapRecord: uploadLaps
+  }))
   if (config.syncName && currentDedis.length > 0) {
     void tm.updatePlayerInfo(...currentDedis)
   }
   emitFetchEvent(currentDedis)
 }
 
-const sendRecords = async (mapId: string, name: string, environment: string, author: string, checkpointsAmount: number): Promise<void> => {
+const sendRecords = async (mapId: string, name: string, environment: string, author: string,
+  checkpointsAmount: number): Promise<void> => {
   if (!client.connected || newDedis.length === 0) { return }
   const recordsArray: any = []
   for (const d of newDedis) {
-    recordsArray.push(
-      {
-        struct: {
-          Login: { string: d.login },
-          Best: { int: d.time },
-          Checks: { string: [...d.checkpoints, d.time].join(',') }
-        }
+    recordsArray.push({
+      struct: {
+        Login: { string: d.login },
+        Best: { int: d.time },
+        Checks: { string: [...d.checkpoints, d.time].join(',') }
       }
-    )
+    })
   }
   const status: any[] | Error = await client.call('dedimania.ChallengeRaceTimes',
-    [
-      { string: mapId },
-      { string: name },
-      { string: environment },
-      { string: author },
-      { string: 'TMF' },
-      { int: recordModeEnum[leaderboard] },
-      { int: checkpointsAmount },
-      { int: config.dediCount },
-      { array: recordsArray }
-    ]
-  )
-  if (status instanceof Error) { tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message) }
+    [{ string: mapId }, { string: name }, { string: environment }, { string: author }, { string: 'TMF' },
+      { int: recordModeEnum[leaderboard] }, { int: checkpointsAmount }, { int: config.dediCount },
+      { array: recordsArray }])
+  if (status instanceof Error) {
+    tm.log.error(`Failed to send dedimania records for map ${tm.utils.strip(name)} (${mapId})`, status.message)
+  }
 }
 
 const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
@@ -203,21 +190,30 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
   const position: number = currentDedis.filter(a => a.time <= time).length + 1
   if (position > config.dediCount || time > (pb ?? Infinity)) { return }
   if (pb === undefined) {
-    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, undefined, position, undefined)
-    currentDedis.splice(position - 1, 0,
-      {
-        login: player.login, time: time, nickname: player.nickname,
-        checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
-      })
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, undefined, position,
+      undefined)
+    currentDedis.splice(position - 1, 0, {
+      login: player.login,
+      time: time,
+      nickname: player.nickname,
+      checkpoints: [...checkpoints],
+      leaderboard,
+      isLapRecord: uploadLaps
+    })
     newDedis.push({
-      login: player.login, time: time, nickname: player.nickname,
-      checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+      login: player.login,
+      time: time,
+      nickname: player.nickname,
+      checkpoints: [...checkpoints],
+      leaderboard,
+      isLapRecord: uploadLaps
     })
     tm.log.info(getLogString(undefined, position, undefined, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time === pb) {
     const previousPosition: number = currentDedis.findIndex(a => a.login === player.login) + 1
-    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, time, previousPosition, previousPosition)
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, time, previousPosition,
+      previousPosition)
     tm.log.info(getLogString(previousPosition, previousPosition, time, time, player))
     emitRecordEvent(dediRecordInfo)
   } else if (time < pb) {
@@ -227,17 +223,25 @@ const addRecord = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' 
       tm.log.error(`Can't find player ${player.login} in memory`)
       return
     }
-    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, previousTime, position, currentDedis.findIndex(a => a.login === player.login) + 1)
+    const dediRecordInfo: NewDediRecord = constructRecordObject(player, checkpoints, time, previousTime, position,
+      currentDedis.findIndex(a => a.login === player.login) + 1)
     currentDedis = currentDedis.filter(a => a.login !== player.login)
-    currentDedis.splice(position - 1, 0,
-      {
-        login: player.login, time: time, nickname: player.nickname,
-        checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
-      })
+    currentDedis.splice(position - 1, 0, {
+      login: player.login,
+      time: time,
+      nickname: player.nickname,
+      checkpoints: [...checkpoints],
+      leaderboard,
+      isLapRecord: uploadLaps
+    })
     newDedis = newDedis.filter(a => a.login !== player.login)
     newDedis.push({
-      login: player.login, time: time, nickname: player.nickname,
-      checkpoints: [...checkpoints], leaderboard, isLapRecord: uploadLaps
+      login: player.login,
+      time: time,
+      nickname: player.nickname,
+      checkpoints: [...checkpoints],
+      leaderboard,
+      isLapRecord: uploadLaps
     })
     tm.log.info(getLogString(previousIndex + 1, position, previousTime, time, player))
     emitRecordEvent(dediRecordInfo)
@@ -251,28 +255,22 @@ const updateServerPlayers = (): void => {
     const nextIds: string[] = tm.jukebox.queue.slice(0, 5).map(a => a.id)
     const players = tm.players.list
     const status: any[] | Error = await client.call('dedimania.UpdateServerPlayers',
-      [
-        { string: 'TMF' },
-        { int: tm.config.game.gameMode },
-        {
-          struct: {
-            SrvName: { string: cfg.name },
-            Comment: { string: cfg.comment },
-            Private: { boolean: cfg.password !== '' },
-            SrvIP: { string: '127.0.0.1' },
-            SrvPort: { string: '5000' },
-            XmlRpcPort: { string: '5000' },
-            NumPlayers: { int: players.filter(a => !a.isSpectator).length },
-            MaxPlayers: { int: cfg.currentMaxPlayers },
-            NumSpecs: { int: players.filter(a => a.isSpectator).length },
-            MaxSpecs: { int: cfg.currentMaxPlayers },
-            LadderMode: { int: cfg.currentLadderMode },
-            NextFiveUID: { string: nextIds.join('/') }
-          }
-        },
-        { array: getPlayersArray() }
-      ]
-    )
+      [{ string: 'TMF' }, { int: tm.config.game.gameMode }, {
+        struct: {
+          SrvName: { string: cfg.name },
+          Comment: { string: cfg.comment },
+          Private: { boolean: cfg.password !== '' },
+          SrvIP: { string: '127.0.0.1' },
+          SrvPort: { string: '5000' },
+          XmlRpcPort: { string: '5000' },
+          NumPlayers: { int: players.filter(a => !a.isSpectator).length },
+          MaxPlayers: { int: cfg.currentMaxPlayers },
+          NumSpecs: { int: players.filter(a => a.isSpectator).length },
+          MaxSpecs: { int: cfg.currentMaxPlayers },
+          LadderMode: { int: cfg.currentLadderMode },
+          NextFiveUID: { string: nextIds.join('/') }
+        }
+      }, { array: getPlayersArray() }])
     if (status instanceof Error) { tm.log.error('Failed to update dedimania status', status.message) }
   }, config.updateInterval * 1000)
 }
@@ -281,85 +279,100 @@ const updateServerPlayers = (): void => {
  * Updates the player information and server player list on the dedimania website
  * @param player Player object
  */
-const playerJoin = async (player:
-  { login: string, nickname: string, region: string, isSpectator: boolean, ladderRank: number }): Promise<void> => {
+const playerJoin = async (player: {
+  login: string,
+  nickname: string,
+  region: string,
+  isSpectator: boolean,
+  ladderRank: number
+}): Promise<void> => {
   if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerArrive',
-    [
-      { string: 'TMF' },
-      { string: player.login },
-      { string: player.nickname },
-      { string: tm.utils.countryToCode(player.region.split('|')[0]) },
-      { string: '' }, // TEAMNAME
-      { int: player.ladderRank },
-      { boolean: player.isSpectator },
-      { boolean: false } // OFFICIAL MODE ALWAYS FALSE
-    ]
-  )
-  if (status instanceof Error) { tm.log.error(`Failed to update dedimania player information for ${tm.utils.strip(player.nickname)} (${player.login})`, status.message) }
+    [{ string: 'TMF' }, { string: player.login }, { string: player.nickname },
+      { string: tm.utils.countryToCode(player.region.split('|')[0]) }, { string: '' }, // TEAMNAME
+      { int: player.ladderRank }, { boolean: player.isSpectator }, { boolean: false } // OFFICIAL MODE ALWAYS FALSE
+    ])
+  if (status instanceof Error) {
+    tm.log.error(
+      `Failed to update dedimania player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
+      status.message)
+  }
 }
 
 /**
  * Updates the server player list on the dedimania website
  * @param player Player object
  */
-const playerLeave = async (player: { login: string, nickname: string }): Promise<void> => {
+const playerLeave = async (player: {
+  login: string,
+  nickname: string
+}): Promise<void> => {
   if (!client.connected) { return }
   const status: any[] | Error = await client.call('dedimania.PlayerLeave',
-    [
-      { string: 'TMF' },
-      { string: player.login }
-    ])
-  if (status instanceof Error) { tm.log.error(`Failed to update player information for ${tm.utils.strip(player.nickname)} (${player.login})`, status.message) }
+    [{ string: 'TMF' }, { string: player.login }])
+  if (status instanceof Error) {
+    tm.log.error(`Failed to update player information for ${tm.utils.strip(player.nickname)} (${player.login})`,
+      status.message)
+  }
 }
 
 const getPlayersArray = (): any[] => {
   const players: tm.Player[] = tm.players.list
   const arr: any[] = []
   for (const player of players) {
-    arr.push(
-      [
-        {
-          struct: {
-            Login: { string: player.login },
-            Nation: { string: player.countryCode },
-            TeamName: { string: '' },
-            TeamId: { int: -1 },
-            IsSpec: { boolean: player.isSpectator },
-            Ranking: { int: player.ladderRank },
-            IsOff: { boolean: false } // OFFICIAL MODE ALWAYS FALSE
-          }
-        }
-      ]
-    )
+    arr.push([{
+      struct: {
+        Login: { string: player.login },
+        Nation: { string: player.countryCode },
+        TeamName: { string: '' },
+        TeamId: { int: -1 },
+        IsSpec: { boolean: player.isSpectator },
+        Ranking: { int: player.ladderRank },
+        IsOff: { boolean: false } // OFFICIAL MODE ALWAYS FALSE
+      }
+    }])
   }
   return arr
 }
 
 const constructRecordObject = (player: Omit<tm.Player, 'currentCheckpoints' | 'isSpectator' | 'isTemporarySpectator' | 'isPureSpectator'>,
-  checkpoints: number[], time: number, previousTime: number | undefined, position: number, previousPosition: number | undefined): NewDediRecord => {
+  checkpoints: number[], time: number, previousTime: number | undefined, position: number,
+  previousPosition: number | undefined): NewDediRecord => {
   return {
     ...player,
     time,
     checkpoints,
     position,
-    previous: (previousTime && previousPosition) ? { time: previousTime, position: previousPosition } : undefined,
+    previous: (previousTime && previousPosition) ? {
+      time: previousTime,
+      position: previousPosition
+    } : undefined,
     leaderboard,
     isLapRecord: uploadLaps
   }
 }
 
-const getLogString = (previousPosition: number | undefined, position: number,
-  previousTime: number | undefined, time: number, player: { login: string, nickname: string }): string[] => {
-  const rs = tm.utils.getRankingString({ position, time }, (previousPosition && previousTime) ?
-    { time: previousTime, position: previousPosition } : undefined)
-  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ? ` (-${rs.difference})` : ``}`]
+const getLogString = (previousPosition: number | undefined, position: number, previousTime: number | undefined,
+  time: number, player: {
+    login: string,
+    nickname: string
+  }): string[] => {
+  const rs = tm.utils.getRankingString({
+    position,
+    time
+  }, (previousPosition && previousTime) ? {
+    time: previousTime,
+    position: previousPosition
+  } : undefined)
+  return [`${tm.utils.strip(player.nickname)} (${player.login}) has ${rs.status} the ${tm.utils.getOrdinalSuffix(
+    position)} dedimania record. Time: ${tm.utils.getTimeString(time)}${rs.difference !== undefined ?
+    ` (-${rs.difference})` : ``}`]
 }
 
 if (config.isEnabled) {
 
   tm.addListener('Startup', (): void => {
-    if(tm.getGameMode() !== 'Stunts') {
+    if (tm.getGameMode() !== 'Stunts') {
       tm.log.trace('Connecting to Dedimania...')
       void initialize()
     }
@@ -371,7 +384,7 @@ if (config.isEnabled) {
     if (prevLb === 'Disabled' && leaderboard !== 'Disabled') {
       void initialize()
       return
-    } 
+    }
     if (prevLb !== 'Disabled' && leaderboard === 'Disabled') {
       currentDedis.length = 0
       newDedis.length = 0
@@ -381,12 +394,14 @@ if (config.isEnabled) {
     if (uploadLaps && tm.getGameMode() !== 'Laps') {
       tm.sendMessage(config.modifiedLapsMessage)
     }
-    void getRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author)
+    void getRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string),
+      info.author)
   }, true)
 
   tm.addListener('EndMap', (info): void => {
     const cpAmount = uploadLaps ? info.checkpointsPerLap : info.checkpointsAmount
-    void sendRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string), info.author, cpAmount)
+    void sendRecords(info.id, info.name, (tm.utils.environmentToNadeoEnvironment(info.environment) as string),
+      info.author, cpAmount)
   })
 
   tm.addListener('PlayerJoin', (info): void => {
@@ -542,7 +557,7 @@ export const dedimania = {
     return client.connected
   },
 
-  /** 
+  /**
    * Whether the plugin is uploading lap times instead of total race time on the current map.
    * True if the server is in Laps mode or if it's in Cup/Rounds/Teams mode with modified laps amount.
    */
@@ -551,7 +566,7 @@ export const dedimania = {
   },
 
   /**
-   * Dedimania leaderboard ('Rounds' or 'TimeAttack') from which the current records were 
+   * Dedimania leaderboard ('Rounds' or 'TimeAttack') from which the current records were
    * fetched and to which the new records will be uploaded.
    * The plugin fetches and uploads records to the Rounds Mode leaderboard in Cup/Rounds/Teams mode
    * if the laps amount is not modified, otherwise to the TimeAttack leaderboard.

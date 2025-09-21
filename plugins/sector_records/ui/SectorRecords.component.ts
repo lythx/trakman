@@ -3,7 +3,7 @@
  * @since 0.3
  */
 
-import { closeButton, componentIds, Grid, centeredText, Paginator, type GridCellFunction, type GridCellObject, PopupWindow } from '../../ui//UI.js'
+import { centeredText, closeButton, componentIds, Grid, type GridCellFunction, type GridCellObject, Paginator, PopupWindow } from '../../ui//UI.js'
 import { sectorRecords } from '../../sector_records/SectorRecords.js'
 import config from './SectorRecords.config.js'
 
@@ -13,7 +13,8 @@ class SectorRecords extends PopupWindow {
   private readonly paginator: Paginator
 
   constructor() {
-    super(componentIds.sectorRecords, config.icon, config.title, (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
+    super(componentIds.sectorRecords, config.icon, config.title,
+      (tm.getGameMode() === 'Stunts' ? config.stuntsNavbar : config.navbar))
     this.grid = new Grid(this.contentWidth, this.contentHeight, config.columnProportions,
       new Array(config.entries + 2).fill(1), config.grid)
     this.paginator = new Paginator(this.openId, this.contentWidth, this.footerHeight,
@@ -58,15 +59,13 @@ class SectorRecords extends PopupWindow {
     this.displayToPlayer(login, { page }, `${page}/${this.paginator.pageCount}`)
   }
 
-  protected constructContent(login: string, params: { page: number }): string {
-    const headers: GridCellFunction[] = [
-      (i, j, w, h) => centeredText(' Index ', w, h),
-      (i, j, w, h) => centeredText(' Nickname ', w, h),
-      (i, j, w, h) => centeredText(' Login ', w, h),
-      (i, j, w, h) => centeredText(' Date ', w, h),
-      (i, j, w, h) => centeredText(' Best ', w, h),
-      (i, j, w, h) => centeredText(' Personal ', w, h)
-    ]
+  protected constructContent(login: string, params: {
+    page: number
+  }): string {
+    const headers: GridCellFunction[] = [(i, j, w, h) => centeredText(' Index ', w, h),
+      (i, j, w, h) => centeredText(' Nickname ', w, h), (i, j, w, h) => centeredText(' Login ', w, h),
+      (i, j, w, h) => centeredText(' Date ', w, h), (i, j, w, h) => centeredText(' Best ', w, h),
+      (i, j, w, h) => centeredText(' Personal ', w, h)]
     const sectors = sectorRecords.mapSectors
     const sectorIndex = config.entries * (params.page - 1)
     const personalSectors = sectorRecords.playerSectors
@@ -76,7 +75,8 @@ class SectorRecords extends PopupWindow {
     }
 
     const nicknameCell: GridCellFunction = (i, j, w, h) => {
-      return centeredText(tm.utils.safeString(tm.utils.strip(sectors[i + sectorIndex - 1]?.nickname ?? '-', false)), w, h)
+      return centeredText(tm.utils.safeString(tm.utils.strip(sectors[i + sectorIndex - 1]?.nickname ?? '-', false)), w,
+        h)
     }
 
     const loginCell: GridCellFunction = (i, j, w, h) => {
@@ -87,8 +87,7 @@ class SectorRecords extends PopupWindow {
 
     const dateCell: GridCellFunction = (i, j, w, h) => {
       const sector = sectors[i + sectorIndex - 1]
-      return centeredText((sector === undefined || sector === null) ? '' :
-        tm.utils.formatDate(sector.date, true), w, h)
+      return centeredText((sector === undefined || sector === null) ? '' : tm.utils.formatDate(sector.date, true), w, h)
     }
 
     const bestSectorCell: GridCellFunction = (i, j, w, h) => {
@@ -106,7 +105,7 @@ class SectorRecords extends PopupWindow {
       const bestSec = sectors?.[i + sectorIndex - 1]?.sector
       let betterSign = '-'
       let worseSign = '+'
-      if(isStunts) {
+      if (isStunts) {
         betterSign = '+'
         worseSign = '-'
       }
@@ -128,7 +127,7 @@ class SectorRecords extends PopupWindow {
     const emptyCell: GridCellObject = {
       background: '',
       colspan: 3,
-      callback: () => '',
+      callback: () => ''
     }
 
     const totalTimeHeaderCell: GridCellObject = {
@@ -154,7 +153,7 @@ class SectorRecords extends PopupWindow {
       }
       let betterSign = '-'
       let worseSign = '+'
-      if(isStunts) {
+      if (isStunts) {
         betterSign = '+'
         worseSign = '-'
       }
@@ -183,7 +182,9 @@ class SectorRecords extends PopupWindow {
     return this.grid.constructXml(arr)
   }
 
-  protected constructFooter(login: string, params: { page: number }): string {
+  protected constructFooter(login: string, params: {
+    page: number
+  }): string {
     return closeButton(this.closeId, this.windowWidth, this.footerHeight) + this.paginator.constructXml(params.page)
   }
 

@@ -1,4 +1,4 @@
-import { leftAlignedText, centeredText, rightAlignedText } from './TextUtils.js'
+import { centeredText, leftAlignedText, rightAlignedText } from './TextUtils.js'
 import raceConfig from './StaticHeaderRace.config.js'
 import resultConfig from './StaticHeaderResult.config.js'
 
@@ -54,7 +54,7 @@ export default class StaticHeader {
   /**
    * Util to display manialink headers in static UI
    * @param preset Default preset options to use
-   * @param options Optional parameters. Parameters in this object override preset parameters 
+   * @param options Optional parameters. Parameters in this object override preset parameters
    */
   constructor(preset: 'race' | 'result' = 'race', options: Partial<StaticHeaderOptions> = {}) {
     if (preset === 'result') {
@@ -83,11 +83,17 @@ export default class StaticHeader {
     if (side) {
       let label: string = ''
       if (cfg.centerText) {
-        label = centeredText(text, cfg.rectangleWidth, cfg.height,
-          { textScale: cfg.textScale, padding: cfg.horizontalPadding, xOffset: cfg.squareWidth + cfg.margin })
+        label = centeredText(text, cfg.rectangleWidth, cfg.height, {
+          textScale: cfg.textScale,
+          padding: cfg.horizontalPadding,
+          xOffset: cfg.squareWidth + cfg.margin
+        })
       } else {
-        label = leftAlignedText(text, cfg.rectangleWidth, cfg.height,
-          { textScale: cfg.textScale, padding: cfg.horizontalPadding, xOffset: cfg.squareWidth + cfg.margin })
+        label = leftAlignedText(text, cfg.rectangleWidth, cfg.height, {
+          textScale: cfg.textScale,
+          padding: cfg.horizontalPadding,
+          xOffset: cfg.squareWidth + cfg.margin
+        })
       }
       return `<quad posn="0 0 5" sizen="${cfg.squareWidth + cfg.rectangleWidth + cfg.margin} ${cfg.height}" action="${cfg.actionId}"/>
           <quad posn="0 0 1" sizen="${cfg.squareWidth} ${cfg.height}" bgcolor="${cfg.iconBackground}"/>
@@ -99,7 +105,10 @@ export default class StaticHeader {
     } else {
       let label: string = ''
       if (cfg.centerText) {
-        label = centeredText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale, padding: cfg.horizontalPadding })
+        label = centeredText(text, cfg.rectangleWidth, cfg.height, {
+          textScale: cfg.textScale,
+          padding: cfg.horizontalPadding
+        })
       } else {
         label = rightAlignedText(text, cfg.rectangleWidth, cfg.height, { textScale: cfg.textScale })
       }

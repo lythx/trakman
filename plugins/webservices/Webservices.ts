@@ -23,6 +23,7 @@ export interface WebservicesInfo {
   country: string,
   countryCode: string
 }
+
 const regex: RegExp = /[A-Z\'^£$%&*()}{@#~?><>,|=+¬ ]/
 const currentAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
 const nextAuthorListeners: ((data?: Readonly<WebservicesInfo>) => void)[] = []
@@ -48,7 +49,7 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
     path: `/tmf/players/${login}/`,
     method: 'GET',
     headers: {
-      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64'),
+      'Authorization': "Basic " + Buffer.from(`${wsLogin}:${wsPassword}`).toString('base64')
     }
   }
 
@@ -66,8 +67,8 @@ const fetchWebservices = async (login: string): Promise<FetchReturnType> => {
         reject(new Error(`Status code: ${res.statusCode}, message: ${data}`))
       }
     }).on('error', (): void => { reject(new Error(`HTTP request error.`)) })
-      .on('timeout', (): void => { reject(new Error(`HTTP request timeout.`)) })
-      .end()
+    .on('timeout', (): void => { reject(new Error(`HTTP request timeout.`)) })
+    .end()
   }).catch((err: Error): Error => {
     const errStr = `Webservices fetch error: ${err?.message}`
     tm.log.warn(errStr)
@@ -89,7 +90,9 @@ const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
     return player
   } else {
     const region = tm.utils.getRegionInfo(player.path)
-    if (region.countryCode === undefined) { throw new Error(`Received undefined country code from webservices for login ${login}`) }
+    if (region instanceof Error || region.countryCode === undefined) {
+      throw new Error(`Received undefined country code from webservices for login ${login}`)
+    }
     const info: WebservicesInfo = {
       id: Number(player.id),
       login: player.login,

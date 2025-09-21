@@ -1,9 +1,8 @@
-import { icons, raceConfig } from "../../ui/UI.js"
+import { icons, raceConfig } from '../../ui/UI.js'
 
 export default {
   posX: raceConfig.rightPosition,
-  side: true,
-  // If true overrides posY prop and places the widget as last component
+  side: true, // If true overrides posY prop and places the widget as last component
   placeAsLastComponent: true,
   posY: 0,
   icon: icons.cash,

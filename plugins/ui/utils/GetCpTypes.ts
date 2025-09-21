@@ -16,7 +16,8 @@ export const getCpTypes = (checkpoints: number[][]): ('best' | 'worst' | 'equal'
       cps[j][i] = cpRow[j]
     }
   }
-  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length), (): any[] => new Array(cps.length).fill(undefined))
+  const cpTypes: ('best' | 'worst' | 'equal' | undefined)[][] = Array.from(Array(cps[0].length),
+    (): any[] => new Array(cps.length).fill(undefined))
   for (const [i, e] of cps.entries()) {
     if (cps?.[0]?.length < 2) {
       break

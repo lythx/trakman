@@ -7,7 +7,7 @@ import TopVisits from './TopVisits.component.js'
 import TopVotes from './TopVotes.component.js'
 import TopWins from './TopWins.component.js'
 
-tm.addListener('Startup', ()=> {
+tm.addListener('Startup', () => {
   new TopDonations()
   new TopPlaytimes()
   new TopRanks()

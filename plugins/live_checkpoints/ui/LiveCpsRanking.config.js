@@ -5,7 +5,7 @@ export default {
   entries: 6,
   entryHeight: 2.15,
   width: cfg.width,
-  title: "Live Checkpoints",
+  title: 'Live Checkpoints',
   icon: icons.bestClock,
   margin: cfg.margin,
   topCount: 1,

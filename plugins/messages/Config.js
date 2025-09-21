@@ -5,7 +5,7 @@ export default {
   specialWin: 50,
   startup: {
     message: `${p.highlight}$L[${tm.config.controller.repo}]Trakman v#{version}$L${p.servermsg} startup sequence successful.`,
-    public: true,
+    public: true
   },
   changelog: {
     message: `${p.error}You can see the recent changes with the ${p.highlight}/changes ${p.error}command.`,
@@ -56,17 +56,17 @@ export default {
     public: true
   },
   recordDifference: {
-    message: ` $n${p.record}(${p.rank}#{position} ${p.highlight}#{time}${p.record})`,
+    message: ` $n${p.record}(${p.rank}#{position} ${p.highlight}#{time}${p.record})`
   },
   dediDifference: {
-    message: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}-#{time}${p.dedirecord})`,
+    message: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}-#{time}${p.dedirecord})`
   },
   dediRecord: {
     message: `${p.highlight}#{nickname}${p.dedirecord} has #{status} the ${p.rank}#{position}${p.dedirecord} dedimania record. Time${p.highlight}: #{time}#{difference}`,
     public: true
   },
   ultiDifference: {
-    message: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}+#{score}${p.dedirecord})`,
+    message: ` $n${p.dedirecord}(${p.rank}#{position} ${p.highlight}+#{score}${p.dedirecord})`
   },
   ultiRecord: {
     message: `${p.highlight}#{nickname}${p.dedirecord} has #{status} the ${p.rank}#{position}${p.dedirecord} ultimania record. Score${p.highlight}: #{score}#{difference}`,
@@ -79,5 +79,5 @@ export default {
   jukeSkipped: {
     message: `${p.vote}Map ${p.highlight}#{map} ${p.vote}will be dropped from the queue, as ${p.highlight}#{nickname} ${p.vote}has left the server.`,
     public: true
-  },
+  }
 }

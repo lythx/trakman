@@ -3,7 +3,7 @@
  * @since 0.4
  */
 
-import { componentIds, List, StaticHeader, StaticComponent } from '../../UI.js'
+import { componentIds, List, StaticComponent, StaticHeader } from '../../UI.js'
 import config from './KarmaRanking.config.js'
 
 export default class KarmaRanking extends StaticComponent {
@@ -16,7 +16,10 @@ export default class KarmaRanking extends StaticComponent {
     super(componentIds.karmaRanking)
     this.header = new StaticHeader('result')
     this.list = new List(config.entries, config.width, this.getHeight() - (this.header.options.height + config.margin),
-      config.columnProportions, { background: config.background, headerBg: this.header.options.textBackground })
+      config.columnProportions, {
+        background: config.background,
+        headerBg: this.header.options.textBackground
+      })
     this.renderOnEvent('KarmaVote', () => {
       return this.display()
     })
@@ -34,17 +37,22 @@ export default class KarmaRanking extends StaticComponent {
 
   displayToPlayer(login: string) {
     if (!this.isDisplayed) { return }
-    return { xml: this.xml, login }
+    return {
+      xml: this.xml,
+      login
+    }
   }
 
   constructXml(): void {
-    const list: Readonly<tm.Map>[] = tm.maps.list.sort((a, b): number => b.voteRatio - a.voteRatio).filter(a => a.voteCount > config.minimumVotes).slice(0, config.entries)
+    const list: Readonly<tm.Map>[] = tm.maps.list.sort((a, b): number => b.voteRatio - a.voteRatio)
+    .filter(a => a.voteCount > config.minimumVotes).slice(0, config.entries)
     this.xml = `<manialink id="${this.id}">
       <format textsize="1"/>
       <frame posn="${this.positionX} ${this.positionY} 2">
       ${this.header.constructXml(config.title, config.icon, this.side)}
       <frame posn="0 ${-this.header.options.height - config.margin} 2">
-        ${this.list.constructXml(list.map(a => a.voteRatio === -1 ? config.defaultText : a.voteRatio.toFixed(0)), list.map(a => tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(a.name), false))))}
+        ${this.list.constructXml(list.map(a => a.voteRatio === -1 ? config.defaultText : a.voteRatio.toFixed(0)),
+      list.map(a => tm.utils.safeString(tm.utils.strip(tm.utils.decodeURI(a.name), false))))}
       </frame>
       </frame>
     </manialink>`

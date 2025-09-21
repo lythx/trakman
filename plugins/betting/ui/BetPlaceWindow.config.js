@@ -1,17 +1,15 @@
-import { raceConfig, StaticHeader } from "../../ui/UI.js"
+import { raceConfig, StaticHeader } from '../../ui/UI.js'
 
 const p = tm.utils.palette
 
 const width = 10
 export default {
   posX: raceConfig.rightPosition - (width + raceConfig.marginBig),
-  headerText: `Bet`,
-  // To position the widget next to side ui widgets set these properties and keep staticPos props null
+  headerText: `Bet`, // To position the widget next to side ui widgets set these properties and keep staticPos props null
   relativePos: {
     side: true,
     widgetNumber: 3
-  },
-  // To set fixed position set these props to numbers
+  }, // To set fixed position set these props to numbers
   staticPos: {
     posY: null,
     height: null
