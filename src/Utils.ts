@@ -187,10 +187,7 @@ export const Utils = {
     region: string,
     country: string,
     countryCode?: string
-  } | Error {
-    if (region === null) {
-      return new Error('Null region')
-    }
+  } {
     let split = region.split('|')
     if (region.startsWith('World')) {
       split.shift()

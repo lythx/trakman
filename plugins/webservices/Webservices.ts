@@ -89,8 +89,11 @@ const fetchPlayer = async (login: string): Promise<WebservicesInfo | Error> => {
   if (player instanceof Error) { // UNKOWN PLAYER MOMENT
     return player
   } else {
+    if (player.path === null) {
+      throw new Error(`Received undefined region info from webservices for login ${login}`)
+    }
     const region = tm.utils.getRegionInfo(player.path)
-    if (region instanceof Error || region.countryCode === undefined) {
+    if (region.countryCode === undefined) {
       throw new Error(`Received undefined country code from webservices for login ${login}`)
     }
     const info: WebservicesInfo = {
