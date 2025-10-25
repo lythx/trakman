@@ -33,7 +33,12 @@ export const forceFixRankCoherence = async (): Promise<void> => {
     }
     maps = allMaps.filter(a => mapList.some(b => b.UId === a.uid))
   } else {
-    maps = allMaps
+    const activeUidSet = new Set<string>(tm.maps.list.map((m: any) => m.id))
+    maps = allMaps.filter(a => activeUidSet.has(a.uid))
+    if (maps.length === 0) {
+      Logger.warn('No active maps found on the server, skipping rank recalculation.')
+      return
+    }
   }
   const playerIds: number[] = (await db.query(`SELECT id FROM players`)).rows.map(a => a.id)
   const allRecords: {
