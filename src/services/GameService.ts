@@ -192,17 +192,24 @@ export class GameService {
   }
 
   /**
-   * Sets the new timelimit in runtime memory. Only works in 'race' game state.
+   * Sets the new timelimit.
    * @param milliseconds Amount of time to set in milliseconds
    * @returns Boolean indicating whether the time got set
    */
-  static setTimeLimit(milliseconds: number): boolean {
-    if (milliseconds < config.dynamicTimerSubtractionLimit || tm.getState() !== 'race') {
-      return false
+  static async setTimeLimit(milliseconds: number): Promise<boolean> {
+    if (this.dynamicTimerOnNextRound) {
+      if (milliseconds < config.dynamicTimerSubtractionLimit || tm.getState() !== 'race') {
+        return false
+      }
+    }
+    else {
+      const res = await Client.call(`SetTimeAttackLimit`, [{ int: milliseconds }])
+      if (res instanceof Error) {
+        Logger.error('Failed to set time limit. Server responded with an error:', res.message)
+        return false
+      }
     }
     this.timeAttackLimit = milliseconds
-    this.remainingDynamicTime = milliseconds
-    this.remainingDynamicTime = Math.max(config.dynamicTimerSubtractionLimit, this.remainingDynamicTime)
     return true
   }
 

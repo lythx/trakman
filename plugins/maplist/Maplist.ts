@@ -206,7 +206,7 @@ export const maplist = {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'name')?.list
     let indices: number[]
     if (list === undefined) {
-      indices = tm.utils.matchString(query, authorSort.map(a => a.name))
+      indices = tm.utils.matchString(query, authorSort.map(a => a.name), true)
       list = indices.map(a => authorSort[a])
       cache.unshift({
         query,
@@ -227,7 +227,7 @@ export const maplist = {
     let list: tm.Map[] | undefined = cache.find(a => a.query === query && a.type === 'author')?.list
     let indices: number[]
     if (list === undefined) {
-      indices = tm.utils.matchString(query, authorSort.map(a => a.author))
+      indices = tm.utils.matchString(query, authorSort.map(a => a.author), true)
       list = indices.map(a => authorSort[a])
       cache.unshift({
         query,

@@ -11,6 +11,10 @@ import uFuzzy from '@leeoniya/ufuzzy'
 
 const uf = new uFuzzy(config.searchOptions)
 
+const reverseSpecialCharmap = Object.fromEntries(
+  Object.entries(specialCharmap).map(([letter, specials]: [string, string[]]): [string, string][] =>
+    specials.map(s => [s, letter])).flat())
+
 const bills: {
   id: number,
   callback: ((status: 'error' | 'refused' | 'accepted', errorString?: string) => void)
@@ -18,7 +22,7 @@ const bills: {
 Events.addListener('BillUpdated', (info: tm.BillUpdatedInfo): void => {
   const billIndex: number = bills.findIndex(a => a.id === info.id)
   if (billIndex !== -1) {
-    switch(info.state) {
+    switch (info.state) {
       case 4:
         bills[billIndex].callback('accepted')
         break
@@ -110,7 +114,7 @@ export const Utils = {
       let cc: Array<number> = []
       alpha += (1.0 / length)
       cc = [startRGB[0] * alpha + (1 - alpha) * endRGB[0], startRGB[1] * alpha + (1 - alpha) * endRGB[1],
-        startRGB[2] * alpha + (1 - alpha) * endRGB[2]]
+      startRGB[2] * alpha + (1 - alpha) * endRGB[2]]
       colours.push(this.getHex(cc, false))
     }
     for (let i = 0; i !== length; i++) {
@@ -155,24 +159,18 @@ export const Utils = {
   /**
    * Attempts to convert supplied string to latin text based on the special charmap.
    * @param str String to convert
+   * @param ignoreNumbers Whether to ignore numbers when converting (eg. 0 -> o), defaults to false
    * @returns Converted string
    */
-  stripSpecialChars(str: string): string {
-    const charmap = Object.fromEntries(
-      Object.entries(specialCharmap).map((a: [string, string[]]): [string, string[]] => [a[0], [a[0], ...a[1]]]))
+  stripSpecialChars(str: string, ignoreNumbers: boolean = false): string {
     let strippedStr: string = ''
     for (const letter of str) {
-      let foundLetter: boolean = false
-      for (const key in charmap) {
-        if (charmap[key].includes(letter)) {
-          strippedStr += key
-          foundLetter = true
-          break
-        }
-      }
-      if (!foundLetter) {
+      if (ignoreNumbers && /\d/.test(letter)) {
         strippedStr += letter
+        continue
       }
+      const latinLetter = reverseSpecialCharmap[letter]
+      strippedStr += latinLetter === undefined ? letter : latinLetter
     }
     return strippedStr
   },
@@ -308,7 +306,7 @@ export const Utils = {
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
-        switch(status) {
+        switch (status) {
           case 'accepted':
             resolve(true)
             break
@@ -339,7 +337,7 @@ export const Utils = {
     if (billId instanceof Error) { return billId }
     return await new Promise((resolve): void => {
       const callback = (status: 'error' | 'refused' | 'accepted', errorString?: string): void => {
-        switch(status) {
+        switch (status) {
           case 'accepted':
             resolve(true)
             break
@@ -416,7 +414,7 @@ export const Utils = {
     let res: string
     try {
       res = decodeURIComponent(str)
-    } catch(e) {
+    } catch (e) {
       // try to cut off the last percent sign and try again
       // this failure happens so little I do not care about speed that much
       // it looks much better usually
@@ -481,7 +479,7 @@ export const Utils = {
       return new TypeError(`Invalid time string`)
     }
     let parsedTime: number
-    switch(unit) {
+    switch (unit) {
       case 's':
         parsedTime = time * 1000
         break
@@ -512,7 +510,7 @@ export const Utils = {
   formatDate(date: Date, displayDay?: true): string {
     if (displayDay === true) {
       return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString()
-      .padStart(2, '0')}/${date.getFullYear()}`
+        .padStart(2, '0')}/${date.getFullYear()}`
     }
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   },
@@ -616,15 +614,49 @@ function strVar(str: string, vars: {
   return str
 }
 
+const matchStringCache: Map<string, string> = new Map()
+const matchStringCacheIgnoreNumbers: Map<string, string> = new Map()
+
 /**
  * Searches for a given string in a given array of values
  * @param needle What string to search for
  * @param haystack Array where to search
+ * @param stripTrackmaniaFormatting Removes all Trackmania specific formatting (e.g. $w, $fff, etc.) from the haystack strings
  * @returns Indices that match the search
  */
-function matchString(needle: string, haystack: string[]): number[] {
+function matchString(needle: string, haystack: string[], stripTrackmaniaFormatting: boolean = false): number[] {
   if (haystack.length === 0) { return [] }
-  haystack = uFuzzy.latinize(haystack)
+  needle = needle.toLowerCase()
+
+  const needleHasNumbers = /\d/.test(needle)
+
+  const reduxMode = haystack.length > config.matchStringReduxModeThreshold
+
+  const cache = needleHasNumbers ? matchStringCacheIgnoreNumbers : matchStringCache
+
+  haystack = haystack.map(val => {
+    let modifiedVal = val.toLowerCase()
+
+    const cachedVal = cache.get(modifiedVal)
+    if (cachedVal !== undefined) {
+      return cachedVal
+    }
+
+    if (!reduxMode) {
+      if (stripTrackmaniaFormatting) {
+        modifiedVal = Utils.strip(modifiedVal, true)
+      }
+      modifiedVal = Utils.stripSpecialChars(modifiedVal, needleHasNumbers)
+    }
+    modifiedVal = uFuzzy.latinize(modifiedVal)
+
+    cache.set(val, modifiedVal)
+    if (cache.size > config.matchStringCacheSize) {
+      cache.clear()
+    }
+    return modifiedVal
+  })
+
   const arr = []
   const idxs = uf.filter(haystack, needle)
   if (idxs != null && idxs.length > 0) {
