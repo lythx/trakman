@@ -17,7 +17,6 @@ import { MapIdsRepository } from './database/MapIdsRepository.js'
 import prefixes from '../config/PrefixesAndPalette.js'
 import controllerConfig from '../config/Config.js'
 import { RoundsService } from './services/RoundsService.js'
-import { forceFixRankCoherence } from './FixRankCoherence.js'
 import fs from 'node:fs/promises'
 
 const playersRepo: PlayerRepository = new PlayerRepository()
@@ -146,7 +145,7 @@ namespace trakman {
 
     getRound: RoundsService.getRoundRecord.bind(RecordService),
 
-    recalculateRanks: forceFixRankCoherence,
+    recalculateRanks: PlayerService.fullRecalculation.bind(PlayerService),
 
     /**
      * Current map local records.

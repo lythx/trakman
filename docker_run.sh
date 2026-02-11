@@ -92,8 +92,6 @@ mkdir -p .pm2/logs
 touch .pm2/logs/Trakman-error.log
 touch .pm2/logs/Trakman-out.log
 touch .pm2/logs/docker.log
-mkdir -p trakman/temp
-touch trakman/temp/rank_coherence.txt
 mkdir -p trakman/plugins/server_links/temp
 touch trakman/plugins/server_links/temp/data.txt
 chown -R server:server /app/server

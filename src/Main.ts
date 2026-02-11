@@ -12,7 +12,6 @@ import { ServerConfig } from './ServerConfig.js'
 import { AdministrationService } from './services/AdministrationService.js'
 import { VoteService } from './services/VoteService.js'
 import { RoundsService } from './services/RoundsService.js'
-import { fixRankCoherence } from './FixRankCoherence.js'
 import 'dotenv/config'
 import * as readline from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
@@ -42,7 +41,6 @@ Logger.trace('Authentication success')
 Logger.trace('Initializing database...')
 await Database.initialize()
 Logger.trace('Database initialized...')
-await fixRankCoherence()
 Logger.trace('Retrieving game info...')
 await GameService.initialize()
 Logger.trace('Game info fetched')
@@ -60,6 +58,9 @@ Logger.trace('Map service instantiated')
 Logger.trace('Fetching records...')
 await RecordService.initialize()
 Logger.trace('Records fetched')
+Logger.trace('Recalculating ranks...')
+await PlayerService.fullRecalculation()
+Logger.trace('Ranks recalculated')
 Logger.trace('Fetching votes...')
 await VoteService.initialize()
 Logger.trace('Vote service instantiated')
