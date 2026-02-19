@@ -1,5 +1,6 @@
 import config from './Config.js'
 import './ui/Maplist.component.js'
+import './ui/MaplistFilters.components.js'
 
 let authorSort: tm.Map[] = []
 let nameSort: tm.Map[] = []
