@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import ids from '../../config/ComponentIds.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   privilege: tm.config.controller.privileges.blacklist,
   title: ' Blacklisted Players ',
   icon: icons.blacklist,
@@ -40,3 +41,5 @@ export default {
     privilege: tm.config.controller.privileges.blacklist // literally useless
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

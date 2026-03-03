@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   masteradmin: {
     public: true,
     privilege: 4,
@@ -24,3 +25,5 @@ export default {
     help: `Set player privilege to None (0).`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   entryHeight: 2.16,
   entries: 6,
   width: cfg.width,
@@ -27,3 +28,5 @@ export default {
   horizontalMaxRows: 5,
   hidePanel: true
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

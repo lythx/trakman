@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   isEnabled: true, // Maximum amount of fetched records
   // (Dedimania normally stores 30, there are exceptions such as Nadeo maps with 50-80 records)
   dediCount: 30,
@@ -11,3 +12,5 @@ export default {
   updateInterval: 240, // Interval for Dedimania server update, in seconds (recommended to be kept between 2-5 minutes)
   modifiedLapsMessage: `${p.dedimessage}Dedimania records will be sent in ${p.highlight}Time Attack` + ` ${p.dedimessage}instead of ${p.highlight}Rounds ${p.dedimessage}mode due to modified lap amount.`
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

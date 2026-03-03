@@ -1,8 +1,10 @@
-import { componentIds as ids, icons } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import ids from '../../ui/config/ComponentIds.js'
+import icons from '../../ui/config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   entries: 15,
   cpsOnFirstPage: 10,
   icon: icons.chartDedi,
@@ -43,3 +45,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

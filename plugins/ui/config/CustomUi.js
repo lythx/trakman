@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   notice: false,
   challengeInfo: false,
   netInfo: true,
@@ -8,3 +9,5 @@ export default {
   scoreTable: true,
   global: true
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

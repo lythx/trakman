@@ -1,10 +1,11 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import icons from '../../config/Icons.js'
 import ids from '../../config/ComponentIds.js'
 
 const p = tm.utils.palette
 const priv = tm.admin.privileges
 
-export default {
+const defaultConfig = {
   title: ' Players ',
   kickPrivilege: priv.kick,
   forceSpecPrivilege: priv.forceSpectator,
@@ -74,3 +75,5 @@ export default {
     privilege: 1
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

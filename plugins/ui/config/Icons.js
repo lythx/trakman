@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   clock: 'https://trakman.ptrk.eu/icons/Clock.png',
   close: 'https://trakman.ptrk.eu/icons/Close.png',
   closeHover: 'https://trakman.ptrk.eu/icons/CloseHover.png',
@@ -177,3 +178,5 @@ export default {
       this.pageLeftHover, this.pageRight, this.pageRightHover]
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

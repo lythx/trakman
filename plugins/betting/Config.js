@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   // If false plugin cant be activated
   isEnabled: false, // This can be changed using an ingame command
   isActive: false,
@@ -46,3 +47,5 @@ export default {
     alreadyNotActive: `${p.error}Betting plugin is already disabled.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

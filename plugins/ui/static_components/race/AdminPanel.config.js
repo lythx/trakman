@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   height: 5,
   width: cfg.width,
   privilege: 1,
@@ -39,3 +40,5 @@ export default {
     endRound: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has forced the ongoing round to end.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

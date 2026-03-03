@@ -1,8 +1,9 @@
-import { icons } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import icons from '../../ui/config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   title: ' Song List ',
   icon: icons.musicList,
   iconWidth: 2,
@@ -23,3 +24,5 @@ export default {
     headerBackground: '333C'
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

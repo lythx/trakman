@@ -1,6 +1,8 @@
-import { icons, raceConfig } from '../../ui/UI.js'
+import { loadConfig } from "../../../src/ConfigLoader.js"
+import icons from '../../ui/config/Icons.js'
+import raceConfig from '../../ui/config/RaceUi.js'
 
-export default {
+const defaultConfig = {
   posX: raceConfig.rightPosition,
   side: true, // If true overrides posY prop and places the widget as last component
   placeAsLastComponent: true,
@@ -14,3 +16,5 @@ export default {
   topBorder: raceConfig.topBorder, // used for Y positioning
   marginBig: raceConfig.marginBig
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

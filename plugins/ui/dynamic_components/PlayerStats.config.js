@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   width: 60,
   title: `Personal Stats`,
   icon: icons.person,
@@ -30,3 +31,5 @@ export default {
     error: `${p.error}There's no information about this player in the database.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import ids from '../config/ComponentIds.js'
 import icons from '../config/Icons.js'
 
-export default {
+const defaultConfig = {
   title: `Server Overview`,
   icon: icons.trakman,
   navbar: [{
@@ -29,3 +30,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

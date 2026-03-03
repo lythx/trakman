@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   cacheSize: 10, // Max number of map arrays stored in cache
   added: `${p.highlight}#{nickname} ${p.vote}has added ${p.highlight}#{map}${p.vote} to the queue.`,
   noPermission: `${p.error}You can't add more than one map to the queue.`,
@@ -14,3 +15,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

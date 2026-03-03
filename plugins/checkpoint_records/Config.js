@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 import { palette as p } from '../../config/PrefixesAndPalette.js'
 
-export default {
+const defaultConfig = {
   isEnabled: true, // Using DB client makes the plugin a bit faster due to high amount of database queries
   // Program can run only run limited amount of clients, the process will hang otherwise
   useDBClient: true,
@@ -24,3 +25,5 @@ export default {
     }
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

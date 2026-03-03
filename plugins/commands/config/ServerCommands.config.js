@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   timelimit: {
     set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`,
     notDynamic: `${p.error}Dynamic timer is disabled.`,
@@ -178,3 +179,5 @@ export default {
     help: `Execute a dedicated server method. Params need to be specified in a valid json format or in "" for strings.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

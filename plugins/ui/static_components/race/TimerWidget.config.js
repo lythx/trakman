@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import icons from '../../config/Icons.js'
 import cfg from '../../config/RaceUi.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   height: 6.45,
   stuntsDynamicMarginTop: 5.5,
   stuntsHeight: 6.45 + 5.5,
@@ -39,3 +40,5 @@ export default {
   resume: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has ${p.highlight}resumed ${p.admin}the timer.`,
   set: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the remaining time to ${p.highlight}#{time}${p.admin}.`
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

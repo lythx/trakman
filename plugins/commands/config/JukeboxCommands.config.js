@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   dropjukebox: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed ${p.highlight}#{name} ${p.admin}from the queue.`,
     error: `${p.error}No such index in the queue.`,
@@ -32,3 +33,5 @@ export default {
     help: `Clear the map history.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

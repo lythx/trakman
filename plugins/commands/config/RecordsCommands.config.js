@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   delrec: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has removed the record of ${p.highlight}#{nickname} ${p.admin}on the ongoing map.`,
     noPlayerRecord: `${p.error}Player #{login} does not have a record on this map.`,
@@ -18,3 +19,5 @@ export default {
     help: `Remove all records on the ongoing map.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   entries: 6,
   lapsEntries: 12,
   stuntsEntries: 8,
@@ -21,3 +22,5 @@ export default {
   hidePanel: true,
   maxRecordsAmount: 3000 // If more records than this get driven in one round the click listener will break
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

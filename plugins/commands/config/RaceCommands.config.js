@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   skip: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has skipped the ongoing map.`,
     public: true,
@@ -46,3 +47,5 @@ export default {
     help: `Force a player into the specified team.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

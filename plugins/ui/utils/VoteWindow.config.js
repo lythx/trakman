@@ -1,10 +1,11 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from '../config/Icons.js'
 import cfg from '../config/RaceUi.js'
 import header from './StaticHeaderRace.config.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   title: ' Vote ',
   width: 25,
   height: 10, // Without the admin buttons
@@ -36,3 +37,5 @@ export default {
     textScale: 1.2
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

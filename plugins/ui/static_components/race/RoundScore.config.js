@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/RaceUi.js'
 import icons from '../../config/Icons.js'
 
-export default {
+const defaultConfig = {
   roundsEntries: 12,
   teamsEntries: 10,
   cupEntries: 12,
@@ -23,3 +24,5 @@ export default {
   },
   hidePanel: true
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

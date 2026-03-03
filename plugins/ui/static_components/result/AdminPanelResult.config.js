@@ -1,9 +1,10 @@
+import { loadConfig } from "../../../../src/ConfigLoader.js"
 import cfg from '../../config/ResultUi.js'
 import icons from '../../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   height: 5,
   width: cfg.width,
   privilege: 1,
@@ -33,3 +34,5 @@ export default {
     shuffle: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has shuffled the queue.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

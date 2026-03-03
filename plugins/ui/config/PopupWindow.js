@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   headerBg: '000C',
   bg: '000C',
   margin: 0.15,
@@ -10,3 +11,5 @@ export default {
   headerPageWidth: 10,
   textScale: 1
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

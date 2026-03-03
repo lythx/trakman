@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from '../config/Icons.js'
 import ids from '../config/ComponentIds.js'
 
-export default {
+const defaultConfig = {
   title: 'TMX Detailed Info',
   icon: icons.maniaExchange,
   margin: 0.15,
@@ -94,3 +95,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

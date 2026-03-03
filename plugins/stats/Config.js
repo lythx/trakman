@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../src/ConfigLoader.js"
+const defaultConfig = {
   winsCount: 100000,
   visitsCount: 100000,
   averagesCount: 100000,
@@ -9,3 +10,5 @@ export default {
   sumsCount: 100000, // Playtimes are updated on endmap and on this interval (default 10 minutes)
   playtimesUpdateInterval: 1000 * 60 * 10
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

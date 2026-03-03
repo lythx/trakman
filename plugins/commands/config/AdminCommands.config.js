@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 const priv = tm.admin.privileges
 
-export default {
+const defaultConfig = {
   kick: {
     privilege: priv.kick,
     aliases: ['k', 'kick'],
@@ -102,3 +103,5 @@ export default {
     public: true
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

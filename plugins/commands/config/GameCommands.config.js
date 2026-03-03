@@ -1,6 +1,7 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   setgamemode: {
     text: `${p.admin}#{title} ${p.highlight}#{adminName} ${p.admin}has set the gamemode to ${p.highlight}#{mode}${p.admin}.`,
     public: true,
@@ -117,3 +118,5 @@ export default {
     help: `Set whether checkpoint respawning is enabled.`
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

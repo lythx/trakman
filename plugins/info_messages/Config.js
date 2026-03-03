@@ -1,6 +1,7 @@
+import { loadConfig } from "../../src/ConfigLoader.js"
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   isEnabled: true, // All the info messages will be prefixed with this text
   messagePrefix: `${p.record}[${p.highlight}INFO${p.record}]`, // Default formatting for the info messages
   // That is put inbetween the prefix and the message
@@ -28,3 +29,5 @@ export default {
   sendOnInterval: false, // Message sending interval
   messageInterval: 120 // Seconds
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

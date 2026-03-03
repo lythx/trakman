@@ -1,8 +1,9 @@
+import { loadConfig } from "../../../src/ConfigLoader.js"
 import icons from '../config/Icons.js'
 
 const p = tm.utils.palette
 
-export default {
+const defaultConfig = {
   title: ' Chat Log ',
   kickPrivilege: 1,
   forceSpecPrivilege: 1,
@@ -26,3 +27,5 @@ export default {
     privilege: 0
   }
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

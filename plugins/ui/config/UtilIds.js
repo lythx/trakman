@@ -1,4 +1,5 @@
-export default {
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = {
   PopupWindow: {
     open: 0,
     close: 1
@@ -25,3 +26,5 @@ export default {
   F7: 17,
   buttons: 18
 }
+
+export default await loadConfig(defaultConfig, import.meta.url)

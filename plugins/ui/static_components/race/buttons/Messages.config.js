@@ -1,7 +1,8 @@
+import { loadConfig } from "../../../../../src/ConfigLoader.js"
 const p = tm.utils.palette
 import buttonCfg from './ButtonsWidget.config.js'
 
-export default {
+const defaultConfig = {
   paySkip: {
     paymentFail: `${p.error}Failed to process payment.`,
     success: `${p.highlight}#{name}${p.donation} has paid ${p.highlight}#{amount}C ${p.donation}to skip the ongoing map.` + ` Skipping in ${p.highlight}#{seconds}s${p.donation}.`
@@ -48,4 +49,6 @@ export default {
     cancelled: `${p.vote} Vote to #{action} the ongoing map was cancelled.`,
     cancelledBy: `${p.vote}#{title} ${p.highlight}#{nickname}${p.vote} has cancelled the vote to #{action} the ongoing map.`
   }
-} 
+}
+
+export default await loadConfig(defaultConfig, import.meta.url)

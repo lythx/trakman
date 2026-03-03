@@ -1,4 +1,5 @@
-export default // Environments are Stadium, Desert, Snow, Bay, Coast, Island, Rally
+import { loadConfig } from "../../../src/ConfigLoader.js"
+const defaultConfig = // Environments are Stadium, Desert, Snow, Bay, Coast, Island, Rally
 // If random order is disabled, mods array will be applied in order
 [{
   environment: 'Stadium',
@@ -29,3 +30,5 @@ export default // Environments are Stadium, Desert, Snow, Bay, Coast, Island, Ra
   modLinks: [`https://trakman.ptrk.eu/TrakmanMod.zip`],
   randomOrder: true
 }]
+
+export default await loadConfig(defaultConfig, import.meta.url)
