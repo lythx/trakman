@@ -10,15 +10,18 @@ export default class MapListFilters extends PopupWindow<{}> {
   private readonly filters: Btn[]
   private readonly environments: Btn[]
   private readonly grid: Grid
+  private readonly filterWindow = config.filterWindow
 
-  private readonly gapX = 0.35
-  private readonly gapY = 0.35
-  private readonly pad = 0.06
-  private readonly inset = 0.05
-  private readonly headerH = 5
-  private readonly btnH = 4
-  private readonly btnTextScale = Math.max(0.8, config.textScale * 0.9)
-  private readonly headerTextScale = Math.max(0.86, config.textScale * 0.92)
+  private readonly gapX = this.filterWindow.gapX
+  private readonly gapY = this.filterWindow.gapY
+  private readonly pad = this.filterWindow.pad
+  private readonly inset = this.filterWindow.inset
+  private readonly headerH = this.filterWindow.headerHeight
+  private readonly btnH = this.filterWindow.buttonHeight
+  private readonly btnTextScale = Math.max(this.filterWindow.buttonTextScale.min,
+    config.textScale * this.filterWindow.buttonTextScale.multiplier)
+  private readonly headerTextScale = Math.max(this.filterWindow.headerTextScale.min,
+    config.textScale * this.filterWindow.headerTextScale.multiplier)
 
   constructor() {
     super(componentIds.mapList + 200, config.icon, 'Map Filters', [{ name: 'Map List', actionId: componentIds.mapList }])
@@ -47,15 +50,16 @@ export default class MapListFilters extends PopupWindow<{}> {
       { label: 'Jukebox', id: next(), onClick: l => openMapList(l, 'jukebox', 1) }
     ]
 
-    this.environments = this.showEnv ? [
-      { label: 'Stadium', id: next(), onClick: l => openMapListEnv(l, 'Stadium', 1) },
-      { label: 'Desert', id: next(), onClick: l => openMapListEnv(l, 'Desert', 1) },
-      { label: 'Snow', id: next(), onClick: l => openMapListEnv(l, 'Snow', 1) },
-      { label: 'Island', id: next(), onClick: l => openMapListEnv(l, 'Island', 1) },
-      { label: 'Rally', id: next(), onClick: l => openMapListEnv(l, 'Rally', 1) },
-      { label: 'Bay', id: next(), onClick: l => openMapListEnv(l, 'Bay', 1) },
-      { label: 'Coast', id: next(), onClick: l => openMapListEnv(l, 'Coast', 1) }
-    ] : []
+    const defaultEnvironments = ['Stadium', 'Desert', 'Snow', 'Island', 'Rally', 'Bay', 'Coast']
+    const customEnvironments = (tm.config.controller.customEnvironments ?? [])
+      .map((env: string) => env.trim())
+      .filter((env: string) => env.length > 0)
+    const allEnvironments = Array.from(new Set(defaultEnvironments.concat(customEnvironments)))
+    this.environments = this.showEnv ? allEnvironments.map(env => ({
+      label: env,
+      id: next(),
+      onClick: l => openMapListEnv(l, env, 1)
+    })) : []
 
     for (const button of [...this.sorting, ...this.filters, ...this.environments]) {
       addManialinkListener(button.id, info => button.onClick(info.login))
@@ -67,10 +71,10 @@ export default class MapListFilters extends PopupWindow<{}> {
     })
 
     tm.commands.add({
-      aliases: ['filter', 'filters'],
-      help: 'Show available map list filters.',
+      aliases: config.commands.filters.aliases,
+      help: config.commands.filters.help,
       callback: info => tm.openManialink(this.openId, info.login),
-      privilege: 0
+      privilege: config.commands.filters.privilege
     })
   }
 

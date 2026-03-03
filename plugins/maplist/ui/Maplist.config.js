@@ -31,6 +31,9 @@ export default {
   navbar: [{
     name: 'Map Info',
     actionId: ids.TMXWindow
+  }, {
+    name: 'Filters',
+    actionId: ids.mapList + 200
   }],
   icons: [icons.ongoingMap, // Map header icon
     icons.tag, // Map name icon
@@ -82,6 +85,27 @@ export default {
       aliases: ['jb', 'jukebox'],
       help: `Display jukebox.`,
       privilege: 0
+    },
+    filters: {
+      aliases: ['filter', 'filters'],
+      help: 'Show available map list filters.',
+      privilege: 0
+    }
+  },
+  filterWindow: {
+    gapX: 0.35,
+    gapY: 0.35,
+    pad: 0.06,
+    inset: 0.05,
+    headerHeight: 5,
+    buttonHeight: 4,
+    buttonTextScale: {
+      min: 0.8,
+      multiplier: 0.9
+    },
+    headerTextScale: {
+      min: 0.86,
+      multiplier: 0.92
     }
   }
 }

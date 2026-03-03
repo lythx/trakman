@@ -207,10 +207,11 @@ export default class MapList extends PopupWindow<{
   }
 
   private buildEnvAliasMap(): Map<string, string> {
-    const base: tm.Environment[] = ['Stadium', 'Island', 'Desert', 'Rally', 'Bay', 'Coast', 'Snow'] as tm.Environment[]
+    const base: string[] = ['Stadium', 'Island', 'Desert', 'Rally', 'Bay', 'Coast', 'Snow']
+      .concat(tm.config.controller.customEnvironments ?? [])
     const alias = new Map<string, string>()
     for (const environment of base) {
-      const nadeo = tm.utils.environmentToNadeoEnvironment(environment) as string
+      const nadeo = tm.utils.environmentToNadeoEnvironment(environment as tm.Environment) as string
       alias.set(this.normalize(environment), nadeo)
       alias.set(this.normalize(nadeo), nadeo)
       if (environment === 'Stadium') { alias.set(this.normalize('Stad'), 'Stadium') }
@@ -241,7 +242,10 @@ export default class MapList extends PopupWindow<{
   async openWithEnvironment(login: string, envRaw: string, page: number): Promise<void> {
     const parsed = this.parseEnvironment(envRaw)
     if (!parsed.ok) {
-      tm.sendMessage(`Unknown environment "${envRaw}". Valid: Stadium, Island, Desert, Rally, Bay, Coast, Snow.`, login)
+      const valid = ['Stadium', 'Island', 'Desert', 'Rally', 'Bay', 'Coast', 'Snow']
+        .concat(tm.config.controller.customEnvironments ?? [])
+        .join(', ')
+      tm.sendMessage(`Unknown environment "${envRaw}". Valid: ${valid}.`, login)
       return
     }
     const list = maplist.get().filter(m => {
