@@ -4,6 +4,7 @@ import { MapRepository } from '../database/MapRepository.js'
 import { Events } from '../Events.js'
 import { Utils } from '../Utils.js'
 import config from '../../config/Config.js'
+import modConfig from '../../plugins/ui/config/Mod.js'
 import { GameService } from './GameService.js'
 import { ManualMapLoading } from './ManualMapLoading.js'
 
@@ -159,6 +160,12 @@ export class MapService {
       // fast difference of maps and remaining
       const mapSet = new Set(this._maps.map(a => a.id))
       for (const v of mapIds.values()) {
+        const existing = this._maps.find(a => a.id === v)
+        if (existing !== undefined && modConfig.useNextMapModOverride) {
+          const modUrl = await ManualMapLoading.getModUrl(existing.fileName) ?? null
+          existing.modUrl = modUrl
+          await this.repo.setModUrl(existing.id, modUrl)
+        }
         if (!addedMapIds.delete(v) && !mapSet.delete(v)) {
           removedMaps.push(v)
         }
@@ -799,7 +806,8 @@ export class MapService {
       checkpointsPerLap: info.NbCheckpoints === -1 ? undefined : info.NbCheckpoints,
       addDate: new Date(),
       isNadeo: false,
-      isClassic: false
+      isClassic: false,
+      modUrl: info.ModUrl ?? null
     }
   }
 

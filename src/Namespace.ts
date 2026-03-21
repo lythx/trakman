@@ -46,6 +46,8 @@ declare global {
       leaderboardRating?: number
       /** Map TMX awards (undefined if the map was never fetched from TMX) */
       awards?: number
+      /** External mod archive URL parsed from the GBX header, if present */
+      modUrl?: string | null
     }
 
     /** TM Server Challenge return type */
@@ -61,7 +63,8 @@ declare global {
       BronzeTime?: number,
       SilverTime?: number,
       AuthorTime?: number,
-      NbLaps?: number
+      NbLaps?: number,
+      ModUrl?: string | null
     }
 
     /** Controller online player object */
@@ -739,6 +742,8 @@ declare global {
       readonly NbLaps: number;
       /** Amount of checkpoints (certain methods (eg. GetChallengeInfo, GetNextChallengeInfo) return -1 here for some reason) */
       readonly NbCheckpoints: number;
+      /** External mod archive URL parsed from the GBX header, if present */
+      readonly ModUrl?: string | null;
     }
 
     /** Ranking object received from EndChallenge and EndRace dedicated server callbacks */

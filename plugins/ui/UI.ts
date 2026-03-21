@@ -31,6 +31,8 @@ import { fullScreenListener } from './utils/FullScreenListener.js'
 import flagIcons from './config/FlagIcons.js'
 import utilIds from './config/UtilIds.js'
 import Buttons from './Buttons.js'
+import { ManualMapLoading } from '../../src/services/ManualMapLoading.js'
+import config from '../../config/Config.js'
 // Has to be like that due to circular dependencies
 import './Imports.js'
 
@@ -47,7 +49,11 @@ const currentModIndex = {
   ...tm.config.controller.customEnvironments.reduce((acc, env) => ({ ...acc, [env]: 0 }), {})
 }
 
-const loadMod = (): void => {
+const loadMod = async (): Promise<void> => {
+  if (!modConfig.enabled) {
+    tm.client.callNoRes('SetForcedMods', [{ boolean: false }, { array: [] }])
+    return
+  }
   const mods: {
     struct: {
       Env: {
@@ -58,7 +64,20 @@ const loadMod = (): void => {
       }
     }
   }[] = []
-  for (const obj of modConfig) {
+  const nextMap = tm.jukebox.queue[0]
+  const nextMapModUrl = config.manualMapLoading.enabled && modConfig.useNextMapModOverride && nextMap !== undefined
+    ? nextMap.modUrl
+    : undefined
+  const nextMapOverride = nextMapModUrl != null ? {
+    environment: nextMap.environment,
+    modLinks: [modConfig.modUrlPrefix + nextMapModUrl],
+    randomOrder: false
+  } : undefined
+  const overrides = nextMapOverride === undefined ? modConfig.overrides : [
+    nextMapOverride,
+    ...modConfig.overrides.filter(a => a.environment !== nextMapOverride.environment)
+  ]
+  for (const obj of overrides) {
     if (obj.modLinks.length === 0) { continue }
     mods.push({
       struct: {
@@ -76,6 +95,26 @@ const loadMod = (): void => {
   }, {
     array: mods
   }])
+}
+
+const sendCurrentMapModUrl = async (login: string): Promise<void> => {
+  const url = tm.maps.current.modUrl
+  if (url === undefined) {
+    tm.sendMessage(modConfig.messages.missing, login)
+    return
+  }
+  tm.sendMessage(tm.utils.strVar(modConfig.messages.current, { url }), login)
+}
+
+if (config.manualMapLoading.enabled) {
+  tm.commands.add({
+    aliases: modConfig.command.aliases,
+    help: modConfig.command.help,
+    callback: (info): void => {
+      void sendCurrentMapModUrl(info.login)
+    },
+    privilege: modConfig.command.privilege
+  })
 }
 
 const iconArr = Object.values(icons.preloadedIcons).map(a => `<quad posn="500 500 0" sizen="10 10" image="${a}"/>`)
@@ -102,7 +141,7 @@ const events: tm.Listener[] = [{
   callback: async (): Promise<void> => {
     await tm.client.call('SendHideManialinkPage')
     preloadIcons()
-    loadMod()
+    await loadMod()
     initalizeKeyListeners()
     customUi = new CustomUi()
     customUi.display()
@@ -133,7 +172,7 @@ const events: tm.Listener[] = [{
   event: 'EndMap',
   callback: async (): Promise<void> => {
     currentModIndex[tm.maps.current.environment as keyof typeof currentModIndex]++
-    loadMod()
+    await loadMod()
   }
 }, {
   event: 'PlayerJoin',
@@ -201,4 +240,3 @@ const addLoadListener = (callback: Function): void => {
 export {
   Paginator, Grid, Navbar, VoteWindow, RecordList, type GridCellFunction, type GridCellObject, List, StaticHeader, PopupWindow, StaticComponent, DynamicComponent, type StaticHeaderOptions, type RLImage, type RLRecord, components, componentIds, icons, raceConfig, resultConfig, flagIcons, utilIds, addKeyListener, removeKeyListener, rightAlignedText, getCpTypes, closeButton, horizontallyCenteredText, staticButton, fullScreenListener, centeredText, addLoadListener, leftAlignedText, addManialinkListener, removeManialinkListener
 }
-

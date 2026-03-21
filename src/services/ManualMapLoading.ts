@@ -20,6 +20,19 @@ export class ManualMapLoading {
     return files.map(a => config.manualMapLoading.mapsDirectory + a)
   }
 
+  static parseModUrlFromGbxString(file: string): string | undefined {
+    const modDep = file.match(/<dep\b(?=[^>]*\bfile="Skins\\[^"]*\\Mod\\[^"]*")(?=[^>]*\burl="[^"]+")[^>]*\/?>/im)?.[0]
+    return modDep?.match(/\burl="([^"]+)"/i)?.[1]
+  }
+
+  static async getModUrl(filename: string): Promise<string | undefined> {
+    const file = await fs.readFile(this.prefix + filename).catch(() => undefined)
+    if (file === undefined) {
+      return undefined
+    }
+    return this.parseModUrlFromGbxString(file.toString())
+  }
+
   /**
    * Parse every map in the `config.mapsDirectoryPrefix/config.mapsDirectory
    * @param presentMaps list of already existing maps to compare with
@@ -131,6 +144,7 @@ export class ManualMapLoading {
     const silverTime = file.match(/silver=".*?"/gm)?.[0].slice(8, -1)
     const authorTime = file.match(/authortime=".*?"/gm)?.[0].slice(12, -1)
     const nbLaps = file.match(/nblaps=".*?"/gm)?.[0].slice(8, -1)
+    const modUrl = this.parseModUrlFromGbxString(file)
     return {
       Name: name,
       UId: uid,
@@ -143,7 +157,8 @@ export class ManualMapLoading {
       BronzeTime: bronzeTime == undefined ? 0 : parseInt(bronzeTime),
       SilverTime: silverTime == undefined ? 0 : parseInt(silverTime),
       AuthorTime: authorTime == undefined ? 0 : parseInt(authorTime),
-      NbLaps: nbLaps == undefined ? 0 : Math.min(Math.max(parseInt(nbLaps), 32767), -32768)
+      NbLaps: nbLaps == undefined ? 0 : Math.min(Math.max(parseInt(nbLaps), 32767), -32768),
+      ModUrl: modUrl
     }
   }
 

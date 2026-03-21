@@ -18,6 +18,7 @@ interface TableEntry {
   readonly gold_time: number
   readonly author_time: number
   readonly copper_price: number
+  readonly mod_url: string | null
   readonly is_lap_race: boolean
   readonly add_date: Date
   readonly leaderboard_rating: number | null
@@ -77,15 +78,15 @@ export class MapRepository extends Repository {
         values.push(
           ([i, map.name.replaceAll('\n', ' '), map.fileName, map.author, environments[map.environment as keyof typeof environments] ?? environments["Stadium"],
             moods[map.mood],
-            map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace,
+            map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.modUrl, map.isLapRace,
             map.defaultLapsAmount, map.checkpointsPerLap, map.addDate.toISOString(), map.leaderboardRating,
-            map.awards]).map(a => a === undefined ? '\\N' : a.toString()
+            map.awards]).map(a => a == null ? '\\N' : a.toString()
               .replaceAll('\t', ' ').replaceAll('\\', '')).join('\t')) // ugly replace to prevent DB errors
       }
     })
     const bulk = values.join('\n')
     const stream: CopyStreamQuery | Error = this.db.stream(
-      'maps(id, name, filename, author, environment, mood, bronze_time, silver_time, ' + 'gold_time,author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)')
+      'maps(id, name, filename, author, environment, mood, bronze_time, silver_time, ' + 'gold_time,author_time, copper_price, mod_url, is_lap_race, laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards)')
     if (stream instanceof Error) {
       await Logger.fatal('Failed to mass-add maps to database', stream)
       return
@@ -108,13 +109,13 @@ export class MapRepository extends Repository {
     }
     if (arr.length === 0) { return }
     const query = `INSERT INTO maps(id, name, filename, author, environment, mood, 
-      bronze_time, silver_time, gold_time, author_time, copper_price, is_lap_race, 
-      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(17,
+      bronze_time, silver_time, gold_time, author_time, copper_price, mod_url, is_lap_race, 
+      laps_amount, checkpoints_amount, add_date, leaderboard_rating, awards) ${this.getInsertValuesString(18,
       ids.length)} ON CONFLICT DO NOTHING`
     const values: any[] = []
     for (const [i, map] of arr.entries()) {
       values.push(ids[i].id, map.name, map.fileName, map.author, environments[map.environment as keyof typeof environments] ?? environments["Stadium"], moods[map.mood],
-        map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.isLapRace,
+        map.bronzeTime, map.silverTime, map.goldTime, map.authorTime, map.copperPrice, map.modUrl, map.isLapRace,
         map.defaultLapsAmount, map.checkpointsPerLap, map.addDate, map.leaderboardRating, map.awards)
     }
     await this.query(query, ...values)
@@ -132,6 +133,7 @@ export class MapRepository extends Repository {
                           gold_time,
                           author_time,
                           copper_price,
+                          mod_url,
                           is_lap_race,
                           laps_amount,
                           checkpoints_amount,
@@ -143,9 +145,9 @@ export class MapRepository extends Repository {
                             JOIN map_ids ON maps.id = map_ids.id
                             LEFT JOIN votes ON votes.map_id = maps.id
                        ${stadiumOnly ? 'WHERE environment = 1' : ''}
-                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-                       author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
-                       leaderboard_rating, awards);`
+                    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                        author_time, copper_price, mod_url, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                        leaderboard_rating, awards);`
     return ((await this.query(query))).map(a => this.constructMapObject(a))
   }
 
@@ -172,6 +174,7 @@ export class MapRepository extends Repository {
                           gold_time,
                           author_time,
                           copper_price,
+                          mod_url,
                           is_lap_race,
                           laps_amount,
                           checkpoints_amount,
@@ -183,9 +186,9 @@ export class MapRepository extends Repository {
                             JOIN map_ids ON maps.id = map_ids.id
                             LEFT JOIN votes ON votes.map_id = maps.id
                    WHERE ${ids.map((_, i) => `id=$${i + 1} OR `).join('').slice(0, -3)}
-                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
-                             leaderboard_rating, awards);`
+                    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                              author_time, copper_price, mod_url, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                              leaderboard_rating, awards);`
     const res = (await this.query(query, ...ids.map(a => a.id)))
     if (!isArr) {
       return res[0] === undefined ? undefined : this.constructMapObject(res[0])
@@ -214,6 +217,7 @@ export class MapRepository extends Repository {
                           gold_time,
                           author_time,
                           copper_price,
+                          mod_url,
                           is_lap_race,
                           laps_amount,
                           checkpoints_amount,
@@ -225,9 +229,9 @@ export class MapRepository extends Repository {
                             JOIN map_ids ON maps.id = map_ids.id
                             LEFT JOIN votes ON votes.map_id = maps.id
                    WHERE ${fileNames.map((a, i) => `filename=$${i + 1} OR `).join('').slice(0, -3)}
-                   GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
-                             author_time, copper_price, is_lap_race, laps_amount, checkpoints_amount, add_date,
-                             leaderboard_rating, awards)`
+                    GROUP BY (uid, name, filename, author, environment, mood, bronze_time, silver_time, gold_time,
+                              author_time, copper_price, mod_url, is_lap_race, laps_amount, checkpoints_amount, add_date,
+                              leaderboard_rating, awards)`
     const res = (await this.query(query, ...fileNames))
     if (!isArr) {
       return res[0] === undefined ? undefined : this.constructMapObject({
@@ -354,6 +358,18 @@ export class MapRepository extends Repository {
     await this.query(query, fileName, id)
   }
 
+  async setModUrl(uid: string, modUrl: string | null): Promise<void> {
+    const id = await mapIdsRepo.get(uid)
+    if (id === undefined) {
+      Logger.error(`Failed to get id for map ${uid} while setting mod url in maps table`)
+      return
+    }
+    const query = `UPDATE maps
+                   SET mod_url=$1
+                   WHERE id = $2`
+    await this.query(query, modUrl, id)
+  }
+
   private constructMapObject(entry: TableEntry): tm.Map {
     return {
       id: entry.uid,
@@ -367,6 +383,7 @@ export class MapRepository extends Repository {
       goldTime: entry.gold_time,
       authorTime: entry.author_time,
       copperPrice: entry.copper_price,
+      modUrl: entry.mod_url,
       isLapRace: entry.is_lap_race,
       addDate: entry.add_date,
       defaultLapsAmount: entry.laps_amount ?? undefined,

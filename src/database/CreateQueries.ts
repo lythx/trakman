@@ -16,6 +16,7 @@ export const createQueries = [`CREATE TABLE IF NOT EXISTS map_ids(
   gold_time INT4 NOT NULL,
   author_time INT4 NOT NULL,
   copper_price INT4 NOT NULL,
+  mod_url TEXT,
   is_lap_race BOOLEAN NOT NULL,
   add_date TIMESTAMP NOT NULL,
   leaderboard_rating INT4,
@@ -27,6 +28,8 @@ export const createQueries = [`CREATE TABLE IF NOT EXISTS map_ids(
     FOREIGN KEY(id) 
 	    REFERENCES map_ids(id)
   );`,
+
+  'ALTER TABLE maps ADD COLUMN IF NOT EXISTS mod_url TEXT;',
 
   `CREATE TABLE IF NOT EXISTS players(
     id INT4 GENERATED ALWAYS AS IDENTITY,
