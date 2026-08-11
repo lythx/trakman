@@ -8,7 +8,8 @@ export interface ButtonData {
   equalTexts?: boolean,
   actionId?: number,
   link?: string,
-  manialink?: string
+  manialink?: string,
+  addPlayerId?: boolean
   /**
    * Enables per-player rendering. Buttons using per-player rendering should override the
    * `UiButton.renderForPlayer()` function (see `MedalButton.ts`)
