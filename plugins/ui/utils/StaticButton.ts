@@ -9,6 +9,7 @@ interface StaticButtonOptions {
   iconWidth?: number,
   iconHeight?: number,
   topPadding?: number,
+  addPlayerId?: boolean,
   background?: string,
   text1Scale?: number,
   text2Scale?: number,
@@ -40,7 +41,8 @@ export default function(iconUrl: string, text1: string, text2: string, width: nu
   const actionId: string = options?.actionId === undefined ? '' : `action="${options.actionId}"`
   const link: string = options?.link === undefined ? '' : `url="${options.link}"`
   const manialink: string = options?.manialink === undefined ? '' : `manialink="${options.manialink}"`
-  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${options?.background ?? config.background}" ${actionId} ${link} ${manialink}/>
+  const addPlayerId: string = options?.addPlayerId === true ? 'addplayerid="1"' : ''
+  return `<quad posn="0 0 1" sizen="${width} ${height}" bgcolor="${options?.background ?? config.background}" ${actionId} ${link} ${manialink} ${addPlayerId}/>
   <quad posn="${(width - (options?.iconWidth ?? config.iconWidth)) / 2} ${-(options?.topPadding ?? config.topPadding)} 5" 
   sizen="${(options?.iconWidth ?? config.iconWidth)} ${(options?.iconHeight ?? config.iconHeight)}" image="${iconUrl}"/>
   ${t1}

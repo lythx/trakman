@@ -20,7 +20,8 @@ export class FavouriteButton extends UiButton {
       padding: cfg.padding,
       actionId: componentIds.favouriteButton,
       equalTexts: cfg.texts.equal,
-      link: "tmtp://#addfavourite=" + tm.config.server.login
+      addPlayerId: true,
+      manialink: `addfavorite?action=add&amp;server=${tm.config.server.login}&amp;name=${encodeURIComponent(tm.config.server.name)}&amp;zone=${encodeURIComponent(tm.config.server.zone)}`
     }
   }
 
