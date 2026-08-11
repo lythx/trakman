@@ -94,7 +94,7 @@ const fetchAlt = async (login: string): Promise<FetchReturnType> => {
       nickname: json?.nickname,
       united: json?.united,
       path: json?.path,
-      idZone: json?.idZone, // this will be changed to zoneId soon
+      idZone: json?.zoneId,
     }
   } catch (err) {
     const errStr = err instanceof Error ? err.message : String(err)
