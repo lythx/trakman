@@ -114,8 +114,11 @@ const rl = readline.createInterface({
   input,
   output
 })
+
 while (running) {
-  await rl.question("")
+  try {
+    await rl.question("")
+  } catch { break }
   Logger.disableConsole()
   const command = await rl.question("Run command as server: ")
   Logger.enableConsole()
