@@ -1,5 +1,5 @@
 import fetch from "node-fetch"
-import type { UltimaniaRecord } from "./UltimaniaTypes"
+import type { UltimaniaRecord } from "./UltimaniaTypes.js"
 import config from './Config.js'
 
 async function fetchRecords(mapId: string): Promise<UltimaniaRecord[] | Error> {
